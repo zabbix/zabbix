@@ -17,14 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXPROMETHEUS_H
-#define ZABBIX_ZBXPROMETHEUS_H
+#include "common.h"
+#include "trapper_request.h"
 
-int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *output, char **value,
-		char **error);
-int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error);
+int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp)
+{
+	ZBX_UNUSED(request);
+	ZBX_UNUSED(sock);
+	ZBX_UNUSED(jp);
 
-int	zbx_prometheus_validate_filter(const char *pattern, char **error);
-int	zbx_prometheus_validate_label(const char *label);
-
-#endif
+	return FAIL;
+}

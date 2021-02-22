@@ -55,6 +55,8 @@ zabbix_server_LDADD = \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
 	trapper/libzbxtrapper.a \
+	trapper/libzbxtrapper_server.a \
+	reporter/libzbxreporter.a \
 	snmptrapper/libzbxsnmptrapper.a \
 	httppoller/libzbxhttppoller.a \
 	escalator/libzbxescalator.a \
@@ -69,7 +71,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
-	reporter/libzbxreporter.a \
 	libzbxserver.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \

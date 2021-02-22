@@ -23,8 +23,8 @@
 #include "zbxipcservice.h"
 #include "daemon.h"
 
-#include "reporter.h"
 #include "report_manager.h"
+#include "report_protocol.h"
 
 
 extern unsigned char	process_type, program_type;

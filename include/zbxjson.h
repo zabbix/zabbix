@@ -198,6 +198,8 @@
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
 
+#define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
+
 typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,

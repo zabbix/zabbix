@@ -24,8 +24,8 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 
-#include "reporter.h"
 #include "report_writer.h"
+#include "report_protocol.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;

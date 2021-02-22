@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ALERTER_PROTOCOL_H
-#define ZABBIX_ALERTER_PROTOCOL_H
+#ifndef ZABBIX_REPORT_PROTOCOL_H
+#define ZABBIX_REPORT_PROTOCOL_H
 
 #include "common.h"
 #include "zbxalgo.h"

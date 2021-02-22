@@ -7,5 +7,6 @@ libzbxreporter_a_SOURCES = \
 	report_manager.h \
 	report_writer.c \
 	report_writer.h \
-	reporter.h
+	report_protocol.c \
+	report_protocol.h
 

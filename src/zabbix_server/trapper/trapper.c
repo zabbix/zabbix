@@ -42,6 +42,7 @@
 #include "trapper_expressions_evaluate.h"
 #include "trapper_item_test.h"
 #include "trapper.h"
+#include "trapper_request.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -1222,7 +1223,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					zbx_trapper_item_test(sock, &jp);
 			}
-			else
+			else if (SUCCEED != trapper_process_request(value, sock, &jp))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 					value);
