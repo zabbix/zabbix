@@ -265,7 +265,7 @@ class CDashboardWidget extends CBaseComponent {
 	setViewMode(view_mode) {
 		if (this.view_mode !== view_mode) {
 			this.view_mode = view_mode;
-			this.div.toggleClass(this._css_classes.hidden_header, view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
+			this.div.toggleClass(this._css_classes.hidden_header, view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
 		}
 
 		return this;
@@ -462,7 +462,7 @@ class CDashboardWidget extends CBaseComponent {
 
 		this.div = $(this._target)
 			.addClass(this._css_classes.root)
-			.toggleClass(this._css_classes.hidden_header, this.view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
+			.toggleClass(this._css_classes.hidden_header, this.view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 			.toggleClass('new-widget', this._is_new);
 
 		if (!this.parent) {
