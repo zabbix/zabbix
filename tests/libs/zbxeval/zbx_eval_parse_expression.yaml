@@ -1291,8 +1291,11 @@ out:
   - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '60s', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   result: SUCCEED
+---
+test case: Fail '1e+309s'
+in:
+  rules: []
+  expression: '1e+309s'
+out:
+  result: FAIL
 ...
-
-
-
-

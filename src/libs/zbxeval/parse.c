@@ -287,7 +287,7 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 {
 	int		len;
 	char		*end;
-	double		tmp;
+	double		tmp, coef;
 
 	if (FAIL == zbx_suffixed_number_parse(ctx->expression + pos, &len))
 		goto error;
@@ -299,17 +299,18 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 		case 'h':
 		case 'd':
 		case 'w':
+			coef = suffix2factor(ctx->expression[pos + len - 1]);
 			token->type = ZBX_EVAL_TOKEN_VAR_TIME;
 			break;
 		default:
-			tmp = strtod(ctx->expression + pos, &end);
-
-			if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
-				goto error;
-
+			coef = 1;
 			token->type = ZBX_EVAL_TOKEN_VAR_NUM;
 			break;
 	}
+
+	tmp = strtod(ctx->expression + pos, &end) * coef;
+	if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
+		goto error;
 
 	token->loc.l = pos;
 	token->loc.r = pos + len - 1;
