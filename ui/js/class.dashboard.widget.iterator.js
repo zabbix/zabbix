@@ -84,6 +84,20 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 	}
 
 	/**
+	 * Clear and reset the state of the iterator.
+	 */
+	clear() {
+		for (const child of this.children) {
+			this._removeWidget(child);
+		}
+
+		this.content_body.empty();
+		this.children = [];
+
+		this.div.removeClass('iterator-alt-content');
+	}
+
+	/**
 	 * Focus specified top-level iterator.
 	 */
 	enter() {
@@ -129,17 +143,17 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		}
 	}
 
-	numColumns() {
+	getNumColumns() {
 		return this.fields['columns'] ? this.fields['columns'] : 2;
 	}
 
-	numRows() {
+	getNumRows() {
 		return this.fields['rows'] ? this.fields['rows'] : 1;
 	}
 
 	isTooSmall(pos) {
-		return pos.width < this.numColumns()
-			|| pos.height < this.numRows() * this._min_rows;
+		return pos.width < this.getNumColumns()
+			|| pos.height < this.getNumRows() * this._min_rows;
 	}
 
 	getTooSmallState() {

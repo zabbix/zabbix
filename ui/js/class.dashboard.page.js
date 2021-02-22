@@ -292,7 +292,7 @@ class CDashboardPage {
 		if (widget instanceof CDashboardWidgetIterator) {
 			// Placeholders will be shown while the iterator will be loading.
 			this._addIteratorPlaceholders(widget,
-				widget.numColumns() * widget.numRows()
+				widget.getNumColumns() * widget.getNumRows()
 			);
 			this._alignIteratorContents(widget, widget.pos);
 		}
@@ -2128,8 +2128,8 @@ class CDashboardPage {
 		iterator.setTooSmallState(false);
 
 		const $placeholders = iterator.content_body.find('.dashbrd-grid-iterator-placeholder');
-		const num_columns = iterator.numColumns();
-		const num_rows = iterator.numRows();
+		const num_columns = iterator.getNumColumns();
+		const num_rows = iterator.getNumRows();
 
 		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
 			const cell_column = index % num_columns;
@@ -2191,27 +2191,12 @@ class CDashboardPage {
 		return true;
 	}
 
-	/**
-	 * Clear and reset the state of the iterator.
-	 */
-	_clearIterator(iterator) {
-		for (const child of iterator.children) {
-			this._removeWidget(child);
-		}
-
-		iterator.content_body.empty();
-		iterator.children = [];
-
-		iterator.div.removeClass('iterator-alt-content');
-	}
-
-
 	// TODO move to widget.iterator
 	_updateIteratorCallback(iterator, response, options) {
 		const has_alt_content = typeof response.messages !== 'undefined' || typeof response.body !== 'undefined';
 
 		if (has_alt_content || iterator.getTooSmallState()) {
-			this._clearIterator(iterator);
+			iterator.clear();
 
 			if (has_alt_content) {
 				const $alt_content = $('<div>');
@@ -2236,7 +2221,7 @@ class CDashboardPage {
 
 		if (iterator.div.hasClass('iterator-alt-content')) {
 			// Returning from alt-content to normal mode.
-			this._clearIterator(iterator);
+			iterator.clear();
 		}
 
 		iterator.updatePager(response.page, response.page_count);
@@ -2258,7 +2243,7 @@ class CDashboardPage {
 
 		const reused_widgetids = [];
 
-		response.children.slice(0, iterator.numColumns() * iterator.numRows())
+		response.children.slice(0, iterator.getNumColumns() * iterator.getNumRows())
 			.forEach((child) => {
 				if (typeof child.widgetid !== 'undefined' && current_children_by_widgetid[child.widgetid]
 					&& this._hasEqualProperties(
@@ -2288,7 +2273,7 @@ class CDashboardPage {
 		}
 
 		this._addIteratorPlaceholders(iterator,
-			iterator.numColumns() * iterator.numRows() - iterator.children.length
+			iterator.getNumColumns() * iterator.getNumRows() - iterator.children.length
 		);
 
 		this._alignIteratorContents(iterator,
@@ -2443,7 +2428,7 @@ class CDashboardPage {
 			const pos = (typeof widget.current_pos === 'object') ? widget.current_pos : widget.pos;
 
 			if (widget.isTooSmall(pos)) {
-				this._clearIterator(widget);
+				widget.clear();
 
 				widget.stopPreloader();
 				widget.setTooSmallState(true);
