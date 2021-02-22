@@ -58,8 +58,8 @@ static char	*export_dir;
  ******************************************************************************/
 int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 {
-	int		i, ret = SUCCEED;
-	char		*start = export_type, *end;
+	int		ret = SUCCEED;
+	char		*start = export_type;
 	uint32_t	mask;
 	char		*types[] = {
 				ZBX_OPTION_EXPTYPE_EVENTS,
@@ -78,13 +78,16 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 
 		do
 		{
+			int	i;
+			char	*end;
+
 			end = strchr(start, ',');
 
 			for (i = 0; NULL != types[i]; i++)
 			{
 				if ((NULL != end && lengths[i] == (size_t)(end - start) &&
 						0 == strncmp(start, types[i], lengths[i])) ||
-						(NULL == end && 0 == strcmp(start, types[i])) )
+						(NULL == end && 0 == strcmp(start, types[i])))
 				{
 					mask |= (uint32_t)(1 << i);
 					break;
@@ -98,7 +101,7 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 			}
 
 			start = end;
-		} while(NULL != start++);
+		} while (NULL != start++);
 	}
 	else
 		mask = ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_HISTORY | ZBX_FLAG_EXPTYPE_TRENDS;
