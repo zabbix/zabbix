@@ -208,7 +208,7 @@ class JMXItemChecker extends ItemChecker
 
 			try
 			{
-				filter = (2 >= argumentCount) ? new ObjectName(item.getArgument(2)) : null;
+				filter = (2 <= argumentCount) ? new ObjectName(item.getArgument(2)) : null;
 			}
 			catch (MalformedObjectNameException e)
 			{
