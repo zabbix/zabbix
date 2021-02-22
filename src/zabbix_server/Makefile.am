@@ -22,7 +22,8 @@ SUBDIRS = \
 	scripts \
 	preprocessor \
 	availability \
-	lld
+	lld \
+	reporter
 
 sbin_PROGRAMS = zabbix_server
 
@@ -68,6 +69,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
+	reporter/libzbxreporter.a \
 	libzbxserver.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -80,6 +82,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
+	$(top_builddir)/src/libs/zbxself/libzbxself_server.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxsys/libzbxsys.a \

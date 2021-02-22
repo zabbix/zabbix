@@ -64,6 +64,8 @@
 #include "availability/avail_manager.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
+#include "reporter/report_manager.h"
+#include "reporter/report_writer.h"
 #include "events.h"
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
@@ -200,6 +202,8 @@ int	CONFIG_LLDWORKER_FORKS		= 2;
 int	CONFIG_ALERTDB_FORKS		= 1;
 int	CONFIG_HISTORYPOLLER_FORKS	= 5;
 int	CONFIG_AVAILMAN_FORKS		= 1;
+int	CONFIG_REPORTMANAGER_FORKS	= 1;
+int	CONFIG_REPORTWRITER_FORKS	= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -476,6 +480,16 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_AVAILMAN;
 		*local_process_num = local_server_num - server_count + CONFIG_AVAILMAN_FORKS;
 	}
+	else if (local_server_num <= (server_count += CONFIG_REPORTMANAGER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_REPORTMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_REPORTMANAGER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_REPORTWRITER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_REPORTWRITER;
+		*local_process_num = local_server_num - server_count + CONFIG_REPORTWRITER_FORKS;
+	}
 	else
 		return FAIL;
 
@@ -547,6 +561,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_VAULTURL)
 		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+
+	if (0 == CONFIG_REPORTWRITER_FORKS)
+		CONFIG_REPORTMANAGER_FORKS = 0;
 }
 
 /******************************************************************************
@@ -866,6 +883,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"StartHistoryPollers",		&CONFIG_HISTORYPOLLER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartReportWriters",		&CONFIG_REPORTWRITER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{NULL}
 	};
@@ -1235,8 +1254,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
 			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS
-			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS +
-			CONFIG_HISTORYPOLLER_FORKS + CONFIG_AVAILMAN_FORKS;
+			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS
+			+ CONFIG_HISTORYPOLLER_FORKS + CONFIG_AVAILMAN_FORKS + CONFIG_REPORTMANAGER_FORKS
+			+ CONFIG_REPORTWRITER_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
 
@@ -1384,6 +1404,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
 				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_REPORTMANAGER:
+				zbx_thread_start(report_manager_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_REPORTWRITER:
+				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}
