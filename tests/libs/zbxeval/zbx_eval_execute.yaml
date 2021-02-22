@@ -809,5 +809,21 @@ in:
 out:
   result: FAIL
   value: 1
+---
+test case: Expression '1e+308K<>0'
+in:
+  rules: []
+  expression: '1e+308K<>0'
+out:
+  result: FAIL
+  value: 1
+---
+test case: Expression '1e+308K<>0'
+in:
+  rules: []
+  expression: '1e+304K<>0'
+out:
+  result: SUCCEED
+  value: 1
 ...
 
