@@ -1213,13 +1213,20 @@ return [
 			]
 		]
 	],
-	'valuemaps' => [
+	'valuemap' => [
 		'key' => 'valuemapid',
 		'fields' => [
 			'valuemapid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
+			],
+			'hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
 			],
 			'name' => [
 				'null' => false,
@@ -1333,7 +1340,7 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'valuemaps',
+				'ref_table' => 'valuemap',
 				'ref_field' => 'valuemapid'
 			],
 			'params' => [
@@ -3639,10 +3646,10 @@ return [
 			]
 		]
 	],
-	'mappings' => [
-		'key' => 'mappingid',
+	'valuemap_mapping' => [
+		'key' => 'valuemap_mappingid',
 		'fields' => [
-			'mappingid' => [
+			'valuemap_mappingid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
@@ -3651,7 +3658,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'valuemaps',
+				'ref_table' => 'valuemap',
 				'ref_field' => 'valuemapid'
 			],
 			'value' => [
