@@ -46,7 +46,6 @@ class testFormApiTokens extends CWebTest {
 		$url = ($source === 'user settings') ? 'zabbix.php?action=user.token.edit' : 'zabbix.php?action=token.edit';
 
 		$this->page->login()->open($url);
-//		$this->assertContains('API tokens', $this->page->getTitle());
 		$this->page->assertTitle('API tokens');
 		$this->page->assertHeader('API tokens');
 
@@ -114,7 +113,8 @@ class testFormApiTokens extends CWebTest {
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
-		$this->assertEquals('API tokens', $this->page->getTitle());
+		$this->page->assertTitle('API tokens');
+		$this->page->assertHeader('API tokens');
 		$this->assertMessage(TEST_GOOD, 'API token updated');
 		$form = $this->query('id:token_form')->asForm()->one();
 		$this->assertEquals(true, $form->getField('Enabled:')->getValue());
