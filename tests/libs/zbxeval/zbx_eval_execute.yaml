@@ -825,5 +825,25 @@ in:
 out:
   result: SUCCEED
   value: 1
+---
+test case: Expression '{$M}=60'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$M}=60'
+  replace:
+  - {token: '{$M}', value: '1m'}
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression '{$M}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$M}'
+  replace:
+  - {token: '{$M}', value: '1m'}
+out:
+  result: SUCCEED
+  value: 60
 ...
 
