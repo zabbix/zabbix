@@ -152,21 +152,6 @@ class CDashboardWidget extends CBaseComponent {
 		this.div.removeClass(this._css_classes.focus);
 	}
 
-	/**
-	 * Blur all child widgets of iterator, except the specified one.
-	 *
-	 * @param {object} except_child  Dashboard widget object.
-	 */
-	leaveIteratorWidgetsExcept(except_child = null) {
-		for (const child of this.children) {
-			if (except_child !== null && child.uniqueid === except_child.uniqueid) {
-				continue;
-			}
-
-			child.div.removeClass(this._css_classes.focus);
-		}
-	}
-
 	update({body, messages, info, debug, script_inline}) {
 		this.content_body.empty();
 
