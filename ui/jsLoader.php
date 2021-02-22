@@ -50,6 +50,7 @@ if (isset($_GET['lang'])) {
 $availableJScripts = [
 	'common.js' => '',
 	'class.dashboard.js' => '',
+	'class.dashboard.loader.js' => '',
 	'class.dashboard.page.js' => '',
 	'class.dashboard.widget.js' => '',
 	'class.dashboard.widget.iterator.js' => '',
