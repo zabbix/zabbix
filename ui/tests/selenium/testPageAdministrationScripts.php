@@ -81,9 +81,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		$this->zbxTestClickButton('script.delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->zbxTestTextPresent('Scripts deleted');
-
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts'));
+		$this->zbxTestTextPresent('Cannot delete scripts');
 	}
 
 	/**
@@ -95,9 +93,15 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('scriptids_'.$script['scriptid']);
 		$this->zbxTestClickButton('script.delete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->zbxTestTextPresent('Script deleted');
-
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
+		if ($script['scriptid'] === '4') {
+			$this->zbxTestCheckTitle('Configuration of scripts');
+			$this->zbxTestTextPresent('Cannot delete script');
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
+		}
+		else {
+			$this->zbxTestCheckTitle('Configuration of scripts');
+			$this->zbxTestTextPresent('Script deleted');
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
+		}
 	}
 }
