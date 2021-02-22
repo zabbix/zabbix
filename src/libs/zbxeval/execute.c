@@ -296,6 +296,39 @@ finish:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vairant_convert_suffixed_num                                     *
+ *                                                                            *
+ * Purpose: convert variant string value containing suffixed number to        *
+ *          floating point variant value                                      *
+ *                                                                            *
+ * Parameters: value     - [OUT] the output value                             *
+ *             value_num - [IN] the value to convert                          *
+ *                                                                            *
+ * Return value: SUCCEED - the value was converted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	vairant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
+{
+	int	len, num_len;
+
+	if (ZBX_VARIANT_STR != value_num->type)
+		return FAIL;
+
+	len = strlen(value_num->data.str);
+	if (SUCCEED != zbx_suffixed_number_parse(value_num->data.str, &num_len) ||
+			num_len != len)
+	{
+		return FAIL;
+	}
+
+	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(value_num->data.str[len - 1]));
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_execute_push_value                                          *
  *                                                                            *
  * Purpose: push value in output stack                                        *
@@ -355,7 +388,14 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 			return FAIL;
 		}
 
-		zbx_variant_copy(&value, &token->value);
+		/* Expanded user macro token variables can contain suffixed numbers. */
+		/* Try to convert them and just copy the expanded value if failed.   */
+		if (ZBX_EVAL_TOKEN_VAR_USERMACRO != token->type ||
+				SUCCEED != vairant_convert_suffixed_num(&value, &token->value))
+		{
+			zbx_variant_copy(&value, &token->value);
+		}
+
 	}
 
 	zbx_vector_var_append_ptr(output, &value);
