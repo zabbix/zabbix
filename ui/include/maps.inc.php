@@ -1453,18 +1453,20 @@ function checkIfProblemTagsMatches(array $filter_tag, array $tags): bool {
 			break;
 
 		case TAG_OPERATOR_NOT_LIKE:
+			$tags_count = count($tags);
 			$tags = array_filter($tags, function ($tag) use ($filter_tag) {
 				return ($filter_tag['tag'] === $tag['tag']
 					&& mb_stripos($tag['value'], $filter_tag['value']) === false
 				);
 			});
-			return (count($tags) == 0);
+			return (count($tags) == $tags_count);
 
 		case TAG_OPERATOR_NOT_EQUAL:
+			$tags_count = count($tags);
 			$tags = array_filter($tags, function ($tag) use ($filter_tag) {
 				return ($filter_tag['tag'] === $tag['tag'] && $filter_tag['value'] === $tag['value']);
 			});
-			return (count($tags) == 0);
+			return (count($tags) == $tags_count);
 
 		case TAG_OPERATOR_EXISTS:
 			return array_key_exists($filter_tag['tag'], zbx_toHash($tags, 'tag'));
