@@ -45,9 +45,19 @@ class CDashboardWidget extends CBaseComponent {
 		initial_load = true,
 		is_editable = false,
 		is_edit_mode = false,
-		is_iterator = defaults.iterator,
+		is_iterator = false,
 		is_new = !widgetid.length,
-		is_ready = false
+		is_ready = false,
+		css_classes = {
+			actions: 'dashbrd-grid-widget-actions',
+			container: 'dashbrd-grid-widget-container',
+			content: 'dashbrd-grid-widget-content',
+			focus: 'dashbrd-grid-widget-focus',
+			head: 'dashbrd-grid-widget-head',
+			hidden_header: 'dashbrd-grid-widget-hidden-header',
+			mask: 'dashbrd-grid-widget-mask',
+			root: 'dashbrd-grid-widget'
+		}
 	} = {}) {
 		super(document.createElement('div'));
 
@@ -85,12 +95,7 @@ class CDashboardWidget extends CBaseComponent {
 		this._is_new = is_new;
 		this._is_ready = is_ready;
 
-		if (this._is_iterator) {
-			this.page = 1;
-			this.page_count = 1;
-			this.children = [];
-			this.update_pending = false
-		}
+		this._css_classes = css_classes;
 
 		this._makeView();
 	}
@@ -114,31 +119,17 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	/**
-	 * Focus specified top-level widget or iterator. If iterator is specified, focus it's hovered child widget as well.
+	 * Focus specified top-level widget.
 	 */
 	enter() {
-		this.div.addClass(this._is_iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
-
-		if (this._is_iterator) {
-			let child_hovered = null;
-
-			for (const child of this.children) {
-				if (child.div.is(':hover')) {
-					child_hovered = child;
-				}
-			}
-
-			if (child_hovered !== null) {
-				child_hovered.enterIteratorWidget();
-			}
-		}
+		this.div.addClass(this._css_classes.focus);
 	}
 
 	/**
 	 * Focus specified child widget of iterator.
 	 */
 	enterIteratorWidget() {
-		this.div.addClass('dashbrd-grid-widget-focus');
+		this.div.addClass(this._css_classes.focus);
 
 		if (this.parent.div.hasClass('dashbrd-grid-iterator-hidden-header')) {
 			this.parent.div.toggleClass('iterator-double-header', this.div.position().top === 0);
@@ -146,7 +137,7 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	/**
-	 * Blur specified top-level widget or iterator. If iterator is specified, blur it's focused child widget as well.
+	 * Blur specified top-level widget.
 	 */
 	leave() {
 		// Widget placeholder doesn't have header.
@@ -158,12 +149,7 @@ class CDashboardWidget extends CBaseComponent {
 			document.activeElement.blur();
 		}
 
-		if (this._is_iterator) {
-			this.leaveIteratorWidgetsExcept();
-			this.div.removeClass('iterator-double-header');
-		}
-
-		this.div.removeClass(this._is_iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
+		this.div.removeClass(this._css_classes.focus);
 	}
 
 	/**
@@ -177,7 +163,7 @@ class CDashboardWidget extends CBaseComponent {
 				continue;
 			}
 
-			child.div.removeClass('dashbrd-grid-widget-focus');
+			child.div.removeClass(this._css_classes.focus);
 		}
 	}
 
@@ -218,10 +204,6 @@ class CDashboardWidget extends CBaseComponent {
 		this._is_edit_mode = is_edit_mode;
 
 		return this;
-	}
-
-	isIterator() {
-		return this._is_iterator;
 	}
 
 	isReady() {
@@ -266,6 +248,10 @@ class CDashboardWidget extends CBaseComponent {
 		return is_ready_updated;
 	}
 
+	getCssClass(key) {
+		return this._css_classes[key] || '';
+	}
+
 	getIndex() {
 		return this._index;
 	}
@@ -279,43 +265,18 @@ class CDashboardWidget extends CBaseComponent {
 	setViewMode(view_mode) {
 		if (this.view_mode !== view_mode) {
 			this.view_mode = view_mode;
-
-			const hidden_header_class = this.isIterator()
-				? 'dashbrd-grid-iterator-hidden-header'
-				: 'dashbrd-grid-widget-hidden-header';
-
-			if (this._is_iterator) {
-				if (view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL) {
-					this.div.removeClass('iterator-double-header');
-				}
-
-				for (const child of this.children) {
-					child.setViewMode(view_mode);
-				}
-			}
-
-			this.div.toggleClass(hidden_header_class, view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
+			this.div.toggleClass(this._css_classes.hidden_header, view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
 		}
 
 		return this;
 	}
 
 	showPreloader() {
-		if (this._is_iterator) {
-			this.div.find('.dashbrd-grid-iterator-content').addClass('is-loading');
-		}
-		else {
-			this.div.find('.dashbrd-grid-widget-content').addClass('is-loading');
-		}
+		this.div.find(`.${this._css_classes.content}`).addClass('is-loading');
 	}
 
 	hidePreloader() {
-		if (this._is_iterator) {
-			this.div.find('.dashbrd-grid-iterator-content').removeClass('is-loading');
-		}
-		else {
-			this.div.find('.dashbrd-grid-widget-content').removeClass('is-loading');
-		}
+		this.div.find(`.${this._css_classes.content}`).removeClass('is-loading');
 	}
 
 	startPreloader(timeout = this._preloader_timeout) {
@@ -400,31 +361,7 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	_makeView() {
-		const iterator_classes = {
-			'root': 'dashbrd-grid-iterator',
-			'container': 'dashbrd-grid-iterator-container',
-			'head': 'dashbrd-grid-iterator-head',
-			'content': 'dashbrd-grid-iterator-content',
-			'focus': 'dashbrd-grid-iterator-focus',
-			'actions': 'dashbrd-grid-iterator-actions',
-			'mask': 'dashbrd-grid-iterator-mask',
-			'hidden_header': 'dashbrd-grid-iterator-hidden-header'
-		};
-
-		const widget_classes = {
-			'root': 'dashbrd-grid-widget',
-			'container': 'dashbrd-grid-widget-container',
-			'head': 'dashbrd-grid-widget-head',
-			'content': 'dashbrd-grid-widget-content',
-			'focus': 'dashbrd-grid-widget-focus',
-			'actions': 'dashbrd-grid-widget-actions',
-			'mask': 'dashbrd-grid-widget-mask',
-			'hidden_header': 'dashbrd-grid-widget-hidden-header'
-		};
-
-		const classes = this._is_iterator ? iterator_classes : widget_classes;
-
-		this.content_header = $('<div>', {'class': classes.head})
+		this.content_header = $('<div>', {'class': this._css_classes.head})
 			.append($('<h4>').text((this.header !== '') ? this.header : this.defaults.header));
 
 		if (!this.parent) {
@@ -480,7 +417,7 @@ class CDashboardWidget extends CBaseComponent {
 					: ''
 				)
 
-				.append($('<ul>', {'class': classes.actions})
+				.append($('<ul>', {'class': this._css_classes.actions})
 					.append(this._is_editable
 						? $('<li>').append(this.$button_edit)
 						: ''
@@ -505,10 +442,10 @@ class CDashboardWidget extends CBaseComponent {
 				);
 		}
 
-		this.content_body = $('<div>', {'class': classes.content})
+		this.content_body = $('<div>', {'class': this._css_classes.content})
 			.toggleClass('no-padding', !this._is_iterator && !this.configuration['padding']);
 
-		this.container = $('<div>', {'class': classes.container})
+		this.container = $('<div>', {'class': this._css_classes.container})
 			.append(this.content_header)
 			.append(this.content_body);
 
@@ -524,8 +461,8 @@ class CDashboardWidget extends CBaseComponent {
 		}
 
 		this.div = $(this._target)
-			.addClass(classes.root)
-			.toggleClass(classes.hidden_header, this.view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
+			.addClass(this._css_classes.root)
+			.toggleClass(this._css_classes.hidden_header, this.view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 			.toggleClass('new-widget', this._is_new);
 
 		if (!this.parent) {
@@ -536,20 +473,13 @@ class CDashboardWidget extends CBaseComponent {
 		}
 
 		// Used for disabling widget interactivity in edit mode while resizing.
-		this.mask = $('<div>', {'class': classes.mask});
+		this.mask = $('<div>', {'class': this._css_classes.mask});
 
 		this.div.append(this.container, this.mask);
 	}
 
 	_registerEvents() {
 		this._events = {
-			iteratorPreviousPage: () => {
-				this.fire(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK);
-			},
-
-			iteratorNextPage: () => {
-				this.fire(WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK);
-			},
 
 			edit: () => {
 				this.fire(WIDGET_EVENT_EDIT_CLICK);
@@ -565,11 +495,6 @@ class CDashboardWidget extends CBaseComponent {
 		};
 
 		if (!this.parent) {
-			if (this._is_iterator) {
-				this.$button_iterator_previous_page.on('click', this._events.iteratorPreviousPage);
-				this.$button_iterator_next_page.on('click', this._events.iteratorNextPage);
-			}
-
 			if (this._is_editable) {
 				this.$button_edit.on('click', this._events.edit);
 			}
@@ -611,11 +536,6 @@ class CDashboardWidget extends CBaseComponent {
 
 	_unregisterEvents() {
 		if (!this.parent) {
-			if (this._is_iterator) {
-				this.$button_iterator_previous_page.off('click', this._events.iteratorPreviousPage);
-				this.$button_iterator_next_page.off('click', this._events.iteratorNextPage);
-			}
-
 			if (this._is_editable) {
 				this.$button_edit.off('click', this._events.edit);
 			}
