@@ -296,6 +296,10 @@ header {
       vertical-align: top;
       position: relative;
       padding: 0 0 0 10px; }
+      header ul li .btn-split {
+        margin-right: 0; }
+        header ul li .btn-split li {
+          padding-left: 0; }
     header ul ul li:first-child {
       padding-left: 0; }
     header ul button {
