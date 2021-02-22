@@ -1298,4 +1298,11 @@ in:
   expression: '1e+309s'
 out:
   result: FAIL
+---
+test case: Fail '1e+308K'
+in:
+  rules: []
+  expression: '1e+308K'
+out:
+  result: FAIL
 ...
