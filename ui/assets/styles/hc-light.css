@@ -5977,8 +5977,7 @@ svg {
 
 .btn-dropdown-toggle {
   white-space: nowrap;
-  overflow: hidden;
-  text-indent: -200px; }
+  overflow: hidden; }
   .btn-dropdown-toggle[class*='icon-'] {
     padding-left: 22px; }
     .btn-dropdown-toggle[class*='icon-']::before {
@@ -5993,7 +5992,6 @@ svg {
       top: 6px;
       right: 2px; }
   .btn-dropdown-toggle:not(:empty) {
-    text-indent: 0px !important;
     padding-right: 22px; }
   .btn-dropdown-toggle::after {
     position: absolute;

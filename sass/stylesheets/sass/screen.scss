@@ -7246,7 +7246,6 @@ $range-input-width: 31px;
 .btn-dropdown-toggle {
 	white-space: nowrap;
 	overflow: hidden;
-	text-indent: -200px;
 
 	&[class*='icon-'] {
 		padding-left: 22px;
@@ -7268,7 +7267,6 @@ $range-input-width: 31px;
 	}
 
 	&:not(:empty) {
-		text-indent: 0px !important;
 		padding-right: 22px;
 	}
 
