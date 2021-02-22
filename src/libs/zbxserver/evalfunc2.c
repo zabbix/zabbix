@@ -1161,29 +1161,7 @@ static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, co
 	{
 		if (arg1 <= values.values_num)
 		{
-			char	*tmp;
-
-			tmp = zbx_history_value2str_dyn(&values.values[arg1 - 1].value, item->value_type);
-
-			if (ITEM_VALUE_TYPE_STR == item->value_type ||
-					ITEM_VALUE_TYPE_TEXT == item->value_type ||
-					ITEM_VALUE_TYPE_LOG == item->value_type)
-			{
-				size_t	len;
-				char	*ptr;
-
-				len = zbx_get_escape_string_len(tmp, "\"\\");
-				ptr = *value = zbx_malloc(NULL, len + 3);
-				*ptr++ = '"';
-				zbx_escape_string(ptr, len + 1, tmp, "\"\\");
-				ptr += len;
-				*ptr++ = '"';
-				*ptr = '\0';
-				zbx_free(tmp);
-			}
-			else
-				*value = tmp;
-
+			*value = zbx_history_value2str_dyn(&values.values[arg1 - 1].value, item->value_type);
 			ret = SUCCEED;
 		}
 		else
