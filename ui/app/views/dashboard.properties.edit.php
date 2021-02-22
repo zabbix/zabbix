@@ -64,6 +64,21 @@ $form_list->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		->setAttribute('autofocus', 'autofocus')
 );
 
+$display_period_select = (new CSelect('display_period'))
+	->setValue($data['dashboard']['display_period'])
+	->setFocusableElementId('display_period')
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+foreach (DASHBOARD_DISPLAY_PERIODS as $period) {
+	$display_period_select->addOption(new CSelectOption($period, secondsToPeriod($period)));
+}
+
+$form_list->addRow(new CLabel(_('Default page display period'), 'display_period'), $display_period_select);
+
+$form_list->addRow(new CLabel(_('Auto start slideshow'), 'auto_start'),
+	(new CCheckBox('auto_start'))->setChecked($data['dashboard']['auto_start'] == 1)
+);
+
 $form->addItem($form_list);
 
 $output = [

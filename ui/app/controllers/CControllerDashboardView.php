@@ -146,6 +146,8 @@ class CControllerDashboardView extends CController {
 			$dashboard = [
 				'dashboardid' => null,
 				'name' => _('New dashboard'),
+				'display_period' => (int) DB::getDefault('dashboard', 'display_period'),
+				'auto_start' => (int) DB::getDefault('dashboard', 'auto_start'),
 				'editable' => true,
 				'pages' => [
 					[
@@ -164,7 +166,7 @@ class CControllerDashboardView extends CController {
 		elseif ($this->hasInput('source_dashboardid')) {
 			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
-				'output' => ['name', 'private'],
+				'output' => ['name', 'private', 'display_period', 'auto_start'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
@@ -175,6 +177,8 @@ class CControllerDashboardView extends CController {
 				$dashboard = [
 					'dashboardid' => null,
 					'name' => $dashboards[0]['name'],
+					'display_period' => (int) $dashboards[0]['display_period'],
+					'auto_start' => (int) $dashboards[0]['auto_start'],
 					'editable' => true,
 					'pages' => CDashboardHelper::preparePagesForGrid(
 						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['pages']), null, true
@@ -215,7 +219,7 @@ class CControllerDashboardView extends CController {
 
 			if ($dashboardid !== null) {
 				$dashboards = API::Dashboard()->get([
-					'output' => ['dashboardid', 'name', 'userid'],
+					'output' => ['dashboardid', 'name', 'userid', 'display_period', 'auto_start'],
 					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 					'dashboardids' => [$dashboardid],
 					'preservekeys' => true
@@ -225,6 +229,8 @@ class CControllerDashboardView extends CController {
 					CDashboardHelper::updateEditableFlag($dashboards);
 
 					$dashboard = array_shift($dashboards);
+					$dashboard['display_period'] = (int) $dashboard['display_period'];
+					$dashboard['auto_start'] = (int) $dashboard['auto_start'];
 					$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
 					$dashboard['owner'] = [
 						'id' => $dashboard['userid'],

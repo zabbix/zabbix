@@ -45,6 +45,8 @@
 				},
 				dashboard: {
 					dashboardid: data.dashboardid,
+					display_period: data.display_period,
+					auto_start: data.auto_start,
 					dynamic_hostid: dynamic.host ? dynamic.host.id : null
 				},
 				options: {
@@ -114,8 +116,8 @@
 				.addEventListener('click', (e) => ZABBIX.Dashboard.addNewWidget(e.target));
 
 			document
-				.getElementById('dashbrd-paste-widget')
-				.addEventListener('click', () => ZABBIX.Dashboard.pasteWidget(null, null));
+				.getElementById('dashbrd-add')
+				.addEventListener('click', events.addClick);
 
 			document
 				.getElementById('dashbrd-save')
@@ -128,15 +130,6 @@
 					e.preventDefault();
 				}
 			);
-
-			if (ZABBIX.Dashboard.getCopiedWidget() !== null) {
-				document.getElementById('dashbrd-paste-widget').disabled = false;
-			}
-			else {
-				$.subscribe('dashboard.grid.copyWidget', () => {
-					document.getElementById('dashbrd-paste-widget').disabled = false;
-				});
-			}
 
 			$.subscribe('dashboard.grid.busy', (e, data) => {
 				is_busy = data.state;
@@ -157,6 +150,8 @@
 				dashboardid: (data.dashboardid !== null) ? data.dashboardid : undefined,
 				userid: data.owner.id,
 				name: data.name,
+				display_period: data.display_period,
+				auto_start: data.auto_start,
 				widgets: [],
 				sharing: data.sharing
 			};
@@ -247,13 +242,55 @@
 		const openProperties = () => {
 			const options = {
 				userid: data.owner.id,
-				name: data.name
+				name: data.name,
+				display_period: data.display_period,
+				auto_start: data.auto_start
 			};
 
 			PopUp('dashboard.properties.edit', options, 'dashboard_properties', this);
 		};
 
 		const events = {
+			addClick: (e) => {
+				const menu = [
+					{
+						items: [
+							{
+								label: t('Add widget'),
+								clickCallback: () => ZABBIX.Dashboard.addNewWidget(e.target)
+							},
+							{
+								label: t('Add page'),
+								clickCallback: () => ZABBIX.Dashboard.addNewPage(e.target),
+								disabled: true
+							}
+						]
+					},
+					{
+						items: [
+							{
+								label: t('Paste widget'),
+								clickCallback: () => ZABBIX.Dashboard.pasteWidget(null, null),
+								disabled: (ZABBIX.Dashboard.getCopiedWidget() === null)
+							},
+							{
+								label: t('Paste page'),
+								clickCallback: () => ZABBIX.Dashboard.pastePage(),
+								disabled: true
+							}
+						]
+					}
+				];
+
+				$(e.target).menuPopup(menu, new jQuery.Event(e), {
+					position: {
+						of: e.target,
+						my: 'left top',
+						at: 'left bottom'
+					}
+				});
+			},
+
 			beforeUnload: (e) => {
 				if (has_properties_modified || ZABBIX.Dashboard.isDashboardUpdated()) {
 					// Display confirmation message.
@@ -337,14 +374,23 @@
 							}
 						}
 						else {
+							const properties = {
+								userid: form_data.userid,
+								name: form_data.name,
+								display_period: parseInt(form_data.display_period),
+								auto_start: (form_data.auto_start === '1') ? 1 : 0
+							};
+
 							has_properties_modified =
-								(form_data.userid !== original_owner_id || form_data.name !== original_name);
+								(JSON.stringify(properties) !== JSON.stringify(original_properties));
 
-							data.owner.id = form_data.userid;
-							data.name = form_data.name;
+							data.owner.id = properties.userid;
+							data.name = properties.name;
+							data.display_period = properties.display_period;
+							data.auto_start = properties.auto_start;
 
-							document.getElementById('<?= ZBX_STYLE_PAGE_TITLE ?>').textContent = form_data.name;
-							document.getElementById('dashboard-direct-link').textContent = form_data.name;
+							document.getElementById('<?= ZBX_STYLE_PAGE_TITLE ?>').textContent = properties.name;
+							document.getElementById('dashboard-direct-link').textContent = properties.name;
 
 							overlayDialogueDestroy(overlay.dialogueid);
 						}
@@ -352,8 +398,12 @@
 			}
 		};
 
-		const original_name = data.name;
-		const original_owner_id = data.owner.id;
+		const original_properties = {
+			userid: data.owner.id,
+			name: data.name,
+			display_period: data.display_period,
+			auto_start: data.auto_start
+		};
 
 		let is_busy = false;
 		let is_busy_saving = false;
