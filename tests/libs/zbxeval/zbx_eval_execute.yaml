@@ -752,5 +752,29 @@ in:
 out:
   result: SUCCEED
   value: 1
+---
+test case: Expression '1e+309<>0'
+in:
+  rules: []
+  expression: '1e+309<>0'
+out:
+  result: FAIL
+  value: 1
+---
+test case: Expression '1e+309s<>0'
+in:
+  rules: []
+  expression: '1e+309s<>0'
+out:
+  result: FAIL
+  value: 1
+---
+test case: Expression '1e+308<>0'
+in:
+  rules: []
+  expression: '1e+308<>0'
+out:
+  result: SUCCEED
+  value: 1
 ...
 
