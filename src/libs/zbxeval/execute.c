@@ -24,8 +24,6 @@
 #include "zbxserver.h"
 #include "eval.h"
 
-static zbx_variant_t	var_zero = {.type = ZBX_VARIANT_DBL, .data = {.dbl = 0}};
-
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_op_unary                                            *
@@ -59,20 +57,21 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
 	if (ZBX_VARIANT_ERR == right->type)
 		return SUCCEED;
 
+	if (SUCCEED != zbx_variant_convert(right, ZBX_VARIANT_DBL))
+	{
+		*error = zbx_dsprintf(*error, "invalid value \"%s\" of type \"%s\" for unary"
+				" operator at \"%s\"", zbx_variant_value_desc(right),
+				zbx_variant_type_desc(right), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
 	switch (token->type)
 	{
 		case ZBX_EVAL_TOKEN_OP_MINUS:
-			if (SUCCEED != zbx_variant_convert(right, ZBX_VARIANT_DBL))
-			{
-				*error = zbx_dsprintf(*error, "invalid value \"%s\" of type \"%s\" for unary minus"
-						" operator at \"%s\"", zbx_variant_value_desc(right),
-						zbx_variant_type_desc(right), ctx->expression + token->loc.l);
-				return FAIL;
-			}
 			value = -right->data.dbl;
 			break;
 		case ZBX_EVAL_TOKEN_OP_NOT:
-			value = (SUCCEED == zbx_variant_compare(right, &var_zero) ? 1 : 0);
+			value = (SUCCEED == zbx_double_compare(right->data.dbl, 0) ? 1 : 0);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -103,20 +102,29 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
  ******************************************************************************/
 static int	eval_execute_op_logic_err(const zbx_eval_token_t *token, const zbx_variant_t *value, double *result)
 {
+	zbx_variant_t	value_dbl;
+
 	if (ZBX_VARIANT_ERR == value->type)
 		return FAIL;
+
+	zbx_variant_copy(&value_dbl, value);
+	if (SUCCEED != zbx_variant_convert(&value_dbl, ZBX_VARIANT_DBL))
+	{
+		zbx_variant_clear(&value_dbl);
+		return FAIL;
+	}
 
 	switch (token->type)
 	{
 		case ZBX_EVAL_TOKEN_OP_AND:
-			if (SUCCEED == zbx_variant_compare(value, &var_zero))
+			if (SUCCEED == zbx_double_compare(value_dbl.data.dbl, 0))
 			{
 				*result = 0;
 				return SUCCEED;
 			}
 			break;
 		case ZBX_EVAL_TOKEN_OP_OR:
-			if (SUCCEED != zbx_variant_compare(value, &var_zero))
+			if (SUCCEED != zbx_double_compare(value_dbl.data.dbl, 0))
 			{
 				*result = 1;
 				return SUCCEED;
@@ -212,30 +220,6 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 			goto finish;
 	}
 
-	/* check logical operators */
-
-	switch (token->type)
-	{
-		case ZBX_EVAL_TOKEN_OP_AND:
-			if (SUCCEED == zbx_variant_compare(left, &var_zero) ||
-					SUCCEED == zbx_variant_compare(right, &var_zero))
-			{
-				value = 0;
-			}
-			else
-				value = 1;
-			goto finish;
-		case ZBX_EVAL_TOKEN_OP_OR:
-			if (SUCCEED != zbx_variant_compare(left, &var_zero) ||
-					SUCCEED != zbx_variant_compare(right, &var_zero))
-			{
-				value = 1;
-			}
-			else
-				value = 0;
-			goto finish;
-	}
-
 	/* check arithmetic operators */
 
 	if (SUCCEED != zbx_variant_convert(left, ZBX_VARIANT_DBL))
@@ -250,6 +234,30 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 		*error = zbx_dsprintf(*error, "invalid right operand value \"%s\" of type \"%s\"",
 				zbx_variant_value_desc(right), zbx_variant_type_desc(right));
 		return FAIL;
+	}
+
+	/* check logical operators */
+
+	switch (token->type)
+	{
+		case ZBX_EVAL_TOKEN_OP_AND:
+			if (SUCCEED == zbx_double_compare(left->data.dbl, 0) ||
+					SUCCEED == zbx_double_compare(right->data.dbl, 0))
+			{
+				value = 0;
+			}
+			else
+				value = 1;
+			goto finish;
+		case ZBX_EVAL_TOKEN_OP_OR:
+			if (SUCCEED != zbx_double_compare(left->data.dbl, 0) ||
+					SUCCEED != zbx_double_compare(right->data.dbl, 0))
+			{
+				value = 1;
+			}
+			else
+				value = 0;
+			goto finish;
 	}
 
 	/* check arithmetic operators */

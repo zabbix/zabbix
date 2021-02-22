@@ -27,7 +27,7 @@ test case: Expression '{$M}'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$M}'
-  replace: 
+  replace:
   - {token: '{$M}', value: '2'}
 out:
   result: SUCCEED
@@ -37,7 +37,7 @@ test case: Expression '{$M}'
 in:
   rules: []
   expression: '{$M}'
-  replace: 
+  replace:
   - {token: '{$M}', value: '2'}
 out:
   result: FAIL
@@ -46,7 +46,7 @@ test case: Expression '{M}'
 in:
   rules: [ZBX_EVAL_PARSE_MACRO]
   expression: '{M}'
-  replace: 
+  replace:
   - {token: '{M}', value: '3'}
 out:
   result: SUCCEED
@@ -56,7 +56,7 @@ test case: Expression '{M}'
 in:
   rules: []
   expression: '{M}'
-  replace: 
+  replace:
   - {token: '{M}', value: '2'}
 out:
   result: FAIL
@@ -65,7 +65,7 @@ test case: Expression '{123}'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTIONID]
   expression: '{123}'
-  replace: 
+  replace:
   - {token: '{123}', value: '4'}
 out:
   result: SUCCEED
@@ -82,7 +82,7 @@ test case: Expression '{123}'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTIONID]
   expression: '{123}'
-  replace: 
+  replace:
   - {token: '{123', value: '4'}
 out:
   result: FAIL
@@ -367,6 +367,13 @@ out:
   result: SUCCEED
   value: '1'
 ---
+test case: Expression 'not "a"'
+in:
+  rules: []
+  expression: 'not "a"'
+out:
+  result: FAIL
+---
 test case: Expression 'min(2, 1)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
@@ -442,7 +449,7 @@ test case: Expression '{$M} or 1'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$M} or 1'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: FAIL
@@ -451,7 +458,7 @@ test case: Expression '{$M} or 0'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$M} or 0'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: FAIL
@@ -460,17 +467,26 @@ test case: Expression '{$M} or 1'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PROCESS_ERROR]
   expression: '{$M} or 1'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: SUCCEED
   value: 1
 ---
+test case: Expression '{$M} or "a"'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PROCESS_ERROR]
+  expression: '{$M} or "a"'
+  replace:
+  - {token: '{$M}', error: 'forced operand error'}
+out:
+  result: FAIL
+---
 test case: Expression '{$M} or 0'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PROCESS_ERROR]
   expression: '{$M} or 0'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: FAIL
@@ -479,7 +495,7 @@ test case: Expression '{$M} and 1'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$M} and 1'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: FAIL
@@ -488,7 +504,7 @@ test case: Expression '{$M} and 0'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$M} and 0'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: FAIL
@@ -497,7 +513,7 @@ test case: Expression '{$M} and 1'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PROCESS_ERROR]
   expression: '{$M} and 1'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: FAIL
@@ -506,17 +522,26 @@ test case: Expression '{$M} and 0'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PROCESS_ERROR]
   expression: '{$M} and 0'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: SUCCEED
   value: 0
 ---
+test case: Expression '{$M} and "a"'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PROCESS_ERROR]
+  expression: '{$M} and "a"'
+  replace:
+  - {token: '{$M}', error: 'forced operand error'}
+out:
+  result: FAIL
+---
 test case: Expression '{$M} + 2 or 1'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PROCESS_ERROR]
   expression: '{$M} + 2 or 1'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: SUCCEED
@@ -526,7 +551,7 @@ test case: Expression '{$M} + 2 and 0'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PROCESS_ERROR]
   expression: '{$M} + 2 and 0'
-  replace: 
+  replace:
   - {token: '{$M}', error: 'forced operand error'}
 out:
   result: SUCCEED
