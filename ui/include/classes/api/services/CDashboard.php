@@ -135,12 +135,12 @@ class CDashboard extends CDashboardGeneral {
 			zbx_db_search('dashboard d', $options, $sql_parts);
 		}
 
-		$db_dashboards = [];
-
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 
 		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+
+		$db_dashboards = [];
 
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
