@@ -776,5 +776,13 @@ in:
 out:
   result: SUCCEED
   value: 1
+---
+test case: Expression '"a" and "b"'
+in:
+  rules: []
+  expression: '"a" and "b"'
+out:
+  result: FAIL
+  value: 1
 ...
 
