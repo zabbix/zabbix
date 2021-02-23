@@ -134,7 +134,11 @@ if ($this->data['actions']) {
 
 		$actionTable->addRow([
 			new CCheckBox('g_actionid['.$action['actionid'].']', $action['actionid']),
-			new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
+			(new CLink($action['name'], (new CUrl('actionconf.php'))
+				->setArgument('form', 'update')
+				->setArgument('eventsource', $data['eventsource'])
+				->setArgument('actionid', $action['actionid'])
+			)),
 			$conditions,
 			$operations,
 			$status
