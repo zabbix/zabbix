@@ -2016,7 +2016,7 @@ function renderTagTableRow($index, $tag = '', $value = '', array $options = []) 
  */
 function renderTagTable(array $tags, $readonly = false, array $options = []) {
 	$table = (new CTable())
-		->addStyle('width:100%;')
+		->addStyle('width: 100%; max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
 
 	$row_options = ['readonly' => $readonly];

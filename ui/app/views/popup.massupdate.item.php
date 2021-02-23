@@ -493,7 +493,6 @@ $tabs = (new CTabView())
 	->addTab('item_tab', $data['prototype'] ? _('Item prototype') : _('Item'), $item_form_list)
 	->addTab('tags_tab', _('Tags'), $tags_form_list)
 	->addTab('preprocessing_tab', _('Preprocessing'), $preprocessing_form_list)
-	->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	->setSelected(0);
 
 // Append tabs to form.
