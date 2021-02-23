@@ -94,7 +94,67 @@ class testFormAdministrationScripts extends CWebTest {
 						'Script' => 'Webhook Script',
 						'Timeout' => '60s',
 						'Description' => 'Test description',
-						'User group' => 'Guests',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Templates',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'host',
+							'Value' => '{HOST.HOST}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'var',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max webhook 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '60s',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Templates'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'host',
+							'Value' => '{HOST.HOST}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'var',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max webhook 3',
+						'Scope' => 'Manual event action',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '60s',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Templates',
 						'Required host permissions' => 'Write',
@@ -348,7 +408,38 @@ class testFormAdministrationScripts extends CWebTest {
 						'Execute on' => 'Zabbix server (proxy)',
 						'Commands' => 'Script command',
 						'Description' => 'Test description',
-						'User group' => 'Disabled',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max script 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server (proxy)',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max script 3',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server (proxy)',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
 						'Host group' => 'Selected',
 						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
 						'Required host permissions' => 'Write',
@@ -398,6 +489,36 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
+					'fields' =>  [
+						'Name' => 'Max IPMI 2',
+						'Scope' => 'Action operation',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Discovered hosts'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max IPMI 3',
+						'Scope' => 'Manual event action',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/name": cannot be empty.',
 					'fields' =>  [
@@ -415,6 +536,160 @@ class testFormAdministrationScripts extends CWebTest {
 						'Name' => 'IPMI empty command',
 						'Type' => 'IPMI',
 						'Command' => ''
+					]
+				]
+			],
+			// SSH.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH',
+						'Scope' => 'Manual host action',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 2',
+						'Scope' => 'Action operation',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 3',
+						'Scope' => 'Manual event action',
+						'Type' => 'SSH',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'fields' =>  [
+						'Name' => '',
+						'Type' => 'SSH',
+						'Commands' => 'SSH empty name'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/command": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'SSH empty command',
+						'Type' => 'SSH',
+						'Commands' => ''
+					]
+				]
+			],
+			//Telnet
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max Telnet',
+						'Scope' => 'Manual host action',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max Telnet 2',
+						'Scope' => 'Action operation',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max Telnet 3',
+						'Scope' => 'Manual event action',
+						'Type' => 'Telnet',
+						'Username' => 'test',
+						'Password' => 'test_password',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'fields' =>  [
+						'Name' => '',
+						'Type' => 'Telnet',
+						'Commands' => 'Telnet empty name'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/command": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Telnet empty command',
+						'Type' => 'Telnet',
+						'Commands' => ''
 					]
 				]
 			]
