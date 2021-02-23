@@ -43,16 +43,6 @@ abstract class CControllerLatest extends CController {
 	 * @return array
 	 */
 	protected function prepareData(array $filter, $sort_field, $sort_order) {
-		// Sorting options for hosts and items.
-		$host_sort_options = [
-			'field' => 'name',
-			'order' => ($sort_field === 'host') ? $sort_order : 'ASC'
-		];
-		$item_sort_options = [
-			'field' => 'name',
-			'order' => ($sort_field === 'name') ? $sort_order : 'ASC'
-		];
-
 		// Select groups for subsequent selection of hosts and items.
 		$multiselect_hostgroup_data = [];
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids'], $multiselect_hostgroup_data) : null;
@@ -65,8 +55,6 @@ abstract class CControllerLatest extends CController {
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
-
-		CArrayHelper::sort($hosts, [$host_sort_options]);
 
 		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
@@ -113,7 +101,24 @@ abstract class CControllerLatest extends CController {
 				'preservekeys' => true
 			]);
 
-			CArrayHelper::sort($items, [$item_sort_options]);
+			if ($sort_field === 'host') {
+				$items = array_map(function ($item) use ($hosts) {
+					return $item + [
+						'host_name' => $hosts[$item['hostid']]['name']
+					];
+				}, $items);
+
+				CArrayHelper::sort($items, [[
+					'field' => 'host_name',
+					'order' => $sort_order
+				]]);
+			}
+			else {
+				CArrayHelper::sort($items, [[
+					'field' => 'name',
+					'order' => $sort_order
+				]]);
+			}
 		}
 		else {
 			$hosts = [];
