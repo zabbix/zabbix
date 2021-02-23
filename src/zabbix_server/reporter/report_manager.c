@@ -120,7 +120,7 @@ static void	rm_destroy(zbx_rm_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Function: am_register_writer                                               *
+ * Function: rm_register_writer                                               *
  *                                                                            *
  * Purpose: registers report writer                                           *
  *                                                                            *
@@ -182,6 +182,39 @@ static void	rm_process_queue(zbx_rm_t *manager, int now)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_test_report                                                   *
+ *                                                                            *
+ * Purpose: test report                                                       *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *             client  - [IN] the connected writer                            *
+ *             message - [IN] the received message                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+{
+	zbx_uint64_t		dashboardid, userid, writer_userid;
+	zbx_vector_ptr_pair_t	params;
+	int			i;
+	unsigned char		*data = NULL;
+	zbx_uint64_t		size;
+
+	zbx_vector_ptr_pair_create(&params);
+
+	report_deserialize_test_request(message->data, &dashboardid, &userid, &writer_userid, &params);
+
+	// TODO: enqueue request
+
+	size = report_serialize_test_response(&data, -1, "Not implemented.");
+
+	zbx_ipc_client_send(client, ZBX_IPC_REPORTER_TEST_REPORT_RESPONSE, data, size);
+	zbx_ipc_client_close(client);
+
+	zbx_free(data);
+	report_destroy_params(&params);
+}
 
 ZBX_THREAD_ENTRY(report_manager_thread, args)
 {
@@ -264,6 +297,9 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 			{
 				case ZBX_IPC_REPORTER_REGISTER:
 					rm_register_writer(&manager, client, message);
+					break;
+				case ZBX_IPC_REPORTER_TEST_REPORT:
+					rm_test_report(&manager, client, message);
 					break;
 			}
 

@@ -22,14 +22,43 @@
 #include "cfg.h"
 #include "zbxjson.h"
 #include "trapper_request.h"
+#include "trapper_auth.h"
 #include "zbxreport.h"
+#include "zbxjson.h"
+
+extern int	CONFIG_REPORTMANAGER_FORKS;
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	char	*error = NULL;
-	int	ret;
+	zbx_user_t		user;
+	char			*error = NULL;
+	int			ret;
+	struct zbx_json_parse	jp_data;
 
-	ret = zbx_report_test(jp, &error);
+	if (0 == CONFIG_REPORTMANAGER_FORKS)
+	{
+		zbx_send_response(sock, FAIL, "Reprot manager is disabled.", CONFIG_TIMEOUT);
+		return;
+	}
+
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
+	{
+		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
+		return;
+	}
+
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		char	*error;
+
+		error = zbx_dsprintf(NULL, "cannot find tag: %s", ZBX_PROTO_TAG_DATA);
+		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
+		zbx_free(error);
+
+		return;
+	}
+
+	ret = zbx_report_test(&jp_data, user.userid, &error);
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
 	zbx_free(error);

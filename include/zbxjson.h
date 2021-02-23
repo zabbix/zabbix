@@ -166,6 +166,8 @@
 #define ZBX_PROTO_TAG_EXPRESSIONS		"expressions"
 #define ZBX_PROTO_TAG_EXPRESSION		"expression"
 #define ZBX_PROTO_TAG_CLIENTIP			"clientip"
+#define ZBX_PROTO_TAG_DASHBOARDID		"dashboardid"
+#define ZBX_PROTO_TAG_USERID			"userid"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

@@ -25,6 +25,16 @@
 
 #define ZBX_IPC_SERVICE_REPORTER	"reporter"
 
-#define ZBX_IPC_REPORTER_REGISTER	1000
+#define ZBX_IPC_REPORTER_REGISTER		1000
+
+#define ZBX_IPC_REPORTER_TEST_REPORT		1001
+#define ZBX_IPC_REPORTER_TEST_REPORT_RESPONSE	1001
+
+void	report_destroy_params(zbx_vector_ptr_pair_t *params);
+
+void	report_deserialize_test_request(const unsigned char *data, zbx_uint64_t *dashboardid, zbx_uint64_t *userid,
+		zbx_uint64_t *writer_userid, zbx_vector_ptr_pair_t *params);
+
+zbx_uint32_t	report_serialize_test_response(unsigned char **data, int status, const char *error);
 
 #endif
