@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:36Z'
   groups:
     -
       name: Templates/Applications
@@ -17,11 +17,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: RabbitMQ
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'RabbitMQ: Get exchanges'
@@ -34,10 +29,11 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns exchanges metrics'
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/exchanges'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'RabbitMQ: Get overview'
           type: HTTP_AGENT
@@ -49,10 +45,11 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns cluster-wide metrics'
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/overview'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
           triggers:
             -
               expression: '{nodata(30m)}=1'
@@ -67,9 +64,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of messages delivered to clients and acknowledged'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -79,6 +73,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages acknowledged per second'
           type: DEPENDENT
@@ -87,9 +85,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of messages delivered to clients and acknowledged per second'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -99,6 +94,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages confirmed'
           type: DEPENDENT
@@ -106,9 +105,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of messages confirmed'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -118,6 +114,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages confirmed per second'
           type: DEPENDENT
@@ -126,9 +126,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of messages confirmed per second'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -138,6 +135,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages delivered'
           type: DEPENDENT
@@ -145,9 +146,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -157,6 +155,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages delivered per second'
           type: DEPENDENT
@@ -165,9 +167,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -177,6 +176,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages published'
           type: DEPENDENT
@@ -184,9 +187,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of messages published'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -196,6 +196,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages published per second'
           type: DEPENDENT
@@ -204,9 +208,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of messages published per second'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -216,6 +217,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages publish_in'
           type: DEPENDENT
@@ -223,9 +228,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of messages published from channels into this overview'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -235,6 +237,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages publish_in per second'
           type: DEPENDENT
@@ -243,9 +249,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of messages published from channels into this overview per sec'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -255,6 +258,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages publish_out'
           type: DEPENDENT
@@ -262,9 +269,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of messages published from this overview into queues'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -274,6 +278,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages publish_out per second'
           type: DEPENDENT
@@ -282,9 +290,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of messages published from this overview into queues per second,0,rabbitmq,total msgs pub out rate'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -294,6 +299,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages returned redeliver'
           type: DEPENDENT
@@ -301,9 +310,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of subset of messages in deliver_get which had the redelivered flag set'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -313,6 +319,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages returned redeliver per second'
           type: DEPENDENT
@@ -321,9 +331,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of subset of messages in deliver_get which had the redelivered flag set per second'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -333,6 +340,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages returned unroutable'
           type: DEPENDENT
@@ -340,9 +351,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Count of messages returned to publisher as unroutable'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -352,6 +360,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages returned unroutable per second'
           type: DEPENDENT
@@ -360,9 +372,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Rate of messages returned to publisher as unroutable per second'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -372,6 +381,10 @@ zabbix_export:
               error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Channels total'
           type: DEPENDENT
@@ -379,9 +392,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of channels'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -389,6 +399,10 @@ zabbix_export:
                 - $.object_totals.channels
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Connections total'
           type: DEPENDENT
@@ -396,9 +410,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of connections'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -406,6 +417,10 @@ zabbix_export:
                 - $.object_totals.connections
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Consumers total'
           type: DEPENDENT
@@ -413,9 +428,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of consumers'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -423,6 +435,10 @@ zabbix_export:
                 - $.object_totals.consumers
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Exchanges total'
           type: DEPENDENT
@@ -430,9 +446,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of exchanges'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -440,6 +453,10 @@ zabbix_export:
                 - $.object_totals.exchanges
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Queues total'
           type: DEPENDENT
@@ -447,9 +464,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of queues'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -457,6 +471,10 @@ zabbix_export:
                 - $.object_totals.queues
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages total'
           type: DEPENDENT
@@ -464,9 +482,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of messages (ready plus unacknowledged)'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -474,6 +489,10 @@ zabbix_export:
                 - $.queue_totals.messages
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages ready for delivery'
           type: DEPENDENT
@@ -481,9 +500,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of messages ready for deliver'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -491,6 +507,10 @@ zabbix_export:
                 - $.queue_totals.messages_ready
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Messages unacknowledged'
           type: DEPENDENT
@@ -498,9 +518,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of unacknowledged messages'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -508,6 +525,10 @@ zabbix_export:
                 - $.queue_totals.messages_unacknowledged
           master_item:
             key: rabbitmq.get_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
       discovery_rules:
         -
           name: 'Exchanges discovery'
@@ -536,9 +557,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of messages delivered to clients and acknowledged per second'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -548,6 +566,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages acknowledged'
               type: DEPENDENT
@@ -555,9 +577,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of messages delivered to clients and acknowledged'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -567,6 +586,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages confirmed per second'
               type: DEPENDENT
@@ -575,9 +598,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of messages confirmed per second'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -587,6 +607,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages confirmed'
               type: DEPENDENT
@@ -594,9 +618,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of messages confirmed'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -606,6 +627,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages delivered per second'
               type: DEPENDENT
@@ -614,9 +639,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -626,6 +648,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages delivered'
               type: DEPENDENT
@@ -633,9 +659,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -645,6 +668,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages published per second'
               type: DEPENDENT
@@ -653,9 +680,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of messages published per second'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -665,6 +689,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages published'
               type: DEPENDENT
@@ -672,9 +700,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of messages published'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -684,6 +709,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_in per second'
               type: DEPENDENT
@@ -692,9 +721,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of messages published from channels into this overview per sec'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -704,6 +730,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_in'
               type: DEPENDENT
@@ -711,9 +741,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of messages published from channels into this overview'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -723,6 +750,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_out per second'
               type: DEPENDENT
@@ -731,9 +762,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of messages published from this overview into queues per second,0,rabbitmq,total msgs pub out rate'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -743,6 +771,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_out'
               type: DEPENDENT
@@ -750,9 +782,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of messages published from this overview into queues'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -762,6 +791,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered per second'
               type: DEPENDENT
@@ -770,9 +803,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of subset of messages in deliver_get which had the redelivered flag set per second'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -782,6 +812,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered'
               type: DEPENDENT
@@ -789,9 +823,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of subset of messages in deliver_get which had the redelivered flag set'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -801,6 +832,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages returned unroutable per second'
               type: DEPENDENT
@@ -809,9 +844,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of messages returned to publisher as unroutable per second'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -821,6 +853,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
             -
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages returned unroutable'
               type: DEPENDENT
@@ -828,9 +864,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of messages returned to publisher as unroutable'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -840,6 +873,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
           master_item:
             key: rabbitmq.get_exchanges
           lld_macro_paths:
@@ -971,11 +1008,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: RabbitMQ
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'RabbitMQ: Service response time'
@@ -984,9 +1016,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          applications:
+          tags:
             -
-              name: RabbitMQ
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{min(5m)}>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
@@ -1002,9 +1035,6 @@ zabbix_export:
           type: SIMPLE
           key: 'net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"]'
           history: 7d
-          applications:
-            -
-              name: RabbitMQ
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -1012,6 +1042,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{last()}=0'
@@ -1029,10 +1063,11 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns nodes metrics'
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
           triggers:
             -
               expression: '{nodata(30m)}=1'
@@ -1055,10 +1090,11 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns cluster-wide metrics'
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/overview'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'RabbitMQ: Get queues'
           type: HTTP_AGENT
@@ -1070,10 +1106,11 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns queues metrics'
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/queues'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'RabbitMQ: Healthcheck'
           type: HTTP_AGENT
@@ -1083,9 +1120,6 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'Runs basic healthchecks in the current node. Checks that the rabbit application is running, channels and queues can be listed successfully, and that no alarms are in effect.'
-          applications:
-            -
-              name: RabbitMQ
           valuemap:
             name: 'RabbitMQ healthcheck'
           preprocessing:
@@ -1100,6 +1134,10 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/healthchecks/node'
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{last()}=0'
@@ -1115,9 +1153,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current free disk space'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1125,6 +1160,10 @@ zabbix_export:
                 - $.disk_free
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Disk free alarm'
           type: DEPENDENT
@@ -1132,9 +1171,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Does the node have disk alarm'
-          applications:
-            -
-              name: RabbitMQ
           valuemap:
             name: 'Alarm state'
           preprocessing:
@@ -1148,6 +1184,10 @@ zabbix_export:
                 - ''
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{last()}=1'
@@ -1163,9 +1203,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Disk free space limit in bytes'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1173,6 +1210,10 @@ zabbix_export:
                 - $.disk_free_limit
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Used file descriptors'
           type: DEPENDENT
@@ -1180,9 +1221,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Used file descriptors'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1190,6 +1228,10 @@ zabbix_export:
                 - $.fd_used
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Memory alarm'
           type: DEPENDENT
@@ -1197,9 +1239,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Does the host has memory alarm'
-          applications:
-            -
-              name: RabbitMQ
           valuemap:
             name: 'Alarm state'
           preprocessing:
@@ -1213,6 +1252,10 @@ zabbix_export:
                 - ''
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{last()}=1'
@@ -1228,9 +1271,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Memory usage high watermark in bytes'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1238,6 +1278,10 @@ zabbix_export:
                 - $.mem_limit
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Memory used'
           type: DEPENDENT
@@ -1246,9 +1290,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Memory used in bytes'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1256,6 +1297,10 @@ zabbix_export:
                 - $.mem_used
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Management plugin version'
           type: DEPENDENT
@@ -1265,9 +1310,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of the management plugin in use'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1279,6 +1321,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: rabbitmq.get_node_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: RabbitMQ version'
           type: DEPENDENT
@@ -1288,9 +1334,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of RabbitMQ on the node which processed this request'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1302,6 +1345,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: rabbitmq.get_node_overview
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -1316,9 +1363,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of network partitions this node is seeing'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1330,6 +1374,10 @@ zabbix_export:
                 - 'return JSON.parse(value).length;'
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{min(5m)}>0'
@@ -1344,9 +1392,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Is the node running or not'
-          applications:
-            -
-              name: RabbitMQ
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -1360,6 +1405,10 @@ zabbix_export:
                 - ''
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{max(5m)}=0'
@@ -1378,9 +1427,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Average number of Erlang processes waiting to run'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1388,6 +1434,10 @@ zabbix_export:
                 - $.run_queue
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Sockets available'
           type: DEPENDENT
@@ -1395,9 +1445,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'File descriptors available for use as sockets'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1405,6 +1452,10 @@ zabbix_export:
                 - $.sockets_total
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Sockets used'
           type: DEPENDENT
@@ -1412,9 +1463,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of file descriptors used as sockets'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1422,6 +1470,10 @@ zabbix_export:
                 - $.sockets_used
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
         -
           name: 'RabbitMQ: Uptime'
           type: DEPENDENT
@@ -1431,9 +1483,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Uptime in milliseconds'
-          applications:
-            -
-              name: RabbitMQ
           preprocessing:
             -
               type: JSONPATH
@@ -1445,6 +1494,10 @@ zabbix_export:
                 - '0.001'
           master_item:
             key: rabbitmq.get_nodes
+          tags:
+            -
+              tag: Application
+              value: RabbitMQ
           triggers:
             -
               expression: '{last()}<10m'
@@ -1483,9 +1536,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of consumers'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1493,6 +1543,10 @@ zabbix_export:
                     - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].consumers.first()'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Memory'
               type: DEPENDENT
@@ -1501,9 +1555,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1511,6 +1562,10 @@ zabbix_export:
                     - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].memory.first()'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages acknowledged per second'
               type: DEPENDENT
@@ -1519,9 +1574,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number per second of messages delivered to clients and acknowledged'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1531,6 +1583,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages acknowledged'
               type: DEPENDENT
@@ -1538,9 +1594,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of messages delivered to clients and acknowledged'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1550,6 +1603,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered per second'
               type: DEPENDENT
@@ -1558,9 +1615,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Count of messages delivered in acknowledgement mode to consumers'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1570,6 +1624,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered'
               type: DEPENDENT
@@ -1577,9 +1635,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of messages delivered in acknowledgement mode to consumers'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1589,6 +1644,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered per second'
               type: DEPENDENT
@@ -1597,9 +1656,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1609,6 +1665,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered'
               type: DEPENDENT
@@ -1616,9 +1676,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1628,6 +1685,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages published per second'
               type: DEPENDENT
@@ -1636,9 +1697,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate per second of messages published'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1648,6 +1706,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages published'
               type: DEPENDENT
@@ -1655,9 +1717,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of messages published'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1667,6 +1726,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages per second'
               type: DEPENDENT
@@ -1675,9 +1738,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Count per second of the total messages in the queue'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1685,6 +1745,10 @@ zabbix_export:
                     - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_details.rate.first()'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered per second'
               type: DEPENDENT
@@ -1693,9 +1757,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate per second of subset of messages in deliver_get which had the redelivered flag set'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1705,6 +1766,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered'
               type: DEPENDENT
@@ -1712,9 +1777,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of subset of messages in deliver_get which had the redelivered flag set'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1724,6 +1786,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages'
               type: DEPENDENT
@@ -1731,9 +1797,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Count of the total messages in the queue'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1741,6 +1804,10 @@ zabbix_export:
                     - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages.first()'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}'
@@ -1755,9 +1822,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number per second of messages ready to be delivered to clients'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1765,6 +1829,10 @@ zabbix_export:
                     - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_ready_details.rate.first()'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages ready'
               type: DEPENDENT
@@ -1772,9 +1840,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of messages ready to be delivered to clients'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1782,6 +1847,10 @@ zabbix_export:
                     - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_ready.first()'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages unacknowledged per second'
               type: DEPENDENT
@@ -1790,9 +1859,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number per second of messages delivered to clients but not yet acknowledged'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1800,6 +1866,10 @@ zabbix_export:
                     - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_unacknowledged_details.rate.first()'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages unacknowledged'
               type: DEPENDENT
@@ -1807,9 +1877,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of messages delivered to clients but not yet acknowledged'
-              application_prototypes:
-                -
-                  name: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1817,6 +1884,10 @@ zabbix_export:
                     - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_unacknowledged.first()'
               master_item:
                 key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: Application
+                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
           graph_prototypes:
             -
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages per second'

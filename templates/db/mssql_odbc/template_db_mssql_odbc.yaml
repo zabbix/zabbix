@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:55Z'
   groups:
     -
       name: Templates/Databases
@@ -26,11 +26,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Databases
-      applications:
-        -
-          name: MSSQL
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'MSSQL: Get performance counters'
@@ -78,9 +73,10 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'The item gets server global status information.'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MSSQL: Auto-param attempts per second'
           type: DEPENDENT
@@ -89,9 +85,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of auto-parameterization attempts per second. Total should be the sum of the failed, safe, and unsafe auto-parameterizations. Auto-parameterization occurs when an instance of SQL Server tries to parameterize a Transact-SQL request by replacing some literals with parameters so that reuse of the resulting cached execution plan across multiple similar-looking requests is possible. Note that auto-parameterizations are also known as simple parameterizations in newer versions of SQL Server. This counter does not include forced parameterizations.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -103,6 +96,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Average latch wait time'
           type: CALCULATED
@@ -116,9 +113,10 @@ zabbix_export:
             (last(mssql.average_latch_wait_time_base) - prev(mssql.average_latch_wait_time_base) + 
             (last(mssql.average_latch_wait_time_base) - prev(mssql.average_latch_wait_time_base)=0))
           description: 'Average latch wait time (in milliseconds) for latch requests that had to wait.'
-          applications:
+          tags:
             -
-              name: MSSQL
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Average latch wait time base'
           type: DEPENDENT
@@ -126,9 +124,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'For internal use only.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JSONPATH
@@ -136,6 +131,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Average Latch Wait Time Base'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MSSQL: Average latch wait time raw'
           type: DEPENDENT
@@ -144,9 +143,6 @@ zabbix_export:
           history: 7d
           units: ms
           description: 'Average latch wait time (in milliseconds) for latch requests that had to wait.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JSONPATH
@@ -154,6 +150,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Average Latch Wait Time (ms)'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MSSQL: Total average wait time'
           type: CALCULATED
@@ -167,9 +167,10 @@ zabbix_export:
             (last(mssql.average_wait_time_base) - prev(mssql.average_wait_time_base) + 
             (last(mssql.average_wait_time_base) - prev(mssql.average_wait_time_base)=0))
           description: 'The average wait time, in milliseconds, for each lock request that had to wait.'
-          applications:
+          tags:
             -
-              name: MSSQL
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
@@ -183,9 +184,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'For internal use only.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JSONPATH
@@ -193,6 +191,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Average Wait Time Base'' && @.instance_name==''_Total'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MSSQL: Total average wait time raw'
           type: DEPENDENT
@@ -201,9 +203,6 @@ zabbix_export:
           history: 7d
           units: ms
           description: 'Average amount of wait time (in milliseconds) for each lock request that resulted in a wait. Information for all locks.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JSONPATH
@@ -211,6 +210,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Average Wait Time (ms)'' && @.instance_name==''_Total'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'MSSQL: Batch requests per second'
           type: DEPENDENT
@@ -220,9 +223,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'Number of Transact-SQL command batches received per second. This statistic is affected by all constraints (such as I/O, number of users, cache size, complexity of requests, and so on). High batch requests mean good throughput.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -234,6 +234,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Buffer cache hit ratio'
           type: DEPENDENT
@@ -243,9 +247,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high. Generally, you can increase the buffer cache hit ratio by increasing the amount of memory available to SQL Server or by using the buffer pool extension feature.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -253,6 +254,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''BufferCacheHitRatio'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
@@ -277,9 +282,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Ratio between cache hits and lookups.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -287,6 +289,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''CacheHitRatio'' && @.instance_name==''_Total'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Cache objects in use'
           type: DEPENDENT
@@ -294,9 +300,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of cache objects in use.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -304,6 +307,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Objects in use'' && @.instance_name==''_Total'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Cache object counts'
           type: DEPENDENT
@@ -311,9 +318,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of cache objects in the cache.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -321,6 +325,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Object Counts'' && @.instance_name==''_Total'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Cache pages'
           type: DEPENDENT
@@ -328,9 +336,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of 8-kilobyte (KB) pages used by cache objects.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -338,6 +343,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Pages'' && @.instance_name==''_Total'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Checkpoint pages per second'
           type: DEPENDENT
@@ -346,9 +355,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -360,6 +366,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Database pages'
           type: DEPENDENT
@@ -367,9 +377,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Indicates the number of pages in the buffer pool with database content.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -377,6 +384,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Database pages'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total data file size'
           type: DEPENDENT
@@ -385,9 +396,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Total size of all the data files.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -399,6 +407,10 @@ zabbix_export:
                 - '1024'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total errors per second'
           type: DEPENDENT
@@ -407,9 +419,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of errors per second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -421,6 +430,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Failed auto-params per second'
           type: DEPENDENT
@@ -429,9 +442,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of failed auto-parameterization attempts per second. This should be small. Note that auto-parameterizations are also known as simple parameterizations in later versions of SQL Server.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -443,6 +453,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Forwarded records per second'
           type: DEPENDENT
@@ -451,9 +465,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of records per second fetched through forwarded record pointers.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -465,6 +476,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Free list stalls per second'
           type: DEPENDENT
@@ -474,9 +489,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'Indicates the number of requests per second that had to wait for a free page.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -488,6 +500,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.FREE_LIST_STALLS.MAX}'
@@ -502,9 +518,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of unrestricted full scans per second. These can be either base-table or full-index scans. Values greater than 1 or 2 indicate that we are having table / Index page scans. If we see high CPU then we need to investigate this counter, otherwise if the full scans are on small tables we can ignore this counter.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -516,6 +529,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Granted Workspace Memory'
           type: DEPENDENT
@@ -524,9 +541,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Specifies the total amount of memory currently granted to executing processes, such as hash, sort, bulk copy, and index creation operations.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -538,6 +552,10 @@ zabbix_export:
                 - '1024'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Index searches per second'
           type: DEPENDENT
@@ -546,9 +564,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of index searches per second. These are used to start a range scan, reposition a range scan, revalidate a scan point, fetch a single index record, and search down the index to locate where to insert a new row.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -560,6 +575,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Errors per second (Info errors)'
           type: DEPENDENT
@@ -568,9 +587,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of errors per second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -582,6 +598,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Errors per second (Kill connection errors)'
           type: DEPENDENT
@@ -590,9 +610,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of errors per second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -604,6 +621,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Latch waits per second'
           type: DEPENDENT
@@ -613,9 +634,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'The number of latch requests that could not be granted immediately. Latches are lightweight means of holding a very transient server resource, such as an address in memory.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -627,6 +645,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Lazy writes per second'
           type: DEPENDENT
@@ -635,9 +657,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Indicates the number of buffers written per second by the buffer manager''s lazy writer. The lazy writer is a system process that flushes out batches of dirty, aged buffers (buffers that contain changes that must be written back to disk before the buffer can be reused for a different page) and makes them available to user processes. The lazy writer eliminates the need to perform frequent checkpoints in order to create available buffers.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -649,6 +668,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.LAZY_WRITES.MAX}'
@@ -664,9 +687,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'Number of new locks and lock conversions per second requested from the lock manager.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -678,6 +698,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.LOCK_REQUESTS.MAX}'
@@ -693,9 +717,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'Number of lock requests per second that timed out, including requests for NOWAIT locks.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -707,6 +728,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.LOCK_TIMEOUTS.MAX}'
@@ -722,9 +747,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'Number of lock requests per second that required the caller to wait.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -736,6 +758,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>0'
@@ -751,9 +777,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Average of total wait time (in milliseconds) for locks in the last second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -765,6 +788,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Logins per second'
           type: DEPENDENT
@@ -773,9 +800,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Total number of logins started per second. This does not include pooled connections. Any value over 2 may indicate insufcient connection pooling.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -787,6 +811,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Logouts per second'
           type: DEPENDENT
@@ -795,9 +823,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Total number of logout operations started per second. Any value over 2 may indicate insufcient connection pooling.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -809,6 +834,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total log file size'
           type: DEPENDENT
@@ -817,9 +846,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Total size of all the transaction log files.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -831,6 +857,10 @@ zabbix_export:
                 - '1024'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total log file used size'
           type: DEPENDENT
@@ -839,9 +869,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'The cumulative used size of all the log files in the database.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -853,6 +880,10 @@ zabbix_export:
                 - '1024'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Maximum workspace memory'
           type: DEPENDENT
@@ -861,9 +892,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Indicates the maximum amount of memory available for executing processes, such as hash, sort, bulk copy, and index creation operations.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -875,6 +903,10 @@ zabbix_export:
                 - '1024'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Memory grants outstanding'
           type: DEPENDENT
@@ -882,9 +914,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Specifies the total number of processes that have successfully acquired a workspace memory grant.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -892,6 +921,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Memory Grants Outstanding'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Memory grants pending'
           type: DEPENDENT
@@ -899,9 +932,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Specifies the total number of processes waiting for a workspace memory grant.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -909,6 +939,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Memory Grants Pending'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total lock requests per second that have deadlocks'
           type: DEPENDENT
@@ -918,9 +952,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'Number of lock requests per second that resulted in a deadlock.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -932,6 +963,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.DEADLOCKS.MAX}'
@@ -946,9 +981,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of errors per second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -960,6 +992,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Page life expectancy'
           type: DEPENDENT
@@ -969,9 +1005,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Indicates the number of seconds a page will stay in the buffer pool without references.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -979,6 +1012,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page life expectancy'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{max(15m)}<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
@@ -994,9 +1031,6 @@ zabbix_export:
           value_type: FLOAT
           units: rps
           description: 'Indicates the number of requests per second to find a page in the buffer pool.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1008,6 +1042,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Page reads per second'
           type: DEPENDENT
@@ -1016,9 +1054,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Indicates the number of physical database page reads that are issued per second. This statistic displays the total number of physical page reads across all databases. Because physical I/O is expensive, you may be able to minimize the cost, either by using a larger data cache, intelligent indexes, and more efficient queries, or by changing the database design.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1030,6 +1065,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.PAGE_READS.MAX}'
@@ -1044,9 +1083,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of page splits per second that occur as the result of overflowing index pages.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1058,6 +1094,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Page writes per second'
           type: DEPENDENT
@@ -1066,9 +1106,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Indicates the number of physical database page writes that are issued per second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1080,6 +1117,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.PAGE_WRITES.MAX}'
@@ -1098,9 +1139,10 @@ zabbix_export:
             last(mssql.sql_compilations_sec.rate) * 100 /
             (last(mssql.batch_requests_sec.rate) + (last(mssql.batch_requests_sec.rate)=0))
           description: 'The ratio of SQL compilations per second to Batch requests per second in percent.'
-          applications:
+          tags:
             -
-              name: MSSQL
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(15m)} > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
@@ -1119,9 +1161,10 @@ zabbix_export:
             last(mssql.sql_recompilations_sec.rate) * 100 /
             (last(mssql.sql_compilations_sec.rate) + (last(mssql.sql_compilations_sec.rate)=0))
           description: 'The ratio of SQL re-compilations per second to SQL compilations per second in percent.'
-          applications:
+          tags:
             -
-              name: MSSQL
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(15m)} > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
@@ -1135,9 +1178,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of currently blocked processes.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1145,6 +1185,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''Processes blocked'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Read-ahead pages per second'
           type: DEPENDENT
@@ -1153,9 +1197,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Indicates the number of pages read per second in anticipation of use.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1167,6 +1208,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Safe auto-params per second'
           type: DEPENDENT
@@ -1175,9 +1220,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of safe auto-parameterization attempts per second. Safe refers to a determination that a cached execution plan can be shared between different similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization attempts some of which turn out to be safe and others fail. Note that auto-parameterizations are also known as simple parameterizations in later versions of SQL Server. This does not include forced parameterizations.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1189,6 +1231,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Full scans to Index searches ratio'
           type: CALCULATED
@@ -1198,9 +1244,10 @@ zabbix_export:
           value_type: FLOAT
           params: 'last(mssql.full_scans_sec.rate) / (last(mssql.index_searches_sec.rate) + (last(mssql.index_searches_sec.rate)=0))'
           description: 'The ratio of Full scans per second to Index searches per second. The threshold recommendation is strictly for OLTP workloads.'
-          applications:
+          tags:
             -
-              name: MSSQL
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(15m)} > 0.001'
@@ -1215,9 +1262,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes compiles caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1229,6 +1273,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: SQL re-compilations per second'
           type: DEPENDENT
@@ -1237,9 +1285,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of statement recompiles per second. Counts the number of times statement recompiles are triggered. Generally, you want the recompiles to be low.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1251,6 +1296,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Table lock escalations per second'
           type: DEPENDENT
@@ -1259,9 +1308,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of times locks on a table were escalated to the TABLE or HoBT granularity.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1273,6 +1319,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Target pages'
           type: DEPENDENT
@@ -1280,9 +1330,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The optimum number of pages in the buffer pool.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1290,6 +1337,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Target pages'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Target server memory'
           type: DEPENDENT
@@ -1298,9 +1349,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Indicates the ideal amount of memory the server can consume.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1312,6 +1360,10 @@ zabbix_export:
                 - '1024'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total latch wait Time'
           type: DEPENDENT
@@ -1321,9 +1373,6 @@ zabbix_export:
           value_type: FLOAT
           units: ms
           description: 'Total latch wait time (in milliseconds) for latch requests in the last second. This value should stay stable compared to the number of latch waits per second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1335,6 +1384,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total server memory'
           type: DEPENDENT
@@ -1343,9 +1396,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Specifies the amount of memory the server has committed using the memory manager.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1357,6 +1407,10 @@ zabbix_export:
                 - '1024'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total transactions number'
           type: DEPENDENT
@@ -1364,9 +1418,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of currently active transactions of all types.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1374,6 +1425,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Transactions'' && @.counter_name==''Transactions'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Total transactions per second'
           type: DEPENDENT
@@ -1382,9 +1437,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Total number of transactions started for all databases per second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1396,6 +1448,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Unsafe auto-params per second'
           type: DEPENDENT
@@ -1404,9 +1460,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of unsafe auto-parameterization attempts per second. For example, the query has some characteristics that prevent the cached plan from being shared. These are designated as unsafe. This does not count the number of forced parameterizations.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1418,6 +1471,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Uptime'
           type: DEPENDENT
@@ -1427,9 +1484,6 @@ zabbix_export:
           trends: 0d
           units: uptime
           description: 'MS SQL Server uptime in ''N days, hh:mm:ss'' format.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1437,6 +1491,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}'' && @.counter_name==''Uptime'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{nodata(30m)}=1'
@@ -1460,9 +1518,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of users connected to MS SQL Server.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1470,6 +1525,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''User Connections'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Errors per second (User errors)'
           type: DEPENDENT
@@ -1478,9 +1537,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of errors per second.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1492,6 +1548,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
         -
           name: 'MSSQL: Version'
           type: DEPENDENT
@@ -1501,9 +1561,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'MS SQL Server version.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1515,6 +1572,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -1530,9 +1591,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of work files created per second. For example, work files could be used to store temporary results for hash joins and hash aggregates.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1544,6 +1602,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.WORK_FILES.MAX}'
@@ -1558,9 +1620,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of work tables created per second. For example, work tables could be used to store temporary results for query spool, lob variables, XML variables, and cursors.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1572,6 +1631,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{min(5m)}>{$MSSQL.WORK_TABLES.MAX}'
@@ -1587,9 +1650,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Percentage of work tables created where the initial two pages of the work table were not allocated but were immediately available from the work table cache.'
-          applications:
-            -
-              name: MSSQL
           preprocessing:
             -
               type: JSONPATH
@@ -1597,6 +1657,10 @@ zabbix_export:
                 - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''WorktablesFromCacheRatio'')].cntr_value.first()'
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{max(5m)}<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
@@ -1610,9 +1674,6 @@ zabbix_export:
           delay: 30s
           history: 7d
           description: 'Test the availability of MS SQL Server on TCP port.'
-          applications:
-            -
-              name: MSSQL
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -1620,6 +1681,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: MSSQL
           triggers:
             -
               expression: '{last()}=0'
@@ -1656,9 +1721,10 @@ zabbix_export:
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting replica states - name, primary and secondary health, synchronization health.'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'': Primary replica recovery health'
               type: DEPENDENT
@@ -1670,9 +1736,6 @@ zabbix_export:
                 0 = In progress
                 1 = Online
                 2 = Unavailable
-              application_prototypes:
-                -
-                  name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               valuemap:
                 name: 'MSSQL AG Recovery health'
               preprocessing:
@@ -1686,6 +1749,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Availability Group \''{#GROUP_NAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=0'
@@ -1701,9 +1768,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Name of the server instance that is hosting the current primary replica.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1715,6 +1779,10 @@ zabbix_export:
                     - 3h
               master_item:
                 key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Availability Group \''{#GROUP_NAME}\'''
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'': Secondary replica recovery health'
               type: DEPENDENT
@@ -1726,9 +1794,6 @@ zabbix_export:
                 0 = In progress
                 1 = Online
                 2 = Unavailable
-              application_prototypes:
-                -
-                  name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               valuemap:
                 name: 'MSSQL AG Recovery health'
               preprocessing:
@@ -1742,6 +1807,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Availability Group \''{#GROUP_NAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=0'
@@ -1759,9 +1828,6 @@ zabbix_export:
                 0: Not healthy. None of the availability replicas have a healthy.
                 1: Partially healthy. The synchronization health of some, but not all, availability replicas is healthy.
                 2: Healthy. The synchronization health of every availability replica is healthy.
-              application_prototypes:
-                -
-                  name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
               valuemap:
                 name: 'MSSQL AG Synchronization health'
               preprocessing:
@@ -1775,6 +1841,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Availability Group \''{#GROUP_NAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=0'
@@ -1822,9 +1892,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of active transactions for the database.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1832,6 +1899,10 @@ zabbix_export:
                     - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Active Transactions'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Data file size'
               type: DEPENDENT
@@ -1840,9 +1911,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Cumulative size of all the data files in the database including any automatic growth. Monitoring this counter is useful, for example, for determining the correct size of tempdb.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1854,6 +1922,10 @@ zabbix_export:
                     - '1024'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Log bytes flushed per second'
               type: DEPENDENT
@@ -1863,9 +1935,6 @@ zabbix_export:
               value_type: FLOAT
               units: Bps
               description: 'Total number of log bytes flushed per second. Useful for determining trends and utilization of the transaction log.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1877,6 +1946,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Log file size'
               type: DEPENDENT
@@ -1885,9 +1958,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Cumulative size of all the transaction log files in the database.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1899,6 +1969,10 @@ zabbix_export:
                     - '1024'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Log file used size'
               type: DEPENDENT
@@ -1907,9 +1981,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The cumulative used size of all the log files in the database.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1921,6 +1992,10 @@ zabbix_export:
                     - '1024'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Log flushes per second'
               type: DEPENDENT
@@ -1929,9 +2004,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of log flushes per second.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1943,6 +2015,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Log flush waits per second'
               type: DEPENDENT
@@ -1951,9 +2027,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of commits per second waiting for the log flush.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1965,6 +2038,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}'
@@ -1980,9 +2057,6 @@ zabbix_export:
               value_type: FLOAT
               units: ms
               description: 'Total wait time (in milliseconds) to flush the log. On an AlwaysOn secondary database, this value indicates the wait time for log records to be hardened to disk.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -1994,6 +2068,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}'
@@ -2007,9 +2085,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Total number of times the transaction log for the database has been expanded.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2017,6 +2092,10 @@ zabbix_export:
                     - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Growths'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Log shrinks'
               type: DEPENDENT
@@ -2024,9 +2103,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Total number of times the transaction log for the database has been shrunk.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2034,6 +2110,10 @@ zabbix_export:
                     - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Shrinks'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Log truncations'
               type: DEPENDENT
@@ -2041,9 +2121,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The number of times the transaction log has been shrunk.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2051,6 +2128,10 @@ zabbix_export:
                     - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Truncations'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
             -
               name: 'MSSQL DB ''{#DBNAME}'': Percent log used'
               type: DEPENDENT
@@ -2060,9 +2141,6 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'Percentage of space in the log that is in use.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2070,6 +2148,10 @@ zabbix_export:
                     - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Percent Log Used'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}'
@@ -2092,9 +2174,6 @@ zabbix_export:
                 6 = OFFLINE | SQL Server 2008 and later
                 7 = COPYING | Azure SQL Database Active Geo-Replication
                 10 = OFFLINE_SECONDARY | Azure SQL Database Active Geo-Replication
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               valuemap:
                 name: 'MSSQL DB state'
               preprocessing:
@@ -2108,6 +2187,10 @@ zabbix_export:
                     - 15m
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}>1'
@@ -2122,9 +2205,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of transactions started for the database per second.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Database ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2136,6 +2216,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Database \''{#DBNAME}\'''
           graph_prototypes:
             -
               name: 'MSSQL DB ''{#DBNAME}'': Log size'
@@ -2222,9 +2306,10 @@ zabbix_export:
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting the states of the local availability database.'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': Suspended'
               type: DEPENDENT
@@ -2235,9 +2320,6 @@ zabbix_export:
                 Database state:
                 0 = Resumed
                 1 = Suspended
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2249,6 +2331,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Local DB \''{#DBNAME}\'''
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': State'
               type: DEPENDENT
@@ -2263,9 +2349,6 @@ zabbix_export:
                 4 = Suspect
                 5 = Emergency
                 6 = Offline
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
               valuemap:
                 name: 'MSSQL DB state'
               preprocessing:
@@ -2279,6 +2362,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Local DB \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}>0'
@@ -2297,9 +2384,6 @@ zabbix_export:
                 1 = Partially healthy. A database on a synchronous-commit availability replica is considered 
                 partially healthy if synchronization_state is 1 (SYNCHRONIZING).
                 2 = Healthy. A database on an synchronous-commit availability replica is considered healthy if synchronization_state is 2 (SYNCHRONIZED), and a database on an asynchronous-commit availability replica is considered healthy if synchronization_state is 1 (SYNCHRONIZING).
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
               valuemap:
                 name: 'MSSQL AG Synchronization health'
               preprocessing:
@@ -2313,6 +2397,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Local DB \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=0'
@@ -2366,9 +2454,10 @@ zabbix_export:
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting mirrors state'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MSSQL Mirroring ''{#DBNAME}'': Role'
               type: DEPENDENT
@@ -2379,9 +2468,6 @@ zabbix_export:
                 Current role of the local database plays in the database mirroring session.
                 1 = Principal
                 2 = Mirror
-              application_prototypes:
-                -
-                  name: 'MSSQL Mirroring ''{#DBNAME}'''
               valuemap:
                 name: 'MSSQL Mirroring Role'
               preprocessing:
@@ -2395,6 +2481,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Mirroring \''{#DBNAME}\'''
             -
               name: 'MSSQL Mirroring ''{#DBNAME}'': Role sequence'
               type: DEPENDENT
@@ -2402,9 +2492,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The number of times that mirroring partners have switched the principal and mirror roles due to a failover or forced service.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Mirroring ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2416,6 +2503,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Mirroring \''{#DBNAME}\'''
             -
               name: 'MSSQL Mirroring ''{#DBNAME}'': Safety level'
               type: DEPENDENT
@@ -2427,9 +2518,6 @@ zabbix_export:
                 0 = Unknown state
                 1 = Off [asynchronous]
                 2 = Full [synchronous]
-              application_prototypes:
-                -
-                  name: 'MSSQL Mirroring ''{#DBNAME}'''
               valuemap:
                 name: 'MSSQL Safety level'
               preprocessing:
@@ -2443,6 +2531,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Mirroring \''{#DBNAME}\'''
             -
               name: 'MSSQL Mirroring ''{#DBNAME}'': State'
               type: DEPENDENT
@@ -2458,9 +2550,6 @@ zabbix_export:
                 4 = Synchronized
                 5 = The partners are not synchronized. Failover is not possible now.
                 6 = The partners are synchronized. Failover is potentially possible. For information about the requirements for failover see, Database Mirroring Operating Modes.
-              application_prototypes:
-                -
-                  name: 'MSSQL Mirroring ''{#DBNAME}'''
               valuemap:
                 name: 'MSSQL Mirroring State'
               preprocessing:
@@ -2474,6 +2563,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Mirroring \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=3'
@@ -2501,9 +2594,6 @@ zabbix_export:
                 0 = Unknown
                 1 = Connected
                 2 = Disconnected
-              application_prototypes:
-                -
-                  name: 'MSSQL Mirroring ''{#DBNAME}'''
               valuemap:
                 name: 'MSSQL Witness state'
               preprocessing:
@@ -2517,6 +2607,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Mirroring \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=2'
@@ -2580,9 +2674,10 @@ zabbix_export:
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting the states of the non-local availability database.'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Log queue size'
               type: DEPENDENT
@@ -2591,9 +2686,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Amount of log records of the primary database that has not been sent to the secondary databases.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2609,6 +2701,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Non-Local DB \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
@@ -2623,9 +2719,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Amount of log records in the log files of the secondary replica that has not yet been redone.'
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
               preprocessing:
                 -
                   type: JSONPATH
@@ -2641,6 +2734,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Non-Local DB \''{#DBNAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
@@ -2691,9 +2788,10 @@ zabbix_export:
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting the database replica states.'
-              applications:
+              tags:
                 -
-                  name: 'Zabbix raw items'
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Connected state'
               type: DEPENDENT
@@ -2706,9 +2804,6 @@ zabbix_export:
                 On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect;
                 On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.
                 1 : Connected. Each primary replica tracks the connection state for every secondary replica in the same availability group. Secondary replicas track the connection state of only the primary replica.
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               valuemap:
                 name: 'MSSQL AG Connected state'
               preprocessing:
@@ -2722,6 +2817,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Replica \''{#REPLICA_NAME}\'''
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Is local'
               type: DEPENDENT
@@ -2732,9 +2831,6 @@ zabbix_export:
                 Whether the replica is local:
                 0 = Indicates a remote secondary replica in an availability group whose primary replica is hosted by the local server instance. This value occurs only on the primary replica location.
                 1 = Indicates a local replica. On secondary replicas, this is the only available value for the availability group to which the replica belongs.
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               valuemap:
                 name: 'MSSQL - Yes / No'
               preprocessing:
@@ -2748,6 +2844,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Replica \''{#REPLICA_NAME}\'''
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Join state'
               type: DEPENDENT
@@ -2758,9 +2858,6 @@ zabbix_export:
                 0 = Not joined
                 1 = Joined, standalone instance
                 2 = Joined, failover cluster instance
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               valuemap:
                 name: 'MSSQL AG Join state'
               preprocessing:
@@ -2774,6 +2871,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Replica \''{#REPLICA_NAME}\'''
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Operational state'
               type: DEPENDENT
@@ -2789,9 +2890,6 @@ zabbix_export:
                 4 = Failed
                 5 = Failed, no quorum
                 6 = Not local
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               valuemap:
                 name: 'MSSQL AG Operational state'
               preprocessing:
@@ -2805,6 +2903,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Replica \''{#REPLICA_NAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=0 or {last()}=1 or {last()}=3'
@@ -2832,9 +2934,6 @@ zabbix_export:
                 0 : In progress. At least one joined database has a database state other than ONLINE 
                 (database_state is not 0).
                 1 : Online. All the joined databases have a database state of ONLINE (database_state is 0).
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               valuemap:
                 name: 'MSSQL AG Recovery health'
               preprocessing:
@@ -2848,6 +2947,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Replica \''{#REPLICA_NAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=0'
@@ -2865,9 +2968,6 @@ zabbix_export:
                 0 = Resolving
                 1 = Primary
                 2 = Secondary
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               valuemap:
                 name: 'MSSQL AG Role'
               preprocessing:
@@ -2881,6 +2981,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Replica \''{#REPLICA_NAME}\'''
             -
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Sync health'
               type: DEPENDENT
@@ -2892,9 +2996,6 @@ zabbix_export:
                 0 : Not healthy. At least one joined database is in the NOT SYNCHRONIZING state.
                 1 : Partially healthy. Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.
                 2 : Healthy. All replicas are in the target synchronization state: synchronous-commit replicas are synchronized, and asynchronous-commit replicas are synchronizing.
-              application_prototypes:
-                -
-                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
               valuemap:
                 name: 'MSSQL AG Synchronization health'
               preprocessing:
@@ -2908,6 +3009,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: Application
+                  value: 'MSSQL Available Group \''{#GROUP_NAME}\'' Replica \''{#REPLICA_NAME}\'''
               trigger_prototypes:
                 -
                   expression: '{last()}=0'

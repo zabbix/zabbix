@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:32Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -27,19 +27,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'Hardware model name'
@@ -54,14 +41,15 @@ zabbix_export:
             MIB: JUNIPER-MIB
             The name, model, or detailed description of the box,indicating which product the box is about, for example 'M40'.
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -75,14 +63,15 @@ zabbix_export:
             MIB: JUNIPER-MIB
             The serial number of this subject, blank if unknown or unavailable.
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -109,11 +98,12 @@ zabbix_export:
             This red alarm state could be turned off by the
             ACO/LT (Alarm Cut Off / Lamp Test) button on the
             front panel module.
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'JUNIPER-ALARM-MIB::jnxRedAlarmState'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
@@ -132,9 +122,6 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: SNMPv2-MIB'
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: REGEX
@@ -145,6 +132,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -181,9 +172,10 @@ zabbix_export:
                 MIB: JUNIPER-MIB
                 The CPU utilization in percentage of this subject. Zero if unavailable or inapplicable.
                 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf
-              applications:
+              tags:
                 -
-                  name: CPU
+                  tag: Application
+                  value: CPU
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -203,9 +195,10 @@ zabbix_export:
                 MIB: JUNIPER-MIB
                 The buffer pool utilization in percentage of this subject.  Zero if unavailable or inapplicable.
                 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
@@ -252,11 +245,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: JUNIPER-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -284,11 +278,12 @@ zabbix_export:
                 MIB: JUNIPER-MIB
                 If they are using DC power supplies there is a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.
                 This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK-MX104/m-p/289644#M14122
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -323,9 +318,10 @@ zabbix_export:
               description: |
                 MIB: JUNIPER-MIB
                 The temperature in Celsius (degrees C) of {#SENSOR_INFO}
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'

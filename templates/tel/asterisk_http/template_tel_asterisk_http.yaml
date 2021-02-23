@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:25Z'
   groups:
     -
       name: Templates/Telephony
@@ -17,11 +17,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Telephony
-      applications:
-        -
-          name: Asterisk
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Asterisk: Active calls'
@@ -30,9 +25,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of active calls at the moment.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -40,6 +32,10 @@ zabbix_export:
                 - $.active_calls
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: Active channels'
           type: DEPENDENT
@@ -47,9 +43,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of active channels at the moment.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -57,6 +50,10 @@ zabbix_export:
                 - $.active_channels
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: Calls processed'
           type: DEPENDENT
@@ -64,9 +61,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of calls processed after the last service restart.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -74,6 +68,10 @@ zabbix_export:
                 - $.calls_processed
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: Calls processed per second'
           type: DEPENDENT
@@ -82,9 +80,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of calls processed per second.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -96,6 +91,10 @@ zabbix_export:
                 - ''
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: Get stats'
           type: HTTP_AGENT
@@ -104,9 +103,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Asterisk system information in JSON format.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -384,6 +380,10 @@ zabbix_export:
               name: secret
               value: '{$AMI.SECRET}'
           retrieve_mode: HEADERS
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Asterisk: IAX offline peers'
           type: DEPENDENT
@@ -391,9 +391,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of offline IAX peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -401,6 +398,10 @@ zabbix_export:
                 - $.iax.offline
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: IAX online peers'
           type: DEPENDENT
@@ -408,9 +409,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of online IAX peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -418,6 +416,10 @@ zabbix_export:
                 - $.iax.online
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: IAX peers'
           type: DEPENDENT
@@ -425,9 +427,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The total number of IAX peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -435,6 +434,10 @@ zabbix_export:
                 - $.iax.total
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: IAX unmonitored peers'
           type: DEPENDENT
@@ -442,9 +445,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of unmonitored IAX peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -452,6 +452,10 @@ zabbix_export:
                 - $.iax.unmonitored
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: PJSIP available endpoints'
           type: DEPENDENT
@@ -459,9 +463,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of available PJSIP peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -469,6 +470,10 @@ zabbix_export:
                 - $.pjsip.available
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: PJSIP endpoints'
           type: DEPENDENT
@@ -476,9 +481,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The total number of PJSIP peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -486,6 +488,10 @@ zabbix_export:
                 - $.pjsip.total
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: PJSIP unavailable endpoints'
           type: DEPENDENT
@@ -493,9 +499,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of unavailable PJSIP peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -503,6 +506,10 @@ zabbix_export:
                 - $.pjsip.unavailable
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: SIP monitored offline'
           type: DEPENDENT
@@ -510,9 +517,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of monitored offline SIP peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -520,6 +524,10 @@ zabbix_export:
                 - $.sip.monitored_offline
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: SIP monitored online'
           type: DEPENDENT
@@ -527,9 +535,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of monitored online SIP peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -537,6 +542,10 @@ zabbix_export:
                 - $.sip.monitored_online
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: SIP peers'
           type: DEPENDENT
@@ -544,9 +553,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The total number of SIP peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -554,6 +560,10 @@ zabbix_export:
                 - $.sip.total
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: SIP unmonitored offline'
           type: DEPENDENT
@@ -561,9 +571,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of unmonitored offline SIP peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -571,6 +578,10 @@ zabbix_export:
                 - $.sip.unmonitored_offline
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: SIP unmonitored online'
           type: DEPENDENT
@@ -578,9 +589,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of unmonitored online SIP peers.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -588,6 +596,10 @@ zabbix_export:
                 - $.sip.unmonitored_online
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: Total queues'
           type: DEPENDENT
@@ -595,9 +607,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of configured queues.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -605,6 +614,10 @@ zabbix_export:
                 - $.queue.total
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
         -
           name: 'Asterisk: Uptime'
           type: DEPENDENT
@@ -614,9 +627,6 @@ zabbix_export:
           value_type: FLOAT
           units: uptime
           description: 'System uptime in ''N days, hh:mm:ss'' format.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -624,6 +634,10 @@ zabbix_export:
                 - $.uptime
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
           triggers:
             -
               expression: '{nodata(30m)}=1'
@@ -650,9 +664,6 @@ zabbix_export:
           value_type: FLOAT
           units: uptime
           description: 'System uptime after a config reload in ''N days, hh:mm:ss'' format.'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -660,6 +671,10 @@ zabbix_export:
                 - $.uptime_reload
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
           triggers:
             -
               expression: '{last()}<10m'
@@ -676,9 +691,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Service version'
-          applications:
-            -
-              name: Asterisk
           preprocessing:
             -
               type: JSONPATH
@@ -686,6 +698,10 @@ zabbix_export:
                 - $.version
           master_item:
             key: asterisk.get_stats
+          tags:
+            -
+              tag: Application
+              value: Asterisk
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -701,9 +717,10 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Asterisk Manager API performance.'
-          applications:
+          tags:
             -
-              name: Asterisk
+              tag: Application
+              value: Asterisk
           triggers:
             -
               expression: '{min(5m)}>{$AMI.RESPONSE_TIME.MAX.WARN}'
@@ -720,9 +737,6 @@ zabbix_export:
           key: 'net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]'
           history: 7d
           description: 'Asterisk Manager API port avalability.'
-          applications:
-            -
-              name: Asterisk
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -730,6 +744,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Asterisk
           triggers:
             -
               expression: '{last()}=0'
@@ -750,9 +768,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The total number of active IAX trunk channels.'
-              application_prototypes:
-                -
-                  name: 'Asterisk IAX trunks'
               preprocessing:
                 -
                   type: JSONPATH
@@ -760,6 +775,10 @@ zabbix_export:
                     - '$.iax.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].active_channels.first()'
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk IAX trunks'
               trigger_prototypes:
                 -
                   expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
@@ -780,9 +799,6 @@ zabbix_export:
                 UNKNOWN
                 UNREACHABLE
                 OK
-              application_prototypes:
-                -
-                  name: 'Asterisk IAX trunks'
               preprocessing:
                 -
                   type: JSONPATH
@@ -794,6 +810,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk IAX trunks'
               trigger_prototypes:
                 -
                   expression: '{last()}="UNKNOWN" or {last()}="UNREACHABLE"'
@@ -828,9 +848,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The total number of active PJSIP trunk channels.'
-              application_prototypes:
-                -
-                  name: 'Asterisk PJSIP trunks'
               preprocessing:
                 -
                   type: JSONPATH
@@ -838,6 +855,10 @@ zabbix_export:
                     - '$.pjsip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].active_channels.first()'
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk PJSIP trunks'
               trigger_prototypes:
                 -
                   expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
@@ -857,9 +878,6 @@ zabbix_export:
                 Unavailable
                 Not in use
                 In use
-              application_prototypes:
-                -
-                  name: 'Asterisk PJSIP trunks'
               preprocessing:
                 -
                   type: JSONPATH
@@ -871,6 +889,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk PJSIP trunks'
               trigger_prototypes:
                 -
                   expression: '{last()}="Unavailable"'
@@ -905,9 +927,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The number of available queue members.'
-              application_prototypes:
-                -
-                  name: 'Asterisk queue "{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -915,6 +934,10 @@ zabbix_export:
                     - '$.queue.queues[?(@.Queue==''{#QUEUE}'')].Available.first()'
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk queue "{#QUEUE}"'
             -
               name: '"{#QUEUE}": Callers'
               type: DEPENDENT
@@ -922,9 +945,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The number incomming calls in queue.'
-              application_prototypes:
-                -
-                  name: 'Asterisk queue "{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -932,6 +952,10 @@ zabbix_export:
                     - '$.queue.queues[?(@.Queue==''{#QUEUE}'')].Callers.first()'
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk queue "{#QUEUE}"'
               trigger_prototypes:
                 -
                   expression: '{min(10m)}>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}'
@@ -945,9 +969,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The number of queue members.'
-              application_prototypes:
-                -
-                  name: 'Asterisk queue "{#QUEUE}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -955,6 +976,10 @@ zabbix_export:
                     - '$.queue.queues[?(@.Queue==''{#QUEUE}'')].LoggedIn.first()'
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk queue "{#QUEUE}"'
           master_item:
             key: asterisk.get_stats
           lld_macro_paths:
@@ -983,9 +1008,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The total number of active SIP trunk channels.'
-              application_prototypes:
-                -
-                  name: 'Asterisk SIP trunks'
               preprocessing:
                 -
                   type: JSONPATH
@@ -993,6 +1015,10 @@ zabbix_export:
                     - '$.sip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].active_channels.first()'
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk SIP trunks'
               trigger_prototypes:
                 -
                   expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
@@ -1013,9 +1039,6 @@ zabbix_export:
                 UNKNOWN
                 UNREACHABLE
                 OK
-              application_prototypes:
-                -
-                  name: 'Asterisk SIP trunks'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1027,6 +1050,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: asterisk.get_stats
+              tags:
+                -
+                  tag: Application
+                  value: 'Asterisk SIP trunks'
               trigger_prototypes:
                 -
                   expression: '{last()}="UNKNOWN" or {last()}="UNREACHABLE"'
