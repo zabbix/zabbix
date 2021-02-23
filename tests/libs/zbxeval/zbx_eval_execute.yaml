@@ -845,4 +845,12 @@ in:
 out:
   result: SUCCEED
   value: 60
+---
+test case: Expression '"1" < "g"'
+in:
+  rules: []
+  expression: '"1" < "g"'
+out:
+  result: SUCCEED
+  value: 1
 ...
