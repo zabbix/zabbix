@@ -380,6 +380,10 @@ class CDashboard extends CDashboardGeneral {
 			}
 		}
 
+		if (!$names) {
+			return;
+		}
+
 		$duplicate = DBfetch(DBselect(
 			'SELECT name FROM dashboard WHERE templateid IS NULL AND '.dbConditionString('name', $names), 1
 		));

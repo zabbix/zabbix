@@ -385,6 +385,10 @@ class CTemplateDashboard extends CDashboardGeneral {
 			}
 		}
 
+		if (!$names_by_template) {
+			return;
+		}
+
 		$where = [];
 		foreach ($names_by_template as $templateid => $names) {
 			$where[] = '('.dbConditionId('templateid', [$templateid]).' AND '.dbConditionString('name', $names).')';
