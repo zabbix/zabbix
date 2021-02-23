@@ -853,4 +853,12 @@ in:
 out:
   result: SUCCEED
   value: 1
+---
+test case: Expression '"1" = "1.0"'
+in:
+  rules: []
+  expression: '"1" = "1.0"'
+out:
+  result: SUCCEED
+  value: 1
 ...
