@@ -196,7 +196,7 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 		return SUCCEED;
 	}
 
-	/* check logical operators */
+	/* check logical equal, not equal operators */
 
 	switch (token->type)
 	{
@@ -205,18 +205,6 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 			goto finish;
 		case ZBX_EVAL_TOKEN_OP_NE:
 			value = (0 == zbx_variant_compare(left, right) ? 0 : 1);
-			goto finish;
-		case ZBX_EVAL_TOKEN_OP_LT:
-			value = (0 > zbx_variant_compare(left, right) ? 1 : 0);
-			goto finish;
-		case ZBX_EVAL_TOKEN_OP_LE:
-			value = (0 >= zbx_variant_compare(left, right) ? 1 : 0);
-			goto finish;
-		case ZBX_EVAL_TOKEN_OP_GT:
-			value = (0 < zbx_variant_compare(left, right) ? 1 : 0);
-			goto finish;
-		case ZBX_EVAL_TOKEN_OP_GE:
-			value = (0 <= zbx_variant_compare(left, right) ? 1 : 0);
 			goto finish;
 	}
 
@@ -264,6 +252,18 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 
 	switch (token->type)
 	{
+		case ZBX_EVAL_TOKEN_OP_LT:
+			value = (0 > zbx_variant_compare(left, right) ? 1 : 0);
+			break;
+		case ZBX_EVAL_TOKEN_OP_LE:
+			value = (0 >= zbx_variant_compare(left, right) ? 1 : 0);
+			break;
+		case ZBX_EVAL_TOKEN_OP_GT:
+			value = (0 < zbx_variant_compare(left, right) ? 1 : 0);
+			break;
+		case ZBX_EVAL_TOKEN_OP_GE:
+			value = (0 <= zbx_variant_compare(left, right) ? 1 : 0);
+			break;
 		case ZBX_EVAL_TOKEN_OP_ADD:
 			value = left->data.dbl + right->data.dbl;
 			break;

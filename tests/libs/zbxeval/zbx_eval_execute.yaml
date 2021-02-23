@@ -851,8 +851,7 @@ in:
   rules: []
   expression: '"1" < "g"'
 out:
-  result: SUCCEED
-  value: 1
+  result: FAIL
 ---
 test case: Expression '"1" = "1.0"'
 in:
