@@ -95,7 +95,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_password' => '',
 				'name' => 'empty-host',
 				'inventory_mode' => '0',
-				'tags' => []
+				'tags' => [],
+				'valuemaps' => []
 			],
 			[
 				'inventory' => [
@@ -260,7 +261,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_password' => 'impi password',
 				'name' => 'export-host',
 				'inventory_mode' => '0',
-				'tags' => []
+				'tags' => [],
+				'valuemaps' => []
 			]
 		]);
 	}
@@ -280,7 +282,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'host' => 'empty-template',
 				'name' => 'empty-template',
 				'description' => '',
-				'tags' => []
+				'tags' => [],
+				'valuemaps' => []
 			],
 			[
 				'groups' =>	[
@@ -313,7 +316,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'host' => 'export-template',
 				'name' => 'export-template',
 				'description' => '',
-				'tags' => []
+				'tags' => [],
+				'valuemaps' => []
 			]
 		]);
 	}
@@ -2002,12 +2006,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					'templates' => [],
-					'tags' => [],
 					'proxy' => [
 						'name' => '0'
 					],
 					'description' => '',
-					'name' => 'host'
+					'name' => 'host',
+					'tags' => [],
+					'valuemaps' => []
 				]
 			]
 		);
@@ -2035,9 +2040,10 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					'templates' => [],
-					'tags' => [],
 					'name' => 'Template_Linux',
-					'description' => ''
+					'description' => '',
+					'tags' => [],
+					'valuemaps' => []
 				],
 				[
 					'macros' => [],
@@ -2048,9 +2054,10 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					'templates' => [],
-					'tags' => [],
 					'name' => 'Template_Simple',
-					'description' => ''
+					'description' => '',
+					'tags' => [],
+					'valuemaps' => []
 				]
 			]
 		);
@@ -2442,6 +2449,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'name' => 'Linux servers'
 						]
 					],
+					'templates' => [],
 					'host' => 'host',
 					'interfaces' =>
 					[
@@ -2467,7 +2475,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'ipmi_username' => '',
 					'macros' => [],
 					'tags' => [],
-					'templates' => []
+					'valuemaps' => []
 				]
 			]
 		);
@@ -2528,7 +2536,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'host' => 'Template_Simple',
 					'name' => 'Template_Simple',
 					'description' => '',
-					'tags' => []
+					'tags' => [],
+					'valuemaps' => []
 				]
 			]
 		);
@@ -2863,7 +2872,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'host' => 'Test 1',
 				'name' => 'Test 1',
 				'description' => '',
-				'tags' => []
+				'tags' => [],
+				'valuemaps' => []
 			]
 		]);
 
@@ -3645,7 +3655,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_password' => '',
 				'name' => 'SNMP host',
 				'inventory_mode' => '-1',
-				'tags' => []
+				'tags' => [],
+				'valuemaps' => []
 			]
 		]);
 

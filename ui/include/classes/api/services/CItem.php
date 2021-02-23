@@ -120,6 +120,7 @@ class CItem extends CItemGeneral {
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'		=> null,
 			'selectPreprocessing'		=> null,
+			'selectValueMap'			=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -129,6 +130,7 @@ class CItem extends CItemGeneral {
 			'limitSelects'				=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+		$this->validateGet($options);
 
 		$this->validateGet($options);
 
@@ -403,7 +405,9 @@ class CItem extends CItemGeneral {
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
+				$options['output']
+			);
 		}
 
 		// removing keys (hash -> array)
@@ -430,16 +434,19 @@ class CItem extends CItemGeneral {
 	/**
 	 * Validates the input parameters for the get() method.
 	 *
-	 * @throws APIException  if the input is invalid
-	 *
 	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
 	 */
 	private function validateGet(array $options) {
-		$evaltype_validator = new CLimitedSetValidator([
-			'values' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
-		]);
-		if (!$evaltype_validator->validate($options['evaltype'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
+		// Validate input parameters.
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
+			'evaltype' => ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])]
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -577,14 +584,14 @@ class CItem extends CItemGeneral {
 		self::validateInventoryLinks($items, true);
 
 		$db_items = $this->get([
-			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
+			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode', 'value_type'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'authtype',
-			'master_itemid'
+			'master_itemid', 'value_type'
 		]);
 
 		$this->validateDependentItems($items);
@@ -673,6 +680,16 @@ class CItem extends CItemGeneral {
 
 				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
 					$item['timeout'] = $defaults['timeout'];
+				}
+			}
+
+			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				if ($item['value_type'] != $db_items[$item['itemid']]['value_type']) {
+					// Reset valuemapid when value_type is LOG or TEXT.
+					$item['valuemapid'] = 0;
+				}
+				else {
+					unset($item['valuemapid']);
 				}
 			}
 		}
@@ -1214,6 +1231,10 @@ class CItem extends CItemGeneral {
 
 			if ($options['selectInterfaces'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.interfaceid', $sqlParts);
+			}
+
+			if ($options['selectValueMap'] !== null) {
+				$sqlParts = $this->addQuerySelect('i.valuemapid', $sqlParts);
 			}
 
 			if ($this->outputIsRequested('lastclock', $options['output'])

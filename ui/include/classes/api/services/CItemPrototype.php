@@ -96,6 +96,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectDiscoveryRule'			=> null,
 			'selectPreprocessing'			=> null,
 			'selectTags'					=> null,
+			'selectValueMap'				=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -105,6 +106,7 @@ class CItemPrototype extends CItemGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -282,7 +284,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
@@ -303,6 +305,77 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options) {
+		// Validate input parameters.
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
+	 * Check item prototype data and set flags field.
+	 *
+	 * @param array  $items										an array of items passed by reference
+	 * @param array  $item['applicationPrototypes']				an array of application prototypes
+	 * @param string $item['applicationPrototypes'][]['name']	application prototype name
+	 * @param bool	 $update
+	 */
+	protected function checkInput(array &$items, $update = false) {
+		parent::checkInput($items, $update);
+
+		// set proper flags to divide normal and discovered items in future processing
+		foreach ($items as &$item) {
+			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
+					&& $item['applicationPrototypes']) {
+				// Check that "name" field exists for application prototypes.
+				foreach ($item['applicationPrototypes'] as $application_prototype) {
+					if (!array_key_exists('name', $application_prototype)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Missing "name" field for application prototype in item prototype "%1$s".', $item['name']
+						));
+					}
+
+					if ($application_prototype['name'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Empty application prototype name in item prototype "%1$s".', $item['name']
+						));
+					}
+
+					if (array_key_exists('templateid', $application_prototype)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot set "templateid" field for application prototype in item prototype "%1$s".',
+							$item['name']
+						));
+					}
+				}
+
+				// Check that "name" field has no duplicate values for application prototypes.
+				$duplicate_name = CArrayHelper::findDuplicate($item['applicationPrototypes'], 'name');
+				if ($duplicate_name) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Duplicate "name" value "%1$s" for application prototype in item prototype "%2$s".',
+						$duplicate_name['name'],
+						$item['name']
+					));
+				}
+			}
+		}
+		unset($item);
 	}
 
 	/**
@@ -436,14 +509,14 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		$db_items = $this->get([
-			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
+			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode', 'value_type'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['type', 'authtype',
-			'master_itemid'
+			'master_itemid', 'value_type'
 		]);
 
 		$this->validateDependentItems($items);
@@ -532,6 +605,13 @@ class CItemPrototype extends CItemGeneral {
 
 				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
 					$item['timeout'] = $defaults['timeout'];
+				}
+			}
+
+			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				if ($item['value_type'] != $db_items[$item['itemid']]['value_type']) {
+					// Reset valuemapid when value_type is LOG or TEXT.
+					$item['valuemapid'] = 0;
 				}
 			}
 		}
@@ -673,6 +753,10 @@ class CItemPrototype extends CItemGeneral {
 		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+			}
+
+			if ($options['selectValueMap'] !== null) {
+				$sqlParts = $this->addQuerySelect('i.valuemapid', $sqlParts);
 			}
 		}
 

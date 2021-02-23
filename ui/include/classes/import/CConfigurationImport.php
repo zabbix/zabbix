@@ -80,7 +80,7 @@ class CConfigurationImport {
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
 		];
 
 		$options = array_merge($default_options, $options);
@@ -140,7 +140,6 @@ class CConfigurationImport {
 		$this->deleteMissingItems();
 
 		// import objects
-		$this->processValueMaps();
 		$this->processHttpTests();
 		$this->processItems();
 		$this->processTriggers();
@@ -228,16 +227,12 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedValueMaps() as $valuemap) {
-			$valueMapsRefs[$valuemap['name']] = $valuemap['name'];
-		}
-
 		foreach ($this->getFormattedItems() as $host => $items) {
 			foreach ($items as $item) {
 				$itemsRefs[$host][$item['key_']] = $item['key_'];
 
 				if (!empty($item['valuemap'])) {
-					$valueMapsRefs[$item['valuemap']['name']] = $item['valuemap']['name'];
+					$valueMapsRefs[$host][$item['valuemap']['name']] = $item['valuemap']['name'];
 				}
 			}
 		}
@@ -250,7 +245,7 @@ class CConfigurationImport {
 					$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
 
 					if (!empty($itemp['valuemap'])) {
-						$valueMapsRefs[$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
+						$valueMapsRefs[$host][$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
 					}
 				}
 
@@ -588,48 +583,6 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Import value maps.
-	 */
-	protected function processValueMaps() {
-		if (!$this->options['valueMaps']['createMissing'] && !$this->options['valueMaps']['updateExisting']) {
-			return;
-		}
-
-		$all_valuemaps = $this->getFormattedValueMaps();
-
-		if (!$all_valuemaps) {
-			return;
-		}
-
-		$valuemaps_to_create = [];
-		$valuemaps_to_update = [];
-
-		foreach ($all_valuemaps as $valuemap) {
-			$valuemapid = $this->referencer->resolveValueMap($valuemap['name']);
-
-			if ($valuemapid) {
-				$valuemap['valuemapid'] = $valuemapid;
-				$valuemaps_to_update[] = $valuemap;
-			}
-			else {
-				$valuemaps_to_create[] = $valuemap;
-			}
-		}
-
-		if ($this->options['valueMaps']['createMissing'] && $valuemaps_to_create) {
-			$valuemapids = API::ValueMap()->create($valuemaps_to_create);
-
-			foreach ($valuemaps_to_create as $key => $valuemap) {
-				$this->referencer->addValueMapRef($valuemap['name'], $valuemapids['valuemapids'][$key]);
-			}
-		}
-
-		if ($this->options['valueMaps']['updateExisting'] && $valuemaps_to_update) {
-			API::ValueMap()->update($valuemaps_to_update);
-		}
-	}
-
-	/**
 	 * Import items.
 	 */
 	protected function processItems() {
@@ -674,7 +627,7 @@ class CConfigurationImport {
 				}
 
 				if (isset($item['valuemap']) && $item['valuemap']) {
-					$valueMapId = $this->referencer->resolveValueMap($item['valuemap']['name']);
+					$valueMapId = $this->referencer->resolveValueMap($hostId, $item['valuemap']['name']);
 
 					if (!$valueMapId) {
 						throw new Exception(_s(
@@ -686,6 +639,7 @@ class CConfigurationImport {
 					}
 
 					$item['valuemapid'] = $valueMapId;
+					unset($item['valuemap']);
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
@@ -1055,7 +1009,7 @@ class CConfigurationImport {
 					}
 
 					if ($prototype['valuemap']) {
-						$valueMapId = $this->referencer->resolveValueMap($prototype['valuemap']['name']);
+						$valueMapId = $this->referencer->resolveValueMap($hostId, $prototype['valuemap']['name']);
 
 						if (!$valueMapId) {
 							throw new Exception(_s(
@@ -1068,6 +1022,7 @@ class CConfigurationImport {
 						}
 
 						$prototype['valuemapid'] = $valueMapId;
+						unset($prototype['valuemap']);
 					}
 
 					if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
@@ -2294,19 +2249,6 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['hosts'];
-	}
-
-	/**
-	 * Get formatted value maps.
-	 *
-	 * @return array
-	 */
-	protected function getFormattedValueMaps() {
-		if (!isset($this->formattedData['valueMaps'])) {
-			$this->formattedData['valueMaps'] = $this->adapter->getValueMaps();
-		}
-
-		return $this->formattedData['valueMaps'];
 	}
 
 	/**

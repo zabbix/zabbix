@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:27:00Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -238,6 +238,28 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN_STATUS}'
           value: '2'
+      valuemaps:
+        -
+          name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+          mappings:
+            -
+              value: '1'
+              newvalue: normal
+            -
+              value: '2'
+              newvalue: warning
+            -
+              value: '3'
+              newvalue: critical
+            -
+              value: '4'
+              newvalue: shutdown
+            -
+              value: '5'
+              newvalue: notPresent
+            -
+              value: '6'
+              newvalue: notFunctioning
     -
       template: 'Cisco CISCO-MEMORY-POOL-MIB SNMP'
       name: 'Cisco CISCO-MEMORY-POOL-MIB SNMP'
@@ -738,25 +760,3 @@ zabbix_export:
           item:
             host: 'Cisco OLD-CISCO-CPU-MIB SNMP'
             key: 'system.cpu.util[avgBusy5]'
-  value_maps:
-    -
-      name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
-      mappings:
-        -
-          value: '1'
-          newvalue: normal
-        -
-          value: '2'
-          newvalue: warning
-        -
-          value: '3'
-          newvalue: critical
-        -
-          value: '4'
-          newvalue: shutdown
-        -
-          value: '5'
-          newvalue: notPresent
-        -
-          value: '6'
-          newvalue: notFunctioning

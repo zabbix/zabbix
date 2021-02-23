@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-11-12T10:49:46Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -333,7 +333,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
-                  
           triggers:
             -
               expression: '{count(#3,"arrayCurrentOffset","like")}=2'
@@ -495,7 +494,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
-                  
           triggers:
             -
               expression: '{count(#3,"arrayHvd","like")}=2'
@@ -608,7 +606,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
-                  
           triggers:
             -
               expression: '{count(#3,"customSettingsEdit","like")}=2'
@@ -940,6 +937,67 @@ zabbix_export:
           macro: '{$VOLTAGE.MIN.CRIT}'
         -
           macro: '{$VOLTAGE.MIN.WARN}'
+      valuemaps:
+        -
+          name: 'ProStar PWM charge state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: NightCheck
+            -
+              value: '2'
+              newvalue: Disconnect
+            -
+              value: '3'
+              newvalue: Night
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Bulk
+            -
+              value: '6'
+              newvalue: Pwm
+            -
+              value: '7'
+              newvalue: Float
+            -
+              value: '8'
+              newvalue: Equalize
+        -
+          name: 'ProStar PWM load state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: LvdWarning
+            -
+              value: '3'
+              newvalue: Lvd
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Disconnect
+            -
+              value: '6'
+              newvalue: NormalOff
+            -
+              value: '7'
+              newvalue: Override
+            -
+              value: '8'
+              newvalue: NotUsed
   graphs:
     -
       name: 'Array: Voltage'
@@ -989,64 +1047,3 @@ zabbix_export:
           item:
             host: 'Morningstar ProStar PWM SNMP'
             key: 'temp.heatsink[heatsinkTemperature.0]'
-  value_maps:
-    -
-      name: 'ProStar PWM charge state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Start
-        -
-          value: '1'
-          newvalue: NightCheck
-        -
-          value: '2'
-          newvalue: Disconnect
-        -
-          value: '3'
-          newvalue: Night
-        -
-          value: '4'
-          newvalue: Fault
-        -
-          value: '5'
-          newvalue: Bulk
-        -
-          value: '6'
-          newvalue: Pwm
-        -
-          value: '7'
-          newvalue: Float
-        -
-          value: '8'
-          newvalue: Equalize
-    -
-      name: 'ProStar PWM load state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Start
-        -
-          value: '1'
-          newvalue: Normal
-        -
-          value: '2'
-          newvalue: LvdWarning
-        -
-          value: '3'
-          newvalue: Lvd
-        -
-          value: '4'
-          newvalue: Fault
-        -
-          value: '5'
-          newvalue: Disconnect
-        -
-          value: '6'
-          newvalue: NormalOff
-        -
-          value: '7'
-          newvalue: Override
-        -
-          value: '8'
-          newvalue: NotUsed

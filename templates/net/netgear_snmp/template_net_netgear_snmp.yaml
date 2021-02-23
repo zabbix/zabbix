@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:10:45Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -352,6 +352,64 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN_STATUS}'
           value: '2'
+      valuemaps:
+        -
+          name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState'
+          mappings:
+            -
+              value: '1'
+              newvalue: operational
+            -
+              value: '2'
+              newvalue: failed
+            -
+              value: '3'
+              newvalue: powering
+            -
+              value: '4'
+              newvalue: notpowering
+            -
+              value: '5'
+              newvalue: notpresent
+        -
+          name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState'
+          mappings:
+            -
+              value: '1'
+              newvalue: operational
+            -
+              value: '2'
+              newvalue: failed
+            -
+              value: '3'
+              newvalue: powering
+            -
+              value: '4'
+              newvalue: notpowering
+            -
+              value: '5'
+              newvalue: notpresent
+        -
+          name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorState'
+          mappings:
+            -
+              value: '1'
+              newvalue: normal
+            -
+              value: '2'
+              newvalue: warning
+            -
+              value: '3'
+              newvalue: critical
+            -
+              value: '4'
+              newvalue: shutdown
+            -
+              value: '5'
+              newvalue: notpresent
+            -
+              value: '6'
+              newvalue: notoperational
   graphs:
     -
       name: 'CPU utilization'
@@ -392,61 +450,3 @@ zabbix_export:
           item:
             host: 'Netgear Fastpath SNMP'
             key: 'vm.memory.util[memoryUsedPercentage.0]'
-  value_maps:
-    -
-      name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState'
-      mappings:
-        -
-          value: '1'
-          newvalue: operational
-        -
-          value: '2'
-          newvalue: failed
-        -
-          value: '3'
-          newvalue: powering
-        -
-          value: '4'
-          newvalue: notpowering
-        -
-          value: '5'
-          newvalue: notpresent
-    -
-      name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState'
-      mappings:
-        -
-          value: '1'
-          newvalue: operational
-        -
-          value: '2'
-          newvalue: failed
-        -
-          value: '3'
-          newvalue: powering
-        -
-          value: '4'
-          newvalue: notpowering
-        -
-          value: '5'
-          newvalue: notpresent
-    -
-      name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorState'
-      mappings:
-        -
-          value: '1'
-          newvalue: normal
-        -
-          value: '2'
-          newvalue: warning
-        -
-          value: '3'
-          newvalue: critical
-        -
-          value: '4'
-          newvalue: shutdown
-        -
-          value: '5'
-          newvalue: notpresent
-        -
-          value: '6'
-          newvalue: notoperational

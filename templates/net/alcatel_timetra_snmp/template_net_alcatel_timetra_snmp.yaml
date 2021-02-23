@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:00:28Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -397,6 +397,25 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      valuemaps:
+        -
+          name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
+          mappings:
+            -
+              value: '1'
+              newvalue: deviceStateUnknown
+            -
+              value: '2'
+              newvalue: deviceNotEquipped
+            -
+              value: '3'
+              newvalue: deviceStateOk
+            -
+              value: '4'
+              newvalue: deviceStateFailed
+            -
+              value: '5'
+              newvalue: deviceStateOutOfService
   graphs:
     -
       name: 'CPU utilization'
@@ -437,22 +456,3 @@ zabbix_export:
           item:
             host: 'Alcatel Timetra TiMOS SNMP'
             key: 'vm.memory.util[vm.memory.util.0]'
-  value_maps:
-    -
-      name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
-      mappings:
-        -
-          value: '1'
-          newvalue: deviceStateUnknown
-        -
-          value: '2'
-          newvalue: deviceNotEquipped
-        -
-          value: '3'
-          newvalue: deviceStateOk
-        -
-          value: '4'
-          newvalue: deviceStateFailed
-        -
-          value: '5'
-          newvalue: deviceStateOutOfService

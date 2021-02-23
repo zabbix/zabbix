@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[5.4.0alpha2])
+AC_INIT([Zabbix],[5.4.0beta1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -1564,11 +1564,12 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_snmp="yes"
 		fi
 	fi
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $SNMP_LDFLAGS"
+	SERVER_LDFLAGS="$SNMP_LDFLAGS $SERVER_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $SNMP_LIBS"
 
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $SNMP_LDFLAGS"
+	PROXY_LDFLAGS="$SNMP_LDFLAGS $PROXY_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SNMP_LIBS"
+
 
 	AC_SUBST(SNMP_CFLAGS)
 

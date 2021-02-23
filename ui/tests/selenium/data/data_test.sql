@@ -687,6 +687,10 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15000, 15000, 1)
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15002, 15002, 1);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15015, 15015, 1);
 
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5701, 15000, 'Template value mapping');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (57001, 5701, 1, 'yes');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (57002, 5701, 0, 'no');
+
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15001, 'Template inheritance test host', 'Template inheritance test host', 0, '');
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15000, 15001, 1, '127.0.0.1', 1, '10051', 1);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15001, 15001, 1, '127.0.0.2', 1, '10052', 0);
@@ -1043,6 +1047,14 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40000, 40000, 1)
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (40001, 'Simple form test host', 'Simple form test host', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40001, 40001, 4);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (40000, 40001, 40000);
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5601, 40001, 'Reference valuemap');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56001, 5601, 1, 'One');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56002, 5601, 2, 'Two');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56003, 5601, 3, 'Three');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56004, 5601, 4, 'Four');
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5602, 40001, 'Второй валъю мап');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56005, 5602, 1, 'один');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56006, 5602, 2, 'два');
 
 -- testFormItem interfaces
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '10051');
@@ -1770,6 +1782,9 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) va
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99004, 19, 50010, 'Http agent item form', '{$_} {$NONEXISTING}', 'http-item-form', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99005, 19, 50010, 'Http agent item for update', '{$LOCALIP} {$A}', 'http-item-update', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, headers) VALUES (99006, 19, 50010, 'Http agent item for delete', '{$A} and IP number {$LOCALIP}', 'http-item-delete', 30, 50023, '', '', 'zabbix.com', '', '');
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5501, 50010, 'Service state');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (55001, 5501, 0, 'Down');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (55002, 5501, 1, 'Up');
 
 -- testPageProblems_TagPriority
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('First test trigger with tag priority','{100181}>100','0','1','','2','','1','0','0','','','99252');

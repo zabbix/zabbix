@@ -23,6 +23,7 @@
 #include "dbupgrade.h"
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "log.h"
 
 /*
  * 5.4 development database patches

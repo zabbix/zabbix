@@ -154,7 +154,6 @@ class ZBase {
 		require_once 'include/services.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
-		require_once 'include/valuemap.inc.php';
 	}
 
 	/**

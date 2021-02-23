@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:11:40Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -342,6 +342,28 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      valuemaps:
+        -
+          name: 'QTECH-MIB::sysFanStatus'
+          mappings:
+            -
+              value: '0'
+              newvalue: normal
+            -
+              value: '1'
+              newvalue: abnormal
+        -
+          name: 'QTECH-MIB::sysPowerStatus'
+          mappings:
+            -
+              value: '0'
+              newvalue: normal
+            -
+              value: '1'
+              newvalue: abnormal
+            -
+              value: '2'
+              newvalue: 'not available'
   graphs:
     -
       name: 'CPU utilization'
@@ -365,25 +387,3 @@ zabbix_export:
           item:
             host: 'QTech QSW SNMP'
             key: 'vm.memory.util[vm.memory.util.0]'
-  value_maps:
-    -
-      name: 'QTECH-MIB::sysFanStatus'
-      mappings:
-        -
-          value: '0'
-          newvalue: normal
-        -
-          value: '1'
-          newvalue: abnormal
-    -
-      name: 'QTECH-MIB::sysPowerStatus'
-      mappings:
-        -
-          value: '0'
-          newvalue: normal
-        -
-          value: '1'
-          newvalue: abnormal
-        -
-          value: '2'
-          newvalue: 'not available'

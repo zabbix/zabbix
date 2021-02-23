@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-11-27T10:47:13Z'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Telephony
@@ -1081,6 +1081,16 @@ zabbix_export:
           macro: '{$AMI.USERNAME}'
           value: zabbix
           description: 'The Asterisk Manager name.'
+      valuemaps:
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
       name: 'Asterisk: Calls stats'
@@ -1163,13 +1173,3 @@ zabbix_export:
           item:
             host: 'Asterisk by HTTP'
             key: asterisk.sip.unmonitored_offline
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

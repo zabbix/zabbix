@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-11-11T10:56:02Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -1324,6 +1324,16 @@ zabbix_export:
                   value:
                     name: 'Zabbix internal queues'
                     host: 'Remote Zabbix server'
+      valuemaps:
+        -
+          name: 'Value cache operating mode'
+          mappings:
+            -
+              value: '0'
+              newvalue: Normal
+            -
+              value: '1'
+              newvalue: 'Low memory'
   graphs:
     -
       name: 'Trend function cache effectiveness'
@@ -1601,13 +1611,3 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server'
             key: 'zabbix[stats,{$ADDRESS},{$PORT},queue]'
-  value_maps:
-    -
-      name: 'Value cache operating mode'
-      mappings:
-        -
-          value: '0'
-          newvalue: Normal
-        -
-          value: '1'
-          newvalue: 'Low memory'

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:28Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -392,6 +392,43 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN_STATUS}'
           value: '5'
+      valuemaps:
+        -
+          name: 'SW-MIB::swOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: online
+            -
+              value: '2'
+              newvalue: offline
+            -
+              value: '3'
+              newvalue: testing
+            -
+              value: '4'
+              newvalue: faulty
+        -
+          name: 'SW-MIB::swSensorStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: faulty
+            -
+              value: '3'
+              newvalue: below-min
+            -
+              value: '4'
+              newvalue: nominal
+            -
+              value: '5'
+              newvalue: above-max
+            -
+              value: '6'
+              newvalue: absent
   graphs:
     -
       name: 'CPU utilization'
@@ -415,40 +452,3 @@ zabbix_export:
           item:
             host: 'Brocade FC SNMP'
             key: 'vm.memory.util[swMemUsage.0]'
-  value_maps:
-    -
-      name: 'SW-MIB::swOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: online
-        -
-          value: '2'
-          newvalue: offline
-        -
-          value: '3'
-          newvalue: testing
-        -
-          value: '4'
-          newvalue: faulty
-    -
-      name: 'SW-MIB::swSensorStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: unknown
-        -
-          value: '2'
-          newvalue: faulty
-        -
-          value: '3'
-          newvalue: below-min
-        -
-          value: '4'
-          newvalue: nominal
-        -
-          value: '5'
-          newvalue: above-max
-        -
-          value: '6'
-          newvalue: absent

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:01Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -1266,6 +1266,34 @@ zabbix_export:
           description: 'Request scheme which may be http or https'
         -
           macro: '{$ETCD.USER}'
+      valuemaps:
+        -
+          name: 'Etcd healthcheck'
+          mappings:
+            -
+              value: '0'
+              newvalue: Failed
+            -
+              value: '1'
+              newvalue: Ok
+        -
+          name: 'Etcd leader'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'No'
+            -
+              value: '1'
+              newvalue: 'Yes'
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '{Etcd by HTTP:etcd.open.fds.min(5m)}/{Etcd by HTTP:etcd.max.fds.last()}*100>{$ETCD.OPEN.FDS.MAX.WARN}'
@@ -1403,31 +1431,3 @@ zabbix_export:
           item:
             host: 'Etcd by HTTP'
             key: etcd.writes.rate
-  value_maps:
-    -
-      name: 'Etcd healthcheck'
-      mappings:
-        -
-          value: '0'
-          newvalue: Failed
-        -
-          value: '1'
-          newvalue: Ok
-    -
-      name: 'Etcd leader'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'No'
-        -
-          value: '1'
-          newvalue: 'Yes'
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

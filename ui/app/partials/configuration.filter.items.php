@@ -95,6 +95,32 @@ $filter_column_1
 		(new CTextBox('filter_key', $data['filter_data']['filter_key']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
+if ($data['filter_data']['hosts']) {
+	$filter_column_1->addRow(_('Value mapping'),
+		(new CMultiSelect([
+			'name' => 'filter_valuemapids[]',
+			'object_name' => 'valuemap_names',
+			'data' => array_values(array_column($data['filter_data']['filter_valuemapids'], null, 'name')),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemap_names',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $filter->getName(),
+					'dstfld1' => 'filter_valuemapids_',
+					'hostids' => array_column($data['filter_data']['hosts'], 'id'),
+					'with_inherited' => true,
+					'context' => $data['context']
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
+}
+else {
+	foreach ($data['filter_data']['filter_valuemapids'] as $filter_valuemapid) {
+		$filter->addVar('filter_valuemapids[]', $filter_valuemapid);
+	}
+}
+
 // Second column.
 $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')

@@ -511,12 +511,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$host_name = array_key_exists('host', $data) ? $data['host'] : $data['template'];
 
 		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($host_name));
-		$dbRow = DBfetch($dbResult);
+		$host_info = DBfetch($dbResult);
 
-		$this->assertNotEquals($dbRow, null);
+		$this->assertNotEquals($host_info, null);
 
-		$hostid = $dbRow['hostid'];
-		$status = $dbRow['status'];
+		$hostid = $host_info['hostid'];
+		$status = $host_info['status'];
 
 		if (isset($data['key'])) {
 			$dbResult = DBselect(
@@ -525,13 +525,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 				' WHERE hostid='.$hostid.
 					' AND key_='.zbx_dbstr($data['key'])
 			);
-			$dbRow = DBfetch($dbResult);
+			$template_info = DBfetch($dbResult);
 
-			$this->assertNotEquals($dbRow, null);
+			$this->assertNotEquals($template_info, null);
 
-			$itemid = $dbRow['itemid'];
-			if (0 != $dbRow['templateid'])
-				$templateid = $dbRow['templateid'];
+			$itemid = $template_info['itemid'];
+			if (0 != $template_info['templateid'])
+				$templateid = $template_info['templateid'];
 		}
 
 		if ($status == HOST_STATUS_TEMPLATE) {
@@ -934,25 +934,67 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('trends');
 		}
 
-		$this->zbxTestTextPresent(['Show value', 'show value mappings']);
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
+			$this->zbxTestTextPresent('Value mapping');
+			$valuemap_field = $this->query('name:itemForm')->asForm()->one()->getField('Value mapping');
 			if (!isset($templateid)) {
-				$this->zbxTestDropdownAssertSelected('valuemapid', 'As is');
+				$this->assertEquals([], $valuemap_field->getValue());
 
-				$options = ['As is'];
-				$result = DBselect('SELECT name FROM valuemaps');
-				while ($row = DBfetch($result)) {
-					$options[] = $row['name'];
+				$db_valuemap = [];
+				$valuemap_result = DBselect('SELECT name FROM valuemap WHERE hostid='.$host_info['hostid']);
+				while ($row = DBfetch($valuemap_result)) {
+					$db_valuemap[] = $row['name'];
 				}
-				$this->zbxTestDropdownHasOptions('valuemapid', $options);
+				$db_mappings = CDBHelper::getAll('SELECT vm.name, m.value, m.newvalue FROM valuemap vm INNER JOIN'.
+						' valuemap_mapping m ON m.valuemapid = vm.valuemapid WHERE vm.hostid='.$host_info['hostid']);
+
+				$valuemap_field->edit();
+				$valuemap_overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				if ($db_valuemap !== []) {
+					$this->assertEquals('Value mapping', $valuemap_overlay->getTitle());
+					$valuemap_table = $valuemap_overlay->query('class:list-table')->one()->asTable();
+					$this->assertEquals(['Name', 'Mapping'], $valuemap_table->getHeadersText());
+
+					$expected_count = (count($db_valuemap) > 3) ? 3 : count($db_valuemap);
+					$table_rows = $valuemap_table->getRows();
+					$this->assertEquals($expected_count, $table_rows->count());
+					foreach($table_rows as $value_mapping) {
+						$valuemap_name = ltrim($value_mapping->getColumn('Name')->getText(), $host_name.': ');
+						$this->assertTrue(in_array($valuemap_name, $db_valuemap));
+
+						$mappings = [];
+						$i = 0;
+						foreach ($db_mappings as $db_mapping) {
+							$mappings_text = $value_mapping->getColumn('Mapping')->getText();
+
+							if ($db_mapping['name'] === $valuemap_name) {
+								$mappings_text = $value_mapping->getColumn('Mapping')->getText();
+								$i++;
+								// Only the first three mappings are displayed in the form for each value mapping
+								if ($i < 4) {
+									$this->assertTrue(str_contains($mappings_text, $db_mapping['value'].' ⇒ '.$db_mapping['newvalue']));
+								}
+								else {
+									$this->assertTrue(str_contains($mappings_text, '…'));
+
+									break;
+								}
+							}
+						}
+					}
+				}
+				else {
+					$this->assertEquals('No data found.', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
+				}
+				$valuemap_overlay->close();
 			}
 			else {
-				$this->zbxTestAssertVisibleId('valuemapid');
-				$this->zbxTestAssertAttribute("//z-select[@id='valuemapid']", 'readonly');
+				$this->assertTrue($valuemap_field->isValid());
+				$this->assertFalse($valuemap_field->isEnabled());
 			}
 		}
 		else {
-			$this->zbxTestAssertNotVisibleXpath('//z-select[@name="valuemapid"]');
+			$this->assertFalse($this->query('xpath://label[text()="Value mapping"]/../..')->one()->isDisplayed());
 		}
 
 		if ($type == 'Zabbix trapper') {
