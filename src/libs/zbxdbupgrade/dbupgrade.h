@@ -65,9 +65,6 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 		int unique);
 int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
-int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templateid, uint64_t userid, int private);
-int	DBpatch_convert_slideshow(void);
-int	DBpatch_delete_screen(uint64_t screenid);
 
 #endif
 
