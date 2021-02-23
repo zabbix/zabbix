@@ -616,7 +616,7 @@ class testFormAdministrationScripts extends CWebTest {
 					]
 				]
 			],
-			//Telnet
+			// Telnet
 			[
 				[
 					'fields' =>  [
