@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:42Z'
   groups:
     -
       name: Templates/Applications
@@ -18,11 +18,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Apache
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Apache: Total bytes'
@@ -33,9 +28,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Total bytes served'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -47,6 +39,10 @@ zabbix_export:
                 - '1024'
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Bytes per second'
           type: DEPENDENT
@@ -58,9 +54,6 @@ zabbix_export:
           description: |
             Calculated as change rate for 'Total bytes' stat.
             BytesPerSec is not used, as it counts average since last Apache server start.
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -76,6 +69,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Total requests'
           type: DEPENDENT
@@ -83,9 +80,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'A total number of accesses'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -93,6 +87,10 @@ zabbix_export:
                 - '$["Total Accesses"]'
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Requests per second'
           type: DEPENDENT
@@ -103,9 +101,6 @@ zabbix_export:
           description: |
             Calculated as change rate for 'Total requests' stat.
             ReqPerSec is not used, as it counts average since last Apache server start.
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -117,6 +112,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Uptime'
           type: DEPENDENT
@@ -125,9 +124,6 @@ zabbix_export:
           history: 7d
           units: uptime
           description: 'Service uptime in seconds'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -135,6 +131,10 @@ zabbix_export:
                 - $.ServerUptimeSeconds
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
           triggers:
             -
               expression: '{last()}<10m'
@@ -151,9 +151,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Service version'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -165,6 +162,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -179,9 +180,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in cleanup state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -189,6 +187,10 @@ zabbix_export:
                 - $.Workers.cleanup
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers closing connection'
           type: DEPENDENT
@@ -196,9 +198,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in closing state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -206,6 +205,10 @@ zabbix_export:
                 - $.Workers.closing
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers DNS lookup'
           type: DEPENDENT
@@ -213,9 +216,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in dnslookup state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -223,6 +223,10 @@ zabbix_export:
                 - $.Workers.dnslookup
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers finishing'
           type: DEPENDENT
@@ -230,9 +234,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in finishing state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -240,6 +241,10 @@ zabbix_export:
                 - $.Workers.finishing
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers keepalive (read)'
           type: DEPENDENT
@@ -247,9 +252,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in keepalive state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -257,6 +259,10 @@ zabbix_export:
                 - $.Workers.keepalive
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers logging'
           type: DEPENDENT
@@ -264,9 +270,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in logging state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -274,6 +277,10 @@ zabbix_export:
                 - $.Workers.logging
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers reading request'
           type: DEPENDENT
@@ -281,9 +288,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in reading state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -291,6 +295,10 @@ zabbix_export:
                 - $.Workers.reading
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers sending reply'
           type: DEPENDENT
@@ -298,9 +306,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in sending state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -308,6 +313,10 @@ zabbix_export:
                 - $.Workers.sending
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers slot with no current process'
           type: DEPENDENT
@@ -315,9 +324,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of slots with no current process'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -325,6 +331,10 @@ zabbix_export:
                 - $.Workers.slot
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers starting up'
           type: DEPENDENT
@@ -332,9 +342,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in starting state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -342,6 +349,10 @@ zabbix_export:
                 - $.Workers.starting
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Workers waiting for connection'
           type: DEPENDENT
@@ -349,9 +360,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Number of workers in waiting state'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -359,6 +367,10 @@ zabbix_export:
                 - $.Workers.waiting
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Total workers busy'
           type: DEPENDENT
@@ -366,9 +378,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of busy worker threads/processes'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -376,6 +385,10 @@ zabbix_export:
                 - $.BusyWorkers
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Total workers idle'
           type: DEPENDENT
@@ -383,9 +396,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'Total number of idle worker threads/processes'
-          applications:
-            -
-              name: Apache
           preprocessing:
             -
               type: JSONPATH
@@ -393,15 +403,20 @@ zabbix_export:
                 - $.IdleWorkers
           master_item:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Service response time'
           key: 'net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
-          applications:
+          tags:
             -
-              name: Apache
+              tag: Application
+              value: Apache
           triggers:
             -
               expression: '{min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}'
@@ -419,9 +434,6 @@ zabbix_export:
           name: 'Apache: Service ping'
           key: 'net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
           history: 7d
-          applications:
-            -
-              name: Apache
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -429,6 +441,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Apache
           triggers:
             -
               expression: '{last()}=0'
@@ -446,34 +462,38 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Process CPU utilization percentage.'
-          applications:
+          tags:
             -
-              name: Apache
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Memory usage (rss)'
           key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,rss]'
           history: 7d
           units: B
           description: 'Resident set size memory used by process in bytes.'
-          applications:
+          tags:
             -
-              name: Apache
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Memory usage (vsize)'
           key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,vsize]'
           history: 7d
           units: B
           description: 'Virtual memory size used by process in bytes.'
-          applications:
+          tags:
             -
-              name: Apache
+              tag: Application
+              value: Apache
         -
           name: 'Apache: Number of processes running'
           key: 'proc.num["{$APACHE.PROCESS_NAME}"]'
           history: 7d
-          applications:
+          tags:
             -
-              name: Apache
+              tag: Application
+              value: Apache
           triggers:
             -
               expression: '{last()}=0'
@@ -488,9 +508,6 @@ zabbix_export:
           description: |
             Getting data from a machine-readable version of the Apache status page.
             https://httpd.apache.org/docs/current/mod/mod_status.html
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -537,6 +554,10 @@ zabbix_export:
                   
                   // Return JSON string
                   return JSON.stringify(output);
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
           triggers:
             -
               expression: '{nodata(30m)}=1'
@@ -570,9 +591,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'Average number of client requests per second'
-              applications:
-                -
-                  name: Apache
               preprocessing:
                 -
                   type: JSONPATH
@@ -580,6 +598,10 @@ zabbix_export:
                     - $.BytesPerReq
               master_item:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Apache
             -
               name: 'Apache: Connections async closing'
               type: DEPENDENT
@@ -587,9 +609,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of async connections in closing state (only applicable to event MPM)'
-              applications:
-                -
-                  name: Apache
               preprocessing:
                 -
                   type: JSONPATH
@@ -597,6 +616,10 @@ zabbix_export:
                     - $.ConnsAsyncClosing
               master_item:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Apache
             -
               name: 'Apache: Connections async keep alive'
               type: DEPENDENT
@@ -604,9 +627,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of async connections in keep-alive state (only applicable to event MPM)'
-              applications:
-                -
-                  name: Apache
               preprocessing:
                 -
                   type: JSONPATH
@@ -614,6 +634,10 @@ zabbix_export:
                     - $.ConnsAsyncKeepAlive
               master_item:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Apache
             -
               name: 'Apache: Connections async writing'
               type: DEPENDENT
@@ -621,9 +645,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of async connections in writing state (only applicable to event MPM)'
-              applications:
-                -
-                  name: Apache
               preprocessing:
                 -
                   type: JSONPATH
@@ -631,6 +652,10 @@ zabbix_export:
                     - $.ConnsAsyncWriting
               master_item:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Apache
             -
               name: 'Apache: Connections total'
               type: DEPENDENT
@@ -638,9 +663,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of total connections'
-              applications:
-                -
-                  name: Apache
               preprocessing:
                 -
                   type: JSONPATH
@@ -648,6 +670,10 @@ zabbix_export:
                     - $.ConnsTotal
               master_item:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Apache
             -
               name: 'Apache: Number of async processes'
               type: DEPENDENT
@@ -655,9 +681,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'Number of async processes'
-              applications:
-                -
-                  name: Apache
               preprocessing:
                 -
                   type: JSONPATH
@@ -665,6 +688,10 @@ zabbix_export:
                     - $.Processes
               master_item:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Apache
           graph_prototypes:
             -
               name: 'Apache: Current async connections{#SINGLETON}'

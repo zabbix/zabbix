@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:59Z'
   groups:
     -
       name: 'Templates/Operating systems'
@@ -26,25 +26,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Operating systems'
-      applications:
-        -
-          name: CPU
-        -
-          name: General
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Monitoring agent'
-        -
-          name: 'Network interfaces'
-        -
-          name: Status
-        -
-          name: Storage
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Version of node_exporter running'
@@ -54,9 +35,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Monitoring agent'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -69,6 +47,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: 'Monitoring agent'
         -
           name: 'Number of open file descriptors'
           type: DEPENDENT
@@ -76,9 +58,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -87,6 +66,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
         -
           name: 'Maximum number of open file descriptors'
           type: DEPENDENT
@@ -95,9 +78,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -110,6 +90,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
           triggers:
             -
               expression: '{last()}<{$KERNEL.MAXFILES.MIN}'
@@ -126,10 +110,11 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          applications:
-            -
-              name: 'Zabbix raw items'
           url: 'http://{HOST.CONN}:{$NODE_EXPORTER_PORT}/metrics'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
           triggers:
             -
               expression: '{nodata(30m)}=1'
@@ -145,9 +130,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: unixtime
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -156,6 +138,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
         -
           name: 'CPU guest time'
           type: DEPENDENT
@@ -165,9 +151,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -192,6 +175,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU guest nice time'
           type: DEPENDENT
@@ -201,9 +188,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -228,6 +212,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU idle time'
           type: DEPENDENT
@@ -237,9 +225,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent doing nothing.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -264,6 +249,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU interrupt time'
           type: DEPENDENT
@@ -273,9 +262,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The amount of time the CPU has been servicing hardware interrupts.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -300,6 +286,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'Interrupts per second'
           type: DEPENDENT
@@ -307,9 +297,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -322,6 +309,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU iowait time'
           type: DEPENDENT
@@ -331,9 +322,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Amount of time the CPU has been waiting for I/O to complete.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -358,6 +346,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'Load average (1m avg)'
           type: DEPENDENT
@@ -365,9 +357,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -376,6 +365,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'Load average (5m avg)'
           type: DEPENDENT
@@ -383,9 +376,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -394,6 +384,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'Load average (15m avg)'
           type: DEPENDENT
@@ -401,9 +395,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -412,6 +403,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU nice time'
           type: DEPENDENT
@@ -421,9 +416,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running users'' processes that have been niced.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -448,15 +440,16 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'Number of CPUs'
           type: DEPENDENT
           key: 'system.cpu.num[node_exporter]'
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -470,6 +463,10 @@ zabbix_export:
                   return JSON.parse(value).length
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU softirq time'
           type: DEPENDENT
@@ -479,9 +476,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The amount of time the CPU has been servicing software interrupts.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -506,6 +500,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU steal time'
           type: DEPENDENT
@@ -515,9 +513,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The amount of CPU ''stolen'' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -542,6 +537,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'Context switches per second'
           type: DEPENDENT
@@ -549,9 +548,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -564,6 +560,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU system time'
           type: DEPENDENT
@@ -573,9 +573,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running the kernel and its processes.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -600,6 +597,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU user time'
           type: DEPENDENT
@@ -609,9 +610,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running users'' processes that are not niced.'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -636,6 +634,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'CPU utilization'
           type: DEPENDENT
@@ -645,9 +647,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'CPU utilization in %'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: JAVASCRIPT
@@ -657,6 +656,10 @@ zabbix_export:
                   return (100 - value)
           master_item:
             key: 'system.cpu.idle[node_exporter]'
+          tags:
+            -
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -680,9 +683,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Labeled system information as provided by the uname system call.'
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -700,6 +700,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
         -
           name: 'System local time'
           type: DEPENDENT
@@ -709,9 +713,6 @@ zabbix_export:
           value_type: FLOAT
           units: unixtime
           description: 'System local time of the host.'
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -720,6 +721,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
           triggers:
             -
               expression: '{fuzzytime({$SYSTEM.FUZZYTIME.MAX})}=0'
@@ -737,9 +742,6 @@ zabbix_export:
           value_type: CHAR
           description: 'System host name.'
           inventory_link: NAME
-          applications:
-            -
-              name: General
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -752,6 +754,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: General
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -768,9 +774,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Operating system architecture of the host.'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -783,6 +786,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Operating system'
           type: DEPENDENT
@@ -792,9 +799,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -802,6 +806,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: 'system.descr[node_exporter]'
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -822,9 +830,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The free space of swap volume/file in bytes.'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -833,6 +838,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Free swap space in %'
           type: CALCULATED
@@ -842,9 +851,10 @@ zabbix_export:
           units: '%'
           params: 'last("system.swap.free[node_exporter]")/last("system.swap.total[node_exporter]")*100'
           description: 'The free space of swap volume/file in percent.'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
           name: 'Total swap space'
           type: DEPENDENT
@@ -854,9 +864,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The total space of swap volume/file in bytes.'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -865,6 +872,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'System uptime'
           type: DEPENDENT
@@ -874,9 +885,6 @@ zabbix_export:
           trends: 0d
           units: uptime
           description: 'System uptime in ''N days, hh:mm:ss'' format.'
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -891,6 +899,10 @@ zabbix_export:
                   return (Math.floor(Date.now()/1000)-Number(value));
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{last()}<10m'
@@ -907,9 +919,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.4/manual/appendix/items/vm.memory.size_params'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -918,6 +927,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Total memory'
           type: DEPENDENT
@@ -927,9 +940,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Total memory in Bytes'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -938,6 +948,10 @@ zabbix_export:
                 - ''
           master_item:
             key: node_exporter.get
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Memory utilization'
           type: CALCULATED
@@ -947,9 +961,10 @@ zabbix_export:
           units: '%'
           params: '(last("vm.memory.total[node_exporter]")-last("vm.memory.available[node_exporter]"))/last("vm.memory.total[node_exporter]")*100'
           description: 'Memory used percentage is calculated as (total-available)/total*100'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
@@ -1005,9 +1020,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1020,6 +1032,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: DEPENDENT
@@ -1027,9 +1043,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1042,6 +1055,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: DEPENDENT
@@ -1050,9 +1067,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: bps
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1069,6 +1083,10 @@ zabbix_export:
                     - '8'
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: DEPENDENT
@@ -1076,9 +1094,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1091,6 +1106,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: DEPENDENT
@@ -1098,9 +1117,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1113,6 +1129,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: DEPENDENT
@@ -1121,9 +1141,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: bps
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1140,6 +1157,10 @@ zabbix_export:
                     - '8'
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: DEPENDENT
@@ -1149,9 +1170,6 @@ zabbix_export:
               trends: 0d
               units: bps
               description: 'Sets value to 0 if metric is missing in node_exporter output.'
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1166,6 +1184,10 @@ zabbix_export:
                     - '8'
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: DEPENDENT
@@ -1177,9 +1199,6 @@ zabbix_export:
                 Indicates the interface RFC2863 operational state as a string.
                 Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".
                 Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
               preprocessing:
@@ -1218,6 +1237,10 @@ zabbix_export:
                       return newvalue;
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)'
@@ -1242,9 +1265,6 @@ zabbix_export:
               history: 7d
               trends: 0d
               description: 'node_network_protocol_type protocol_type value of /sys/class/net/<iface>.'
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               valuemap:
                 name: 'Linux::Interface protocol types'
               preprocessing:
@@ -1255,6 +1275,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
           trigger_prototypes:
             -
               expression: |
@@ -1391,14 +1415,14 @@ zabbix_export:
             key: node_exporter.get
           lld_macro_paths:
             -
-              lld_macro: '{#IFNAME}'
-              path: $.labels.device
-            -
               lld_macro: '{#HELP}'
               path: $.help
             -
               lld_macro: '{#IFALIAS}'
               path: $.labels.ifalias
+            -
+              lld_macro: '{#IFNAME}'
+              path: $.labels.device
             -
               lld_macro: '{#IFOPERSTATUS}'
               path: $.labels.operstate
@@ -1433,9 +1457,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.'
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1448,6 +1469,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk read request avg waiting time (r_await)'
               type: CALCULATED
@@ -1457,9 +1482,10 @@ zabbix_export:
               units: '!ms'
               params: '(last("vfs.dev.read.time.rate[node_exporter,\"{#DEVNAME}\"]")/(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]")+(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]")=0)))*1000*(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]") > 0)'
               description: 'This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Disk {#DEVNAME}'
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk read rate'
               type: DEPENDENT
@@ -1469,9 +1495,6 @@ zabbix_export:
               value_type: FLOAT
               units: '!r/s'
               description: 'r/s. The number (after merges) of read requests completed per second for the device.'
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1484,6 +1507,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk read time (rate)'
               type: DEPENDENT
@@ -1492,9 +1519,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of total read time counter. Used in r_await calculation'
-              applications:
-                -
-                  name: 'Zabbix raw items'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1507,6 +1531,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: '{#DEVNAME}: Disk utilization'
               type: DEPENDENT
@@ -1516,9 +1544,6 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.'
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1535,6 +1560,10 @@ zabbix_export:
                     - '100'
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk write request avg waiting time (w_await)'
               type: CALCULATED
@@ -1544,9 +1573,10 @@ zabbix_export:
               units: '!ms'
               params: '(last("vfs.dev.write.time.rate[node_exporter,\"{#DEVNAME}\"]")/(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]")+(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]")=0)))*1000*(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]") > 0)'
               description: 'This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Disk {#DEVNAME}'
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk write rate'
               type: DEPENDENT
@@ -1556,9 +1586,6 @@ zabbix_export:
               value_type: FLOAT
               units: '!w/s'
               description: 'w/s. The number (after merges) of write requests completed per second for the device.'
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1571,6 +1598,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk write time (rate)'
               type: DEPENDENT
@@ -1579,9 +1610,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Rate of total write time counter. Used in w_await calculation'
-              applications:
-                -
-                  name: 'Zabbix raw items'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1594,6 +1622,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
           trigger_prototypes:
             -
               expression: '{Linux by Prom:vfs.dev.read.await[node_exporter,"{#DEVNAME}"].min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Linux by Prom:vfs.dev.write.await[node_exporter,"{#DEVNAME}"].min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
@@ -1707,9 +1739,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1718,6 +1747,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Free inodes in %'
               type: DEPENDENT
@@ -1726,9 +1759,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_TO_JSON
@@ -1751,6 +1781,10 @@ zabbix_export:
                       return (inode_free/inode_total)*100;
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
@@ -1781,9 +1815,10 @@ zabbix_export:
               units: '%'
               params: '(last("vfs.fs.used[node_exporter,\"{#FSNAME}\"]")/last("vfs.fs.total[node_exporter,\"{#FSNAME}\"]"))*100'
               description: 'Space utilization in % for {#FSNAME}'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Filesystem {#FSNAME}'
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Total space'
               type: DEPENDENT
@@ -1793,9 +1828,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'Total space in Bytes'
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1804,6 +1836,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: node_exporter.get
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Used space'
               type: CALCULATED
@@ -1813,9 +1849,10 @@ zabbix_export:
               units: B
               params: '(last("vfs.fs.total[node_exporter,\"{#FSNAME}\"]")-last("vfs.fs.free[node_exporter,\"{#FSNAME}\"]"))'
               description: 'Used storage in Bytes'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Filesystem {#FSNAME}'
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
           trigger_prototypes:
             -
               expression: |
@@ -1875,14 +1912,14 @@ zabbix_export:
             key: node_exporter.get
           lld_macro_paths:
             -
-              lld_macro: '{#FSTYPE}'
-              path: $.labels.fstype
+              lld_macro: '{#FSDEVICE}'
+              path: $.labels.device
             -
               lld_macro: '{#FSNAME}'
               path: $.labels.mountpoint
             -
-              lld_macro: '{#FSDEVICE}'
-              path: $.labels.device
+              lld_macro: '{#FSTYPE}'
+              path: $.labels.fstype
             -
               lld_macro: '{#HELP}'
               path: $.help

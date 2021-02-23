@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:58Z'
   groups:
     -
       name: Templates/SAN
@@ -23,13 +23,6 @@ zabbix_export:
       groups:
         -
           name: Templates/SAN
-      applications:
-        -
-          name: CPU
-        -
-          name: 'NetApp FAS3220'
-        -
-          name: 'Network interfaces'
       items:
         -
           name: 'NetApp FAS3220: Failed disks count'
@@ -38,14 +31,15 @@ zabbix_export:
           key: 'fas3220.disk[diskFailedCount]'
           history: 7d
           description: 'The number of disks that are currently broken.'
-          applications:
-            -
-              name: 'NetApp FAS3220'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: 'NetApp FAS3220'
         -
           name: 'NetApp FAS3220: Failed disks message'
           type: SNMP_AGENT
@@ -55,14 +49,15 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'If diskFailedCount is non-zero, this is a string describing the failed disk or disks. Each failed disk is described.'
-          applications:
-            -
-              name: 'NetApp FAS3220'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: 'NetApp FAS3220'
         -
           name: 'NetApp FAS3220: Product firmware version'
           type: SNMP_AGENT
@@ -72,14 +67,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version string for the firmware running on this platform.'
-          applications:
-            -
-              name: 'NetApp FAS3220'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: 'NetApp FAS3220'
         -
           name: 'NetApp FAS3220: Product version'
           type: SNMP_AGENT
@@ -89,14 +85,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version string for the software running on this platform.'
-          applications:
-            -
-              name: 'NetApp FAS3220'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: 'NetApp FAS3220'
       discovery_rules:
         -
           name: 'Cluster metrics discovery'
@@ -113,14 +110,15 @@ zabbix_export:
               key: 'fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"]'
               history: 7d
               description: 'Count of the number of chassis fans that are not operating within the recommended RPM range.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
             -
               name: 'Node {#NODE.NAME}: Failed FAN messgae'
               type: SNMP_AGENT
@@ -130,14 +128,15 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'Text message describing current condition of chassis fans. This is useful only if envFailedFanCount is not zero.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
             -
               name: 'Node {#NODE.NAME}: Degraded power supplies count'
               type: SNMP_AGENT
@@ -145,14 +144,15 @@ zabbix_export:
               key: 'fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"]'
               history: 7d
               description: 'Count of the number of power supplies that are in degraded mode.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
             -
               name: 'Node {#NODE.NAME}: Degraded power supplies message'
               type: SNMP_AGENT
@@ -162,14 +162,15 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'Text message describing the state of any power supplies that are currently degraded. This is useful only if envFailedPowerSupplyCount is not zero.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
             -
               name: 'Node {#NODE.NAME}: Over-temperature'
               type: SNMP_AGENT
@@ -177,14 +178,15 @@ zabbix_export:
               key: 'fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"]'
               history: 7d
               description: 'An indication of whether the hardware is currently operating outside of its recommended temperature range. The hardware will shutdown if the temperature exceeds critical thresholds.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
                   expression: '{last()}=2'
@@ -198,9 +200,6 @@ zabbix_export:
               key: 'fas3220.cluster[nodeHealth, "{#NODE.NAME}"]'
               history: 7d
               description: 'Whether or not the node can communicate with the cluster.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -208,6 +207,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
                   expression: '{last()}=0'
@@ -223,14 +226,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Node Location. Same as sysLocation for a specific node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Inventory'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Inventory'
             -
               name: 'Node {#NODE.NAME}: Model'
               type: SNMP_AGENT
@@ -240,14 +244,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Node Model. Same as productModel for a specific node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Inventory'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Inventory'
             -
               name: 'Node {#NODE.NAME}: NVRAM battery status'
               type: SNMP_AGENT
@@ -267,9 +272,6 @@ zabbix_export:
                 unknown(7),
                 overCharged(8),
                 fullyCharged(9).
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               valuemap:
                 name: 'FAS3220 NVRAM battery status'
               preprocessing:
@@ -277,6 +279,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -292,14 +298,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Node Serial Number. Same as productSerialNum for a specific node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Inventory'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Inventory'
             -
               name: 'Node {#NODE.NAME}: Uptime'
               type: SNMP_AGENT
@@ -308,14 +315,15 @@ zabbix_export:
               history: 7d
               units: s
               description: 'Node uptime. Same as sysUpTime for a specific node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} Health'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.01'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} Health'
               trigger_prototypes:
                 -
                   expression: '{last()}<10m'
@@ -351,9 +359,10 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'The average, over the last minute, of the percentage of time that this processor was not idle.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Node {#NODE.NAME} CPU'
+                  tag: Application
+                  value: 'Node {#NODE.NAME} CPU'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -410,14 +419,15 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total disk space that is free for use on {#FSNAME}.'
-              application_prototypes:
-                -
-                  name: '{#VSERVER}{#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
               trigger_prototypes:
                 -
                   expression: '{min({$FAS3220.FS.TIME:"{#FSNAME}"})}<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0'
@@ -431,14 +441,15 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total capacity in Bytes for {#FSNAME}.'
-              application_prototypes:
-                -
-                  name: '{#VSERVER}{#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
             -
               name: '{#VSERVER}{#FSNAME}: Total space used'
               type: SNMP_AGENT
@@ -447,14 +458,15 @@ zabbix_export:
               history: 7d
               units: B
               description: 'The total disk space that is in use on {#FSNAME}.'
-              application_prototypes:
-                -
-                  name: '{#VSERVER}{#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
             -
               name: '{#VSERVER}{#FSNAME}: Saved by compression percents'
               type: SNMP_AGENT
@@ -464,9 +476,10 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'Provides the percentage of compression savings in a volume, which is ((compr_saved/used)) * 10(compr_saved + 0). This is only returned for volumes.'
-              application_prototypes:
+              tags:
                 -
-                  name: '{#VSERVER}{#FSNAME}'
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
             -
               name: '{#VSERVER}{#FSNAME}: Saved by deduplication percents'
               type: SNMP_AGENT
@@ -476,9 +489,10 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'Provides the percentage of deduplication savings in a volume, which is ((dedup_saved/(dedup_saved + used)) * 100). This is only returned for volumes.'
-              application_prototypes:
+              tags:
                 -
-                  name: '{#VSERVER}{#FSNAME}'
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
             -
               name: '{#VSERVER}{#FSNAME}: Used space percents'
               type: SNMP_AGENT
@@ -487,9 +501,10 @@ zabbix_export:
               history: 7d
               units: '%'
               description: 'The percentage of disk space currently in use on {#FSNAME}.'
-              application_prototypes:
+              tags:
                 -
-                  name: '{#VSERVER}{#FSNAME}'
+                  tag: Application
+                  value: '{#VSERVER}{#FSNAME}'
               trigger_prototypes:
                 -
                   expression: '{max({$FAS3220.FS.TIME:"{#FSNAME}"})}>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1'
@@ -566,9 +581,6 @@ zabbix_export:
                   alreadyInTakenoverMode(17),
                   nvramLogUnsynchronized(18),
                   stateofBackupMailboxIsDoubtful(19).
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} HA'
               valuemap:
                 name: 'FAS3220 HA cannot takeover cause'
               preprocessing:
@@ -576,6 +588,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} HA'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -608,9 +624,6 @@ zabbix_export:
               key: 'fas3220.ha[haSettings, "{#NODE.NAME}"]'
               history: 7d
               description: 'High Availability configuration settings. The value notConfigured(1) indicates that the HA is not licensed. The thisNodeDead(5) setting indicates that this node has been takenover.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE.NAME} HA'
               valuemap:
                 name: 'FAS3220 HA settings'
               preprocessing:
@@ -618,6 +631,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE.NAME} HA'
               trigger_prototypes:
                 -
                   expression: '{last()}=1'
@@ -675,14 +692,15 @@ zabbix_export:
               delay: 3m
               history: 7d
               description: 'The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Inbound packets with errors'
               type: SNMP_AGENT
@@ -691,14 +709,15 @@ zabbix_export:
               delay: 3m
               history: 7d
               description: 'The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits received'
               type: SNMP_AGENT
@@ -707,9 +726,6 @@ zabbix_export:
               history: 7d
               units: bps
               description: 'The total number of octets received on the interface, including framing characters.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -719,6 +735,10 @@ zabbix_export:
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets discarded'
               type: SNMP_AGENT
@@ -727,14 +747,15 @@ zabbix_export:
               delay: 3m
               history: 7d
               description: 'The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets with errors'
               type: SNMP_AGENT
@@ -743,14 +764,15 @@ zabbix_export:
               delay: 3m
               history: 7d
               description: 'The number of outbound packets that could not be transmitted because of errors.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits sent'
               type: SNMP_AGENT
@@ -759,9 +781,6 @@ zabbix_export:
               history: 7d
               units: bps
               description: 'The total number of octets transmitted out of the interface, including framing characters.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -771,6 +790,10 @@ zabbix_export:
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Health degraded reason'
               type: SNMP_AGENT
@@ -780,14 +803,15 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: 'The list of reasons why the port is marked as degraded.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Health'
               type: SNMP_AGENT
@@ -796,9 +820,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The health status of the port.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port health'
               preprocessing:
@@ -806,6 +827,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): State'
               type: SNMP_AGENT
@@ -813,9 +838,6 @@ zabbix_export:
               key: 'fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"]'
               history: 7d
               description: 'The link-state of the port. Normally it is either UP(2) or DOWN(3).'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port link state'
               preprocessing:
@@ -823,6 +845,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Role'
               type: SNMP_AGENT
@@ -830,9 +856,6 @@ zabbix_export:
               key: 'fas3220.net.port[netportRole, "{#NODE}", "{#IFNAME}"]'
               history: 7d
               description: 'Role of the port. A port must have one of the following roles: cluster(1), data(2), mgmt(3), intercluster(4), cluster-mgmt(5) or undef(0). The cluster port is used to communicate to other node(s) in the cluster. The data port services clients'' requests. It is where all the file requests come in. The management port is used by administrator to manage resources within a node. The intercluster port is used to communicate to other cluster. The cluster-mgmt port is used to manage resources within the cluster. The undef role is for the port that has not yet been assigned a role.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port role'
               preprocessing:
@@ -840,6 +863,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Speed'
               type: SNMP_AGENT
@@ -847,9 +874,6 @@ zabbix_export:
               key: 'fas3220.net.port[netportSpeedOper, "{#NODE}", "{#IFNAME}"]'
               history: 7d
               description: 'The speed that appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port speed'
               preprocessing:
@@ -857,6 +881,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
             -
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Up by an administrator'
               type: SNMP_AGENT
@@ -864,9 +892,6 @@ zabbix_export:
               key: 'fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"]'
               history: 7d
               description: 'Indicates whether the port status is set ''UP'' by an administrator.'
-              application_prototypes:
-                -
-                  name: '{#IFDESCR}'
               valuemap:
                 name: 'FAS3220 Port UP by administrator'
               preprocessing:
@@ -874,6 +899,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: '{#IFDESCR}'
           trigger_prototypes:
             -
               expression: |
