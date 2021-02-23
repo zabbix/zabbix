@@ -562,6 +562,12 @@ class CImportDataAdapter {
 							if (array_key_exists('trends', $operation) && $operation['trends'] !== '') {
 								$operation['optrends']['trends'] = $operation['trends'];
 							}
+							if (array_key_exists('tags', $operation) && $operation['tags']) {
+								$operation['optag'] = [];
+								foreach ($operation['tags'] as $tag) {
+									$operation['optag'][] = $tag;
+								}
+							}
 							break;
 
 						case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
