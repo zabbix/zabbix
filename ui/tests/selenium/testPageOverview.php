@@ -620,8 +620,7 @@ class testPageOverview extends CLegacyWebTest {
 						'Configuration',
 						'Trigger URL',
 						'Webhook url for all',
-						'1_item',
-						'Selenium script'
+						'1_item'
 					]
 				]
 			],
