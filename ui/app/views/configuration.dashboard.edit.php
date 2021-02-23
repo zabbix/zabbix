@@ -45,11 +45,14 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 			(new CTag('nav', true, [
 				new CList([
 					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
-					(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
-						->addClass(ZBX_STYLE_BTN_ALT),
-					(new CButton('dashbrd-paste-widget', _('Paste widget')))
-						->addClass(ZBX_STYLE_BTN_ALT)
-						->setEnabled(false),
+					(new CList())
+						->addClass(ZBX_STYLE_BTN_SPLIT)
+						->addItem((new CButton('dashbrd-add-widget', _('Add')))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem(
+							(new CButton('dashbrd-add', '&#8203;'))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+						),
 					(new CButton('dashbrd-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
 					''

@@ -28,6 +28,8 @@ class CControllerTemplateDashboardUpdate extends CController {
 			'templateid' => 'required|db dashboard.templateid',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'name' => 'required|db dashboard.name|not_empty',
+			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' => 'required|db dashboard.auto_start|in 0,1',
 			'widgets' => 'array'
 		];
 
@@ -78,6 +80,8 @@ class CControllerTemplateDashboardUpdate extends CController {
 
 		$dashboard = [
 			'name' => $this->getInput('name'),
+			'display_period' => $this->getInput('display_period'),
+			'auto_start' => $this->getInput('auto_start'),
 			'widgets' => []
 		];
 
@@ -108,11 +112,40 @@ class CControllerTemplateDashboardUpdate extends CController {
 		}
 
 		if ($this->hasInput('dashboardid')) {
+				// TODO: fix temporary solution.
+				$ds = API::TemplateDashboard()->get([
+					'output' => ['dashboardid'],
+					'selectPages' => ['dashboard_pageid'],
+					'dashboardids' => [$dashboard['dashboardid']],
+//					'preservekeys' => true
+				]);
+
+				$dashboard_pageid = $ds[0]['pages'][0]['dashboard_pageid'];
+				$dashboard['pages'] = [
+					[
+						'dashboard_pageid' => $dashboard_pageid,
+						'widgets' => $dashboard['widgets'],
+					],
+				];
+				unset($dashboard['widgets']);
+				// =============================
+
+
 			$result = API::TemplateDashboard()->update($dashboard);
 			$message = _('Dashboard updated');
 			$error_msg =  _('Failed to update dashboard');
 		}
 		else {
+				// TODO: fix temporary solution.
+				$dashboard['pages'] = [
+					[
+						'widgets' => $dashboard['widgets'],
+					],
+				];
+				unset($dashboard['widgets']);
+				// =============================
+
+
 			$result = API::TemplateDashboard()->create($dashboard);
 			$message = _('Dashboard created');
 			$error_msg = _('Failed to create dashboard');

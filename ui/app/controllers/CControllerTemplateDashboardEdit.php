@@ -51,7 +51,7 @@ class CControllerTemplateDashboardEdit extends CController {
 
 		if ($this->hasInput('dashboardid')) {
 			$dashboards = API::TemplateDashboard()->get([
-				'output' => ['dashboardid', 'name', 'templateid'],
+				'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'dashboardids' => [$this->getInput('dashboardid')],
 				'editable' => true
@@ -78,6 +78,8 @@ class CControllerTemplateDashboardEdit extends CController {
 				'dashboardid' => null,
 				'templateid' => $this->getInput('templateid'),
 				'name' => _('New dashboard'),
+				'display_period' => DB::getDefault('dashboard', 'display_period'),
+				'auto_start' => DB::getDefault('dashboard', 'auto_start'),
 				'pages' => [
 					[
 						'dashboard_pageid' => null,
