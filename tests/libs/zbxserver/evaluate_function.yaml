@@ -46,7 +46,7 @@ in:
   params: ''
 out:
   return: SUCCEED
-  value: '"xyz"'
+  value: 'xyz'
 ---
 test case: Evaluate last() <- '😓...'
 in:
@@ -64,10 +64,10 @@ in:
 out:
   return: SUCCEED
   value: 
-     header: '"'
+     header: ''
      page: 😓
      pages: 20000
-     footer: '"'
+     footer: ''
 ---
 test case: Evaluate last() <- '123'
 in:
@@ -82,7 +82,7 @@ in:
   params: ''
 out:
   return: SUCCEED
-  value: '"123"'
+  value: '123'
 ---
 test case: Evaluate last() <- ' a b '
 in:
@@ -97,7 +97,7 @@ in:
   params: ''
 out:
   return: SUCCEED
-  value: '" a b "'
+  value: ' a b '
 ---
 test case: Evaluate last()  <- '\"c:\\\"'
 in:
@@ -112,7 +112,7 @@ in:
   params: ''
 out:
   return: SUCCEED
-  value: '"\"c:\\\""'
+  value: '"c:\"'
 ---
 test case: Evaluate last(:now-10m) <- 0.1, 0.2
 in:

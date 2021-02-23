@@ -5043,6 +5043,7 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 			func = (zbx_func_t *)zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
 			func->function = zbx_strdup(NULL, func_local.function);
 			func->parameter = zbx_strdup(NULL, func_local.parameter);
+			zbx_variant_set_none(&func->value);
 		}
 
 		ifunc_local.functionid = functions[i].functionid;
@@ -5088,8 +5089,6 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 	zbx_hashset_iter_reset(funcs, &iter);
 	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
-		char	*value = NULL;
-
 		i = zbx_vector_uint64_bsearch(&itemids, func->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		if (SUCCEED != errcodes[i])
@@ -5114,7 +5113,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 		{
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, items[i].host.host,
-					items[i].key_orig, func->parameter, " item belongs to a disabled host.");
+					items[i].key_orig, func->parameter, " item belongs to a disabled host");
 			continue;
 		}
 
@@ -5124,12 +5123,12 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 			/* set 'unknown' error value */
 			zbx_variant_set_error(&func->value,
 					zbx_eval_format_function_error(func->function, items[i].host.host,
-							items[i].key_orig, func->parameter, "item is not supported."));
+							items[i].key_orig, func->parameter, "item is not supported"));
 			continue;
 		}
 
-		if (SUCCEED != evaluate_function2(&value, &items[i], func->function, func->parameter, &func->timespec,
-				&error))
+		if (SUCCEED != evaluate_function2(&func->value, &items[i], func->function, func->parameter,
+				&func->timespec, &error))
 		{
 			/* compose and store error message for future use */
 			zbx_variant_set_error(&func->value,
@@ -5138,8 +5137,6 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 			zbx_free(error);
 			continue;
 		}
-
-		zbx_variant_set_str(&func->value, value);
 	}
 
 	DCconfig_clean_items(items, errcodes, itemids.values_num);
