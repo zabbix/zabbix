@@ -438,10 +438,10 @@ switch ($data['method']) {
 
 			case 'users':
 				$users = API::User()->get([
-					'output' => ['userid', 'alias', 'name', 'surname'],
+					'output' => ['userid', 'username', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
 						? [
-							'alias' => $data['search'],
+							'username' => $data['search'],
 							'name' => $data['search'],
 							'surname' => $data['search']
 						]
@@ -452,7 +452,7 @@ switch ($data['method']) {
 
 				if ($users) {
 					CArrayHelper::sort($users, [
-						['field' => 'alias', 'order' => ZBX_SORT_UP]
+						['field' => 'username', 'order' => ZBX_SORT_UP]
 					]);
 
 					if (array_key_exists('limit', $data)) {

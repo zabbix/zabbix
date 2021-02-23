@@ -246,13 +246,13 @@ class CControllerPopupGeneric extends CController {
 			'users' => [
 				'title' => _('Users'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'usergrpid,alias,fullname,userid',
+				'allowed_src_fields' => 'usergrpid,username,fullname,userid',
 				'form' => [
 					'name' => 'userform',
 					'id' => 'users'
 				],
 				'table_columns' => [
-					_('Alias'),
+					_('Username'),
 					_x('Name', 'user first name'),
 					_('Surname')
 				]
@@ -956,11 +956,11 @@ class CControllerPopupGeneric extends CController {
 
 			case 'users':
 				$options += [
-					'output' => ['alias', 'name', 'surname', 'type', 'theme', 'lang']
+					'output' => ['username', 'name', 'surname', 'type', 'theme', 'lang']
 				];
 
 				$records = API::User()->get($options);
-				CArrayHelper::sort($records, ['alias']);
+				CArrayHelper::sort($records, ['username']);
 				break;
 
 			case 'templates':

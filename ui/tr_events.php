@@ -143,7 +143,7 @@ else {
 
 $actions = getEventDetailsActions($event);
 $users = API::User()->get([
-	'output' => ['alias', 'name', 'surname'],
+	'output' => ['username', 'name', 'surname'],
 	'userids' => array_keys($actions['userids']),
 	'preservekeys' => true
 ]);

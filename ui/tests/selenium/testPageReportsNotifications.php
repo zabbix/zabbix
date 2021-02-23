@@ -44,9 +44,9 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Get users from DB
 		$user_alias = [];
-		$get_user_alias = DBselect('SELECT alias FROM users');
+		$get_user_alias = DBselect('SELECT username FROM users');
 		while ($row = DBfetch($get_user_alias)) {
-			$user_alias[] = $row['alias'];
+			$user_alias[] = $row['username'];
 		}
 		sort($user_alias);
 
@@ -72,15 +72,15 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'year' => '2017',
 					'users' => [
 						[
-							'alias' => 'admin-zabbix',
+							'username' => 'admin-zabbix',
 							'notifications' => [ '', '', '', '4', '', '', '', '', '', '', '', '12']
 						],
 						[
-							'alias' => 'guest',
+							'username' => 'guest',
 							'notifications' => [ '', '2', '', '', '', '', '', '', '', '10', '', '']
 						],
 						[
-							'alias' => 'test-user',
+							'username' => 'test-user',
 							'notifications' => [ '', '', '3', '', '', '', '', '', '', '', '11', '']
 						]
 					]
@@ -93,15 +93,15 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'year' => '2016',
 					'users' => [
 						[
-							'alias' => 'admin-zabbix',
+							'username' => 'admin-zabbix',
 							'notifications' => [ '', '', '', '', '', '', '', '', '', '', '', '']
 						],
 						[
-							'alias' => 'disabled-user',
+							'username' => 'disabled-user',
 							'notifications' => [ '', '', '', '', '', '', '', '', '', '', '15', '']
 						],
 						[
-							'alias' => 'user-for-blocking',
+							'username' => 'user-for-blocking',
 							'notifications' => [ '', '', '', '', '', '', '14', '', '', '', '', '']
 						]
 					]
@@ -113,11 +113,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'period' => 'Yearly',
 					'users' => [
 						[
-							'alias' => 'admin-zabbix',
+							'username' => 'admin-zabbix',
 							'notifications' => [ '', '', '', '', '', '16', '']
 						],
 						[
-							'alias' => 'disabled-user',
+							'username' => 'disabled-user',
 							'notifications' => [ '', '', '', '', '15', '7', '']
 						]
 					]
@@ -130,15 +130,15 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'media_type' => 'Email',
 					'users' => [
 						[
-							'alias' => 'Tag-user',
+							'username' => 'Tag-user',
 							'notifications' => [ '', '', '', '', '', '', '']
 						],
 						[
-							'alias' => 'admin-zabbix',
+							'username' => 'admin-zabbix',
 							'notifications' => [ '', '', '', '', '', '8', '']
 						],
 						[
-							'alias' => 'disabled-user',
+							'username' => 'disabled-user',
 							'notifications' => [ '', '', '', '', '6', '3', '']
 						]
 					]
@@ -195,14 +195,14 @@ class testPageReportsNotifications extends CLegacyWebTest {
 			$user_notifications = [];
 			if ($data['period'] === 'Yearly') {
 				for ($i = 0; $i <= 7; $i++) {
-					$get_user_rows = $this->webDriver->findElements(WebDriverBy::xpath('//table/tbody/tr['.$i.']/td['.$user_column_number[$user['alias']].']'));
+					$get_user_rows = $this->webDriver->findElements(WebDriverBy::xpath('//table/tbody/tr['.$i.']/td['.$user_column_number[$user['username']].']'));
 					foreach ($get_user_rows as $row) {
 						$user_notifications[] = $row->getText();
 					}
 				}
 			}
 			else {
-				$get_user_rows = $this->webDriver->findElements(WebDriverBy::xpath('//table/tbody/tr/td['.$user_column_number[$user['alias']].']'));
+				$get_user_rows = $this->webDriver->findElements(WebDriverBy::xpath('//table/tbody/tr/td['.$user_column_number[$user['username']].']'));
 				foreach ($get_user_rows as $row) {
 					$user_notifications[] = $row->getText();
 				}

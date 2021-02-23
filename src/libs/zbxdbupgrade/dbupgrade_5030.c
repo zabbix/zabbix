@@ -493,6 +493,28 @@ static int	DBpatch_5030041(void)
 {
 	return DBcreate_index("users", "users_1", "username", 1);
 }
+
+static int	DBpatch_5030042(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter_username' where idx='web.user.filter_alias'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030043(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set value_str='username' where idx='web.user.sort' and value_str='alias'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5030)
@@ -541,5 +563,7 @@ DBPATCH_ADD(5030038, 0, 1)
 DBPATCH_ADD(5030039, 0, 1)
 DBPATCH_ADD(5030040, 0, 1)
 DBPATCH_ADD(5030041, 0, 1)
+DBPATCH_ADD(5030042, 0, 1)
+DBPATCH_ADD(5030043, 0, 1)
 
 DBPATCH_END()
