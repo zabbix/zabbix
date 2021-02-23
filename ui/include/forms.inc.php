@@ -177,7 +177,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 	$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 	$simple_interval_parser = new CSimpleIntervalParser();
 
-	// generate array with values for subfilters of selected items
+	// Generate array with values for subfilters of selected items.
 	foreach ($items as $item) {
 		// tags
 		foreach ($item['tags'] as $tag) {
