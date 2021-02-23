@@ -860,4 +860,12 @@ in:
 out:
   result: SUCCEED
   value: 1
+---
+test case: Expression 'min(2s, 1m)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'min(2s, 1m)'
+out:
+  result: SUCCEED
+  value: '2'
 ...
