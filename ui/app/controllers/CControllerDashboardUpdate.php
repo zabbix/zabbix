@@ -117,6 +117,7 @@ class CControllerDashboardUpdate extends CController {
 
 		if (array_key_exists('dashboardid', $dashboard)) {
 
+				// TODO: fix temporary solution.
 				$ds = API::Dashboard()->get([
 					'output' => ['dashboardid'],
 					'selectPages' => ['dashboard_pageid'],
@@ -132,7 +133,7 @@ class CControllerDashboardUpdate extends CController {
 					],
 				];
 				unset($dashboard['widgets']);
-
+				// =============================
 
 
 			$result = API::Dashboard()->update($dashboard);
@@ -140,12 +141,14 @@ class CControllerDashboardUpdate extends CController {
 			$error_msg =  _('Failed to update dashboard');
 		}
 		else {
+				// TODO: fix temporary solution.
 				$dashboard['pages'] = [
 					[
 						'widgets' => $dashboard['widgets'],
 					],
 				];
 				unset($dashboard['widgets']);
+				// =============================
 
 
 			$result = API::Dashboard()->create($dashboard);

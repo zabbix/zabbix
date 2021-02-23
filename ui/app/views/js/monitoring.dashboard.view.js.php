@@ -377,8 +377,8 @@
 							const properties = {
 								userid: form_data.userid,
 								name: form_data.name,
-								display_period: parseInt(form_data.display_period),
-								auto_start: (form_data.auto_start === '1') ? 1 : 0
+								display_period: form_data.display_period,
+								auto_start: (form_data.auto_start === '1') ? '1' : '0'
 							};
 
 							has_properties_modified =
