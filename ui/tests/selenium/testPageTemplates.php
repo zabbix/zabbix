@@ -256,7 +256,7 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not exist'],
 						['name' => 'tag', 'operator' => 'Does not exist']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'A template with tags for cloning',
 						'A template with tags for updating',
 						'Form test template'
@@ -270,7 +270,7 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not exist'],
 						['name' => 'tag', 'operator' => 'Does not exist']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'Form test template'
 					]
 				]
@@ -281,7 +281,7 @@ class testPageTemplates extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'Form test template'
 					]
 				]
@@ -292,7 +292,7 @@ class testPageTemplates extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'Form test template'
 					]
 				]
@@ -304,7 +304,7 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag'],
 						['name' => 'tag', 'operator' => 'Does not equal', 'value' => 'TEMPLATE']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'Form test template'
 					]
 				]
@@ -316,7 +316,7 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag'],
 						['name' => 'action', 'operator' => 'Does not equal', 'value' => 'update']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'Form test template',
 						'A template with tags for updating'
 					]
@@ -328,7 +328,7 @@ class testPageTemplates extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'test', 'operator' => 'Does not contain', 'value' => 'test_']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'Form test template'
 					]
 				]
@@ -339,7 +339,7 @@ class testPageTemplates extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'test', 'operator' => 'Does not contain', 'value' => 'test_']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'Form test template'
 					]
 				]
@@ -351,7 +351,7 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not contain', 'value' => 'test_'],
 						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clo']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'Form test template',
 						'A template with tags for cloning'
 					]
@@ -364,7 +364,7 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'temp'],
 						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'upd']
 					],
-					'absence_templates' => [
+					'absent_templates' => [
 						'A template with tags for updating'
 					]
 				]
@@ -373,7 +373,7 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	/**
-	 * Test filtering templates by tags.
+	 * Filtering templates by tags.
 	 *
 	 * @dataProvider getFilterByTagsData
 	 */
@@ -387,14 +387,14 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		// Check that correct result displayed.
-		if (array_key_exists('absence_templates', $data)) {
+		if (array_key_exists('absent_templates', $data)) {
 			$filtering = $this->getTableResult('Name');
-			foreach ($data['absence_templates'] as $absence) {
-				if (($key = array_search($absence, $filtering)) !== false) {
+			foreach ($data['absent_templates'] as $absence) {
+				if (($key = array_search($absence, $filtering))) {
 					unset($filtering[$key]);
 				}
-				$filtering = array_values($filtering);
 			}
+			$filtering = array_values($filtering);
 			$this->assertTableDataColumn($filtering, 'Name');
 		}
 		else {

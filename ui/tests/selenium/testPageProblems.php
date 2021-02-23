@@ -215,7 +215,7 @@ class testPageProblems extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'Alpha', 'operator' => 'Does not exist']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Third test trigger with tag priority',
 						'First test trigger with tag priority'
 					]
@@ -227,7 +227,7 @@ class testPageProblems extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'Alpha', 'operator' => 'Does not exist']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Third test trigger with tag priority',
 						'First test trigger with tag priority'
 					]
@@ -240,7 +240,7 @@ class testPageProblems extends CLegacyWebTest {
 						['name' => 'Service', 'operator' => 'Does not exist'],
 						['name' => 'Database', 'operator' => 'Does not exist']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Test trigger to check tag filter on problem page'
 					]
 				]
@@ -252,7 +252,7 @@ class testPageProblems extends CLegacyWebTest {
 						['name' => 'Service', 'operator' => 'Does not exist'],
 						['name' => 'Database', 'operator' => 'Does not exist']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Trigger for tag permissions Oracle',
 						'Test trigger with tag',
 						'Trigger for tag permissions MySQL',
@@ -266,7 +266,7 @@ class testPageProblems extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Inheritance trigger with tags'
 					]
 				]
@@ -277,7 +277,7 @@ class testPageProblems extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Inheritance trigger with tags'
 					]
 				]
@@ -289,7 +289,7 @@ class testPageProblems extends CLegacyWebTest {
 						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium'],
 						['name' => 'Beta', 'operator' => 'Does not equal', 'value' => 'b']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Inheritance trigger with tags',
 						'Second test trigger with tag priority',
 						'First test trigger with tag priority'
@@ -303,7 +303,7 @@ class testPageProblems extends CLegacyWebTest {
 						['name' => 'Service', 'operator' => 'Does not equal', 'value' => 'abc'],
 						['name' => 'Database', 'operator' => 'Does not equal']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Test trigger to check tag filter on problem page'
 					]
 				]
@@ -314,7 +314,7 @@ class testPageProblems extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Third test trigger with tag priority',
 						'First test trigger with tag priority'
 					]
@@ -326,7 +326,7 @@ class testPageProblems extends CLegacyWebTest {
 					'tags' => [
 						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Third test trigger with tag priority',
 						'First test trigger with tag priority'
 					]
@@ -339,7 +339,7 @@ class testPageProblems extends CLegacyWebTest {
 						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'],
 						['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'Third test trigger with tag priority',
 						'First test trigger with tag priority'
 					]
@@ -352,7 +352,7 @@ class testPageProblems extends CLegacyWebTest {
 						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'],
 						['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
 					],
-					'absence_problems' => [
+					'absent_problems' => [
 						'First test trigger with tag priority'
 					]
 				]
@@ -361,7 +361,7 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	/**
-	 * Test filtering templates by tags.
+	 * Filtering problems by tags.
 	 *
 	 * @dataProvider getFilterByTagsExceptContainsEqualsData
 	 */
@@ -376,13 +376,13 @@ class testPageProblems extends CLegacyWebTest {
 
 		// We remove from the result list templates that is not displayed there.
 		$filtering = $this->getTableResult('Problem');
-		if (array_key_exists('absence_problems', $data)) {
-			foreach ($data['absence_problems'] as $absence) {
-				if (($key = array_search($absence, $filtering)) !== false) {
+		if (array_key_exists('absent_problems', $data)) {
+			foreach ($data['absent_problems'] as $absence) {
+				if (($key = array_search($absence, $filtering))) {
 					unset($filtering[$key]);
 				}
-				$filtering = array_values($filtering);
 			}
+			$filtering = array_values($filtering);
 			$this->assertTableDataColumn($filtering, 'Problem');
 		}
 		else {
