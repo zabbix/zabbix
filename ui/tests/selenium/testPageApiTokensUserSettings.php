@@ -18,9 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/common/testPageApiTokens.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
@@ -29,25 +27,12 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  *
  * @on-before prepareTokenData
  */
-class testPageApiTokensUserSettings extends CWebTest {
+class testPageApiTokensUserSettings extends testPageApiTokens {
 
 	public static $timestamp;
 
 	const STATUS_CHANGE_TOKEN = 'Expired token for admin';
 	const DELETE_TOKEN = 'Future token for admin';
-
-	use TableTrait;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
-	}
 
 	public static function prepareTokenData() {
 		CDataHelper::setSessionId(null);
@@ -130,122 +115,11 @@ class testPageApiTokensUserSettings extends CWebTest {
 			]
 		];
 
-		// Open API tokens page and check header.
-		$this->page->login()->open('zabbix.php?action=user.token.list');
-		$this->assertEquals('API tokens', $this->query('tag:h1')->one()->getText());
-
-		// Check status of buttons on the tokens page.
-		$form_buttons = [
-			'Create API token' => true,
-			'Enable' => false,
-			'Disable' => false,
-			'Delete' => false
-		];
-
-		foreach ($form_buttons as $button => $enabled) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled($enabled));
-		}
-
-		// Check displaying and hiding the filter.
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$filter_tab = $this->query('xpath://a[contains(text(), "Filter")]')->one();
-		$filter = $filter_form->query('id:tab_0')->one();
-		$this->assertTrue($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertFalse($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertTrue($filter->isDisplayed());
-
-		// Check that all filter fields are present.
-		$filter_fields = ['Name', 'Expires in less than', 'Status'];
-		$this-> assertEquals($filter_fields, $filter_form->getLabels()->asText());
-
-		// Check the count of returned tokens and the count of selected tokens.
-		$count = CDBHelper::getCount('SELECT tokenid FROM token WHERE userid=1');
-		$this->assertTableStats($count);
-		$selected_count = $this->query('id:selected_count')->one();
-		$this->assertEquals('0 selected', $selected_count->getText());
-		$all_tokens = $this->query('id:all_tokens')->one()->asCheckbox();
-		$all_tokens->set(true);
-		$this->assertEquals($count.' selected', $selected_count->getText());
-
-		// Check that buttons became enabled.
-		foreach (['Enable', 'Disable', 'Delete'] as $button) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
-		}
-
-		$all_tokens->set(false);
-		$this->assertEquals('0 selected', $selected_count->getText());
-
-		// Check tokens table headers.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$headers = $table->getHeadersText();
-
-		// Remove empty element from headers array.
-		array_shift($headers);
-		$reference_headers = ['Name', 'Expires at', 'Created at', 'Last accessed at', 'Status'];
-		$this->assertSame($reference_headers, $headers);
-
-		foreach ($headers as $header) {
-			if ($header === 'Created at') {
-				$this->assertFalse($table->query('xpath:.//a[text()="'.$header.'"]')->one(false)->isValid());
-			}
-			else {
-				$this->assertTrue($table->query('xpath:.//a[contains(text(), "'.$header.'")]')->one()->isClickable());
-			}
-		}
-
-		// Check parameters of tokens in the token list table.
-		$this->assertTableData($token_data);
+		$this->testPageApiTokensLayout($token_data, 'user settings');
 	}
 
 	public function testPageApiTokensUserSettings_ChangeStatus() {
-		$this->page->login()->open('zabbix.php?action=user.token.list');
-
-		// Disable API token.
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', self::STATUS_CHANGE_TOKEN);
-		$status = $row->getColumn('Status')->query('xpath:.//a')->one();
-		$status->click();
-
-		// Check token disabled.
-		$this->checkTokenStatus($row, 'disabled');
-
-		// Enable API token.
-		$status->click();
-
-		// Check token enabled.
-		$this->checkTokenStatus($row, 'enabled');
-
-		// Disable API token via button.
-		$row->select();
-		$this->query('button:Disable')->one()->waitUntilClickable()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->checkTokenStatus($row, 'disabled');
-
-		// Enable API token via button.
-		$row->select();
-		$this->query('button:Enable')->one()->waitUntilClickable()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->checkTokenStatus($row, 'enabled');
-	}
-
-	private function checkTokenStatus($row, $expected) {
-		if ($expected === 'enabled') {
-			$message_title = 'API token enabled';
-			$column_status = 'Enabled';
-			$db_status = '0';
-		}
-		else {
-			$message_title = 'API token disabled';
-			$column_status = 'Disabled';
-			$db_status = '1';
-		}
-
-		$this->assertMessage(TEST_GOOD, $message_title );
-		$this->assertEquals($column_status, $row->getColumn('Status')->getText());
-		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM token WHERE name=\''.self::STATUS_CHANGE_TOKEN.'\''));
+		$this->testPageApiTokensChangeStatus('zabbix.php?action=user.token.list', self::STATUS_CHANGE_TOKEN);
 	}
 
 	public function getFilterData() {
@@ -380,32 +254,7 @@ class testPageApiTokensUserSettings extends CWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageApiTokensUserSettings_Filter($data) {
-		$this->page->login()->open('zabbix.php?action=user.token.list');
-
-		// Apply and submit the filter from data provider.
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-
-		// Place $timestamp variable value in data provider as the data providers are formed befor execution of on-before.
-		if (array_key_exists('Expires in less than', $data)) {
-			$form->query('xpath:.//label[@for="filter-expires-state"]/span')->asCheckbox()->one()->set(true);
-			$form->query('xpath:.//input[@id="filter-expires-days"]')->one()->fill($data['Expires in less than']);
-		}
-		$form->fill($data['filter']);
-		$form->submit();
-		$this->page->waitUntilReady();
-
-		if (CTestArrayHelper::get($data, 'no_data')) {
-			$this->assertTableData();
-		}
-		else {
-			// Using token name check that only the expected filters are returned in the list.
-			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
-		}
-
-		// Reset the filter and check that all API tokens are displayed.
-		$this->query('button:Reset')->one()->click();
-		$count = CDBHelper::getCount('SELECT tokenid FROM token WHERE userid=1');
-		$this->assertTableStats($count);
+		$this->testPageApiTokensFilter($data, 'user settings');
 	}
 
 	public function getSortData() {
@@ -473,38 +322,10 @@ class testPageApiTokensUserSettings extends CWebTest {
 			}
 		}
 
-		$this->page->login()->open('zabbix.php?action=user.token.list');
-		$table = $this->query('class:list-table')->asTable()->one();
-
-		// In user settings API tokens list field Status is too wide, so sorting requires to click on the header link.
-		$header = $table->query('xpath:.//a[text()="'.$data['sort_field'].'"]')->one();
-		$header->click();
-
-		$sorted_once = [];
-		foreach ($table->getRows() as $row) {
-			$sorted_once[] = $row->getColumn($data['sort_field'])->getText();
-		}
-		$this->assertEquals($data['expected'], $sorted_once);
-
-		// Check column sorting in the oposite direction.
-		$header->click();
-		$sorted_twice = [];
-		foreach ($table->getRows() as $row) {
-			$sorted_twice[] = $row->getColumn($data['sort_field'])->getText();
-		}
-		$this->assertEquals(array_reverse($data['expected']), $sorted_twice);
+		$this->testPageApiTokensSort($data, 'zabbix.php?action=user.token.list');
 	}
 
 	public function testPageApiTokensUserSettings_Delete() {
-		$this->page->login()->open('zabbix.php?action=user.token.list');
-
-		// Delete API token.
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', self::DELETE_TOKEN)->select();
-		$this->query('button:Delete')->one()->waitUntilClickable()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-
-		// Check that token is deleted from DB.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT tokenid FROM token WHERE name = \''.self::DELETE_TOKEN.'\''));
+		$this->testPageApiTokensDelete('zabbix.php?action=user.token.list', self::DELETE_TOKEN);
 	}
 }
