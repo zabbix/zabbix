@@ -721,7 +721,7 @@ static int	eval_execute_function_sum(const zbx_eval_context_t *ctx, const zbx_ev
 	{
 		zbx_vector_dbl_t	*dbl_vector = output->values[i].data.dbl_vector;
 
-		for (i = 0; i < dbl_vector->values_num; i++)\
+		for (i = 0; i < dbl_vector->values_num; i++)
 			sum += dbl_vector->values[i];
 	}
 
