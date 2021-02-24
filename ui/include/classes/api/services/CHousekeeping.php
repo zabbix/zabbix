@@ -45,8 +45,7 @@ class CHousekeeping extends CApiService {
 	private $output_fields = ['hk_events_mode', 'hk_events_trigger', 'hk_events_internal', 'hk_events_discovery',
 		'hk_events_autoreg', 'hk_services_mode', 'hk_services', 'hk_audit_mode', 'hk_audit', 'hk_sessions_mode',
 		'hk_sessions', 'hk_history_mode', 'hk_history_global', 'hk_history', 'hk_trends_mode', 'hk_trends_global',
-		'hk_trends', 'db_extension', 'compression_status', 'compress_older', 'compression_availability'
-	];
+		'hk_trends', 'db_extension', 'compression_status', 'compress_older'];
 
 	/**
 	 * Get housekeeping parameters.
@@ -170,7 +169,7 @@ class CHousekeeping extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$output_fields = array_diff($this->output_fields, ['db_extension', 'compression_availability']);
+		$output_fields = array_diff($this->output_fields, ['db_extension']);
 		$output_fields[] = 'configid';
 
 		return DB::select('config', ['output' => $output_fields])[0];
