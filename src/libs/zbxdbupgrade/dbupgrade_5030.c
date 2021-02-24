@@ -2073,7 +2073,8 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 	result = DBselect(
 			"select slideid,screenid,step,delay"
 				" from slides"
-				" where slideshowid=" ZBX_FS_UI64, slideshowid);
+				" where slideshowid=" ZBX_FS_UI64
+				" order by step asc limit 50", slideshowid);
 
 	if (NULL == result)
 		return FAIL;
