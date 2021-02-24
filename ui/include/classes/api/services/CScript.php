@@ -285,7 +285,7 @@ class CScript extends CApiService {
 			$path = '/'.++$i;
 
 			$type_rules = $this->getTypeValidationRules($script['type'], 'create', $type_fields);
-			$scope_rules = $this->getScopeValidationRules($script['scope'], $scope_fields);
+			$this->getScopeValidationRules($script['scope'], $scope_fields);
 
 			$type_rules['fields'] += $common_fields + $scope_fields;
 
@@ -637,7 +637,7 @@ class CScript extends CApiService {
 		$scripts = $this->extendFromObjects($scripts, $db_scripts, ['name', 'type', 'command', 'scope']);
 
 		$i = 0;
-		foreach ($scripts as $num => &$script) {
+		foreach ($scripts as &$script) {
 			$path = '/'.++$i;
 			$db_script = $db_scripts[$script['scriptid']];
 			$method = 'update';
@@ -656,7 +656,7 @@ class CScript extends CApiService {
 			}
 
 			$type_rules = $this->getTypeValidationRules($script['type'], $method, $type_fields);
-			$scope_rules = $this->getScopeValidationRules($script['scope'], $scope_fields);
+			$this->getScopeValidationRules($script['scope'], $scope_fields);
 
 			$type_rules['fields'] += $common_fields + $scope_fields;
 
