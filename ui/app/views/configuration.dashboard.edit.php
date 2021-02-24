@@ -25,13 +25,16 @@
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('class.dashboard.js');
+$this->addJsFile('class.dashboard.loader.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.js');
+$this->addJsFile('class.dashboard.widget.iterator.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('multiselect.js');
 $this->addJsFile('class.cclock.js');
+$this->addJsFile('class.sortable.js');
 
-$this->includeJsFile('dashboard/class.template-dashboard.js.php');
 $this->includeJsFile('configuration.dashboard.edit.js.php');
 
 (new CWidget())
@@ -42,11 +45,14 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 			(new CTag('nav', true, [
 				new CList([
 					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
-					(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
-						->addClass(ZBX_STYLE_BTN_ALT),
-					(new CButton('dashbrd-paste-widget', _('Paste widget')))
-						->addClass(ZBX_STYLE_BTN_ALT)
-						->setEnabled(false),
+					(new CList())
+						->addClass(ZBX_STYLE_BTN_SPLIT)
+						->addItem((new CButton('dashbrd-add-widget', _('Add')))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem(
+							(new CButton('dashbrd-add', '&#8203;'))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+						),
 					(new CButton('dashbrd-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
 					''
@@ -57,11 +63,34 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 		])))
 	)
 	->setNavigation(getHostNavigation('dashboards', $data['dashboard']['templateid']))
-	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
+	->addItem(
+		(new CDiv())
+			->addClass(ZBX_STYLE_DASHBRD)
+			->addItem(
+				(new CDiv())
+					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
+					->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
+					->addItem(
+						(new CDiv())
+							->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+							->addItem([
+								(new CSimpleButton())
+									->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+									->addClass('btn-iterator-page-previous')
+									->setEnabled(false),
+								(new CSimpleButton())
+									->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+									->addClass('btn-iterator-page-next')
+									->setEnabled(false)
+							])
+					)
+			)
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
+	)
 	->show();
 
 (new CScriptTag(
-	'initializeTemplateDashboard('.
+	'initializeView('.
 		json_encode($data['dashboard']).','.
 		json_encode($data['widget_defaults']).','.
 		json_encode($data['page']).

@@ -28,6 +28,8 @@ class CControllerDashboardUpdate extends CController {
 			'dashboardid' => 'db dashboard.dashboardid',
 			'userid' => 'required|db dashboard.userid',
 			'name' => 'required|db dashboard.name|not_empty',
+			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' => 'required|db dashboard.auto_start|in 0,1',
 			'widgets' => 'array',
 			'sharing' => 'array'
 		];
@@ -70,6 +72,8 @@ class CControllerDashboardUpdate extends CController {
 		$dashboard = [
 			'name' => $this->getInput('name'),
 			'userid' => $this->getInput('userid', 0),
+			'display_period' => $this->getInput('display_period'),
+			'auto_start' => $this->getInput('auto_start'),
 			'widgets' => []
 		];
 
@@ -113,6 +117,7 @@ class CControllerDashboardUpdate extends CController {
 
 		if (array_key_exists('dashboardid', $dashboard)) {
 
+				// TODO: fix temporary solution.
 				$ds = API::Dashboard()->get([
 					'output' => ['dashboardid'],
 					'selectPages' => ['dashboard_pageid'],
@@ -128,7 +133,7 @@ class CControllerDashboardUpdate extends CController {
 					],
 				];
 				unset($dashboard['widgets']);
-
+				// =============================
 
 
 			$result = API::Dashboard()->update($dashboard);
@@ -136,12 +141,14 @@ class CControllerDashboardUpdate extends CController {
 			$error_msg =  _('Failed to update dashboard');
 		}
 		else {
+				// TODO: fix temporary solution.
 				$dashboard['pages'] = [
 					[
 						'widgets' => $dashboard['widgets'],
 					],
 				];
 				unset($dashboard['widgets']);
+				// =============================
 
 
 			$result = API::Dashboard()->create($dashboard);

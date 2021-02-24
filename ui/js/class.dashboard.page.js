@@ -54,6 +54,8 @@ class CDashboardPage {
 
 		this._widgets = [];
 
+		this._is_active = false;
+
 		const add_new_widget_callback = (e) => {
 			if (!this.isEditMode()) {
 				this.editDashboard();
@@ -87,31 +89,10 @@ class CDashboardPage {
 
 		this._data.new_widget_placeholder.showAtDefaultPosition();
 
-		let resize_timeout;
-
 		if (this._options['edit_mode']) {
 			this._doAction('onEditStart');
 			this._editDashboard();
 		}
-
-		$(window).on('resize', () => {
-			clearTimeout(resize_timeout);
-			resize_timeout = setTimeout(() => {
-				for (const w of this._widgets) {
-					this._resizeWidget(w);
-				}
-			}, 200);
-
-			// Recalculate dashboard container minimal required height.
-			this._data.minimal_height = this._calculateGridMinHeight();
-			this._data.cell_width = this._getCurrentCellWidth();
-			this._data.new_widget_placeholder.resize();
-			this._resizeDashboardGrid();
-		});
-
-		['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition'].forEach((action) => {
-			this.addAction(action, this._hideMessageExhausted);
-		});
 	}
 
 	getDashboardData() {
@@ -124,6 +105,75 @@ class CDashboardPage {
 
 	getOptions() {
 		return this._options;
+	}
+
+	activate() {
+		this._is_active = true;
+
+		for (const w of this._widgets) {
+			w.activate();
+		}
+
+		this._registerEvents();
+	}
+
+	deactivate() {
+		this._is_active = false;
+
+		for (const w of this._widgets) {
+			w.deactivate();
+		}
+
+		this._unregisterEvents();
+	}
+
+	_registerEvents() {
+		this._events = {
+			resize: () => {
+				clearTimeout(this._events._resize_timeout);
+				this._events._resize_timeout = setTimeout(() => {
+					for (const w of this._widgets) {
+						this._resizeWidget(w);
+					}
+				}, 200);
+
+				// Recalculate dashboard container minimal required height.
+				this._data.minimal_height = this._calculateGridMinHeight();
+				this._data.cell_width = this._getCurrentCellWidth();
+				this._data.new_widget_placeholder.resize();
+				this._resizeDashboardGrid();
+			}
+		}
+
+		for (const action of ['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition']) {
+			this.addAction(action, this._hideMessageExhausted);
+		}
+
+		for (const w of this._widgets) {
+			if (w instanceof CDashboardWidgetIterator) {
+				this.addAction('onResizeEnd', this._onIteratorResizeEnd, w.uniqueid, {
+					trigger_name: `onIteratorResizeEnd_${w.uniqueid}`,
+					parameters: [w]
+				});
+			}
+		}
+
+		$(window).on('resize', this._events.resize);
+	}
+
+	_unregisterEvents() {
+		for (const action of ['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition']) {
+			this.removeAction(action, this._hideMessageExhausted);
+		}
+
+		for (const w of this._widgets) {
+			if (w instanceof CDashboardWidgetIterator) {
+				this.removeAction('onResizeEnd', this._onIteratorResizeEnd);
+			}
+		}
+
+		$(window).off('resize', this._events.resize);
+		clearTimeout(this._events._resize_timeout);
 	}
 
 	/**
@@ -176,34 +226,46 @@ class CDashboardPage {
 	}
 
 	addWidget(widget) {
-		widget = new CDashboardWidget({
+		widget = {
 			...JSON.parse(JSON.stringify(widget)),
+			defaults: this._data.widget_defaults[widget.type],
 			uniqueid: this._generateUniqueId(),
 			index: this._widgets.length,
-			dynamic_hostid: this._data.dashboard.dynamic_hostid !== null ? this._data.dashboard.dynamic_hostid : null,
-			min_width: this._options['widget-width'],
-			min_height: this._options['widget-height'],
+			cell_height: this._options['widget-height'],
+			cell_width: this._options['widget-width'],
 			is_editable: this._options['editable'] && !this._options['kioskmode'],
-			defaults: this._data.widget_defaults[widget.type]
-		});
+			dynamic_hostid: this._data.dashboard.dynamic_hostid !== null ? this._data.dashboard.dynamic_hostid : null
+		};
+
+		if (widget.defaults.iterator) {
+			widget = new CDashboardWidgetIterator({
+				min_rows: this._options['widget-min-rows'],
+				...widget
+			});
+
+			widget
+				.on(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK, (e) => {
+					const w = e.detail.target;
+
+					if (w.page > 1) {
+						w.page--;
+						this._updateWidgetContent(w);
+					}
+				})
+				.on(WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK, (e) => {
+					const w = e.detail.target;
+
+					if (w.page < w.page_count) {
+						w.page++;
+						this._updateWidgetContent(w);
+					}
+				})
+		}
+		else {
+			widget = new CDashboardWidget(widget);
+		}
 
 		widget
-			.on(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK, (e) => {
-				const w = e.detail.target;
-
-				if (w.page > 1) {
-					w.page--;
-					this._updateWidgetContent(w);
-				}
-			})
-			.on(WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK, (e) => {
-				const w = e.detail.target;
-
-				if (w.page < w.page_count) {
-					w.page++;
-					this._updateWidgetContent(w);
-				}
-			})
 			.on(WIDGET_EVENT_EDIT_CLICK, (e) => {
 				this.editWidget(e.detail.target, e.target);
 			})
@@ -227,17 +289,12 @@ class CDashboardPage {
 		widget.showPreloader();
 		this._data.new_widget_placeholder.hide();
 
-		if (widget.iterator) {
+		if (widget instanceof CDashboardWidgetIterator) {
 			// Placeholders will be shown while the iterator will be loading.
 			this._addIteratorPlaceholders(widget,
-				this._numIteratorColumns(widget) * this._numIteratorRows(widget)
+				widget.getNumColumns() * widget.getNumRows()
 			);
 			this._alignIteratorContents(widget, widget.pos);
-
-			this.addAction('onResizeEnd', this._onIteratorResizeEnd, widget.uniqueid, {
-				trigger_name: `onIteratorResizeEnd_${widget.uniqueid}`,
-				parameters: [this._data, widget]
-			});
 		}
 
 		if (this._options['edit_mode']) {
@@ -329,9 +386,8 @@ class CDashboardPage {
 		return this._options['updated'];
 	}
 
-	saveDashboard(callback) {
+	saveDashboard() {
 		this._doAction('beforeDashboardSave');
-		callback(this._widgets);
 	}
 
 	/**
@@ -453,7 +509,7 @@ class CDashboardPage {
 				new_widget.update_paused = true;
 
 				this._setWidgetModeEdit(new_widget);
-				new_widget.disableWidgetControls();
+				new_widget.disableControls();
 
 				const url = new Curl('zabbix.php');
 				url.setArgument('action', 'dashboard.widget.sanitize');
@@ -475,7 +531,7 @@ class CDashboardPage {
 
 				new_widget.fields = response.fields;
 				new_widget.update_paused = false;
-				new_widget.enableWidgetControls();
+				new_widget.enableControls();
 				this._updateWidgetContent(new_widget);
 
 				this._options['updated'] = true;
@@ -798,6 +854,18 @@ class CDashboardPage {
 		}
 	}
 
+	removeAction(hook_name, function_to_call) {
+		if (typeof this._data.triggers[hook_name] === 'undefined') {
+			return;
+		}
+
+		for (const i in this._data.triggers[hook_name]) {
+			if (this._data.triggers[hook_name][i].function === function_to_call) {
+				delete this._data.triggers[hook_name][i];
+			}
+		}
+	}
+
 	/**
 	 * Find out if widgets should react on mouse and focus events.
 	 *
@@ -835,7 +903,7 @@ class CDashboardPage {
 	 * @param {object} widget  Dashboard widget object.
 	 */
 	_enterWidget(widget) {
-		if (widget.div.hasClass(widget.iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus')) {
+		if (widget.div.hasClass(widget.getCssClass('focus'))) {
 			return;
 		}
 
@@ -844,12 +912,12 @@ class CDashboardPage {
 		}
 
 		if (widget.parent) {
-			this._doLeaveWidgetsOfIteratorExcept(widget.parent, widget);
-			this._doEnterWidgetOfIterator(widget);
+			widget.parent.leaveIteratorWidgetsExcept(widget);
+			widget.enterIteratorWidget();
 		}
 		else {
 			this._doLeaveWidgetsExcept(widget);
-			this._doEnterWidget(widget);
+			widget.enter();
 		}
 
 		this._slideKiosk();
@@ -862,7 +930,7 @@ class CDashboardPage {
 	 * @param {object} widget  Dashboard widget object.
 	 */
 	_leaveWidget(widget) {
-		if (!widget.div.hasClass(widget.iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus')) {
+		if (!widget.div.hasClass(widget.getCssClass('focus'))) {
 			return;
 		}
 
@@ -870,45 +938,9 @@ class CDashboardPage {
 			return;
 		}
 
-		this._doLeaveWidget(widget);
+		widget.leave();
 
 		this._slideKiosk();
-	}
-
-	/**
-	 * Focus specified top-level widget or iterator. If iterator is specified, focus it's hovered child widget as well.
-	 *
-	 * @param {object} widget  Dashboard widget object.
-	 */
-	_doEnterWidget(widget) {
-		widget.div.addClass(widget.iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
-
-		if (widget.iterator) {
-			let child_hovered = null;
-
-			for (const child of widget.children) {
-				if (child.div.is(':hover')) {
-					child_hovered = child;
-				}
-			}
-
-			if (child_hovered !== null) {
-				this._doEnterWidgetOfIterator(child_hovered);
-			}
-		}
-	}
-
-	/**
-	 * Focus specified child widget of iterator.
-	 *
-	 * @param {object} widget  Dashboard widget object.
-	 */
-	_doEnterWidgetOfIterator(widget) {
-		widget.div.addClass('dashbrd-grid-widget-focus');
-
-		if (widget.parent.div.hasClass('dashbrd-grid-iterator-hidden-header')) {
-			widget.parent.div.toggleClass('iterator-double-header', widget.div.position().top === 0);
-		}
 	}
 
 	/**
@@ -923,47 +955,8 @@ class CDashboardPage {
 					continue;
 				}
 
-				this._doLeaveWidget(w);
+				w.leave();
 			}
-		}
-	}
-
-	/**
-	 * Blur specified top-level widget or iterator. If iterator is specified, blur it's focused child widget as well.
-	 *
-	 * @param {object} widget  Dashboard widget object.
-	 */
-	_doLeaveWidget(widget) {
-		// Widget placeholder doesn't have header.
-		if (!widget.content_header) {
-			return;
-		}
-
-		if (widget.content_header.has(document.activeElement).length) {
-			document.activeElement.blur();
-		}
-
-		if (widget.iterator) {
-			this._doLeaveWidgetsOfIteratorExcept(widget);
-			widget.div.removeClass('iterator-double-header');
-		}
-
-		widget.div.removeClass(widget.iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
-	}
-
-	/**
-	 * Blur all child widgets of iterator, except the specified one.
-	 *
-	 * @param {object} iterator      Iterator object.
-	 * @param {object} except_child  Dashboard widget object.
-	 */
-	_doLeaveWidgetsOfIteratorExcept(iterator, except_child = null) {
-		for (const child of iterator.children) {
-			if (except_child !== null && child.uniqueid === except_child.uniqueid) {
-				continue;
-			}
-
-			child.div.removeClass('dashbrd-grid-widget-focus');
 		}
 	}
 
@@ -971,24 +964,12 @@ class CDashboardPage {
 	 * Update dashboard sliding effect if in kiosk mode.
 	 */
 	_slideKiosk() {
-		const iterator_classes = {
-			'focus': 'dashbrd-grid-iterator-focus',
-			'hidden_header': 'dashbrd-grid-iterator-hidden-header'
-		};
-
-		const widget_classes = {
-			'focus': 'dashbrd-grid-widget-focus',
-			'hidden_header': 'dashbrd-grid-widget-hidden-header'
-		};
-
 		// Calculate the dashboard offset (0, 1 or 2 lines) based on focused widget.
 
 		let slide_lines = 0;
 
 		for (const widget of this._widgets) {
-			const classes = widget.iterator ? iterator_classes : widget_classes;
-
-			if (!widget.div.hasClass(classes.focus)) {
+			if (!widget.div.hasClass(widget.getCssClass('focus'))) {
 				continue;
 			}
 
@@ -997,10 +978,10 @@ class CDashboardPage {
 				break;
 			}
 
-			if (widget.iterator) {
+			if (widget instanceof CDashboardWidgetIterator) {
 				slide_lines = widget.div.hasClass('iterator-double-header') ? 2 : 1;
 			}
-			else if (widget.div.hasClass(classes.hidden_header)) {
+			else if (widget.div.hasClass(widget.getCssClass('hidden_header'))) {
 				slide_lines = 1;
 			}
 
@@ -1045,84 +1026,19 @@ class CDashboardPage {
 		}
 	}
 
-	_setWidgetViewMode(widget, view_mode) {
-		if (widget.view_mode == view_mode) {
-			return;
-		}
-
-		widget.view_mode = view_mode;
-
-		const hidden_header_class = widget.iterator
-			? 'dashbrd-grid-iterator-hidden-header'
-			: 'dashbrd-grid-widget-hidden-header';
-
-		if (widget.iterator) {
-			if (view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL) {
-				widget.div.removeClass('iterator-double-header');
-			}
-
-			for (const child of widget.children) {
-				this._setWidgetViewMode(child, view_mode);
-			}
-		}
-
-		widget.div.toggleClass(hidden_header_class, view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
-	}
-
-	_updateIteratorPager(iterator) {
-		$('.dashbrd-grid-iterator-pager-info', iterator.content_header)
-			.text(`${iterator.page} / ${iterator.page_count}`);
-
-		iterator.content_header.addClass('pager-visible');
-
-		const too_narrow = iterator.content_header.width() <
-			$('.dashbrd-grid-iterator-pager', iterator.content_header).outerWidth(true)
-			+ $('.dashbrd-grid-iterator-actions', iterator.content_header).outerWidth(true);
-
-		const is_pager_visible = iterator.page_count > 1 && !too_narrow && !this._getIteratorTooSmallState(iterator);
-
-		iterator.content_header.toggleClass('pager-visible', is_pager_visible);
-	}
-
-	_addWidgetInfoButtons($content_header, buttons) {
-		// Note: this function is used only for widgets and not iterators.
-
-		const $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
-
-		for (const button of buttons) {
-			$widget_actions.prepend(
-				$('<li>', {'class': 'widget-info-button'})
-					.append(
-						$('<button>', {
-							'type': 'button',
-							'class': button.icon,
-							'data-hintbox': 1,
-							'data-hintbox-static': 1
-						})
-					)
-					.append(
-						$('<div>', {
-							'class': 'hint-box',
-							'html': button.hint
-						}).hide()
-					)
-			);
+	_applyWidgetConfiguration(widget, configuration) {
+		if ('padding' in configuration) {
+			this._setWidgetPadding(widget, configuration['padding']);
 		}
 	}
 
 	_setWidgetPadding(widget, padding) {
 		// Note: this function is used only for widgets and not iterators.
 
-		if (!widget.iterator && widget.configuration['padding'] !== padding) {
+		if (!(widget instanceof CDashboardWidgetIterator) && widget.configuration['padding'] !== padding) {
 			widget.configuration['padding'] = padding;
 			widget.content_body.toggleClass('no-padding', !padding);
 			this._resizeWidget(widget);
-		}
-	}
-
-	_applyWidgetConfiguration(widget, configuration) {
-		if ('padding' in configuration) {
-			this._setWidgetPadding(widget, configuration['padding']);
 		}
 	}
 
@@ -1224,7 +1140,7 @@ class CDashboardPage {
 	}
 
 	_getCurrentCellWidth() {
-		return $('.dashbrd-grid-container').width() / this._options['max-columns'];
+		return this._$target.width() / this._options['max-columns'];
 	}
 
 	_setDivPosition($div, pos) {
@@ -1322,11 +1238,11 @@ class CDashboardPage {
 
 	_sortWidgets(widgets) {
 		widgets
-			.sort((box1, box2) => {
-				return box1.pos.y - box2.pos.y;
+			.sort((w1, w2) => {
+				return w1.pos.y - w2.pos.y;
 			})
-			.forEach((box, index) => {
-				box.div.data('widget-index', index);
+			.forEach((w, index) => {
+				w.setIndex(index);
 			});
 
 		return widgets;
@@ -1385,7 +1301,8 @@ class CDashboardPage {
 						pos.height -= w.pos.y - pos.y;
 						overlaps = (pos.height < w.pos.height || pos.y >= w.pos.y);
 					}
-					else {
+
+					if (overlaps) {
 						break;
 					}
 				}
@@ -1847,13 +1764,13 @@ class CDashboardPage {
 			widget.current_pos = pos;
 			this._realignResize(widget);
 
-			if (widget.iterator) {
+			if (widget instanceof CDashboardWidgetIterator) {
 				this._alignIteratorContents(widget, widget.current_pos);
 			}
 
 			for (const w of this._widgets) {
 				if (widget.uniqueid !== w.uniqueid) {
-					if (w.iterator) {
+					if (w instanceof CDashboardWidgetIterator) {
 						const box_pos = this._calcDivPosition(w.div);
 
 						if (box_pos.width !== w.current_pos.width || box_pos.height !== w.current_pos.height) {
@@ -1996,7 +1913,7 @@ class CDashboardPage {
 				this._setResizableState('enable');
 				this._stopWidgetPositioning(widget);
 
-				if (widget.iterator && !widget.div.is(':hover')) {
+				if (widget instanceof CDashboardWidgetIterator && !widget.div.is(':hover')) {
 					widget.div.removeClass('iterator-double-header');
 				}
 
@@ -2031,7 +1948,7 @@ class CDashboardPage {
 			minHeight: this._options['widget-min-rows'] * this._options['widget-height'],
 			start: (e) => {
 				this._doLeaveWidgetsExcept(widget);
-				this._doEnterWidget(widget);
+				widget.enter();
 
 				this._$target.addClass('dashbrd-positioning');
 
@@ -2096,7 +2013,7 @@ class CDashboardPage {
 				});
 			},
 			stop: () => {
-				this._doLeaveWidget(widget);
+				widget.leave();
 
 				delete widget.prev_pos;
 
@@ -2105,7 +2022,7 @@ class CDashboardPage {
 
 				widget.container.removeAttr('style');
 
-				if (widget.iterator) {
+				if (widget instanceof CDashboardWidgetIterator) {
 					this._alignIteratorContents(widget, widget.pos);
 				}
 
@@ -2146,40 +2063,8 @@ class CDashboardPage {
 		}
 	}
 
-	_hidePreloader(widget) {
-		if (widget.iterator) {
-			widget.div.find('.dashbrd-grid-iterator-content').removeClass('is-loading');
-		}
-		else {
-			widget.div.find('.dashbrd-grid-widget-content').removeClass('is-loading');
-		}
-	}
-
-	_startPreloader(widget, timeout) {
-		timeout = timeout || widget.preloader_timeout;
-
-		if (typeof widget.preloader_timeoutid !== 'undefined' || widget.div.find('.is-loading').length) {
-			return;
-		}
-
-		widget.preloader_timeoutid = setTimeout(() => {
-			delete widget.preloader_timeoutid;
-
-			widget.showPreloader();
-		}, timeout);
-	}
-
-	_stopPreloader(widget) {
-		if (typeof widget.preloader_timeoutid !== 'undefined') {
-			clearTimeout(widget.preloader_timeoutid);
-			delete widget.preloader_timeoutid;
-		}
-
-		this._hidePreloader(widget);
-	}
-
 	_setUpdateWidgetContentTimer(widget, rf_rate) {
-		widget.clearUpdateWidgetContentTimer();
+		widget.clearUpdateContentTimer();
 
 		if (widget.updating_content) {
 			// Waiting for another AJAX request to either complete of fail.
@@ -2207,27 +2092,6 @@ class CDashboardPage {
 		}
 	}
 
-	_setIteratorTooSmallState(iterator, enabled) {
-		iterator.div.toggleClass('iterator-too-small', enabled);
-	}
-
-	_getIteratorTooSmallState(iterator) {
-		return iterator.div.hasClass('iterator-too-small');
-	}
-
-	_numIteratorColumns(iterator) {
-		return iterator.fields['columns'] ? iterator.fields['columns'] : 2;
-	}
-
-	_numIteratorRows(iterator) {
-		return iterator.fields['rows'] ? iterator.fields['rows'] : 1;
-	}
-
-	_isIteratorTooSmall(iterator, pos) {
-		return pos.width < this._numIteratorColumns(iterator)
-			|| pos.height < this._numIteratorRows(iterator) * this._options['widget-min-rows'];
-	}
-
 	_addIteratorPlaceholders(iterator, count) {
 		$('.dashbrd-grid-iterator-placeholder', iterator.content_body).remove();
 
@@ -2247,25 +2111,25 @@ class CDashboardPage {
 	}
 
 	_alignIteratorContents(iterator, pos) {
-		if (this._isIteratorTooSmall(iterator, pos)) {
-			this._setIteratorTooSmallState(iterator, true);
+		if (iterator.isTooSmall(pos)) {
+			iterator.setTooSmallState(true);
 
 			return;
 		}
 
-		if (this._getIteratorTooSmallState(iterator) && iterator.update_pending) {
-			this._setIteratorTooSmallState(iterator, false);
+		if (iterator.getTooSmallState() && iterator.update_pending) {
+			iterator.setTooSmallState(false);
 			iterator.showPreloader();
 			this._updateWidgetContent(iterator);
 
 			return;
 		}
 
-		this._setIteratorTooSmallState(iterator, false);
+		iterator.setTooSmallState(false);
 
 		const $placeholders = iterator.content_body.find('.dashbrd-grid-iterator-placeholder');
-		const num_columns = this._numIteratorColumns(iterator);
-		const num_rows = this._numIteratorRows(iterator);
+		const num_columns = iterator.getNumColumns();
+		const num_rows = iterator.getNumRows();
 
 		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
 			const cell_column = index % num_columns;
@@ -2313,26 +2177,6 @@ class CDashboardPage {
 		}
 	}
 
-	_addWidgetOfIterator(iterator, child) {
-		child = new CDashboardWidget({
-			'view_mode': iterator.view_mode,
-			...child,
-			'iterator': false,
-			'parent': iterator,
-			'new_widget': false,
-			uniqueid: this._generateUniqueId(),
-			min_width: this._options['widget-width'],
-			min_height: this._options['widget-height'],
-			// is_editable: this._options['editable'] && !this._options['kioskmode'],
-			defaults: this._data.widget_defaults[child.type]
-		});
-
-		iterator.content_body.append(child.div);
-		iterator.children.push(child);
-
-		child.showPreloader();
-	}
-
 	_hasEqualProperties(object_1, object_2) {
 		if (Object.keys(object_1).length !== Object.keys(object_2).length) {
 			return false;
@@ -2347,25 +2191,12 @@ class CDashboardPage {
 		return true;
 	}
 
-	/**
-	 * Clear and reset the state of the iterator.
-	 */
-	_clearIterator(iterator) {
-		for (const child of iterator.children) {
-			this._removeWidget(child);
-		}
-
-		iterator.content_body.empty();
-		iterator.children = [];
-
-		iterator.div.removeClass('iterator-alt-content');
-	}
-
+	// TODO move to widget.iterator
 	_updateIteratorCallback(iterator, response, options) {
 		const has_alt_content = typeof response.messages !== 'undefined' || typeof response.body !== 'undefined';
 
-		if (has_alt_content || this._getIteratorTooSmallState(iterator)) {
-			this._clearIterator(iterator);
+		if (has_alt_content || iterator.getTooSmallState()) {
+			iterator.clear();
 
 			if (has_alt_content) {
 				const $alt_content = $('<div>');
@@ -2379,9 +2210,7 @@ class CDashboardPage {
 				iterator.content_body.append($alt_content);
 				iterator.div.addClass('iterator-alt-content');
 
-				iterator.page = 1;
-				iterator.page_count = 1;
-				this._updateIteratorPager(iterator);
+				iterator.updatePager(1, 1);
 			}
 			else {
 				iterator.update_pending = true;
@@ -2392,12 +2221,10 @@ class CDashboardPage {
 
 		if (iterator.div.hasClass('iterator-alt-content')) {
 			// Returning from alt-content to normal mode.
-			this._clearIterator(iterator);
+			iterator.clear();
 		}
 
-		iterator.page = response.page;
-		iterator.page_count = response.page_count;
-		this._updateIteratorPager(iterator);
+		iterator.updatePager(response.page, response.page_count);
 
 		const current_children = iterator.children;
 		const current_children_by_widgetid = {};
@@ -2416,7 +2243,7 @@ class CDashboardPage {
 
 		const reused_widgetids = [];
 
-		response.children.slice(0, this._numIteratorColumns(iterator) * this._numIteratorRows(iterator))
+		response.children.slice(0, iterator.getNumColumns() * iterator.getNumRows())
 			.forEach((child) => {
 				if (typeof child.widgetid !== 'undefined' && current_children_by_widgetid[child.widgetid]
 					&& this._hasEqualProperties(
@@ -2431,7 +2258,11 @@ class CDashboardPage {
 					reused_widgetids.push(child.widgetid);
 				}
 				else {
-					this._addWidgetOfIterator(iterator, child);
+					iterator.addWidget({
+						...child,
+						defaults: this._data.widget_defaults[child.type],
+						uniqueid: this._generateUniqueId()
+					});
 				}
 			});
 
@@ -2442,7 +2273,7 @@ class CDashboardPage {
 		}
 
 		this._addIteratorPlaceholders(iterator,
-			this._numIteratorColumns(iterator) * this._numIteratorRows(iterator) - iterator.children.length
+			iterator.getNumColumns() * iterator.getNumRows() - iterator.children.length
 		);
 
 		this._alignIteratorContents(iterator,
@@ -2493,30 +2324,6 @@ class CDashboardPage {
 		}
 	}
 
-	_updateWidgetCallback(widget, response) {
-		widget.content_body.empty();
-		if (typeof response.messages !== 'undefined') {
-			widget.content_body.append(response.messages);
-		}
-		widget.content_body.append(response.body);
-
-		if (typeof response.debug !== 'undefined') {
-			$(response.debug).appendTo(widget.content_body);
-		}
-
-		widget.removeWidgetInfoButtons();
-		if (typeof response.info !== 'undefined' && !this._options['edit_mode']) {
-			this._addWidgetInfoButtons(widget.content_header, response.info);
-		}
-
-		// Creates new script elements and removes previous ones to force their re-execution.
-		widget.content_script.empty();
-		if (typeof response.script_inline !== 'undefined') {
-			// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
-			widget.content_script.append($('<script>').text(response.script_inline));
-		}
-	}
-
 	_isDeletedWidget(widget) {
 		let search_widgets = this._widgets;
 
@@ -2533,69 +2340,6 @@ class CDashboardPage {
 		});
 
 		return !widgets_found.length;
-	}
-
-	_setWidgetReady(widget) {
-		if (widget.ready) {
-			return;
-		}
-
-		const dashboard_was_ready = !this._widgets.filter((w) => {
-			return !w.ready;
-		}).length;
-
-		let ready_updated = false;
-
-		if (widget.iterator) {
-			if (!widget.children.length) {
-				// Set empty iterator to ready state.
-
-				ready_updated = !widget.ready;
-				widget.ready = true;
-			}
-		}
-		else if (widget.parent) {
-			widget.ready = true;
-
-			let children = widget.parent.children,
-				children_not_ready = children.filter(function(widget) {
-					return !widget.ready;
-				});
-
-			if (!children_not_ready.length) {
-				// Set parent iterator to ready state.
-
-				ready_updated = !widget.parent.ready;
-				widget.parent.ready = true;
-			}
-		}
-		else {
-			ready_updated = !widget.ready;
-			widget.ready = true;
-		}
-
-		if (ready_updated) {
-			/*
-			 * The conception:
-			 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.
-			 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' once, as soon as all widgets are loaded.
-			 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' for each new widget added in edit mode.
-			 */
-
-			if (dashboard_was_ready) {
-				this._registerDataExchangeCommit();
-			}
-			else {
-				const dashboard_is_ready = !this._widgets.filter(function(widget) {
-					return !widget.ready;
-				}).length;
-
-				if (dashboard_is_ready) {
-					this._registerDataExchangeCommit();
-					this._doAction('onDashboardReady');
-				}
-			}
-		}
 	}
 
 	_registerDataExchangeCommit() {
@@ -2658,13 +2402,6 @@ class CDashboardPage {
 		this.callWidgetDataShare();
 	}
 
-	_getWidgetContentSize(widget) {
-		return {
-			'content_width': Math.floor(widget.content_body.width()),
-			'content_height': Math.floor(widget.content_body.height())
-		};
-	}
-
 	_isEqualContentSize(size_1, size_2) {
 		if (size_1 === undefined || size_2 === undefined) {
 			return false;
@@ -2674,7 +2411,7 @@ class CDashboardPage {
 	}
 
 	_updateWidgetContent(widget, options = {}) {
-		widget.clearUpdateWidgetContentTimer();
+		widget.clearUpdateContentTimer();
 
 		if (widget.updating_content) {
 			// Waiting for another AJAX request to either complete or fail.
@@ -2687,20 +2424,20 @@ class CDashboardPage {
 			return;
 		}
 
-		if (widget.iterator) {
+		if (widget instanceof CDashboardWidgetIterator) {
 			const pos = (typeof widget.current_pos === 'object') ? widget.current_pos : widget.pos;
 
-			if (this._isIteratorTooSmall(widget, pos)) {
-				this._clearIterator(widget);
+			if (widget.isTooSmall(pos)) {
+				widget.clear();
 
-				this._stopPreloader(widget);
-				this._setIteratorTooSmallState(widget, true);
+				widget.stopPreloader();
+				widget.setTooSmallState(true);
 				widget.update_pending = true;
 
 				return;
 			}
 			else {
-				this._setIteratorTooSmallState(widget, false);
+				widget.setTooSmallState(false);
 				widget.update_pending = false;
 			}
 		}
@@ -2727,9 +2464,9 @@ class CDashboardPage {
 			'view_mode': widget.view_mode
 		};
 
-		widget.content_size = this._getWidgetContentSize(widget);
+		widget.content_size = widget.getContentSize();
 
-		if (widget.iterator) {
+		if (widget instanceof CDashboardWidgetIterator) {
 			ajax_data.page = widget.page;
 		}
 		else {
@@ -2742,7 +2479,7 @@ class CDashboardPage {
 
 		this._setDashboardBusy('updateWidgetContent', widget.uniqueid);
 
-		this._startPreloader(widget);
+		widget.startPreloader();
 
 		widget.updating_content = true;
 
@@ -2757,7 +2494,7 @@ class CDashboardPage {
 			.then((response) => {
 				delete widget.updating_content;
 
-				this._stopPreloader(widget);
+				widget.stopPreloader();
 
 				if (this._isDeletedWidget(widget)) {
 					return $.Deferred().reject();
@@ -2770,11 +2507,17 @@ class CDashboardPage {
 					$content_header.attr('aria-label', (response.aria_label !== '') ? response.aria_label : null);
 				}
 
-				if (widget.iterator) {
+				if (widget instanceof CDashboardWidgetIterator) {
 					this._updateIteratorCallback(widget, response, options);
 				}
 				else {
-					this._updateWidgetCallback(widget, response);
+					widget.update({
+						body: response.body,
+						messages: response.messages,
+						info: response.info,
+						debug: response.debug,
+						script_inline: response.script_inline
+					});
 				}
 
 				this._doAction('onContentUpdated');
@@ -2782,7 +2525,34 @@ class CDashboardPage {
 			.then(() => {
 				// Separate 'then' section allows to execute JavaScripts added by widgets in previous section first.
 
-				this._setWidgetReady(widget);
+				if (!widget.isReady()) {
+					const dashboard_was_ready = !this._widgets.filter((w) => {
+						return !w.isReady();
+					}).length;
+
+					if (widget.updateReady()) {
+						/*
+					 * The conception:
+					 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.
+					 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' once, as soon as all widgets are loaded.
+					 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' for each new widget added in edit mode.
+					 */
+
+						if (dashboard_was_ready) {
+							this._registerDataExchangeCommit();
+						}
+						else {
+							const dashboard_is_ready = !this._widgets.filter(function(w) {
+								return !w.isReady();
+							}).length;
+
+							if (dashboard_is_ready) {
+								this._registerDataExchangeCommit();
+								this._doAction('onDashboardReady');
+							}
+						}
+					}
+				}
 
 				if (!widget.parent) {
 					// Iterator child widgets are excluded here.
@@ -2792,7 +2562,7 @@ class CDashboardPage {
 				// The widget is loaded now, although possibly already resized.
 				widget.initial_load = false;
 
-				if (!widget.iterator) {
+				if (!(widget instanceof CDashboardWidgetIterator)) {
 					// Update the widget, if it was resized before it was fully loaded.
 					this._resizeWidget(widget);
 				}
@@ -2931,10 +2701,10 @@ class CDashboardPage {
 				else {
 					// Set view mode of a reusable widget early to escape focus flickering.
 					if (widget !== null && widget.type === type) {
-						this._setWidgetViewMode(widget, view_mode);
+						widget.setViewMode(view_mode);
 
 						this._doLeaveWidgetsExcept(widget);
-						this._doEnterWidget(widget);
+						widget.enter();
 					}
 				}
 			})
@@ -3016,14 +2786,14 @@ class CDashboardPage {
 					widget.fields = fields;
 
 					// Set preloader to widget content after overlayDialogueDestroy as fast as we can.
-					this._startPreloader(widget, 100);
+					widget.startPreloader(100);
 
 					// View mode was just set after the overlayDialogueDestroy was called in first 'then' section.
 
 					this._applyWidgetConfiguration(widget, configuration);
 					this._doAction('afterUpdateWidgetConfig');
 
-					if (widget.iterator) {
+					if (widget instanceof CDashboardWidgetIterator) {
 						this._updateWidgetContent(widget, {
 							'update_policy': 'resize_or_refresh'
 						});
@@ -3038,13 +2808,13 @@ class CDashboardPage {
 					this._removeWidget(widget);
 
 					const widget_data = {
-						'type': type,
-						'header': name,
-						'view_mode': view_mode,
-						'pos': widget.pos,
-						'fields': fields,
-						'configuration': configuration,
-						'new_widget': false
+						type: type,
+						header: name,
+						view_mode: view_mode,
+						pos: widget.pos,
+						fields: fields,
+						configuration: configuration,
+						is_new: false
 					};
 
 					// Disable position/size checking during addWidget call.
@@ -3432,11 +3202,14 @@ class CDashboardPage {
 	}
 
 	_setWidgetModeEdit(widget) {
-		widget.clearUpdateWidgetContentTimer();
+		widget.setEditMode(true);
+		widget.clearUpdateContentTimer();
 
-		if (!widget.iterator) {
-			widget.removeWidgetInfoButtons();
+		if (!(widget instanceof CDashboardWidgetIterator)) {
+			widget.removeInfoButtons();
 		}
+
+		widget.activate();
 
 		this._makeDraggable(widget);
 		this._makeResizable(widget);
@@ -3462,7 +3235,7 @@ class CDashboardPage {
 	 * Remove the widget without updating the dashboard.
 	 */
 	_removeWidget(widget) {
-		if (widget.iterator) {
+		if (widget instanceof CDashboardWidgetIterator) {
 			for (const child of widget.children) {
 				this._doAction('onWidgetDelete', child);
 				this._removeWidgetActions(child);
@@ -3476,7 +3249,7 @@ class CDashboardPage {
 			widget.div.remove();
 		}
 		else {
-			const index = widget.div.data('widget-index');
+			const index = widget.getIndex();
 
 			this._doAction('onWidgetDelete', widget);
 			this._removeWidgetActions(widget);
@@ -3485,7 +3258,7 @@ class CDashboardPage {
 			this._widgets.splice(index, 1);
 
 			for (let i = index; i < this._widgets.length; i++) {
-				this._widgets[i].div.data('widget-index', i);
+				this._widgets[i].setIndex(i);
 			}
 		}
 	}
@@ -3522,9 +3295,9 @@ class CDashboardPage {
 	}
 
 	_onIteratorResizeEnd(iterator) {
-		this._updateIteratorPager(iterator);
+		iterator.updatePager();
 
-		if (this._getIteratorTooSmallState(iterator)) {
+		if (iterator.getTooSmallState()) {
 			return;
 		}
 
@@ -3536,13 +3309,13 @@ class CDashboardPage {
 	_resizeWidget(widget) {
 		let success = false;
 
-		if (widget.iterator) {
+		if (widget instanceof CDashboardWidgetIterator) {
 			// Iterators will sync first, then selectively propagate the resize event to the child widgets.
 			success = this._doAction('onResizeEnd', widget);
 		}
 		else {
 			const size_old = widget.content_size;
-			const size_new = this._getWidgetContentSize(widget);
+			const size_new = widget.getContentSize();
 
 			if (!this._isEqualContentSize(size_old, size_new)) {
 				success = this._doAction('onResizeEnd', widget);

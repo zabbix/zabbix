@@ -598,7 +598,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 
 	// Do not show "Copy" action for host dashboards.
 	if (ZABBIX.Dashboard.getOptions()['allowed_edit']
-			&& (dashboard_data.templateid === null || dashboard_data.dynamic_hostid === null)) {
+			&& (dashboard_data.dashboard.templateid === null || dashboard_data.dashboard.dynamic_hostid === null)) {
 		widget_actions.push({
 			label: t('S_COPY'),
 			clickCallback: function() {

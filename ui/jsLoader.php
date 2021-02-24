@@ -49,8 +49,11 @@ if (isset($_GET['lang'])) {
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = [
 	'common.js' => '',
+	'class.dashboard.js' => '',
+	'class.dashboard.loader.js' => '',
 	'class.dashboard.page.js' => '',
 	'class.dashboard.widget.js' => '',
+	'class.dashboard.widget.iterator.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
@@ -134,6 +137,9 @@ $tranStrings = [
 	'class.overlay.js' => [
 		'Operation details' => _('Operation details')
 	],
+	'class.dashboard.js' => [
+		'Page %1$d' => _('Page %1$d')
+	],
 	'class.dashboard.page.js' => [
 		'Edit widget' => _('Edit widget'),
 		'Add widget' => _('Add widget'),
@@ -145,17 +151,19 @@ $tranStrings = [
 		'Edit' => _('Edit'),
 		'Cancel' => _('Cancel'),
 		'Delete' => _('Delete'),
-		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
-		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
-		'Add a new widget' => _('Add a new widget'),
-		'Release to create a widget.' => _('Release to create a widget.'),
-		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Previous page' => _('Previous page'),
 		'Next page' => _('Next page'),
 		'Widget is too small for the specified number of columns and rows.' =>
 			_('Widget is too small for the specified number of columns and rows.'),
 		'Cannot add widget: not enough free space on the dashboard.' =>
 			_('Cannot add widget: not enough free space on the dashboard.')
+	],
+	'class.dashboard.widget.placeholder.js' => [
+		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
+		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
+		'Add a new widget' => _('Add a new widget'),
+		'Release to create a widget.' => _('Release to create a widget.'),
+		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),

@@ -49,8 +49,8 @@ class CDashboard extends CDashboardGeneral {
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'private' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
-				'display_period' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
-				'auto_start' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0,1']
+				'display_period' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
+				'auto_start' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0,1']
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
@@ -135,12 +135,12 @@ class CDashboard extends CDashboardGeneral {
 			zbx_db_search('dashboard d', $options, $sql_parts);
 		}
 
-		$db_dashboards = [];
-
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 
 		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+
+		$db_dashboards = [];
 
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
@@ -184,8 +184,8 @@ class CDashboard extends CDashboardGeneral {
 		}
 		unset($dashboard);
 
-		$this->updateDashboardUser($dashboards, false);
-		$this->updateDashboardUsrgrp($dashboards, false);
+		$this->updateDashboardUser($dashboards, __FUNCTION__);
+		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
 		$this->updatePages($dashboards);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $dashboards);
@@ -218,8 +218,8 @@ class CDashboard extends CDashboardGeneral {
 			DB::update('dashboard', $upd_dashboards);
 		}
 
-		$this->updateDashboardUser($dashboards, true);
-		$this->updateDashboardUsrgrp($dashboards, true);
+		$this->updateDashboardUser($dashboards, __FUNCTION__);
+		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
 		$this->updatePages($dashboards, $db_dashboards);
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $dashboards, $db_dashboards);
@@ -380,6 +380,10 @@ class CDashboard extends CDashboardGeneral {
 			}
 		}
 
+		if (!$names) {
+			return;
+		}
+
 		$duplicate = DBfetch(DBselect(
 			'SELECT name FROM dashboard WHERE templateid IS NULL AND '.dbConditionString('name', $names), 1
 		));
@@ -487,10 +491,10 @@ class CDashboard extends CDashboardGeneral {
 	/**
 	 * Update table "dashboard_user".
 	 *
-	 * @param array $dashboards
-	 * @param bool  $update
+	 * @param array  $dashboards
+	 * @param string $method
 	 */
-	protected function updateDashboardUser(array $dashboards, bool $update): void {
+	protected function updateDashboardUser(array $dashboards, string $method): void {
 		$dashboards_users = [];
 
 		foreach ($dashboards as $dashboard) {
@@ -509,7 +513,7 @@ class CDashboard extends CDashboardGeneral {
 			return;
 		}
 
-		$db_dashboard_users = $update
+		$db_dashboard_users = ($method === 'update')
 			? DB::select('dashboard_user', [
 				'output' => ['dashboard_userid', 'dashboardid', 'userid', 'permission'],
 				'filter' => ['dashboardid' => array_keys($dashboards_users)]
@@ -579,10 +583,10 @@ class CDashboard extends CDashboardGeneral {
 	/**
 	 * Update table "dashboard_usrgrp".
 	 *
-	 * @param array $dashboards
-	 * @param bool  $update
+	 * @param array  $dashboards
+	 * @param string $method
 	 */
-	protected function updateDashboardUsrgrp(array $dashboards, bool $update): void {
+	protected function updateDashboardUsrgrp(array $dashboards, string $method): void {
 		$dashboards_usrgrps = [];
 
 		foreach ($dashboards as $dashboard) {
@@ -601,7 +605,7 @@ class CDashboard extends CDashboardGeneral {
 			return;
 		}
 
-		$db_dashboard_usrgrps = $update
+		$db_dashboard_usrgrps = ($method === 'update')
 			? DB::select('dashboard_usrgrp', [
 				'output' => ['dashboard_usrgrpid', 'dashboardid', 'usrgrpid', 'permission'],
 				'filter' => ['dashboardid' => array_keys($dashboards_usrgrps)]

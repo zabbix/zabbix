@@ -2916,7 +2916,7 @@ $form-icon-btn: (
 
 .dashbrd-navigation-tabs {
 	// Compensate 2px padding of tabs.
-	margin: -2px 10px 0 0;
+	margin: -2px 10px -2px 0;
 	overflow: hidden;
 
 	.csortable {
@@ -2982,8 +2982,8 @@ $form-icon-btn: (
 		border: 1px solid lighten($blue, 30%);
 	}
 
-	& .csortable > .csortable-item > div.selected-page,
-	& .csortable-list > .csortable-item > div.selected-page {
+	& .csortable > .csortable-item > div.selected-tab,
+	& .csortable-list > .csortable-item > div.selected-tab {
 		color: $white;
 		background: $ui-bg-selected-color;
 		border: 1px solid transparent;
@@ -2997,8 +2997,8 @@ $form-icon-btn: (
 	button {
 		margin-left: 10px;
 
-		&.previous-page,
-		&.next-page {
+		&.dashbrd-previous-page,
+		&.dashbrd-next-page {
 			display: none;
 			margin: 0;
 		}
@@ -7246,7 +7246,6 @@ $range-input-width: 31px;
 .btn-dropdown-toggle {
 	white-space: nowrap;
 	overflow: hidden;
-	text-indent: -200px;
 
 	&[class*='icon-'] {
 		padding-left: 22px;
@@ -7265,6 +7264,10 @@ $range-input-width: 31px;
 			top: 6px;
 			right: 2px;
 		}
+	}
+
+	&:not(:empty) {
+		padding-right: 22px;
 	}
 
 	&::after {

@@ -78,6 +78,14 @@ header {
 			vertical-align: top;
 			position: relative;
 			padding: 0 0 0 10px;
+
+			.btn-split {
+				margin-right: 0;
+
+				li {
+					padding-left: 0;
+				}
+			}
 		}
 
 		ul li:first-child {

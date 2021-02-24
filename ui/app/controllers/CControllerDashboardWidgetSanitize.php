@@ -70,7 +70,8 @@ class CControllerDashboardWidgetSanitize extends CController {
 		$fields = $form->fieldsToApi();
 
 		if ($this->context === CWidgetConfig::CONTEXT_DASHBOARD) {
-			$fields = CDashboardHelper::unsetInaccessibleFields([['fields' => $fields]])[0]['fields'];
+			$fields = CDashboardHelper::unsetInaccessibleFields([['widgets' => [['fields' => $fields]]]]);
+			$fields = $fields[0]['widgets'][0]['fields'];
 		}
 
 		$output = [

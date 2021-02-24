@@ -38,11 +38,15 @@ if (array_key_exists('no_data', $data)) {
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('class.dashboard.js');
+$this->addJsFile('class.dashboard.loader.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.js');
+$this->addJsFile('class.dashboard.widget.iterator.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.cclock.js');
+$this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.host.dashboard.view.js.php');
 
@@ -94,13 +98,38 @@ if ($data['time_selector'] !== null) {
 	);
 }
 
-if ($data['dashboard']['widgets']) {
+if (count($data['dashboard']['pages']) > 1
+		|| (count($data['dashboard']['pages']) == 1 && $data['dashboard']['pages'][0]['widgets']))  {
 	$widget
-		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_DASHBRD)
+				->addItem(
+					(new CDiv())
+						->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
+						->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
+						->addItem(
+							(new CDiv())
+								->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+								->addItem([
+									(new CSimpleButton())
+										->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+										->addClass('btn-iterator-page-previous')
+										->setEnabled(false),
+									(new CSimpleButton())
+										->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+										->addClass('btn-iterator-page-next')
+										->setEnabled(false),
+									(new CSimpleButton('Start slideshow'))->addClass(ZBX_STYLE_BTN_ALT)
+								])
+						)
+				)
+				->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
+		)
 		->show();
 
 	(new CScriptTag(
-		'initializeHostDashboard('.
+		'initializeView('.
 			json_encode($data['host']).','.
 			json_encode($data['dashboard']).','.
 			json_encode($data['widget_defaults']).','.

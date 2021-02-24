@@ -51,15 +51,13 @@ class CControllerTemplateDashboardEdit extends CController {
 
 		if ($this->hasInput('dashboardid')) {
 			$dashboards = API::TemplateDashboard()->get([
-				'output' => ['dashboardid', 'name', 'templateid'],
-				'selectPages' => ['widgets'],
+				'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
+				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'dashboardids' => [$this->getInput('dashboardid')],
 				'editable' => true
 			]);
 
 			$this->dashboard = $dashboards[0];
-			$this->dashboard['widgets'] = $this->dashboard['pages'][0]['widgets'];
-			unset($this->dashboard['pages']);
 
 			return (bool) $this->dashboard;
 		}
@@ -71,8 +69,8 @@ class CControllerTemplateDashboardEdit extends CController {
 	protected function doAction() {
 		if ($this->hasInput('dashboardid')) {
 			$dashboard = $this->dashboard;
-			$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['widgets'],
-				$dashboard['templateid'], false
+			$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], $dashboard['templateid'],
+				false
 			);
 		}
 		else {
@@ -80,7 +78,16 @@ class CControllerTemplateDashboardEdit extends CController {
 				'dashboardid' => null,
 				'templateid' => $this->getInput('templateid'),
 				'name' => _('New dashboard'),
-				'widgets' => []
+				'display_period' => DB::getDefault('dashboard', 'display_period'),
+				'auto_start' => DB::getDefault('dashboard', 'auto_start'),
+				'pages' => [
+					[
+						'dashboard_pageid' => null,
+						'name' => '',
+						'display_period' => 0,
+						'widgets' => []
+					]
+				]
 			];
 		}
 

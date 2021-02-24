@@ -2546,3 +2546,36 @@ function relativeDateToText($from, $to) {
 
 	return $from.' – '.$to;
 }
+
+/**
+ * Get human readable time period.
+ *
+ * @param int $seconds
+ *
+ * @return string
+ */
+function secondsToPeriod(int $seconds): string {
+	$hours = floor($seconds / 3600);
+	$seconds -= $hours * 3600;
+
+	$minutes = floor($seconds / 60);
+	$seconds -= $minutes * 60;
+
+	$period = ($hours > 0) ? _n('%1$s hour', '%1$s hours', $hours) : '';
+
+	if ($minutes > 0) {
+		if ($period !== '') {
+			$period .= ', ';
+		}
+		$period .= _n('%1$s minute', '%1$s minutes', $minutes);
+	}
+
+	if ($seconds > 0 || $period === '') {
+		if ($period !== '') {
+			$period .= ', ';
+		}
+		$period .= _n('%1$s second', '%1$s seconds', $seconds);
+	}
+
+	return $period;
+}
