@@ -2074,12 +2074,6 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/name": contains invalid characters.'
 			],
 			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'script_name/',
-				'/1/name',
-				'Invalid parameter "/1/name": contains invalid characters.'
-			],
-			[
 				['type' => API_SCRIPT_NAME],
 				'a/b/c/',
 				'/1/name',
