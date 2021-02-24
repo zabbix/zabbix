@@ -769,9 +769,6 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
-
-		// Reset filter due to not influence further tests.
-		$this->query('button:Reset')->one()->click();
 	}
 
 	public function testPageMonitoringHosts_ResetButtonCheck() {
