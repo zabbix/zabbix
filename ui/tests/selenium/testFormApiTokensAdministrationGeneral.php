@@ -302,7 +302,6 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	public function testFormApiTokensAdministrationGeneral_Update($data) {
 		// Skip the case with user name change as this field is disabled in token edit mode.
 		if ($data['fields']['User'] !== 'Admin') {
-
 			return;
 		}
 

@@ -94,8 +94,9 @@ class testFormApiTokens extends CWebTest {
 	 * @param integer	$tokenid	ID of the token for which the regenerate form is opened.
 	 */
 	public function checkTokensRegenerateFormLayout($source, $tokenid) {
-		$url = ($source === 'user settings') ? 'zabbix.php?action=user.token.edit&tokenid='.$tokenid :
-				'zabbix.php?action=token.edit&tokenid='.$tokenid;
+		$url = ($source === 'user settings')
+				? 'zabbix.php?action=user.token.edit&tokenid='.$tokenid
+				: 'zabbix.php?action=token.edit&tokenid='.$tokenid;
 		$values = [
 			'Name:' => 'Admin reference token',
 			'User:' => 'Admin (Zabbix Administrator)',
