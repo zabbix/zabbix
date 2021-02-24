@@ -955,9 +955,9 @@ zabbix_export:
               units: '%'
               params: 'last("huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, \"{#NAME}\"]")/last("huawei.5300.v5[hwInfoStoragePoolTotalCapacity, \"{#NAME}\"]")*100'
               description: 'Used capacity of a storage pool in percents.'
-              applications:
+              application_prototypes:
                 -
-                  name: Huawei
+                  name: 'Pool {#MODEL}'
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})}>{#THRESHOLD}'
