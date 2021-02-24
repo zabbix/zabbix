@@ -191,11 +191,11 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 			]
 		];
 
-		$this->testPageApiTokensLayout($token_data, 'administration');
+		$this->checkLayout($token_data, 'administration');
 	}
 
 	public function testPageApiTokensAdministrationGeneral_ChangeStatus() {
-		$this->testPageApiTokensChangeStatus('zabbix.php?action=token.list', self::STATUS_CHANGE_TOKEN);
+		$this->checkStatusChange('zabbix.php?action=token.list', self::STATUS_CHANGE_TOKEN);
 	}
 
 	public function getFilterData() {
@@ -439,7 +439,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageApiTokensAdministrationGeneral_Filter($data) {
-		$this->testPageApiTokensFilter($data, 'administration');
+		$this->checkFilter($data, 'administration');
 	}
 
 	public function getSortData() {
@@ -550,10 +550,10 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 			}
 		}
 
-		$this->testPageApiTokensSort($data, 'zabbix.php?action=token.list');
+		$this->checkSorting($data, 'zabbix.php?action=token.list');
 	}
 
 	public function testPageApiTokensAdministrationGeneral_Delete() {
-		$this->testPageApiTokensDelete('zabbix.php?action=token.list', self::DELETE_TOKEN);
+		$this->checkDelete('zabbix.php?action=token.list', self::DELETE_TOKEN);
 	}
 }

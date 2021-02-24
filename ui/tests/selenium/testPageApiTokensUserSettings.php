@@ -115,11 +115,11 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 			]
 		];
 
-		$this->testPageApiTokensLayout($token_data, 'user settings');
+		$this->checkLayout($token_data, 'user settings');
 	}
 
 	public function testPageApiTokensUserSettings_ChangeStatus() {
-		$this->testPageApiTokensChangeStatus('zabbix.php?action=user.token.list', self::STATUS_CHANGE_TOKEN);
+		$this->checkStatusChange('zabbix.php?action=user.token.list', self::STATUS_CHANGE_TOKEN);
 	}
 
 	public function getFilterData() {
@@ -254,7 +254,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageApiTokensUserSettings_Filter($data) {
-		$this->testPageApiTokensFilter($data, 'user settings');
+		$this->checkFilter($data, 'user settings');
 	}
 
 	public function getSortData() {
@@ -322,10 +322,10 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 			}
 		}
 
-		$this->testPageApiTokensSort($data, 'zabbix.php?action=user.token.list');
+		$this->checkSorting($data, 'zabbix.php?action=user.token.list');
 	}
 
 	public function testPageApiTokensUserSettings_Delete() {
-		$this->testPageApiTokensDelete('zabbix.php?action=user.token.list', self::DELETE_TOKEN);
+		$this->checkDelete('zabbix.php?action=user.token.list', self::DELETE_TOKEN);
 	}
 }

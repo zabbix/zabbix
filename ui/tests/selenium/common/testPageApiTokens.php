@@ -40,7 +40,13 @@ class testPageApiTokens extends CWebTest {
 		];
 	}
 
-	public function testPageApiTokensLayout($token_data, $source) {
+	/**
+	 * Function that checks the layout of the API token list in Administration or User settings section.
+	 *
+	 * @param array $token_data		Reference array with expected content of the API tokens list table.
+	 * @param string $source		Section from which the scenario is executed.
+	 */
+	public function checkLayout($token_data, $source) {
 		if ($source === 'user settings') {
 			$url = 'zabbix.php?action=user.token.list';
 			$filter_fields = ['Name', 'Expires in less than', 'Status'];
@@ -120,7 +126,13 @@ class testPageApiTokens extends CWebTest {
 		$this->assertTableData($token_data);
 	}
 
-	public function testPageApiTokensChangeStatus($url, $token) {
+	/**
+	 * Function to checks token status change from API tokens list view.
+	 *
+	 * @param string $url		URL of the view with the API tokens list.
+	 * @param string $token		The name of the token which status is going to be changed.
+	 */
+	public function checkStatusChange($url, $token) {
 		$this->page->login()->open($url);
 
 		// Disable API token.
@@ -151,6 +163,13 @@ class testPageApiTokens extends CWebTest {
 		$this->checkTokenStatus($row, 'enabled', $token);
 	}
 
+	/**
+	 * Function that checks the status of the token in the API token list.
+	 *
+	 * @param CTableRow	$row		Table row that contains the token with changes status.
+	 * @param string	$expected	Flag that determines if the token should be enabled or disabled.
+	 * @param string	$token		Token name which status was changed.
+	 */
 	private function checkTokenStatus($row, $expected, $token) {
 		if ($expected === 'enabled') {
 			$message_title = 'API token enabled';
@@ -168,7 +187,13 @@ class testPageApiTokens extends CWebTest {
 		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM token WHERE name=\''.$token.'\''));
 	}
 
-	public function testPageApiTokensFilter($data, $source) {
+	/**
+	 * Function that checks filtering of API tokens list.
+	 *
+	 * @param array	 $data		Data provider.
+	 * @param string $source	Section from which the scenario is executed.
+	 */
+	public function checkFilter($data, $source) {
 		if ($source === 'administration') {
 			$url = 'zabbix.php?action=token.list';
 			$sql = 'SELECT tokenid FROM token';
@@ -204,7 +229,13 @@ class testPageApiTokens extends CWebTest {
 		$this->assertTableStats(CDBHelper::getCount($sql));
 	}
 
-	public function testPageApiTokensSort($data, $url) {
+	/**
+	 * Function that check sorting tokens by columns in the API tokens list table.
+	 *
+	 * @param array  $data	Data provider.
+	 * @param string $url	URL of the view with the API tokens list.
+	 */
+	public function checkSorting($data, $url) {
 		$this->page->login()->open($url);
 		$table = $this->query('class:list-table')->asTable()->one();
 		$header = $table->query('xpath:.//a[text()="'.$data['sort_field'].'"]')->one();
@@ -225,7 +256,13 @@ class testPageApiTokens extends CWebTest {
 		$this->assertEquals(array_reverse($data['expected']), $sorted_twice);
 	}
 
-	public function testPageApiTokensDelete($url, $token) {
+	/**
+	 * Function that check deletion of API tokens from the list.
+	 *
+	 * @param string $url		URL of the view with the API tokens list.
+	 * @param string $token		Name of the token to be deleted.
+	 */
+	public function checkDelete($url, $token) {
 		$this->page->login()->open($url);
 
 		// Delete API token.
