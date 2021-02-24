@@ -333,7 +333,36 @@ class testWebScenario extends CAPITest {
 					]
 				]],
 				'expected_error' => null
-			]
+			],
+			[
+				'httptest' => [[
+					'name' => 'Http test with some tags',
+					'hostid' => '50009',
+					'steps' => [
+						[
+							'name' => 'Step 1',
+							'url' => 'http://zabbix.com',
+							'no' => 0
+						],
+						[
+							'name' => 'Step 2',
+							'url' => 'http://zabbix.com',
+							'no' => 1
+						]
+					],
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => 'value 1'
+						],
+						[
+							'tag' => 'tag',
+							'value' => 'value 2'
+						]
+					]
+				]],
+				'expected_error' => null
+			],
 		];
 	}
 
@@ -350,6 +379,28 @@ class testWebScenario extends CAPITest {
 				$this->assertEquals($db_row_web['name'], $httptests[$key]['name']);
 				$this->assertEquals($db_row_web['hostid'], $httptests[$key]['hostid']);
 
+				if (array_key_exists('tags', $httptests[$key])) {
+					// CHeck http test tags.
+					$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM httptest_tag WHERE httptestid='.zbx_dbstr($id)));
+					uasort($httptests[$key]['tags'], function ($a, $b) {
+						return strnatcasecmp($a['value'], $b['value']);
+					});
+					uasort($db_tags, function ($a, $b) {
+						return strnatcasecmp($a['value'], $b['value']);
+					});
+					$this->assertTrue(array_values($db_tags) === array_values($httptests[$key]['tags']));
+
+					// Check http test item tags.
+					$db_items = DBFetchArray(DBSelect('SELECT itemid FROM httptestitem WHERE httptestid='.zbx_dbstr($id)));
+					foreach ($db_items as $itemid) {
+						$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM item_tag WHERE itemid='.zbx_dbstr($itemid['itemid'])));
+						uasort($db_tags, function ($a, $b) {
+							return strnatcasecmp($a['value'], $b['value']);
+						});
+						$this->assertTrue(array_values($db_tags) === array_values($httptests[$key]['tags']));
+					}
+				}
+
 				$db_result_steps = DBSelect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($id).' order by no;');
 				$db_rows_steps = DBFetchArray($db_result_steps);
 				$this->assertCount(count($httptests[$key]['steps']), $db_rows_steps);
@@ -365,6 +416,18 @@ class testWebScenario extends CAPITest {
 					foreach ($dataset_step as $property_name => $expected) {
 						$debug_msg = 'Case, httptest['.$key.']->step['.$no.']->property['.$property_name.']';
 						$this->assertEquals($expected, $db_step[$property_name], $debug_msg);
+					}
+
+					// Check http test step item tags.
+					if (array_key_exists('tags', $httptests[$key])) {
+						$db_items = DBFetchArray(DBSelect('SELECT itemid FROM httpstepitem WHERE httpstepid='.zbx_dbstr($db_step['httpstepid'])));
+						foreach ($db_items as $itemid) {
+							$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM item_tag WHERE itemid='.zbx_dbstr($itemid['itemid'])));
+							uasort($db_tags, function ($a, $b) {
+								return strnatcasecmp($a['value'], $b['value']);
+							});
+							$this->assertTrue(array_values($db_tags) === array_values($httptests[$key]['tags']));
+						}
 					}
 				}
 			}
