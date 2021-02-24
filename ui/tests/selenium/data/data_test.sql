@@ -2835,18 +2835,18 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) V
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (141, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
 
 -- Overrides for LLD Overrides test
-INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (200, 33800, 'Override for update 1', 1, 1, 0);
-INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (201, 33800, 'Override for update 2', 2, 0, 0);
+INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 33800, 'Override for update 1', 1, 1, 0);
+INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5001, 33800, 'Override for update 2', 2, 0, 0);
 
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (300, 200, 8, '{#MACRO1}', 'test expression_1');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (301, 200, 9, '{#MACRO2}', 'test expression_2');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (302, 200, 12, '{#MACRO3}', '');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (303, 200, 13, '{#MACRO4}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (300, 5000, 8, '{#MACRO1}', 'test expression_1');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (301, 5000, 9, '{#MACRO2}', 'test expression_2');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (302, 5000, 12, '{#MACRO3}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (303, 5000, 13, '{#MACRO4}', '');
 
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (400, 200, 0, 0, 'test item pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (401, 200, 1, 1, 'test trigger pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (402, 201, 2, 8, 'test graph pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (403, 201, 3, 9, 'test host pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (400, 5000, 0, 0, 'test item pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (401, 5000, 1, 1, 'test trigger pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (402, 5001, 2, 8, 'test graph pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (403, 5001, 3, 9, 'test host pattern');
 
 INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (400, 0);
 INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (402, 0);
