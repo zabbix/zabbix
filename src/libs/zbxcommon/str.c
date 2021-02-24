@@ -6114,7 +6114,8 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
 	if ('"' == src[left])
 	{
 		src += left + 1;
-		str = ptr = zbx_malloc(NULL, right - left);
+		str = zbx_malloc(NULL, right - left);
+		ptr = str;
 
 		while ('"' != *src)
 		{
