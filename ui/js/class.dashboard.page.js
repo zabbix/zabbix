@@ -217,7 +217,7 @@ class CDashboardPage {
 
 	addWidgets(widgets) {
 		for (const w of widgets) {
-			this.addWidget(w);
+			this._addWidget(w);
 		}
 
 		for (const w of this._widgets) {
@@ -225,22 +225,23 @@ class CDashboardPage {
 		}
 	}
 
-	addWidget(widget) {
-		widget = {
-			...JSON.parse(JSON.stringify(widget)),
-			defaults: this._data.widget_defaults[widget.type],
+	_addWidget(config) {
+		config = {
+			...config,
+			defaults: this._data.widget_defaults[config.type],
 			uniqueid: this._generateUniqueId(),
 			index: this._widgets.length,
 			cell_height: this._options['widget-height'],
 			cell_width: this._options['widget-width'],
 			is_editable: this._options['editable'] && !this._options['kioskmode'],
-			dynamic_hostid: this._data.dashboard.dynamic_hostid !== null ? this._data.dashboard.dynamic_hostid : null
+			dynamic_hostid: this._data.dashboard.dynamic_hostid
 		};
 
-		if (widget.defaults.iterator) {
+		let widget;
+		if (config.defaults.iterator) {
 			widget = new CDashboardWidgetIterator({
 				min_rows: this._options['widget-min-rows'],
-				...widget
+				...config
 			});
 
 			widget
@@ -262,7 +263,7 @@ class CDashboardPage {
 				})
 		}
 		else {
-			widget = new CDashboardWidget(widget);
+			widget = new CDashboardWidget(config);
 		}
 
 		widget
@@ -502,7 +503,7 @@ class CDashboardPage {
 
 		this._promiseScrollIntoView(pos)
 			.then(() => {
-				this.addWidget(new_widget);
+				this._addWidget(new_widget);
 				new_widget = this._widgets.slice(-1)[0];
 
 				// Restrict loading content prior to sanitizing widget fields.
@@ -2770,7 +2771,7 @@ class CDashboardPage {
 
 					this._promiseScrollIntoView(pos)
 						.then(() => {
-							this.addWidget(widget_data);
+							this._addWidget(widget_data);
 							this._data.pos_action = '';
 
 							// New widget is last element in data['widgets'] array.
@@ -2819,7 +2820,7 @@ class CDashboardPage {
 
 					// Disable position/size checking during addWidget call.
 					this._data.pos_action = 'updateWidgetConfig';
-					this.addWidget(widget_data);
+					this._addWidget(widget_data);
 					this._data.pos_action = '';
 
 					// New widget is last element in data['widgets'] array.
