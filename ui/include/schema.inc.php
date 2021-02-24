@@ -2870,6 +2870,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
+			'compression_availability' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
 			'compress_older' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,

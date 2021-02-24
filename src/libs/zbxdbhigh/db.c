@@ -853,64 +853,44 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  *                                                                            *
  * Function: DBcheck_capabilities                                             *
  *                                                                            *
- * Purpose: checks DBMS for optional features and exit if is not suitable     *
+ * Purpose: checks DBMS for optional features and adjusting configuration     *
  *                                                                            *
  ******************************************************************************/
 void	DBcheck_capabilities(void)
 {
 #ifdef HAVE_POSTGRESQL
-
-#define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
-#define MIN_TIMESCALEDB_VERSION			10500
-	int		postgresql_version, timescaledb_version;
-	DB_RESULT	result;
-	DB_ROW		row;
+	int	compression_available = OFF;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if (FAIL == DBfield_exists("config", "db_extension"))
-		goto out;
-
-	if (NULL == (result = DBselect("select db_extension from config")))
-		goto out;
-
-	if (NULL == (row = DBfetch(result)))
-		goto clean;
-
-	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
-		goto clean;
-
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > (postgresql_version = zbx_dbms_get_version()))
+	if (100002 <= zbx_dbms_get_version())
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %d is not supported with TimescaleDB, minimum is %d",
-				postgresql_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
-		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
-	}
+		DB_RESULT	result;
+		DB_ROW		row;
+		int		major, minor, patch, version;
 
-	if (0 == (timescaledb_version = zbx_tsdb_get_version()))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
-		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
-	}
+		if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
+			goto out;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
+		if (NULL == (row = DBfetch(result)))
+			goto clean;
 
-	if (MIN_TIMESCALEDB_VERSION > timescaledb_version)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
-				timescaledb_version, MIN_TIMESCALEDB_VERSION);
-		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
-	}
+		zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
+
+		sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch);
+		version = major * 10000;
+		version += minor * 100;
+		version += patch;
+
+		if (10500 <= version)
+			compression_available = ON;
 clean:
-	DBfree_result(result);
+		DBfree_result(result);
+	}
 out:
+	DBexecute("update config set compression_availability=%d", compression_available);
+
 	DBclose();
 #endif
 }
@@ -2089,6 +2069,9 @@ int	DBtxn_ongoing(void)
 int	DBtable_exists(const char *table_name)
 {
 	char		*table_name_esc;
+#ifdef HAVE_POSTGRESQL
+	char		*table_schema_esc;
+#endif
 	DB_RESULT	result;
 	int		ret;
 
@@ -2104,12 +2087,18 @@ int	DBtable_exists(const char *table_name)
 				" and lower(tname)='%s'",
 			table_name_esc);
 #elif defined(HAVE_POSTGRESQL)
+	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+			"public" : CONFIG_DBSCHEMA);
+
 	result = DBselect(
 			"select 1"
 			" from information_schema.tables"
 			" where table_name='%s'"
 				" and table_schema='%s'",
-			table_name_esc, zbx_db_get_schema_esc());
+			table_name_esc, table_schema_esc);
+
+	zbx_free(table_schema_esc);
+
 #elif defined(HAVE_SQLITE3)
 	result = DBselect(
 			"select 1"
@@ -2138,7 +2127,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_POSTGRESQL)
-	char		*table_name_esc, *field_name_esc;
+	char		*table_name_esc, *field_name_esc, *table_schema_esc;
 	int		ret;
 #elif defined(HAVE_SQLITE3)
 	char		*table_name_esc;
@@ -2175,6 +2164,8 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	DBfree_result(result);
 #elif defined(HAVE_POSTGRESQL)
+	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+			"public" : CONFIG_DBSCHEMA);
 	table_name_esc = DBdyn_escape_string(table_name);
 	field_name_esc = DBdyn_escape_string(field_name);
 
@@ -2184,10 +2175,11 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 			" where table_name='%s'"
 				" and column_name='%s'"
 				" and table_schema='%s'",
-			table_name_esc, field_name_esc, zbx_db_get_schema_esc());
+			table_name_esc, field_name_esc, table_schema_esc);
 
 	zbx_free(field_name_esc);
 	zbx_free(table_name_esc);
+	zbx_free(table_schema_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
@@ -2217,6 +2209,9 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 int	DBindex_exists(const char *table_name, const char *index_name)
 {
 	char		*table_name_esc, *index_name_esc;
+#if defined(HAVE_POSTGRESQL)
+	char		*table_schema_esc;
+#endif
 	DB_RESULT	result;
 	int		ret;
 
@@ -2236,13 +2231,18 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 				" and lower(index_name)='%s'",
 			table_name_esc, index_name_esc);
 #elif defined(HAVE_POSTGRESQL)
+	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+				"public" : CONFIG_DBSCHEMA);
+
 	result = DBselect(
 			"select 1"
 			" from pg_indexes"
 			" where tablename='%s'"
 				" and indexname='%s'"
 				" and schemaname='%s'",
-			table_name_esc, index_name_esc, zbx_db_get_schema_esc());
+			table_name_esc, index_name_esc, table_schema_esc);
+
+	zbx_free(table_schema_esc);
 #endif
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
@@ -2438,11 +2438,12 @@ void	DBcheck_character_set(void)
 #elif defined(HAVE_POSTGRESQL)
 #define OID_LENGTH_MAX		20
 
-	char		*database_name_esc, oid[OID_LENGTH_MAX];
+	char		*database_name_esc, *schema_name_esc, oid[OID_LENGTH_MAX];
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
+	schema_name_esc = (NULL != CONFIG_DBSCHEMA) ? DBdyn_escape_string(CONFIG_DBSCHEMA) : strdup("public");
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
@@ -2469,7 +2470,7 @@ void	DBcheck_character_set(void)
 			"select oid"
 			" from pg_namespace"
 			" where nspname='%s'",
-			zbx_db_get_schema_esc());
+			schema_name_esc);
 
 	if (NULL == result || NULL == (row = DBfetch(result)) || '\0' == **row)
 	{
@@ -2534,6 +2535,7 @@ void	DBcheck_character_set(void)
 out:
 	DBfree_result(result);
 	DBclose();
+	zbx_free(schema_name_esc);
 	zbx_free(database_name_esc);
 #endif
 }
@@ -3672,25 +3674,3 @@ int	zbx_db_check_instanceid(void)
 
 	return ret;
 }
-
-#if defined(HAVE_POSTGRESQL)
-/******************************************************************************
- *                                                                            *
- * Function: zbx_db_get_schema_esc                                            *
- *                                                                            *
- * Purpose: returns escaped DB schema name                                    *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_db_get_schema_esc(void)
-{
-	static char	*name;
-
-	if (NULL == name)
-	{
-		name = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
-				"public" : CONFIG_DBSCHEMA);
-	}
-
-	return name;
-}
-#endif

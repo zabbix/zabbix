@@ -348,6 +348,7 @@ typedef struct
 {
 	char		*extension;
 	unsigned char	history_compression_status;
+	unsigned char	history_compression_availability;
 	int		history_compress_older;
 }
 zbx_config_db_t;

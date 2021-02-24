@@ -110,7 +110,8 @@ class CControllerHousekeepingEdit extends CController {
 			'compress_older' => $this->getInput('compress_older', CHousekeepingHelper::get(
 				CHousekeepingHelper::COMPRESS_OLDER
 			)),
-			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION)
+			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION),
+			'compression_availability' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_AVAILABILITY)
 		];
 
 		$response = new CControllerResponseData($data);
