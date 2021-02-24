@@ -128,8 +128,8 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 	{
 		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, new_state, NULL, trigger->expression_orig, NULL, 0, 0, NULL, 0,
-				NULL, 0, NULL, NULL, new_error);
+				&trigger->timespec, new_state, NULL, trigger->expression_orig, NULL, 0, 0,
+				&trigger->tags, 0, NULL, 0, NULL, NULL, new_error);
 	}
 
 	zbx_append_trigger_diff(diffs, trigger->triggerid, trigger->priority, flags, trigger->value, new_state,

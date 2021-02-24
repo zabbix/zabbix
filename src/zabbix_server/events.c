@@ -277,6 +277,12 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 		switch (object)
 		{
 			case EVENT_OBJECT_TRIGGER:
+				if (NULL != trigger_tags)
+				{
+					for (i = 0; i < trigger_tags->values_num; i++)
+						process_trigger_tag(event, (const zbx_tag_t *)trigger_tags->values[i]);
+				}
+
 				get_item_tags_by_expression(trigger_expression, &item_tags);
 				break;
 			case EVENT_OBJECT_ITEM:
