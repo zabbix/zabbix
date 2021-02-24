@@ -81,7 +81,7 @@ class CControllerTokenCreate extends CController {
 
 			[$user] = (CWebUser::$data['userid'] != $token['userid'])
 				? API::User()->get([
-					'output' => ['alias', 'name', 'surname'],
+					'output' => ['username', 'name', 'surname'],
 					'userids' => $token['userid']
 				])
 				: [CWebUser::$data];

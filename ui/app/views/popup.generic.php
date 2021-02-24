@@ -218,19 +218,19 @@ switch ($data['popup_type']) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
 					zbx_jsvalue($user['userid']).', '.$options['parentid'].');';
 
-			$alias = (new CLink($user['alias'], 'javascript:void(0);'))
+			$username = (new CLink($user['username'], 'javascript:void(0);'))
 				->setId('spanid'.$user['userid'])
 				->onClick($js_action.$js_action_onclick);
 
-			$table->addRow([$check_box, $alias, $user['name'], $user['surname']]);
+			$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
 
 			$entry = [];
 			$srcfld1 = $options['srcfld1'];
 			if ($srcfld1 === 'userid') {
 				$entry['id'] = $user['userid'];
 			}
-			elseif ($srcfld1 === 'alias') {
-				$entry['name'] = $user['alias'];
+			elseif ($srcfld1 === 'username') {
+				$entry['name'] = $user['username'];
 			}
 
 			$srcfld2 = $options['srcfld2'];
