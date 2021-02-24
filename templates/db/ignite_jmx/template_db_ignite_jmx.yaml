@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-02-12T10:53:08Z'
+  date: '2021-02-15T12:47:17Z'
   groups:
     -
       name: Templates/Databases
@@ -12,7 +12,7 @@ zabbix_export:
         The template to monitor Apache Ignite by Zabbix that work without any external scripts.
           It works with both standalone and cluster instances.
           The metrics are discoverable and collected by JMX.  
-          Current jmx tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.
+          Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.
           You can set {$IGNITE.USER} and {$IGNITE.PASSWORD} macros in the template for using on the host level.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
@@ -417,8 +417,6 @@ zabbix_export:
               application_prototypes:
                 -
                   name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
-                -
-                  name: 'Ignite instance {#JMXIGNITEINSTANCENAME}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
             -
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, rate'
@@ -671,7 +669,7 @@ zabbix_export:
                   return JSON.stringify(data)
                   
         -
-          name: 'Ingite kernal metrics'
+          name: 'Ignite kernal metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]'
           delay: 30m
@@ -965,8 +963,6 @@ zabbix_export:
               application_prototypes:
                 -
                   name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
-                -
-                  name: 'Ignite instance {#JMXIGNITEINSTANCENAME}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -1322,7 +1318,7 @@ zabbix_export:
           trigger_prototypes:
             -
               expression: '{Ignite by JMX:jmx["{#JMXOBJ}",Backups].min(5m)}>={Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}'
-              name: 'Cache group [{#JMXNAME}]: One or more backups are unavaliable'
+              name: 'Cache group [{#JMXNAME}]: One or more backups are unavailable'
               priority: WARNING
           graph_prototypes:
             -
