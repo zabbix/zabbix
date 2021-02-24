@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-15T12:47:35Z'
+  date: '2021-02-24T10:32:24Z'
   groups:
     -
       name: Templates/Databases
@@ -279,15 +279,16 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -526,15 +527,16 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
         -
           name: 'Cluster metrics'
           type: JMX
@@ -656,15 +658,16 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
         -
           name: 'Ignite kernal metrics'
           type: JMX
@@ -762,15 +765,17 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
+                  
         -
           name: 'TCP Ccmmunication SPI metrics'
           type: JMX
@@ -801,6 +806,24 @@ zabbix_export:
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'The number of  messages received per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication reconnect rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",ReconnectCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Gets maximum number of reconnect attempts used when establishing connection with remote nodes per second.'
               application_prototypes:
                 -
                   name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
@@ -852,15 +875,18 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
+                  
+                  
         -
           name: 'TCP discovery SPI'
           type: JMX
@@ -1022,15 +1048,18 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
+                  
+                  
         -
           name: 'Transaction metrics'
           type: JMX
@@ -1138,15 +1167,18 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
+                  
+                  
         -
           name: 'Cache groups'
           type: JMX
@@ -1341,15 +1373,16 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1461,15 +1494,16 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1724,15 +1758,16 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  Object.assign(item, {
+                  '{#JMXIGNITEINSTANCENAME}': 'null'
+                  });
+                  }
                   
                   }
                   
                   return JSON.stringify(data)
+                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
