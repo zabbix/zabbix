@@ -151,7 +151,7 @@ class CControllerScriptList extends CController {
 				$groupids[] = $script['groupid'];
 			}
 
-			$script['actions']  = [];
+			$script['actions'] = [];
 
 			if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION && $actions) {
 				foreach ($actions as $action) {

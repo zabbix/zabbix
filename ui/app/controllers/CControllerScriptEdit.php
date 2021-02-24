@@ -81,7 +81,7 @@ class CControllerScriptEdit extends CController {
 	}
 
 	protected function doAction() {
-		// Fefault values.
+		// Default values.
 		$data = [
 			'sid' => $this->getUserSID(),
 			'scriptid' => 0,
