@@ -377,24 +377,24 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 * @throws APIException if dashboard names are not unique.
 	 */
 	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
-		$names_by_template = [];
+		$names_by_templateid = [];
 
 		foreach ($dashboards as $dashboard) {
 			if ($db_dashboards === null || $dashboard['name'] !== $db_dashboards[$dashboard['dashboardid']]['name']) {
-				$names_by_template[$dashboard['templateid']][] = $dashboard['name'];
+				$names_by_templateid[$dashboard['templateid']][] = $dashboard['name'];
 			}
 		}
 
-		if (!$names_by_template) {
+		if (!$names_by_templateid) {
 			return;
 		}
 
 		$where = [];
-		foreach ($names_by_template as $templateid => $names) {
-			$where[] = '('.dbConditionId('templateid', [$templateid]).' AND '.dbConditionString('name', $names).')';
+		foreach ($names_by_templateid as $templateid => $names) {
+			$where[] = '('.dbConditionId('d.templateid', [$templateid]).' AND '.dbConditionString('d.name', $names).')';
 		}
 
-		$duplicate = DBfetch(DBselect('SELECT name FROM dashboard WHERE '.implode(' OR ', $where), 1));
+		$duplicate = DBfetch(DBselect('SELECT d.name FROM dashboard d WHERE '.implode(' OR ', $where), 1));
 
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Dashboard "%1$s" already exists.', $duplicate['name']));
