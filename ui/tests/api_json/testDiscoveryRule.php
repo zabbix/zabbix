@@ -2890,8 +2890,8 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test overrides and override operations are deleted.' => [
 				['133763'],
-				['101', '102'],
-				['101', '102', '103', '104', '105', '106'],
+				['1001', '1002'],
+				['1001', '1002', '1003', '1004', '1005', '1006'],
 				null
 			]
 		];

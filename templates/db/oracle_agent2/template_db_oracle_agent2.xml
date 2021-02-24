@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-01-12T13:47:39Z</date>
+   <date>2021-02-10T14:36:17Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -500,7 +500,7 @@
                </master_item>
             </item>
             <item>
-               <name>Oracle: FRA, Used space in %</name>
+               <name>Oracle: FRA, Usable space in %</name>
                <type>DEPENDENT</type>
                <key>oracle.fra_usable_pct</key>
                <delay>0</delay>
@@ -1815,7 +1815,11 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DEST_NAME}'].log_sequence.first()</params>
+                           <params>$..['{#DEST_NAME}'].error.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1862,7 +1866,11 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DEST_NAME}'].log_sequence.first()</params>
+                           <params>$..['{#DEST_NAME}'].status.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2291,7 +2299,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.file_bytes.first()</params>
+                           <params>$..['{#TABLESPACE}'].file_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2314,7 +2322,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.free_bytes.first()</params>
+                           <params>$..['{#TABLESPACE}'].free_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2337,7 +2345,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.max_bytes.first()</params>
+                           <params>$..['{#TABLESPACE}'].max_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2362,7 +2370,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.status.first()</params>
+                           <params>$..['{#TABLESPACE}'].status.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2406,7 +2414,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.used_bytes.first()</params>
+                           <params>$..['{#TABLESPACE}'].used_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2430,7 +2438,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.used_file_pct.first()</params>
+                           <params>$..['{#TABLESPACE}'].used_file_pct.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2472,7 +2480,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.used_pct_max.first()</params>
+                           <params>$..['{#TABLESPACE}'].used_pct_max.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
