@@ -282,9 +282,7 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 			}
 			value = left->data.dbl / right->data.dbl;
 			break;
-
 	}
-
 finish:
 	zbx_variant_clear(left);
 	zbx_variant_clear(right);
@@ -769,7 +767,7 @@ static int	eval_execute_function_avg(const zbx_eval_context_t *ctx, const zbx_ev
 	{
 		zbx_vector_dbl_t	*dbl_vector = output->values[i].data.dbl_vector;
 
-		for (i = 0; i < dbl_vector->values_num; i++)\
+		for (i = 0; i < dbl_vector->values_num; i++)
 			avg += dbl_vector->values[i];
 
 		avg /= dbl_vector->values_num;
@@ -1287,7 +1285,6 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 				default:
 					*error = zbx_dsprintf(*error, "unknown token at \"%s\"",
 							ctx->expression + token->loc.l);
-
 			}
 		}
 	}
