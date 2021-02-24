@@ -77,16 +77,16 @@ abstract class CDashboardGeneral extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_pages = DB::select('dashboard_page', [
+		$db_dashboard_pages = DB::select('dashboard_page', [
 			'output' => [],
 			'filter' => ['dashboardid' => $dashboardids],
 			'preservekeys' => true
 		]);
 
-		if ($db_pages) {
+		if ($db_dashboard_pages) {
 			$db_widgets = DB::select('widget', [
 				'output' => [],
-				'filter' => ['dashboard_pageid' => array_keys($db_pages)],
+				'filter' => ['dashboard_pageid' => array_keys($db_dashboard_pages)],
 				'preservekeys' => true
 			]);
 
@@ -94,7 +94,7 @@ abstract class CDashboardGeneral extends CApiService {
 				self::deleteWidgets(array_keys($db_widgets));
 			}
 
-			DB::delete('dashboard_page', ['dashboard_pageid' => array_keys($db_pages)]);
+			DB::delete('dashboard_page', ['dashboard_pageid' => array_keys($db_dashboard_pages)]);
 		}
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
@@ -115,7 +115,7 @@ abstract class CDashboardGeneral extends CApiService {
 		$dashboardids = [];
 
 		// Select widgets of these pages.
-		$pageids = [];
+		$dashboard_pageids = [];
 
 		// Select fields of these widgets.
 		$widgetids = [];
@@ -124,12 +124,12 @@ abstract class CDashboardGeneral extends CApiService {
 			if (array_key_exists('pages', $dashboard)) {
 				$dashboardids[$dashboard['dashboardid']] = true;
 
-				foreach ($dashboard['pages'] as $page) {
-					if (array_key_exists('dashboard_pageid', $page)) {
-						if (array_key_exists('widgets', $page)) {
-							$pageids[$page['dashboard_pageid']] = true;
+				foreach ($dashboard['pages'] as $dashboard_page) {
+					if (array_key_exists('dashboard_pageid', $dashboard_page)) {
+						if (array_key_exists('widgets', $dashboard_page)) {
+							$dashboard_pageids[$dashboard_page['dashboard_pageid']] = true;
 
-							foreach ($page['widgets'] as $widget) {
+							foreach ($dashboard_page['widgets'] as $widget) {
 								if (array_key_exists('widgetid', $widget)) {
 									if (array_key_exists('fields', $widget)) {
 										$widgetids[$widget['widgetid']] = true;
@@ -148,21 +148,21 @@ abstract class CDashboardGeneral extends CApiService {
 		unset($db_dashboard);
 
 		if ($dashboardids) {
-			$db_pages = DB::select('dashboard_page', [
+			$db_dashboard_pages = DB::select('dashboard_page', [
 				'output' => array_keys(DB::getSchema('dashboard_page')['fields']),
 				'filter' => ['dashboardid' => array_keys($dashboardids)],
 				'preservekeys' => true
 			]);
 
-			foreach ($db_pages as &$db_page) {
-				$db_page['widgets'] = [];
+			foreach ($db_dashboard_pages as &$db_dashboard_page) {
+				$db_dashboard_page['widgets'] = [];
 			}
-			unset($db_page);
+			unset($db_dashboard_page);
 
-			if ($pageids) {
+			if ($dashboard_pageids) {
 				$db_widgets = DB::select('widget', [
 					'output' => array_keys(DB::getSchema('widget')['fields']),
-					'filter' => ['dashboard_pageid' => array_keys($pageids)],
+					'filter' => ['dashboard_pageid' => array_keys($dashboard_pageids)],
 					'preservekeys' => true
 				]);
 
@@ -172,24 +172,24 @@ abstract class CDashboardGeneral extends CApiService {
 				unset($db_widget);
 
 				if ($widgetids) {
-					$db_fields = DB::select('widget_field', [
+					$db_widget_fields = DB::select('widget_field', [
 						'output' => array_keys(DB::getSchema('widget_field')['fields']),
 						'filter' => ['widgetid' => array_keys($widgetids)],
 						'preservekeys' => true
 					]);
 
-					foreach ($db_fields as $fieldid => $db_field) {
-						$db_widgets[$db_field['widgetid']]['fields'][$fieldid] = $db_field;
+					foreach ($db_widget_fields as $widget_fieldid => $db_widget_field) {
+						$db_widgets[$db_widget_field['widgetid']]['fields'][$widget_fieldid] = $db_widget_field;
 					}
 				}
 
 				foreach ($db_widgets as $widgetid => $db_widget) {
-					$db_pages[$db_widget['dashboard_pageid']]['widgets'][$widgetid] = $db_widget;
+					$db_dashboard_pages[$db_widget['dashboard_pageid']]['widgets'][$widgetid] = $db_widget;
 				}
 			}
 
-			foreach ($db_pages as $pageid => $db_page) {
-				$db_dashboards[$db_page['dashboardid']]['pages'][$pageid] = $db_page;
+			foreach ($db_dashboard_pages as $dashboard_pageid => $db_dashboard_page) {
+				$db_dashboards[$db_dashboard_page['dashboardid']]['pages'][$dashboard_pageid] = $db_dashboard_page;
 			}
 		}
 	}
@@ -208,25 +208,25 @@ abstract class CDashboardGeneral extends CApiService {
 				continue;
 			}
 
-			$db_pages = $db_dashboards[$dashboard['dashboardid']]['pages'];
+			$db_dashboard_pages = $db_dashboards[$dashboard['dashboardid']]['pages'];
 
-			foreach ($dashboard['pages'] as $page) {
-				if (array_key_exists('dashboard_pageid', $page)
-						&& !array_key_exists($page['dashboard_pageid'], $db_pages)) {
+			foreach ($dashboard['pages'] as $dashboard_page) {
+				if (array_key_exists('dashboard_pageid', $dashboard_page)
+						&& !array_key_exists($dashboard_page['dashboard_pageid'], $db_dashboard_pages)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						_('No permissions to referred object or it does not exist!')
 					);
 				}
 
-				if (!array_key_exists('widgets', $page)) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
 					continue;
 				}
 
-				$db_widgets = array_key_exists('dashboard_pageid', $page)
-					? $db_pages[$page['dashboard_pageid']]['widgets']
+				$db_widgets = array_key_exists('dashboard_pageid', $dashboard_page)
+					? $db_dashboard_pages[$dashboard_page['dashboard_pageid']]['widgets']
 					: [];
 
-				foreach ($page['widgets'] as $widget) {
+				foreach ($dashboard_page['widgets'] as $widget) {
 					if (array_key_exists('widgetid', $widget) && !array_key_exists($widget['widgetid'], $db_widgets)) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS,
 							_('No permissions to referred object or it does not exist!')
@@ -272,18 +272,18 @@ abstract class CDashboardGeneral extends CApiService {
 				continue;
 			}
 
-			$db_pages = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']]['pages'] : null;
+			$db_dashboard_pages = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']]['pages'] : null;
 
-			foreach ($dashboard['pages'] as $page_index => $page) {
-				if (!array_key_exists('widgets', $page)) {
+			foreach ($dashboard['pages'] as $dashboard_page_index => $dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
 					continue;
 				}
 
 				$filled = [];
 
-				foreach ($page['widgets'] as $widget) {
+				foreach ($dashboard_page['widgets'] as $widget) {
 					$widget += array_key_exists('widgetid', $widget)
-						? $db_pages[$page['dashboard_pageid']]['widgets'][$widget['widgetid']]
+						? $db_dashboard_pages[$dashboard_page['dashboard_pageid']]['widgets'][$widget['widgetid']]
 						: $widget_defaults;
 
 					for ($x = $widget['x']; $x < $widget['x'] + $widget['width']; $x++) {
@@ -291,7 +291,7 @@ abstract class CDashboardGeneral extends CApiService {
 							if (array_key_exists($x, $filled) && array_key_exists($y, $filled[$x])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard "%1$s".',
-										$dashboard['name'], $page_index, $widget['x'], $widget['y']
+										$dashboard['name'], $dashboard_page_index + 1, $widget['x'], $widget['y']
 									)
 								);
 							}
@@ -304,7 +304,7 @@ abstract class CDashboardGeneral extends CApiService {
 							|| $widget['y'] + $widget['height'] > DASHBOARD_MAX_ROWS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard "%1$s" is out of bounds.',
-								$dashboard['name'], $page_index, $widget['x'], $widget['y']
+								$dashboard['name'], $dashboard_page_index + 1, $widget['x'], $widget['y']
 							)
 						);
 					}
@@ -339,44 +339,47 @@ abstract class CDashboardGeneral extends CApiService {
 				continue;
 			}
 
-			$db_pages = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']]['pages'] : null;
+			$db_dashboard_pages = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']]['pages'] : null;
 
-			foreach ($dashboard['pages'] as $page) {
-				if (!array_key_exists('widgets', $page)) {
+			foreach ($dashboard['pages'] as $dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
 					continue;
 				}
 
-				foreach ($page['widgets'] as $widget) {
+				foreach ($dashboard_page['widgets'] as $widget) {
 					if (!array_key_exists('fields', $widget)) {
 						continue;
 					}
 
 					$widgetid = array_key_exists('widgetid', $widget) ? $widget['widgetid'] : null;
 
-					// Skip testing linked object availability of already stored fields.
-					$current_fields = [];
+					// Skip testing linked object availability of already stored widget fields.
+					$stored_widget_fields = [];
 
 					if ($widgetid !== null) {
-						$db_widget = $db_pages[$page['dashboard_pageid']]['widgets'][$widgetid];
+						$db_widget = $db_dashboard_pages[$dashboard_page['dashboard_pageid']]['widgets'][$widgetid];
 
-						foreach ($db_widget['fields'] as $db_field) {
-							if (array_key_exists($db_field['type'], $ids)) {
-								$value = $db_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_field['type']]];
-								$current_fields[$db_field['type']][$value] = true;
+						foreach ($db_widget['fields'] as $db_widget_field) {
+							if (array_key_exists($db_widget_field['type'], $ids)) {
+								$value = $db_widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_widget_field['type']]];
+								$stored_widget_fields[$db_widget_field['type']][$value] = true;
 							}
 						}
 					}
 
-					foreach ($widget['fields'] as $field) {
-						if (array_key_exists($field['type'], $ids)) {
+					foreach ($widget['fields'] as $widget_field) {
+						if (array_key_exists($widget_field['type'], $ids)) {
 							if ($widgetid === null
-									|| !array_key_exists($field['type'], $current_fields)
-									|| !array_key_exists($field['value'], $current_fields[$field['type']])) {
+									|| !array_key_exists($widget_field['type'], $stored_widget_fields)
+									|| !array_key_exists($widget_field['value'],
+										$stored_widget_fields[$widget_field['type']]
+									)) {
 								if ($this instanceof CTemplateDashboard) {
-									$ids[$field['type']][$field['value']][$dashboard['templateid']] = true;
+									$ids[$widget_field['type']][$widget_field['value']][$dashboard['templateid']] =
+										true;
 								}
 								else {
-									$ids[$field['type']][$field['value']] = true;
+									$ids[$widget_field['type']][$widget_field['value']] = true;
 								}
 							}
 						}
@@ -560,70 +563,72 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array|null $db_dashboards
 	 */
 	protected function updatePages(array $dashboards, array $db_dashboards = null): void {
-		$db_pages = [];
+		$db_dashboard_pages = [];
 
 		if ($db_dashboards !== null) {
 			foreach ($dashboards as $dashboard) {
 				if (array_key_exists('pages', $dashboard)) {
-					$db_pages += $db_dashboards[$dashboard['dashboardid']]['pages'];
+					$db_dashboard_pages += $db_dashboards[$dashboard['dashboardid']]['pages'];
 				}
 			}
 		}
 
-		$ins_pages = [];
-		$upd_pages = [];
+		$ins_dashboard_pages = [];
+		$upd_dashboard_pages = [];
 
 		foreach ($dashboards as $dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
 				continue;
 			}
 
-			foreach ($dashboard['pages'] as $page_index => $page) {
-				$page['sortorder'] = $page_index;
+			foreach ($dashboard['pages'] as $dashboard_page_index => $dashboard_page) {
+				$dashboard_page['sortorder'] = $dashboard_page_index;
 
-				if (array_key_exists('dashboard_pageid', $page)) {
-					$upd_page = DB::getUpdatedValues('dashboard_page', $page, $db_pages[$page['dashboard_pageid']]);
+				if (array_key_exists('dashboard_pageid', $dashboard_page)) {
+					$upd_dashboard_page = DB::getUpdatedValues('dashboard_page', $dashboard_page,
+						$db_dashboard_pages[$dashboard_page['dashboard_pageid']]
+					);
 
-					if ($upd_page) {
-						$upd_pages[] = [
-							'values' => $upd_page,
-							'where' => ['dashboard_pageid' => $page['dashboard_pageid']]
+					if ($upd_dashboard_page) {
+						$upd_dashboard_pages[] = [
+							'values' => $upd_dashboard_page,
+							'where' => ['dashboard_pageid' => $dashboard_page['dashboard_pageid']]
 						];
 					}
 
-					unset($db_pages[$page['dashboard_pageid']]);
+					unset($db_dashboard_pages[$dashboard_page['dashboard_pageid']]);
 				}
 				else {
-					unset($page['widgets']);
-					$ins_pages[] = ['dashboardid' => $dashboard['dashboardid']] + $page;
+					unset($dashboard_page['widgets']);
+					$ins_dashboard_pages[] = ['dashboardid' => $dashboard['dashboardid']] + $dashboard_page;
 				}
 			}
 		}
 
-		if ($ins_pages) {
-			$pageids = DB::insert('dashboard_page', $ins_pages);
+		if ($ins_dashboard_pages) {
+			$dashboard_pageids = DB::insert('dashboard_page', $ins_dashboard_pages);
 
 			foreach ($dashboards as &$dashboard) {
 				if (array_key_exists('pages', $dashboard)) {
-					foreach ($dashboard['pages'] as &$page) {
-						if (!array_key_exists('dashboard_pageid', $page)) {
-							$page['dashboard_pageid'] = array_shift($pageids);
+					foreach ($dashboard['pages'] as &$dashboard_page) {
+						if (!array_key_exists('dashboard_pageid', $dashboard_page)) {
+							$dashboard_page['dashboard_pageid'] = array_shift($dashboard_pageids);
 						}
 					}
-					unset($page);
+					unset($dashboard_page);
 				}
 			}
 			unset($dashboard);
 		}
 
-		if ($upd_pages) {
-			DB::update('dashboard_page', $upd_pages);
+		if ($upd_dashboard_pages) {
+			DB::update('dashboard_page', $upd_dashboard_pages);
 		}
 
 		$this->updateWidgets($dashboards, $db_dashboards);
 
-		if ($db_pages) {
-			DB::delete('dashboard_page', ['dashboard_pageid' => array_keys($db_pages)]);
+		if ($db_dashboard_pages) {
+			DB::delete('dashboard_page', ['dashboard_pageid' => array_keys($db_dashboard_pages)]);
 		}
 	}
 
@@ -644,15 +649,15 @@ abstract class CDashboardGeneral extends CApiService {
 					continue;
 				}
 
-				$db_pages = $db_dashboards[$dashboard['dashboardid']]['pages'];
+				$db_dashboard_pages = $db_dashboards[$dashboard['dashboardid']]['pages'];
 
-				foreach ($dashboard['pages'] as $page) {
-					if (!array_key_exists('widgets', $page)) {
+				foreach ($dashboard['pages'] as $dashboard_page) {
+					if (!array_key_exists('widgets', $dashboard_page)) {
 						continue;
 					}
 
-					if (array_key_exists($page['dashboard_pageid'], $db_pages)) {
-						$db_widgets += $db_pages[$page['dashboard_pageid']]['widgets'];
+					if (array_key_exists($dashboard_page['dashboard_pageid'], $db_dashboard_pages)) {
+						$db_widgets += $db_dashboard_pages[$dashboard_page['dashboard_pageid']]['widgets'];
 					}
 				}
 			}
@@ -666,12 +671,12 @@ abstract class CDashboardGeneral extends CApiService {
 				continue;
 			}
 
-			foreach ($dashboard['pages'] as $page) {
-				if (!array_key_exists('widgets', $page)) {
+			foreach ($dashboard['pages'] as $dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
 					continue;
 				}
 
-				foreach ($page['widgets'] as $widget) {
+				foreach ($dashboard_page['widgets'] as $widget) {
 					if (array_key_exists('widgetid', $widget)) {
 						$upd_widget = DB::getUpdatedValues('widget', $widget, $db_widgets[$widget['widgetid']]);
 
@@ -685,7 +690,7 @@ abstract class CDashboardGeneral extends CApiService {
 						unset($db_widgets[$widget['widgetid']]);
 					}
 					else {
-						$ins_widgets[] = ['dashboard_pageid' => $page['dashboard_pageid']] + $widget;
+						$ins_widgets[] = ['dashboard_pageid' => $dashboard_page['dashboard_pageid']] + $widget;
 					}
 				}
 			}
@@ -696,9 +701,9 @@ abstract class CDashboardGeneral extends CApiService {
 
 			foreach ($dashboards as &$dashboard) {
 				if (array_key_exists('pages', $dashboard)) {
-					foreach ($dashboard['pages'] as &$page) {
-						if (array_key_exists('widgets', $page)) {
-							foreach ($page['widgets'] as &$widget) {
+					foreach ($dashboard['pages'] as &$dashboard_page) {
+						if (array_key_exists('widgets', $dashboard_page)) {
+							foreach ($dashboard_page['widgets'] as &$widget) {
 								if (!array_key_exists('widgetid', $widget)) {
 									$widget['widgetid'] = array_shift($widgetids);
 								}
@@ -706,7 +711,7 @@ abstract class CDashboardGeneral extends CApiService {
 							unset($widget);
 						}
 					}
-					unset($page);
+					unset($dashboard_page);
 				}
 			}
 			unset($dashboard);
@@ -732,66 +737,68 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array|null $db_dashboards
 	 */
 	protected function updateWidgetFields(array $dashboards, array $db_dashboards = null): void {
-		$ins_fields = [];
-		$upd_fields = [];
-		$del_fieldids = [];
+		$ins_widget_fields = [];
+		$upd_widget_fields = [];
+		$del_widget_fieldids = [];
 
 		foreach ($dashboards as $dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
 				continue;
 			}
 
-			$db_pages = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']]['pages'] : [];
+			$db_dashboard_pages = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']]['pages'] : [];
 
-			foreach ($dashboard['pages'] as $page) {
-				if (!array_key_exists('widgets', $page)) {
+			foreach ($dashboard['pages'] as $dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
 					continue;
 				}
 
-				$db_widgets = array_key_exists($page['dashboard_pageid'], $db_pages)
-					? $db_pages[$page['dashboard_pageid']]['widgets']
+				$db_widgets = array_key_exists($dashboard_page['dashboard_pageid'], $db_dashboard_pages)
+					? $db_dashboard_pages[$dashboard_page['dashboard_pageid']]['widgets']
 					: [];
 
-				foreach ($page['widgets'] as $widget) {
+				foreach ($dashboard_page['widgets'] as $widget) {
 					if (!array_key_exists('fields', $widget)) {
 						continue;
 					}
 
-					$db_fields = array_key_exists($widget['widgetid'], $db_widgets)
+					$db_widget_fields = array_key_exists($widget['widgetid'], $db_widgets)
 						? $db_widgets[$widget['widgetid']]['fields']
 						: [];
 
-					$fields = [];
+					$widget_fields = [];
 
-					foreach ($widget['fields'] as $field) {
-						$field[self::WIDGET_FIELD_TYPE_COLUMNS[$field['type']]] = $field['value'];
-						$fields[$field['type']][$field['name']][] = $field;
+					foreach ($widget['fields'] as $widget_field) {
+						$widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']]] = $widget_field['value'];
+						$widget_fields[$widget_field['type']][$widget_field['name']][] = $widget_field;
 					}
 
-					foreach ($db_fields as $db_field) {
-						if (array_key_exists($db_field['type'], $fields)
-								&& array_key_exists($db_field['name'], $fields[$db_field['type']])
-								&& $fields[$db_field['type']][$db_field['name']]) {
-							$field = array_shift($fields[$db_field['type']][$db_field['name']]);
+					foreach ($db_widget_fields as $db_widget_field) {
+						if (array_key_exists($db_widget_field['type'], $widget_fields)
+								&& array_key_exists($db_widget_field['name'], $widget_fields[$db_widget_field['type']])
+								&& $widget_fields[$db_widget_field['type']][$db_widget_field['name']]) {
+							$widget_field = array_shift(
+								$widget_fields[$db_widget_field['type']][$db_widget_field['name']]
+							);
 
-							$upd_field = DB::getUpdatedValues('widget_field', $field, $db_field);
+							$upd_widget_field = DB::getUpdatedValues('widget_field', $widget_field, $db_widget_field);
 
-							if ($upd_field) {
-								$upd_fields[] = [
-									'values' => $upd_field,
-									'where' => ['widget_fieldid' => $db_field['widget_fieldid']]
+							if ($upd_widget_field) {
+								$upd_widget_fields[] = [
+									'values' => $upd_widget_field,
+									'where' => ['widget_fieldid' => $db_widget_field['widget_fieldid']]
 								];
 							}
 						}
 						else {
-							$del_fieldids[] = $db_field['widget_fieldid'];
+							$del_widget_fieldids[] = $db_widget_field['widget_fieldid'];
 						}
 					}
 
-					foreach ($fields as $fields) {
-						foreach ($fields as $fields) {
-							foreach ($fields as $field) {
-								$ins_fields[] = ['widgetid' => $widget['widgetid']] + $field;
+					foreach ($widget_fields as $widget_fields) {
+						foreach ($widget_fields as $widget_fields) {
+							foreach ($widget_fields as $widget_field) {
+								$ins_widget_fields[] = ['widgetid' => $widget['widgetid']] + $widget_field;
 							}
 						}
 					}
@@ -799,16 +806,16 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		if ($ins_fields) {
-			DB::insert('widget_field', $ins_fields);
+		if ($ins_widget_fields) {
+			DB::insert('widget_field', $ins_widget_fields);
 		}
 
-		if ($upd_fields) {
-			DB::update('widget_field', $upd_fields);
+		if ($upd_widget_fields) {
+			DB::update('widget_field', $upd_widget_fields);
 		}
 
-		if ($del_fieldids) {
-			DB::delete('widget_field', ['widget_fieldid' => $del_fieldids]);
+		if ($del_widget_fieldids) {
+			DB::delete('widget_field', ['widget_fieldid' => $del_widget_fieldids]);
 		}
 	}
 
@@ -843,30 +850,28 @@ abstract class CDashboardGeneral extends CApiService {
 				$options['selectPages'] = array_diff($options['selectPages'], ['widgets']);
 			}
 
-			$db_pages = API::getApiService()->select('dashboard_page', [
+			$db_dashboard_pages = API::getApiService()->select('dashboard_page', [
 				'output' => $this->outputExtend($options['selectPages'], ['dashboardid', 'sortorder']),
 				'filter' => ['dashboardid' => array_keys($result)],
 				'preservekeys' => true
 			]);
 
-			if ($db_pages) {
-				uasort($db_pages,
-					function(array $db_page_1, array $db_page_2): int {
-						return $db_page_1['sortorder'] <=> $db_page_2['sortorder'];
-					}
-				);
+			if ($db_dashboard_pages) {
+				uasort($db_dashboard_pages, function (array $db_dashboard_page_1, array $db_dashboard_page_2): int {
+					return $db_dashboard_page_1['sortorder'] <=> $db_dashboard_page_2['sortorder'];
+				});
 
 				if ($widgets_requested) {
-					foreach ($db_pages as &$db_page) {
-						$db_page['widgets'] = [];
+					foreach ($db_dashboard_pages as &$db_dashboard_page) {
+						$db_dashboard_page['widgets'] = [];
 					}
-					unset($db_page);
+					unset($db_dashboard_page);
 
 					$db_widgets = DB::select('widget', [
 						'output' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'view_mode',
 							'dashboard_pageid'
 						],
-						'filter' => ['dashboard_pageid' => array_keys($db_pages)],
+						'filter' => ['dashboard_pageid' => array_keys($db_dashboard_pages)],
 						'preservekeys' => true
 					]);
 
@@ -876,7 +881,7 @@ abstract class CDashboardGeneral extends CApiService {
 						}
 						unset($db_widget);
 
-						$db_fields = DB::select('widget_field', [
+						$db_widget_fields = DB::select('widget_field', [
 							'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
 								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
 							],
@@ -886,11 +891,11 @@ abstract class CDashboardGeneral extends CApiService {
 							]
 						]);
 
-						foreach ($db_fields as $db_field) {
-							$db_widgets[$db_field['widgetid']]['fields'][] = [
-								'type' => $db_field['type'],
-								'name' => $db_field['name'],
-								'value' => $db_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_field['type']]]
+						foreach ($db_widget_fields as $db_widget_field) {
+							$db_widgets[$db_widget_field['widgetid']]['fields'][] = [
+								'type' => $db_widget_field['type'],
+								'name' => $db_widget_field['name'],
+								'value' => $db_widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_widget_field['type']]]
 							];
 						}
 					}
@@ -898,16 +903,18 @@ abstract class CDashboardGeneral extends CApiService {
 					foreach ($db_widgets as $db_widget) {
 						$dashboard_pageid = $db_widget['dashboard_pageid'];
 						unset($db_widget['dashboard_pageid']);
-						$db_pages[$dashboard_pageid]['widgets'][] = $db_widget;
+						$db_dashboard_pages[$dashboard_pageid]['widgets'][] = $db_widget;
 					}
 				}
 
-				$db_pages = $this->unsetExtraFields($db_pages, ['dashboard_pageid'], $options['selectPages']);
+				$db_dashboard_pages = $this->unsetExtraFields($db_dashboard_pages, ['dashboard_pageid'],
+					$options['selectPages']
+				);
 
-				foreach ($db_pages as $db_page) {
-					$dashboardid = $db_page['dashboardid'];
-					unset($db_page['dashboardid'], $db_page['sortorder']);
-					$result[$dashboardid]['pages'][] = $db_page;
+				foreach ($db_dashboard_pages as $db_dashboard_page) {
+					$dashboardid = $db_dashboard_page['dashboardid'];
+					unset($db_dashboard_page['dashboardid'], $db_dashboard_page['sortorder']);
+					$result[$dashboardid]['pages'][] = $db_dashboard_page;
 				}
 			}
 		}
