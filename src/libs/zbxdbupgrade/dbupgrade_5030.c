@@ -1323,10 +1323,12 @@ static int	DBpatch_5030070(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
-			"'web.items.subfilter_apps','web.latest.filter.application',"
+			"'web.applications.filter','web.latest.filter.application',"
 			"'web.overview.filter.application','web.applications.filter.active',"
 			"'web.applications.filter_groups','web.applications.filter_hostids',"
-			"'web.applications.php.sort','web.applications.php.sortorder')"))
+			"'web.applications.php.sort','web.applications.php.sortorder',"
+			"'web.hosts.items.subfilter_apps','web.templates.items.subfilter_apps',"
+			"'web.latest.toggle','web.latest.toggle_other','web.items.filter_application')"))
 		return FAIL;
 
 	return SUCCEED;
