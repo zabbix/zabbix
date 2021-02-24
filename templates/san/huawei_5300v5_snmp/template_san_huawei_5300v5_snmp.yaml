@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-15T15:15:04Z'
+  date: '2021-02-24T11:15:15Z'
   groups:
     -
       name: Templates/Modules
@@ -1117,6 +1117,418 @@ zabbix_export:
           macro: '{$HUAWEI.5300.TEMP.MAX.WARN}'
           value: '35'
           description: 'Maximum temperature of enclosure'
+      valuemaps:
+        -
+          name: 'Huawei storage: Controller role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Normal
+            -
+              value: '1'
+              newvalue: Master
+            -
+              value: '2'
+              newvalue: Slave
+        -
+          name: 'Huawei storage: Health status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undefined
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: Fault
+            -
+              value: '3'
+              newvalue: Pre-fail
+            -
+              value: '4'
+              newvalue: 'Partially broken'
+            -
+              value: '5'
+              newvalue: Degraded
+            -
+              value: '6'
+              newvalue: 'Bad sectors found'
+            -
+              value: '7'
+              newvalue: 'Bit errors found'
+            -
+              value: '8'
+              newvalue: Consistent
+            -
+              value: '9'
+              newvalue: Inconsistent
+            -
+              value: '10'
+              newvalue: Busy
+            -
+              value: '11'
+              newvalue: 'No input'
+            -
+              value: '12'
+              newvalue: 'Low battery'
+            -
+              value: '13'
+              newvalue: 'Single link fault'
+            -
+              value: '14'
+              newvalue: Invalid
+            -
+              value: '15'
+              newvalue: 'Write protect'
+        -
+          name: 'Huawei storage: LUN status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: Faulty
+            -
+              value: '3'
+              newvalue: Unformatted
+            -
+              value: '4'
+              newvalue: Formatting
+        -
+          name: 'Huawei storage: Running status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undefined
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: Running
+            -
+              value: '3'
+              newvalue: 'Not running'
+            -
+              value: '4'
+              newvalue: 'Not existed'
+            -
+              value: '5'
+              newvalue: 'Sleep in high temperature'
+            -
+              value: '6'
+              newvalue: Starting
+            -
+              value: '7'
+              newvalue: 'Power failure rotection'
+            -
+              value: '8'
+              newvalue: 'Spin down'
+            -
+              value: '9'
+              newvalue: Started
+            -
+              value: '10'
+              newvalue: 'Link Up'
+            -
+              value: '11'
+              newvalue: 'Link Down'
+            -
+              value: '12'
+              newvalue: 'Powering on'
+            -
+              value: '13'
+              newvalue: 'Powered off'
+            -
+              value: '14'
+              newvalue: Pre-copy
+            -
+              value: '15'
+              newvalue: Copyback
+            -
+              value: '16'
+              newvalue: Reconstruction
+            -
+              value: '17'
+              newvalue: Expansion
+            -
+              value: '18'
+              newvalue: Unformatted
+            -
+              value: '19'
+              newvalue: Formatting
+            -
+              value: '20'
+              newvalue: Unmapped
+            -
+              value: '21'
+              newvalue: 'Initial synchronizing'
+            -
+              value: '22'
+              newvalue: Consistent
+            -
+              value: '23'
+              newvalue: Synchronizing
+            -
+              value: '24'
+              newvalue: Synchronized
+            -
+              value: '25'
+              newvalue: Unsynchronized
+            -
+              value: '26'
+              newvalue: Split
+            -
+              value: '27'
+              newvalue: Online
+            -
+              value: '28'
+              newvalue: Offline
+            -
+              value: '29'
+              newvalue: Locked
+            -
+              value: '30'
+              newvalue: Enabled
+            -
+              value: '31'
+              newvalue: Disabled
+            -
+              value: '32'
+              newvalue: Balancing
+            -
+              value: '33'
+              newvalue: 'To be recovered'
+            -
+              value: '34'
+              newvalue: Interrupted
+            -
+              value: '35'
+              newvalue: Invalid
+            -
+              value: '36'
+              newvalue: 'Not start'
+            -
+              value: '37'
+              newvalue: Queuing
+            -
+              value: '38'
+              newvalue: Stopped
+            -
+              value: '39'
+              newvalue: Copying
+            -
+              value: '40'
+              newvalue: Completed
+            -
+              value: '41'
+              newvalue: Paused
+            -
+              value: '42'
+              newvalue: 'Reverse synchronizing'
+            -
+              value: '43'
+              newvalue: Activated
+            -
+              value: '44'
+              newvalue: Restore
+            -
+              value: '45'
+              newvalue: Inactive
+            -
+              value: '46'
+              newvalue: Idle
+            -
+              value: '47'
+              newvalue: 'Powering off'
+            -
+              value: '48'
+              newvalue: Charging
+            -
+              value: '49'
+              newvalue: 'Charging completed'
+            -
+              value: '50'
+              newvalue: Discharging
+            -
+              value: '51'
+              newvalue: Upgrading
+            -
+              value: '52'
+              newvalue: 'Power Lost'
+            -
+              value: '53'
+              newvalue: Initializing
+            -
+              value: '54'
+              newvalue: 'Apply change'
+            -
+              value: '55'
+              newvalue: 'Online disable'
+            -
+              value: '56'
+              newvalue: 'Offline disable'
+            -
+              value: '57'
+              newvalue: 'Online frozen'
+            -
+              value: '58'
+              newvalue: 'Offline frozen'
+            -
+              value: '59'
+              newvalue: Closed
+            -
+              value: '60'
+              newvalue: Removing
+            -
+              value: '61'
+              newvalue: 'In service'
+            -
+              value: '62'
+              newvalue: 'Out of service'
+            -
+              value: '63'
+              newvalue: 'Running normal'
+            -
+              value: '64'
+              newvalue: 'Running fail'
+            -
+              value: '65'
+              newvalue: 'Running success'
+            -
+              value: '66'
+              newvalue: 'Running success'
+            -
+              value: '67'
+              newvalue: 'Running failed'
+            -
+              value: '68'
+              newvalue: Waiting
+            -
+              value: '69'
+              newvalue: Canceling
+            -
+              value: '70'
+              newvalue: Canceled
+            -
+              value: '71'
+              newvalue: 'About to synchronize'
+            -
+              value: '72'
+              newvalue: 'Synchronizing data'
+            -
+              value: '73'
+              newvalue: 'Failed to synchronize'
+            -
+              value: '74'
+              newvalue: Fault
+            -
+              value: '75'
+              newvalue: Migrating
+            -
+              value: '76'
+              newvalue: Migrated
+            -
+              value: '77'
+              newvalue: Activating
+            -
+              value: '78'
+              newvalue: Deactivating
+            -
+              value: '79'
+              newvalue: 'Start failed'
+            -
+              value: '80'
+              newvalue: 'Stop failed'
+            -
+              value: '81'
+              newvalue: Decommissioning
+            -
+              value: '82'
+              newvalue: Decommissioned
+            -
+              value: '83'
+              newvalue: Recommissioning
+            -
+              value: '84'
+              newvalue: 'Replacing node'
+            -
+              value: '85'
+              newvalue: Scheduling
+            -
+              value: '86'
+              newvalue: Pausing
+            -
+              value: '87'
+              newvalue: Suspending
+            -
+              value: '88'
+              newvalue: Suspended
+            -
+              value: '89'
+              newvalue: Overload
+            -
+              value: '90'
+              newvalue: 'To be switch'
+            -
+              value: '91'
+              newvalue: Switching
+            -
+              value: '92'
+              newvalue: 'To be cleanup'
+            -
+              value: '93'
+              newvalue: 'Forced start'
+            -
+              value: '94'
+              newvalue: Error
+            -
+              value: '95'
+              newvalue: 'Job completed'
+            -
+              value: '96'
+              newvalue: 'Partition Migrating'
+            -
+              value: '97'
+              newvalue: Mount
+            -
+              value: '98'
+              newvalue: Umount
+            -
+              value: '99'
+              newvalue: INSTALLING
+            -
+              value: '100'
+              newvalue: 'To Be Synchronized'
+            -
+              value: '101'
+              newvalue: Connecting
+            -
+              value: '102'
+              newvalue: 'Service Switching'
+            -
+              value: '103'
+              newvalue: 'Power-on failed'
+            -
+              value: '104'
+              newvalue: REPAIRING
+            -
+              value: '105'
+              newvalue: abnormal
+            -
+              value: '106'
+              newvalue: Deleting
+            -
+              value: '107'
+              newvalue: Modifying
+            -
+              value: '108'
+              newvalue: 'Running(clearing data)'
+            -
+              value: '109'
+              newvalue: 'Running(synchronizing data)'
   graphs:
     -
       name: 'OceanStor 5300 V5: Capacity'
@@ -1132,415 +1544,3 @@ zabbix_export:
           item:
             host: 'Huawei OceanStor 5300 V5 SNMP'
             key: 'huawei.5300.v5[usedCapacity]'
-  value_maps:
-    -
-      name: 'Huawei storage: Controller role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Normal
-        -
-          value: '1'
-          newvalue: Master
-        -
-          value: '2'
-          newvalue: Slave
-    -
-      name: 'Huawei storage: Health status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Undefined
-        -
-          value: '1'
-          newvalue: Normal
-        -
-          value: '2'
-          newvalue: Fault
-        -
-          value: '3'
-          newvalue: Pre-fail
-        -
-          value: '4'
-          newvalue: 'Partially broken'
-        -
-          value: '5'
-          newvalue: Degraded
-        -
-          value: '6'
-          newvalue: 'Bad sectors found'
-        -
-          value: '7'
-          newvalue: 'Bit errors found'
-        -
-          value: '8'
-          newvalue: Consistent
-        -
-          value: '9'
-          newvalue: Inconsistent
-        -
-          value: '10'
-          newvalue: Busy
-        -
-          value: '11'
-          newvalue: 'No input'
-        -
-          value: '12'
-          newvalue: 'Low battery'
-        -
-          value: '13'
-          newvalue: 'Single link fault'
-        -
-          value: '14'
-          newvalue: Invalid
-        -
-          value: '15'
-          newvalue: 'Write protect'
-    -
-      name: 'Huawei storage: LUN status'
-      mappings:
-        -
-          value: '1'
-          newvalue: Normal
-        -
-          value: '2'
-          newvalue: Faulty
-        -
-          value: '3'
-          newvalue: Unformatted
-        -
-          value: '4'
-          newvalue: Formatting
-    -
-      name: 'Huawei storage: Running status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Undefined
-        -
-          value: '1'
-          newvalue: Normal
-        -
-          value: '2'
-          newvalue: Running
-        -
-          value: '3'
-          newvalue: 'Not running'
-        -
-          value: '4'
-          newvalue: 'Not existed'
-        -
-          value: '5'
-          newvalue: 'Sleep in high temperature'
-        -
-          value: '6'
-          newvalue: Starting
-        -
-          value: '7'
-          newvalue: 'Power failure rotection'
-        -
-          value: '8'
-          newvalue: 'Spin down'
-        -
-          value: '9'
-          newvalue: Started
-        -
-          value: '10'
-          newvalue: 'Link Up'
-        -
-          value: '11'
-          newvalue: 'Link Down'
-        -
-          value: '12'
-          newvalue: 'Powering on'
-        -
-          value: '13'
-          newvalue: 'Powered off'
-        -
-          value: '14'
-          newvalue: Pre-copy
-        -
-          value: '15'
-          newvalue: Copyback
-        -
-          value: '16'
-          newvalue: Reconstruction
-        -
-          value: '17'
-          newvalue: Expansion
-        -
-          value: '18'
-          newvalue: Unformatted
-        -
-          value: '19'
-          newvalue: Formatting
-        -
-          value: '20'
-          newvalue: Unmapped
-        -
-          value: '21'
-          newvalue: 'Initial synchronizing'
-        -
-          value: '22'
-          newvalue: Consistent
-        -
-          value: '23'
-          newvalue: Synchronizing
-        -
-          value: '24'
-          newvalue: Synchronized
-        -
-          value: '25'
-          newvalue: Unsynchronized
-        -
-          value: '26'
-          newvalue: Split
-        -
-          value: '27'
-          newvalue: Online
-        -
-          value: '28'
-          newvalue: Offline
-        -
-          value: '29'
-          newvalue: Locked
-        -
-          value: '30'
-          newvalue: Enabled
-        -
-          value: '31'
-          newvalue: Disabled
-        -
-          value: '32'
-          newvalue: Balancing
-        -
-          value: '33'
-          newvalue: 'To be recovered'
-        -
-          value: '34'
-          newvalue: Interrupted
-        -
-          value: '35'
-          newvalue: Invalid
-        -
-          value: '36'
-          newvalue: 'Not start'
-        -
-          value: '37'
-          newvalue: Queuing
-        -
-          value: '38'
-          newvalue: Stopped
-        -
-          value: '39'
-          newvalue: Copying
-        -
-          value: '40'
-          newvalue: Completed
-        -
-          value: '41'
-          newvalue: Paused
-        -
-          value: '42'
-          newvalue: 'Reverse synchronizing'
-        -
-          value: '43'
-          newvalue: Activated
-        -
-          value: '44'
-          newvalue: Restore
-        -
-          value: '45'
-          newvalue: Inactive
-        -
-          value: '46'
-          newvalue: Idle
-        -
-          value: '47'
-          newvalue: 'Powering off'
-        -
-          value: '48'
-          newvalue: Charging
-        -
-          value: '49'
-          newvalue: 'Charging completed'
-        -
-          value: '50'
-          newvalue: Discharging
-        -
-          value: '51'
-          newvalue: Upgrading
-        -
-          value: '52'
-          newvalue: 'Power Lost'
-        -
-          value: '53'
-          newvalue: Initializing
-        -
-          value: '54'
-          newvalue: 'Apply change'
-        -
-          value: '55'
-          newvalue: 'Online disable'
-        -
-          value: '56'
-          newvalue: 'Offline disable'
-        -
-          value: '57'
-          newvalue: 'Online frozen'
-        -
-          value: '58'
-          newvalue: 'Offline frozen'
-        -
-          value: '59'
-          newvalue: Closed
-        -
-          value: '60'
-          newvalue: Removing
-        -
-          value: '61'
-          newvalue: 'In service'
-        -
-          value: '62'
-          newvalue: 'Out of service'
-        -
-          value: '63'
-          newvalue: 'Running normal'
-        -
-          value: '64'
-          newvalue: 'Running fail'
-        -
-          value: '65'
-          newvalue: 'Running success'
-        -
-          value: '66'
-          newvalue: 'Running success'
-        -
-          value: '67'
-          newvalue: 'Running failed'
-        -
-          value: '68'
-          newvalue: Waiting
-        -
-          value: '69'
-          newvalue: Canceling
-        -
-          value: '70'
-          newvalue: Canceled
-        -
-          value: '71'
-          newvalue: 'About to synchronize'
-        -
-          value: '72'
-          newvalue: 'Synchronizing data'
-        -
-          value: '73'
-          newvalue: 'Failed to synchronize'
-        -
-          value: '74'
-          newvalue: Fault
-        -
-          value: '75'
-          newvalue: Migrating
-        -
-          value: '76'
-          newvalue: Migrated
-        -
-          value: '77'
-          newvalue: Activating
-        -
-          value: '78'
-          newvalue: Deactivating
-        -
-          value: '79'
-          newvalue: 'Start failed'
-        -
-          value: '80'
-          newvalue: 'Stop failed'
-        -
-          value: '81'
-          newvalue: Decommissioning
-        -
-          value: '82'
-          newvalue: Decommissioned
-        -
-          value: '83'
-          newvalue: Recommissioning
-        -
-          value: '84'
-          newvalue: 'Replacing node'
-        -
-          value: '85'
-          newvalue: Scheduling
-        -
-          value: '86'
-          newvalue: Pausing
-        -
-          value: '87'
-          newvalue: Suspending
-        -
-          value: '88'
-          newvalue: Suspended
-        -
-          value: '89'
-          newvalue: Overload
-        -
-          value: '90'
-          newvalue: 'To be switch'
-        -
-          value: '91'
-          newvalue: Switching
-        -
-          value: '92'
-          newvalue: 'To be cleanup'
-        -
-          value: '93'
-          newvalue: 'Forced start'
-        -
-          value: '94'
-          newvalue: Error
-        -
-          value: '95'
-          newvalue: 'Job completed'
-        -
-          value: '96'
-          newvalue: 'Partition Migrating'
-        -
-          value: '97'
-          newvalue: Mount
-        -
-          value: '98'
-          newvalue: Umount
-        -
-          value: '99'
-          newvalue: INSTALLING
-        -
-          value: '100'
-          newvalue: 'To Be Synchronized'
-        -
-          value: '101'
-          newvalue: Connecting
-        -
-          value: '102'
-          newvalue: 'Service Switching'
-        -
-          value: '103'
-          newvalue: 'Power-on failed'
-        -
-          value: '104'
-          newvalue: REPAIRING
-        -
-          value: '105'
-          newvalue: abnormal
-        -
-          value: '106'
-          newvalue: Deleting
-        -
-          value: '107'
-          newvalue: Modifying
-        -
-          value: '108'
-          newvalue: 'Running(clearing data)'
-        -
-          value: '109'
-          newvalue: 'Running(synchronizing data)'
