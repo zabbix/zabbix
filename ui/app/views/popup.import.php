@@ -30,6 +30,7 @@ $titles = [
 	'groups' => _('Groups'),
 	'hosts' => _('Hosts'),
 	'templates' => _('Templates'),
+	'valueMaps' => _('Value mappings'),
 	'templateDashboards' => _('Template dashboards'),
 	'templateLinkage' => _('Template linkage'),
 	'applications' => _('Applications'),
@@ -47,7 +48,6 @@ $user_type = CWebUser::getType();
 if ($user_type == USER_TYPE_SUPER_ADMIN) {
 	$titles['images'] = _('Images');
 	$titles['mediaTypes'] = _('Media types');
-	$titles['valueMaps'] = _('Value mappings');
 }
 
 foreach ($titles as $key => $title) {
@@ -72,12 +72,6 @@ foreach ($titles as $key => $title) {
 
 		if ($key === 'images') {
 			$cbExist->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
-		}
-
-		if ($key === 'valueMaps') {
-			$cbExist->onClick(
-				'updateWarning(this, '.json_encode(_('Value mappings for value maps will be updated!')).')'
-			);
 		}
 	}
 

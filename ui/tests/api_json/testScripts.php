@@ -129,7 +129,95 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Script name "test" already used in menu path for script "test/test".'
 			],
-			// Check successfully creation of script.
+			// Check type.
+			[
+				'script' => [
+					'name' => 'API empty type',
+					'command' => 'reboot server',
+					'type' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			[
+				'script' => [
+					'name' => 'API type string',
+					'command' => 'reboot server',
+					'type' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			[
+				'script' => [
+					'name' => 'API invalid type',
+					'command' => 'reboot server',
+					'type' => '1.1'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			[
+				'script' => [
+					'name' => 'Validate script type',
+					'type' => 8
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 5.'
+			],
+			// Webhook script validation.
+			[
+				'script' => [
+					[
+						'name' => 'Webhook validate script',
+						'type' => 5,
+						'command' => ''
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
+			],
+			[
+				'script' => [
+					[
+						'name' => '',
+						'type' => 5,
+						'command' => 'Script command'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				'script' => [
+					'name' => 'Webhook validate script',
+					'type' => 5
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "command" is missing.'
+			],
+			[
+				'script' => [
+					'type' => 5,
+					'command' => 'Script command'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
+			],
+			// Check successful creation of script.
+			[
+				'script' => [
+					[
+						'name' => 'Webhook create script',
+						'type' => 5,
+						'command' => 'Script command'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'script' => [
+					[
+						'name' => 'Webhook with params',
+						'type' => 5,
+						'command' => 'Script command',
+						'parameters' => []
+					]
+				],
+				'expected_error' => null
+			],
 			[
 				'script' => [
 					[
@@ -341,6 +429,66 @@ class testScripts extends CAPITest {
 					'groupsObjectProperties' => ['flags'],
 					'result_keys' => ['groups', 'scriptid']
 				]
+			],
+			// Get scripts parameters.
+			[
+				'params' => [
+					'__auth' => ['Admin', 'zabbix'],
+					'output' => ['parameters'],
+					'scriptids' => 200
+				],
+				'expect' => [
+					'error' => null,
+					'result_keys' => ['parameters'],
+					'parameters' => [
+						[
+							'name' => 'parameter 1',
+							'value' => 'value 1'
+						],
+						[
+							'name' => 'parameter 2',
+							'value' => 'value 2'
+						]
+					]
+				]
+			],
+			// Filter webhooks.
+			[
+				'params' => [
+					'__auth' => ['Admin', 'zabbix'],
+					'output' => [ 'scriptid', 'parameters'],
+					'filter' => ['type' => 5]
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['200'],
+					'!has.scriptid' => ['201'],
+					'result_keys' => ['scriptid', 'parameters'],
+					'parameters' => [
+						[
+							'name' => 'parameter 1',
+							'value' => 'value 1'
+						],
+						[
+							'name' => 'parameter 2',
+							'value' => 'value 2'
+						]
+					]
+				]
+			],
+			// Filter IPMI.
+			[
+				'params' => [
+					'__auth' => ['Admin', 'zabbix'],
+					'output' => ['scriptid'],
+					'filter' => ['type' => 1]
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['201'],
+					'!has.scriptid' => ['200'],
+					'result_keys' => ['scriptid']
+				]
 			]
 		];
 	}
@@ -418,6 +566,9 @@ class testScripts extends CAPITest {
 				sort($expect['result_keys']);
 				ksort($script);
 				$this->assertEquals($expect['result_keys'], array_keys($script));
+				if (array_key_exists('parameters', $expect)) {
+					$this->assertEquals($expect['parameters'], $script['parameters']);
+				}
 			}
 		}
 	}
@@ -439,7 +590,7 @@ class testScripts extends CAPITest {
 				$this->assertEquals($dbRowUser['groupid'], 0);
 				$this->assertEquals($dbRowUser['description'], '');
 				$this->assertEquals($dbRowUser['confirmation'], '');
-				$this->assertEquals($dbRowUser['type'], 0);
+				$this->assertEquals($dbRowUser['type'], $script[$key]['type']);
 				$this->assertEquals($dbRowUser['execute_on'], 2);
 			}
 		}
@@ -583,12 +734,104 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Script name "test" already used in menu path for script "test/test".'
 			],
-			// Check successfully script update.
+			// Check type.
 			[
 				'script' => [
 					[
 						'scriptid' => '6',
-						'name' => 'Апи скрипт обнавлён утф-8',
+						'name' => 'API empty type',
+						'command' => 'reboot server',
+						'type' => ''
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			[
+				'script' => [
+					[
+						'scriptid' => '6',
+						'name' => 'API type string',
+						'command' => 'reboot server',
+						'type' => 'abc'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			[
+				'script' => [
+					[
+						'scriptid' => '6',
+						'name' => 'API invalid type',
+						'command' => 'reboot server',
+						'type' => '1.1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			[
+				'script' => [
+					[
+						'scriptid' => '6',
+						'name' => 'Validate script type',
+						'type' => 8
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 5.'
+			],
+			// Webhook script validation.
+			[
+				'script' => [
+					[
+						'scriptid' => '6',
+						'name' => 'Webhook validate script',
+						'type' => 5,
+						'command' => ''
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
+			],
+			[
+				'script' => [
+					[
+						'name' => '',
+						'scriptid' => '6',
+						'type' => 5,
+						'command' => 'Script command'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+			],
+			// Check successful creation of script.
+			[
+				'script' => [
+					[
+						'scriptid' => '6',
+						'name' => 'Webhook update script',
+						'type' => 5,
+						'command' => 'Script command'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'script' => [
+					[
+						'scriptid' => '6',
+						'name' => 'Webhook update script with params',
+						'type' => 5,
+						'command' => 'Script command',
+						'parameters' => []
+					]
+				],
+				'expected_error' => null
+			],
+			// Check successful script update.
+			[
+				'script' => [
+					[
+						'scriptid' => '6',
+						'type' => 0,
+						'name' => 'Апи скрипт обновлён утф-8',
 						'command' => 'reboot server'
 					]
 				],
@@ -598,11 +841,13 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'scriptid' => '6',
+						'type' => 0,
 						'name' => 'API updated one script',
 						'command' => 'reboot server 1'
 					],
 					[
 						'scriptid' => '7',
+						'type' => 1,
 						'name' => 'API updated two script',
 						'command' => 'reboot server 2'
 					]
@@ -629,8 +874,8 @@ class testScripts extends CAPITest {
 				$this->assertEquals($dbRow['groupid'], 0);
 				$this->assertEquals($dbRow['description'], '');
 				$this->assertEquals($dbRow['confirmation'], '');
-				$this->assertEquals($dbRow['type'], 5);
 				$this->assertEquals($dbRow['execute_on'], 2);
+				$this->assertEquals($dbRow['type'], array_key_exists('type', $scripts[$key]) ? $scripts[$key]['type'] : 0);
 			}
 		}
 		else {
@@ -755,43 +1000,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Host group with ID "123456" is not available.'
 			],
-			// Check type.
-			[
-				'script' => [
-					'name' => 'API empty type',
-					'type' => 0,
-					'command' => 'reboot server',
-					'type' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API type string',
-					'type' => 0,
-					'command' => 'reboot server',
-					'type' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API invalid type',
-					'type' => 0,
-					'command' => 'reboot server',
-					'type' => '1.1'
-				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API nonexistent type',
-					'type' => 0,
-					'command' => 'reboot server',
-					'type' => '2'
-				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 5.'
-			],
 			// Check execute_on.
 			[
 				'script' => [
@@ -832,18 +1040,75 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API IPMI execute_on agent',
-					'type' => 0,
 					'command' => 'reboot server',
 					'type' => '1',
 					'execute_on' => '0'
 				],
 				'expected_error' => 'Only scripts of type "Script" can be executed by agent.'
 			],
+			// Webhook parameters.
+			[
+				'script' => [
+					'name' => 'Webhook validation with params',
+					'type' => 5,
+					'command' => 'Script command',
+					'parameters' => [
+						[
+							'name' => 'param1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'param1',
+							'value' => 'value1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/2": value (name)=(param1) already exists.'
+			],
+			[
+				'script' => [
+					'name' => 'Webhook validation with params',
+					'type' => 5,
+					'command' => 'Script command',
+					'parameters' => [
+						[
+							'name' => '',
+							'value' => 'value1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+			],
+			[
+				'script' => [
+					'name' => 'Webhook validation with params',
+					'type' => 5,
+					'command' => 'Script command',
+					'parameters' => [
+						[
+							'value' => 'value1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "name" is missing.'
+			],
+			[
+				'script' => [
+					'name' => 'Webhook validation with params',
+					'type' => 5,
+					'command' => 'Script command',
+					'parameters' => [
+						[
+							'name' => 'name1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "value" is missing.'
+			],
 			// Check successfully creation and update with all properties.
 			[
 				'script' => [
 						'name' => 'API script with all properties',
-						'type' => 0,
 						'command' => 'reboot agent',
 						'host_access' => '3',
 						'usrgrpid' => '13',
@@ -852,6 +1117,46 @@ class testScripts extends CAPITest {
 						'confirmation' => 'Do you want to reboot it?',
 						'type' => '0',
 						'execute_on' => '0'
+				],
+				'expected_error' => null
+			],
+			[
+				'script' => [
+					'name' => 'Create webhook script with params',
+					'type' => 5,
+					'command' => 'Script command',
+					'host_access' => '3',
+					'usrgrpid' => '13',
+					'groupid' => '50005',
+					'description' => 'Check successfully creation or update with all properties',
+					'confirmation' => 'Do you want to reboot it?',
+					'execute_on' => '1',
+					'parameters' => [
+						[
+							'name' => '!@#$%^&*()_+<>,.\/',
+							'value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'name' => str_repeat('n', 255),
+							'value' => str_repeat('v', 2048)
+						],
+						[
+							'name' => '{$MACRO:A}',
+							'value' => '{$MACRO:A}'
+						],
+						[
+							'name' => '{$USERMACRO}',
+							'value' => ''
+						],
+						[
+							'name' => '{HOST.HOST}',
+							'value' => '{EVENT.NAME}'
+						],
+						[
+							'name' => 'Имя',
+							'value' => 'Значение'
+						]
+					]
 				],
 				'expected_error' => null
 			]

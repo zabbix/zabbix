@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-12-28T07:14:50Z'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -583,6 +583,28 @@ zabbix_export:
           macro: '{$MS.EXCHANGE.RPC.WARN}'
           value: '0.05'
           description: 'Threshold for RPC requests latency trigger.'
+      valuemaps:
+        -
+          name: 'Exchange database copy role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Passive
+            -
+              value: '1'
+              newvalue: Active
+        -
+          name: 'Exchange database state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Dismounted
+            -
+              value: '1'
+              newvalue: Mounted
+            -
+              value: '2'
+              newvalue: Healthy
   graphs:
     -
       name: 'MS Exchange [Client Access Server]: Request rate'
@@ -610,25 +632,3 @@ zabbix_export:
           item:
             host: 'Microsoft Exchange Server 2016 by Zabbix agent'
             key: 'perf_counter_en["\MSExchangeWS\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
-  value_maps:
-    -
-      name: 'Exchange database copy role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Passive
-        -
-          value: '1'
-          newvalue: Active
-    -
-      name: 'Exchange database state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Dismounted
-        -
-          value: '1'
-          newvalue: Mounted
-        -
-          value: '2'
-          newvalue: Healthy

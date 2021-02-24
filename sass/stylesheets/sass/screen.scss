@@ -532,6 +532,7 @@ form {
 			.link-action {
 				height: 16px;
 				min-width: 1em;
+				@extend %overflow-ellipsis;
 			}
 
 			.separator {
@@ -7199,7 +7200,6 @@ $range-input-width: 31px;
 // Macros mass update tab.
 
 .checkbox-block {
-	display: none;
 	margin: 10px 0;
 }
 
@@ -7462,5 +7462,33 @@ z-select,
 		color: $font-color;
 		background-color: $form-bg-color !important;
 		border-color: $form-border-color;
+	}
+}
+
+.valuemap-list-table {
+	tbody {
+		td {
+			border-bottom: 1px solid $table-border-color;
+
+			&.wordwrap {
+				white-space: normal;
+			}
+		}
+
+		tr:first-child td {
+			border-top: 1px solid $table-border-color;
+		}
+	}
+}
+
+.valuemap-checkbox {
+	margin-top: 10px;
+}
+
+.overlay-dialogue {
+	.valuemap-list-table {
+		td {
+			vertical-align: top;
+		}
 	}
 }

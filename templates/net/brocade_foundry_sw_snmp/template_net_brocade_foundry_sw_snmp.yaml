@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:29Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -306,6 +306,31 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      valuemaps:
+        -
+          name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: failure
+        -
+          name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: failure
     -
       template: 'Brocade_Foundry Performance SNMP'
       name: 'Brocade_Foundry Performance SNMP'
@@ -660,6 +685,31 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      valuemaps:
+        -
+          name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: failure
+        -
+          name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: failure
   graphs:
     -
       name: 'CPU utilization'
@@ -683,28 +733,3 @@ zabbix_export:
           item:
             host: 'Brocade_Foundry Performance SNMP'
             key: 'vm.memory.util[snAgGblDynMemUtil.0]'
-  value_maps:
-    -
-      name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: normal
-        -
-          value: '3'
-          newvalue: failure
-    -
-      name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: normal
-        -
-          value: '3'
-          newvalue: failure

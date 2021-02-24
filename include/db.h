@@ -504,6 +504,10 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
 void	DBcheck_capabilities(void);
 
+#ifdef HAVE_POSTGRESQL
+char	*zbx_db_get_schema_esc(void);
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Type: ZBX_GRAPH_ITEMS                                                      *

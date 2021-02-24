@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:42Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -471,19 +471,19 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN:"Ambient"}'
           value: '30'
-  value_maps:
-    -
-      name: 'IMM-MIB::systemHealthStat'
-      mappings:
+      valuemaps:
         -
-          value: '0'
-          newvalue: nonRecoverable
-        -
-          value: '2'
-          newvalue: critical
-        -
-          value: '4'
-          newvalue: nonCritical
-        -
-          value: '255'
-          newvalue: normal
+          name: 'IMM-MIB::systemHealthStat'
+          mappings:
+            -
+              value: '0'
+              newvalue: nonRecoverable
+            -
+              value: '2'
+              newvalue: critical
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '255'
+              newvalue: normal

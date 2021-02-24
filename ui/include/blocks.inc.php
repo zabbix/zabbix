@@ -49,6 +49,7 @@ function getSystemStatusData(array $filter) {
 		: EXTACK_OPTION_ALL;
 	$filter_evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
 	$filter_tags = array_key_exists('tags', $filter) ? $filter['tags'] : [];
+	$show_opdata = array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 		if ($filter_hostids === null) {
@@ -167,21 +168,37 @@ function getSystemStatusData(array $filter) {
 			'output' => ['priority', 'manual_close'],
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['name'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'triggerids' => array_keys($triggerids),
 			'monitored' => true,
 			'skipDependent' => true,
 			'preservekeys' => true
 		];
 
-		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
-			$options['output'] = array_merge(
-				$options['output'],
-				['url', 'expression', 'recovery_mode', 'recovery_expression', 'opdata']
+		if ($show_opdata) {
+			$options['selectFunctions'] = ['itemid'];
+			$options['output'] = array_merge($options['output'],
+				['expression', 'recovery_mode', 'recovery_expression', 'opdata']
 			);
 		}
 
 		$data['triggers'] = API::Trigger()->get($options);
+
+		if ($show_opdata && $data['triggers']) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+				'selectValueMap' => ['mappings'],
+				'triggerids' => array_keys($data['triggers']),
+				'preservekeys' => true
+			]);
+
+			foreach ($data['triggers'] as &$trigger) {
+				foreach ($trigger['functions'] as $function) {
+					$trigger['items'][] = $items[$function['itemid']];
+				}
+				unset($trigger['functions']);
+			}
+			unset($trigger);
+		}
 
 		foreach ($data['triggers'] as &$trigger) {
 			CArrayHelper::sort($trigger['hosts'], [['field' => 'name', 'order' => ZBX_SORT_UP]]);

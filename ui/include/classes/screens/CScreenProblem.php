@@ -157,6 +157,7 @@ class CScreenProblem extends CScreenBase {
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
 			? $filter['triggerids']
 			: null;
+		$show_opdata = array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 			if ($filter_hostids === null) {
@@ -306,15 +307,11 @@ class CScreenProblem extends CScreenBase {
 						'preservekeys' => true
 					];
 
-					$show_opdata = (array_key_exists('show_opdata', $filter)
-							&& $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE);
-
 					$details = (array_key_exists('details', $filter) && $filter['details'] == 1);
 
 					if ($show_opdata) {
 						$options['output'][] = 'opdata';
-						$options['selectItems'] =
-							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
+						$options['selectFunctions'] = ['itemid'];
 					}
 
 					if ($resolve_comments || $resolve_urls || $show_opdata || $details) {
@@ -350,6 +347,23 @@ class CScreenProblem extends CScreenBase {
 		$data['problems'] = array_slice($data['problems'], 0, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
 			true
 		);
+
+		if ($show_opdata && $data['triggers']) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+				'selectValueMap' => ['mappings'],
+				'triggerids' => array_keys($data['triggers']),
+				'preservekeys' => true
+			]);
+
+			foreach ($data['triggers'] as &$trigger) {
+				foreach ($trigger['functions'] as $function) {
+					$trigger['items'][] = $items[$function['itemid']];
+				}
+				unset($trigger['functions']);
+			}
+			unset($trigger);
+		}
 
 		return $data;
 	}

@@ -772,7 +772,9 @@ class CDiscoveryRule extends CItemGeneral {
 			['sources' => ['expression', 'recovery_expression']]
 		);
 		foreach ($dstTriggers as $id => &$trigger) {
-			unset($trigger['triggerid'], $trigger['templateid']);
+			unset($trigger['triggerid'], $trigger['templateid'], $trigger['hosts'], $trigger['functions'],
+				$trigger['items'], $trigger['discoveryRule']
+			);
 
 			// Update the destination expressions.
 			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],
@@ -2200,12 +2202,29 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectValueMap' => ['name'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);
 		$new_itemids = [];
 		$itemkey_to_id = [];
 		$create_items = [];
+		$src_valuemap_names = [];
+		$valuemap_map = [];
+
+		foreach ($item_prototypes as $item_prototype) {
+			if ($item_prototype['valuemap']) {
+				$src_valuemap_names[] = $item_prototype['valuemap']['name'];
+			}
+		}
+
+		if ($src_valuemap_names) {
+			$valuemap_map = array_column(API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'hostids' => $dstHost['hostid'],
+				'filter' => ['name' => $src_valuemap_names]
+			]), 'valuemapid', 'name');
+		}
 
 		if ($item_prototypes) {
 			$create_order = [];
@@ -2291,6 +2310,12 @@ class CDiscoveryRule extends CItemGeneral {
 				$item_prototype = $item_prototypes[$key];
 				$item_prototype['ruleid'] = $dstDiscovery['itemid'];
 				$item_prototype['hostid'] = $dstDiscovery['hostid'];
+
+				if ($item_prototype['valuemapid'] != 0) {
+					$item_prototype['valuemapid'] = array_key_exists($item_prototype['valuemap']['name'], $valuemap_map)
+						? $valuemap_map[$item_prototype['valuemap']['name']]
+						: 0;
+				}
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
