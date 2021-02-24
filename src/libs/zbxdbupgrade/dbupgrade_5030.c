@@ -905,7 +905,10 @@ static int	DBpatch_5030050(void)
 	return SUCCEED;
 }
 
-
+static int	DBpatch_5030051(void)
+{
+	return DBdrop_field("config", "compression_availability");
+}
 #endif
 
 DBPATCH_START(5030)
@@ -963,5 +966,6 @@ DBPATCH_ADD(5030047, 0, 1)
 DBPATCH_ADD(5030048, 0, 1)
 DBPATCH_ADD(5030049, 0, 1)
 DBPATCH_ADD(5030050, 0, 1)
+DBPATCH_ADD(5030051, 0, 1)
 
 DBPATCH_END()
