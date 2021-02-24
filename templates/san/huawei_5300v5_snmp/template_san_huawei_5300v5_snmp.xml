@@ -96,10 +96,6 @@ Template tooling version used: 0.38</description>
                             <type>MULTIPLIER</type>
                             <params>1048576</params>
                         </step>
-                        <step>
-                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>10m</params>
-                        </step>
                     </preprocessing>
                 </item>
                 <item>
@@ -466,12 +462,6 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                                     <name>Disk {#MODEL}</name>
                                 </application_prototype>
                             </application_prototypes>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>10m</params>
-                                </step>
-                            </preprocessing>
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{min({$HUAWEI.5300.DISK.TEMP.MAX.TIME})}&gt;{$HUAWEI.5300.DISK.TEMP.MAX.WARN:&quot;{#MODEL}&quot;}</expression>
@@ -564,12 +554,6 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                                     <name>Enclosure {#NAME}</name>
                                 </application_prototype>
                             </application_prototypes>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>10m</params>
-                                </step>
-                            </preprocessing>
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{min({$HUAWEI.5300.TEMP.MAX.TIME})}&gt;{$HUAWEI.5300.TEMP.MAX.WARN}</expression>
