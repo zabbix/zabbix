@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestLogout();
 		$this->zbxTestWaitForPageToLoad();
 		$this->webDriver->manage()->deleteAllCookies();
-		$userid = DBfetch(DBselect('SELECT userid FROM users WHERE alias='. zbx_dbstr($this->user)));
+		$userid = DBfetch(DBselect('SELECT userid FROM users WHERE username='. zbx_dbstr($this->user)));
 		$this->assertFalse(empty($userid));
 		$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b54f', $userid['userid']);
 	}

@@ -1,0 +1,1563 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-02-02T13:28:33Z'
+  groups:
+    -
+      name: 'Templates/Video surveillance'
+  templates:
+    -
+      template: 'Hikvision camera by HTTP'
+      name: 'Hikvision camera by HTTP'
+      description: 'Template tooling version used: 0.38'
+      groups:
+        -
+          name: 'Templates/Video surveillance'
+      applications:
+        -
+          name: CPU
+        -
+          name: 'Hikvision camera'
+        -
+          name: Memory
+        -
+          name: Status
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Hikvision camera: Boot loader released date'
+          type: DEPENDENT
+          key: hikvision_cam.boot_released_date
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.bootReleasedDate
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Boot loader version'
+          type: DEPENDENT
+          key: hikvision_cam.boot_version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: SOFTWARE_APP_E
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.bootVersion
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: CPU utilization'
+          type: DEPENDENT
+          key: hikvision_cam.cpu.util
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'CPU utilization in %'
+          applications:
+            -
+              name: CPU
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceStatus.CPUList.CPU.cpuUtilization
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: hikvision_cam.get_status
+          triggers:
+            -
+              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              name: 'Hikvision camera: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          name: 'Hikvision camera: Current device time'
+          type: DEPENDENT
+          key: hikvision_cam.current_device_time
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceStatus.currentDeviceTime
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hikvision_cam.get_status
+        -
+          name: 'Hikvision camera: Device description'
+          type: DEPENDENT
+          key: hikvision_cam.device_description
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: NOTES
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.deviceDescription
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Device ID'
+          type: DEPENDENT
+          key: hikvision_cam.device_id
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.deviceID
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Device location'
+          type: DEPENDENT
+          key: hikvision_cam.device_location
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: LOCATION
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.deviceLocation
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Device name'
+          type: DEPENDENT
+          key: hikvision_cam.device_name
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: NAME
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.deviceName
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Device type'
+          type: DEPENDENT
+          key: hikvision_cam.device_type
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: TYPE
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.deviceType
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Encoder released date'
+          type: DEPENDENT
+          key: hikvision_cam.encoder_released_date
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: SOFTWARE_APP_D
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.encoderReleasedDate
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Encoder version'
+          type: DEPENDENT
+          key: hikvision_cam.encoder_version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: SOFTWARE_APP_C
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.encoderVersion
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Firmware released date'
+          type: DEPENDENT
+          key: hikvision_cam.firmware_released_date
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: SOFTWARE_APP_B
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.firmwareReleasedDate
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Firmware version'
+          type: DEPENDENT
+          key: hikvision_cam.firmware_version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: SOFTWARE_APP_A
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.firmwareVersion
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Hikvision camera: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Hikvision camera version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Hikvision camera: Get device info'
+          type: HTTP_AGENT
+          key: hikvision_cam.get_info
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$USER}'
+          password: '{$PASSWORD}'
+          description: 'Used to get the device information'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
+            -
+              type: XML_TO_JSON
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
+          url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/System/deviceInfo'
+          status_codes: '200,401'
+        -
+          name: 'Hikvision camera: Get device info: Login status'
+          type: DEPENDENT
+          key: hikvision_cam.get_info.login_status
+          delay: '0'
+          history: 7d
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'Login status'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  
+                  if ("html" in data){
+                      if (data.html.head.title === "Document Error: Unauthorized")
+                         {return 1}
+                      else if (data.html.head.title === "Connection error")
+                         {return 2}
+                  }
+                  return 0;
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Get system status'
+          type: HTTP_AGENT
+          key: hikvision_cam.get_status
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$USER}'
+          password: '{$PASSWORD}'
+          description: 'It is used to get the status information of the device'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
+            -
+              type: XML_TO_JSON
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
+          url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/System/status'
+          status_codes: '200,401'
+        -
+          name: 'Hikvision camera: Get system status: Login status'
+          type: DEPENDENT
+          key: hikvision_cam.get_status.login_status
+          delay: '0'
+          history: 7d
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'Login status'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  
+                  if ("html" in data){
+                      if (data.html.head.title === "Document Error: Unauthorized")
+                         {return 1}
+                      else if (data.html.head.title === "Connection error")
+                         {return 2}
+                  }
+                  return 0;
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: hikvision_cam.get_streaming
+        -
+          name: 'Hikvision camera: Get streaming channels'
+          type: HTTP_AGENT
+          key: hikvision_cam.get_streaming
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$USER}'
+          password: '{$PASSWORD}'
+          description: 'Used to get the properties of streaming channels for the device'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
+            -
+              type: XML_TO_JSON
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
+          url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/Streaming/channels'
+          status_codes: '200,401'
+        -
+          name: 'Hikvision camera: Get streaming channels: Login status'
+          type: DEPENDENT
+          key: hikvision_cam.get_streaming.login_status
+          delay: '0'
+          history: 7d
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'Login status'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  
+                  if ("html" in data){
+                      if (data.html.head.title === "Document Error: Unauthorized")
+                         {return 1}
+                      else if (data.html.head.title === "Connection error")
+                         {return 2}
+                  }
+                  return 0;
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: hikvision_cam.get_streaming
+        -
+          name: 'Hikvision camera: Hardware version'
+          type: DEPENDENT
+          key: hikvision_cam.hardware_version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.hardwareVersion
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: MACaddress'
+          type: DEPENDENT
+          key: hikvision_cam.mac_address
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: MACADDRESS_A
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.macAddress
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Memory utilization'
+          type: DEPENDENT
+          key: hikvision_cam.memory.usage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Memory utilization in %'
+          applications:
+            -
+              name: Memory
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceStatus.MemoryList.Memory.memoryUsage
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: hikvision_cam.get_status
+          triggers:
+            -
+              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              name: 'Hikvision camera: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+        -
+          name: 'Hikvision camera: Model'
+          type: DEPENDENT
+          key: hikvision_cam.model
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: MODEL
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.model
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Serial number'
+          type: DEPENDENT
+          key: hikvision_cam.serial_number
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: SERIALNO_A
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.serialNumber
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Hikvision camera: Camera has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Camera serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Hikvision camera: Supported beep'
+          type: DEPENDENT
+          key: hikvision_cam.support_beep
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.supportBeep
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Supported video loss'
+          type: DEPENDENT
+          key: hikvision_cam.support_video_loss
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.supportVideoLoss
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: System contact'
+          type: DEPENDENT
+          key: hikvision_cam.system_contact
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: CONTACT
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.systemContact
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Telecontrol ID'
+          type: DEPENDENT
+          key: hikvision_cam.telecontrol_id
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Hikvision camera'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceInfo.telecontrolID
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: hikvision_cam.get_info
+        -
+          name: 'Hikvision camera: Uptime'
+          type: DEPENDENT
+          key: hikvision_cam.uptime
+          delay: '0'
+          history: 7d
+          trends: '0'
+          units: uptime
+          description: 'System uptime in ''N days, hh:mm:ss'' format.'
+          applications:
+            -
+              name: Status
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.DeviceStatus.deviceUpTime
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hikvision_cam.get_status
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'Hikvision camera: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'PTZ discovery'
+          type: HTTP_AGENT
+          key: hikvision_cam.ptz.discovery
+          delay: 1d
+          authtype: DIGEST
+          username: '{$USER}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: 'Hikvision camera: Get PTZ info: Channel "{#PTZ_CHANNEL_ID}": Login status'
+              type: DEPENDENT
+              key: 'hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              valuemap:
+                name: 'Login status'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var data = JSON.parse(value);
+                      
+                      if ("html" in data){
+                          if (data.html.head.title === "Document Error: Unauthorized")
+                             {return 1}
+                          else if (data.html.head.title === "Connection error")
+                             {return 2}
+                      }
+                      return 0;
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=1'
+                  name: 'Hikvision camera:Authorisation error on get PTZ channels'
+                  priority: WARNING
+                  description: 'Check the correctness of the authorization data'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Hikvision camera: Authorisation error'
+                      expression: |
+                        {Hikvision camera by HTTP:hikvision_cam.get_info.login_status.last()}=1 or
+                        {Hikvision camera by HTTP:hikvision_cam.get_streaming.login_status.last()}=1 or
+                        {Hikvision camera by HTTP:hikvision_cam.get_status.login_status.last()}=1
+                -
+                  expression: '{last()}=2'
+                  name: 'Hikvision camera: Error receiving data on PTZ channels'
+                  priority: WARNING
+                  description: 'Check the availability of the HTTP port'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Hikvision camera: Error receiving data'
+                      expression: |
+                        {Hikvision camera by HTTP:hikvision_cam.get_info.login_status.last()}=2 or
+                        {Hikvision camera by HTTP:hikvision_cam.get_streaming.login_status.last()}=2 or
+                        {Hikvision camera by HTTP:hikvision_cam.get_status.login_status.last()}=2
+            -
+              name: 'Hikvision camera: Get PTZ info'
+              type: HTTP_AGENT
+              key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              authtype: DIGEST
+              username: '{$USER}'
+              password: '{$PASSWORD}'
+              description: 'High precision positioning which is accurate to a bit after the decimal point'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
+                -
+                  type: XML_TO_JSON
+                  parameters:
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
+              url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/PTZCtrl/channels/{#PTZ_CHANNEL_ID}/status'
+              status_codes: '200,401'
+            -
+              name: 'Channel "{#PTZ_CHANNEL_ID}": Absolute zoom'
+              type: DEPENDENT
+              key: 'hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!x'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.PTZStatus.AbsoluteHigh.absoluteZoom
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+            -
+              name: 'Channel "{#PTZ_CHANNEL_ID}": Azimuth'
+              type: DEPENDENT
+              key: 'hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!°'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.PTZStatus.AbsoluteHigh.azimuth
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+            -
+              name: 'Channel "{#PTZ_CHANNEL_ID}": Elevation'
+              type: DEPENDENT
+              key: 'hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!°'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.PTZStatus.AbsoluteHigh.elevation
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+          trigger_prototypes:
+            -
+              expression: |
+                {Hikvision camera by HTTP:hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}].diff()}=1 or 
+                {Hikvision camera by HTTP:hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}].diff()}=1 or 
+                {Hikvision camera by HTTP:hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}].diff()}=1
+              name: 'Channel "{#PTZ_CHANNEL_ID}": PTZ position changed'
+              priority: INFO
+              description: 'The direction of the camera has changed'
+              manual_close: 'YES'
+          url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/PTZCtrl/channels'
+          status_codes: '200,401'
+          preprocessing:
+            -
+              type: XML_TO_JSON
+              parameters:
+                - ''
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  var out = [];
+                  
+                  if ("PTZChannel" in data.PTZChannelList) {
+                      out.push({
+                          "{#PTZ_CHANNEL_ID}": data.PTZChannelList.PTZChannel.id
+                      })
+                  }
+                  
+                  return JSON.stringify(out);
+        -
+          name: 'Streaming channels discovery'
+          type: HTTP_AGENT
+          key: hikvision_cam.streaming.discovery
+          delay: 1d
+          authtype: DIGEST
+          username: '{$USER}'
+          password: '{$PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#CHANNEL_ENABLED}'
+                value: 'true'
+                formulaid: A
+          item_prototypes:
+            -
+              name: 'Channel "{#CHANNEL_ID}": Constant bitRate'
+              type: DEPENDENT
+              key: 'hikvision_cam.constant_bit_rate[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              units: '!kbit/s'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.constantBitRate'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Fixed quality'
+              type: DEPENDENT
+              key: 'hikvision_cam.fixed_quality[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              units: '%'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.fixedQuality'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": GovLength'
+              type: DEPENDENT
+              key: 'hikvision_cam.gov_length[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.GovLength'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": H264Profile'
+              type: DEPENDENT
+              key: 'hikvision_cam.h264Profile[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.H264Profile'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Key frame interval'
+              type: DEPENDENT
+              key: 'hikvision_cam.key_frame_interval[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.keyFrameInterval'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Frame rate (max)'
+              type: DEPENDENT
+              key: 'hikvision_cam.max_frame_rate[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              units: '!fps'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.maxFrameRate'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Smoothing'
+              type: DEPENDENT
+              key: 'hikvision_cam.smoothing[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.smoothing'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Snapshot image type'
+              type: DEPENDENT
+              key: 'hikvision_cam.snap_shot_image_type[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.snapShotImageType'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": VBR lower'
+              type: DEPENDENT
+              key: 'hikvision_cam.vbr_lower_cap[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              units: '!kbit/s'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.vbrLowerCap'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": VBR upper'
+              type: DEPENDENT
+              key: 'hikvision_cam.vbr_upper_cap[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              units: '!kbit/s'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.vbrUpperCap'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Video codec type'
+              type: DEPENDENT
+              key: 'hikvision_cam.video_codec_type[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoCodecType'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Video quality control type'
+              type: DEPENDENT
+              key: 'hikvision_cam.video_quality_control_type[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoQualityControlType'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Resolution height'
+              type: DEPENDENT
+              key: 'hikvision_cam.video_resolution_height[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              units: '!px'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoResolutionHeight'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Resolution width'
+              type: DEPENDENT
+              key: 'hikvision_cam.video_resolution_width[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              units: '!px'
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoResolutionWidth'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+            -
+              name: 'Channel "{#CHANNEL_ID}": Video scan type'
+              type: DEPENDENT
+              key: 'hikvision_cam.video_scan_type[{#CHANNEL_ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              application_prototypes:
+                -
+                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoScanType'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[0]'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hikvision_cam.get_streaming
+          trigger_prototypes:
+            -
+              expression: |
+                {Hikvision camera by HTTP:hikvision_cam.video_resolution_height[{#CHANNEL_ID}].last()}<>{$HIKVISION_STREAM_HEIGHT} or
+                {Hikvision camera by HTTP:hikvision_cam.video_resolution_width[{#CHANNEL_ID}].last()}<>{$HIKVISION_STREAM_WIDTH}
+              name: 'Channel "{#CHANNEL_ID}": Invalid video stream resolution parameters'
+              priority: WARNING
+              description: |
+                expected: {$HIKVISION_STREAM_WIDTH} px x {$HIKVISION_STREAM_HEIGHT} px
+                received: {ITEM.LASTVALUE2} x {ITEM.LASTVALUE1}
+              manual_close: 'YES'
+            -
+              expression: |
+                {Hikvision camera by HTTP:hikvision_cam.fixed_quality[{#CHANNEL_ID}].diff()}=1 or
+                {Hikvision camera by HTTP:hikvision_cam.constant_bit_rate[{#CHANNEL_ID}].diff()}=1 or
+                {Hikvision camera by HTTP:hikvision_cam.video_quality_control_type[{#CHANNEL_ID}].diff()}=1 or
+                {Hikvision camera by HTTP:hikvision_cam.video_resolution_width[{#CHANNEL_ID}].diff()}=1 or
+                {Hikvision camera by HTTP:hikvision_cam.video_resolution_height[{#CHANNEL_ID}].diff()}=1
+              name: 'Channel "{#CHANNEL_ID}": Parameters of video stream are changed'
+              priority: INFO
+              manual_close: 'YES'
+          url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/Streaming/channels'
+          status_codes: '200,401'
+          preprocessing:
+            -
+              type: XML_TO_JSON
+              parameters:
+                - ''
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  var out = [];
+                  
+                  data.StreamingChannelList.StreamingChannel.forEach(function (field) {
+                      out.push({
+                          "{#CHANNEL_ID}": field.id,
+                          "{#CHANNEL_NAME}": field.channelName,
+                          "{#CHANNEL_ENABLED}": field.enabled
+                      });
+                  })
+                  
+                  return JSON.stringify(out);
+          overrides:
+            -
+              name: 'trigger disabled non main channels'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#CHANNEL_ID}'
+                    value: '{$HIKVISION_MAIN_CHANNEL_ID}'
+                    operator: NOT_MATCHES_REGEX
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'Invalid video stream resolution parameters'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$HIKVISION_ISAPI_PORT}'
+          value: '80'
+          description: 'ISAPI port on device'
+        -
+          macro: '{$HIKVISION_MAIN_CHANNEL_ID}'
+          value: '101'
+          description: 'Main video stream ID'
+        -
+          macro: '{$HIKVISION_STREAM_HEIGHT}'
+          value: '1080'
+          description: 'Main video stream image height'
+        -
+          macro: '{$HIKVISION_STREAM_WIDTH}'
+          value: '1920'
+          description: 'Main video stream image width'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '95'
+        -
+          macro: '{$PASSWORD}'
+          type: SECRET_TEXT
+        -
+          macro: '{$USER}'
+          value: admin
+      valuemaps:
+        -
+          name: 'Login status'
+          mappings:
+            -
+              value: '0'
+              newvalue: OK
+            -
+              value: '1'
+              newvalue: Unauthorized
+            -
+              value: '2'
+              newvalue: 'Connection error'
+  triggers:
+    -
+      expression: |
+        {Hikvision camera by HTTP:hikvision_cam.get_info.login_status.last()}=1 or
+        {Hikvision camera by HTTP:hikvision_cam.get_streaming.login_status.last()}=1 or
+        {Hikvision camera by HTTP:hikvision_cam.get_status.login_status.last()}=1
+      name: 'Hikvision camera: Authorisation error'
+      priority: WARNING
+      description: 'Check the correctness of the authorization data'
+      manual_close: 'YES'
+    -
+      expression: |
+        {Hikvision camera by HTTP:hikvision_cam.get_info.login_status.last()}=2 or
+        {Hikvision camera by HTTP:hikvision_cam.get_streaming.login_status.last()}=2 or
+        {Hikvision camera by HTTP:hikvision_cam.get_status.login_status.last()}=2
+      name: 'Hikvision camera: Error receiving data'
+      priority: WARNING
+      description: 'Check the availability of the HTTP port'
+      manual_close: 'YES'
+  graphs:
+    -
+      name: 'Hikvision camera: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Hikvision camera by HTTP'
+            key: hikvision_cam.cpu.util
+    -
+      name: 'Hikvision camera: Memory'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Hikvision camera by HTTP'
+            key: hikvision_cam.memory.usage

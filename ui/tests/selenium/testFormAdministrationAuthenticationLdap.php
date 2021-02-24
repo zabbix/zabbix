@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	public function testFormAdministrationAuthenticationLdap_CheckSettings($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
-		$this->assertPageTitle('Configuration of authentication');
+		$this->page->assertTitle('Configuration of authentication');
 
 		$form = $this->query('name:form_auth')->asForm()->one();
 		$form->fill(['Default authentication' => 'LDAP']);

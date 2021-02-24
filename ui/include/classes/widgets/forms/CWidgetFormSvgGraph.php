@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -312,7 +312,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 				'jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");'.
 				'jQuery("[name^=\"severities[\"]", widget).prop("disabled", !on);'.
 				'jQuery("[name=\"evaltype\"]", widget).prop("disabled", !on);'.
-				'jQuery("input, button", jQuery("#tags_table_tags", widget)).prop("disabled", !on);'
+				'jQuery("input, button, z-select", jQuery("#tags_table_tags", widget)).prop("disabled", !on);'
 			);
 
 		if (array_key_exists('show_problems', $this->data)) {

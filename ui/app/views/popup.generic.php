@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,19 +218,19 @@ switch ($data['popup_type']) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
 					zbx_jsvalue($user['userid']).', '.$options['parentid'].');';
 
-			$alias = (new CLink($user['alias'], 'javascript:void(0);'))
+			$username = (new CLink($user['username'], 'javascript:void(0);'))
 				->setId('spanid'.$user['userid'])
 				->onClick($js_action.$js_action_onclick);
 
-			$table->addRow([$check_box, $alias, $user['name'], $user['surname']]);
+			$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
 
 			$entry = [];
 			$srcfld1 = $options['srcfld1'];
 			if ($srcfld1 === 'userid') {
 				$entry['id'] = $user['userid'];
 			}
-			elseif ($srcfld1 === 'alias') {
-				$entry['name'] = $user['alias'];
+			elseif ($srcfld1 === 'username') {
+				$entry['name'] = $user['username'];
 			}
 
 			$srcfld2 = $options['srcfld2'];
@@ -623,11 +623,68 @@ switch ($data['popup_type']) {
 			$table->addRow([
 				$check_box,
 				$description,
-				$script_execute_on,
-				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'))
+				$script_execute_on
 			]);
 		}
 		unset($data['table_records']);
+		break;
+
+	case 'valuemap_names':
+		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
+
+		foreach ($data['table_records'] as $valuemap) {
+			$table->addRow([
+				new CCheckBox('item['.$valuemap['id'].']', $valuemap['id']),
+				(new CLink($valuemap['name'], '#'))
+					->setId('spanid'.$valuemap['id'])
+					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick))
+			]);
+		}
+		break;
+
+	case 'valuemaps':
+		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
+
+		foreach ($data['table_records'] as $valuemap) {
+			$name = [];
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$valuemap['id'].']', $valuemap['id'])
+				: null;
+
+			$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
+			$name[] = NAME_DELIMITER;
+
+			if (array_key_exists('_disabled', $valuemap) && $valuemap['_disabled']) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+				$name[] = (new CSpan($valuemap['name']))->addClass(ZBX_STYLE_GREY);
+
+				unset($data['table_records'][$valuemap['id']]);
+			}
+			else {
+				$js_action = 'addValue('.json_encode($options['reference']).', '.
+					json_encode($valuemap['id']).', '.$options['parentid'].');';
+
+				$name[] = (new CLink($valuemap['name'], '#'))
+					->setId('spanid'.$valuemap['id'])
+					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick));
+			}
+
+			$span = [];
+
+			foreach (array_slice($valuemap['mappings'], 0, 3) as $mapping) {
+				$span[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
+				$span[] = BR();
+			}
+
+			if (count($valuemap['mappings']) > 3) {
+				$span[] = '&hellip;';
+			}
+
+			$table->addRow([$check_box, $name, $span]);
+		}
 		break;
 }
 
@@ -645,7 +702,7 @@ if ($data['multiselect'] && $form !== null) {
 
 // Types require results returned as array.
 $types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
-	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods'
+	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods', 'valuemaps'
 ];
 
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {

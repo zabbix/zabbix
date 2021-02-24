@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1180,6 +1180,7 @@ function make_trigger_details($trigger, $eventid) {
 		->addRow([
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
+				->addClass(ZBX_STYLE_WORDWRAP)
 				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid))
 			)
 		])

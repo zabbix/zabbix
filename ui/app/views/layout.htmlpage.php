@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ function local_showSidebar(array $data): void {
 function local_showFooter(array $data): void {
 	echo (new CPartial('layout.htmlpage.footer', [
 		'user' => [
-			'alias' => CWebUser::$data['alias'],
+			'username' => CWebUser::$data['username'],
 			'debug_mode' => CWebUser::$data['debug_mode']
 		],
 		'web_layout_mode' => $data['web_layout_mode']

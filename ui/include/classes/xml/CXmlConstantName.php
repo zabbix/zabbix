@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -198,10 +198,20 @@ class CXmlConstantName {
 
 
 	// const MD5 = 'MD5'; // Duplicate.
-	const SHA = 'SHA';
+	const SHA = 'SHA'; // Used before version 5.4 as interface "authprotocol" invariant.
+	const SHA1 = 'SHA1';
+	const SHA224 = 'SHA224';
+	const SHA256 = 'SHA256';
+	const SHA384 = 'SHA384';
+	const SHA512 = 'SHA512';
 
 	const DES = 'DES';
-	const AES = 'AES';
+	const AES = 'AES'; // Used in version 5.2 as interface "privprotocol" invariant.
+	const AES128 = 'AES128';
+	const AES192 = 'AES192';
+	const AES256 = 'AES256';
+	const AES192C = 'AES192C';
+	const AES256C = 'AES256C';
 
 	const NOAUTHNOPRIV = 'NOAUTHNOPRIV';
 	const AUTHNOPRIV = 'AUTHNOPRIV';
@@ -254,6 +264,8 @@ class CXmlConstantName {
 	const IN_RANGE = 'IN_RANGE';
 	const MATCHES_REGEX = 'MATCHES_REGEX';
 	const NOT_MATCHES_REGEX = 'NOT_MATCHES_REGEX';
+	const EXISTS = 'EXISTS';
+	const NOT_EXISTS = 'NOT_EXISTS';
 	const CHECK_JSON_ERROR = 'CHECK_JSON_ERROR';
 	const CHECK_XML_ERROR = 'CHECK_XML_ERROR';
 	const CHECK_REGEX_ERROR = 'CHECK_REGEX_ERROR';
@@ -265,6 +277,7 @@ class CXmlConstantName {
 	const PROMETHEUS_TO_JSON = 'PROMETHEUS_TO_JSON';
 	const CSV_TO_JSON = 'CSV_TO_JSON';
 	const STR_REPLACE = 'STR_REPLACE';
+	const XML_TO_JSON = 'XML_TO_JSON';
 
 	const AND_OR = 'AND_OR';
 	const XML_AND = 'AND';

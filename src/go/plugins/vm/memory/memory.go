@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@
 package memory
 
 import (
-	"errors"
-
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -
@@ -35,16 +34,20 @@ var impl Plugin
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 1 {
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	switch key {
 	case "vm.memory.size":
-		return p.exportVmMemorySize(params)
+		var mode string
+		if len(params) > 0 {
+			mode = params[0]
+		}
+
+		return p.exportVMMemorySize(mode)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-
 }
 
 func init() {

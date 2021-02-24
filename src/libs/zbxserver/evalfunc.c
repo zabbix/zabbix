@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2203,11 +2203,11 @@ static int	evaluate_STRLEN(char **value, DC_ITEM *item, const char *parameters, 
 		if (arg1 <= values.values_num)
 		{
 			size_t	sz, value_alloc = 0, value_offset = 0;
+			char	*hist_val;
 
-			if (ITEM_VALUE_TYPE_LOG == item->value_type)
-				sz = zbx_strlen_utf8(values.values[0].value.log->value);
-			else
-				sz = zbx_strlen_utf8(values.values[0].value.str);
+			hist_val = zbx_history_value2str_dyn(&values.values[arg1 - 1].value, item->value_type);
+			sz = zbx_strlen_utf8(hist_val);
+			zbx_free(hist_val);
 
 			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_SIZE_T, sz);
 			ret = SUCCEED;
@@ -3309,7 +3309,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	value_esc = DBdyn_escape_string(value);
 	result = DBselect(
 			"select newvalue"
-			" from mappings"
+			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64
 				" and value" ZBX_SQL_STRCMP,
 			valuemapid, ZBX_SQL_STRVAL_EQ(value_esc));

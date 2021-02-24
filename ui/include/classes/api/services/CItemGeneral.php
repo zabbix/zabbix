@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -606,6 +606,8 @@ abstract class CItemGeneral extends CApiService {
 			$this->validateItemPreprocessing($fullItem);
 		}
 		unset($item);
+
+		$this->validateValueMaps($items);
 
 		$this->checkExistingItems($items);
 	}
@@ -1244,12 +1246,16 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$type_validator = new CLimitedSetValidator(['values' => $this::$supported_preprocessing_types]);
+			$type_validator = new CLimitedSetValidator(['values' => static::SUPPORTED_PREPROCESSING_TYPES]);
 
 			$error_handler_validator = new CLimitedSetValidator([
 				'values' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
 					ZBX_PREPROC_FAIL_SET_ERROR
 				]
+			]);
+
+			$unsupported_error_handler_validator = new CLimitedSetValidator([
+				'values' => [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR]
 			]);
 
 			$prometheus_pattern_parser = new CPrometheusPatternParser(['usermacros' => true,
@@ -1446,6 +1452,7 @@ abstract class CItemGeneral extends CApiService {
 
 					case ZBX_PREPROC_DELTA_VALUE:
 					case ZBX_PREPROC_DELTA_SPEED:
+					case ZBX_PREPROC_XML_TO_JSON:
 						// Check if 'params' is empty, because it must be empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1457,12 +1464,15 @@ abstract class CItemGeneral extends CApiService {
 							);
 						}
 
-						// Check if one of the deltas (Delta per second or Delta value) already exists.
-						if ($delta) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
-						}
-						else {
-							$delta = true;
+						if ($preprocessing['type'] == ZBX_PREPROC_DELTA_VALUE
+								|| $preprocessing['type'] == ZBX_PREPROC_DELTA_SPEED) {
+							// Check if one of the deltas (Delta per second or Delta value) already exists.
+							if ($delta) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
+							}
+							else {
+								$delta = true;
+							}
 						}
 						break;
 
@@ -1652,6 +1662,43 @@ abstract class CItemGeneral extends CApiService {
 						}
 						break;
 
+					case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+						if (is_array($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif (!$unsupported_error_handler_validator->validate($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
+									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
+								)
+							);
+						}
+
+						if (is_array($preprocessing['error_handler_params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE
+								&& $preprocessing['error_handler_params'] !== ''
+								&& $preprocessing['error_handler_params'] !== null
+								&& $preprocessing['error_handler_params'] !== false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('should be empty')
+								)
+							);
+						}
+						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR
+								&& ($preprocessing['error_handler_params'] === ''
+									|| $preprocessing['error_handler_params'] === null
+									|| $preprocessing['error_handler_params'] === false)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('cannot be empty')
+								)
+							);
+						}
+						break;
+
 					default:
 						if (is_array($preprocessing['error_handler'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1746,37 +1793,98 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Update item pre-processing data in DB. Delete old records and create new ones.
 	 *
-	 * @param array $items                     An array of items.
-	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
+	 * @param array  $items
+	 * @param string $items[]['itemid']
+	 * @param array  $items[]['preprocessing']
+	 * @param int    $items[]['preprocessing'][]['type']
+	 * @param string $items[]['preprocessing'][]['params']
+	 * @param int    $items[]['preprocessing'][]['error_handler']
+	 * @param string $items[]['preprocessing'][]['error_handler_params']
 	 */
 	protected function updateItemPreprocessing(array $items) {
-		$item_preproc = [];
-		$item_preprocids = [];
+		$item_preprocs = [];
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
-				$item_preprocids[] = $item['itemid'];
+				$item_preprocs[$item['itemid']] = [];
 				$step = 1;
 
-				foreach ($item['preprocessing'] as $preprocessing) {
-					$item_preproc[] = [
-						'itemid' => $item['itemid'],
-						'step' => $preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++,
-						'type' => $preprocessing['type'],
-						'params' => $preprocessing['params'],
-						'error_handler' => $preprocessing['error_handler'],
-						'error_handler_params' => $preprocessing['error_handler_params']
+				foreach ($item['preprocessing'] as $item_preproc) {
+					$curr_step = $item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++;
+					$item_preprocs[$item['itemid']][$curr_step] = [
+						'type' => $item_preproc['type'],
+						'params' => $item_preproc['params'],
+						'error_handler' => $item_preproc['error_handler'],
+						'error_handler_params' => $item_preproc['error_handler_params']
 					];
 				}
 			}
 		}
 
-		if ($item_preprocids) {
-			DB::delete('item_preproc', ['itemid' => $item_preprocids]);
+		if (!$item_preprocs) {
+			return;
 		}
 
-		if ($item_preproc) {
-			DB::insertBatch('item_preproc', $item_preproc);
+		$ins_item_preprocs = [];
+		$upd_item_preprocs = [];
+		$del_item_preprocids = [];
+
+		$options = [
+			'output' => ['item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'],
+			'filter' => ['itemid' => array_keys($item_preprocs)]
+		];
+		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
+
+		while ($db_item_preproc = DBfetch($db_item_preprocs)) {
+			if (array_key_exists($db_item_preproc['step'], $item_preprocs[$db_item_preproc['itemid']])) {
+				$item_preproc = $item_preprocs[$db_item_preproc['itemid']][$db_item_preproc['step']];
+				$upd_item_preproc = [];
+
+				if ($item_preproc['type'] != $db_item_preproc['type']) {
+					$upd_item_preproc['type'] = $item_preproc['type'];
+				}
+				if ($item_preproc['params'] !== $db_item_preproc['params']) {
+					$upd_item_preproc['params'] = $item_preproc['params'];
+				}
+				if ($item_preproc['error_handler'] != $db_item_preproc['error_handler']) {
+					$upd_item_preproc['error_handler'] = $item_preproc['error_handler'];
+				}
+				if ($item_preproc['error_handler_params'] !== $db_item_preproc['error_handler_params']) {
+					$upd_item_preproc['error_handler_params'] = $item_preproc['error_handler_params'];
+				}
+
+				if ($upd_item_preproc) {
+					$upd_item_preprocs[] = [
+						'values' => $upd_item_preproc,
+						'where' => ['item_preprocid' => $db_item_preproc['item_preprocid']]
+					];
+				}
+				unset($item_preprocs[$db_item_preproc['itemid']][$db_item_preproc['step']]);
+			}
+			else {
+				$del_item_preprocids[] = $db_item_preproc['item_preprocid'];
+			}
+		}
+
+		foreach ($item_preprocs as $itemid => $preprocs) {
+			foreach ($preprocs as $step => $preproc) {
+				$ins_item_preprocs[] = [
+					'itemid' => $itemid,
+					'step' => $step
+				] + $preproc;
+			}
+		}
+
+		if ($del_item_preprocids) {
+			DB::delete('item_preproc', ['item_preprocid' => $del_item_preprocids]);
+		}
+
+		if ($upd_item_preprocs) {
+			DB::update('item_preproc', $upd_item_preprocs);
+		}
+
+		if ($ins_item_preprocs) {
+			DB::insertBatch('item_preproc', $ins_item_preprocs);
 		}
 	}
 
@@ -1979,6 +2087,50 @@ abstract class CItemGeneral extends CApiService {
 					$result[$itemid]['preprocessing'][] = $step;
 				}
 			}
+		}
+
+		// Add value mapping.
+		if (($this instanceof CItemPrototype || $this instanceof CItem) && $options['selectValueMap'] !== null) {
+			if ($options['selectValueMap'] === API_OUTPUT_EXTEND) {
+				$options['selectValueMap'] = ['valuemapid', 'name', 'mappings'];
+			}
+
+			foreach ($result as &$item) {
+				$item['valuemap'] = [];
+			}
+			unset($item);
+
+			$valuemaps = DB::select('valuemap', [
+				'output' => array_diff($this->outputExtend($options['selectValueMap'], ['valuemapid', 'hostid']),
+					['mappings']
+				),
+				'filter' => ['valuemapid' => array_keys(array_flip(array_column($result, 'valuemapid')))],
+				'preservekeys' => true
+			]);
+
+			if ($this->outputIsRequested('mappings', $options['selectValueMap']) && $valuemaps) {
+				$params = [
+					'output' => ['valuemapid', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)]
+				];
+				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
+
+				while ($mapping = DBfetch($query)) {
+					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'value' => $mapping['value'],
+						'newvalue' => $mapping['newvalue']
+					];
+				}
+			}
+
+			foreach ($result as &$item) {
+				if (array_key_exists('valuemapid', $item) && array_key_exists($item['valuemapid'], $valuemaps)) {
+					$item['valuemap'] = array_intersect_key($valuemaps[$item['valuemapid']],
+						array_flip($options['selectValueMap'])
+					);
+				}
+			}
+			unset($item);
 		}
 
 		if (!$options['countOutput'] && $this->outputIsRequested('parameters', $options['output'])) {
@@ -2588,5 +2740,51 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Check that valuemap belong to same host as item.
+	 *
+	 * @param array $items
+	 */
+	protected function validateValueMaps(array $items): void {
+		$valuemapids_by_hostid = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != 0) {
+				$valuemapids_by_hostid[$item['hostid']][$item['valuemapid']] = true;
+			}
+		}
+
+		$sql_where = [];
+		foreach ($valuemapids_by_hostid as $hostid => $valuemapids) {
+			$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
+				dbConditionId('vm.valuemapid', array_keys($valuemapids)).')';
+		}
+
+		if ($sql_where) {
+			$result = DBselect(
+				'SELECT vm.valuemapid,vm.hostid'.
+				' FROM valuemap vm'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+			while ($row = DBfetch($result)) {
+				unset($valuemapids_by_hostid[$row['hostid']][$row['valuemapid']]);
+
+				if (!$valuemapids_by_hostid[$row['hostid']]) {
+					unset($valuemapids_by_hostid[$row['hostid']]);
+				}
+			}
+
+			if ($valuemapids_by_hostid) {
+				$hostid = key($valuemapids_by_hostid);
+				$valuemapid = key($valuemapids_by_hostid[$hostid]);
+
+				$host_row = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
+					$valuemapid, $host_row['host']
+				));
+			}
+		}
 	}
 }

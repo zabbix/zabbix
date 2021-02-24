@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -232,10 +232,10 @@ class CControllerActionOperationGet extends CController {
 			$users = [];
 			if ($operation['opmessage_usr']) {
 				$db_users = API::User()->get([
-					'output' => ['userid', 'alias', 'name', 'surname'],
+					'output' => ['userid', 'username', 'name', 'surname'],
 					'userids' => array_column($operation['opmessage_usr'], 'userid')
 				]);
-				CArrayHelper::sort($db_users, ['alias']);
+				CArrayHelper::sort($db_users, ['username']);
 
 				foreach ($db_users as $db_user) {
 					$users[] = [

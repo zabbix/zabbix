@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ class CControllerAuthenticationEdit extends CController {
 			'action_passw_change' => 'authentication.edit',
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'ldap_test_password' => '',
-			'ldap_test_user' => CWebUser::$data['alias'],
+			'ldap_test_user' => CWebUser::$data['username'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'change_bind_password' => 0,
 			'form_refresh' => 0

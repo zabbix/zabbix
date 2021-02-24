@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,11 @@ import (
 	"zabbix.com/pkg/tls"
 )
 
+const (
+	TimeoutModeFixed = iota
+	TimeoutModeShift
+)
+
 const headerSize = 4 + 1 + 4 + 4
 const tcpProtocol = byte(0x01)
 const zlibCompress = byte(0x02)
@@ -44,10 +49,12 @@ const (
 )
 
 type Connection struct {
-	conn      net.Conn
-	tlsConfig *tls.Config
-	state     int
-	compress  bool
+	conn        net.Conn
+	tlsConfig   *tls.Config
+	state       int
+	compress    bool
+	timeout     time.Duration
+	timeoutMode int
 }
 
 type Listener struct {
@@ -55,25 +62,17 @@ type Listener struct {
 	tlsconfig *tls.Config
 }
 
-func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...interface{}) (c *Connection, err error) {
-	c = &Connection{state: connStateConnect, compress: true}
+func Open(address string, localAddr *net.Addr, timeout time.Duration, timeoutMode int, args ...interface{}) (c *Connection, err error) {
+	c = &Connection{state: connStateConnect, compress: true, timeout: timeout, timeoutMode: timeoutMode}
 	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
 	c.conn, err = d.Dial("tcp", address)
 
 	if nil != err {
 		return
 	}
-
-	if timeout != 0 {
-		if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); nil != err {
-			return
-		}
-
-		if err = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
-			return
-		}
+	if err = c.conn.SetDeadline(time.Now().Add(timeout)); err != nil {
+		return
 	}
-
 	var tlsconfig *tls.Config
 	if len(args) > 0 {
 		var ok bool
@@ -81,7 +80,7 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...in
 			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
 		}
 		if tlsconfig != nil {
-			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout)
+			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout, timeoutMode == TimeoutModeShift)
 		}
 	}
 	return
@@ -116,10 +115,9 @@ func (c *Connection) write(w io.Writer, data []byte) (err error) {
 	return err
 }
 
-func (c *Connection) Write(data []byte, timeout time.Duration) error {
-	if timeout != 0 {
-		err := c.conn.SetWriteDeadline(time.Now().Add(timeout))
-		if nil != err {
+func (c *Connection) Write(data []byte) error {
+	if c.timeoutMode == TimeoutModeShift {
+		if err := c.conn.SetWriteDeadline(time.Now().Add(c.timeout)); err != nil {
 			return err
 		}
 	}
@@ -127,8 +125,8 @@ func (c *Connection) Write(data []byte, timeout time.Duration) error {
 	return c.write(c.conn, data)
 }
 
-func (c *Connection) WriteString(s string, timeout time.Duration) error {
-	return c.Write([]byte(s), timeout)
+func (c *Connection) WriteString(s string) error {
+	return c.Write([]byte(s))
 }
 
 func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
@@ -245,12 +243,13 @@ func (c *Connection) uncompress(data []byte, expLen uint32) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
-	if timeout != 0 {
-		if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); err != nil {
+func (c *Connection) Read() (data []byte, err error) {
+	if c.timeoutMode == TimeoutModeShift {
+		if err = c.conn.SetReadDeadline(time.Now().Add(c.timeout)); err != nil {
 			return
 		}
 	}
+
 	if c.state == connStateAccept && c.tlsConfig != nil {
 		c.state = connStateEstablished
 
@@ -273,7 +272,7 @@ func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
 			return nil, errors.New("cannot accept encrypted connection")
 		}
 		var tlsConn net.Conn
-		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b, timeout); err != nil {
+		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b, c.timeout, c.timeoutMode == TimeoutModeShift); err != nil {
 			return
 		}
 		c.conn = tlsConn
@@ -303,12 +302,13 @@ func Listen(address string, args ...interface{}) (c *Listener, err error) {
 	return
 }
 
-func (l *Listener) Accept() (c *Connection, err error) {
+func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (c *Connection, err error) {
 	var conn net.Conn
 	if conn, err = l.listener.Accept(); err != nil {
 		return
 	} else {
-		c = &Connection{conn: conn, tlsConfig: l.tlsconfig, state: connStateAccept}
+		c = &Connection{conn: conn, tlsConfig: l.tlsconfig, state: connStateAccept, timeout: timeout,
+			timeoutMode: timeoutMode}
 	}
 	return
 }
@@ -339,7 +339,7 @@ func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data [
 		}
 	}
 
-	c, err := Open(address, localAddr, timeout, tlsconfig)
+	c, err := Open(address, localAddr, timeout, TimeoutModeFixed, tlsconfig)
 	if err != nil {
 		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err
@@ -349,7 +349,7 @@ func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data [
 
 	log.Tracef("sending [%s] to [%s]", string(data), address)
 
-	err = c.Write(data, 0)
+	err = c.Write(data)
 	if err != nil {
 		log.Tracef("cannot send to [%s]: %s", address, err)
 		return nil, err
@@ -357,7 +357,7 @@ func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data [
 
 	log.Tracef("receiving data from [%s]", address)
 
-	b, err := c.Read(0)
+	b, err := c.Read()
 	if err != nil {
 		log.Tracef("cannot receive data from [%s]: %s", address, err)
 		return nil, err

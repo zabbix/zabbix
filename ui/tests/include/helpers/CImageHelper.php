@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -167,8 +167,8 @@ class CImageHelper {
 				$color = imagecolorallocate($image, $color[0], $color[1], $color[2]);
 			}
 
-			imagefilledrectangle($image, $region['x'], $region['y'], $region['x'] + $region['width'],
-					$region['y'] + $region['height'], $color
+			imagefilledrectangle($image, $region['x'] - 1, $region['y'] - 1, $region['x'] + $region['width'] + 2,
+					$region['y'] + $region['height'] + 2, $color
 			);
 		}
 

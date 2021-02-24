@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,50 +22,25 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
-	"os"
 	"reflect"
 	"testing"
-
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 )
 
-// TestMain does the before and after setup
-func TestMain(m *testing.M) {
-	var code int
-
-	_ = log.Open(log.Console, log.Debug, "", 0)
-
-	log.Infof("[TestMain] Start connecting to PostgreSQL...")
-	if err := сreateConnection(); err != nil {
-		log.Infof("failed to create connection to PostgreSQL for tests")
-		os.Exit(code)
-	}
-	// initialize plugin
-	impl.Init(pluginName)
-	impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
-
-	code = m.Run()
-	if code != 0 {
-		log.Critf("failed to run PostgreSQL tests")
-		os.Exit(code)
-	}
-	log.Infof("[TestMain] Cleaning up...")
-	os.Exit(code)
-}
-
 func TestPlugin_pingHandler(t *testing.T) {
-	var pingOK int64 = 1
-	// create pool or aquare conn from old pool for test
-	sharedPool, err := getConnPool(t)
+	// create pool or acquire conn from old pool for test
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *postgresConn
-		params []string
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -75,16 +50,16 @@ func TestPlugin_pingHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("pingHandler should return %d if connection is ok", postgresPingOk),
+			fmt.Sprintf("pingHandler should return %d if connection is ok", pingOk),
 			&impl,
-			args{conn: sharedPool},
-			pingOK,
+			args{context.Background(), sharedPool, keyPing, nil, []string{}},
+			pingOk,
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.pingHandler(tt.args.conn, keyPostgresPing, tt.args.params)
+			got, err := pingHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.pingHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:03Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -672,7 +672,71 @@ zabbix_export:
         -
           macro: '{$IIS.SERVICE}'
           value: http
-          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/current/ru/manual/config/items/itemtypes/simple_checks'
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/5.4/manual/config/items/itemtypes/simple_checks'
+      valuemaps:
+        -
+          name: 'Application pool state'
+          mappings:
+            -
+              value: '1'
+              newvalue: Uninitialized
+            -
+              value: '2'
+              newvalue: Initialized
+            -
+              value: '3'
+              newvalue: Running
+            -
+              value: '4'
+              newvalue: Disabling
+            -
+              value: '5'
+              newvalue: Disabled
+            -
+              value: '6'
+              newvalue: 'Shutdown Pending'
+            -
+              value: '7'
+              newvalue: 'Delete Pending'
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          name: 'Windows service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Running
+            -
+              value: '1'
+              newvalue: Paused
+            -
+              value: '2'
+              newvalue: 'Start pending'
+            -
+              value: '3'
+              newvalue: 'Pause pending'
+            -
+              value: '4'
+              newvalue: 'Continue pending'
+            -
+              value: '5'
+              newvalue: 'Stop pending'
+            -
+              value: '6'
+              newvalue: Stopped
+            -
+              value: '7'
+              newvalue: Unknown
+            -
+              value: '255'
+              newvalue: 'No such service'
   graphs:
     -
       name: 'IIS: Cache hits percentage'
@@ -755,67 +819,3 @@ zabbix_export:
           item:
             host: 'IIS by Zabbix agent'
             key: 'perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]'
-  value_maps:
-    -
-      name: 'Application pool state'
-      mappings:
-        -
-          value: '1'
-          newvalue: Uninitialized
-        -
-          value: '2'
-          newvalue: Initialized
-        -
-          value: '3'
-          newvalue: Running
-        -
-          value: '4'
-          newvalue: Disabling
-        -
-          value: '5'
-          newvalue: Disabled
-        -
-          value: '6'
-          newvalue: 'Shutdown Pending'
-        -
-          value: '7'
-          newvalue: 'Delete Pending'
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
-    -
-      name: 'Windows service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Running
-        -
-          value: '1'
-          newvalue: Paused
-        -
-          value: '2'
-          newvalue: 'Start pending'
-        -
-          value: '3'
-          newvalue: 'Pause pending'
-        -
-          value: '4'
-          newvalue: 'Continue pending'
-        -
-          value: '5'
-          newvalue: 'Stop pending'
-        -
-          value: '6'
-          newvalue: Stopped
-        -
-          value: '7'
-          newvalue: Unknown
-        -
-          value: '255'
-          newvalue: 'No such service'

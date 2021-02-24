@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'url'					=> 'string',
 			'value'					=> 'string',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
-			'valuemapid'			=> 'int32',
+			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1',
 			'not_supported'			=> 'in 1'
@@ -253,6 +253,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			]
 		];
 
+		$valuemap = ($this->getInput('valuemapid', 0) != 0)
+			? API::ValueMap()->get([
+				'output' => [],
+				'selectMappings' => ['newvalue', 'value'],
+				'valuemapids' => $this->getInput('valuemapid')
+			])[0]
+			: [];
+
 		// Get value from host.
 		if ($this->get_value_from_host) {
 			// Get post data for particular item type.
@@ -287,6 +295,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
+
+			/*
+			 * Server will turn off status code check if field value is empty. If field is not present, then server will
+			 * default to check if status code is 200.
+			 */
+			if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $item_test_data)) {
+				$item_test_data['status_codes'] = '';
+			}
 
 			if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {
 				unset($item_test_data['value_type']);
@@ -401,11 +417,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'result' => $result['result']
 						];
 
-						if ($this->getInput('valuemapid', 0)) {
-							$mapped_value = getMappedValue($result['result'], $this->getInput('valuemapid'));
-							if ($mapped_value !== false) {
-								$output['mapped_value'] = $mapped_value;
-							}
+						if ($valuemap) {
+							$output['mapped_value'] = CValueMapHelper::applyValueMap($result['result'], $valuemap);
 						}
 					}
 					elseif (array_key_exists('error', $result)) {

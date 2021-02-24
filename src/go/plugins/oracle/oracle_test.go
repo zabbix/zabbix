@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,13 +94,6 @@ func TestPlugin_Export(t *testing.T) {
 		wantErr    error
 	}{
 		{
-			name:       "Unknown metric",
-			p:          &impl,
-			args:       args{"unknown.metric", nil, nil},
-			wantResult: nil,
-			wantErr:    zbxerr.ErrorUnsupportedMetric,
-		},
-		{
 			name:       "Too many parameters",
 			p:          &impl,
 			args:       args{keyPing, []string{Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv, "excess_param"}, nil},
@@ -110,9 +103,9 @@ func TestPlugin_Export(t *testing.T) {
 		{
 			name:       "Should fail if unknown session given",
 			p:          &impl,
-			args:       args{"foo", []string{"fakeSession"}, nil},
+			args:       args{keyUser, []string{"fakeSession"}, nil},
 			wantResult: nil,
-			wantErr:    zbxerr.ErrorUnknownSession,
+			wantErr:    errors.New("Connection failed: ORA-12545: Connect failed because target host or object does not exist."),
 		},
 		{
 			name:       "pingHandler should return pingOk if connection is alive",
@@ -139,7 +132,7 @@ func TestPlugin_Export(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
-			if err != nil && err.Error() != tt.wantErr.Error() {
+			if err != nil && (tt.wantErr == nil || err.Error() != tt.wantErr.Error()) {
 				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

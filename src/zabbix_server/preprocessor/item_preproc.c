@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxregexp.h"
 #include "log.h"
+#include "zbxembed.h"
+#include "zbxprometheus.h"
 
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
@@ -27,10 +29,6 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "zbxregexp.h"
-#include "zbxjson.h"
-#include "zbxembed.h"
-#include "zbxprometheus.h"
 #include "preproc_history.h"
 
 #include "item_preproc.h"
@@ -931,117 +929,6 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: item_preproc_xpath_op                                            *
- *                                                                            *
- * Purpose: execute xpath query                                               *
- *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the operation parameters                         *
- *             errmsg - [OUT] error message                                   *
- *                                                                            *
- * Return value: SUCCEED - the value was processed successfully               *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char **errmsg)
-{
-#ifndef HAVE_LIBXML2
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(params);
-	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
-	return FAIL;
-#else
-	xmlDoc		*doc = NULL;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlErrorPtr	pErr;
-	xmlBufferPtr	xmlBufferLocal;
-	int		ret = FAIL, i;
-	char		buffer[32], *ptr;
-
-	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-		return FAIL;
-
-	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
-	{
-		if (NULL != (pErr = xmlGetLastError()))
-			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
-		else
-			*errmsg = zbx_strdup(*errmsg, "cannot parse xml value");
-		return FAIL;
-	}
-
-	xpathCtx = xmlXPathNewContext(doc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
-	{
-		pErr = xmlGetLastError();
-		*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
-		goto out;
-	}
-
-	switch (xpathObj->type)
-	{
-		case XPATH_NODESET:
-			xmlBufferLocal = xmlBufferCreate();
-
-			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-			{
-				nodeset = xpathObj->nodesetval;
-				for (i = 0; i < nodeset->nodeNr; i++)
-					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
-			}
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
-
-			xmlBufferFree(xmlBufferLocal);
-			ret = SUCCEED;
-			break;
-		case XPATH_STRING:
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xpathObj->stringval));
-			ret = SUCCEED;
-			break;
-		case XPATH_BOOLEAN:
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_dsprintf(NULL, "%d", xpathObj->boolval));
-			ret = SUCCEED;
-			break;
-		case XPATH_NUMBER:
-			zbx_variant_clear(value);
-			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
-
-			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90    */
-			/* so simply check the if the result starts with digit (accounting for -inf) */
-			if (*(ptr = buffer) == '-')
-				ptr++;
-			if (0 != isdigit(*ptr))
-			{
-				del_zeros(buffer);
-				zbx_variant_set_str(value, zbx_strdup(NULL, buffer));
-				ret = SUCCEED;
-			}
-			else
-				*errmsg = zbx_strdup(*errmsg, "Invalid numeric value");
-			break;
-		default:
-			*errmsg = zbx_strdup(*errmsg, "Unknown result");
-			break;
-	}
-out:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
-
-	return ret;
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: item_preproc_xpath                                               *
  *                                                                            *
  * Purpose: execute xpath query                                               *
@@ -1058,7 +945,10 @@ static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **e
 {
 	char	*err = NULL;
 
-	if (SUCCEED == item_preproc_xpath_op(value, params, &err))
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (SUCCEED == zbx_query_xpath(value, params, &err))
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "cannot extract XML value with xpath \"%s\": %s", params, err);
@@ -2043,6 +1933,35 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_xml_to_json                                         *
+ *                                                                            *
+ * Purpose: convert XML format value to JSON format                           *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_xml_to_json(zbx_variant_t *value, char **errmsg)
+{
+	char	*json = NULL;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	if (FAIL == zbx_xml_to_json(value->data.str, &json, errmsg))
+		return FAIL;
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, json);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: item_preproc_str_replace                                         *
  *                                                                            *
  * Purpose: replace substrings in string                                      *
@@ -2200,6 +2119,9 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			break;
 		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
 			ret = item_preproc_validate_notsupport(error);
+			break;
+		case ZBX_PREPROC_XML_TO_JSON:
+			ret = item_preproc_xml_to_json(value, error);
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");

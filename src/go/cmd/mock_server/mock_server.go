@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,10 +44,10 @@ type MockServerOptions struct {
 
 var options MockServerOptions
 
-func handleConnection(c *zbxcomms.Connection, tFlag int) {
+func handleConnection(c *zbxcomms.Connection) {
 	defer c.Close()
 
-	js, err := c.Read(time.Second * time.Duration(tFlag))
+	js, err := c.Read()
 	if err != nil {
 		log.Warningf("Read failed: %s\n", err)
 		return
@@ -65,14 +65,14 @@ func handleConnection(c *zbxcomms.Connection, tFlag int) {
 	case "active checks":
 		activeChecks, err := ioutil.ReadFile(options.ActiveChecksFile)
 		if err == nil {
-			err = c.Write(activeChecks, time.Second*time.Duration(tFlag))
+			err = c.Write(activeChecks)
 		}
 		if err != nil {
 			log.Warningf("Write failed: %s\n", err)
 			return
 		}
 	case "agent data":
-		err = c.WriteString("{\"response\":\"success\",\"info\":\"processed: 0; failed: 0; total: 0; seconds spent: 0.042523\"}", time.Second*time.Duration(tFlag))
+		err = c.WriteString("{\"response\":\"success\",\"info\":\"processed: 0; failed: 0; total: 0; seconds spent: 0.042523\"}")
 		if err != nil {
 			log.Warningf("Write failed: %s\n", err)
 			return
@@ -155,11 +155,11 @@ func main() {
 	defer listener.Close()
 
 	for {
-		c, err := listener.Accept()
+		c, err := listener.Accept(time.Second*time.Duration(options.Timeout), zbxcomms.TimeoutModeShift)
 		if err != nil {
 			log.Critf("Accept failed: %s\n", err)
 			return
 		}
-		go handleConnection(c, options.Timeout)
+		go handleConnection(c)
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class CMediatype extends CApiService {
 	 * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
 	 * @param string $options['pattern'] filter by Host name containing only give pattern
 	 * @param int $options['limit'] output will be limited to given number
-	 * @param string $options['sortfield'] output will be sorted by given property [ 'mediatypeid', 'alias' ]
+	 * @param string $options['sortfield'] output will be sorted by given property [ 'mediatypeid' ]
 	 * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
 	 * @return array
 	 */

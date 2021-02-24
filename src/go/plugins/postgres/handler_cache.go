@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,28 +21,31 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
-)
-
-const (
-	keyPostgresCache = "pgsql.cache.hit"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // cacheHandler finds cache hit percent and returns int64 if all is OK or nil otherwise.
-func (p *Plugin) cacheHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+func cacheHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
 	var cache float64
+
 	query := `SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2) FROM pg_catalog.pg_stat_database;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&cache)
-
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&cache)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return cache, nil

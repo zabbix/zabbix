@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import (
 // Options is a plugin configuration
 type Options struct {
 	Endpoint string `conf:"default=unix:///var/run/docker.sock"`
-	Timeout  int    `conf:"default=5"`
+	Timeout  int    `conf:"optional,range=1:30"`
 }
 
 // Configure implements the Configurator interface.
@@ -46,7 +46,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 	socketPath := strings.Split(p.options.Endpoint, "://")[1]
 	p.client = newClient(socketPath, p.options.Timeout)
-
 }
 
 // Validate implements the Configurator interface.
@@ -61,7 +60,7 @@ func (p *Plugin) Validate(options interface{}) error {
 
 	endpointParts := strings.SplitN(opts.Endpoint, "://", 2)
 	if len(endpointParts) == 1 || endpointParts[0] != "unix" {
-		return errors.New(errorInvalidEndpoint)
+		return errors.New("invalid endpoint format")
 	}
 
 	return err

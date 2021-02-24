@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -219,8 +219,8 @@ class CHostPrototype extends CHostBase {
 					'securitylevel' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
 					'authpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
 					'privpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
-					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA])],
-					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES])],
+					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
+					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
 					'contextname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')]
 											]],
 											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]
@@ -431,8 +431,8 @@ class CHostPrototype extends CHostBase {
 					'securitylevel' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
 					'authpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
 					'privpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
-					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA])],
-					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES])],
+					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
+					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
 					'contextname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')]
 											]],
 											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]

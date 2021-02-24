@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'SNMP agent',
 						'Key' => 'snmp.v2'
 					],
-					'host_interface' => '127.0.0.2 : 161',
+					'host_interface' => '127.0.0.2:161',
 					'snmp_fields' => [
 						'version' => 'SNMPv2',
 						'comunity' => 'public'
@@ -255,7 +255,7 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'SNMP agent',
 						'Key' => 'snmp.v1'
 					],
-					'host_interface' => '127.0.0.5 : 161',
+					'host_interface' => '127.0.0.5:161',
 					'snmp_fields' => [
 						'version' => 'SNMPv1',
 						'comunity' => 'public'
@@ -269,15 +269,15 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'SNMP agent',
 						'Key' => 'snmp.v3'
 					],
-					'host_interface' => '127.0.0.6 : 161',
+					'host_interface' => '127.0.0.6:161',
 					'snmp_fields' => [
 						'version' => 'SNMPv3',
 						'context' => 'test_context',
 						'security' => 'test_security_name',
 						'security_level' => 'authPriv',
-						'authentication_protocol' => 'SHA',
+						'authentication_protocol' => 'SHA1',
 						'authentication_passphrase' => '{$TEST}',
-						'privacy_protocol' => 'AES',
+						'privacy_protocol' => 'AES128',
 						'privacy_passphrase' => 'test_privpassphrase'
 					]
 				]
@@ -669,7 +669,8 @@ class testFormItemTest extends CWebTest {
 				$item_form->getField('Host interface')->fill($data['host_interface']);
 			}
 			// Get ip and port separately.
-			$host_interface = explode(' : ', $item_form->getField('Host interface')->getText(), 2);
+			$host_interface = explode(':', $item_form->getField('Host interface')
+				->getText(), 2);
 		}
 
 		if (CTestArrayHelper::get($data, 'preprocessing')){
@@ -707,9 +708,9 @@ class testFormItemTest extends CWebTest {
 						'context' => 'id:interface_details_contextname',
 						'security' => 'id:interface_details_securityname',
 						'security_level' => 'id:interface_details_securitylevel',
-						'authentication_protocol' => 'id:interface_details_authprotocol',
+						'authentication_protocol' => 'name:interfaces[details][authprotocol]',
 						'authentication_passphrase' => 'id:interface_details_authpassphrase',
-						'privacy_protocol' => 'id:interface_details_privprotocol',
+						'privacy_protocol' => 'name:interfaces[details][privprotocol]',
 						'privacy_passphrase' => 'id:interface_details_privpassphrase'
 					];
 				}

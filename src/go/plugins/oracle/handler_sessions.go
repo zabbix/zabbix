@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,33 +21,15 @@ package oracle
 
 import (
 	"context"
-	"strconv"
 
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keySessions = "oracle.sessions.stats"
-
-const sessionsMaxParams = 1
-
-func sessionsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func sessionsHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var (
 		sessions string
 		err      error
 	)
-
-	lockMaxTime := 600
-
-	if len(params) > sessionsMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
-
-	if len(params) == 1 {
-		lockMaxTime, err = strconv.Atoi(params[0])
-		if err != nil {
-			return nil, zbxerr.ErrorInvalidParams
-		}
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
@@ -140,7 +122,7 @@ func sessionsHandler(ctx context.Context, conn OraClient, params []string) (inte
 						STAT_NAME = 'NUM_CPU_CORES'
 				) num_cores
 			) v
-	`, lockMaxTime)
+	`, params["LockMaxTime"])
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

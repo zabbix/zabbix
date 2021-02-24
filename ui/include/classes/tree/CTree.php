@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -161,7 +161,9 @@ class CTree {
 		$js.= 'var '.$this->treename.' = null';
 		$js.= '</script>'."\n";
 
-		zbx_add_post_js($this->treename.' = new CTree("tree_'.CWebUser::$data['alias'].'_'.$this->treename.'", '.$this->treename.'_tree);');
+		zbx_add_post_js($this->treename.' = new CTree("tree_'.CWebUser::$data['username'].'_'.$this->treename.'", '.
+			$this->treename.'_tree);'
+		);
 
 		return new CJsScript($js);
 	}

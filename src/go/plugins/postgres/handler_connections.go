@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,18 +21,17 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
-)
-
-const (
-	keyPostgresConnections = "pgsql.connections"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // connectionsHandler executes select from pg_stat_activity command and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) connectionsHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+func connectionsHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
 	var connectionsJSON string
-	var err error
+
 	query := `SELECT row_to_json(T)
 	FROM (
 		SELECT
@@ -48,15 +47,18 @@ func (p *Plugin) connectionsHandler(conn *postgresConn, key string, params []str
 			(SELECT count(*) FROM pg_prepared_xacts) AS prepared
 		FROM pg_stat_activity WHERE datid is not NULL) T;`
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&connectionsJSON)
-
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&connectionsJSON)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return connectionsJSON, nil

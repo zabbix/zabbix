@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,7 +184,7 @@ class CControllerUsergroupEdit extends CController {
 	 */
 	private function getUsersMs() {
 		$options = [
-			'output' => ['userid', 'alias', 'name', 'surname']
+			'output' => ['userid', 'username', 'name', 'surname']
 		];
 
 		if ($this->hasInput('usrgrpid') && !$this->hasInput('form_refresh')) {

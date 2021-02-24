@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,7 +134,8 @@ if ($trigger['opdata'] !== '') {
 }
 else {
 	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+		'selectValueMap' => ['mappings'],
 		'triggerids' => $event['objectid']
 	]);
 	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
@@ -143,7 +144,7 @@ else {
 
 $actions = getEventDetailsActions($event);
 $users = API::User()->get([
-	'output' => ['alias', 'name', 'surname'],
+	'output' => ['username', 'name', 'surname'],
 	'userids' => array_keys($actions['userids']),
 	'preservekeys' => true
 ]);

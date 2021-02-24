@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-11-24T11:00:44Z'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -1272,6 +1272,94 @@ zabbix_export:
                   value:
                     name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                     host: 'Windows network by Zabbix agent'
+      valuemaps:
+        -
+          name: 'Win32_NetworkAdapter::AdapterTypeId'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Ethernet 802.3'
+            -
+              value: '1'
+              newvalue: 'Token Ring 802.5'
+            -
+              value: '2'
+              newvalue: 'Fiber Distributed Data Interface (FDDI)'
+            -
+              value: '3'
+              newvalue: 'Wide Area Network (WAN)'
+            -
+              value: '4'
+              newvalue: LocalTalk
+            -
+              value: '5'
+              newvalue: 'Ethernet using DIX header format'
+            -
+              value: '6'
+              newvalue: ARCNET
+            -
+              value: '7'
+              newvalue: 'ARCNET (878.2)'
+            -
+              value: '8'
+              newvalue: ATM
+            -
+              value: '9'
+              newvalue: Wireless
+            -
+              value: '10'
+              newvalue: 'Infrared Wireless'
+            -
+              value: '11'
+              newvalue: Bpc
+            -
+              value: '12'
+              newvalue: CoWan
+            -
+              value: '13'
+              newvalue: '1394'
+        -
+          name: 'Win32_NetworkAdapter::NetConnectionStatus'
+          mappings:
+            -
+              value: '0'
+              newvalue: Disconnected
+            -
+              value: '1'
+              newvalue: Connecting
+            -
+              value: '2'
+              newvalue: Connected
+            -
+              value: '3'
+              newvalue: Disconnecting
+            -
+              value: '4'
+              newvalue: 'Hardware Not Present'
+            -
+              value: '5'
+              newvalue: 'Hardware Disabled'
+            -
+              value: '6'
+              newvalue: 'Hardware Malfunction'
+            -
+              value: '7'
+              newvalue: 'Media Disconnected'
+            -
+              value: '8'
+              newvalue: Authenticating
+            -
+              value: '9'
+              newvalue: 'Authentication Succeeded'
+            -
+              value: '10'
+              newvalue: 'Authentication Failed'
+            -
+              value: '11'
+              newvalue: 'Invalid Address'
+            -
+              value: '12'
+              newvalue: 'Credentials Required'
     -
       template: 'Windows physical disks by Zabbix agent'
       name: 'Windows physical disks by Zabbix agent'
@@ -1567,6 +1655,37 @@ zabbix_export:
           macro: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
           value: ^manual|disabled$
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
+      valuemaps:
+        -
+          name: 'Windows service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Running
+            -
+              value: '1'
+              newvalue: Paused
+            -
+              value: '2'
+              newvalue: 'Start pending'
+            -
+              value: '3'
+              newvalue: 'Pause pending'
+            -
+              value: '4'
+              newvalue: 'Continue pending'
+            -
+              value: '5'
+              newvalue: 'Stop pending'
+            -
+              value: '6'
+              newvalue: Stopped
+            -
+              value: '7'
+              newvalue: Unknown
+            -
+              value: '255'
+              newvalue: 'No such service'
   triggers:
     -
       expression: '{Windows CPU by Zabbix agent:perf_counter_en["\System\Processor Queue Length"].min(5m)} - {Windows CPU by Zabbix agent:wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"].last()} * 2 > {$CPU.QUEUE.CRIT.MAX}'
@@ -1655,121 +1774,3 @@ zabbix_export:
           item:
             host: 'Windows memory by Zabbix agent'
             key: 'system.swap.size[,total]'
-  value_maps:
-    -
-      name: 'Win32_NetworkAdapter::AdapterTypeId'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'Ethernet 802.3'
-        -
-          value: '1'
-          newvalue: 'Token Ring 802.5'
-        -
-          value: '2'
-          newvalue: 'Fiber Distributed Data Interface (FDDI)'
-        -
-          value: '3'
-          newvalue: 'Wide Area Network (WAN)'
-        -
-          value: '4'
-          newvalue: LocalTalk
-        -
-          value: '5'
-          newvalue: 'Ethernet using DIX header format'
-        -
-          value: '6'
-          newvalue: ARCNET
-        -
-          value: '7'
-          newvalue: 'ARCNET (878.2)'
-        -
-          value: '8'
-          newvalue: ATM
-        -
-          value: '9'
-          newvalue: Wireless
-        -
-          value: '10'
-          newvalue: 'Infrared Wireless'
-        -
-          value: '11'
-          newvalue: Bpc
-        -
-          value: '12'
-          newvalue: CoWan
-        -
-          value: '13'
-          newvalue: '1394'
-    -
-      name: 'Win32_NetworkAdapter::NetConnectionStatus'
-      mappings:
-        -
-          value: '0'
-          newvalue: Disconnected
-        -
-          value: '1'
-          newvalue: Connecting
-        -
-          value: '2'
-          newvalue: Connected
-        -
-          value: '3'
-          newvalue: Disconnecting
-        -
-          value: '4'
-          newvalue: 'Hardware Not Present'
-        -
-          value: '5'
-          newvalue: 'Hardware Disabled'
-        -
-          value: '6'
-          newvalue: 'Hardware Malfunction'
-        -
-          value: '7'
-          newvalue: 'Media Disconnected'
-        -
-          value: '8'
-          newvalue: Authenticating
-        -
-          value: '9'
-          newvalue: 'Authentication Succeeded'
-        -
-          value: '10'
-          newvalue: 'Authentication Failed'
-        -
-          value: '11'
-          newvalue: 'Invalid Address'
-        -
-          value: '12'
-          newvalue: 'Credentials Required'
-    -
-      name: 'Windows service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Running
-        -
-          value: '1'
-          newvalue: Paused
-        -
-          value: '2'
-          newvalue: 'Start pending'
-        -
-          value: '3'
-          newvalue: 'Pause pending'
-        -
-          value: '4'
-          newvalue: 'Continue pending'
-        -
-          value: '5'
-          newvalue: 'Stop pending'
-        -
-          value: '6'
-          newvalue: Stopped
-        -
-          value: '7'
-          newvalue: Unknown
-        -
-          value: '255'
-          newvalue: 'No such service'

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -162,6 +162,7 @@ class CHost extends CHostGeneral {
 			'selectHostDiscovery'				=> null,
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
+			'selectValueMaps'					=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
 			'preservekeys'						=> false,
@@ -489,71 +490,11 @@ class CHost extends CHostGeneral {
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			if ($options['inheritedTags']) {
-				$tags = [];
-
-				$db_template_tags = DBfetchArray(DBselect(
-					'SELECT h.hostid,ht.tag,ht.value'.
-					' FROM hosts h,host_tag ht'.
-					' WHERE '.CApiTagHelper::addWhereCondition($options['tags'], TAG_EVAL_TYPE_OR, 'h','host_tag',
-							'hostid').
-						' AND ht.hostid=h.hostid'.
-						' AND h.status='.HOST_STATUS_TEMPLATE
-				));
-
-				foreach ($options['tags'] as $tag) {
-					$templateids = [];
-					foreach ($db_template_tags as $template_tag) {
-						if (CApiTagHelper::checkTag($tag, $template_tag)) {
-							$templateids[$template_tag['hostid']] = true;
-						}
-					}
-
-					if (!array_key_exists($tag['tag'], $tags)) {
-						$tags[$tag['tag']] = [
-							'templateids' => [],
-							'pairs' => []
-						];
-					}
-
-					$tags[$tag['tag']]['pairs'][] = [
-						'value' => $tag['value'],
-						'operator' => $tag['operator']
-					];
-
-					while ($templateids) {
-						$tags[$tag['tag']]['templateids'] += $templateids;
-
-						$templateids = API::Template()->get([
-							'output' => [],
-							'parentTemplateids' => array_keys($templateids),
-							'preservekeys' => true,
-							'nopermissions' => true
-						]);
-					}
-				}
-
-				$where = [];
-				foreach ($tags as $tag => $_tag) {
-					$_tags = [];
-					foreach ($_tag['pairs'] as $pair) {
-						$_tags[] = [
-							'tag' => $tag,
-							'value' => $pair['value'],
-							'operator' => $pair['operator']
-						];
-					}
-
-					$where[] = '('.
-						CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid').
-						' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids'])).
-					')';
-				}
-
 				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
-				$operator = ($options['evaltype'] == TAG_EVAL_TYPE_AND_OR) ? ' AND ' : ' OR ';
-				$sqlParts['where'][] = '('.implode($operator, $where).')';
+				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
+					$options['evaltype']
+				);
 			}
 			else {
 				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
@@ -1794,7 +1735,8 @@ class CHost extends CHostGeneral {
 			'severities' =>	[
 				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true
 			],
-			'withProblemsSuppressed' =>  ['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL]
+			'withProblemsSuppressed' =>		['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -2187,7 +2129,6 @@ class CHost extends CHostGeneral {
 					}
 				}
 			}
-
 			// Permissions to host groups is validated in massUpdate().
 		}
 		unset($host);

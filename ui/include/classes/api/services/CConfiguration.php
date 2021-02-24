@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,8 +45,7 @@ class CConfiguration extends CApiService {
 				'maps' =>		['type' => API_IDS],
 				'mediaTypes' =>	['type' => API_IDS],
 				'screens' =>	['type' => API_IDS],
-				'templates' =>	['type' => API_IDS],
-				'valueMaps' =>	['type' => API_IDS]
+				'templates' =>	['type' => API_IDS]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
@@ -159,7 +158,8 @@ class CConfiguration extends CApiService {
 				]],
 				'valueMaps' =>			['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
 				]]
 			]]
 		]];

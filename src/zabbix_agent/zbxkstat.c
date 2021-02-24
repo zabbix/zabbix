@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,8 +115,11 @@ out:
 
 void	zbx_kstat_destroy(void)
 {
-	if (NULL != kc)
-		kstat_close(kc);
+	if (NULL == kc)
+		return;
+
+	kstat_close(kc);
+	zbx_mutex_destroy(&kstat_lock);
 }
 
 /******************************************************************************

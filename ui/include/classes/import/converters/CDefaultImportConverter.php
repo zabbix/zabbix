@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,10 +56,14 @@ class CDefaultImportConverter extends CConverter {
 				if (array_key_exists($tag, $data)) {
 					$data[$tag] = $this->addDefaultValue($data[$tag], $tag_rules);
 				}
+				elseif (array_key_exists('ex_default', $tag_rules)) {
+					$data[$tag] = (string) call_user_func($tag_rules['ex_default'], $data);
+				}
+				elseif (array_key_exists('default', $tag_rules)) {
+					$data[$tag] = (string) $tag_rules['default'];
+				}
 				else {
-					$data[$tag] = array_key_exists('default', $tag_rules)
-						? (string) $tag_rules['default']
-						: (($tag_rules['type'] & XML_STRING) ? '' : []);
+					$data[$tag] = (($tag_rules['type'] & XML_STRING) ? '' : []);
 				}
 			}
 		}

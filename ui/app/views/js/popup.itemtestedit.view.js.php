@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -407,7 +407,7 @@ function saveItemTestInputs() {
 			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val(),
-			interface_details: interface ? interface['details'] : null
+			interface_details: (interface && 'details' in interface) ? interface['details'] : null
 		});
 	<?php endif ?>
 

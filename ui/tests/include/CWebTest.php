@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -279,30 +279,6 @@ class CWebTest extends CTest {
 	 */
 	public function query($type, $locator = null) {
 		return $this->page->query($type, $locator);
-	}
-
-	/**
-	 * Check page title text.
-	 *
-	 * @param string $title		page title
-	 */
-	public function assertPageTitle($title) {
-		global $ZBX_SERVER_NAME;
-
-		if ($ZBX_SERVER_NAME !== '') {
-			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
-		}
-
-		$this->assertEquals($title, $this->page->getTitle());
-	}
-
-	/**
-	 * Check page header
-	 *
-	 * @param string $header	page header to be compared
-	 */
-	public function assertPageHeader($header) {
-		$this->assertEquals($header, $this->query('xpath://h1[@id="page-title-general"]')->one()->getText());
 	}
 
 	/**

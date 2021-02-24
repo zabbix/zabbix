@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,12 +29,17 @@ type unixTime int64
 // UnmarshalJSON is used to convert time to unixtime
 func (tm *unixTime) UnmarshalJSON(b []byte) (err error) {
 	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return nil
+	}
+
 	t, err := time.Parse(time.RFC3339, s)
 	if err != nil {
 		return nil
 	}
 
 	*tm = unixTime(t.Unix())
+
 	return err
 }
 

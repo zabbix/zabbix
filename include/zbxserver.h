@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@
 #define MACRO_TYPE_ITEM_TAG		0x01000000
 #define MACRO_TYPE_EVENT_NAME		0x02000000	/* event name in trigger configuration */
 #define MACRO_TYPE_EXPRESSION		0x04000000	/* macros in expression macro */
+#define MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x08000000
 
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
@@ -108,5 +109,4 @@ void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
-
 #endif

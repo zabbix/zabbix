@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -234,6 +234,8 @@ class TabIndicatorFactory {
 				return new GraphOverridesTabIndicatorItem;
 			case 'Permissions':
 				return new PermissionsTabIndicatorItem;
+			case 'Valuemaps':
+				return new ValuemapsTabIndicatorItem;
 		}
 
 		return null;
@@ -1382,5 +1384,41 @@ class PermissionsTabIndicatorItem extends TabIndicatorItem {
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
 			this.addAttributes(element);
 		});
+	}
+}
+
+class ValuemapsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#valuemap-table tbody tr')
+			.length;
+	}
+
+	initObserver(element) {
+		const target_node = document.querySelector('#valuemap-table');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, _observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						this.addAttributes(element);
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
 	}
 }

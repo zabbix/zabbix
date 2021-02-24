@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,13 +46,22 @@ foreach ($filter_tags as $tag) {
 		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
 			->setAttribute('placeholder', _('tag'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-			->setModern(true),
+		(new CSelect('filter_tags['.$i.'][operator]'))
+			->addOptions(CSelect::createOptionsFromArray([
+				TAG_OPERATOR_EXISTS => _('Exists'),
+				TAG_OPERATOR_EQUAL => _('Equals'),
+				TAG_OPERATOR_LIKE => _('Contains'),
+				TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+				TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+				TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+			]))
+			->setValue($tag['operator'])
+			->setFocusableElementId('filter-tags-'.$i.'-operator-select')
+			->setId('filter_tags_'.$i.'_operator'),
 		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setId('filter_tags_'.$i.'_value'),
 		(new CCol(
 			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)

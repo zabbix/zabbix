@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-11-12T14:28:31Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -31,7 +31,7 @@ zabbix_export:
           value_type: LOG
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/current/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
+          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/5.4/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
           applications:
             -
               name: VMware
@@ -229,6 +229,22 @@ zabbix_export:
               interfaces:
                 -
                   ip: '{#VM.IP}'
+      valuemaps:
+        -
+          name: 'VMware status'
+          mappings:
+            -
+              value: '0'
+              newvalue: gray
+            -
+              value: '1'
+              newvalue: green
+            -
+              value: '2'
+              newvalue: yellow
+            -
+              value: '3'
+              newvalue: red
     -
       template: 'VMware Guest'
       name: 'VMware Guest'
@@ -691,6 +707,19 @@ zabbix_export:
               applications:
                 -
                   name: VMware
+      valuemaps:
+        -
+          name: 'VMware VirtualMachinePowerState'
+          mappings:
+            -
+              value: '0'
+              newvalue: poweredOff
+            -
+              value: '1'
+              newvalue: poweredOn
+            -
+              value: '2'
+              newvalue: suspended
     -
       template: 'VMware Hypervisor'
       name: 'VMware Hypervisor'
@@ -1129,6 +1158,31 @@ zabbix_export:
               applications:
                 -
                   name: VMware
+      valuemaps:
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          name: 'VMware status'
+          mappings:
+            -
+              value: '0'
+              newvalue: gray
+            -
+              value: '1'
+              newvalue: green
+            -
+              value: '2'
+              newvalue: yellow
+            -
+              value: '3'
+              newvalue: red
     -
       template: 'VMware macros'
       name: 'VMware macros'
@@ -1146,40 +1200,3 @@ zabbix_export:
         -
           macro: '{$VMWARE.USERNAME}'
           description: 'VMware service user name'
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
-    -
-      name: 'VMware status'
-      mappings:
-        -
-          value: '0'
-          newvalue: gray
-        -
-          value: '1'
-          newvalue: green
-        -
-          value: '2'
-          newvalue: yellow
-        -
-          value: '3'
-          newvalue: red
-    -
-      name: 'VMware VirtualMachinePowerState'
-      mappings:
-        -
-          value: '0'
-          newvalue: poweredOff
-        -
-          value: '1'
-          newvalue: poweredOn
-        -
-          value: '2'
-          newvalue: suspended

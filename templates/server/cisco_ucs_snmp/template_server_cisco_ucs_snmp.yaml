@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:40Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -776,358 +776,358 @@ zabbix_export:
         -
           macro: '{$VDISK_OK_STATUS:"equipped"}'
           value: '10'
-  value_maps:
-    -
-      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
-      mappings:
-        -
-          value: '0'
-          newvalue: unknown
-        -
-          value: '1'
-          newvalue: operable
-        -
-          value: '2'
-          newvalue: inoperable
-        -
-          value: '3'
-          newvalue: degraded
-        -
-          value: '4'
-          newvalue: poweredOff
-        -
-          value: '5'
-          newvalue: powerProblem
-        -
-          value: '6'
-          newvalue: removed
-        -
-          value: '7'
-          newvalue: voltageProblem
-        -
-          value: '8'
-          newvalue: thermalProblem
-        -
-          value: '9'
-          newvalue: performanceProblem
-        -
-          value: '10'
-          newvalue: accessibilityProblem
-        -
-          value: '11'
-          newvalue: identityUnestablishable
-        -
-          value: '12'
-          newvalue: biosPostTimeout
-        -
-          value: '13'
-          newvalue: disabled
-        -
-          value: '14'
-          newvalue: malformedFru
-        -
-          value: '15'
-          newvalue: backplanePortProblem
-        -
-          value: '16'
-          newvalue: chassisIntrusion
-        -
-          value: '51'
-          newvalue: fabricConnProblem
-        -
-          value: '52'
-          newvalue: fabricUnsupportedConn
-        -
-          value: '81'
-          newvalue: config
-        -
-          value: '82'
-          newvalue: equipmentProblem
-        -
-          value: '83'
-          newvalue: decomissioning
-        -
-          value: '84'
-          newvalue: chassisLimitExceeded
-        -
-          value: '100'
-          newvalue: notSupported
-        -
-          value: '101'
-          newvalue: discovery
-        -
-          value: '102'
-          newvalue: discoveryFailed
-        -
-          value: '103'
-          newvalue: identify
-        -
-          value: '104'
-          newvalue: postFailure
-        -
-          value: '105'
-          newvalue: upgradeProblem
-        -
-          value: '106'
-          newvalue: peerCommProblem
-        -
-          value: '107'
-          newvalue: autoUpgrade
-        -
-          value: '108'
-          newvalue: linkActivateBlocked
-    -
-      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence'
-      mappings:
-        -
-          value: '0'
-          newvalue: unknown
-        -
-          value: '1'
-          newvalue: empty
-        -
-          value: '10'
-          newvalue: equipped
-        -
-          value: '11'
-          newvalue: missing
-        -
-          value: '12'
-          newvalue: mismatch
-        -
-          value: '13'
-          newvalue: equippedNotPrimary
-        -
-          value: '14'
-          newvalue: equippedSlave
-        -
-          value: '15'
-          newvalue: mismatchSlave
-        -
-          value: '16'
-          newvalue: missingSlave
-        -
-          value: '20'
-          newvalue: equippedIdentityUnestablishable
-        -
-          value: '21'
-          newvalue: mismatchIdentityUnestablishable
-        -
-          value: '22'
-          newvalue: equippedWithMalformedFru
-        -
-          value: '30'
-          newvalue: inaccessible
-        -
-          value: '40'
-          newvalue: unauthorized
-        -
-          value: '100'
-          newvalue: notSupported
-        -
-          value: '101'
-          newvalue: equippedUnsupported
-        -
-          value: '102'
-          newvalue: equippedDiscNotStarted
-        -
-          value: '103'
-          newvalue: equippedDiscInProgress
-        -
-          value: '104'
-          newvalue: equippedDiscError
-        -
-          value: '105'
-          newvalue: equippedDiscUnknown
-    -
-      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState'
-      mappings:
-        -
-          value: '0'
-          newvalue: indeterminate
-        -
-          value: '1'
-          newvalue: unassociated
-        -
-          value: '10'
-          newvalue: ok
-        -
-          value: '11'
-          newvalue: discovery
-        -
-          value: '12'
-          newvalue: config
-        -
-          value: '13'
-          newvalue: unconfig
-        -
-          value: '14'
-          newvalue: powerOff
-        -
-          value: '15'
-          newvalue: restart
-        -
-          value: '20'
-          newvalue: maintenance
-        -
-          value: '21'
-          newvalue: test
-        -
-          value: '29'
-          newvalue: computeMismatch
-        -
-          value: '30'
-          newvalue: computeFailed
-        -
-          value: '31'
-          newvalue: degraded
-        -
-          value: '32'
-          newvalue: discoveryFailed
-        -
-          value: '33'
-          newvalue: configFailure
-        -
-          value: '34'
-          newvalue: unconfigFailed
-        -
-          value: '35'
-          newvalue: testFailed
-        -
-          value: '36'
-          newvalue: maintenanceFailed
-        -
-          value: '40'
-          newvalue: removed
-        -
-          value: '41'
-          newvalue: disabled
-        -
-          value: '50'
-          newvalue: inaccessible
-        -
-          value: '60'
-          newvalue: thermalProblem
-        -
-          value: '61'
-          newvalue: powerProblem
-        -
-          value: '62'
-          newvalue: voltageProblem
-        -
-          value: '63'
-          newvalue: inoperable
-        -
-          value: '101'
-          newvalue: decomissioning
-        -
-          value: '201'
-          newvalue: biosRestore
-        -
-          value: '202'
-          newvalue: cmosReset
-        -
-          value: '203'
-          newvalue: diagnostics
-        -
-          value: '204'
-          newvalue: diagnosticsFailed
-        -
-          value: '210'
-          newvalue: pendingReboot
-        -
-          value: '211'
-          newvalue: pendingReassociation
-        -
-          value: '212'
-          newvalue: svnicNotPresent
-    -
-      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
-      mappings:
-        -
-          value: '0'
-          newvalue: unspecified
-        -
-          value: '1'
-          newvalue: simple
-        -
-          value: '2'
-          newvalue: mirror
-        -
-          value: '3'
-          newvalue: stripe
-        -
-          value: '4'
-          newvalue: raid
-        -
-          value: '5'
-          newvalue: stripeParity
-        -
-          value: '6'
-          newvalue: stripeDualParity
-        -
-          value: '7'
-          newvalue: mirrorStripe
-        -
-          value: '8'
-          newvalue: stripeParityStripe
-        -
-          value: '9'
-          newvalue: stripeDualParityStripe
-    -
-      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus'
-      mappings:
-        -
-          value: '0'
-          newvalue: unknown
-        -
-          value: '1'
-          newvalue: online
-        -
-          value: '2'
-          newvalue: unconfiguredGood
-        -
-          value: '3'
-          newvalue: globalHotSpare
-        -
-          value: '4'
-          newvalue: dedicatedHotSpare
-        -
-          value: '5'
-          newvalue: jbod
-        -
-          value: '6'
-          newvalue: offline
-        -
-          value: '7'
-          newvalue: rebuilding
-        -
-          value: '8'
-          newvalue: copyback
-        -
-          value: '9'
-          newvalue: failed
-        -
-          value: '10'
-          newvalue: unconfiguredBad
-        -
-          value: '11'
-          newvalue: predictiveFailure
-        -
-          value: '12'
-          newvalue: disabledForRemoval
-        -
-          value: '13'
-          newvalue: foreignConfiguration
-        -
-          value: '14'
-          newvalue: zeroing
-        -
-          value: '15'
-          newvalue: good
-        -
-          value: '16'
-          newvalue: bad
-        -
-          value: '17'
-          newvalue: lockedForeignConfiguration
+      valuemaps:
+        -
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: operable
+            -
+              value: '2'
+              newvalue: inoperable
+            -
+              value: '3'
+              newvalue: degraded
+            -
+              value: '4'
+              newvalue: poweredOff
+            -
+              value: '5'
+              newvalue: powerProblem
+            -
+              value: '6'
+              newvalue: removed
+            -
+              value: '7'
+              newvalue: voltageProblem
+            -
+              value: '8'
+              newvalue: thermalProblem
+            -
+              value: '9'
+              newvalue: performanceProblem
+            -
+              value: '10'
+              newvalue: accessibilityProblem
+            -
+              value: '11'
+              newvalue: identityUnestablishable
+            -
+              value: '12'
+              newvalue: biosPostTimeout
+            -
+              value: '13'
+              newvalue: disabled
+            -
+              value: '14'
+              newvalue: malformedFru
+            -
+              value: '15'
+              newvalue: backplanePortProblem
+            -
+              value: '16'
+              newvalue: chassisIntrusion
+            -
+              value: '51'
+              newvalue: fabricConnProblem
+            -
+              value: '52'
+              newvalue: fabricUnsupportedConn
+            -
+              value: '81'
+              newvalue: config
+            -
+              value: '82'
+              newvalue: equipmentProblem
+            -
+              value: '83'
+              newvalue: decomissioning
+            -
+              value: '84'
+              newvalue: chassisLimitExceeded
+            -
+              value: '100'
+              newvalue: notSupported
+            -
+              value: '101'
+              newvalue: discovery
+            -
+              value: '102'
+              newvalue: discoveryFailed
+            -
+              value: '103'
+              newvalue: identify
+            -
+              value: '104'
+              newvalue: postFailure
+            -
+              value: '105'
+              newvalue: upgradeProblem
+            -
+              value: '106'
+              newvalue: peerCommProblem
+            -
+              value: '107'
+              newvalue: autoUpgrade
+            -
+              value: '108'
+              newvalue: linkActivateBlocked
+        -
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence'
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: empty
+            -
+              value: '10'
+              newvalue: equipped
+            -
+              value: '11'
+              newvalue: missing
+            -
+              value: '12'
+              newvalue: mismatch
+            -
+              value: '13'
+              newvalue: equippedNotPrimary
+            -
+              value: '14'
+              newvalue: equippedSlave
+            -
+              value: '15'
+              newvalue: mismatchSlave
+            -
+              value: '16'
+              newvalue: missingSlave
+            -
+              value: '20'
+              newvalue: equippedIdentityUnestablishable
+            -
+              value: '21'
+              newvalue: mismatchIdentityUnestablishable
+            -
+              value: '22'
+              newvalue: equippedWithMalformedFru
+            -
+              value: '30'
+              newvalue: inaccessible
+            -
+              value: '40'
+              newvalue: unauthorized
+            -
+              value: '100'
+              newvalue: notSupported
+            -
+              value: '101'
+              newvalue: equippedUnsupported
+            -
+              value: '102'
+              newvalue: equippedDiscNotStarted
+            -
+              value: '103'
+              newvalue: equippedDiscInProgress
+            -
+              value: '104'
+              newvalue: equippedDiscError
+            -
+              value: '105'
+              newvalue: equippedDiscUnknown
+        -
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState'
+          mappings:
+            -
+              value: '0'
+              newvalue: indeterminate
+            -
+              value: '1'
+              newvalue: unassociated
+            -
+              value: '10'
+              newvalue: ok
+            -
+              value: '11'
+              newvalue: discovery
+            -
+              value: '12'
+              newvalue: config
+            -
+              value: '13'
+              newvalue: unconfig
+            -
+              value: '14'
+              newvalue: powerOff
+            -
+              value: '15'
+              newvalue: restart
+            -
+              value: '20'
+              newvalue: maintenance
+            -
+              value: '21'
+              newvalue: test
+            -
+              value: '29'
+              newvalue: computeMismatch
+            -
+              value: '30'
+              newvalue: computeFailed
+            -
+              value: '31'
+              newvalue: degraded
+            -
+              value: '32'
+              newvalue: discoveryFailed
+            -
+              value: '33'
+              newvalue: configFailure
+            -
+              value: '34'
+              newvalue: unconfigFailed
+            -
+              value: '35'
+              newvalue: testFailed
+            -
+              value: '36'
+              newvalue: maintenanceFailed
+            -
+              value: '40'
+              newvalue: removed
+            -
+              value: '41'
+              newvalue: disabled
+            -
+              value: '50'
+              newvalue: inaccessible
+            -
+              value: '60'
+              newvalue: thermalProblem
+            -
+              value: '61'
+              newvalue: powerProblem
+            -
+              value: '62'
+              newvalue: voltageProblem
+            -
+              value: '63'
+              newvalue: inoperable
+            -
+              value: '101'
+              newvalue: decomissioning
+            -
+              value: '201'
+              newvalue: biosRestore
+            -
+              value: '202'
+              newvalue: cmosReset
+            -
+              value: '203'
+              newvalue: diagnostics
+            -
+              value: '204'
+              newvalue: diagnosticsFailed
+            -
+              value: '210'
+              newvalue: pendingReboot
+            -
+              value: '211'
+              newvalue: pendingReassociation
+            -
+              value: '212'
+              newvalue: svnicNotPresent
+        -
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
+          mappings:
+            -
+              value: '0'
+              newvalue: unspecified
+            -
+              value: '1'
+              newvalue: simple
+            -
+              value: '2'
+              newvalue: mirror
+            -
+              value: '3'
+              newvalue: stripe
+            -
+              value: '4'
+              newvalue: raid
+            -
+              value: '5'
+              newvalue: stripeParity
+            -
+              value: '6'
+              newvalue: stripeDualParity
+            -
+              value: '7'
+              newvalue: mirrorStripe
+            -
+              value: '8'
+              newvalue: stripeParityStripe
+            -
+              value: '9'
+              newvalue: stripeDualParityStripe
+        -
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus'
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: online
+            -
+              value: '2'
+              newvalue: unconfiguredGood
+            -
+              value: '3'
+              newvalue: globalHotSpare
+            -
+              value: '4'
+              newvalue: dedicatedHotSpare
+            -
+              value: '5'
+              newvalue: jbod
+            -
+              value: '6'
+              newvalue: offline
+            -
+              value: '7'
+              newvalue: rebuilding
+            -
+              value: '8'
+              newvalue: copyback
+            -
+              value: '9'
+              newvalue: failed
+            -
+              value: '10'
+              newvalue: unconfiguredBad
+            -
+              value: '11'
+              newvalue: predictiveFailure
+            -
+              value: '12'
+              newvalue: disabledForRemoval
+            -
+              value: '13'
+              newvalue: foreignConfiguration
+            -
+              value: '14'
+              newvalue: zeroing
+            -
+              value: '15'
+              newvalue: good
+            -
+              value: '16'
+              newvalue: bad
+            -
+              value: '17'
+              newvalue: lockedForeignConfiguration

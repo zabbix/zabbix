@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -471,21 +471,35 @@ class CWidgetHelper {
 		$i = 0;
 
 		foreach ($tags as $tag) {
+			$zselect_operator = (new CSelect($field->getName().'['.$i.'][operator]'))
+				->addOptions(CSelect::createOptionsFromArray([
+					TAG_OPERATOR_EXISTS => _('Exists'),
+					TAG_OPERATOR_EQUAL => _('Equals'),
+					TAG_OPERATOR_LIKE => _('Contains'),
+					TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+				]))
+				->setValue($tag['operator'])
+				->setFocusableElementId($field->getName().'-'.$i.'-operator-select')
+				->setId($field->getName().'_'.$i.'_operator');
+
+			if (!$enabled) {
+				$zselect_operator->setDisabled();
+			}
+
 			$tags_table->addRow([
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired(self::isAriaRequired($field))
 					->setEnabled($enabled),
-				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
-					->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-					->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-					->setModern(true)
-					->setEnabled($enabled),
+				$zselect_operator,
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAriaRequired(self::isAriaRequired($field))
+					->setId($field->getName().'_'.$i.'_value')
 					->setEnabled($enabled),
 				(new CCol(
 					(new CButton($field->getName().'['.$i.'][remove]', _('Remove')))
@@ -523,14 +537,23 @@ class CWidgetHelper {
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field)),
-			(new CRadioButtonList($field->getName().'[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
+			(new CSelect($field->getName().'[#{rowNum}][operator]'))
+				->addOptions(CSelect::createOptionsFromArray([
+					TAG_OPERATOR_EXISTS => _('Exists'),
+					TAG_OPERATOR_EQUAL => _('Equals'),
+					TAG_OPERATOR_LIKE => _('Contains'),
+					TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+				]))
+				->setValue(TAG_OPERATOR_LIKE)
+				->setFocusableElementId($field->getName().'-#{rowNum}-operator-select')
+				->setId($field->getName().'_#{rowNum}_operator'),
 			(new CTextBox($field->getName().'[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field)),
+				->setAriaRequired(self::isAriaRequired($field))
+				->setId($field->getName().'_#{rowNum}_value'),
 			(new CCol(
 				(new CButton($field->getName().'[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)

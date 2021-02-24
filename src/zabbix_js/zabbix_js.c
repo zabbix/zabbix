@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,55 +146,11 @@ static char	*read_file(const char *filename, char **error)
 	return data;
 }
 
-static char	*execute_script(const char *script, const char *param, int timeout, char **error)
-{
-	zbx_es_t	es;
-	char		*code = NULL;
-	int		size;
-	char		*errmsg = NULL, *result = NULL;
-
-	zbx_es_init(&es);
-	if (FAIL == zbx_es_init_env(&es, &errmsg))
-	{
-		*error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
-		zbx_free(errmsg);
-		return NULL;
-	}
-
-	if (0 != timeout)
-		zbx_es_set_timeout(&es, timeout);
-
-	if (FAIL == zbx_es_compile(&es, script, &code, &size, &errmsg))
-	{
-		*error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
-		zbx_free(errmsg);
-		goto out;
-	}
-
-	if (FAIL == zbx_es_execute(&es, script, code, size, param, &result, &errmsg))
-	{
-		*error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
-		zbx_free(errmsg);
-		goto out;
-	}
-out:
-	if (FAIL == zbx_es_destroy_env(&es, &errmsg))
-	{
-		zbx_error("cannot destroy scripting environment: %s", errmsg);
-		zbx_free(result);
-	}
-
-	zbx_free(code);
-	zbx_free(errmsg);
-
-	return result;
-}
-
 int	main(int argc, char **argv)
 {
 	int	ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
 	char	*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL, *error = NULL,
-		*result = NULL;
+		*result = NULL, script_error[MAX_STRING_LEN];
 
 	progname = get_program_name(argv[0]);
 
@@ -289,9 +245,9 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	if (NULL == (result = execute_script(script, param, timeout, &error)))
+	if (FAIL == zbx_es_execute_command(script, param, timeout, &result, script_error, sizeof(script_error), NULL))
 	{
-		zbx_error("error executing script:\n%s", error);
+		zbx_error("error executing script:\n%s", script_error);
 		goto close;
 	}
 	ret = SUCCEED;

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -302,6 +302,14 @@ $tabs = (new CTabView())
 	->addTab('inventoryTab', _('Inventory'), $inventoryFormList)
 	->addTab('encryptionTab', _('Encryption'), $encryption_form_list)
 	->setSelected(0);
+
+if (!$data['discovered_host']) {
+	$tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
+		'visible' => [],
+		'hostids' => $data['ids'],
+		'context' => 'host'
+	]));
+}
 
 $form->addItem($tabs);
 

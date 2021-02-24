@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:07:35Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -307,13 +307,13 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '50'
-  value_maps:
-    -
-      name: 'HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: normal
-        -
-          value: '2'
-          newvalue: abnormal
+          name: 'HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState'
+          mappings:
+            -
+              value: '1'
+              newvalue: normal
+            -
+              value: '2'
+              newvalue: abnormal

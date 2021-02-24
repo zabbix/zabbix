@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,36 +24,26 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
-//Session struct
-type Session struct {
-	// URI is a connection string consisting of a network scheme, a host address and a port or a path to a Unix-socket.
-	Uri string `conf:"optional"`
-
-	// User to send to protected MySQL server.
-	User string `conf:"optional"`
-
-	// Password to send to protected MySQL server.
-	Password string `conf:"optional"`
-}
-
 // PluginOptions option from config file
 type PluginOptions struct {
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
+	// Timeout is the maximum time in seconds for waiting when a connection has to be established.
+	// Default value equals to the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
+
+	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
+	// Default value equals to the global agent timeout.
+	CallTimeout int `conf:"optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]*Session `conf:"optional"`
+	Sessions map[string]conf.Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-
-	p.Debugf("Start configuring...")
-
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
@@ -62,40 +52,15 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.options.Timeout = global.Timeout
 	}
 
-	for _, session := range p.options.Sessions {
-		if session.Uri == "" {
-			session.Uri = "tcp://localhost:3306"
-		}
-		if session.User == "" {
-			session.User = "root"
-			session.Password = ""
-		}
+	if p.options.CallTimeout == 0 {
+		p.options.CallTimeout = global.Timeout
 	}
-
-	p.Debugf("Configuring is complete")
 }
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
 func (p *Plugin) Validate(options interface{}) error {
 	var opts PluginOptions
-	var err error
 
-	p.Debugf("Start config validation...")
-
-	err = conf.Unmarshal(options, &opts)
-	if err != nil {
-		return err
-	}
-
-	for _, s := range opts.Sessions {
-		_, err = checkURI(&Session{Uri: s.Uri, User: s.User, Password: s.Password})
-		if err != nil {
-			return err
-		}
-	}
-
-	p.Debugf("Config is valid")
-
-	return err
+	return conf.Unmarshal(options, &opts)
 }

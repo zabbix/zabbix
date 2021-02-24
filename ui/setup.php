@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ $fields = [
 	'type' =>				[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'"'), null],
 	'server' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
 	'port' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
-	'database' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')],
+	'database' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			'(isset({type}) && {type} !== "'.ZBX_DB_ORACLE.'")', _('Database name')],
 	'user' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
 	'password' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'schema' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],

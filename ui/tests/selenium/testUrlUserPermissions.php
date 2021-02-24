@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -585,15 +585,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'zabbix.php?action=macros.edit',
 				'title' =>	'Configuration of macros',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => false
-				]
-			]],
-			[[
-				'url' => 'zabbix.php?action=valuemap.list',
-				'title' =>	'Configuration of value mapping',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

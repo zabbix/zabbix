@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -538,36 +538,47 @@ function overlayDialogue(params, trigger_elmnt) {
 /**
  * Execute script.
  *
- * @param string hostid				host id
- * @param string scriptid			script id
- * @param string confirmation		confirmation text
+ * @param string scriptid			Script ID.
+ * @param string confirmation		Confirmation text.
  * @param {object} trigger_elmnt	UI element that was clicked to open overlay dialogue.
+ * @param string hostid				Host ID.
+ * @param string eventid			Event ID.
  */
-function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
+function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eventid = null) {
 	var execute = function() {
+		var popup_options = {scriptid: scriptid};
+
 		if (hostid !== null) {
-			PopUp('popup.scriptexec', {
-				hostid: hostid,
-				scriptid: scriptid
-			}, null, trigger_elmnt);
+			popup_options.hostid = hostid;
+		}
+
+		if (eventid !== null) {
+			popup_options.eventid = eventid;
+		}
+
+		if (Object.keys(popup_options).length === 2) {
+			PopUp('popup.scriptexec', popup_options, null, trigger_elmnt);
 		}
 	};
 
 	if (confirmation.length > 0) {
 		overlayDialogue({
 			'title': t('Execution confirmation'),
-			'content': jQuery('<span>').text(confirmation),
+			'content': jQuery('<span>')
+				.addClass('confirmation-msg')
+				.text(confirmation),
+			'class': 'modal-popup modal-popup-small',
 			'buttons': [
 				{
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'focused': (hostid === null),
+					'focused': (hostid === null && eventid === null),
 					'action': function() {}
 				},
 				{
 					'title': t('Execute'),
-					'enabled': (hostid !== null),
-					'focused': (hostid !== null),
+					'enabled': (hostid !== null || eventid !== null),
+					'focused': (hostid !== null || eventid !== null),
 					'action': function() {
 						execute();
 					}
@@ -873,4 +884,24 @@ function downloadPngImage($dom_node, file_name) {
 	a.download = file_name;
 	a.target = '_blank';
 	a.click();
+}
+
+/**
+ * Writes text into primary clipboard. Provides fallback for insecure context.
+ *
+ * @param {string} text  Text to write.
+ */
+function writeTextClipboard(text) {
+	if (window.isSecureContext) {
+		return window.navigator.clipboard.writeText(text);
+	}
+
+	const textarea = document.createElement('textarea');
+
+	textarea.value = text;
+	textarea.style.position = 'fixed';
+	document.body.appendChild(textarea);
+	textarea.select();
+	document.execCommand('copy');
+	textarea.remove();
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -130,8 +130,8 @@ if ($media_types) {
 	$users = [];
 
 	$db_users = API::User()->get([
-		'output' => ['userid', 'alias', 'name', 'surname'],
-		'sortfield' => 'alias'
+		'output' => ['userid', 'username', 'name', 'surname'],
+		'sortfield' => 'username'
 	]);
 
 	foreach ($db_users as $user_data) {

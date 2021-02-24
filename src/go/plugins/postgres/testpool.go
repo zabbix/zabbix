@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,39 +22,68 @@
 package postgres
 
 import (
-	"context"
-	"strconv"
-	"testing"
+	"database/sql"
+	"fmt"
+	"os"
 	"time"
-
 	"zabbix.com/pkg/log"
-
-	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-var sharedConn *postgresConn
+var sharedConn *PGConn
 
-func getConnPool(t testing.TB) (*postgresConn, error) {
+func getConnPool() (*PGConn, error) {
 	return sharedConn, nil
 }
 
-func сreateConnection() error {
-	connString := "postgresql://postgres:postgres@localhost:5432/postgres"
-	newConn, err := pgxpool.Connect(context.Background(), connString)
+func getEnv() (pgAddr, pgUser, pgPwd, pgDb string) {
+	pgAddr = os.Getenv("PG_ADDR")
+	pgUser = os.Getenv("PG_USER")
+	pgPwd = os.Getenv("PG_PWD")
+	pgDb = os.Getenv("PG_DB")
+
+	if pgAddr == "" {
+		pgAddr = "localhost:5432"
+	}
+	if pgUser == "" {
+		pgUser = "postgres"
+	}
+	if pgPwd == "" {
+		pgPwd = "postgres"
+	}
+	if pgDb == "" {
+		pgDb = "postgres"
+	}
+
+	return
+}
+
+func createConnection() error {
+	pgAddr, pgUser, pgPwd, pgDb := getEnv()
+
+	connString := fmt.Sprintf("postgresql://%s:%s@%s/%s", pgUser, pgPwd, pgAddr, pgDb)
+
+	newConn, err := sql.Open("pgx", connString)
 	if err != nil {
-		log.Critf("[сreateConnection] cannot create connection to Postgres: %s", err.Error())
+		log.Critf("[createConnection] cannot create connection to Postgres: %s", err.Error())
+
 		return err
 	}
-	versionPG, err := GetPostgresVersion(newConn)
+
+	var version int
+
+	err = newConn.QueryRow(`select current_setting('server_version_num');`).Scan(&version)
 	if err != nil {
-		log.Critf("[сreateConnection] cannot get Postgres version: %s", err.Error())
+		log.Critf("[createConnection] cannot get Postgres version: %s", err.Error())
+
 		return err
 	}
-	version, err := strconv.Atoi(versionPG)
-	if err != nil {
-		log.Critf("[сreateConnection] invalid Postgres version: %s", err.Error())
-		return err
+
+	sharedConn = &PGConn{
+		client:         newConn,
+		lastTimeAccess: time.Now(),
+		version:        version,
+		callTimeout:    30,
 	}
-	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: version, connString: connString, timeout: 30}
+
 	return nil
 }

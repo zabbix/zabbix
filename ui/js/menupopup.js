@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 	if (typeof options.scripts !== 'undefined') {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
+			items: getMenuPopupScriptData(options.scripts, trigger_elmnt, options.hostid)
 		});
 	}
 
@@ -827,6 +827,14 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
+	// scripts
+	if (typeof options.scripts !== 'undefined') {
+		sections.push({
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, trigger_elmnt, null, options.eventid)
+		});
+	}
+
 	return sections;
 }
 
@@ -1097,12 +1105,13 @@ function getMenuPopupTriggerMacro(options) {
  * Build script menu tree.
  *
  * @param array scripts           Scripts names.
- * @param array hostId            Host ID.
  * @param {object} trigger_elmnt  UI element which triggered opening of overlay dialogue.
+ * @param array hostid            Host ID.
+ * @param array eventid           Event ID.
  *
  * @returns array
  */
-function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
+function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 	var tree = {};
 
 	var appendTreeItem = function(tree, name, items, params) {
@@ -1132,9 +1141,10 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 				name = (items.length > 0) ? items.pop() : script.name;
 
 			appendTreeItem(tree, name, items, {
-				hostId: hostId,
-				scriptId: script.scriptid,
-				confirmation: script.confirmation
+				scriptid: script.scriptid,
+				confirmation: script.confirmation,
+				hostid: hostid,
+				eventid: eventid
 			});
 		}
 	}
@@ -1151,10 +1161,14 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 					item.items = getMenuPopupScriptItems(data.items, trigger_elm);
 				}
 
-				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
+				if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
 					item.clickCallback = function(e) {
-						jQuery(this).closest('.menu-popup-top').menuPopup('close', trigger_elm, false);
-						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
+						jQuery(this)
+							.closest('.menu-popup-top')
+							.menuPopup('close', trigger_elm, false);
+						executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
+							data.params.eventid
+						);
 						cancelEvent(e);
 					};
 				}

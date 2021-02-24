@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,6 +173,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 		// Only non-empty fields need to be sent to server.
 		$data = $this->unsetEmptyValues($data);
+
+		/*
+		 * Server will turn off status code check if field value is empty. If field is not present, then server will
+		 * default to check if status code is 200.
+		 */
+		if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $data)) {
+			$data['status_codes'] = '';
+		}
 
 		$output = [
 			'user' => [
