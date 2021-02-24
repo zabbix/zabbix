@@ -121,16 +121,7 @@ class CControllerActionOperationGet extends CController {
 				'inventory_mode' => (string) HOST_INVENTORY_MANUAL
 			],
 			'opcommand' => [
-				'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-				'scriptid' => '0',
-				'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_AGENT,
-				'port' => '',
-				'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
-				'username' => '',
-				'password' => '',
-				'publickey' => '',
-				'privatekey' => '',
-				'command' => ''
+				'scriptid' => '0'
 			]
 		];
 	}
