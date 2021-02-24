@@ -1,54 +1,11 @@
 
-# VMware macros
-
-## Overview
-
-For Zabbix version: 5.2 and higher  
-
-## Setup
-
-Refer to the vendor documentation.
-
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
-|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
-|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
-
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
-
-
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-
-## Triggers
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
-
-## Feedback
-
-Please report any issues with the template at https://support.zabbix.com
-
 # VMware
 
 ## Overview
 
 For Zabbix version: 5.2 and higher  
 The template to monitor VMware vCenter and ESX hypervisor.
-The "Template VM VMware Hypervisor" and "Template VM VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
+The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
 For additional information please check https://www.zabbix.com/documentation/5.2/manual/vm_monitoring
 
 
@@ -162,14 +119,27 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Uncommitted storage space |<p>Additional storage space, in bytes, potentially used by this virtual machine on all datastores.</p> |SIMPLE |vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Unshared storage space |<p>Total storage space, in bytes, occupied by the virtual machine across all datastores, that is not shared with any other virtual machine.</p> |SIMPLE |vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Uptime |<p>System uptime.</p> |SIMPLE |vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: Guest memory swapped |<p>Amount of guest physical memory that is swapped out to the swap space.</p> |SIMPLE |vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: Host memory consumed |<p>Amount of host physical memory consumed for backing up guest physical memory pages.</p> |SIMPLE |vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: Host memory usage in percents |<p>Percentage of host physical memory that has been consumed.</p> |SIMPLE |vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: CPU usage in percents |<p>CPU usage as a percentage during the interval.</p> |SIMPLE |vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: CPU latency in percents |<p>Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).</p> |SIMPLE |vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: CPU readiness latency in percents |<p>Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.</p> |SIMPLE |vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: CPU swap-in latence in percents |<p>Percentage of CPU time spent waiting for swap-in.</p> |SIMPLE |vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: Uptime of guest OS |<p>Total time elapsed since the last operating system boot-up (in seconds).</p> |SIMPLE |vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Number of bytes received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (bytes per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps] |
 |VMware |VMware: Number of packets received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (packets per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps] |
 |VMware |VMware: Number of bytes transmitted on interface {#IFDESC} |<p>VMware virtual machine network interface output statistics (bytes per second).</p> |SIMPLE |vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps] |
 |VMware |VMware: Number of packets transmitted on interface {#IFDESC} |<p>VMware virtual machine network interface output statistics (packets per second).</p> |SIMPLE |vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps] |
+|VMware |VMware: Network utilization on interface {#IFDESC} |<p>VMware virtual machine network utilization (combined transmit-rates and receive-rates) during the interval.</p> |SIMPLE |vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
 |VMware |VMware: Average number of bytes read from the disk {#DISKDESC} |<p>VMware virtual machine disk device read statistics (bytes per second).</p> |SIMPLE |vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps] |
 |VMware |VMware: Average number of reads from the disk {#DISKDESC} |<p>VMware virtual machine disk device read statistics (operations per second).</p> |SIMPLE |vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops] |
 |VMware |VMware: Average number of bytes written to the disk {#DISKDESC} |<p>VMware virtual machine disk device write statistics (bytes per second).</p> |SIMPLE |vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps] |
 |VMware |VMware: Average number of writes to the disk {#DISKDESC} |<p>VMware virtual machine disk device write statistics (operations per second).</p> |SIMPLE |vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops] |
+|VMware |VMware: Average number of outstanding read requests to the disk {#DISKDESC} |<p>Average number of outstanding read requests to the virtual disk during the collection interval.</p> |SIMPLE |vmware.vm.storage.readoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}] |
+|VMware |VMware: Average number of outstanding write requests to the disk {#DISKDESC} |<p>Average number of outstanding write requests to the virtual disk during the collection interval.</p> |SIMPLE |vmware.vm.storage.writeoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}] |
+|VMware |VMware: Average write latency to the disk {#DISKDESC} |<p>The average time a write to the virtual disk takes.</p> |SIMPLE |vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}] |
+|VMware |VMware: Average read latency to the disk {#DISKDESC} |<p>The average time a read from the virtual disk takes.</p> |SIMPLE |vmware.vm.storage.totalreadlatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}] |
 |VMware |VMware: Free disk space on {#FSNAME} |<p>VMware virtual machine file system statistics (bytes).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},free] |
 |VMware |VMware: Free disk space on {#FSNAME} (percentage) |<p>VMware virtual machine file system statistics (percentages).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree] |
 |VMware |VMware: Total disk space on {#FSNAME} |<p>VMware virtual machine total disk space (bytes).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},total]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -179,7 +149,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -216,9 +186,13 @@ No specific Zabbix configuration is required.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|VMware |VMware: {#HV.NAME} ping |<p>Checks if the hypervisor is running and accepting ICMP pings.</p> |SIMPLE |icmpping[]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|VMware |VMware: Hypervisor ping |<p>Checks if the hypervisor is running and accepting ICMP pings.</p> |SIMPLE |icmpping[]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |VMware |VMware: Cluster name |<p>Cluster name of the guest VM.</p> |SIMPLE |vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: CPU usage |<p>Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.</p> |SIMPLE |vmware.hv.cpu.usage[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
+|VMware |VMware: CPU usage in percents |<p>CPU usage as a percentage during the interval.</p> |SIMPLE |vmware.hv.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
+|VMware |VMware: CPU utilization |<p>CPU usage as a percentage during the interval depends on power management or HT.</p> |SIMPLE |vmware.hv.cpu.utilization[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
+|VMware |VMware: Power usage |<p>Current power usage.</p> |SIMPLE |vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
+|VMware |VMware: Power usage maximum allowed |<p>Maximum allowed power usage.</p> |SIMPLE |vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID},max]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |VMware |VMware: Datacenter name |<p>Datacenter name of the hypervisor.</p> |SIMPLE |vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: Full name |<p>The complete product name, including the version information.</p> |SIMPLE |vmware.hv.fullname[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: CPU frequency |<p>The speed of the CPU cores. This is an average value if there are multiple speeds. The product of CPU frequency and number of cores is approximately equal to the sum of the MHz for all the individual cores on the host.</p> |SIMPLE |vmware.hv.hw.cpu.freq[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
@@ -242,6 +216,7 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Free space on datastore {#DATASTORE} (percentage) |<p>VMware datastore space in percentage from total.</p> |SIMPLE |vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree] |
 |VMware |VMware: Total size of datastore {#DATASTORE} |<p>VMware datastore space in bytes.</p> |SIMPLE |vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}] |
 |VMware |VMware: Average write latency of the datastore {#DATASTORE} |<p>Average amount of time for a write operation to the datastore (milliseconds).</p> |SIMPLE |vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency] |
+|VMware |VMware: Multipath count for datastore {#DATASTORE} |<p>Number of available datastore paths.</p> |SIMPLE |vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}] |
 
 ## Triggers
 
@@ -253,6 +228,50 @@ No specific Zabbix configuration is required.
 |VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3` |HIGH | |
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
 |VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`{TEMPLATE_NAME:vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}].diff()}=1 and {TEMPLATE_NAME:vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}].last()}<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com
+
+# VMware macros
+
+## Overview
+
+For Zabbix version: 5.2 and higher  
+
+## Setup
+
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
+|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
+|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
+
+## Template links
+
+There are no template links in this template.
+
+## Discovery rules
+
+
+## Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+
+## Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
 
 ## Feedback
 
