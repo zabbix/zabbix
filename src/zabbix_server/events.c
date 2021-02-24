@@ -279,8 +279,14 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 			case EVENT_OBJECT_TRIGGER:
 				if (NULL != trigger_tags)
 				{
+					event->trigger.expression = zbx_strdup(NULL, trigger_expression);
+					event->trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
+
 					for (i = 0; i < trigger_tags->values_num; i++)
 						process_trigger_tag(event, (const zbx_tag_t *)trigger_tags->values[i]);
+
+					zbx_free(event->trigger.expression);
+					zbx_free(event->trigger.recovery_expression);
 				}
 
 				get_item_tags_by_expression(trigger_expression, &item_tags);
