@@ -17,22 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
-
-public class AllTestRunner
+public interface HelloMBean
 {
-	public static void main(String[] args)
-	{
-		String[] testClasses = new String[]
-		{
-			"IntegerValidatorTest",
-			"ZabbixItemTest",
-			"JMXTest"
-		};
-
-		for (int i = 0; i < testClasses.length; i++)
-			testClasses[i] = ConfigurationManager.getPackage() + "." + testClasses[i];
-
-		org.junit.runner.JUnitCore.main(testClasses);
-	}
+	public void setMessage(String message);
+	public String getMessage();
+	public void sayHello();
 }
