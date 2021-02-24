@@ -660,7 +660,7 @@ zabbix_export:
               applications:
                 -
                   name: VMware
-        -
+            -
               name: 'VMware: Network utilization on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]'
