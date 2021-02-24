@@ -77,10 +77,6 @@ zabbix_export:
               type: MULTIPLIER
               parameters:
                 - '1048576'
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
         -
           name: 'OceanStor 5300 V5: Version'
           type: SNMP_AGENT
@@ -370,11 +366,6 @@ zabbix_export:
               application_prototypes:
                 -
                   name: 'Disk {#MODEL}'
-              preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.DISK.TEMP.MAX.TIME})}>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}'
@@ -448,11 +439,6 @@ zabbix_export:
               application_prototypes:
                 -
                   name: 'Enclosure {#NAME}'
-              preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.TEMP.MAX.TIME})}>{$HUAWEI.5300.TEMP.MAX.WARN}'
