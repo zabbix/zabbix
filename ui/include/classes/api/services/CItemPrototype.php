@@ -329,8 +329,6 @@ class CItemPrototype extends CItemGeneral {
 	 * Check item prototype data and set flags field.
 	 *
 	 * @param array  $items										an array of items passed by reference
-	 * @param array  $item['applicationPrototypes']				an array of application prototypes
-	 * @param string $item['applicationPrototypes'][]['name']	application prototype name
 	 * @param bool	 $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
@@ -339,41 +337,6 @@ class CItemPrototype extends CItemGeneral {
 		// set proper flags to divide normal and discovered items in future processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
-			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
-					&& $item['applicationPrototypes']) {
-				// Check that "name" field exists for application prototypes.
-				foreach ($item['applicationPrototypes'] as $application_prototype) {
-					if (!array_key_exists('name', $application_prototype)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Missing "name" field for application prototype in item prototype "%1$s".', $item['name']
-						));
-					}
-
-					if ($application_prototype['name'] === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Empty application prototype name in item prototype "%1$s".', $item['name']
-						));
-					}
-
-					if (array_key_exists('templateid', $application_prototype)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot set "templateid" field for application prototype in item prototype "%1$s".',
-							$item['name']
-						));
-					}
-				}
-
-				// Check that "name" field has no duplicate values for application prototypes.
-				$duplicate_name = CArrayHelper::findDuplicate($item['applicationPrototypes'], 'name');
-				if ($duplicate_name) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Duplicate "name" value "%1$s" for application prototype in item prototype "%2$s".',
-						$duplicate_name['name'],
-						$item['name']
-					));
-				}
-			}
 		}
 		unset($item);
 	}
