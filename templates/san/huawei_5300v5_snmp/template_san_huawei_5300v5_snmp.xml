@@ -1220,11 +1220,11 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <units>%</units>
                             <params>last(&quot;huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, \&quot;{#NAME}\&quot;]&quot;)/last(&quot;huawei.5300.v5[hwInfoStoragePoolTotalCapacity, \&quot;{#NAME}\&quot;]&quot;)*100</params>
                             <description>Used capacity of a storage pool in percents.</description>
-                            <applications>
-                                <application>
-                                    <name>Huawei</name>
-                                </application>
-                            </applications>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Pool {#MODEL}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{min({$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})}&gt;{#THRESHOLD}</expression>
