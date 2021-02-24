@@ -368,7 +368,7 @@ class CScript extends CApiService {
 						$upd_script['password'] = '';
 						$upd_script['publickey'] = '';
 						$upd_script['privatekey'] = '';
-					break;
+						break;
 
 					case ZBX_SCRIPT_TYPE_IPMI:
 						$upd_script['port'] = '';
@@ -382,14 +382,14 @@ class CScript extends CApiService {
 
 					case ZBX_SCRIPT_TYPE_SSH:
 						$upd_script['execute_on'] = DB::getDefault('scripts', 'execute_on');
-					break;
+						break;
 
 					case ZBX_SCRIPT_TYPE_TELNET:
 						$upd_script['authtype'] = DB::getDefault('scripts', 'authtype');
 						$upd_script['publickey'] = '';
 						$upd_script['privatekey'] = '';
 						$upd_script['execute_on'] = DB::getDefault('scripts', 'execute_on');
-					break;
+						break;
 
 					case ZBX_SCRIPT_TYPE_WEBHOOK:
 						$upd_script['port'] = '';
@@ -399,7 +399,7 @@ class CScript extends CApiService {
 						$upd_script['publickey'] = '';
 						$upd_script['privatekey'] = '';
 						$upd_script['execute_on'] = DB::getDefault('scripts', 'execute_on');
-					break;
+						break;
 				}
 			}
 			elseif ($type == ZBX_SCRIPT_TYPE_SSH && $authtype != $db_authtype && $authtype == ITEM_AUTHTYPE_PASSWORD) {
