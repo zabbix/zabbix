@@ -373,8 +373,6 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	/**
-	 * Filtering templates by tags.
-	 *
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageTemplates_FilterByTags($data) {

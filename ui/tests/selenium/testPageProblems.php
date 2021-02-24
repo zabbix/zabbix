@@ -361,8 +361,6 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	/**
-	 * Filtering problems by tags.
-	 *
 	 * @dataProvider getFilterByTagsExceptContainsEqualsData
 	 */
 	public function testPageProblems_FilterByTagsExceptContainsEquals($data) {
