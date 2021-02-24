@@ -1305,4 +1305,11 @@ in:
   expression: '1e+308K'
 out:
   result: FAIL
+---
+test case: Succeed 'min(2s, 1m),'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'min(2s, 1m),'
+out:
+  result: FAIL
 ...

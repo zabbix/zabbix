@@ -761,7 +761,6 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 		if (ZBX_EVAL_TOKEN_GROUP_CLOSE == token.type && ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type)
 			eval_append_arg_null(ctx);
 
-
 		if (ZBX_EVAL_TOKEN_COMMA == token.type && 0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR))
 			eval_append_arg_null(ctx);
 
@@ -884,6 +883,12 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 	if (0 != (ctx->last_token_type & ZBX_EVAL_CLASS_OPERATOR))
 	{
 		*error = zbx_strdup(*error, "expression ends with operator");
+		goto out;
+	}
+
+	if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type)
+	{
+		*error = zbx_strdup(*error, "expression ends with comma");
 		goto out;
 	}
 
