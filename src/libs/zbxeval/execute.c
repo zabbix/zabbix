@@ -308,19 +308,21 @@ finish:
  ******************************************************************************/
 static int	vairant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
 {
-	int	len, num_len;
+	int	len, num_len, offset;
 
 	if (ZBX_VARIANT_STR != value_num->type)
 		return FAIL;
 
 	len = strlen(value_num->data.str);
-	if (SUCCEED != zbx_suffixed_number_parse(value_num->data.str, &num_len) ||
-			num_len != len)
+	offset = ('-' == *value_num->data.str ? 1 : 0);
+
+	if (SUCCEED != zbx_suffixed_number_parse(value_num->data.str + offset, &num_len) ||
+			num_len != len - offset)
 	{
 		return FAIL;
 	}
 
-	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(value_num->data.str[len - 1]));
+	zbx_variant_set_dbl(value,  atof(value_num->data.str) * suffix2factor(value_num->data.str[len - 1]));
 
 	return SUCCEED;
 }
