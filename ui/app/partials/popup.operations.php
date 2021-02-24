@@ -34,8 +34,7 @@ $form_list = new CFormList();
 /*
  * Operations row.
  */
-
-$select_operations = (new CSelect('operations'))->setFocusableElementId('operations');
+$select_operations = (new CSelect('operations'))->setFocusableElementId('operations-select');
 
 $form_list->addRow(new CLabel(_('Operations'), $select_operations->getFocusableElementId()), [
 		$select_operations,
