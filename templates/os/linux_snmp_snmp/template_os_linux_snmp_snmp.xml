@@ -1175,12 +1175,12 @@ Total memory in Bytes</description>
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
-                     <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                     <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                      <priority>AVERAGE</priority>
                      <description>The system is running out of free memory.</description>
                      <dependencies>
                         <dependency>
-                           <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+                           <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                            <expression>{Template Module Linux memory SNMP:vm.memory.available[snmp].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -1429,24 +1429,24 @@ Template tooling version used: 0.36</description>
    <triggers>
       <trigger>
          <expression>{Template Module Linux memory SNMP:system.swap.pfree[snmp].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory SNMP:system.swap.total[memTotalSwap.0].last()}&gt;0</expression>
-         <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
+         <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
          <description>This trigger is ignored, if there is no swap configured</description>
          <dependencies>
             <dependency>
-               <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+               <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                <expression>{Template Module Linux memory SNMP:vm.memory.util[snmp].min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
-               <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+               <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                <expression>{Template Module Linux memory SNMP:vm.memory.available[snmp].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
          <expression>{Template Module Linux memory SNMP:vm.memory.available[snmp].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}&gt;0</expression>
-         <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+         <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>

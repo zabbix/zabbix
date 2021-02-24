@@ -155,7 +155,7 @@ Total memory usage in percentage.</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
-                           <name>#{#SNMPINDEX}: High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                           <name>#{#SNMPINDEX}: High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                            <priority>AVERAGE</priority>
                            <description>The system is running out of free memory.</description>
                         </trigger_prototype>
