@@ -506,6 +506,10 @@ void	DBextract_DBversion(void);
 void	DBcheck_version_requirements(void);
 void	DBcheck_capabilities(void);
 
+#ifdef HAVE_POSTGRESQL
+char	*zbx_db_get_schema_esc(void);
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Type: ZBX_GRAPH_ITEMS                                                      *
@@ -602,7 +606,7 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
-int	DBget_user_names(zbx_uint64_t userid, char **alias, char **name, char **surname);
+int	DBget_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:05:07Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -425,6 +425,40 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '55'
+      valuemaps:
+        -
+          name: 'EXTREME-SYSTEM-MIB::extremeFanOperational'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'true - on'
+            -
+              value: '2'
+              newvalue: 'false - off'
+        -
+          name: 'EXTREME-SYSTEM-MIB::extremeOverTemperatureAlarm'
+          mappings:
+            -
+              value: '1'
+              newvalue: alarm
+            -
+              value: '2'
+              newvalue: normal
+        -
+          name: 'EXTREME-SYSTEM-MIB::extremePowerSupplyStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: notPresent
+            -
+              value: '2'
+              newvalue: presentOK
+            -
+              value: '3'
+              newvalue: presentNotOK
+            -
+              value: '4'
+              newvalue: presentPowerOff
   triggers:
     -
       expression: |
@@ -449,37 +483,3 @@ zabbix_export:
           item:
             host: 'Extreme EXOS SNMP'
             key: 'system.cpu.util[extremeCpuMonitorTotalUtilization.0]'
-  value_maps:
-    -
-      name: 'EXTREME-SYSTEM-MIB::extremeFanOperational'
-      mappings:
-        -
-          value: '1'
-          newvalue: 'true - on'
-        -
-          value: '2'
-          newvalue: 'false - off'
-    -
-      name: 'EXTREME-SYSTEM-MIB::extremeOverTemperatureAlarm'
-      mappings:
-        -
-          value: '1'
-          newvalue: alarm
-        -
-          value: '2'
-          newvalue: normal
-    -
-      name: 'EXTREME-SYSTEM-MIB::extremePowerSupplyStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: notPresent
-        -
-          value: '2'
-          newvalue: presentOK
-        -
-          value: '3'
-          newvalue: presentNotOK
-        -
-          value: '4'
-          newvalue: presentPowerOff

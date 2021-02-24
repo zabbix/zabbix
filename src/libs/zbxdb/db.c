@@ -101,7 +101,7 @@ static ub4	OCI_DBserver_status(void);
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
-static int			ZBX_PG_SVERSION = 0;
+static int			ZBX_PG_SVERSION = 0, ZBX_TSDB_VERSION = -1;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
@@ -637,8 +637,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION,"ORACLE OOOOOOOO 111");
-
 		/* allocate an error handle */
 		(void)OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&oracle.errhp, OCI_HTYPE_ERROR,
 				(size_t)0, (dvoid **)0);
@@ -2456,7 +2454,7 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
  *          returns DBMS version as integer: MMmmuu                           *
  *          M = major version part                                            *
  *          m = minor version part                                            *
- *          u = micro version part                                            *
+ *          u = patch version part                                            *
  *                                                                            *
  * Example: 1.2.34 version will be returned as 10234                          *
  *                                                                            *
@@ -2524,12 +2522,11 @@ void	zbx_dbms_extract_version(void)
 		return;
 
 	ZBX_MYSQL_SVERSION = mysql_get_server_version(conn);
-	zabbix_log(LOG_LEVEL_INFORMATION, "VVVADE: %s",mysql_get_server_info(conn));
 
 	zbx_snprintf_alloc(&buffer, &str_alloc, &str_offset, "%s", mysql_get_server_info(conn));
-	zabbix_log(LOG_LEVEL_INFORMATION,"YYY %s",buffer);
 
 	p = strstr(buffer,"MariaDB");
+
 	if (NULL != p)
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "MMM MARIADB DETECTED!");
@@ -2648,6 +2645,71 @@ out:
 
 	printf("RESULT_VERSION: %d\n", ZBX_ORACLE_SVERSION);
 #else
-
 #endif
 }
+
+#if defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tsdb_get_version                                             *
+ *                                                                            *
+ * Purpose: returns TimescaleDB (TSDB) version as integer: MMmmuu             *
+ *          M = major version part                                            *
+ *          m = minor version part                                            *
+ *          u = patch version part                                            *
+ *                                                                            *
+ * Example: TSDB 1.5.1 version will be returned as 10501                      *
+ *                                                                            *
+ * Return value: TSDB version or 0 if unknown or the extension not installed  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tsdb_get_version(void)
+{
+	int		ver, major, minor, patch;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (-1 == ZBX_TSDB_VERSION)
+	{
+		/* catalog pg_extension not available */
+		if (90001 > ZBX_PG_SVERSION)
+		{
+			ver = ZBX_TSDB_VERSION = 0;
+			goto out;
+		}
+
+		result = zbx_db_select("select extversion from pg_extension where extname = 'timescaledb'");
+
+		/* database down, can re-query in the next call */
+		if ((DB_RESULT)ZBX_DB_DOWN == result)
+		{
+			ver = 0;
+			goto out;
+		}
+
+		/* extension is not installed */
+		if (NULL == result)
+		{
+			ver = ZBX_TSDB_VERSION = 0;
+			goto out;
+		}
+
+		if (NULL != (row = zbx_db_fetch(result)) &&
+				3 == sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch))
+		{
+			ver = major * 10000;
+			ver += minor * 100;
+			ver += patch;
+			ZBX_TSDB_VERSION = ver;
+		}
+		else
+			ver = ZBX_TSDB_VERSION = 0;
+
+		DBfree_result(result);
+	}
+	else
+		ver = ZBX_TSDB_VERSION;
+out:
+	return ver;
+}
+#endif

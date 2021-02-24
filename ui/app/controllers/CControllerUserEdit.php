@@ -32,7 +32,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$fields = [
 			'userid' =>				'db users.userid',
-			'alias' =>				'db users.alias',
+			'username' =>			'db users.username',
 			'name' =>				'db users.name',
 			'surname' =>			'db users.surname',
 			'user_groups' =>		'array_id|not_empty',
@@ -71,7 +71,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
-				'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
+				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
 					'rows_per_page', 'url', 'roleid', 'timezone'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
@@ -96,7 +96,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$data = [
 			'userid' => 0,
-			'alias' => '',
+			'username' => '',
 			'name' => '',
 			'surname' => '',
 			'password1' => '',
@@ -118,13 +118,13 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
-			'db_user' => ['alias' => '']
+			'db_user' => ['username' => '']
 		];
 		$user_groups = [];
 
 		if ($this->getInput('userid', 0) != 0) {
 			$data['userid'] = $this->getInput('userid');
-			$data['alias'] = $this->user['alias'];
+			$data['username'] = $this->user['username'];
 			$data['name'] = $this->user['name'];
 			$data['surname'] = $this->user['surname'];
 			$user_groups = zbx_objectValues($this->user['usrgrps'], 'usrgrpid');
@@ -140,7 +140,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['rows_per_page'] = $this->user['rows_per_page'];
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
-			$data['db_user']['alias'] = $this->user['alias'];
+			$data['db_user']['username'] = $this->user['username'];
 
 			if (!$this->getInput('form_refresh', 0)) {
 				$data['roleid'] = $this->user['roleid'];
@@ -154,7 +154,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		}
 
 		// Overwrite with input variables.
-		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'timezone', 'theme',
+		$this->getInputs($data, ['username', 'name', 'surname', 'password1', 'password2', 'lang', 'timezone', 'theme',
 			'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'roleid'
 		]);
 		if ($data['form_refresh'] != 0) {

@@ -103,7 +103,13 @@ void	zbx_dbms_extract_version(void);
 int	zbx_dbms_mariadb_used(void);
 #endif
 
+#ifdef HAVE_POSTGRESQL
+int	zbx_tsdb_get_version(void);
+#define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
+#endif
+
 #ifdef HAVE_ORACLE
+
 /* context for dynamic parameter binding */
 typedef struct
 {

@@ -1,6 +1,15 @@
+Changes for 5.4.0beta1
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 5.4.0alpha2
 
 New features:
+A.F.I...ST [ZBXNEXT-5868] moved global mappings to host / template (afayantsev, rlataria, Sasha, vso)
 .........T [ZBXNEXT-6385] added template "Apache Ignite by JMX" (ychukina)
 .......PS. [ZBXNEXT-6301] extended set of collected VMware metrics for VM and HV (asestakovs)
 A.F.....S. [ZBXNEXT-6427,ZBXNEXT-6458] added support for strong encryption protocols for SNMPv3 (dgoloscapov, talbergs)
@@ -14,6 +23,8 @@ A.F.....S. [ZBXNEXT-6427,ZBXNEXT-6458] added support for strong encryption proto
 .......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
 
 Bug fixes:
+A......... [ZBX-19025] fixed usage of LIMIT in SQL in user.update and user.delete API (vmurzins)
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
 ...G...... [ZBX-17543] fixed error in case if wmi.getall returned no items (dgoloscapov)
 ........S. [ZBX-18917] disabled global script webhook execution on proxy (dgoloscapov)
 .........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
@@ -94,6 +105,25 @@ A.F....... [ZBXNEXT-6324] moved Configuration -> Discovery to MVC (talbergs)
 A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (vmaksimovs)
 .........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.6rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.2.5
+
+5.2.5rc2 was released as 5.2.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.2.5rc2
+
+Bug fixes:
+A......... [ZBX-19025] fixed usage of LIMIT in SQL in user.update and user.delete API (vmurzins)
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.5rc1
@@ -511,6 +541,24 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.10rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9
+
+5.0.9rc2 was released as 5.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9rc2
+
+Bug fixes:
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.9rc1
@@ -2474,6 +2522,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.30rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29
+
+4.0.29rc1 was released as 4.0.29 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.29rc1

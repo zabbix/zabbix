@@ -903,10 +903,6 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'macros.edit')
 		->getUrl();
 
-	$valuemap_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'valuemap.list')
-		->getUrl();
-
 	$trigdisplay_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
@@ -935,7 +931,6 @@ function getAdministrationGeneralSubmenu() {
 				$iconmap_url      => _('Icon mapping'),
 				$regex_url        => _('Regular expressions'),
 				$macros_url       => _('Macros'),
-				$valuemap_url     => _('Value mapping'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
 				$tokens_url       => $can_access_tokens ? _('API tokens') : null,

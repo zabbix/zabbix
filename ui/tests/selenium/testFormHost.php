@@ -195,6 +195,14 @@ class testFormHost extends CWebTest {
 	public function testFormHost_Layout() {
 		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost with items']);
 		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		// Check tabs available in the form
+		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
+		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
+		foreach ($tabs as $tab) {
+			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab).
+					"]")->one()->isValid());
+		}
+
 		// Host form fields maxlength attribute.
 		foreach (['Host name' => 128, 'Visible name' => 128, 'Description' => 65535] as $field => $maxlength) {
 			$this->assertEquals($maxlength, $form->getField($field)->getAttribute('maxlength'));

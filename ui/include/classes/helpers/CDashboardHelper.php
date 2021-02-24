@@ -32,7 +32,7 @@ class CDashboardHelper {
 	 */
 	public static function getOwnerName($userid): string {
 		$users = API::User()->get([
-			'output' => ['name', 'surname', 'alias'],
+			'output' => ['name', 'surname', 'username'],
 			'userids' => $userid
 		]);
 

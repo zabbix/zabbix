@@ -224,7 +224,7 @@ try {
 
 	if (CSessionHelper::has('saml_data')) {
 		$saml_data = CSessionHelper::get('saml_data');
-		CWebUser::$data = API::getApiService('user')->loginByAlias($saml_data['username_attribute'],
+		CWebUser::$data = API::getApiService('user')->loginByUsername($saml_data['username_attribute'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);

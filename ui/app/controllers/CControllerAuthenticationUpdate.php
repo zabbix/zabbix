@@ -172,7 +172,7 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			$login = $ldap_validator->validate([
-				'user' => $this->getInput('ldap_test_user', CWebUser::$data['alias']),
+				'username' => $this->getInput('ldap_test_user', CWebUser::$data['username']),
 				'password' => $this->getInput('ldap_test_password', '')
 			]);
 

@@ -84,7 +84,7 @@ function local_showSidebar(array $data): void {
 function local_showFooter(array $data): void {
 	echo (new CPartial('layout.htmlpage.footer', [
 		'user' => [
-			'alias' => CWebUser::$data['alias'],
+			'username' => CWebUser::$data['username'],
 			'debug_mode' => CWebUser::$data['debug_mode']
 		],
 		'web_layout_mode' => $data['web_layout_mode']

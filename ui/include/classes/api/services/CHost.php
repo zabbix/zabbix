@@ -162,6 +162,7 @@ class CHost extends CHostGeneral {
 			'selectHostDiscovery'				=> null,
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
+			'selectValueMaps'					=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
 			'preservekeys'						=> false,
@@ -489,108 +490,11 @@ class CHost extends CHostGeneral {
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			if ($options['inheritedTags']) {
-				// Swap tag operators to include templates (normally should be excluded) for later processing.
-				$filter = array_map(function($tag) {
-					$swapping_map = [
-						TAG_OPERATOR_LIKE => TAG_OPERATOR_LIKE,
-						TAG_OPERATOR_EQUAL => TAG_OPERATOR_EQUAL,
-						TAG_OPERATOR_NOT_LIKE => TAG_OPERATOR_LIKE,
-						TAG_OPERATOR_NOT_EQUAL => TAG_OPERATOR_EQUAL,
-						TAG_OPERATOR_EXISTS => TAG_OPERATOR_EXISTS,
-						TAG_OPERATOR_NOT_EXISTS => TAG_OPERATOR_EXISTS
-					];
-					return ['operator' => $swapping_map[$tag['operator']]] + $tag;
-				}, $options['tags']);
-
-				$db_template_tags = DBfetchArray(DBselect(
-					'SELECT h.hostid,ht.tag,ht.value,ht.hosttagid'.
-					' FROM hosts h'.
-					' LEFT JOIN host_tag ht'.
-					' ON ht.hostid=h.hostid'.
-					' WHERE'.
-						' h.status='.HOST_STATUS_TEMPLATE.
-						' AND ('.CApiTagHelper::addWhereCondition($filter, TAG_EVAL_TYPE_OR, 'h','host_tag', 'hostid').
-							' OR ht.hosttagid IS NULL)'
-				));
-
-				$tags = [];
-				foreach ($options['tags'] as $tag) {
-					if (!array_key_exists($tag['tag'], $tags)) {
-						$tags[$tag['tag']] = [
-							'templateids_in' => [],
-							'templateids_not_in' => [],
-							'pairs' => []
-						];
-					}
-
-					$tags[$tag['tag']]['pairs'][] = [
-						'value' => array_key_exists('value', $tag) ? $tag['value'] : '',
-						'operator' => $tag['operator']
-					];
-
-					[$templateids_in, $templateids_not_in]
-							= CApiTagHelper::checkMatchingTemplates($tag, $db_template_tags);
-
-					while ($templateids_in) {
-						$tags[$tag['tag']]['templateids_in'] += $templateids_in;
-
-						$templateids_in = API::Template()->get([
-							'output' => [],
-							'parentTemplateids' => array_keys($templateids_in),
-							'preservekeys' => true,
-							'nopermissions' => true
-						]);
-					}
-
-					while ($templateids_not_in) {
-						$tags[$tag['tag']]['templateids_not_in'] += $templateids_not_in;
-
-						$templateids_not_in = API::Template()->get([
-							'output' => [],
-							'parentTemplateids' => array_keys($templateids_not_in),
-							'preservekeys' => true,
-							'nopermissions' => true
-						]);
-					}
-				}
-
-				$where = [];
-				foreach ($tags as $tag => $_tag) {
-					$_tags = [];
-					foreach ($_tag['pairs'] as $pair) {
-						$_tags[] = [
-							'tag' => $tag,
-							'value' => $pair['value'],
-							'operator' => $pair['operator']
-						];
-					}
-
-					// Filtering by host tags.
-					$_where = CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid');
-
-					// Exclude hosts having templates with TAG_OPERATOR_NOT_* tags.
-					if ($_tag['templateids_not_in']) {
-						$_where = '('.
-							$_where.
-							' AND ('.
-								'ht2.templateid IS NULL'.
-								' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids_not_in']), true).
-							')'.
-						')';
-					}
-
-					// Extend results with hosts having inherited tags matching filtering criteria.
-					if ($_tag['templateids_in']) {
-						$_where .= ' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids_in']));
-					}
-					$where[] = '('.$_where.')';
-				}
-
 				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
-				$operator = ($options['evaltype'] == TAG_EVAL_TYPE_AND_OR) ? ' AND ' : ' OR ';
-				$sqlParts['where'][] = '('.implode($operator, $where).')';
+				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
+					$options['evaltype']
+				);
 			}
 			else {
 				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
@@ -1831,7 +1735,8 @@ class CHost extends CHostGeneral {
 			'severities' =>	[
 				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true
 			],
-			'withProblemsSuppressed' =>  ['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL]
+			'withProblemsSuppressed' =>		['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -2224,7 +2129,6 @@ class CHost extends CHostGeneral {
 					}
 				}
 			}
-
 			// Permissions to host groups is validated in massUpdate().
 		}
 		unset($host);
