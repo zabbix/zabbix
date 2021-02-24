@@ -862,8 +862,10 @@ abstract class CDashboardGeneral extends CApiService {
 					}
 					unset($db_page);
 
-					$db_widgets = API::getApiService()->select('widget', [
-						'output' => API_OUTPUT_EXTEND,
+					$db_widgets = DB::select('widget', [
+						'output' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'view_mode',
+							'dashboard_pageid'
+						],
 						'filter' => ['dashboard_pageid' => array_keys($db_pages)],
 						'preservekeys' => true
 					]);
@@ -874,8 +876,10 @@ abstract class CDashboardGeneral extends CApiService {
 						}
 						unset($db_widget);
 
-						$db_fields = API::getApiService()->select('widget_field', [
-							'output' => API_OUTPUT_EXTEND,
+						$db_fields = DB::select('widget_field', [
+							'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
+								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
+							],
 							'filter' => [
 								'widgetid' => array_keys($db_widgets),
 								'type' => array_keys(self::WIDGET_FIELD_TYPE_COLUMNS)
