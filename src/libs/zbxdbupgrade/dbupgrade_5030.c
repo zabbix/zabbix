@@ -2156,7 +2156,6 @@ static int	DBpatch_5030052(void)
 
 		if (FAIL == (ret = DBpatch_delay_routine(row[2], &delay)))
 			break;
-		printf("AKDBG delay '%s' -> %d\n", row[2], delay);
 
 		ret = 	DBpatch_convert_slideshow(slideshowid, row[1], delay, userid, private);
 	}
