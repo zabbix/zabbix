@@ -362,7 +362,7 @@ class testWebScenario extends CAPITest {
 					]
 				]],
 				'expected_error' => null
-			],
+			]
 		];
 	}
 
