@@ -210,7 +210,6 @@
 		this.operations = new OperationViewType(this.$obj.find('>ul>li[id^="operations"]'));
 		this.operation_type = this.$obj.find('[id^="operation-type"]');
 		this.operation_opcommand_scriptid = this.$obj.find('[id^="operation_opcommand_scriptid"]');
-		this.$current_focus = this.operations.$select;
 
 		this.operations.onchange = (operations) => {
 			var script_pattern = /^id\[([\d]+)\]|cmd\[([\d]+)\]$/,
