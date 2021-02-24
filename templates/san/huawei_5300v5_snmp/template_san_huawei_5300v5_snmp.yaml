@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-02-24T06:13:30Z'
+  date: '2021-02-15T15:08:09Z'
   groups:
     -
       name: Templates/Modules
