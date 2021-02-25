@@ -1312,4 +1312,11 @@ in:
   expression: 'min(2s, 1m),'
 out:
   result: FAIL
+---
+test case: Succeed '1 + ((/host/key))'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  expression: '1 + ((/host/key,1d))'
+out:
+  result: FAIL
 ...

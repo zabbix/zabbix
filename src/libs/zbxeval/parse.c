@@ -545,7 +545,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 				if (2 <= ctx->ops.values_num)
 					func_token = &ctx->ops.values[ctx->ops.values_num - 2];
 
-				if (NULL == func_token && 0 == (func_token->type & ZBX_EVAL_CLASS_FUNCTION))
+				if (NULL == func_token || 0 == (func_token->type & ZBX_EVAL_CLASS_FUNCTION))
 				{
 					*error = zbx_dsprintf(*error, "item query must be first argument of a"
 							" historical function at \"%s\"", ctx->expression + pos);
