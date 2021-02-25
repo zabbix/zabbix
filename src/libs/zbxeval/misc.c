@@ -168,7 +168,7 @@ size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t m
 		unsigned char **data)
 {
 	int		i;
-	unsigned char	buffer_static[ZBX_EVAL_STATIC_BUFFER_SIZE], *buffer = buffer_static, *ptr = buffer, len_buff[4];
+	unsigned char	buffer_static[ZBX_EVAL_STATIC_BUFFER_SIZE], *buffer = buffer_static, *ptr = buffer, len_buff[6];
 	size_t		buffer_size = ZBX_EVAL_STATIC_BUFFER_SIZE;
 	zbx_uint32_t	len, len_offset;
 
@@ -181,15 +181,16 @@ size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t m
 	{
 		const zbx_eval_token_t	*token = &ctx->stack.values[i];
 
-		reserve_buffer(&buffer, &buffer_size, 20, &ptr);
+		/* reserve space for maximum possible for worst case scenario with empty variant:     */
+		/*  4 bytes token type, 6 bytes per compact uint31 and 1 byte empty variant (4+3*6+1) */
+		reserve_buffer(&buffer, &buffer_size, 23, &ptr);
 
 		ptr += zbx_serialize_value(ptr, token->type);
 		ptr += zbx_serialize_uint31_compact(ptr, token->opt);
-
-		serialize_variant(&buffer, &buffer_size, &token->value, &ptr);
-
 		ptr += zbx_serialize_uint31_compact(ptr, token->loc.l);
 		ptr += zbx_serialize_uint31_compact(ptr, token->loc.r);
+
+		serialize_variant(&buffer, &buffer_size, &token->value, &ptr);
 	}
 
 	len = ptr - buffer;
@@ -240,12 +241,13 @@ void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_u
 
 		data += zbx_deserialize_value(data, &token->type);
 		data += zbx_deserialize_uint31_compact(data, &token->opt);
-		data += deserialize_variant(data, &token->value);
 
 		data += zbx_deserialize_uint31_compact(data, &pos);
 		token->loc.l = pos;
 		data += zbx_deserialize_uint31_compact(data, &pos);
 		token->loc.r = pos;
+
+		data += deserialize_variant(data, &token->value);
 	}
 }
 
