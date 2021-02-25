@@ -1345,6 +1345,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/": cannot be empty.'
 			],
 			[
+				['type' => API_OBJECTS, 'length' => 2, 'fields' => []],
+				[[], [], []],
+				'/',
+				'Invalid parameter "/": value is too long.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 3, 'fields' => []],
+				[[], [], []],
+				'/',
+				[[], [], []]
+			],
+			[
 				['type' => API_OBJECTS, 'fields' => []],
 				['000' => []],
 				'/',
