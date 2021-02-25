@@ -564,8 +564,8 @@ abstract class CDashboardGeneral extends CApiService {
 				continue;
 			}
 
-			foreach ($dashboard['pages'] as $dashboard_page_index => $dashboard_page) {
-				$dashboard_page['sortorder'] = $dashboard_page_index;
+			foreach ($dashboard['pages'] as $index => $dashboard_page) {
+				$dashboard_page['sortorder'] = $index;
 
 				if (array_key_exists('dashboard_pageid', $dashboard_page)) {
 					$upd_dashboard_page = DB::getUpdatedValues('dashboard_page', $dashboard_page,
