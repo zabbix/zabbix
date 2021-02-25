@@ -134,10 +134,11 @@ class testPageUserRoles extends CWebTest {
 		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
 
 		// Check that number displayed near Users and # columns are equal.
-		foreach ($table->getRows() as $row) {
-			$users_count = $row->getColumn('Users')->query('xpath:./a[contains(@class, "link-alt")]')->count();
+		foreach ($roleids as $role) {
+			$users_count = $table->findRow('Name', $role['name'])->getColumn('Users')->query('xpath:./a[contains(@class, "link-alt")]')->count();
+			$this->assertEquals($users_count, CDBHelper::getCount('SELECT * FROM users WHERE roleid='.zbx_dbstr($role['roleid'])));
 			if ($users_count !== 0) {
-				$users_amount = $row->getColumn('#')->query('xpath:./sup')->one()->getText();
+				$users_amount = $table->findRow('Name', $role['name'])->getColumn('#')->query('xpath:./sup')->one()->getText();
 				$this->assertEquals($users_count, intval($users_amount));
 			}
 			else {
