@@ -13,7 +13,7 @@ and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level
 
 This template was tested on:
 
-- Zabbix, version 5.0 and later
+- Zabbix, version 5.2 and later
 - Smartmontools, version 7.1 and later
 
 ## Setup
