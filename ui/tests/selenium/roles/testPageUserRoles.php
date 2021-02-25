@@ -60,6 +60,10 @@ class testPageUserRoles extends CWebTest {
 			[
 				'name' => '$^&#%*',
 				'type' => 1
+			],
+			[
+				'name' => 'role_with_min end',
+				'type' => 1
 			]
 		]);
 	}
@@ -161,10 +165,20 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				[
+					'name' => 'min ro',
+					'result' => [
+						'Admin role',
+						'Super admin role'
+					]
+				]
+			],
+			[
+				[
 					'name' => ' ',
 					'result' => [
 						'Admin role',
 						'Guest role',
+						'role_with_min end',
 						'Super admin role',
 						'User role'
 					]
@@ -180,6 +194,7 @@ class testPageUserRoles extends CWebTest {
 						'Remove_role_1',
 						'Remove_role_2',
 						'Remove_role_3',
+						'role_with_min end',
 						'Super admin role',
 						'User role'
 					]
@@ -265,7 +280,6 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'message_header' => 'User role deleted',
 					'roles' => [
 						'Remove_role_1'
@@ -274,7 +288,6 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'message_header' => 'User roles deleted',
 					'roles' => [
 						'Remove_role_2',
