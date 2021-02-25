@@ -494,6 +494,7 @@ void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message)
 	memset(ctx, 0, sizeof(zbx_eval_context_t));
 	zbx_vector_eval_token_create(&ctx->stack);
 	zbx_vector_eval_token_reserve(&ctx->stack, 2);
+	ctx->stack.values_num = 2;
 
 	token = ctx->stack.values;
 	memset(token, 0, 2 * sizeof(zbx_eval_token_t));

@@ -1192,10 +1192,9 @@ static int	eval_throw_execption(const zbx_eval_context_t *ctx, const zbx_eval_to
 {
 	zbx_variant_t	*arg;
 
-	if (1 != output->values_num || 1 != token->opt)
+	if (0 == output->values_num)
 	{
-		*error = zbx_dsprintf(*error, "exception must have one argument at \"%s\"",
-				ctx->expression + token->loc.l);
+		*error = zbx_strdup(*error, "exception must have one argument");
 		return FAIL;
 	}
 

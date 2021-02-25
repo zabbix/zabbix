@@ -690,11 +690,9 @@ static void	eval_append_arg_null(zbx_eval_context_t *ctx)
  ******************************************************************************/
 static void	eval_clear(zbx_eval_context_t *ctx)
 {
-	if (NULL != ctx->expression)
+	if (NULL != ctx->stack.values)
 	{
 		int	i;
-
-		ctx->expression = NULL;
 
 		for (i = 0; i < ctx->stack.values_num; i++)
 			zbx_variant_clear(&ctx->stack.values[i].value);
