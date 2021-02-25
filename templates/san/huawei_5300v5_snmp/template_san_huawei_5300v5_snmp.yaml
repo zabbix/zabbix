@@ -3,7 +3,7 @@ zabbix_export:
   date: '2021-02-15T15:08:09Z'
   groups:
     -
-      name: Templates/Modules
+      name: Templates/SAN
   templates:
     -
       template: 'Huawei OceanStor 5300 V5 SNMP'
@@ -19,7 +19,7 @@ zabbix_export:
           name: 'Generic SNMP'
       groups:
         -
-          name: Templates/Modules
+          name: Templates/SAN
       applications:
         -
           name: CPU
