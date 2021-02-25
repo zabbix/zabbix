@@ -396,6 +396,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'parameters'
 		],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+		'selectTags' => ['tag', 'value'],
 		'itemids' => $src_itemids,
 		'preservekeys' => true
 	]);
