@@ -694,7 +694,7 @@ class CScreenProblem extends CScreenBase {
 		$userids = $userids + $actions['userids'];
 		$data['users'] = $userids
 			? API::User()->get([
-				'output' => ['alias', 'name', 'surname'],
+				'output' => ['username', 'name', 'surname'],
 				'userids' => array_keys($userids + $actions['userids']),
 				'preservekeys' => true
 			])

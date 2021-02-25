@@ -40,7 +40,7 @@ else {
 	$widget_name = _('User profile').NAME_DELIMITER;
 	$widget_name .= ($data['name'] !== '' || $data['surname'] !== '')
 		? $data['name'].' '.$data['surname']
-		: $data['alias'];
+		: $data['username'];
 	$widget->setTitleSubmenu(getUserSettingsSubmenu());
 }
 
@@ -64,13 +64,13 @@ $user_form_list = new CFormList('user_form_list');
 
 if ($data['action'] === 'user.edit') {
 	$user_form_list
-		->addRow((new CLabel(_('Alias'), 'alias'))->setAsteriskMark(),
-			(new CTextBox('alias', $data['alias']))
-				->setReadonly($data['db_user']['alias'] === ZBX_GUEST_USER)
+		->addRow((new CLabel(_('Username'), 'username'))->setAsteriskMark(),
+			(new CTextBox('username', $data['username']))
+				->setReadonly($data['db_user']['username'] === ZBX_GUEST_USER)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
-				->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
+				->setAttribute('maxlength', DB::getFieldLength('users', 'username'))
 		)
 		->addRow(_x('Name', 'user first name'),
 			(new CTextBox('name', $data['name']))
@@ -131,7 +131,7 @@ if ($data['change_password']) {
 else {
 	$user_form_list->addRow(_('Password'),
 		(new CSimpleButton(_('Change password')))
-			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER)
+			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER)
 			->setAttribute('autofocus', 'autofocus')
 			->onClick('javascript: submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -151,7 +151,7 @@ $theme_select = (new CSelect('theme'))
 	->addOption(new CSelectOption(THEME_DEFAULT, _('System default')));
 
 $language_error = null;
-if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
+if ($data['action'] === 'user.edit' && $data['db_user']['username'] === ZBX_GUEST_USER) {
 	$lang_select
 		->setName(null)
 		->setReadonly();
@@ -209,7 +209,7 @@ $user_form_list
 	->addRow(new CLabel(_('Theme'), $theme_select->getFocusableElementId()), $theme_select);
 
 // Append auto-login & auto-logout to form list.
-if ($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER) {
+if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
 	$user_form_list->addRow(_('Auto-login'),

@@ -269,7 +269,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-                  name: '{#MODULE_NAME}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#MODULE_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:

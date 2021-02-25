@@ -905,7 +905,49 @@ static int	DBpatch_5030050(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5030051(void)
+{
+	return DBdrop_field("config", "compression_availability");
+}
 
+static int	DBpatch_5030052(void)
+{
+	return DBdrop_index("users", "users_1");
+}
+
+static int	DBpatch_5030053(void)
+{
+	const ZBX_FIELD	field = {"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("users", "alias", &field);
+}
+
+static int	DBpatch_5030054(void)
+{
+	return DBcreate_index("users", "users_1", "username", 1);
+}
+
+static int	DBpatch_5030055(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter_username' where idx='web.user.filter_alias'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030056(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set value_str='username' where idx='web.user.sort' and value_str='alias'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5030)
@@ -963,5 +1005,11 @@ DBPATCH_ADD(5030047, 0, 1)
 DBPATCH_ADD(5030048, 0, 1)
 DBPATCH_ADD(5030049, 0, 1)
 DBPATCH_ADD(5030050, 0, 1)
+DBPATCH_ADD(5030051, 0, 1)
+DBPATCH_ADD(5030052, 0, 1)
+DBPATCH_ADD(5030053, 0, 1)
+DBPATCH_ADD(5030054, 0, 1)
+DBPATCH_ADD(5030055, 0, 1)
+DBPATCH_ADD(5030056, 0, 1)
 
 DBPATCH_END()
