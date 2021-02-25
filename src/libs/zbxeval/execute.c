@@ -294,7 +294,7 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: vairant_convert_suffixed_num                                     *
+ * Function: variant_convert_suffixed_num                                     *
  *                                                                            *
  * Purpose: convert variant string value containing suffixed number to        *
  *          floating point variant value                                      *
@@ -306,7 +306,7 @@ finish:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	vairant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
+static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
 {
 	int	len, num_len, offset;
 
@@ -316,13 +316,10 @@ static int	vairant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_
 	len = strlen(value_num->data.str);
 	offset = ('-' == *value_num->data.str ? 1 : 0);
 
-	if (SUCCEED != zbx_suffixed_number_parse(value_num->data.str + offset, &num_len) ||
-			num_len != len - offset)
-	{
+	if (SUCCEED != zbx_suffixed_number_parse(value_num->data.str + offset, &num_len) || num_len != len - offset)
 		return FAIL;
-	}
 
-	zbx_variant_set_dbl(value,  atof(value_num->data.str) * suffix2factor(value_num->data.str[len - 1]));
+	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(value_num->data.str[len - 1]));
 
 	return SUCCEED;
 }
@@ -391,7 +388,7 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 		/* Expanded user macro token variables can contain suffixed numbers. */
 		/* Try to convert them and just copy the expanded value if failed.   */
 		if (ZBX_EVAL_TOKEN_VAR_USERMACRO != token->type ||
-				SUCCEED != vairant_convert_suffixed_num(&value, &token->value))
+				SUCCEED != variant_convert_suffixed_num(&value, &token->value))
 		{
 			zbx_variant_copy(&value, &token->value);
 		}
