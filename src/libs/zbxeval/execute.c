@@ -1294,7 +1294,6 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 				default:
 					*error = zbx_dsprintf(*error, "unknown token at \"%s\"",
 							ctx->expression + token->loc.l);
-					ret = FAIL;
 					goto out;
 			}
 		}
