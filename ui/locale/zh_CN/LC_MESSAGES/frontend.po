@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 19:57+0200\n"
-"PO-Revision-Date: 2017-10-11 11:47+0300\n"
-"Last-Translator: 岂几 <tom3000@126.com>\n"
+"POT-Creation-Date: 2021-02-12 19:53+0200\n"
+"PO-Revision-Date: 2021-02-15 09:13+0300\n"
+"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1507715225.000000\n"
+"X-POOTLE-MTIME: 1613373219.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" 替代 \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -49,12 +49,12 @@ msgstr "\"%1$s\" 预计"
 #: maintenance.php:133 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%1$s\" 必须是在 1970.01.01 与 2038.01.18之间."
 
 #: include/classes/api/services/CItemGeneral.php:1367
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "\"%1$s\" 的值必须小于或等于 \"%2$s\" 的值"
 
 #: include/classes/import/validators/C10XmlValidator.php:381
 #: include/classes/import/validators/C10XmlValidator.php:403
@@ -67,7 +67,7 @@ msgstr "“主机：key值” 关键的预计"
 #: include/views/js/configuration.host.discovery.edit.js.php:91
 #: include/views/js/item.preprocessing.js.php:148
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:549
 #, c-format
@@ -96,7 +96,7 @@ msgstr[0] "%1$d of %3$d%2$s 问题显示"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:115
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d 个问题被选择。"
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -138,7 +138,7 @@ msgstr[0] "%1$s 事件"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
+msgstr[0] "%1$s 主机在维护中"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:119
 #: include/views/monitoring.history.php:32
@@ -209,14 +209,14 @@ msgstr[0] "%1$s 秒"
 #: jsLoader.php:257
 #, c-format
 msgid "%1$s symbols remaining"
-msgstr ""
+msgstr "%1$s 标记剩余"
 
 #: include/maps.inc.php:363 include/maps.inc.php:366 include/maps.inc.php:373
 #: include/maps.inc.php:378
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
+msgstr[0] "%1$s 未知的问题"
 
 #: app/views/monitoring.widget.problems.view.php:276
 #, c-format
@@ -248,8 +248,8 @@ msgstr "%1$s, 选择"
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgstr[0] ""
-"发生了 %4$s 次失败的登陆尝试。最后一次失败的登陆尝试发生在 %2$s 日 %3$s 客户端IP地址是 %1$s。\n"
-"连续发生了 %4$s 次失败的登陆尝试。最后一次失败的登陆尝试发生在 %2$s 日 %3$s 客户端IP地址是 %1$s。"
+"发生了 %4$s 次失败的登陆尝试。最后一次失败的登陆尝试发生在 %2$s 日 %3$s 客户端IP地址是 %1$s 。\n"
+" 连续发生了 %4$s 次失败的登陆尝试。最后一次失败的登陆尝试发生在 %2$s 日 %3$s 客户端IP地址是 %1$s 。"
 
 #: include/classes/screens/CScreenDiscovery.php:213
 #, c-format
@@ -325,11 +325,11 @@ msgstr "最近500个值"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<空字符串>"
 
 #: include/forms.inc.php:1340 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
-msgstr ""
+msgstr "<标签名称>"
 
 #: include/views/monitoring.sysmap.edit.php:126
 msgid "<manual>"
@@ -339,7 +339,7 @@ msgstr "<手册>"
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<指标名称>{<标签名称>=\"<标签名称>\",...} == <值>"
 
 #: app/views/administration.script.edit.php:44
 msgid "<sub-menu/sub-menu/...>script"
@@ -489,9 +489,9 @@ msgid "Action added"
 msgstr "动作已添加"
 
 #: include/classes/core/ZBase.php:463
-#, c-format
+#, fuzzy, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "动作类 %1$s 必须扩展 %2$s 类。"
 
 #: actionconf.php:202
 msgid "Action deleted"
@@ -710,7 +710,7 @@ msgstr "添加"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "添加（已达消息类型限制）"
 
 #: jsLoader.php:146
 msgid "Add a new widget"
@@ -730,7 +730,7 @@ msgstr "添加主机"
 
 #: app/partials/massupdate.macros.tab.php:93
 msgid "Add missing"
-msgstr ""
+msgstr "添加缺失的"
 
 #: jsLoader.php:343
 msgid "Add multiple maps"
@@ -742,7 +742,7 @@ msgstr "添加新数据集"
 
 #: include/views/configuration.host.edit.php:147
 msgid "Add new interface"
-msgstr ""
+msgstr "添加新的接口"
 
 #: include/classes/widgets/CWidgetHelper.php:724
 msgid "Add new override"
@@ -805,7 +805,7 @@ msgstr "持续时间小于"
 #: include/views/monitoring.overview.triggers.php:71
 #, c-format
 msgid "Age less than %1$s"
-msgstr ""
+msgstr "存在时间小于 %1$s"
 
 #: app/views/administration.script.list.php:87 app/views/popup.generic.php:618
 #: include/hosts.inc.php:1407 include/items.inc.php:345
@@ -834,15 +834,15 @@ msgstr "agent代理程序的接口"
 
 #: include/classes/widgets/CWidgetHelper.php:1136
 msgid "Aggregate"
-msgstr ""
+msgstr "聚合"
 
 #: include/classes/widgets/CWidgetHelper.php:1108
 msgid "Aggregation function"
-msgstr ""
+msgstr "聚合函数"
 
 #: include/classes/widgets/CWidgetHelper.php:1127
 msgid "Aggregation interval"
-msgstr ""
+msgstr "聚合时间区间"
 
 #: include/actions.inc.php:2105
 msgid "Alert message"
@@ -1139,7 +1139,7 @@ msgstr "纯文字"
 #: app/views/administration.authentication.edit.php:206
 #: app/views/administration.authentication.edit.php:240
 msgid "Assertions"
-msgstr ""
+msgstr "断言"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1149,7 +1149,7 @@ msgstr "资产标签"
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
-msgstr[0] "每周 %1$s:%2$s %3$s 每 %4$s 周 %1$s:%2$s %3$s"
+msgstr[0] "每周的 %1$s:%2$s %3$s每 %4$s 周的 %1$s:%2$s %3$s"
 
 #: include/maintenances.inc.php:50
 #, c-format
@@ -1173,7 +1173,7 @@ msgstr "于(时:分)"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "至少必须执行一项操作。"
 
 #: include/classes/api/services/CMaintenance.php:279
 #: include/classes/api/services/CMaintenance.php:704
@@ -1190,11 +1190,11 @@ msgstr "必须创建至少一个维护期间."
 
 #: include/classes/setup/CFrontendSetup.php:259
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "应该至少支持MySQL，PostgreSQL或Oracle中的一种。"
 
 #: include/views/configuration.correlation.edit.php:154
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "必须至少选择一项操作。"
 
 #: include/views/configuration.action.edit.php:529
 msgid "At least one operation must exist."
@@ -1546,11 +1546,11 @@ msgstr "CPU 使用率。返回浮点数"
 
 #: app/views/popup.itemtestedit.view.php:163
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1796
 msgid "CSV to JSON"
-msgstr ""
+msgstr "转换 CSV 为 JSON"
 
 #: include/views/configuration.services.edit.php:90 services.php:40
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1563,19 +1563,19 @@ msgstr "可计算的"
 
 #: include/classes/items/CHelpItems.php:733
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "根据提供的各种参数计算平均值。Zabbix服务器通过在数据库直接执行查询来收集聚合信息。"
 
 #: include/classes/items/CHelpItems.php:741
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "根据提供的各种参数计算最大值。Zabbix服务器通过在数据库直接执行查询来收集聚合信息。"
 
 #: include/classes/items/CHelpItems.php:737
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "根据提供的各种参数计算最小值。Zabbix服务器通过在数据库直接执行查询来收集聚合信息。"
 
 #: include/classes/items/CHelpItems.php:745
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "根据提供的各种参数计算总计值。 Zabbix服务器通过在数据库直接执行查询来收集聚合信息。"
 
 #: jsLoader.php:172
 msgid "Calendar"
@@ -1731,7 +1731,7 @@ msgstr "无法添加报警媒介类型"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
+msgstr[0] "不能添加模块：%1$s。"
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -1803,7 +1803,7 @@ msgstr "无法添加用户"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:100
 msgid "Cannot add user group"
-msgstr ""
+msgstr "不能添加用户组"
 
 #: app/controllers/CControllerValuemapCreate.php:41
 #: app/controllers/CControllerValuemapCreate.php:77
@@ -1816,7 +1816,7 @@ msgstr "不能添加web场景"
 
 #: jsLoader.php:154
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "不能添加小构建：仪表板上没有足够的空余空间"
 
 #: jsLoader.php:144
 msgid "Cannot add widgets in kiosk mode"
@@ -2376,7 +2376,7 @@ msgstr ""
 #: include/classes/import/CConfigurationImport.php:762
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "在主机\"%3$s\"上，未能找到可用于监控项 \"%2$s\" 的 \"%1$s\" 接口。"
 
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
@@ -7308,7 +7308,7 @@ msgstr ""
 msgid "Host availability"
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:1077
+#: include/classes/api/services/CHostInterface.php:1083
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "主机不能有超过一个同类型的默认接口."
 
@@ -8252,11 +8252,11 @@ msgstr "函数传入了错误的参数"
 #: include/classes/api/services/CHostInterface.php:452
 #: include/classes/api/services/CHostInterface.php:627
 #: include/classes/api/services/CHostInterface.php:871
-#: include/classes/api/services/CHostInterface.php:1112
-#: include/classes/api/services/CHostInterface.php:1127
-#: include/classes/api/services/CHostInterface.php:1163
-#: include/classes/api/services/CHostInterface.php:1181
-#: include/classes/api/services/CHostInterface.php:1198
+#: include/classes/api/services/CHostInterface.php:1118
+#: include/classes/api/services/CHostInterface.php:1133
+#: include/classes/api/services/CHostInterface.php:1169
+#: include/classes/api/services/CHostInterface.php:1187
+#: include/classes/api/services/CHostInterface.php:1204
 #: include/classes/api/services/CHost.php:1352
 #: include/classes/api/services/CHostPrototype.php:457
 #: include/classes/api/services/CHostPrototype.php:478
@@ -8301,7 +8301,7 @@ msgstr "函数传入了错误的参数"
 msgid "Incorrect arguments passed to function."
 msgstr "函数传入了错误的参数。"
 
-#: include/classes/api/services/CHostInterface.php:1145
+#: include/classes/api/services/CHostInterface.php:1151
 msgid "Incorrect bulk value for interface."
 msgstr "接口的值不正确"
 
@@ -9256,7 +9256,7 @@ msgstr "安装名称"
 msgid "Interface"
 msgstr "接口"
 
-#: include/classes/api/services/CHostInterface.php:1098
+#: include/classes/api/services/CHostInterface.php:1104
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "接口是链接到\"%2$s\"上的监控项\"%1$s\"."
@@ -11893,8 +11893,8 @@ msgstr "未发现数据"
 msgid "No data."
 msgstr "没有数据。"
 
-#: include/classes/api/services/CHostInterface.php:998
-#: include/classes/api/services/CHostInterface.php:1070
+#: include/classes/api/services/CHostInterface.php:999
+#: include/classes/api/services/CHostInterface.php:1074
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "在\"%2$s\"上的\"%1$s\"类型无默认接口."
@@ -20612,14 +20612,14 @@ msgstr "在此输入搜索"
 
 #: include/classes/validators/CApiInputValidator.php:1800
 msgid "unacceptable URL"
-msgstr ""
+msgstr "不可接受的网址"
 
 #: include/classes/import/validators/C44XmlValidator.php:2220
 #: include/classes/import/validators/C50XmlValidator.php:2363
 #: include/classes/import/validators/CXmlValidatorGeneral.php:267
 #, c-format
 msgid "unexpected constant \"%1$s\""
-msgstr ""
+msgstr "非期望的常数值 \"%1$s\""
 
 #: include/classes/export/CConfigurationExportBuilder.php:105
 #: include/classes/import/converters/CConstantImportConverter.php:60
@@ -20627,7 +20627,7 @@ msgstr ""
 #: include/classes/import/validators/C50XmlValidator.php:2321
 #, c-format
 msgid "unexpected constant value \"%1$s\""
-msgstr ""
+msgstr "非期望的常数值 \"%1$s\""
 
 #: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
@@ -20683,7 +20683,7 @@ msgstr "未知的"
 
 #: app/controllers/CControllerPopupItemTestSend.php:197
 msgid "unsupported time suffix"
-msgstr ""
+msgstr "不支持的时间后缀"
 
 #: include/classes/import/validators/CXmlValidator.php:63
 msgid "unsupported version number"
@@ -20728,7 +20728,7 @@ msgstr "值"
 #: include/classes/api/services/CDiscoveryRule.php:1830
 #, c-format
 msgid "value \"%1$s\" already exists"
-msgstr ""
+msgstr "值 \"%1$s\" 已存在"
 
 #: include/classes/import/CConfigurationImport.php:871
 #: include/classes/import/CConfigurationImport.php:909
@@ -20788,20 +20788,20 @@ msgstr "值必须是 %1$s 之一"
 
 #: include/classes/api/services/CItemGeneral.php:1524
 msgid "value of first parameter is too long"
-msgstr ""
+msgstr "第一个参数的值太长了"
 
 #: include/correlation.inc.php:215
 msgid "value of new event tag"
-msgstr ""
+msgstr "新时间标签的值"
 
 #: include/classes/api/services/CItemGeneral.php:1530
 msgid "value of second parameter is too long"
-msgstr ""
+msgstr "第二个参数值太长了"
 
 #: include/classes/api/services/CItemGeneral.php:1541
 #, c-format
 msgid "value of third parameter must be one of %1$s"
-msgstr ""
+msgstr "第三个参数的值必须是 %1$s 中的一个"
 
 #: include/actions.inc.php:571 include/actions.inc.php:589
 #: include/actions.inc.php:734 include/actions.inc.php:752
