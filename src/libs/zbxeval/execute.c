@@ -701,7 +701,7 @@ static int	eval_execute_function_sum(const zbx_eval_context_t *ctx, const zbx_ev
 		zbx_vector_var_t *output, char **error)
 {
 	int		i, ret;
-	double		sum;
+	double		sum = 0;
 	zbx_variant_t	value;
 
 	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
@@ -747,7 +747,7 @@ static int	eval_execute_function_avg(const zbx_eval_context_t *ctx, const zbx_ev
 		zbx_vector_var_t *output, char **error)
 {
 	int		i, ret;
-	double		avg;
+	double		avg = 0;
 	zbx_variant_t	value;
 
 	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
