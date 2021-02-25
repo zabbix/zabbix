@@ -42,6 +42,8 @@ install: all
 	if test ! -f "$(ZJG_DEST)/lib/logback-console.xml"; then cp lib/logback-console.xml "$(ZJG_DEST)/lib"; fi
 
 clean:
+	rm -f tests/com/zabbix/gateway/jmx_test_beans/*.class
+	rm -f bin/*
 	rm -f $(ZJG)
 	rm -f tests/com/zabbix/gateway/jmx_test_beans/*.class
 	rm -f bin/*
