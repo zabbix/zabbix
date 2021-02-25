@@ -529,6 +529,13 @@ static int	DBpatch_5030045(void)
 	return DBadd_field("httptest", &field);
 }
 
+static int	DBpatch_5030046(void)
+{
+	const ZBX_FIELD	field = {"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("valuemap", &field);
+}
+
 static char *Update_template_name(char *old)
 {
 	char	*ptr, new[MAX_STRING_LEN];
@@ -541,7 +548,7 @@ static char *Update_template_name(char *old)
 	return ptr;
 }
 
-static int	DBpatch_5030046(void)
+static int	DBpatch_5030047(void)
 {
 	int			ret = SUCCEED;
 	char			*name, *uuid, *sql = NULL;
@@ -582,10 +589,10 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030047(void)
+static int	DBpatch_5030048(void)
 {
 	int			ret = SUCCEED;
-	char			*name, *key, *uuid, *sql = NULL, *value=NULL;
+	char			*name, *key, *uuid, *sql = NULL, *value = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -628,10 +635,10 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030048(void)
+static int	DBpatch_5030049(void)
 {
 	int		ret = SUCCEED;
-	char		*name, *host_name, *uuid, *sql = NULL, *value=NULL;
+	char		*name, *uuid, *sql = NULL, *value = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, value_alloc = 0, value_offset = 0;
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -693,22 +700,6 @@ static int	DBpatch_5030048(void)
 		zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", name);
 		zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", expression);
 
-		result2 = DBselect(
-				"select h.name"
-				" from functions f"
-				" left join items i on i.itemid=f.itemid"
-				" join hosts h on h.hostid=i.hostid and h.status = %d"
-				" where f.triggerid = %s",
-				HOST_STATUS_TEMPLATE, row[0]);
-
-		while (NULL != (row2 = DBfetch(result2)))
-		{
-			host_name = DBdyn_escape_string(row2[0]);
-			name = Update_template_name(name);
-			zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", host_name);
-			zbx_free(host_name);
-		}
-
 		uuid = zbx_gen_uuid4(value);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
 				" where triggerid=%s;\n", uuid, row[0]);
@@ -716,8 +707,6 @@ static int	DBpatch_5030048(void)
 		zbx_free(name);
 		zbx_free(uuid);
 		zbx_free(value);
-
-		DBfree_result(result2);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
@@ -734,10 +723,10 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030049(void)
+static int	DBpatch_5030050(void)
 {
 	int			ret = SUCCEED;
-	char			*name, *host_name, *uuid, *sql = NULL, *value=NULL;
+	char			*name, *host_name, *uuid, *sql = NULL, *value = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0, value_alloc = 0, value_offset = 0;
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -803,10 +792,10 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030050(void)
+static int	DBpatch_5030051(void)
 {
 	int			ret = SUCCEED;
-	char			*name, *dashboard, *uuid, *sql = NULL, *value=NULL;
+	char			*name, *dashboard, *uuid, *sql = NULL, *value = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -849,10 +838,10 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030051(void)
+static int	DBpatch_5030052(void)
 {
 	int			ret = SUCCEED;
-	char			*name, *httptest, *uuid, *sql = NULL, *value=NULL;
+	char			*name, *httptest, *uuid, *sql = NULL, *value = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -895,7 +884,53 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030052(void)
+static int	DBpatch_5030053(void)
+{
+	int			ret = SUCCEED;
+	char			*name, *valuemap, *uuid, *sql = NULL, *value = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_ROW			row;
+	DB_RESULT		result;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select v.valuemapid, v.name, h.name"
+			" from valuemap v"
+			" left join hosts h on h.hostid=v.hostid"
+			" where h.status=%d",
+			HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		name = DBdyn_escape_string(row[2]);
+		name = Update_template_name(name);
+		valuemap = DBdyn_escape_string(row[1]);
+		value = zbx_dsprintf(value, "%s%s", name, valuemap);
+		uuid = zbx_gen_uuid4(value);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update valuemap set uuid='%s' where valuemapid=%s;\n", uuid, row[0]);
+		zbx_free(name);
+		zbx_free(valuemap);
+		zbx_free(uuid);
+		zbx_free(value);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5030054(void)
 {
 	int			ret = SUCCEED;
 	char			*name, *uuid, *sql = NULL;
@@ -933,10 +968,10 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030053(void)
+static int	DBpatch_5030055(void)
 {
 	int			ret = SUCCEED;
-	char			*name, *key, *key_discovery, *uuid, *sql = NULL, *value=NULL;
+	char			*name, *key, *key_discovery, *uuid, *sql = NULL, *value = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -984,10 +1019,10 @@ out:
 
 }
 
-static int	DBpatch_5030054(void)
+static int	DBpatch_5030056(void)
 {
 	int		ret = SUCCEED;
-	char		*name, *host_name, *uuid, *sql = NULL, *value=NULL;
+	char		*name, *uuid, *sql = NULL, *value = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, value_alloc = 0, value_offset = 0;
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -997,7 +1032,7 @@ static int	DBpatch_5030054(void)
 	result = DBselect(
 			"select t.triggerid, t.description, t.expression, t.recovery_expression"
 			" from triggers t"
-			" where t.templateid is null and t.flags = %d",
+			" where t.templateid is null and t.flags=%d",
 			ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1010,6 +1045,26 @@ static int	DBpatch_5030054(void)
 		zbx_uint64_t 	functionid;
 		DB_ROW		row2;
 		DB_RESULT	result2;
+
+		result2 = DBselect(
+				"select i2.key_"
+				" from items i"
+				" join hosts h on h.hostid=i.hostid and h.status=%d"
+				" left join item_discovery id on id.itemid=i.itemid"
+				" join items i2 on id.parent_itemid=i2.itemid"
+				" join functions f on i.itemid=f.itemid and f.triggerid=%s"
+				" where i.flags=%d",
+				HOST_STATUS_TEMPLATE, row[0], ZBX_FLAG_DISCOVERY_PROTOTYPE);
+
+		if (NULL == (row2 = DBfetch(result2)))
+		{
+			DBfree_result(result2);
+			continue;
+		}
+
+		zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", row2[0]);
+
+		DBfree_result(result2);
 
 		name = DBdyn_escape_string(row[1]);
 
@@ -1025,9 +1080,9 @@ static int	DBpatch_5030054(void)
 				result2 = DBselect(
 						"select h.name, i.key_, f.name, f.parameter"
 						" from functions f"
-						" left join items i on i.itemid = f.itemid"
-						" join hosts h on h.hostid = i.hostid"
-						" where f.functionid = " ZBX_FS_UI64,
+						" left join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
 						functionid);
 
 				while (NULL != (row2 = DBfetch(result2)))
@@ -1049,39 +1104,6 @@ static int	DBpatch_5030054(void)
 		zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", name);
 		zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", expression);
 
-		result2 = DBselect(
-				"select i2.key_"
-				" from items i"
-				" left join item_discovery id on id.itemid = i.itemid"
-				" join items i2 on id.parent_itemid = i2.itemid"
-				" join functions f on i.itemid = f.itemid and f.triggerid = %s"
-				" where i.flags = %d",
-				row[0], ZBX_FLAG_DISCOVERY_PROTOTYPE);
-
-		while (NULL != (row2 = DBfetch(result2)))
-		{
-			zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", row2[0]);
-			break;
-		}
-
-		DBfree_result(result2);
-
-		result2 = DBselect(
-				"select h.name"
-				" from functions f"
-				" left join items i on i.itemid = f.itemid"
-				" join hosts h on h.hostid = i.hostid and h.status = %d"
-				" where f.triggerid = %s",
-				HOST_STATUS_TEMPLATE, row[0]);
-
-		while (NULL != (row2 = DBfetch(result2)))
-		{
-			host_name = DBdyn_escape_string(row2[0]);
-			host_name = Update_template_name(host_name);
-			zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", host_name);
-			zbx_free(host_name);
-		}
-
 		uuid = zbx_gen_uuid4(value);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
 				" where triggerid=%s;\n", uuid, row[0]);
@@ -1089,8 +1111,6 @@ static int	DBpatch_5030054(void)
 		zbx_free(name);
 		zbx_free(uuid);
 		zbx_free(value);
-
-		DBfree_result(result2);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
@@ -1107,10 +1127,10 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030055(void)
+static int	DBpatch_5030057(void)
 {
 	int			ret = SUCCEED;
-	char			*name, *templ_name, *host_name, *key, *uuid, *sql = NULL, *value=NULL;
+	char			*name, *templ_name, *key, *uuid, *sql = NULL, *value = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0, value_alloc = 0, value_offset = 0;
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -1119,39 +1139,21 @@ static int	DBpatch_5030055(void)
 	result = DBselect(
 			"select distinct g.graphid, g.name, h.name, i2.key_"
 			" from graphs g"
-			" left join graphs_items gi on gi.graphid = g.graphid"
-			" join items i on i.itemid = gi.itemid and i.flags = %d"
-			" join hosts h on h.hostid=i.hostid and h.status = %d"
-			" join item_discovery id on id.itemid = i.itemid"
-			" join items i2 on id.parent_itemid = i2.itemid"
-			" where g.templateid is null and g.flags = %d",
+			" left join graphs_items gi on gi.graphid=g.graphid"
+			" join items i on i.itemid=gi.itemid and i.flags=%d"
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" join item_discovery id on id.itemid=i.itemid"
+			" join items i2 on id.parent_itemid=i2.itemid"
+			" where g.templateid is null and g.flags=%d",
 			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DB_ROW			row2;
-		DB_RESULT		result2;
-
 		name = DBdyn_escape_string(row[1]);
 		templ_name = DBdyn_escape_string(row[2]);
 		templ_name = Update_template_name(templ_name);
 		key = DBdyn_escape_string(row[3]);
-		zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s%s%s", name, templ_name, key);
-
-		result2 = DBselect(
-				"select h.name"
-				" from graphs_items gi"
-				" left join items i on i.itemid=gi.itemid"
-				" join hosts h on h.hostid=i.hostid and h.status = %d"
-				" where gi.graphid = %s",
-				HOST_STATUS_TEMPLATE, row[0]);
-
-		while (NULL != (row2 = DBfetch(result2)))
-		{
-			host_name = DBdyn_escape_string(row2[0]);
-			zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", host_name);
-			zbx_free(host_name);
-		}
+		zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s%s%s", templ_name, key, name);
 
 		uuid = zbx_gen_uuid4(value);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set uuid='%s'"
@@ -1162,8 +1164,6 @@ static int	DBpatch_5030055(void)
 		zbx_free(uuid);
 		zbx_free(value);
 
-		DBfree_result(result2);
-
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
@@ -1179,7 +1179,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030056(void)
+static int	DBpatch_5030058(void)
 {
 	int			ret = SUCCEED;
 	char			*name, *name_tmpl, *key, *uuid, *value = NULL, *sql = NULL;
@@ -1192,9 +1192,9 @@ static int	DBpatch_5030056(void)
 	result = DBselect(
 			"select h.hostid, h.name, h2.name, i.key_"
 			" from hosts h"
-			" left join host_discovery hd on hd.hostid = h.hostid"
-			" join items i on i.itemid = hd.parent_itemid"
-			" join hosts h2 on h2.hostid = i.hostid and h2.status = %d"
+			" left join host_discovery hd on hd.hostid=h.hostid"
+			" join items i on i.itemid=hd.parent_itemid"
+			" join hosts h2 on h2.hostid=i.hostid and h2.status=%d"
 			" where h.flags=%d and h.templateid is null",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
@@ -1292,5 +1292,7 @@ DBPATCH_ADD(5030053, 0, 1)
 DBPATCH_ADD(5030054, 0, 1)
 DBPATCH_ADD(5030055, 0, 1)
 DBPATCH_ADD(5030056, 0, 1)
+DBPATCH_ADD(5030057, 0, 1)
+DBPATCH_ADD(5030058, 0, 1)
 
 DBPATCH_END()
