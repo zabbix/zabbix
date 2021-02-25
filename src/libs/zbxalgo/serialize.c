@@ -69,10 +69,10 @@ zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value
  *                                                                            *
  * Purpose: deserialize 31 bit unsigned integer from utf-8 like byte stream   *
  *                                                                            *
- * Parameters: ptr   - [IN] the byte strem                                    *
+ * Parameters: ptr   - [IN] the byte stream                                   *
  *             value - [OUT] the deserialized value                           *
  *                                                                            *
- * Return value: The number of bytes read from byte strean.                   *
+ * Return value: The number of bytes read from byte stream.                   *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_deserialize_uint31_compact(const unsigned char *ptr, zbx_uint32_t *value)
