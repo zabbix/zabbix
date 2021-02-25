@@ -21,7 +21,6 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testPageTemplates extends CLegacyWebTest {
 
