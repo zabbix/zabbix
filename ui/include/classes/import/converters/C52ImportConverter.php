@@ -25,6 +25,17 @@
 class C52ImportConverter extends CConverter {
 
 	/**
+	 * Converter used to convert trigger expressions from 5.2 to 5.4 syntax.
+	 *
+	 * @var C30TriggerConverter
+	 */
+	protected $trigger_expression_converter;
+
+	public function __construct() {
+		$this->trigger_expression_converter = new C30TriggerConverter();
+	}
+
+	/**
 	 * Convert import data from 5.2 to 5.4 version.
 	 *
 	 * @param array $data
@@ -35,7 +46,18 @@ class C52ImportConverter extends CConverter {
 		$data['zabbix_export']['version'] = '5.4';
 
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
-			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
+			$data['zabbix_export']['hosts'] = $this->convertHosts($data['zabbix_export']['hosts']);
+		}
+
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = $this->convertTemplates($data['zabbix_export']['templates']);
+		}
+
+		if (array_key_exists('triggers', $data['zabbix_export'])) {
+			foreach ($data['zabbix_export']['triggers'] as &$trigger) {
+				$trigger = $this->convertTrigger($trigger);
+			}
+			unset($trigger);
 		}
 
 		return $data;
@@ -44,22 +66,81 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert hosts.
 	 *
-	 * @static
-	 *
 	 * @param array $hosts
 	 *
 	 * @return array
 	 */
-	private static function convertHosts(array $hosts): array {
+	private function convertHosts(array $hosts): array {
 		$tls_fields = array_flip(['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
 			'tls_psk'
 		]);
 
 		foreach ($hosts as &$host) {
 			$host = array_diff_key($host, $tls_fields);
+
+			if (array_key_exists('items', $host)) {
+				foreach ($host['items'] as &$item) {
+					if (array_key_exists('triggers', $item)) {
+						foreach ($item['triggers'] as &$trigger) {
+							$trigger = $this->convertTrigger($trigger, $host['host'], $item['name']);
+						}
+						unset($trigger);
+					}
+				}
+				unset($item);
+			}
 		}
 		unset($host);
 
 		return $hosts;
+	}
+
+	/**
+	 * Convert templates.
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
+	private function convertTemplates(array $templates): array {
+		foreach ($templates as &$template) {
+			if (array_key_exists('items', $template)) {
+				foreach ($template['items'] as &$item) {
+					if (array_key_exists('triggers', $item)) {
+						foreach ($item['triggers'] as &$trigger) {
+							$trigger = $this->convertTrigger($trigger, $template['host'], $item['name']);
+						}
+						unset($trigger);
+					}
+				}
+				unset($item);
+			}
+		}
+		unset($template);
+
+		return $templates;
+	}
+
+	/**
+	 * Convert trigger expression to new syntax.
+	 *
+	 * @param array  $trigger
+	 * @param string $host     (optional)
+	 * @param string $item     (optional)
+	 *
+	 * @return array
+	 */
+	private function convertTrigger(array $trigger, ?string $host = null, ?string $item = null): array {
+		foreach (['expression', 'recovery_expression'] as $source) {
+			if (array_key_exists($source, $trigger)) {
+				$trigger[$source] = $this->trigger_expression_converter->convert(array_filter([
+					'expression' => $trigger[$source],
+					'host' => $host,
+					'item' => $item
+				]));
+			}
+		}
+
+		return $trigger;
 	}
 }
