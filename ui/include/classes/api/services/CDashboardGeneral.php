@@ -238,23 +238,6 @@ abstract class CDashboardGeneral extends CApiService {
 	}
 
 	/**
-	 * Check pages.
-	 *
-	 * @param array $dashboards
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function checkPages(array $dashboards): void {
-		foreach ($dashboards as $dashboard) {
-			if (array_key_exists('pages', $dashboard) && count($dashboard['pages']) > DASHBOARD_MAX_PAGES) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Max number of pages (%2$d) exceeded on dashboard "%1$s".',
-					$dashboard['name'], DASHBOARD_MAX_PAGES
-				));
-			}
-		}
-	}
-
-	/**
 	 * Check widgets.
 	 *
 	 * Note: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.

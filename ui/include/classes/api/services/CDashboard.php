@@ -247,7 +247,7 @@ class CDashboard extends CDashboardGeneral {
 			]],
 			'display_period' =>	['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
 			'auto_start' =>		['type' => API_INT32, 'in' => '0,1'],
-			'pages' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+			'pages' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DASHBOARD_MAX_PAGES, 'fields' => [
 				'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('dashboard_page', 'name')],
 				'display_period' =>	['type' => API_INT32, 'in' => implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))],
 				'widgets' =>		['type' => API_OBJECTS, 'fields' => [
@@ -278,7 +278,6 @@ class CDashboard extends CDashboardGeneral {
 		$this->checkDuplicates($dashboards);
 		$this->checkUsers($dashboards);
 		$this->checkUserGroups($dashboards);
-		$this->checkPages($dashboards);
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards);
 	}
@@ -305,7 +304,7 @@ class CDashboard extends CDashboardGeneral {
 			]],
 			'display_period' =>		['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
 			'auto_start' =>			['type' => API_INT32, 'in' => '0,1'],
-			'pages' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['dashboard_pageid']], 'fields' => [
+			'pages' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['dashboard_pageid']], 'length' => DASHBOARD_MAX_PAGES, 'fields' => [
 				'dashboard_pageid' =>	['type' => API_ID],
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('dashboard_page', 'name')],
 				'display_period' =>		['type' => API_INT32, 'in' => implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))],
@@ -358,7 +357,6 @@ class CDashboard extends CDashboardGeneral {
 		$this->checkDuplicates($dashboards, $db_dashboards);
 		$this->checkUsers($dashboards, $db_dashboards);
 		$this->checkUserGroups($dashboards);
-		$this->checkPages($dashboards);
 		$this->checkWidgets($dashboards, $db_dashboards);
 		$this->checkWidgetFields($dashboards, $db_dashboards);
 	}
