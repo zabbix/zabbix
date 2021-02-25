@@ -257,7 +257,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 			$db_dashboard_pages = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']]['pages'] : null;
 
-			foreach ($dashboard['pages'] as $dashboard_page_index => $dashboard_page) {
+			foreach ($dashboard['pages'] as $index => $dashboard_page) {
 				if (!array_key_exists('widgets', $dashboard_page)) {
 					continue;
 				}
@@ -274,7 +274,7 @@ abstract class CDashboardGeneral extends CApiService {
 							if (array_key_exists($x, $filled) && array_key_exists($y, $filled[$x])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard "%1$s".',
-										$dashboard['name'], $dashboard_page_index + 1, $widget['x'], $widget['y']
+										$dashboard['name'], $index + 1, $widget['x'], $widget['y']
 									)
 								);
 							}
@@ -287,7 +287,7 @@ abstract class CDashboardGeneral extends CApiService {
 							|| $widget['y'] + $widget['height'] > DASHBOARD_MAX_ROWS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard "%1$s" is out of bounds.',
-								$dashboard['name'], $dashboard_page_index + 1, $widget['x'], $widget['y']
+								$dashboard['name'], $index + 1, $widget['x'], $widget['y']
 							)
 						);
 					}
