@@ -326,6 +326,8 @@ char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
 
+char	*CONFIG_WEBSERVICE_URL	= NULL;
+
 volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -668,6 +670,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #endif
 	err |= (FAIL == zbx_db_validate_config_features());
 
+	if (0 != CONFIG_REPORTWRITER_FORKS && NULL == CONFIG_WEBSERVICE_URL)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when "
+				" setting \"StartReportWriters\" configuration parameter");
+	}
+
 	if (0 != err)
 		exit(EXIT_FAILURE);
 }
@@ -887,6 +895,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"StartReportWriters",		&CONFIG_REPORTWRITER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"WebServiceURL",		&CONFIG_WEBSERVICE_URL,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 

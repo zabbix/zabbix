@@ -660,6 +660,7 @@ FIELD		|media_type_test_timeout	|t_varchar(32)	|'65s'	|NOT NULL	|ZBX_NODATA
 FIELD		|script_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
 FIELD		|item_test_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
 FIELD		|session_key	|t_varchar(32)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1922,15 +1923,17 @@ FIELD		|reportuserid	|t_id		|	|NOT NULL	|0
 FIELD		|reportid	|t_id		|	|NOT NULL	|0		|1|report|reportid
 FIELD		|userid		|t_id		|	|NOT NULL	|0		|2|users|userid
 FIELD		|exclude	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|access_userid	|t_id		|	|NULL		|0		|3|users|userid		|RESTRICT
 INDEX		|1		|reportid
 
 TABLE|report_usrgrp|reportusrgrpid|ZBX_DATA
 FIELD		|reportusrgrpid|t_id		|	|NOT NULL	|0
 FIELD		|reportid	|t_id		|	|NOT NULL	|0		|1|report|reportid
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0		|2|usrgrp|usrgrpid
+FIELD		|access_userid	|t_id		|	|NULL		|0		|3|users|userid		|RESTRICT
 INDEX		|1		|reportid
 
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030052	|5030052
+ROW		|5030055	|5030055

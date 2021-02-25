@@ -27,14 +27,24 @@
 
 #define ZBX_IPC_REPORTER_REGISTER		1000
 
-#define ZBX_IPC_REPORTER_TEST_REPORT		1001
-#define ZBX_IPC_REPORTER_TEST_REPORT_RESPONSE	1001
+#define ZBX_IPC_REPORTER_TEST_REPORT		1010
+#define ZBX_IPC_REPORTER_TEST_REPORT_RESULT	1011
+
+#define ZBX_IPC_REPORTER_SEND_REPORT		1020
+#define ZBX_IPC_REPORTER_SEND_REPORT_RESULT	1021
 
 void	report_destroy_params(zbx_vector_ptr_pair_t *params);
 
 void	report_deserialize_test_request(const unsigned char *data, zbx_uint64_t *dashboardid, zbx_uint64_t *userid,
-		zbx_uint64_t *writer_userid, zbx_vector_ptr_pair_t *params);
+		zbx_uint64_t *viewer_userid, int *report_time, int *period, zbx_vector_ptr_pair_t *params);
 
-zbx_uint32_t	report_serialize_test_response(unsigned char **data, int status, const char *error);
+zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const char *error);
 
+void	report_deserialize_response(const unsigned char *data, int *status, char **error);
+
+zbx_uint32_t	report_serialize_send_request(unsigned char **data, const char *url, const char *cookie,
+		const zbx_vector_str_t *emails, const zbx_vector_ptr_pair_t *params);
+
+void	report_deserialize_send_request(const unsigned char *data, char **url, char **cookie, zbx_vector_str_t *emails,
+		zbx_vector_ptr_pair_t *params);
 #endif

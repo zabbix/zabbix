@@ -557,6 +557,7 @@ static int	DBpatch_5030045(void)
 					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"exclude", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"access_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{0}
 				},
 				NULL
@@ -586,12 +587,20 @@ static int	DBpatch_5030048(void)
 
 static int	DBpatch_5030049(void)
 {
+	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("report_user", 3, &field);
+}
+
+static int	DBpatch_5030050(void)
+{
 	const ZBX_TABLE	table =
 			{"report_usrgrp", "reportusrgrpid", 0,
 				{
 					{"reportusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"access_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{0}
 				},
 				NULL
@@ -600,23 +609,37 @@ static int	DBpatch_5030049(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030050(void)
+static int	DBpatch_5030051(void)
 {
 	return DBcreate_index("report_usrgrp", "report_usrgrp_1", "reportid", 0);
 }
 
-static int	DBpatch_5030051(void)
+static int	DBpatch_5030052(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 1, &field);
 }
 
-static int	DBpatch_5030052(void)
+static int	DBpatch_5030053(void)
 {
 	const ZBX_FIELD field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 2, &field);
+}
+
+static int	DBpatch_5030054(void)
+{
+	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("report_usrgrp", 3, &field);
+}
+
+static int	DBpatch_5030055(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
 }
 
 
@@ -679,5 +702,8 @@ DBPATCH_ADD(5030049, 0, 1)
 DBPATCH_ADD(5030050, 0, 1)
 DBPATCH_ADD(5030051, 0, 1)
 DBPATCH_ADD(5030052, 0, 1)
+DBPATCH_ADD(5030053, 0, 1)
+DBPATCH_ADD(5030054, 0, 1)
+DBPATCH_ADD(5030055, 0, 1)
 
 DBPATCH_END()
