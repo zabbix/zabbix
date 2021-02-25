@@ -541,9 +541,8 @@ class CUser extends CApiService {
 						' GROUP BY ug.userid'.
 						' HAVING MAX(g.gui_access)<'.GROUP_GUI_ACCESS_DISABLED.
 							' AND MAX(g.users_status)='.GROUP_STATUS_ENABLED.
-					')'.
-				' LIMIT 1'
-			);
+					')'
+			, 1);
 
 			if (!DBfetch($db_superadmins)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1154,9 +1153,8 @@ class CUser extends CApiService {
 						' GROUP BY ug.userid'.
 						' HAVING MAX(g.gui_access)<'.GROUP_GUI_ACCESS_DISABLED.
 							' AND MAX(g.users_status)='.GROUP_STATUS_ENABLED.
-					')'.
-				' LIMIT 1'
-			);
+					')'
+			, 1);
 
 			if (!DBfetch($db_superadmins)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,

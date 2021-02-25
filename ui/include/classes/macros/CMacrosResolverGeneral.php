@@ -908,9 +908,10 @@ class CMacrosResolverGeneral {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
 				$value = UNRESOLVED_MACRO_STRING;
 
-				$history = Manager::History()->getLastValues([$function], 1,
+				$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
 					CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
-				);
+				));
+
 				if (!array_key_exists($function['itemid'], $history)) {
 					continue;
 				}

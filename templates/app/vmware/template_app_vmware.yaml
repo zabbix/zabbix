@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-12T14:22:58Z'
+  date: '2021-02-22T10:17:35Z'
   groups:
     -
       name: Templates/Applications
@@ -255,6 +255,18 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          name: 'VMware: CPU latency in percents'
+          type: SIMPLE
+          key: 'vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          history: 7d
+          units: '%'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).'
+          applications:
+            -
+              name: VMware
+        -
           name: 'VMware: Number of virtual CPUs'
           type: SIMPLE
           key: 'vmware.vm.cpu.num[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -272,6 +284,18 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          name: 'VMware: CPU readiness latency in percents'
+          type: SIMPLE
+          key: 'vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          history: 7d
+          units: '%'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.'
+          applications:
+            -
+              name: VMware
+        -
           name: 'VMware: CPU ready'
           type: SIMPLE
           key: 'vmware.vm.cpu.ready[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -280,6 +304,30 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Time that the virtual machine was ready, but could not get scheduled to run on the physical CPU during last measurement interval (VMware vCenter/ESXi Server performance counter sampling interval - 20 seconds)'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: CPU swap-in latence in percents'
+          type: SIMPLE
+          key: 'vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          history: 7d
+          units: '%'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Percentage of CPU time spent waiting for swap-in.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: CPU usage in percents'
+          type: SIMPLE
+          key: 'vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          history: 7d
+          units: '%'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'CPU usage as a percentage during the interval.'
           applications:
             -
               name: VMware
@@ -314,6 +362,37 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+        -
+          name: 'VMware: Guest memory swapped'
+          type: SIMPLE
+          key: 'vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Amount of guest physical memory that is swapped out to the swap space.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Uptime of guest OS'
+          type: SIMPLE
+          key: 'vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          history: 7d
+          units: uptime
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Total time elapsed since the last operating system boot-up (in seconds).'
+          applications:
+            -
+              name: VMware
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'VMware: VM has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
         -
           name: 'VMware: Hypervisor name'
           type: SIMPLE
@@ -354,6 +433,18 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'The amount of memory currently in the compression cache for this VM.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Host memory consumed'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Amount of host physical memory consumed for backing up guest physical memory pages.'
           applications:
             -
               name: VMware
@@ -436,6 +527,18 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          name: 'VMware: Host memory usage in percents'
+          type: SIMPLE
+          key: 'vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          history: 7d
+          units: '%'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Percentage of host physical memory that has been consumed.'
+          applications:
+            -
+              name: VMware
+        -
           name: 'VMware: Power state'
           type: SIMPLE
           key: 'vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
@@ -501,13 +604,6 @@ zabbix_export:
           applications:
             -
               name: VMware
-          triggers:
-            -
-              expression: '{last()}<10m'
-              name: 'VMware: VM has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
       discovery_rules:
         -
           name: 'Network device discovery'
@@ -564,6 +660,23 @@ zabbix_export:
               applications:
                 -
                   name: VMware
+            -
+              name: 'VMware: Network utilization on interface {#IFDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]'
+              history: 7d
+              units: Bps
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine network utilization (combined transmit-rates and receive-rates) during the interval.'
+              applications:
+                -
+                  name: VMware
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
         -
           name: 'Disk device discovery'
           type: SIMPLE
@@ -573,6 +686,52 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           description: 'Discovery of all disk devices.'
           item_prototypes:
+            -
+              name: 'VMware: Average number of outstanding read requests to the disk {#DISKDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.storage.readoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Average number of outstanding read requests to the virtual disk during the collection interval.'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Average read latency to the disk {#DISKDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.storage.totalreadlatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
+              history: 7d
+              units: '!ms'
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'The average time a read from the virtual disk takes.'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Average write latency to the disk {#DISKDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
+              history: 7d
+              units: '!ms'
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'The average time a write to the virtual disk takes.'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Average number of outstanding write requests to the disk {#DISKDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.storage.writeoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Average number of outstanding write requests to the virtual disk during the collection interval.'
+              applications:
+                -
+                  name: VMware
             -
               name: 'VMware: Average number of bytes read from the disk {#DISKDESC}'
               type: SIMPLE
@@ -740,6 +899,18 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          name: 'VMware: CPU usage in percents'
+          type: SIMPLE
+          key: 'vmware.hv.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+          history: 7d
+          units: '%'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'CPU usage as a percentage during the interval.'
+          applications:
+            -
+              name: VMware
+        -
           name: 'VMware: CPU usage'
           type: SIMPLE
           key: 'vmware.hv.cpu.usage[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -748,6 +919,18 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: CPU utilization'
+          type: SIMPLE
+          key: 'vmware.hv.cpu.utilization[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+          history: 7d
+          units: '%'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'CPU usage as a percentage during the interval depends on power management or HT.'
           applications:
             -
               name: VMware
@@ -928,7 +1111,6 @@ zabbix_export:
           name: 'VMware: Number of bytes received'
           type: SIMPLE
           key: 'vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
-          delay: '1m'
           history: 7d
           units: Bps
           username: '{$VMWARE.USERNAME}'
@@ -941,12 +1123,40 @@ zabbix_export:
           name: 'VMware: Number of bytes transmitted'
           type: SIMPLE
           key: 'vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
-          delay: '1m'
           history: 7d
           units: Bps
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: 'VMware hypervisor network output statistics (bytes per second).'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Power usage maximum allowed'
+          type: SIMPLE
+          key: 'vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID},max]'
+          history: 7d
+          units: '!W'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Maximum allowed power usage.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'VMware: Power usage'
+          type: SIMPLE
+          key: 'vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+          history: 7d
+          units: '!W'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Current power usage.'
           applications:
             -
               name: VMware
@@ -1071,10 +1281,28 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           item_prototypes:
             -
+              name: 'VMware: Multipath count for datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Number of available datastore paths.'
+              applications:
+                -
+                  name: VMware
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {last()}<{#MULTIPATH.COUNT}'
+                  name: 'VMware: The multipath count has been changed'
+                  opdata: 'Current: {ITEM.LASTVALUE}, Registered: {#MULTIPATH.COUNT}'
+                  priority: AVERAGE
+                  description: 'The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).'
+                  manual_close: 'YES'
+            -
               name: 'VMware: Average read latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
-              delay: '1m'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
@@ -1113,7 +1341,6 @@ zabbix_export:
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
-              delay: '1m'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
