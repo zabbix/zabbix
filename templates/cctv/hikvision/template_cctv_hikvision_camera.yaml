@@ -608,7 +608,7 @@ zabbix_export:
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-              name: 'Hikvision camera: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'Hikvision camera: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
         -

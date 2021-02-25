@@ -176,7 +176,7 @@ class testLanguage extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->checkLanguage($data['message'], $data['page_title'], $data['body_lang'], $data['defaultdb_lang']);
-		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.zbx_dbstr('user-zabbix')));
+		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.zbx_dbstr('user-zabbix')));
 
 
 		// After logout, login menu has system language.
@@ -194,7 +194,7 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Alias' => 'testRU',
+						'Username' => 'testRU',
 						'Groups' => [
 							'Selenium user group'
 						],
@@ -211,7 +211,7 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Alias' => 'testDEF',
+						'Username' => 'testDEF',
 						'Groups' => [
 							'Selenium user group'
 						],
@@ -228,7 +228,7 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Alias' => 'testENG',
+						'Username' => 'testENG',
 						'Groups' => [
 							'Selenium user group'
 						],
@@ -258,11 +258,11 @@ class testLanguage extends CWebTest {
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
-		$this->page->userLogin($data['fields']['Alias'], $data['fields']['Password']);
+		$this->page->userLogin($data['fields']['Username'], $data['fields']['Password']);
 		$this->page->assertTitle($data['page_title']);
 		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
-		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.
-				zbx_dbstr($data['fields']['Alias'])));
+		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.
+				zbx_dbstr($data['fields']['Username'])));
 		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
 	}
 

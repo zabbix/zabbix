@@ -293,7 +293,7 @@ function getSystemStatusData(array $filter) {
 		$data['actions'] = [
 			'all_actions' => $actions['data'],
 			'users' => API::User()->get([
-				'output' => ['alias', 'name', 'surname'],
+				'output' => ['username', 'name', 'surname'],
 				'userids' => array_keys($actions['userids']),
 				'preservekeys' => true
 			]),

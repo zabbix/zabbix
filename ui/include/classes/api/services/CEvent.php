@@ -1066,7 +1066,7 @@ class CEvent extends CApiService {
 				$acknowledges = DBFetchArrayAssoc(DBselect(self::createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 
 				// if the user data is requested via extended output or specified fields, join the users table
-				$userFields = ['alias', 'name', 'surname'];
+				$userFields = ['username', 'name', 'surname'];
 				$requestUserData = [];
 				foreach ($userFields as $userField) {
 					if ($this->outputIsRequested($userField, $options['select_acknowledges'])) {

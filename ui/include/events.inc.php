@@ -230,14 +230,14 @@ function make_event_details(array $event, array $allowed) {
 		elseif ($event['userid'] != 0) {
 			if ($event['userid'] == CWebUser::$data['userid']) {
 				$table->addRow([_('Resolved by'), getUserFullname([
-					'alias' => CWebUser::$data['alias'],
+					'username' => CWebUser::$data['username'],
 					'name' => CWebUser::$data['name'],
 					'surname' => CWebUser::$data['surname']
 				])]);
 			}
 			else {
 				$user = API::User()->get([
-					'output' => ['alias', 'name', 'surname'],
+					'output' => ['username', 'name', 'surname'],
 					'userids' => [$event['userid']]
 				]);
 
@@ -340,7 +340,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 	$actions = getEventsActionsIconsData($events, $triggers, $r_events);
 	$users = API::User()->get([
-		'output' => ['alias', 'name', 'surname'],
+		'output' => ['username', 'name', 'surname'],
 		'userids' => array_keys($actions['userids']),
 		'preservekeys' => true
 	]);

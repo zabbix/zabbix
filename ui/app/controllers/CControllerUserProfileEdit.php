@@ -70,7 +70,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 		}
 
 		$users = API::User()->get([
-			'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
+			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
 				'rows_per_page', 'url', 'timezone'
 			],
 			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
@@ -96,7 +96,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$data = [
 			'userid' => CWebUser::$data['userid'],
-			'alias' => $this->user['alias'],
+			'username' => $this->user['username'],
 			'name' => $this->user['name'],
 			'surname' => $this->user['surname'],
 			'change_password' => $this->hasInput('change_password') || $this->hasInput('password1'),

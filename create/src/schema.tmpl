@@ -31,7 +31,7 @@ UNIQUE		|1		|name
 
 TABLE|users|userid|ZBX_DATA
 FIELD		|userid		|t_id		|	|NOT NULL	|0
-FIELD		|alias		|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|username	|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|passwd		|t_varchar(60)	|''	|NOT NULL	|0
@@ -47,7 +47,7 @@ FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
 FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
-UNIQUE		|1		|alias
+UNIQUE		|1		|username
 
 TABLE|maintenances|maintenanceid|ZBX_DATA
 FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0
@@ -614,7 +614,6 @@ FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|db_extension	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|compression_status	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|compression_availability	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compress_older	|t_varchar(32)	|'7d'	|NOT NULL	|ZBX_NODATA
 FIELD		|instanceid	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_auth_enabled	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -1871,4 +1870,4 @@ INDEX		|1		|selementid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030082	|5030082
+ROW		|5030088	|5030088

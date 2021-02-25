@@ -45,7 +45,7 @@ class CMediatype extends CApiService {
 	 * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
 	 * @param string $options['pattern'] filter by Host name containing only give pattern
 	 * @param int $options['limit'] output will be limited to given number
-	 * @param string $options['sortfield'] output will be sorted by given property [ 'mediatypeid', 'alias' ]
+	 * @param string $options['sortfield'] output will be sorted by given property [ 'mediatypeid' ]
 	 * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
 	 * @return array
 	 */

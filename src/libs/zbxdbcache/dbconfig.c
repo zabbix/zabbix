@@ -932,8 +932,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
 					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
-					"compression_status", "compression_availability", "compress_older",
-					"instanceid", "default_timezone"};	/* sync with zbx_dbsync_compare_config() */
+					"compression_status", "compress_older", "instanceid",
+					"default_timezone"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, ret;
@@ -981,11 +981,10 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	DCstrpool_replace(found, (const char **)&config->config->db.extension, row[26]);
 	ZBX_STR2UCHAR(config->config->autoreg_tls_accept, row[27]);
 	ZBX_STR2UCHAR(config->config->db.history_compression_status, row[28]);
-	ZBX_STR2UCHAR(config->config->db.history_compression_availability, row[29]);
 
-	if (SUCCEED != is_time_suffix(row[30], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != is_time_suffix(row[29], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[30]);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[29]);
 		config->config->db.history_compress_older = 0;
 	}
 
@@ -994,7 +993,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	/* instance id cannot be changed - update it only at first sync to avoid read locks later */
 	if (0 == found)
-		DCstrpool_replace(found, &config->config->instanceid, row[31]);
+		DCstrpool_replace(found, &config->config->instanceid, row[30]);
 
 #if TRIGGER_SEVERITY_COUNT != 6
 #	error "row indexes below are based on assumption of six trigger severity levels"
@@ -1074,7 +1073,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
 	}
 #endif
-	DCstrpool_replace(found, &config->config->default_timezone, row[32]);
+	DCstrpool_replace(found, &config->config->default_timezone, row[31]);
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
@@ -11886,7 +11885,6 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	{
 		cfg->db.extension = zbx_strdup(NULL, config->config->db.extension);
 		cfg->db.history_compression_status = config->config->db.history_compression_status;
-		cfg->db.history_compression_availability = config->config->db.history_compression_availability;
 		cfg->db.history_compress_older = config->config->db.history_compress_older;
 	}
 

@@ -52,7 +52,7 @@ class CAudit {
 		AUDIT_RESOURCE_SETTINGS =>				['configid', null, 'config'],
 		AUDIT_RESOURCE_TRIGGER =>				['triggerid', 'description', 'triggers'],
 		AUDIT_RESOURCE_TRIGGER_PROTOTYPE =>		['triggerid', 'description', 'triggers'],
-		AUDIT_RESOURCE_USER =>					['userid', 'alias', 'users'],
+		AUDIT_RESOURCE_USER =>					['userid', 'username', 'users'],
 		AUDIT_RESOURCE_USER_GROUP =>			['usrgrpid', 'name', 'usrgrp'],
 		AUDIT_RESOURCE_VALUE_MAP =>				['valuemapid', 'name', 'valuemaps'],
 		AUDIT_RESOURCE_TEMPLATE_DASHBOARD =>	['dashboardid', 'name', 'dashboard']

@@ -909,6 +909,50 @@ static int	DBpatch_5030050(void)
 
 static int	DBpatch_5030051(void)
 {
+	return DBdrop_field("config", "compression_availability");
+}
+
+static int	DBpatch_5030052(void)
+{
+	return DBdrop_index("users", "users_1");
+}
+
+static int	DBpatch_5030053(void)
+{
+	const ZBX_FIELD	field = {"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("users", "alias", &field);
+}
+
+static int	DBpatch_5030054(void)
+{
+	return DBcreate_index("users", "users_1", "username", 1);
+}
+
+static int	DBpatch_5030055(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter_username' where idx='web.user.filter_alias'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030056(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set value_str='username' where idx='web.user.sort' and value_str='alias'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030057(void)
+{
 	const ZBX_TABLE table =
 			{"item_tag", "itemtagid", 0,
 				{
@@ -924,19 +968,19 @@ static int	DBpatch_5030051(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030052(void)
+static int	DBpatch_5030058(void)
 {
 	return DBcreate_index("item_tag", "item_tag_1", "itemid", 0);
 }
 
-static int	DBpatch_5030053(void)
+static int	DBpatch_5030059(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_tag", 1, &field);
 }
 
-static int	DBpatch_5030054(void)
+static int	DBpatch_5030060(void)
 {
 	const ZBX_TABLE table =
 			{"httptest_tag", "httptesttagid", 0,
@@ -953,19 +997,19 @@ static int	DBpatch_5030054(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030055(void)
+static int	DBpatch_5030061(void)
 {
 	return DBcreate_index("httptest_tag", "httptest_tag_1", "httptestid", 0);
 }
 
-static int	DBpatch_5030056(void)
+static int	DBpatch_5030062(void)
 {
 	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("httptest_tag", 1, &field);
 }
 
-static int	DBpatch_5030057(void)
+static int	DBpatch_5030063(void)
 {
 	const ZBX_TABLE table =
 			{"sysmaps_element_tag", "selementtagid", 0,
@@ -983,26 +1027,26 @@ static int	DBpatch_5030057(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030058(void)
+static int	DBpatch_5030064(void)
 {
 	return DBcreate_index("sysmaps_element_tag", "sysmaps_element_tag_1", "selementid", 0);
 }
 
-static int	DBpatch_5030059(void)
+static int	DBpatch_5030065(void)
 {
 	const ZBX_FIELD	field = {"selementid", NULL, "sysmaps_elements", "selementid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sysmaps_element_tag", 1, &field);
 }
 
-static int	DBpatch_5030060(void)
+static int	DBpatch_5030066(void)
 {
 	const ZBX_FIELD	field = {"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps_elements", &field);
 }
 
-static int	DBpatch_5030061(void)
+static int	DBpatch_5030067(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -1035,7 +1079,7 @@ static int	DBpatch_5030061(void)
 	return ret;
 }
 
-static int	DBpatch_5030062(void)
+static int	DBpatch_5030068(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -1070,7 +1114,7 @@ static int	DBpatch_5030062(void)
 	return ret;
 }
 
-static int	DBpatch_5030063(void)
+static int	DBpatch_5030069(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -1102,7 +1146,7 @@ static int	DBpatch_5030063(void)
 	return ret;
 }
 
-static int	DBpatch_5030064(void)
+static int	DBpatch_5030070(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -1134,7 +1178,7 @@ static int	DBpatch_5030064(void)
 	return ret;
 }
 
-static int	DBpatch_5030065(void)
+static int	DBpatch_5030071(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -1188,7 +1232,7 @@ static int	DBpatch_5030065(void)
 	return ret;
 }
 
-static int	DBpatch_5030066(void)
+static int	DBpatch_5030072(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -1240,7 +1284,7 @@ static int	DBpatch_5030066(void)
 	return ret;
 }
 
-static int	DBpatch_5030067(void)
+static int	DBpatch_5030073(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -1288,7 +1332,7 @@ static int	DBpatch_5030067(void)
 	return ret;
 }
 
-static int	DBpatch_5030068(void)
+static int	DBpatch_5030074(void)
 {
 #define CONDITION_TYPE_APPLICATION	15
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -1304,7 +1348,7 @@ static int	DBpatch_5030068(void)
 #undef CONDITION_TYPE_APPLICATION
 }
 
-static int	DBpatch_5030069(void)
+static int	DBpatch_5030075(void)
 {
 #define AUDIT_RESOURCE_APPLICATION	12
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -1317,7 +1361,7 @@ static int	DBpatch_5030069(void)
 #undef AUDIT_RESOURCE_APPLICATION
 }
 
-static int	DBpatch_5030070(void)
+static int	DBpatch_5030076(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1506,7 +1550,7 @@ static int	DBpatch_parse_applications_json(struct zbx_json_parse *jp, struct zbx
 	return SUCCEED;
 }
 
-static int	DBpatch_5030071(void)
+static int	DBpatch_5030077(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -1557,7 +1601,7 @@ static int	DBpatch_5030071(void)
 	return ret;
 }
 
-static int	DBpatch_5030072(void)
+static int	DBpatch_5030078(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -1626,56 +1670,55 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030073(void)
+static int	DBpatch_5030079(void)
 {
 	return DBdrop_foreign_key("httptest", 1);
 }
 
-static int	DBpatch_5030074(void)
+static int	DBpatch_5030080(void)
 {
 	return DBdrop_index("httptest", "httptest_1");
 }
 
-static int	DBpatch_5030075(void)
+static int	DBpatch_5030081(void)
 {
 	return DBdrop_field("httptest", "applicationid");
 }
 
-static int	DBpatch_5030076(void)
+static int	DBpatch_5030082(void)
 {
 	return DBdrop_field("sysmaps_elements", "application");
 }
 
-static int	DBpatch_5030077(void)
+static int	DBpatch_5030083(void)
 {
 	return DBdrop_table("application_discovery");
 }
 
-static int	DBpatch_5030078(void)
+static int	DBpatch_5030084(void)
 {
 	return DBdrop_table("item_application_prototype");
 }
 
-static int	DBpatch_5030079(void)
+static int	DBpatch_5030085(void)
 {
 	return DBdrop_table("application_prototype");
 }
 
-static int	DBpatch_5030080(void)
+static int	DBpatch_5030086(void)
 {
 	return DBdrop_table("application_template");
 }
 
-static int	DBpatch_5030081(void)
+static int	DBpatch_5030087(void)
 {
 	return DBdrop_table("items_applications");
 }
 
-static int	DBpatch_5030082(void)
+static int	DBpatch_5030088(void)
 {
 	return DBdrop_table("applications");
 }
-
 #endif
 
 DBPATCH_START(5030)
@@ -1765,5 +1808,11 @@ DBPATCH_ADD(5030079, 0, 1)
 DBPATCH_ADD(5030080, 0, 1)
 DBPATCH_ADD(5030081, 0, 1)
 DBPATCH_ADD(5030082, 0, 1)
+DBPATCH_ADD(5030083, 0, 1)
+DBPATCH_ADD(5030084, 0, 1)
+DBPATCH_ADD(5030085, 0, 1)
+DBPATCH_ADD(5030086, 0, 1)
+DBPATCH_ADD(5030087, 0, 1)
+DBPATCH_ADD(5030088, 0, 1)
 
 DBPATCH_END()
