@@ -303,6 +303,14 @@ $tabs = (new CTabView())
 	->addTab('encryptionTab', _('Encryption'), $encryption_form_list)
 	->setSelected(0);
 
+if (!$data['discovered_host']) {
+	$tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
+		'visible' => [],
+		'hostids' => $data['ids'],
+		'context' => 'host'
+	]));
+}
+
 $form->addItem($tabs);
 
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));

@@ -77,7 +77,7 @@ class CControllerUserroleList extends CController {
 			'active_tab' => CProfile::get('web.userrole.filter.active', 1),
 			'roles' => API::Role()->get([
 				'output' => ['roleid', 'name', 'type', 'readonly'],
-				'selectUsers' => ['userid', 'alias'],
+				'selectUsers' => ['userid', 'username'],
 				'search' => ['name' => ($filter['name'] !== '') ? $filter['name'] : null],
 				'sortfield' => $sort_field,
 				'limit' => $limit,
@@ -97,7 +97,7 @@ class CControllerUserroleList extends CController {
 		$userids = [];
 
 		foreach ($data['roles'] as &$role) {
-			CArrayHelper::sort($role['users'], ['alias']);
+			CArrayHelper::sort($role['users'], ['username']);
 
 			$role['user_cnt'] = count($role['users']);
 			if ($role['user_cnt'] > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
@@ -110,7 +110,7 @@ class CControllerUserroleList extends CController {
 		unset($role);
 
 		$users = API::User()->get([
-			'output' => ['userid', 'alias', 'name', 'surname', 'gui_access', 'users_status', 'roleid'],
+			'output' => ['userid', 'username', 'name', 'surname', 'gui_access', 'users_status', 'roleid'],
 			'userids' => $userids,
 			'getAccess' => true
 		]);
@@ -121,7 +121,7 @@ class CControllerUserroleList extends CController {
 		unset($user);
 
 		foreach ($data['roles'] as &$role) {
-			CArrayHelper::sort($role['users'], ['alias']);
+			CArrayHelper::sort($role['users'], ['username']);
 		}
 		unset($role);
 

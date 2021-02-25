@@ -184,7 +184,7 @@ class CToken extends CApiService {
 	 * @return array
 	 */
 	public function create(array $tokens): array {
-		if ($this::$userData['alias'] === ZBX_GUEST_USER) {
+		if ($this::$userData['username'] === ZBX_GUEST_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
@@ -300,7 +300,7 @@ class CToken extends CApiService {
 	 * @return array
 	 */
 	public function update(array $tokens): array {
-		if ($this::$userData['alias'] === ZBX_GUEST_USER) {
+		if ($this::$userData['username'] === ZBX_GUEST_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
@@ -410,7 +410,7 @@ class CToken extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $tokenids): array {
-		if ($this::$userData['alias'] === ZBX_GUEST_USER) {
+		if ($this::$userData['username'] === ZBX_GUEST_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
@@ -452,7 +452,7 @@ class CToken extends CApiService {
 	 * @return array
 	 */
 	public function generate(array $tokenids): array {
-		if ($this::$userData['alias'] === ZBX_GUEST_USER) {
+		if ($this::$userData['username'] === ZBX_GUEST_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 

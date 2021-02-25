@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:22Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -1945,6 +1945,37 @@ zabbix_export:
                   value:
                     name: 'PostgreSQL checkpoints'
                     host: PostgreSQL
+      valuemaps:
+        -
+          name: 'PostgreSQL recovery role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Master
+            -
+              value: '1'
+              newvalue: Standby
+        -
+          name: 'PostgreSQL replication status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Master
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
       name: 'PostgreSQL bgwriter'
@@ -2160,34 +2191,3 @@ zabbix_export:
           item:
             host: PostgreSQL
             key: pgsql.wal.count
-  value_maps:
-    -
-      name: 'PostgreSQL recovery role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Master
-        -
-          value: '1'
-          newvalue: Standby
-    -
-      name: 'PostgreSQL replication status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
-        -
-          value: '2'
-          newvalue: Master
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

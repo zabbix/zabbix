@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-30T08:27:06Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -1170,6 +1170,16 @@ zabbix_export:
         -
           macro: '{$KAFKA.USER}'
           value: zabbix
+      valuemaps:
+        -
+          name: 'Kafka controller state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Inactive
+            -
+              value: '1'
+              newvalue: Active
   graphs:
     -
       name: 'Kafka: Broker throughput'
@@ -1411,13 +1421,3 @@ zabbix_export:
           item:
             host: 'Apache Kafka by JMX'
             key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]'
-  value_maps:
-    -
-      name: 'Kafka controller state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Inactive
-        -
-          value: '1'
-          newvalue: Active

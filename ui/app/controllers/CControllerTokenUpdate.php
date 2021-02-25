@@ -89,7 +89,7 @@ class CControllerTokenUpdate extends CController {
 
 				[$user] = (CWebUser::$data['userid'] != $userid)
 					? API::User()->get([
-						'output' => ['alias', 'name', 'surname'],
+						'output' => ['username', 'name', 'surname'],
 						'userids' => $userid
 					])
 					: [CWebUser::$data];

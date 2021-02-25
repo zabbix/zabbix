@@ -95,7 +95,7 @@ class CControllerTokenEdit extends CController {
 		if ($data['userid'] != 0) {
 			[$user] = (CWebUser::$data['userid'] != $data['userid'])
 				? API::User()->get([
-					'output' => ['alias', 'name', 'surname'],
+					'output' => ['username', 'name', 'surname'],
 					'userids' => $data['userid']
 				])
 				: [CWebUser::$data];

@@ -266,16 +266,34 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public static function isCompressed(array $tables): bool {
-		// Compression is available for TimescaleDB 1.5 and greater.
-		if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) != ZBX_DB_EXTENSION_TIMESCALEDB
-				|| CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_AVAILABILITY) != 1) {
+		if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) != ZBX_DB_EXTENSION_TIMESCALEDB) {
 			return false;
 		}
 
-		$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
-			' FROM timescaledb_information.compressed_hypertable_stats'.
-			' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
+		$timescale_v1 = DBfetch(DBselect(
+			'SELECT NULL FROM pg_catalog.pg_class c'.
+			' JOIN pg_catalog.pg_namespace n'.
+			' ON n.oid=c.relnamespace'.
+			' WHERE n.nspname='.zbx_dbstr('timescaledb_information').
+			' AND c.relname='.zbx_dbstr('compressed_hypertable_stats')
 		));
+
+		if ($timescale_v1) {
+			$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
+				' FROM timescaledb_information.compressed_hypertable_stats'.
+				' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
+			));
+
+			return (bool) $result['chunks'];
+		}
+
+		$query = implode(' UNION ', array_map(function ($table) {
+			return 'SELECT number_compressed_chunks chunks'.
+				' FROM hypertable_compression_stats('.zbx_dbstr($table).')'.
+				' WHERE number_compressed_chunks != 0';
+		}, $tables));
+
+		$result = DBfetch(DBselect($query));
 
 		return (bool) $result['chunks'];
 	}
