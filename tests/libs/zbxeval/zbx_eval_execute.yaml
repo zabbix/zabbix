@@ -868,4 +868,22 @@ in:
 out:
   result: SUCCEED
   value: '2'
+---
+test case: Expression 'min(2s, 1m),'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'min(2s, 1m),'
+out:
+  result: FAIL
+  value: '2'
+---
+test case: Expression '-60={$M}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '-60={$M}'
+  replace:
+  - {token: '{$M}', value: '-1m'}
+out:
+  result: SUCCEED
+  value: 1
 ...

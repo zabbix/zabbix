@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "log.h"
-
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "eval.h"
@@ -294,7 +293,7 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: vairant_convert_suffixed_num                                     *
+ * Function: variant_convert_suffixed_num                                     *
  *                                                                            *
  * Purpose: convert variant string value containing suffixed number to        *
  *          floating point variant value                                      *
@@ -306,19 +305,18 @@ finish:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	vairant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
+static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
 {
-	int	len, num_len;
+	int	len, num_len, offset;
 
 	if (ZBX_VARIANT_STR != value_num->type)
 		return FAIL;
 
 	len = strlen(value_num->data.str);
-	if (SUCCEED != zbx_suffixed_number_parse(value_num->data.str, &num_len) ||
-			num_len != len)
-	{
+	offset = ('-' == *value_num->data.str ? 1 : 0);
+
+	if (SUCCEED != zbx_suffixed_number_parse(value_num->data.str + offset, &num_len) || num_len != len - offset)
 		return FAIL;
-	}
 
 	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(value_num->data.str[len - 1]));
 
@@ -389,7 +387,7 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 		/* Expanded user macro token variables can contain suffixed numbers. */
 		/* Try to convert them and just copy the expanded value if failed.   */
 		if (ZBX_EVAL_TOKEN_VAR_USERMACRO != token->type ||
-				SUCCEED != vairant_convert_suffixed_num(&value, &token->value))
+				SUCCEED != variant_convert_suffixed_num(&value, &token->value))
 		{
 			zbx_variant_copy(&value, &token->value);
 		}
@@ -399,6 +397,23 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 	zbx_vector_var_append_ptr(output, &value);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_push_null                                           *
+ *                                                                            *
+ * Purpose: push null value in output stack                                   *
+ *                                                                            *
+ * Parameters: output   - [IN/OUT] the output value stack                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	eval_execute_push_null(zbx_vector_var_t *output)
+{
+	zbx_variant_t	value;
+
+	zbx_variant_set_none(&value);
+	zbx_vector_var_append_ptr(output, &value);
 }
 
 /******************************************************************************
@@ -702,7 +717,7 @@ static int	eval_execute_function_sum(const zbx_eval_context_t *ctx, const zbx_ev
 		zbx_vector_var_t *output, char **error)
 {
 	int		i, ret;
-	double		sum;
+	double		sum = 0;
 	zbx_variant_t	value;
 
 	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
@@ -748,7 +763,7 @@ static int	eval_execute_function_avg(const zbx_eval_context_t *ctx, const zbx_ev
 		zbx_vector_var_t *output, char **error)
 {
 	int		i, ret;
-	double		avg;
+	double		avg = 0;
 	zbx_variant_t	value;
 
 	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
@@ -1180,32 +1195,24 @@ static int	eval_execute_hist_function(const zbx_eval_context_t *ctx, const zbx_e
  *                                                                            *
  * Purpose: throw exception by returning the specified error                  *
  *                                                                            *
- * Parameters: ctx    - [IN] the evaluation context                           *
- *             token  - [IN] the function token                               *
- *             output - [IN/OUT] the output value stack                       *
+ * Parameters: output - [IN/OUT] the output value stack                       *
  *             error  - [OUT] the error message in the case of failure        *
  *                                                                            *
- * Return value:  FAIL    - otherwise                                          *
- *                                                                            *
  ******************************************************************************/
-static int	eval_throw_execption(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		zbx_vector_var_t *output, char **error)
+static void	eval_throw_execption(zbx_vector_var_t *output, char **error)
 {
 	zbx_variant_t	*arg;
 
-	if (1 != output->values_num || 1 != token->opt)
+	if (0 == output->values_num)
 	{
-		*error = zbx_dsprintf(*error, "exception must have one argument at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
+		*error = zbx_strdup(*error, "exception must have one argument");
+		return;
 	}
 
 	arg = &output->values[output->values_num - 1];
 	zbx_variant_convert(arg, ZBX_VARIANT_STR);
 	*error = arg->data.str;
 	zbx_variant_set_none(arg);
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -1260,6 +1267,9 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 					if (SUCCEED != eval_execute_push_value(ctx, token, &output, error))
 						goto out;
 					break;
+				case ZBX_EVAL_TOKEN_ARG_NULL:
+					eval_execute_push_null(&output);
+					break;
 				case ZBX_EVAL_TOKEN_FUNCTION:
 					if (SUCCEED != eval_execute_function(ctx, token, &output, error))
 						goto out;
@@ -1279,12 +1289,12 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_EXCEPTION:
-					eval_throw_execption(ctx, token, &output, error);
-					ret = FAIL;
+					eval_throw_execption(&output, error);
 					goto out;
 				default:
 					*error = zbx_dsprintf(*error, "unknown token at \"%s\"",
 							ctx->expression + token->loc.l);
+					goto out;
 			}
 		}
 	}

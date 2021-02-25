@@ -101,5 +101,17 @@ in:
     retval: []
 out:
   result: FAIL
+---
+test case: Expression 'sum(hist(/host/key,))'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'sum(hist(/host/key,))'
+  callbacks:
+  - name: hist
+    args_num: 2
+    retval: [1, 2, 3]
+out:
+  result: SUCCEED
+  value: 6
 ...
 

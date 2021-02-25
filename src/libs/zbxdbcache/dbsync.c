@@ -20,8 +20,6 @@
 #include "common.h"
 #include "log.h"
 #include "dbcache.h"
-#include "zbxserver.h"
-#include "mutexs.h"
 #include "zbxserialize.h"
 #include "base64.h"
 #include "zbxeval.h"
@@ -2205,7 +2203,7 @@ static char	**dbsync_trigger_preproc_row(char **row)
 {
 	zbx_vector_uint64_t	hostids, functionids;
 	zbx_eval_context_t	ctx, ctx_r;
-	char			*error;
+	char			*error = NULL;
 	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT;
 
 	zbx_vector_uint64_create(&hostids);

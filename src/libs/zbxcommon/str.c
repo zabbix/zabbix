@@ -6099,7 +6099,7 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  *                                                                            *
  * Function: zbx_strloc_unquote                                               *
  *                                                                            *
- * Purpose: unquotes substring at the specified location                      *
+ * Purpose: unquotes valid substring at the specified location                *
  *                                                                            *
  * Parameters: src - [IN] the source string                                   *
  *             loc - [IN] the substring location                              *
@@ -6114,7 +6114,8 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
 	if ('"' == src[left])
 	{
 		src += left + 1;
-		str = ptr = zbx_malloc(NULL, right - left);
+		str = zbx_malloc(NULL, right - left);
+		ptr = str;
 
 		while ('"' != *src)
 		{
@@ -6128,6 +6129,10 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
 					case '"':
 						*ptr++ = '"';
 						break;
+					case '\0':
+						THIS_SHOULD_NEVER_HAPPEN;
+						*ptr = '\0';
+						return str;
 				}
 			}
 			else

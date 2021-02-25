@@ -91,7 +91,7 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error)
 {
 	const char	*period_shift;
-	int		ret = FAIL;
+	int		ret;
 
 	if (NULL == (period_shift = strchr(params, ':')))
 	{

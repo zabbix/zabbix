@@ -494,6 +494,7 @@ void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message)
 	memset(ctx, 0, sizeof(zbx_eval_context_t));
 	zbx_vector_eval_token_create(&ctx->stack);
 	zbx_vector_eval_token_reserve(&ctx->stack, 2);
+	ctx->stack.values_num = 2;
 
 	token = ctx->stack.values;
 	memset(token, 0, 2 * sizeof(zbx_eval_token_t));
@@ -905,7 +906,6 @@ void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const
 	dst->rules = src->rules;
 	zbx_vector_eval_token_create(&dst->stack);
 	zbx_vector_eval_token_reserve(&dst->stack, src->stack.values_num);
-	zbx_vector_eval_token_create(&dst->ops);
 
 	zbx_vector_eval_token_append_array(&dst->stack, src->stack.values, src->stack.values_num);
 	for (i = 0; i < dst->stack.values_num; i++)

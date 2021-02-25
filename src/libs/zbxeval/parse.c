@@ -545,7 +545,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 				if (2 <= ctx->ops.values_num)
 					func_token = &ctx->ops.values[ctx->ops.values_num - 2];
 
-				if (NULL == func_token && 0 == (func_token->type & ZBX_EVAL_CLASS_FUNCTION))
+				if (NULL == func_token || 0 == (func_token->type & ZBX_EVAL_CLASS_FUNCTION))
 				{
 					*error = zbx_dsprintf(*error, "item query must be first argument of a"
 							" historical function at \"%s\"", ctx->expression + pos);
@@ -690,11 +690,9 @@ static void	eval_append_arg_null(zbx_eval_context_t *ctx)
  ******************************************************************************/
 static void	eval_clear(zbx_eval_context_t *ctx)
 {
-	if (NULL != ctx->expression)
+	if (NULL != ctx->stack.values)
 	{
 		int	i;
-
-		ctx->expression = NULL;
 
 		for (i = 0; i < ctx->stack.values_num; i++)
 			zbx_variant_clear(&ctx->stack.values[i].value);
@@ -760,7 +758,6 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 
 		if (ZBX_EVAL_TOKEN_GROUP_CLOSE == token.type && ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type)
 			eval_append_arg_null(ctx);
-
 
 		if (ZBX_EVAL_TOKEN_COMMA == token.type && 0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR))
 			eval_append_arg_null(ctx);
@@ -884,6 +881,12 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 	if (0 != (ctx->last_token_type & ZBX_EVAL_CLASS_OPERATOR))
 	{
 		*error = zbx_strdup(*error, "expression ends with operator");
+		goto out;
+	}
+
+	if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type)
+	{
+		*error = zbx_strdup(*error, "expression ends with comma");
 		goto out;
 	}
 

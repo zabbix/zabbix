@@ -1229,7 +1229,7 @@ static int	DBpatch_5030026(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char			delim = ' ', *esc;
+		char			delim, *esc;
 		zbx_dbpatch_trigger_t	trigger;
 
 		ZBX_STR2UINT64(trigger.triggerid, row[0]);
