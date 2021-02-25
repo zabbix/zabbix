@@ -968,7 +968,7 @@ static void	DBpatch_get_min_widget_size(zbx_db_screen_item_t *item, int *w, int 
 		case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 		case SCREEN_RESOURCE_SYSTEM_STATUS:
 		case SCREEN_RESOURCE_HOST_TRIGGERS:
-			*w = 4; *h = 2;
+			*w = 1; *h = 1;
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_WARNING, "%s: unknown resource type %d", __func__, item->resourcetype);
