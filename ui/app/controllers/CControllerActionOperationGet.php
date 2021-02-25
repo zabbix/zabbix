@@ -136,7 +136,7 @@ class CControllerActionOperationGet extends CController {
 	 * @return array  Each of fields is nullable, meaning given operation may not have particular configuration domain.
 	 */
 	private function popupConfig(array $operation, int $eventsource, int $recovery): array {
-		$operations = $this->popupConfigOperations($operation, $eventsource, $recovery);
+		$operation_types = $this->popupConfigOperationTypes($operation, $eventsource, $recovery);
 		$operation_steps = $this->popupConfigOperationSteps($operation, $eventsource, $recovery);
 		$operation_message = $this->popupConfigOperationMessage($operation, $eventsource);
 		$operation_command = $this->popupConfigOperationCommand($operation, $eventsource);
@@ -144,7 +144,7 @@ class CControllerActionOperationGet extends CController {
 		$operation_condition = $this->popupConfigOperationCondition($operation, $eventsource, $recovery);
 
 		return [
-			'operations' => $operations,
+			'operation_types' => $operation_types,
 			'operation_type' => $operation['operationtype'],
 			'operation_steps' => $operation_steps,
 			'operation_message' => $operation_message,
@@ -163,7 +163,7 @@ class CControllerActionOperationGet extends CController {
 	 *
 	 * @return array
 	 */
-	private function popupConfigOperations(array $operation, int $eventsource, int $recovery): array {
+	private function popupConfigOperationTypes(array $operation, int $eventsource, int $recovery): array {
 		$operation_type_options = [];
 		$scripts_allowed = false;
 

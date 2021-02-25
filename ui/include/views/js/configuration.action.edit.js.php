@@ -207,11 +207,11 @@
 
 		this.$obj = $($('#operation-popup-tmpl').html());
 		this.$wrapper = this.$obj.find('>ul');
-		this.operations = new OperationViewType(this.$obj.find('>ul>li[id^="operations"]'));
-		this.operation_type = this.$obj.find('[id^="operation-type"]');
+		this.operation_type_row = new OperationViewType(this.$obj.find('>ul>li[id^="operation-type"]'));
+		this.operation_type = this.$obj.find('[id^="operation_type"]');
 		this.operation_opcommand_scriptid = this.$obj.find('[id^="operation_opcommand_scriptid"]');
 
-		this.operations.onchange = (operations) => {
+		this.operation_type_row.onchange = (operations) => {
 			var script_pattern = /^id\[([\d]+)\]|cmd\[([\d]+)\]$/,
 				command_pattern = /^cmd\[([\d]+)\]$/,
 				script_match = script_pattern.exec(operations),
@@ -230,7 +230,7 @@
 
 			this.render();
 			this.onupdate();
-			this.operations.$select.focus();
+			this.operation_type_row.$select.focus();
 		};
 
 		this.operation_steps = new OperationViewSteps(this.$obj.find('>ul>li[id^="operation-step"]'));
@@ -262,7 +262,7 @@
 	OperationView.prototype.render = function() {
 		this.detach();
 
-		this.operations.attach(this.$wrapper);
+		this.operation_type_row.attach(this.$wrapper);
 		this.operation_steps.attach(this.$wrapper);
 
 		if (this.props.operation_type == operation_details.OPERATION_TYPE_MESSAGE
@@ -326,12 +326,12 @@
 			this.operation_condition.setConfig(conf.operation_condition);
 		}
 
-		if (conf.operations === null) {
+		if (conf.operation_types === null) {
 			this.operation_type.attach = this.operation_type.detach;
 		}
 		else {
 			this.props.operation_type = conf.operation_type;
-			this.operations.setConfig(conf.operations);
+			this.operation_type_row.setConfig(conf.operation_types);
 		}
 	};
 

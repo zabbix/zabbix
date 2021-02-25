@@ -32,16 +32,16 @@ $form = (new CForm())
 $form_list = new CFormList();
 
 /*
- * Operations row.
+ * Operation row.
  */
-$select_operations = (new CSelect('operations'))->setFocusableElementId('operations-select');
+$select_operations = (new CSelect('operation[operationtype]'))->setFocusableElementId('operations-select');
 
-$form_list->addRow(new CLabel(_('Operations'), $select_operations->getFocusableElementId()), [
+$form_list->addRow(new CLabel(_('Operation'), $select_operations->getFocusableElementId()), [
 		$select_operations,
-		(new CVar('operationtype', 0, 'operation-type')),
+		(new CVar('operationtype', 0, 'operation_type')),
 		(new CVar('operation[opcommand][scriptid]', 0))
 	],
-	'operations'
+	'operation-type'
 );
 
 /*
