@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateHost extends CController {
+class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract {
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -46,6 +46,13 @@ class CControllerPopupMassupdateHost extends CController {
 			'tls_subject' => 'string',
 			'tls_psk_identity' => 'string',
 			'tls_psk' => 'string',
+			'valuemaps' => 'array',
+			'valuemap_remove' => 'array',
+			'valuemap_remove_except' => 'in 1',
+			'valuemap_remove_all' => 'in 1',
+			'valuemap_rename' => 'array',
+			'valuemap_update_existing' => 'in 1',
+			'valuemap_add_missing' => 'in 1',
 			'macros_add' => 'in 0,1',
 			'macros_update' => 'in 0,1',
 			'macros_remove' => 'in 0,1',
@@ -55,6 +62,7 @@ class CControllerPopupMassupdateHost extends CController {
 			'mass_update_groups' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_macros' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+			'valuemap_massupdate' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_RENAME, ZBX_ACTION_REMOVE_ALL]),
 			'inventory_mode' => 'in '.implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]),
 			'status' => 'in '.implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]),
 			'tls_connect' => 'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
@@ -82,21 +90,17 @@ class CControllerPopupMassupdateHost extends CController {
 	protected function checkPermissions() {
 		$hosts = API::Host()->get([
 			'output' => [],
-			'hostids' => $this->getInput('ids', []),
+			'hostids' => $this->getInput('ids'),
 			'editable' => true
 		]);
 
-		if (!$hosts) {
-			return false;
-		}
-
-		return true;
+		return count($hosts) > 0;
 	}
 
 	protected function doAction() {
 		if ($this->hasInput('update')) {
 			$output = [];
-			$hostids = $this->getInput('ids', []);
+			$hostids = $this->getInput('ids');
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
 				function (array $macro): bool {
@@ -436,6 +440,11 @@ class CControllerPopupMassupdateHost extends CController {
 					}
 				}
 
+				// Value mapping.
+				if (array_key_exists('valuemaps', $visible)) {
+					$this->updateValueMaps($hostids);
+				}
+
 				DBend(true);
 			}
 			catch (Exception $e) {
@@ -467,7 +476,7 @@ class CControllerPopupMassupdateHost extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'ids' => $this->getInput('ids', []),
+				'ids' => $this->getInput('ids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => 'hosts.php'
 			];
@@ -478,6 +487,13 @@ class CControllerPopupMassupdateHost extends CController {
 					'status' => [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]
 				],
 				'sortfield' => 'host'
+			]);
+
+			$data['discovered_host'] = !(bool) API::Host()->get([
+				'output' => [],
+				'hostids' => $data['ids'],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+				'limit' => 1
 			]);
 
 			$this->setResponse(new CControllerResponseData($data));

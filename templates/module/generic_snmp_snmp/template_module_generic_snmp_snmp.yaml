@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:24Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -205,16 +205,16 @@ zabbix_export:
         -
           macro: '{$SNMP.TIMEOUT}'
           value: 5m
-  value_maps:
-    -
-      name: zabbix.host.available
-      mappings:
+      valuemaps:
         -
-          value: '0'
-          newvalue: 'not available'
-        -
-          value: '1'
-          newvalue: available
-        -
-          value: '2'
-          newvalue: unknown
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

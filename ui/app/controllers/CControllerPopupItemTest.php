@@ -723,8 +723,8 @@ abstract class CControllerPopupItemTest extends CController {
 				'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 				'authpassphrase' => '',
 				'privpassphrase' => '',
-				'authprotocol' => ITEM_AUTHPROTOCOL_MD5,
-				'privprotocol' => ITEM_PRIVPROTOCOL_DES,
+				'authprotocol' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
+				'privprotocol' => ITEM_SNMPV3_PRIVPROTOCOL_DES,
 				'contextname' => ''
 			]
 		];

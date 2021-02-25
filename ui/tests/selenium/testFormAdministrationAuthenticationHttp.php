@@ -542,16 +542,16 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			$session = $session_cookie['sessionid'];
 
 			$user_data = CDBHelper::getRow(
-				'SELECT u.alias'.
+				'SELECT u.username'.
 				' FROM users u,sessions s'.
 				' WHERE u.userid=s.userid'.
 					' AND sessionid='.zbx_dbstr($session)
 			);
 			if (array_key_exists('user_case_sensitive', $data)) {
-				$this->assertEquals($user_data['alias'], $data['user_case_sensitive']);
+				$this->assertEquals($user_data['username'], $data['user_case_sensitive']);
 			}
 			else {
-				$this->assertEquals($user_data['alias'], $alias);
+				$this->assertEquals($user_data['username'], $alias);
 			}
 
 			$this->page->logout();
@@ -596,7 +596,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	private function setHttpConfiguration($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
-		$this->assertPageTitle('Configuration of authentication');
+		$this->page->assertTitle('Configuration of authentication');
 
 		// Fill fields in 'HTTP settings' tab.
 		$form = $this->query('name:form_auth')->asForm()->one();

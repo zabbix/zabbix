@@ -732,6 +732,53 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Resolves items value maps, valuemap property will be added to every item.
+	 *
+	 * @param array $items
+	 * @param int   $items[]['itemid']
+	 * @param int   $items[]['valuemapid']
+	 *
+	 * @return array
+	 */
+	protected static function getItemsValueMaps(array $items): array {
+		foreach ($items as &$item) {
+			$item['valuemap'] = [];
+		}
+		unset($item);
+
+		$valuemapids = array_flip(array_column($items, 'valuemapid'));
+		unset($valuemapids[0]);
+
+		if (!$valuemapids) {
+			return $items;
+		}
+
+		$options = [
+			'output' => ['valuemapid', 'value', 'newvalue'],
+			'filter' => ['valuemapid' => array_keys($valuemapids)]
+		];
+		$db_mappings = DBselect(DB::makeSql('valuemap_mapping', $options));
+
+		$db_valuemaps = [];
+
+		while ($db_mapping  = DBfetch($db_mappings)) {
+			$db_valuemaps[$db_mapping['valuemapid']]['mappings'][] = [
+				'value' => $db_mapping['value'],
+				'newvalue' => $db_mapping['newvalue']
+			];
+		}
+
+		foreach ($items as &$item) {
+			if (array_key_exists($item['valuemapid'], $db_valuemaps)) {
+				$item['valuemap'] = $db_valuemaps[$item['valuemapid']];
+			}
+		}
+		unset($item);
+
+		return $items;
+	}
+
+	/**
 	 * Get item macros.
 	 *
 	 * @param array $macros
@@ -764,6 +811,7 @@ class CMacrosResolverGeneral {
 		));
 
 		$functions = CMacrosResolverHelper::resolveItemNames($functions);
+		$functions = self::getItemsValueMaps($functions);
 
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
@@ -890,7 +938,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$functions = DBfetchArray(DBselect(
-			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type,i.units,i.valuemapid'.
+			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN hosts h ON i.hostid=h.hostid'.
@@ -908,9 +956,10 @@ class CMacrosResolverGeneral {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
 				$value = UNRESOLVED_MACRO_STRING;
 
-				$history = Manager::History()->getLastValues([$function], 1,
+				$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
 					CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
-				);
+				));
+
 				if (!array_key_exists($function['itemid'], $history)) {
 					continue;
 				}
@@ -940,13 +989,7 @@ class CMacrosResolverGeneral {
 				}
 
 				foreach ($tokens as $token) {
-					$macro_value = UNRESOLVED_MACRO_STRING;
-
-					if ($value !== null) {
-						$macro_value = formatHistoryValue($value, $function);
-					}
-
-					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
+					$macro_values[$function['triggerid']][$token['token']] = $value;
 				}
 			}
 		}
@@ -1217,7 +1260,7 @@ class CMacrosResolverGeneral {
 							}
 							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
 								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
-									if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+									if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
 										$value['value'] = $val;
 										break;
 									}
@@ -1294,7 +1337,7 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+						if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default

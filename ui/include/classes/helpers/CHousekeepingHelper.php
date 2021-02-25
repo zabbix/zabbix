@@ -25,7 +25,6 @@
 class CHousekeepingHelper extends CConfigGeneralHelper {
 
 	public const COMPRESS_OLDER = 'compress_older';
-	public const COMPRESSION_AVAILABILITY = 'compression_availability';
 	public const COMPRESSION_STATUS = 'compression_status';
 	public const DB_EXTENSION = 'db_extension';
 	public const HK_AUDIT = 'hk_audit';

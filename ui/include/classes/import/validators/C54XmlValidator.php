@@ -289,6 +289,24 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD
 	];
 
+	private $SNMPV3_AUTHPROTOCOL = [
+		CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5,
+		CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA1,
+		CXmlConstantValue::SNMPV3_SHA224 => CXmlConstantName::SHA224,
+		CXmlConstantValue::SNMPV3_SHA256 => CXmlConstantName::SHA256,
+		CXmlConstantValue::SNMPV3_SHA384 => CXmlConstantName::SHA384,
+		CXmlConstantValue::SNMPV3_SHA512 => CXmlConstantName::SHA512
+	];
+
+	private $SNMPV3_PRIVPROTOCOL = [
+		CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES,
+		CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES128,
+		CXmlConstantValue::SNMPV3_AES192 => CXmlConstantName::AES192,
+		CXmlConstantValue::SNMPV3_AES256 => CXmlConstantName::AES256,
+		CXmlConstantValue::SNMPV3_AES192C => CXmlConstantName::AES192C,
+		CXmlConstantValue::SNMPV3_AES256C => CXmlConstantName::AES256C
+	];
+
 	private $EVENT_SOURCE = [
 		CXmlConstantValue::EVENT_SOURCE_TRIGGERS => CXmlConstantName::TRIGGERS,
 		CXmlConstantValue::EVENT_SOURCE_DISCOVERY => CXmlConstantName::DISCOVERY,
@@ -417,9 +435,9 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 								'contextname' =>			['type' => XML_STRING, 'default' => ''],
 								'securityname' =>			['type' => XML_STRING, 'default' => ''],
 								'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-								'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+								'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
 								'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-								'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+								'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
 								'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
 								'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 							]],
@@ -468,7 +486,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -618,7 +636,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 												'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 											]],
-											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+											'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
@@ -817,9 +835,9 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 												'contextname' =>			['type' => XML_STRING, 'default' => ''],
 												'securityname' =>			['type' => XML_STRING, 'default' => ''],
 												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
 												'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
 												'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
 												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 											]]
@@ -876,7 +894,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -1075,7 +1093,18 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 						'poc_2_screen' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_2_notes' =>			['type' => XML_STRING, 'default' => '']
 					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE]
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
+					'valuemaps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'valuemap', 'rules' => [
+						'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
+								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
+									'value' =>					['type' => XML_STRING | XML_REQUIRED],
+									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]]
+						]]
+					]]
 				]]
 			]],
 			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
@@ -1135,7 +1164,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -1283,7 +1312,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 												'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 											]],
-											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+											'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
@@ -1480,9 +1509,9 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 												'contextname' =>			['type' => XML_STRING, 'default' => ''],
 												'securityname' =>			['type' => XML_STRING, 'default' => ''],
 												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
 												'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
 												'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
 												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 											]]
@@ -1539,7 +1568,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -1689,7 +1718,18 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							]]
 						]]
 					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE]
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
+					'valuemaps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'valuemap', 'rules' => [
+						'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
+								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
+									'value' =>					['type' => XML_STRING | XML_REQUIRED],
+									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]]
+						]]
+					]]
 				]]
 			]],
 			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
@@ -1966,17 +2006,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 						]]
 					]]
 				]]
-			]],
-			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
-				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'mappings' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
-						'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-							'value' =>					['type' => XML_STRING, 'default' => ''],
-							'newvalue' =>				['type' => XML_STRING, 'default' => '']
-						]]
-					]]
-				]]
 			]]
 		]];
 	}
@@ -2053,6 +2082,21 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		$rules = $this->getMapElementsExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);
+	}
+
+	/**
+	 * Chooses default value for preprocessing step error handler.
+	 *
+	 * @param array $parent_data  Data's parent array.
+	 *
+	 * @return int
+	 */
+	public function defaultPreprocErrHandler(array $parent_data): int {
+		if ($parent_data['type'] == CXmlConstantValue::CHECK_NOT_SUPPORTED) {
+			return CXmlConstantValue::DISCARD_VALUE;
+		}
+
+		return CXmlConstantValue::ORIGINAL_ERROR;
 	}
 
 	/**
@@ -2295,6 +2339,29 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Validate preprocessing step error handler.
+	 *
+	 * @param string|array $data         Import data.
+	 * @param array        $parent_data  Data's parent array.
+	 * @param string       $path         XML path.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return string|array
+	 */
+	public function validatePreprocErrHandler($data, array $parent_data, $path) {
+		$in = $this->ITEM_PREPROCESSING_ERROR_HANDLER;
+
+		if ($parent_data['type'] == CXmlConstantName::CHECK_NOT_SUPPORTED) {
+			unset($in[CXmlConstantValue::ORIGINAL_ERROR]);
+		}
+
+		$rules = ['type' => XML_STRING, 'in' => $in];
+
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**

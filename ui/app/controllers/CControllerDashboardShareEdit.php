@@ -100,7 +100,7 @@ class CControllerDashboardShareEdit extends CController {
 		$users = zbx_toHash($users, 'userid');
 
 		$db_users = API::User()->get([
-			'output' => ['userid', 'alias', 'name', 'surname'],
+			'output' => ['userid', 'username', 'name', 'surname'],
 			'userids' => array_keys($users)
 		]);
 

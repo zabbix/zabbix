@@ -96,7 +96,7 @@ class CScreenActions extends CScreenBase {
 
 		$db_users = $userids
 			? API::User()->get([
-				'output' => ['userid', 'alias', 'name', 'surname'],
+				'output' => ['userid', 'username', 'name', 'surname'],
 				'userids' => array_keys($userids),
 				'preservekeys' => true
 			])

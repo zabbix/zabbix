@@ -20,6 +20,6 @@
 #ifndef ZABBIX_SHA512CRYPT_H
 #define ZABBIX_SHA512CRYPT_H
 
-void sha512_hash(const char *in, char *out);
+void zbx_sha512_hash(const char *in, char *out);
 
 #endif
