@@ -2205,7 +2205,7 @@ static char	**dbsync_trigger_preproc_row(char **row)
 {
 	zbx_vector_uint64_t	hostids, functionids;
 	zbx_eval_context_t	ctx, ctx_r;
-	char			*error;
+	char			*error = NULL;
 	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT;
 
 	zbx_vector_uint64_create(&hostids);
