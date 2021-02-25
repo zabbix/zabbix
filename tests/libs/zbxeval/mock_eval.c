@@ -30,7 +30,7 @@ zbx_uint64_t	mock_eval_read_rules(const char *path)
 	zbx_uint64_t		rules = 0;
 	zbx_mock_handle_t	hrules, hflag;
 	zbx_mock_error_t	err;
-	int			rules_num;
+	int			rules_num = 0;
 
 	hrules = zbx_mock_get_parameter_handle(path);
 	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hrules, &hflag))))

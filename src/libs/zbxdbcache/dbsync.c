@@ -2065,7 +2065,7 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: compare serialized expression                                     *
  *                                                                            *
- * Parameter: data1 - [IN] the base64 encoded expression                      *
+ * Parameter: col   - [IN] the base64 encoded expression                      *
  *            data2 - [IN] the serialized expression in cache                 *
  *                                                                            *
  * Return value: SUCCEED - the expressions are identical                      *
