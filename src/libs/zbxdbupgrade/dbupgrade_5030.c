@@ -829,7 +829,7 @@ static int DBpatch_reference_name(char **ref_name)
 static int	DBpatch_init_dashboard(zbx_db_dashboard_t *dashboard, char *name, uint64_t userid,
 		int private)
 {
-	int ret = SUCCEED;
+	int	ret = SUCCEED;
 
 	memset((void *)dashboard, 0, sizeof(zbx_db_dashboard_t));
 
@@ -1412,9 +1412,9 @@ static zbx_db_widget_field_t	*DBpatch_make_widget_field(int type, char *name, vo
 
 static void DBpatch_widget_from_screen_item(zbx_db_screen_item_t *si, zbx_db_widget_t *w, zbx_vector_ptr_t *fields)
 {
-	zbx_db_widget_field_t	*f;
 	int			tmp;
 	char			*reference = NULL;
+	zbx_db_widget_field_t	*f;
 
 	w->name = zbx_strdup(NULL, "");
 	w->view_mode = 0;	/* ZBX_WIDGET_VIEW_MODE_NORMAL */
