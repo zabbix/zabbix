@@ -1487,7 +1487,6 @@ out:
 	zbx_free(sql);
 
 	return ret;
-
 }
 
 static int	DBpatch_5030074(void)
