@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "log.h"
-
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "eval.h"
@@ -398,6 +397,23 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 	zbx_vector_var_append_ptr(output, &value);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_push_null                                           *
+ *                                                                            *
+ * Purpose: push null value in output stack                                   *
+ *                                                                            *
+ * Parameters: output   - [IN/OUT] the output value stack                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	eval_execute_push_null(zbx_vector_var_t *output)
+{
+	zbx_variant_t	value;
+
+	zbx_variant_set_none(&value);
+	zbx_vector_var_append_ptr(output, &value);
 }
 
 /******************************************************************************
@@ -1251,6 +1267,9 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 					if (SUCCEED != eval_execute_push_value(ctx, token, &output, error))
 						goto out;
 					break;
+				case ZBX_EVAL_TOKEN_ARG_NULL:
+					eval_execute_push_null(&output);
+					break;
 				case ZBX_EVAL_TOKEN_FUNCTION:
 					if (SUCCEED != eval_execute_function(ctx, token, &output, error))
 						goto out;
@@ -1271,11 +1290,12 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 					break;
 				case ZBX_EVAL_TOKEN_EXCEPTION:
 					eval_throw_execption(&output, error);
-					ret = FAIL;
 					goto out;
 				default:
 					*error = zbx_dsprintf(*error, "unknown token at \"%s\"",
 							ctx->expression + token->loc.l);
+					ret = FAIL;
+					goto out;
 			}
 		}
 	}

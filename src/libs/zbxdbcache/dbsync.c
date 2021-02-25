@@ -20,8 +20,6 @@
 #include "common.h"
 #include "log.h"
 #include "dbcache.h"
-#include "zbxserver.h"
-#include "mutexs.h"
 #include "zbxserialize.h"
 #include "base64.h"
 #include "zbxeval.h"

@@ -18,9 +18,8 @@
 **/
 
 #include "common.h"
-#include "zbxalgo.h"
-#include "zbxvariant.h"
 #include "log.h"
+#include "zbxvariant.h"
 
 #include "../zbxalgo/vectorimpl.h"
 
