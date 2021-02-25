@@ -1678,14 +1678,14 @@ class testScripts extends CAPITest {
 					$this->assertEquals($db_script['scope'], $scripts[$num]['scope']);
 				}
 				else {
-					$this->assertEquals($db_script['scope'], CDBHelper::getDefault('scripts', 'scope'));
+					$this->assertEquals($db_script['scope'], DB::getDefault('scripts', 'scope'));
 				}
 
 				// Check menu path.
 				if ($db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
 					$this->assertEmpty($db_script['menu_path']);
 					$this->assertSame($db_script['usrgrpid'], '0');
-					$this->assertEquals($db_script['host_access'], CDBHelper::getDefault('scripts', 'host_access'));
+					$this->assertEquals($db_script['host_access'], DB::getDefault('scripts', 'host_access'));
 					$this->assertEmpty($db_script['confirmation']);
 				}
 				else {
@@ -1711,7 +1711,7 @@ class testScripts extends CAPITest {
 						$this->assertEquals($db_script['host_access'], $scripts[$num]['host_access']);
 					}
 					else {
-						$this->assertEquals($db_script['host_access'], CDBHelper::getDefault('scripts', 'host_access'));
+						$this->assertEquals($db_script['host_access'], DB::getDefault('scripts', 'host_access'));
 					}
 
 					// Check confirmation.
@@ -1747,15 +1747,13 @@ class testScripts extends CAPITest {
 								$this->assertEquals($db_script['execute_on'], $scripts[$num]['execute_on']);
 							}
 							else {
-								$this->assertEquals($db_script['execute_on'],
-									CDBHelper::getDefault('scripts', 'execute_on')
-								);
+								$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
 							}
 
 							// Check other fields.
-							$this->assertSame($db_script['timeout'], CDBHelper::getDefault('scripts', 'timeout'));
+							$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
 							$this->assertEmpty($db_script['port']);
-							$this->assertEquals($db_script['authtype'], CDBHelper::getDefault('scripts', 'authtype'));
+							$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
 							$this->assertEmpty($db_script['username']);
 							$this->assertEmpty($db_script['password']);
 							$this->assertEmpty($db_script['publickey']);
@@ -1764,12 +1762,10 @@ class testScripts extends CAPITest {
 							break;
 
 						case ZBX_SCRIPT_TYPE_IPMI:
-							$this->assertEquals($db_script['execute_on'],
-								CDBHelper::getDefault('scripts', 'execute_on')
-							);
-							$this->assertSame($db_script['timeout'], CDBHelper::getDefault('scripts', 'timeout'));
+							$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
+							$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
 							$this->assertEmpty($db_script['port']);
-							$this->assertEquals($db_script['authtype'], CDBHelper::getDefault('scripts', 'authtype'));
+							$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
 							$this->assertEmpty($db_script['username']);
 							$this->assertEmpty($db_script['password']);
 							$this->assertEmpty($db_script['publickey']);
@@ -1806,9 +1802,7 @@ class testScripts extends CAPITest {
 								}
 							}
 							else {
-								$this->assertEquals($db_script['authtype'],
-									CDBHelper::getDefault('scripts', 'authtype')
-								);
+								$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
 								$this->assertEmpty($db_script['publickey']);
 								$this->assertEmpty($db_script['privatekey']);
 							}
@@ -1822,10 +1816,8 @@ class testScripts extends CAPITest {
 							}
 
 							// Check other fields.
-							$this->assertEquals($db_script['execute_on'],
-								CDBHelper::getDefault('scripts', 'execute_on')
-							);
-							$this->assertSame($db_script['timeout'], CDBHelper::getDefault('scripts', 'timeout'));
+							$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
+							$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
 							$this->assertEmpty($db_script_parameters);
 							break;
 
@@ -1851,11 +1843,9 @@ class testScripts extends CAPITest {
 							}
 
 							// Check other fields.
-							$this->assertEquals($db_script['execute_on'],
-								CDBHelper::getDefault('scripts', 'execute_on')
-							);
-							$this->assertSame($db_script['timeout'], CDBHelper::getDefault('scripts', 'timeout'));
-							$this->assertEquals($db_script['authtype'], CDBHelper::getDefault('scripts', 'authtype'));
+							$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
+							$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
+							$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
 							$this->assertEmpty($db_script['publickey']);
 							$this->assertEmpty($db_script['privatekey']);
 							$this->assertEmpty($db_script_parameters);
@@ -1867,7 +1857,7 @@ class testScripts extends CAPITest {
 								$this->assertSame($db_script['timeout'], $scripts[$num]['timeout']);
 							}
 							else {
-								$this->assertSame($db_script['timeout'], CDBHelper::getDefault('scripts', 'timeout'));
+								$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
 							}
 
 							// Check parameters.
@@ -1900,11 +1890,9 @@ class testScripts extends CAPITest {
 							}
 
 							// Check other fields.
-							$this->assertEquals($db_script['execute_on'],
-								CDBHelper::getDefault('scripts', 'execute_on')
-							);
+							$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
 							$this->assertEmpty($db_script['port']);
-							$this->assertEquals($db_script['authtype'], CDBHelper::getDefault('scripts', 'authtype'));
+							$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
 							$this->assertEmpty($db_script['username']);
 							$this->assertEmpty($db_script['password']);
 							$this->assertEmpty($db_script['publickey']);
@@ -3652,18 +3640,14 @@ class testScripts extends CAPITest {
 								}
 								else {
 									$this->assertEquals($db_upd_script['execute_on'],
-										CDBHelper::getDefault('scripts', 'execute_on')
+										DB::getDefault('scripts', 'execute_on')
 									);
 								}
 
 								// Check other fields.
-								$this->assertSame($db_upd_script['timeout'],
-									CDBHelper::getDefault('scripts', 'timeout')
-								);
+								$this->assertSame($db_upd_script['timeout'], DB::getDefault('scripts', 'timeout'));
 								$this->assertEmpty($db_upd_script['port']);
-								$this->assertEquals($db_upd_script['authtype'],
-									CDBHelper::getDefault('scripts', 'authtype')
-								);
+								$this->assertEquals($db_upd_script['authtype'], DB::getDefault('scripts', 'authtype'));
 								$this->assertEmpty($db_upd_script['username']);
 								$this->assertEmpty($db_upd_script['password']);
 								$this->assertEmpty($db_upd_script['publickey']);
@@ -3673,15 +3657,11 @@ class testScripts extends CAPITest {
 
 							case ZBX_SCRIPT_TYPE_IPMI:
 								$this->assertEquals($db_upd_script['execute_on'],
-									CDBHelper::getDefault('scripts', 'execute_on')
+									DB::getDefault('scripts', 'execute_on')
 								);
-								$this->assertSame($db_upd_script['timeout'],
-									CDBHelper::getDefault('scripts', 'timeout')
-								);
+								$this->assertSame($db_upd_script['timeout'], DB::getDefault('scripts', 'timeout'));
 								$this->assertEmpty($db_upd_script['port']);
-								$this->assertEquals($db_upd_script['authtype'],
-									CDBHelper::getDefault('scripts', 'authtype')
-								);
+								$this->assertEquals($db_upd_script['authtype'], DB::getDefault('scripts', 'authtype'));
 								$this->assertEmpty($db_upd_script['username']);
 								$this->assertEmpty($db_upd_script['password']);
 								$this->assertEmpty($db_upd_script['publickey']);
@@ -3763,11 +3743,9 @@ class testScripts extends CAPITest {
 
 								// Check other fields.
 								$this->assertEquals($db_upd_script['execute_on'],
-									CDBHelper::getDefault('scripts', 'execute_on')
+									DB::getDefault('scripts', 'execute_on')
 								);
-								$this->assertSame($db_upd_script['timeout'],
-									CDBHelper::getDefault('scripts', 'timeout')
-								);
+								$this->assertSame($db_upd_script['timeout'], DB::getDefault('scripts', 'timeout'));
 								$this->assertEmpty($db_upd_script['parameters']);
 								break;
 
@@ -3799,15 +3777,10 @@ class testScripts extends CAPITest {
 
 								// Check other fields.
 								$this->assertEquals($db_upd_script['execute_on'],
-									CDBHelper::getDefault('scripts', 'execute_on')
+									DB::getDefault('scripts', 'execute_on')
 								);
-								$this->assertSame($db_upd_script['timeout'],
-									CDBHelper::getDefault('scripts', 'timeout')
-								);
-								$this->assertEquals($db_upd_script['authtype'],
-									CDBHelper::getDefault('scripts', 'authtype')
-								);
-
+								$this->assertSame($db_upd_script['timeout'], DB::getDefault('scripts', 'timeout'));
+								$this->assertEquals($db_upd_script['authtype'], DB::getDefault('scripts', 'authtype'));
 								$this->assertEmpty($db_upd_script['publickey']);
 								$this->assertEmpty($db_upd_script['privatekey']);
 								$this->assertEmpty($db_upd_script['parameters']);
@@ -3850,12 +3823,10 @@ class testScripts extends CAPITest {
 
 								// Check other fields.
 								$this->assertEquals($db_upd_script['execute_on'],
-									CDBHelper::getDefault('scripts', 'execute_on')
+									DB::getDefault('scripts', 'execute_on')
 								);
 								$this->assertEmpty($db_upd_script['port']);
-								$this->assertEquals($db_upd_script['authtype'],
-									CDBHelper::getDefault('scripts', 'authtype')
-								);
+								$this->assertEquals($db_upd_script['authtype'], DB::getDefault('scripts', 'authtype'));
 								$this->assertEmpty($db_upd_script['username']);
 								$this->assertEmpty($db_upd_script['password']);
 								$this->assertEmpty($db_upd_script['publickey']);
@@ -3919,9 +3890,7 @@ class testScripts extends CAPITest {
 				if ($db_upd_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
 					$this->assertEmpty($db_upd_script['menu_path']);
 					$this->assertSame($db_upd_script['usrgrpid'], '0');
-					$this->assertEquals($db_upd_script['host_access'],
-						CDBHelper::getDefault('scripts', 'host_access')
-					);
+					$this->assertEquals($db_upd_script['host_access'], DB::getDefault('scripts', 'host_access'));
 					$this->assertEmpty($db_upd_script['confirmation']);
 				}
 				else {
