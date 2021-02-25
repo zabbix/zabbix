@@ -2681,7 +2681,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param string $items[]['tags'][]['value']
 	 */
 	protected function updateItemTags(array $items): void {
-		$items = array_filter($items, function($item) {
+		$items = array_filter($items, function ($item) {
 			return array_key_exists('tags', $item);
 		});
 
