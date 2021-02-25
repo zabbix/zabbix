@@ -96,13 +96,17 @@ class CDashboardWidget extends CBaseComponent {
 		this._is_ready = is_ready;
 
 		this._css_classes = css_classes;
-
-		this._makeView();
 	}
 
 	activate() {
 		if (!this._is_active) {
 			this._is_active = true;
+
+			if (!this._target.hasChildNodes()) {
+				this._makeView();
+				this.setDivPosition(this.pos);
+				this.showPreloader();
+			}
 
 			this._registerEvents();
 		}
@@ -177,6 +181,10 @@ class CDashboardWidget extends CBaseComponent {
 		}
 	}
 
+	isActive() {
+		return this._is_active;
+	}
+
 	isEditable() {
 		return this._is_editable;
 	}
@@ -193,6 +201,10 @@ class CDashboardWidget extends CBaseComponent {
 
 	isReady() {
 		return this._is_ready;
+	}
+
+	getView() {
+		return this.div;
 	}
 
 	/**
@@ -371,12 +383,12 @@ class CDashboardWidget extends CBaseComponent {
 			}
 
 			if (this._is_iterator) {
-				this.$button_iterator_previous_page = $('<button>', {
+				this.$button_previous_page = $('<button>', {
 					'type': 'button',
 					'class': 'btn-iterator-page-previous',
 					'title': t('Previous page')
 				});
-				this.$button_iterator_next_page = $('<button>', {
+				this.$button_next_page = $('<button>', {
 					'type': 'button',
 					'class': 'btn-iterator-page-next',
 					'title': t('Next page')
@@ -395,9 +407,9 @@ class CDashboardWidget extends CBaseComponent {
 			this.content_header
 				.append(this._is_iterator
 					? $('<div>', {'class': 'dashbrd-grid-iterator-pager'}).append(
-						this.$button_iterator_previous_page,
+						this.$button_previous_page,
 						$('<span>', {'class': 'dashbrd-grid-iterator-pager-info'}),
-						this.$button_iterator_next_page
+						this.$button_next_page
 					)
 					: ''
 				)
@@ -461,6 +473,15 @@ class CDashboardWidget extends CBaseComponent {
 		this.mask = $('<div>', {'class': this._css_classes.mask});
 
 		this.div.append(this.container, this.mask);
+	}
+
+	setDivPosition(pos) {
+		this.div.css({
+			left: `${this._cell_width * pos.x}%`,
+			top: `${this._cell_height * pos.y}px`,
+			width: `${this._cell_width * pos.width}%`,
+			height: `${this._cell_height * pos.height}px`
+		});
 	}
 
 	_registerEvents() {
