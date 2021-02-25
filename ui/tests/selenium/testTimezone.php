@@ -110,7 +110,7 @@ class testTimezone extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view');
 		$user_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 		$this->assertEquals($system_time, $user_time);
-		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE alias='.zbx_dbstr('test-timezone')));
+		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE username='.zbx_dbstr('test-timezone')));
 		$this->assertEquals('system', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
 		$this->page->logout();
 	}
@@ -120,7 +120,7 @@ class testTimezone extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Alias' => 'test_utc',
+						'Username' => 'test_utc',
 						'Groups' => [
 							'Selenium user group'
 						],
@@ -135,7 +135,7 @@ class testTimezone extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Alias' => 'test_def',
+						'Username' => 'test_def',
 						'Groups' => [
 							'Selenium user group'
 						],
@@ -150,7 +150,7 @@ class testTimezone extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Alias' => 'test_amer',
+						'Username' => 'test_amer',
 						'Groups' => [
 							'Selenium user group'
 						],
@@ -165,7 +165,7 @@ class testTimezone extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Alias' => 'test_asia',
+						'Username' => 'test_asia',
 						'Groups' => [
 							'Selenium user group'
 						],
@@ -199,7 +199,7 @@ class testTimezone extends CWebTest {
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
-		$this->page->userLogin($data['fields']['Alias'], $data['fields']['Password']);
+		$this->page->userLogin($data['fields']['Username'], $data['fields']['Password']);
 		$this->page->open('zabbix.php?action=problem.view');
 
 		// Expected time after timezone change.
@@ -209,8 +209,8 @@ class testTimezone extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view');
 		$user_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 		$this->assertEquals($system_time, $user_time);
-		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE alias='.
-				zbx_dbstr($data['fields']['Alias'])));
+		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE username='.
+				zbx_dbstr($data['fields']['Username'])));
 		$this->assertEquals('system', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
 		$this->page->logout();
 	}

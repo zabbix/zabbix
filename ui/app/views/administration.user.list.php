@@ -59,8 +59,8 @@ $widget = (new CWidget())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Alias'),
-				(new CTextBox('filter_alias', $data['filter']['alias']))
+			(new CFormList())->addRow(_('Username'),
+				(new CTextBox('filter_username', $data['filter']['username']))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 			),
@@ -103,7 +103,7 @@ $table = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_users'))->onClick("checkAll('".$form->getName()."', 'all_users', 'userids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Alias'), 'alias', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Username'), 'username', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Surname'), 'surname', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('User role'), 'role_name', $data['sort'], $data['sortorder'], $url),
@@ -194,7 +194,7 @@ foreach ($data['users'] as $user) {
 			$gui_access_style = ZBX_STYLE_GREEN;
 	}
 
-	$alias = new CLink($user['alias'], (new CUrl('zabbix.php'))
+	$username = new CLink($user['username'], (new CUrl('zabbix.php'))
 		->setArgument('action', 'user.edit')
 		->setArgument('userid', $userid)
 	);
@@ -223,7 +223,7 @@ foreach ($data['users'] as $user) {
 	// Append user to table.
 	$table->addRow([
 		new CCheckBox('userids['.$userid.']', $userid),
-		(new CCol($alias))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($username))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
 		$user['surname'],
 		$user['role']['name'],

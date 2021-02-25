@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-11-26T12:14:17Z'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -1377,6 +1377,28 @@ zabbix_export:
         -
           macro: '{$CEPH.USER}'
           value: zabbix
+      valuemaps:
+        -
+          name: 'Ceph cluster status'
+          mappings:
+            -
+              value: '0'
+              newvalue: HEALTH_OK
+            -
+              value: '1'
+              newvalue: HEALTH_WARN
+            -
+              value: '2'
+              newvalue: HEALTH_ERR
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
       name: 'Ceph: Cluster bandwidth'
@@ -1484,25 +1506,3 @@ zabbix_export:
           item:
             host: 'Ceph by Zabbix Agent2'
             key: ceph.osd_fill.min
-  value_maps:
-    -
-      name: 'Ceph cluster status'
-      mappings:
-        -
-          value: '0'
-          newvalue: HEALTH_OK
-        -
-          value: '1'
-          newvalue: HEALTH_WARN
-        -
-          value: '2'
-          newvalue: HEALTH_ERR
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

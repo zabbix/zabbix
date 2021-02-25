@@ -206,7 +206,7 @@ There are no template links in this template.
 |Redis: Connections are rejected |<p>The number of connections has reached the value of "maxclients".</p><p>https://redis.io/topics/clients</p> |`{TEMPLATE_NAME:redis.stats.rejected_connections.last()}>0` |HIGH | |
 |Redis: Replication lag with master is too high (over {$REDIS.REPL.LAG.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:redis.replication.master_last_io_seconds_ago[{#SINGLETON}].min(5m)}>{$REDIS.REPL.LAG.MAX.WARN}` |WARNING | |
 |Redis: Process is not running |<p>-</p> |`{TEMPLATE_NAME:proc.num["{$REDIS.PROCESS_NAME}{#SINGLETON}"].last()}=0` |HIGH | |
-|Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m) |<p>-</p> |`{TEMPLATE_NAME:redis.memory.maxmemory[{#SINGLETON}].min(5m)}/{Redis:redis.memory.used_memory.last()}*100>{$REDIS.MEM.PUSED.MAX.WARN}` |WARNING | |
+|Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m) |<p>-</p> |`{TEMPLATE_NAME:redis.memory.used_memory.last()}/{TEMPLATE_NAME:redis.memory.maxmemory[{#SINGLETON}].min(5m)}*100>{$REDIS.MEM.PUSED.MAX.WARN}` |WARNING | |
 |Redis: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:redis.info["{$REDIS.CONN.URI}"].nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Redis: Service is down</p> |
 |Redis: Configuration has changed |<p>Redis configuration has changed. Ack to close.</p> |`{TEMPLATE_NAME:redis.config["{$REDIS.CONN.URI}"].diff()}=1 and {TEMPLATE_NAME:redis.config["{$REDIS.CONN.URI}"].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 

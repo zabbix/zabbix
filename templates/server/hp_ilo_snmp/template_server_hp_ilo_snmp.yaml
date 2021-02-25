@@ -1454,541 +1454,541 @@ zabbix_export:
         -
           macro: '{$VDISK_OK_STATUS}'
           value: '2'
-  value_maps:
-    -
-      name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: degraded
-        -
-          value: '4'
-          newvalue: failed
-    -
-      name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: unknown
-        -
-          value: '3'
-          newvalue: system
-        -
-          value: '4'
-          newvalue: systemBoard
-        -
-          value: '5'
-          newvalue: ioBoard
-        -
-          value: '6'
-          newvalue: cpu
-        -
-          value: '7'
-          newvalue: memory
-        -
-          value: '8'
-          newvalue: storage
-        -
-          value: '9'
-          newvalue: removableMedia
-        -
-          value: '10'
-          newvalue: powerSupply
-        -
-          value: '11'
-          newvalue: ambient
-        -
-          value: '12'
-          newvalue: chassis
-        -
-          value: '13'
-          newvalue: bridgeCard
-    -
-      name: 'CPQIDA-MIB::cpqDaAccelBattery'
-      mappings:
-        -
-          value: '1'
-          newvalue: Other
-        -
-          value: '2'
-          newvalue: Ok
-        -
-          value: '3'
-          newvalue: Recharging
-        -
-          value: '4'
-          newvalue: Failed
-        -
-          value: '5'
-          newvalue: Degraded
-        -
-          value: '6'
-          newvalue: 'Not Present'
-        -
-          value: '7'
-          newvalue: 'Capacitor failed'
-    -
-      name: 'CPQIDA-MIB::cpqDaAccelStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: invalid
-        -
-          value: '3'
-          newvalue: enabled
-        -
-          value: '4'
-          newvalue: tmpDisabled
-        -
-          value: '5'
-          newvalue: permDisabled
-        -
-          value: '6'
-          newvalue: cacheModFlashMemNotAttached
-        -
-          value: '7'
-          newvalue: cacheModDegradedFailsafeSpeed
-        -
-          value: '8'
-          newvalue: cacheModCriticalFailure
-        -
-          value: '9'
-          newvalue: cacheReadCacheNotMapped
-    -
-      name: 'CPQIDA-MIB::cpqDaCntlrModel'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ida
-        -
-          value: '3'
-          newvalue: idaExpansion
-        -
-          value: '4'
-          newvalue: ida-2
-        -
-          value: '5'
-          newvalue: smart
-        -
-          value: '6'
-          newvalue: smart-2e
-        -
-          value: '7'
-          newvalue: smart-2p
-        -
-          value: '8'
-          newvalue: smart-2sl
-        -
-          value: '9'
-          newvalue: smart-3100es
-        -
-          value: '10'
-          newvalue: smart-3200
-        -
-          value: '11'
-          newvalue: smart-2dh
-        -
-          value: '12'
-          newvalue: smart-221
-        -
-          value: '13'
-          newvalue: sa-4250es
-        -
-          value: '14'
-          newvalue: sa-4200
-        -
-          value: '15'
-          newvalue: sa-integrated
-        -
-          value: '16'
-          newvalue: sa-431
-        -
-          value: '17'
-          newvalue: sa-5300
-        -
-          value: '18'
-          newvalue: raidLc2
-        -
-          value: '19'
-          newvalue: sa-5i
-        -
-          value: '20'
-          newvalue: sa-532
-        -
-          value: '21'
-          newvalue: sa-5312
-        -
-          value: '22'
-          newvalue: sa-641
-        -
-          value: '23'
-          newvalue: sa-642
-        -
-          value: '24'
-          newvalue: sa-6400
-        -
-          value: '25'
-          newvalue: sa-6400em
-        -
-          value: '26'
-          newvalue: sa-6i
-        -
-          value: '27'
-          newvalue: sa-generic
-        -
-          value: '29'
-          newvalue: sa-p600
-        -
-          value: '30'
-          newvalue: sa-p400
-        -
-          value: '31'
-          newvalue: sa-e200
-        -
-          value: '32'
-          newvalue: sa-e200i
-        -
-          value: '33'
-          newvalue: sa-p400i
-        -
-          value: '34'
-          newvalue: sa-p800
-        -
-          value: '35'
-          newvalue: sa-e500
-        -
-          value: '36'
-          newvalue: sa-p700m
-        -
-          value: '37'
-          newvalue: sa-p212
-        -
-          value: '38'
-          newvalue: sa-p410
-        -
-          value: '39'
-          newvalue: sa-p410i
-        -
-          value: '40'
-          newvalue: sa-p411
-        -
-          value: '41'
-          newvalue: sa-b110i
-        -
-          value: '42'
-          newvalue: sa-p712m
-        -
-          value: '43'
-          newvalue: sa-p711m
-        -
-          value: '44'
-          newvalue: sa-p812
-        -
-          value: '45'
-          newvalue: sw-1210m
-        -
-          value: '46'
-          newvalue: sa-p220i
-        -
-          value: '47'
-          newvalue: sa-p222
-        -
-          value: '48'
-          newvalue: sa-p420
-        -
-          value: '49'
-          newvalue: sa-p420i
-        -
-          value: '50'
-          newvalue: sa-p421
-        -
-          value: '51'
-          newvalue: sa-b320i
-        -
-          value: '52'
-          newvalue: sa-p822
-        -
-          value: '53'
-          newvalue: sa-p721m
-        -
-          value: '54'
-          newvalue: sa-b120i
-        -
-          value: '55'
-          newvalue: hps-1224
-        -
-          value: '56'
-          newvalue: hps-1228
-        -
-          value: '57'
-          newvalue: hps-1228m
-        -
-          value: '58'
-          newvalue: sa-p822se
-        -
-          value: '59'
-          newvalue: hps-1224e
-        -
-          value: '60'
-          newvalue: hps-1228e
-        -
-          value: '61'
-          newvalue: hps-1228em
-        -
-          value: '62'
-          newvalue: sa-p230i
-        -
-          value: '63'
-          newvalue: sa-p430i
-        -
-          value: '64'
-          newvalue: sa-p430
-        -
-          value: '65'
-          newvalue: sa-p431
-        -
-          value: '66'
-          newvalue: sa-p731m
-        -
-          value: '67'
-          newvalue: sa-p830i
-        -
-          value: '68'
-          newvalue: sa-p830
-        -
-          value: '69'
-          newvalue: sa-p831
-        -
-          value: '70'
-          newvalue: sa-p530
-        -
-          value: '71'
-          newvalue: sa-p531
-        -
-          value: '72'
-          newvalue: sa-p244br
-        -
-          value: '73'
-          newvalue: sa-p246br
-        -
-          value: '74'
-          newvalue: sa-p440
-        -
-          value: '75'
-          newvalue: sa-p440ar
-        -
-          value: '76'
-          newvalue: sa-p441
-        -
-          value: '77'
-          newvalue: sa-p741m
-        -
-          value: '78'
-          newvalue: sa-p840
-        -
-          value: '79'
-          newvalue: sa-p841
-        -
-          value: '80'
-          newvalue: sh-h240ar
-        -
-          value: '81'
-          newvalue: sh-h244br
-        -
-          value: '82'
-          newvalue: sh-h240
-        -
-          value: '83'
-          newvalue: sh-h241
-        -
-          value: '84'
-          newvalue: sa-b140i
-        -
-          value: '85'
-          newvalue: sh-generic
-        -
-          value: '88'
-          newvalue: sa-p840ar
-    -
-      name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
-      mappings:
-        -
-          value: '0'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: none
-        -
-          value: '3'
-          newvalue: RAID-1/RAID-10
-        -
-          value: '4'
-          newvalue: RAID-4
-        -
-          value: '5'
-          newvalue: RAID-5
-        -
-          value: '7'
-          newvalue: RAID-6
-        -
-          value: '8'
-          newvalue: RAID-50
-        -
-          value: '9'
-          newvalue: RAID-60
-        -
-          value: '10'
-          newvalue: 'RAID-1 ADM'
-        -
-          value: '11'
-          newvalue: 'RAID-10 ADM'
-    -
-      name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: failed
-        -
-          value: '4'
-          newvalue: unconfigured
-        -
-          value: '5'
-          newvalue: recovering
-        -
-          value: '6'
-          newvalue: readyForRebuild
-        -
-          value: '7'
-          newvalue: rebuilding
-        -
-          value: '8'
-          newvalue: wrongDrive
-        -
-          value: '9'
-          newvalue: badConnect
-        -
-          value: '10'
-          newvalue: overheating
-        -
-          value: '11'
-          newvalue: shutdown
-        -
-          value: '12'
-          newvalue: expanding
-        -
-          value: '13'
-          newvalue: notAvailable
-        -
-          value: '14'
-          newvalue: queuedForExpansion
-        -
-          value: '15'
-          newvalue: multipathAccessDegraded
-        -
-          value: '16'
-          newvalue: erasing
-        -
-          value: '17'
-          newvalue: predictiveSpareRebuildReady
-        -
-          value: '18'
-          newvalue: rapidParityInitInProgress
-        -
-          value: '19'
-          newvalue: rapidParityInitPending
-        -
-          value: '20'
-          newvalue: noAccessEncryptedNoCntlrKey
-        -
-          value: '21'
-          newvalue: unencryptedToEncryptedInProgress
-        -
-          value: '22'
-          newvalue: newLogDrvKeyRekeyInProgress
-        -
-          value: '23'
-          newvalue: noAccessEncryptedCntlrEncryptnNotEnbld
-        -
-          value: '24'
-          newvalue: unencryptedToEncryptedNotStarted
-        -
-          value: '25'
-          newvalue: newLogDrvKeyRekeyRequestReceived
-    -
-      name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
-      mappings:
-        -
-          value: '1'
-          newvalue: Other
-        -
-          value: '2'
-          newvalue: rotatingPlatters
-        -
-          value: '3'
-          newvalue: solidState
-    -
-      name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: replaceDrive
-        -
-          value: '4'
-          newvalue: replaceDriveSSDWearOut
-    -
-      name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: failed
-        -
-          value: '4'
-          newvalue: predictiveFailure
-    -
-      name: 'CPQSINFO-MIB::status'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: ok
-        -
-          value: '3'
-          newvalue: degraded
-        -
-          value: '4'
-          newvalue: failed
+      valuemaps:
+        -
+          name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: degraded
+            -
+              value: '4'
+              newvalue: failed
+        -
+          name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: system
+            -
+              value: '4'
+              newvalue: systemBoard
+            -
+              value: '5'
+              newvalue: ioBoard
+            -
+              value: '6'
+              newvalue: cpu
+            -
+              value: '7'
+              newvalue: memory
+            -
+              value: '8'
+              newvalue: storage
+            -
+              value: '9'
+              newvalue: removableMedia
+            -
+              value: '10'
+              newvalue: powerSupply
+            -
+              value: '11'
+              newvalue: ambient
+            -
+              value: '12'
+              newvalue: chassis
+            -
+              value: '13'
+              newvalue: bridgeCard
+        -
+          name: 'CPQIDA-MIB::cpqDaAccelBattery'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: Ok
+            -
+              value: '3'
+              newvalue: Recharging
+            -
+              value: '4'
+              newvalue: Failed
+            -
+              value: '5'
+              newvalue: Degraded
+            -
+              value: '6'
+              newvalue: 'Not Present'
+            -
+              value: '7'
+              newvalue: 'Capacitor failed'
+        -
+          name: 'CPQIDA-MIB::cpqDaAccelStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: invalid
+            -
+              value: '3'
+              newvalue: enabled
+            -
+              value: '4'
+              newvalue: tmpDisabled
+            -
+              value: '5'
+              newvalue: permDisabled
+            -
+              value: '6'
+              newvalue: cacheModFlashMemNotAttached
+            -
+              value: '7'
+              newvalue: cacheModDegradedFailsafeSpeed
+            -
+              value: '8'
+              newvalue: cacheModCriticalFailure
+            -
+              value: '9'
+              newvalue: cacheReadCacheNotMapped
+        -
+          name: 'CPQIDA-MIB::cpqDaCntlrModel'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ida
+            -
+              value: '3'
+              newvalue: idaExpansion
+            -
+              value: '4'
+              newvalue: ida-2
+            -
+              value: '5'
+              newvalue: smart
+            -
+              value: '6'
+              newvalue: smart-2e
+            -
+              value: '7'
+              newvalue: smart-2p
+            -
+              value: '8'
+              newvalue: smart-2sl
+            -
+              value: '9'
+              newvalue: smart-3100es
+            -
+              value: '10'
+              newvalue: smart-3200
+            -
+              value: '11'
+              newvalue: smart-2dh
+            -
+              value: '12'
+              newvalue: smart-221
+            -
+              value: '13'
+              newvalue: sa-4250es
+            -
+              value: '14'
+              newvalue: sa-4200
+            -
+              value: '15'
+              newvalue: sa-integrated
+            -
+              value: '16'
+              newvalue: sa-431
+            -
+              value: '17'
+              newvalue: sa-5300
+            -
+              value: '18'
+              newvalue: raidLc2
+            -
+              value: '19'
+              newvalue: sa-5i
+            -
+              value: '20'
+              newvalue: sa-532
+            -
+              value: '21'
+              newvalue: sa-5312
+            -
+              value: '22'
+              newvalue: sa-641
+            -
+              value: '23'
+              newvalue: sa-642
+            -
+              value: '24'
+              newvalue: sa-6400
+            -
+              value: '25'
+              newvalue: sa-6400em
+            -
+              value: '26'
+              newvalue: sa-6i
+            -
+              value: '27'
+              newvalue: sa-generic
+            -
+              value: '29'
+              newvalue: sa-p600
+            -
+              value: '30'
+              newvalue: sa-p400
+            -
+              value: '31'
+              newvalue: sa-e200
+            -
+              value: '32'
+              newvalue: sa-e200i
+            -
+              value: '33'
+              newvalue: sa-p400i
+            -
+              value: '34'
+              newvalue: sa-p800
+            -
+              value: '35'
+              newvalue: sa-e500
+            -
+              value: '36'
+              newvalue: sa-p700m
+            -
+              value: '37'
+              newvalue: sa-p212
+            -
+              value: '38'
+              newvalue: sa-p410
+            -
+              value: '39'
+              newvalue: sa-p410i
+            -
+              value: '40'
+              newvalue: sa-p411
+            -
+              value: '41'
+              newvalue: sa-b110i
+            -
+              value: '42'
+              newvalue: sa-p712m
+            -
+              value: '43'
+              newvalue: sa-p711m
+            -
+              value: '44'
+              newvalue: sa-p812
+            -
+              value: '45'
+              newvalue: sw-1210m
+            -
+              value: '46'
+              newvalue: sa-p220i
+            -
+              value: '47'
+              newvalue: sa-p222
+            -
+              value: '48'
+              newvalue: sa-p420
+            -
+              value: '49'
+              newvalue: sa-p420i
+            -
+              value: '50'
+              newvalue: sa-p421
+            -
+              value: '51'
+              newvalue: sa-b320i
+            -
+              value: '52'
+              newvalue: sa-p822
+            -
+              value: '53'
+              newvalue: sa-p721m
+            -
+              value: '54'
+              newvalue: sa-b120i
+            -
+              value: '55'
+              newvalue: hps-1224
+            -
+              value: '56'
+              newvalue: hps-1228
+            -
+              value: '57'
+              newvalue: hps-1228m
+            -
+              value: '58'
+              newvalue: sa-p822se
+            -
+              value: '59'
+              newvalue: hps-1224e
+            -
+              value: '60'
+              newvalue: hps-1228e
+            -
+              value: '61'
+              newvalue: hps-1228em
+            -
+              value: '62'
+              newvalue: sa-p230i
+            -
+              value: '63'
+              newvalue: sa-p430i
+            -
+              value: '64'
+              newvalue: sa-p430
+            -
+              value: '65'
+              newvalue: sa-p431
+            -
+              value: '66'
+              newvalue: sa-p731m
+            -
+              value: '67'
+              newvalue: sa-p830i
+            -
+              value: '68'
+              newvalue: sa-p830
+            -
+              value: '69'
+              newvalue: sa-p831
+            -
+              value: '70'
+              newvalue: sa-p530
+            -
+              value: '71'
+              newvalue: sa-p531
+            -
+              value: '72'
+              newvalue: sa-p244br
+            -
+              value: '73'
+              newvalue: sa-p246br
+            -
+              value: '74'
+              newvalue: sa-p440
+            -
+              value: '75'
+              newvalue: sa-p440ar
+            -
+              value: '76'
+              newvalue: sa-p441
+            -
+              value: '77'
+              newvalue: sa-p741m
+            -
+              value: '78'
+              newvalue: sa-p840
+            -
+              value: '79'
+              newvalue: sa-p841
+            -
+              value: '80'
+              newvalue: sh-h240ar
+            -
+              value: '81'
+              newvalue: sh-h244br
+            -
+              value: '82'
+              newvalue: sh-h240
+            -
+              value: '83'
+              newvalue: sh-h241
+            -
+              value: '84'
+              newvalue: sa-b140i
+            -
+              value: '85'
+              newvalue: sh-generic
+            -
+              value: '88'
+              newvalue: sa-p840ar
+        -
+          name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
+          mappings:
+            -
+              value: '0'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: none
+            -
+              value: '3'
+              newvalue: RAID-1/RAID-10
+            -
+              value: '4'
+              newvalue: RAID-4
+            -
+              value: '5'
+              newvalue: RAID-5
+            -
+              value: '7'
+              newvalue: RAID-6
+            -
+              value: '8'
+              newvalue: RAID-50
+            -
+              value: '9'
+              newvalue: RAID-60
+            -
+              value: '10'
+              newvalue: 'RAID-1 ADM'
+            -
+              value: '11'
+              newvalue: 'RAID-10 ADM'
+        -
+          name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: failed
+            -
+              value: '4'
+              newvalue: unconfigured
+            -
+              value: '5'
+              newvalue: recovering
+            -
+              value: '6'
+              newvalue: readyForRebuild
+            -
+              value: '7'
+              newvalue: rebuilding
+            -
+              value: '8'
+              newvalue: wrongDrive
+            -
+              value: '9'
+              newvalue: badConnect
+            -
+              value: '10'
+              newvalue: overheating
+            -
+              value: '11'
+              newvalue: shutdown
+            -
+              value: '12'
+              newvalue: expanding
+            -
+              value: '13'
+              newvalue: notAvailable
+            -
+              value: '14'
+              newvalue: queuedForExpansion
+            -
+              value: '15'
+              newvalue: multipathAccessDegraded
+            -
+              value: '16'
+              newvalue: erasing
+            -
+              value: '17'
+              newvalue: predictiveSpareRebuildReady
+            -
+              value: '18'
+              newvalue: rapidParityInitInProgress
+            -
+              value: '19'
+              newvalue: rapidParityInitPending
+            -
+              value: '20'
+              newvalue: noAccessEncryptedNoCntlrKey
+            -
+              value: '21'
+              newvalue: unencryptedToEncryptedInProgress
+            -
+              value: '22'
+              newvalue: newLogDrvKeyRekeyInProgress
+            -
+              value: '23'
+              newvalue: noAccessEncryptedCntlrEncryptnNotEnbld
+            -
+              value: '24'
+              newvalue: unencryptedToEncryptedNotStarted
+            -
+              value: '25'
+              newvalue: newLogDrvKeyRekeyRequestReceived
+        -
+          name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: rotatingPlatters
+            -
+              value: '3'
+              newvalue: solidState
+        -
+          name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: replaceDrive
+            -
+              value: '4'
+              newvalue: replaceDriveSSDWearOut
+        -
+          name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: failed
+            -
+              value: '4'
+              newvalue: predictiveFailure
+        -
+          name: 'CPQSINFO-MIB::status'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: degraded
+            -
+              value: '4'
+              newvalue: failed

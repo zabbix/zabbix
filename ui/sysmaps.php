@@ -309,7 +309,7 @@ if (hasRequest('form')) {
 	}
 
 	$data['users'] = API::User()->get([
-		'output' => ['userid', 'alias', 'name', 'surname'],
+		'output' => ['userid', 'username', 'name', 'surname'],
 		'userids' => $userids,
 		'preservekeys' => true
 	]);

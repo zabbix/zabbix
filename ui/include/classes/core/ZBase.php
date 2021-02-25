@@ -154,7 +154,6 @@ class ZBase {
 		require_once 'include/services.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
-		require_once 'include/valuemap.inc.php';
 	}
 
 	/**
@@ -202,12 +201,12 @@ class ZBase {
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')
-					->setSelectedByAction($action_name, $_GET,
+					->setSelectedByAction($action_name, $_REQUEST,
 						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
 					);
 
 				$this->component_registry->get('menu.user')
-					->setSelectedByAction($action_name, $_GET,
+					->setSelectedByAction($action_name, $_REQUEST,
 						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
 					);
 

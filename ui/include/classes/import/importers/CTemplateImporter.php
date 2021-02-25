@@ -50,6 +50,7 @@ class CTemplateImporter extends CImporter {
 
 			$templatesToCreate = [];
 			$templatesToUpdate = [];
+			$valuemaps = [];
 			$templateLinkage = [];
 			$tmpls_to_clear = [];
 
@@ -80,6 +81,10 @@ class CTemplateImporter extends CImporter {
 
 					$templatesToCreate[] = $template;
 				}
+
+				if ($template['valuemaps']) {
+					$valuemaps[$template['host']] = $template['valuemaps'];
+				}
 			}
 
 			if ($this->options['templates']['createMissing'] && $templatesToCreate) {
@@ -98,6 +103,19 @@ class CTemplateImporter extends CImporter {
 							'templates_link' => $templateLinkage[$createdTemplate['host']]
 						]);
 					}
+
+					if ($this->options['valueMaps']['createMissing']
+							&& array_key_exists($createdTemplate['host'], $valuemaps)) {
+						$ins_valuemaps = [];
+						foreach ($valuemaps[$createdTemplate['host']] as $valuemap) {
+							$valuemap['hostid'] = $templateId;
+							$ins_valuemaps[] = $valuemap;
+						}
+
+						if ($ins_valuemaps) {
+							API::ValueMap()->create($ins_valuemaps);
+						}
+					}
 				}
 			}
 
@@ -109,19 +127,19 @@ class CTemplateImporter extends CImporter {
 					$db_template_links = API::Template()->get([
 						'output' => ['templateid'],
 						'selectParentTemplates' => ['templateid'],
-						'templateids' => zbx_objectValues($templatesToUpdate, 'templateid'),
+						'templateids' => array_column($templatesToUpdate, 'templateid'),
 						'preservekeys' => true
 					]);
 
 					foreach ($db_template_links as &$db_template_link) {
-						$db_template_link = zbx_objectValues($db_template_link['parentTemplates'], 'templateid');
+						$db_template_link = array_column($db_template_link['parentTemplates'], 'templateid');
 					}
 					unset($db_template_link);
 
 					foreach ($templatesToUpdate as $tmpl) {
 						if (array_key_exists($tmpl['host'], $templateLinkage)) {
 							$tmpls_to_clear[$tmpl['templateid']] = array_diff($db_template_links[$tmpl['templateid']],
-								zbx_objectValues($templateLinkage[$tmpl['host']], 'templateid')
+								array_column($templateLinkage[$tmpl['host']], 'templateid')
 							);
 						}
 						else {
@@ -153,6 +171,63 @@ class CTemplateImporter extends CImporter {
 							'templates' => $updatedTemplate,
 							'templates_link' => $templateLinkage[$updatedTemplate['host']]
 						]);
+					}
+
+					$db_valuemaps = API::ValueMap()->get([
+						'output' => ['valuemapid', 'name'],
+						'hostids' => [$updatedTemplate['templateid']]
+					]);
+
+					if ($this->options['valueMaps']['createMissing']
+							&& array_key_exists($updatedTemplate['host'], $valuemaps)) {
+						$ins_valuemaps = [];
+						$valuemap_names = array_column($db_valuemaps, 'name');
+						foreach ($valuemaps[$updatedTemplate['host']] as $valuemap) {
+							if (!in_array($valuemap['name'], $valuemap_names)) {
+								$valuemap['hostid'] = $updatedTemplate['templateid'];
+								$ins_valuemaps[] = $valuemap;
+							}
+						}
+
+						if ($ins_valuemaps) {
+							API::ValueMap()->create($ins_valuemaps);
+						}
+					}
+
+					if ($this->options['valueMaps']['updateExisting']
+							&& array_key_exists($updatedTemplate['host'], $valuemaps)) {
+						$upd_valuemaps = [];
+						foreach ($db_valuemaps as $db_valuemap) {
+							foreach ($valuemaps[$updatedTemplate['host']] as $valuemap) {
+								if ($db_valuemap['name'] === $valuemap['name']) {
+									$valuemap['valuemapid'] = $db_valuemap['valuemapid'];
+									$upd_valuemaps[] = $valuemap;
+								}
+							}
+						}
+
+						if ($upd_valuemaps) {
+							API::ValueMap()->update($upd_valuemaps);
+						}
+					}
+
+					if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
+						$del_valuemapids = [];
+						if (array_key_exists($updatedTemplate['host'], $valuemaps)) {
+							$valuemap_names = array_column($valuemaps[$updatedTemplate['host']], 'name');
+							foreach ($db_valuemaps as $db_valuemap) {
+								if (!in_array($db_valuemap['name'], $valuemap_names)) {
+									$del_valuemapids[] = $db_valuemap['valuemapid'];
+								}
+							}
+						}
+						else {
+							$del_valuemapids = array_column($db_valuemaps, 'valuemapid');
+						}
+
+						if ($del_valuemapids) {
+							API::ValueMap()->delete($del_valuemapids);
+						}
 					}
 				}
 			}
@@ -265,7 +340,7 @@ class CTemplateImporter extends CImporter {
 			}
 		}
 
-		return zbx_objectValues($templates, 'host');
+		return array_column($templates, 'host');
 	}
 
 	/**

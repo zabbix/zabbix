@@ -454,7 +454,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else{
 				DB::update('items', [
-					'values' => ['templateid' => 0],
+					'values' => ['templateid' => 0, 'valuemapid' => 0],
 					'where' => ['itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL])]
 				]);
 
@@ -473,7 +473,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else {
 				DB::update('items', [
-					'values' => ['templateid' => 0],
+					'values' => ['templateid' => 0, 'valuemapid' => 0],
 					'where' => ['itemid' => $item_prototypeids]
 				]);
 
@@ -976,6 +976,47 @@ abstract class CHostGeneral extends CHostBase {
 					'tag' => $tag['tag'],
 					'value' => $tag['value']
 				];
+			}
+		}
+
+		// Add value mapping.
+		if ($options['selectValueMaps'] !== null) {
+			if ($options['selectValueMaps'] === API_OUTPUT_EXTEND) {
+				$options['selectValueMaps'] = ['valuemapid', 'name', 'mappings'];
+			}
+
+			foreach ($result as &$host) {
+				$host['valuemaps'] = [];
+			}
+			unset($host);
+
+			$valuemaps = DB::select('valuemap', [
+				'output' => array_diff($this->outputExtend($options['selectValueMaps'], ['valuemapid', 'hostid']),
+					['mappings']
+				),
+				'filter' => ['hostid' => $hostids],
+				'preservekeys' => true
+			]);
+
+			if ($this->outputIsRequested('mappings', $options['selectValueMaps']) && $valuemaps) {
+				$params = [
+					'output' => ['valuemapid', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)]
+				];
+				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
+
+				while ($mapping = DBfetch($query)) {
+					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'value' => $mapping['value'],
+						'newvalue' => $mapping['newvalue']
+					];
+				}
+			}
+
+			foreach ($valuemaps as $valuemap) {
+				$result[$valuemap['hostid']]['valuemaps'][] = array_intersect_key($valuemap,
+					array_flip($options['selectValueMaps'])
+				);
 			}
 		}
 
