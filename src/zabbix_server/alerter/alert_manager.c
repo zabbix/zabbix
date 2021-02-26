@@ -378,8 +378,9 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, uns
 	}
 	else
 	{
-		/* reset remove flag */
-		mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_NONE;
+		/* reset remove flag if normal media type is being added */
+		if (ZBX_AM_MEDIATYPE_FLAG_NONE == flags)
+			mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_NONE;
 	}
 
 	mediatype->type = type;
