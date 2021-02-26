@@ -22,6 +22,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "zbxserver.h"
+#include "zbxregexp.h"
 
 /*
  * 5.4 development database patches
@@ -1013,8 +1014,12 @@ static char *Update_template_name(char *old)
 
 	ptr = old;
 
-	if (1 == sscanf(old, "Template %*[^ ] %s", new) && strlen(new) > MIN_TEMPLATE_NAME_LEN)
+	if (NULL != zbx_regexp_match(old, "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) ", NULL) &&
+			1 == sscanf(old, "Template %*[^ ] %s", new) &&
+			strlen(new) > MIN_TEMPLATE_NAME_LEN)
+	{
 		ptr = zbx_strdup(ptr, new);
+	}
 
 	return ptr;
 }
