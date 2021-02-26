@@ -85,7 +85,7 @@ static void	serialize_variant(unsigned char **buffer, size_t *size, const zbx_va
 			break;
 		case ZBX_VARIANT_DBL:
 			reserve_buffer(buffer, size, sizeof(value->data.dbl), ptr);
-			*ptr += zbx_serialize_double(*ptr, value->data.dbl) + 1;
+			*ptr += zbx_serialize_double(*ptr, value->data.dbl);
 			break;
 		case ZBX_VARIANT_STR:
 			len = strlen(value->data.str) + 1;
