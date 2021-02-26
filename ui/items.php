@@ -1174,7 +1174,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 				'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectHosts' => ['status', 'name', 'flags'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 			'selectItemDiscovery' => ['parent_itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
