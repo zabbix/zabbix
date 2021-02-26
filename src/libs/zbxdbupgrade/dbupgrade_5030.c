@@ -1554,10 +1554,14 @@ static int	DBpatch_5030077(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 	int		ret = SUCCEED;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select profileid,value_str from profiles"
 			" where idx='web.monitoring.problem.properties'");
@@ -1578,15 +1582,14 @@ static int	DBpatch_5030077(void)
 				SUCCEED == (ret = DBpatch_parse_applications_json(&jp, &json, &tags, &app, 0)))
 		{
 			ZBX_DBROW2UINT64(profileid, row[0]);
+
 			value_str = DBdyn_escape_string(json.buffer);
-
-			if (ZBX_DB_OK > DBexecute("update profiles set value_str='%s' where profileid=" ZBX_FS_UI64,
-					value_str, profileid))
-			{
-				ret = FAIL;
-			}
-
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update profiles set value_str='%s' where profileid=" ZBX_FS_UI64 ";\n",
+					value_str, profileid);
 			zbx_free(value_str);
+
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 		else
 			zabbix_log(LOG_LEVEL_ERR, "failed to parse web.monitoring.problem.properties JSON");
@@ -1597,6 +1600,13 @@ static int	DBpatch_5030077(void)
 		zbx_json_free(&json);
 	}
 	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+
+	zbx_free(sql);
 
 	return ret;
 }
