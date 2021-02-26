@@ -437,8 +437,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.10rc1
 
 New features:
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.9
