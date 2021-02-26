@@ -210,9 +210,9 @@ class testSidebarMenu extends CWebTest {
 						'Icon mapping',
 						'Regular expressions',
 						'Macros',
-						'Value mapping',
 						'Trigger displaying options',
 						'Modules',
+						'API tokens',
 						'Other'
 					]
 				]
