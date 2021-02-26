@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-02-08T18:34:37Z</date>
+   <groups>
+      <group>
+         <name>Templates/Modules</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Module SMART by Zabbix agent 2</template>
+         <name>Template Module SMART by Zabbix agent 2</name>
+         <description>The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>SMART: Get attributes</name>
+               <key>smart.disk.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Attribute discovery</name>
+               <type>ZABBIX_PASSIVE</type>
+               <key>smart.attribute.discovery</key>
+               <delay>1h</delay>
+               <description>Discovery SMART Vendor Specific Attributes of disks.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: ID {#ID} {#ATTRNAME}</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.error[{#NAME},{#ID}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].ata_smart_attributes.table[?(@.id=={#ID})].value.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()} &lt;= {#THRESH}</expression>
+                           <name>SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed</name>
+                           <priority>WARNING</priority>
+                           <description>The value should be greater than THRESH.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <overrides>
+                  <override>
+                     <name>ID filter</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ID}</macro>
+                              <value>{$SMART.ATTRIBUTE.ID.MATCHES}</value>
+                              <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                           <condition>
+                              <macro>{#NAME}</macro>
+                              <value>{$SMART.DISK.NAME.MATCHES}</value>
+                              <formulaid>B</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Disk discovery</name>
+               <type>ZABBIX_PASSIVE</type>
+               <key>smart.disk.discovery</key>
+               <delay>1h</delay>
+               <description>Discovery SMART disks.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Critical warning</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.critical_warning[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>This field indicates critical warnings for the state of the controller.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.critical_warning.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Power on hours</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.hours[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>s</units>
+                     <description>Count of hours in power-on state. The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state. "By default, the total expected lifetime of a hard disk in perfect condition is defined as 5 years (running every day and night on all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some pre-2005 drives, this raw value may advance erratically and/or "wrap around" (reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].power_on_time.hours.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Media errors</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.media_errors[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Contains the number of occurrences where the controller detected an unrecovered data integrity error. Errors such as uncorrectable ECC, CRC checksum failure, or LBA tag mismatch are included in this field.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.media_errors.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Device model</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.model[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].model_name.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Percentage used</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.percentage_used[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>%</units>
+                     <description>Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.percentage_used.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;90</expression>
+                           <name>SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Serial number</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.sn[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].serial_number.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>SMART [{#NAME}]: Disk has been replaced (new serial number received)</name>
+                           <priority>INFO</priority>
+                           <description>Device serial number has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Temperature</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.temperature[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>°C</units>
+                     <description>Current drive temperature.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].temperature.current.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.WARN}</expression>
+                           <name>SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)</name>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
+                                 <expression>{Template Module SMART by Zabbix agent 2:smart.disk.temperature[{#NAME}].avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
+                           <name>SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>SMART [{#NAME}]: Self-test passed</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.test[{#NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The disk is passed the SMART self-test or not.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].ata_smart_data.self_test.status.passed.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}="false"</expression>
+                           <name>SMART [{#NAME}]: Disk self-test is not passed</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <overrides>
+                  <override>
+                     <name>Self-test</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#DISKTYPE}</macro>
+                              <value>nvme</value>
+                              <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>Self-test</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Not NVMe</name>
+                     <step>2</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#DISKTYPE}</macro>
+                              <value>nvme</value>
+                              <formulaid>A</formulaid>
+                              <operator>NOT_MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>Media|Percentage|Critical</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$SMART.ATTRIBUTE.ID.MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>This macro is used in overrides of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$SMART.DISK.NAME.MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>This macro is used in overrides of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$SMART.TEMPERATURE.MAX.CRIT}</macro>
+               <value>65</value>
+               <description>This macro is used for trigger expression. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$SMART.TEMPERATURE.MAX.WARN}</macro>
+               <value>50</value>
+               <description>This macro is used for trigger expression. It can be overridden on the host or linked template level.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+</zabbix_export>
