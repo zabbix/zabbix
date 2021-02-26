@@ -156,7 +156,6 @@ class testConfiguration extends CAPITest {
 			['hosts'],
 			['images'],
 			['maps'],
-			['screens'],
 			['templates'],
 			['valueMaps']
 		];
@@ -236,13 +235,6 @@ class testConfiguration extends CAPITest {
 				[
 					'options' => [
 						'maps' => ['1']
-					]
-				]
-			],
-			[
-				[
-					'options' => [
-						'screens' => ['3']
 					]
 				]
 			],
@@ -458,11 +450,6 @@ class testConfiguration extends CAPITest {
 			]],
 			[[
 				'parameter' => 'maps',
-				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => ['deleteMissing']
-			]],
-			[[
-				'parameter' => 'screens',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]],
@@ -788,37 +775,6 @@ class testConfiguration extends CAPITest {
 				'parameter' => 'groups',
 				'source' => "{\"zabbix_export\":{\"version\":\"4.0\",\"date\":\"2020-08-03T12:41:17Z\",\"groups\":[{\"name\":\"API host group yaml import\"}]}}",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
-			],
-			[
-				'format' => 'xml',
-				'parameter' => 'screens',
-				'source' => '<?xml version="1.0" encoding="UTF-8"?>
-								<zabbix_export>
-								<version>3.2</version>
-								<date>2016-12-12T07:18:00Z</date>
-								<screens>
-									<screen>
-										<name>API screen xml import</name>
-										<hsize>1</hsize>
-										<vsize>1</vsize>
-									</screen>
-								</screens>
-								</zabbix_export>',
-				'sql' => 'select * from screens where name=\'API screen xml import\''
-			],
-			[
-				'format' => 'json',
-				'parameter' => 'screens',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","screens":[{"name":"API screen json import",'
-							. '"hsize":"1","vsize":"1"}]}}',
-				'sql' => 'select * from screens where name=\'API screen json import\''
-			],
-			[
-				'format' => 'yaml',
-				'parameter' => 'screens',
-				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:44:35Z\"\n".
-						"  screens:\n  - name: API screen yaml import\n    hsize: \"1\"\n    vsize: \"1\"\n    screen_items: []\n...\n",
-				'sql' => 'select * from screens where name=\'API screen yaml import\''
 			],
 			[
 				'format' => 'xml',
