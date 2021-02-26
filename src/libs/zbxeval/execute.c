@@ -1191,7 +1191,7 @@ static int	eval_execute_hist_function(const zbx_eval_context_t *ctx, const zbx_e
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_throw_execption                                             *
+ * Function: eval_throw_exception                                             *
  *                                                                            *
  * Purpose: throw exception by returning the specified error                  *
  *                                                                            *
@@ -1199,7 +1199,7 @@ static int	eval_execute_hist_function(const zbx_eval_context_t *ctx, const zbx_e
  *             error  - [OUT] the error message in the case of failure        *
  *                                                                            *
  ******************************************************************************/
-static void	eval_throw_execption(zbx_vector_var_t *output, char **error)
+static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
 {
 	zbx_variant_t	*arg;
 
@@ -1289,7 +1289,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_EXCEPTION:
-					eval_throw_execption(&output, error);
+					eval_throw_exception(&output, error);
 					goto out;
 				default:
 					*error = zbx_dsprintf(*error, "unknown token at \"%s\"",
