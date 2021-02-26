@@ -2234,9 +2234,9 @@ static char	**dbsync_trigger_preproc_row(char **row)
 		}
 		else
 		{
-			zbx_eval_get_functionids(&ctx, &functionids);
+			zbx_eval_get_functionids(&ctx_r, &functionids);
 
-			if (SUCCEED == zbx_eval_check_timer_functions(&ctx))
+			if (SUCCEED == zbx_eval_check_timer_functions(&ctx_r))
 				timer |= ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION;
 		}
 	}
