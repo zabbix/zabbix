@@ -2105,7 +2105,6 @@ class CDashboardPage {
 		return true;
 	}
 
-	// TODO move to widget.iterator
 	_updateIteratorCallback(iterator, response, options) {
 		const has_alt_content = typeof response.messages !== 'undefined' || typeof response.body !== 'undefined';
 
@@ -2140,12 +2139,11 @@ class CDashboardPage {
 
 		iterator.updatePager(response.page, response.page_count);
 
-		const current_children = iterator.children;
 		const current_children_by_widgetid = {};
 
-		iterator.children = [];
+		iterator.setChildren([]);
 
-		for (const child of current_children) {
+		for (const child of iterator.getChildren()) {
 			if (child.widgetid !== '') {
 				current_children_by_widgetid[child.widgetid] = child;
 			}
@@ -2207,7 +2205,7 @@ class CDashboardPage {
 			}
 		}
 
-		iterator._addPlaceholders(iterator.getNumColumns() * iterator.getNumRows() - iterator.children.length);
+		iterator._addPlaceholders(iterator.getNumColumns() * iterator.getNumRows() - iterator.getChildren().length);
 		if (this._options['kioskmode'] && iterator.getView().position().top === 0) {
 			this._slideKiosk();
 		}
@@ -2216,7 +2214,7 @@ class CDashboardPage {
 			this._updateWidgetContent(iterator);
 		}
 
-		for (const child of iterator.children) {
+		for (const child of iterator.getChildren()) {
 			/* Possible update policies for the child widgets:
 				resize: execute 'onResizeEnd' action (widget won't update if there's no trigger or size hasn't changed).
 					- Is used to propagate iterator's resize event.
@@ -2268,7 +2266,7 @@ class CDashboardPage {
 				return true;
 			}
 
-			search_widgets = widget.parent.children;
+			search_widgets = widget.parent.getChildren();
 		}
 
 		const widgets_found = search_widgets.filter(function(w) {
@@ -3175,7 +3173,7 @@ class CDashboardPage {
 	 */
 	_removeWidget(widget) {
 		if (widget instanceof CDashboardWidgetIterator) {
-			for (const child of widget.children) {
+			for (const child of widget.getChildren()) {
 				this._doAction('onWidgetDelete', child);
 				this._removeWidgetActions(child);
 				child.getView().remove();
