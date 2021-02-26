@@ -1030,7 +1030,7 @@ static int	DBpatch_5030065(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-				"select h.hostid, h.name"
+				"select h.hostid,h.name"
 				" from hosts h"
 				" where h.status=%d",
 				HOST_STATUS_TEMPLATE);
@@ -1071,10 +1071,10 @@ static int	DBpatch_5030066(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-				"select i.itemid, i.key_, h.name"
+				"select i.itemid,i.key_,h.name"
 				" from items i"
-				" left join hosts h on h.hostid = i.hostid"
-				" where h.status=%d and i.flags in (%d , %d)",
+				" left join hosts h on h.hostid=i.hostid"
+				" where h.status=%d and i.flags in (%d,%d)",
 				HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1084,7 +1084,7 @@ static int	DBpatch_5030066(void)
 		key = DBdyn_escape_string(row[1]);
 		value = zbx_dsprintf(value, "%s%s", name, key);
 		uuid = zbx_gen_uuid4(value);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid ='%s' where itemid = %s;\n",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
 				uuid, row[0]);
 		zbx_free(name);
 		zbx_free(key);
@@ -1117,9 +1117,9 @@ static int	DBpatch_5030067(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select t.triggerid, t.description, t.expression, t.recovery_expression"
+			"select t.triggerid,t.description,t.expression,t.recovery_expression"
 			" from triggers t"
-			" where t.templateid is null and t.flags = %d",
+			" where t.templateid is null and t.flags=%d",
 			ZBX_FLAG_DISCOVERY_NORMAL);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1145,11 +1145,11 @@ static int	DBpatch_5030067(void)
 				*pexpr_s = '\0';
 
 				result2 = DBselect(
-						"select h.name, i.key_, f.name, f.parameter"
+						"select h.name,i.key_,f.name,f.parameter"
 						" from functions f"
-						" left join items i on i.itemid = f.itemid"
-						" join hosts h on h.hostid = i.hostid"
-						" where f.functionid = " ZBX_FS_UI64,
+						" left join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
 						functionid);
 
 				while (NULL != (row2 = DBfetch(result2)))
@@ -1204,9 +1204,9 @@ static int	DBpatch_5030068(void)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = DBselect(
-			"select g.graphid, g.name"
+			"select g.graphid,g.name"
 			" from graphs g"
-			" where g.templateid is null and g.flags = %d",
+			" where g.templateid is null and g.flags=%d",
 			ZBX_FLAG_DISCOVERY_NORMAL);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1218,11 +1218,11 @@ static int	DBpatch_5030068(void)
 		zbx_snprintf_alloc(&value, &value_alloc, &value_offset,"%s", name);
 
 		result2 = DBselect(
-				"select h.name, h.status"
+				"select h.name,h.status"
 				" from graphs_items gi"
 				" left join items i on i.itemid=gi.itemid"
 				" join hosts h on h.hostid=i.hostid"
-				" where gi.graphid = %s",
+				" where gi.graphid=%s",
 				row[0]);
 
 		while (NULL != (row2 = DBfetch(result2)))
@@ -1274,7 +1274,7 @@ static int	DBpatch_5030069(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select d.dashboardid, d.name, h.name"
+			"select d.dashboardid,d.name,h.name"
 			" from dashboard d"
 			" left join hosts h on h.hostid=d.templateid"
 			" where h.status=%d",
@@ -1320,7 +1320,7 @@ static int	DBpatch_5030070(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select ht.httptestid, ht.name, h.name"
+			"select ht.httptestid,ht.name,h.name"
 			" from httptest ht"
 			" left join hosts h on h.hostid=ht.hostid"
 			" where h.status=%d",
@@ -1366,7 +1366,7 @@ static int	DBpatch_5030071(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select v.valuemapid, v.name, h.name"
+			"select v.valuemapid,v.name,h.name"
 			" from valuemap v"
 			" left join hosts h on h.hostid=v.hostid"
 			" where h.status=%d",
@@ -1412,7 +1412,7 @@ static int	DBpatch_5030072(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select hg.groupid, hg.name"
+			"select hg.groupid,hg.name"
 			" from hstgrp hg");
 
 	while (NULL != (row = DBfetch(result)))
@@ -1450,7 +1450,7 @@ static int	DBpatch_5030073(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select i.itemid, i.key_, h.name, i2.key_"
+			"select i.itemid,i.key_,h.name,i2.key_"
 			" from items i"
 			" left join hosts h on h.hostid=i.hostid"
 			" join item_discovery id on id.itemid=i.itemid"
@@ -1500,7 +1500,7 @@ static int	DBpatch_5030074(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select t.triggerid, t.description, t.expression, t.recovery_expression"
+			"select t.triggerid,t.description,t.expression,t.recovery_expression"
 			" from triggers t"
 			" where t.templateid is null and t.flags=%d",
 			ZBX_FLAG_DISCOVERY_PROTOTYPE);
@@ -1548,7 +1548,7 @@ static int	DBpatch_5030074(void)
 				*pexpr_s = '\0';
 
 				result2 = DBselect(
-						"select h.name, i.key_, f.name, f.parameter"
+						"select h.name,i.key_,f.name,f.parameter"
 						" from functions f"
 						" left join items i on i.itemid=f.itemid"
 						" join hosts h on h.hostid=i.hostid"
@@ -1607,7 +1607,7 @@ static int	DBpatch_5030075(void)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = DBselect(
-			"select distinct g.graphid, g.name, h.name, i2.key_"
+			"select distinct g.graphid,g.name,h.name,i2.key_"
 			" from graphs g"
 			" left join graphs_items gi on gi.graphid=g.graphid"
 			" join items i on i.itemid=gi.itemid and i.flags=%d"
@@ -1660,7 +1660,7 @@ static int	DBpatch_5030076(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select h.hostid, h.name, h2.name, i.key_"
+			"select h.hostid,h.name,h2.name,i.key_"
 			" from hosts h"
 			" left join host_discovery hd on hd.hostid=h.hostid"
 			" join items i on i.itemid=hd.parent_itemid"
