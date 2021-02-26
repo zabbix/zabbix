@@ -26,7 +26,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multiselect.js', 'class.tab-indicators.js', 'textareaflexible.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multiselect.js', 'class.tab-indicators.js', 'textareaflexible.js',
+	'class.tagfilteritem.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -92,6 +94,8 @@ $fields = [
 	],
 	'filter_groupids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'filter_hostids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null, IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null],
+	'filter_tags'		=> [T_ZBX_STR, O_OPT, null,	null,			null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.
@@ -763,6 +767,26 @@ else {
 		CProfile::update($prefix.'httpconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
 		CProfile::updateArray($prefix.'httpconf.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'httpconf.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+
+		$filter_tags_fmt = [
+			'tags' => [],
+			'values' => [],
+			'operators' => []
+		];
+
+		foreach (getRequest('filter_tags', []) as $filter_tag) {
+			if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
+				continue;
+			}
+
+			$filter_tags_fmt['tags'][] = $filter_tag['tag'];
+			$filter_tags_fmt['values'][] = $filter_tag['value'];
+			$filter_tags_fmt['operators'][] = $filter_tag['operator'];
+		}
+
+		CProfile::updateArray($prefix.'httpconf.filter.tags.tag', $filter_tags_fmt['tags'], PROFILE_TYPE_STR);
+		CProfile::updateArray($prefix.'httpconf.filter.tags.value', $filter_tags_fmt['values'], PROFILE_TYPE_STR);
+		CProfile::updateArray($prefix.'httpconf.filter.tags.operator', $filter_tags_fmt['operators'], PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete($prefix.'httpconf.filter_status');
@@ -772,13 +796,27 @@ else {
 		if (count($filter_hostids) != 1) {
 			CProfile::deleteIdx($prefix.'httpconf.filter_hostids');
 		}
+		CProfile::deleteIdx($prefix.'httpconf.filter.evaltype');
+		CProfile::deleteIdx($prefix.'httpconf.filter.tags.tag');
+		CProfile::deleteIdx($prefix.'httpconf.filter.tags.value');
+		CProfile::deleteIdx($prefix.'httpconf.filter.tags.operator');
 	}
 
 	$filter = [
 		'status' => CProfile::get($prefix.'httpconf.filter_status', -1),
 		'groups' => CProfile::getArray($prefix.'httpconf.filter_groupids', null),
-		'hosts' => CProfile::getArray($prefix.'httpconf.filter_hostids', null)
+		'hosts' => CProfile::getArray($prefix.'httpconf.filter_hostids', null),
+		'evaltype' => CProfile::get($prefix.'httpconf.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+		'tags' => []
 	];
+
+	foreach (CProfile::getArray($prefix.'httpconf.filter.tags.tag', []) as $i => $tag) {
+		$filter['tags'][] = [
+			'tag' => $tag,
+			'value' => CProfile::get($prefix.'httpconf.filter.tags.value', null, $i),
+			'operator' => CProfile::get($prefix.'httpconf.filter.tags.operator', null, $i)
+		];
+	}
 
 	// Get host groups.
 	$filter['groups'] = $filter['groups']
@@ -835,6 +873,8 @@ else {
 		'selectTags' => ['tag', 'value'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 		'groupids' => $filter_groupids,
+		'tags' => $data['filter']['tags'],
+		'evaltype' => $data['filter']['evaltype'],
 		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
@@ -912,6 +952,14 @@ else {
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['http_tests'], true, 'httptestid', ZBX_TAG_COUNT_DEFAULT);
+
+	if (!$data['filter']['tags']) {
+		$data['filter']['tags'] = [[
+			'tag' => '',
+			'value' => '',
+			'operator' => TAG_OPERATOR_LIKE
+		]];
+	}
 
 	// render view
 	echo (new CView('configuration.httpconf.list', $data))->getOutput();

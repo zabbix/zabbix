@@ -64,6 +64,8 @@ class CHttpTest extends CApiService {
 			'templated'      => null,
 			'monitored'      => null,
 			'nopermissions'  => null,
+			'evaltype'		=> TAG_EVAL_TYPE_AND_OR,
+			'tags'			=> null,
 			// filter
 			'filter'         => null,
 			'search'         => null,
@@ -132,6 +134,13 @@ class CHttpTest extends CApiService {
 			if ($options['groupCount']) {
 				$sqlParts['group']['hostid'] = 'ht.hostid';
 			}
+		}
+
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'ht',
+				'httptest_tag', 'httptestid'
+			);
 		}
 
 		// groupids
