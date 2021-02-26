@@ -56,5 +56,8 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 
 int	zbx_history_requires_trends(int value_type);
 
+static int		ZBX_ELASTIC_SVERSION = DBVERSION_UNDEFINED;
+//int	zbx_elastic_get_version(void);
+int	zbx_history_get_version(void);
 
 #endif

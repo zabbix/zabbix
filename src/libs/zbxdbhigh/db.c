@@ -858,93 +858,145 @@ void	DBextract_DBversion(void)
 	DBclose();
 }
 
-void doIt (int x, char* y)
-{
-
-char yy[100];
-zbx_snprintf(yy, sizeof(yy), "%d",x);
-int i = 0;
-int ii = 0;
-while(y[i++] = yy[ii++])
-{
-	if(0 == ii%2 && ii<(strlen(yy)-1))
-	y[i++] = '.';
-
-}
-
-	printf ("RES ->%s<-", y);
-}
-
-
-void	DBcheck_version_requirements(void)
-{
 #define MAX_FRIENDLY_VERSION_OUTPUT 100
-	char friendly_min_version[MAX_FRIENDLY_VERSION_OUTPUT];
-	char friendly_max_version[MAX_FRIENDLY_VERSION_OUTPUT];
-	char friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT];
+void	doIt(int x, char* y)
+{
+	char	yy[MAX_FRIENDLY_VERSION_OUTPUT];
+	size_t	i = 0;
+	size_t	ii = 0;
 
+	if (-1 == x)
+	{
+		y[0] = '\0';
+
+		return;
+	}
+
+	zbx_snprintf(yy, sizeof(yy), "%d", x);
+
+	int b = strlen(yy)-1;
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN of %s is %d", yy, b);
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN NEXT: %c", yy[b]);
+
+	y[b+(b/2)+1] = '\0';
+	while((y[b+(b/2)-i++] = yy[b-ii++]))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "yy at position: %d, is %c",b-(ii-1), yy[b-(ii-1)]);
+		zabbix_log(LOG_LEVEL_INFORMATION, "y at position: %d, is %c",b+(b/2)-(i-1), y[b+(b/2)-(i-1)]);
+
+		if (0 == ii % 2 && ii < (strlen(yy) ))
+			y[b+b/2-i++] = '.';
+	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "RES ->%s<-", y);
+}
+
+typedef enum
+{
+	DB_VERSION_SUPPORTED,
+	DB_VERSION_LOWER_THAN_MINIMUM,
+	DB_VERSION_HIGHER_THAN_MAXIMUM,
+	DB_VERSION_FAILED_TO_RETRIEVE
+} db_version_status_flags_shared_with_FRONTEND;
+
+static void	fillIt(struct zbx_json *json, char *database, int current_version, int min_version, int max_version)
+{
+	char	friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT];
+	char	friendly_min_version[MAX_FRIENDLY_VERSION_OUTPUT];
+	char	friendly_max_version[MAX_FRIENDLY_VERSION_OUTPUT];
+	int	flag;
+
+	if (DBVERSION_UNDEFINED == current_version)
+	{
+		flag = DB_VERSION_FAILED_TO_RETRIEVE;
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to retrieve %s version", database);
+	}
+	else if (min_version > current_version)
+	{
+		flag = DB_VERSION_LOWER_THAN_MINIMUM;
+		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! %s version is %d which is smaller than minimum of %d",
+				database, current_version, min_version);
+	}
+	else if (max_version < current_version)
+	{
+		flag = DB_VERSION_HIGHER_THAN_MAXIMUM;
+		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! %s version is %d which is higher than maximum of %d",
+				database, current_version, max_version);
+	}
+	else
+		flag = DB_VERSION_SUPPORTED;
+
+	doIt(current_version, friendly_current_version);
+	doIt(min_version, friendly_min_version);
+	doIt(max_version, friendly_max_version);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_1 version: %d, fr cur_version: ->%s<-", current_version, friendly_current_version);
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_2 min_version: %d, fr cur_version: ->%s<-", min_version, friendly_min_version);
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_1 max_version: %d, fr cur_version: ->%s<-", max_version, friendly_max_version);
+
+	zbx_json_addobject(json, NULL);
+	zbx_json_addstring(json, "database", database, ZBX_JSON_TYPE_STRING);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "VBADGER CVL %s", friendly_current_version);
+	zabbix_log(LOG_LEVEL_INFORMATION, "VBADGER min %s", friendly_min_version);
+	zabbix_log(LOG_LEVEL_INFORMATION, "VBADGER  max", friendly_max_version);
+
+	if (DB_VERSION_FAILED_TO_RETRIEVE != flag)
+		zbx_json_addstring(json, "current_version", friendly_current_version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "min_version", friendly_min_version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "max_version", friendly_max_version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(json, "flag", flag);
+	zbx_json_close(json);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "KRONEG 1: %s\n", json->buffer);
+}
+
+void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
+{
+	int current_version;
+	struct zbx_json	json;
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	current_version = zbx_dbms_get_version();
 #if defined(HAVE_MYSQL)
 #define MYSQL_MYSQL_MIN_VERSION 50562
 #define MYSQL_MYSQL_MAX_VERSION 80000
 #define MARIA_MYSQL_MIN_VERSION 10037
-	int version = zbx_dbms_get_version();
-
 	if (ON == zbx_dbms_mariadb_used())
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "MariaDB Server version: %d", version);
-
-		if (MARIA_MYSQL_MIN_VERSION > version)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! MariaDB version is %d, must be at least %d or higher", version,
-				MARIA_MYSQL_MIN_VERSION);
-		}
-	}
+		fillIt(&json, "MariaDB", current_version, MARIA_MYSQL_MIN_VERSION, -1);
 	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "MySQL Server version: %d", version);
-
-		if (MYSQL_MYSQL_MIN_VERSION > version || MYSQL_MYSQL_MAX_VERSION < version)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! MySQL version is %d, must be between %d and %d", version,
-				MYSQL_MYSQL_MIN_VERSION, MYSQL_MYSQL_MAX_VERSION);
-		}
-	}
-
+		fillIt(&json, "MySQL", current_version, MYSQL_MYSQL_MIN_VERSION, MYSQL_MYSQL_MAX_VERSION);
 #elif defined(HAVE_ORACLE)
 #define ORACLE_MIN_VERSION 1102000000
-	int version = zbx_dbms_get_version();
-
-	if (ORACLE_MIN_VERSION > version)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! ORACLE version is %d, must be at least %d or higher", version,
-			ORACLE_MIN_VERSION);
-	}
+	fillIt(&json, "Oracle", current_version, ORACLE_MIN_VERSION, -1);
 #elif defined(HAVE_POSTGRESQL)
 #define POSTGRESQL_MIN_VERSION 92924
-	int version = zbx_dbms_get_version();
+	fillIt(&json, "PostgreSQL", current_version, POSTGRESQL_MIN_VERSION, -1);
+#endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", version);
-
-	if (POSTGRESQL_MIN_VERSION > version)
+#if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
+#define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION 70000
+	if (1 == elastic_is_used)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! PostgreSQL version is %d, must be at least %d or higher", version,
-			POSTGRESQL_MIN_VERSION);
+		fillIt(&json, "ElasticDB", elastic_version, SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION,
+				-1);
 	}
 #endif
 
-	doIt(version, friendly_current_version);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_1 version: %d, fr cur_version: ->%s<-",version, friendly_current_version);
-/*
-clean old value
-write new value
+	zabbix_log(LOG_LEVEL_INFORMATION, "BUFFER X: ->%s<-", json.buffer);
 
-database
-current
-minimum
-maximum
-flag
-*/
+	DBbegin();
+	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", json.buffer))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
+	}
+
+	DBcommit();
+	DBclose();
+
+	zbx_json_free(&json);
 
 }
 

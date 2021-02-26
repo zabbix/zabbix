@@ -34,7 +34,6 @@
 #define		ZBX_IDX_JSON_ALLOCATE		256
 #define		ZBX_JSON_ALLOCATE		2048
 
-
 const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 
 extern char	*CONFIG_HISTORY_STORAGE_URL;
@@ -1026,7 +1025,6 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
  ************************************************************************************/
 void	zbx_elastic_check_version(void)
 {
-	int			status = FAIL;
 	size_t			id_alloc = 0;
 	char			errbuf[CURL_ERROR_SIZE], *version_number = NULL, *curl_res = NULL;
 	struct zbx_json_parse	jp, jp_values, jp_sub;
@@ -1035,19 +1033,27 @@ void	zbx_elastic_check_version(void)
 	CURLoption		opt;
 	CURL			*handle;
 
+	int next_start_index = 0;
+	int local_status, overall_status = SUCCEED;
+	#define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E		3
+	char	major_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E];
+	char	minor_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E];
+	char	increment_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E];
+	int major_version_num, minor_version_num, increment_version_num;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 != curl_global_init(CURL_GLOBAL_ALL))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize cURL library");
-
+		overall_status = FAIL;
 		goto out;
 	}
 
 	if (NULL == (handle = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL session");
-
+		overall_status = FAIL;
 		goto out;
 	}
 
@@ -1061,6 +1067,7 @@ void	zbx_elastic_check_version(void)
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_ERRORBUFFER, errbuf)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		overall_status = FAIL;
 		goto clean;
 	}
 
@@ -1069,6 +1076,7 @@ void	zbx_elastic_check_version(void)
 	if (CURLE_OK != (err = curl_easy_perform(handle)))
 	{
 		elastic_log_error(handle, err, errbuf);
+		overall_status = FAIL;
 		goto clean;
 	}
 
@@ -1078,31 +1086,91 @@ void	zbx_elastic_check_version(void)
 		SUCCEED != zbx_json_value_by_name_dyn(&jp_sub, "number", &version_number, &id_alloc, NULL))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to parse elasticsearch version result");
+		overall_status = FAIL;
 		goto clean;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Elasticsearch version retrieved: %s", version_number);
 
-	status = SUCCEED;
+	//status = SUCCEED;
 clean:
 	curl_easy_cleanup(handle);
 	curl_slist_free_all(curl_headers);
 out:
-#define SUPPORTED_ELASTIC_SEARCH_MAJOR_VERSION 7
-	if (FAIL == status || 0 == isdigit(version_number[0]) || (SUPPORTED_ELASTIC_SEARCH_MAJOR_VERSION !=
-			(version_number[0] - '0')) || ('.' != version_number[1]))
+
+#define DO_IT_E(a)								\
+local_status = SUCCEED;								\
+a[0] = version_number[next_start_index];					\
+										\
+if ('.' != version_number[next_start_index + 1])				\
+{										\
+	if ('.' == version_number[next_start_index + 2])			\
+	{									\
+		a[1] = version_number[next_start_index + 1];			\
+		a[2] = '\0';							\
+		next_start_index = next_start_index + 3;			\
+										\
+		if (0 == isdigit(a[0]) || 0 == isdigit(a[1]))			\
+			local_status = FAIL;					\
+		else								\
+			a##_num = atoi(a);					\
+	}									\
+	else if (' ' != version_number[next_start_index + 2] && '\0' != version_number[next_start_index + 2])	\
+	{ \
+		local_status = FAIL;				\
+	} \
+}									\
+else if ('.' == version_number[next_start_index + 1])				\
+{										\
+	a[1] = '\0';								\
+	next_start_index = next_start_index + 2;				\
+										\
+	if (0 == isdigit(a[0]))							\
+	{\
+		local_status = FAIL;						\
+}\
+		else							\
+		a##_num  = atoi(a);						\
+}										\
+else										\
+{\
+	local_status = FAIL;			\
+}\
+						\
+if (FAIL == local_status)							\
+{										\
+	zabbix_log(LOG_LEVEL_CRIT,						\
+			"Cannot determine %s in ElasticDB version", #a);	\
+	a##_num = 0;							\
+	overall_status = FAIL;							\
+} \
+
+
+	if (FAIL != overall_status)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Elasticsearch version is unsupported or it could not be retrieved");
+		DO_IT_E(major_version);
+		DO_IT_E(minor_version);
+		DO_IT_E(increment_version);
+	}
+	int elasticDB_version;
+
+	if (FAIL == overall_status)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to detect elastic_DB version from the following query result: %s",
+				NULL == version_number ? "(null)" : version_number);
+		elasticDB_version = DBVERSION_UNDEFINED;
+	}
+	else
+	{
+		elasticDB_version = major_version_num * 10000 + minor_version_num * 100 +
+				increment_version_num;
 	}
 
-	zbx_free(version_number);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
+	printf("RESULT_VERSION: %d\n", elasticDB_version);
 
-#else
-void	zbx_elastic_check_version(void)
-{
+	ZBX_ELASTIC_SVERSION = elasticDB_version;
 }
+#else
 
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
 {

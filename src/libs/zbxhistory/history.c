@@ -429,3 +429,8 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
 	return d2->timestamp.sec - d1->timestamp.sec;
 }
 
+int	zbx_history_get_version(void)
+{
+	return  NULL == CONFIG_HISTORY_STORAGE_URL ? DBVERSION_UNDEFINED : ZBX_ELASTIC_SVERSION;
+}
+

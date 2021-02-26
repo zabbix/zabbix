@@ -503,7 +503,8 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
 void	DBextract_DBversion(void);
-void	DBcheck_version_requirements(void);
+//void	fillIt(zbx_jsonchar *database, int current_version, int min_version, int max_version);
+void	DBcheck_version_requirements(int, int);
 void	DBcheck_capabilities(void);
 
 #ifdef HAVE_POSTGRESQL

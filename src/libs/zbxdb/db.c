@@ -76,7 +76,7 @@ static int	db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
-static int			ZBX_MYSQL_SVERSION = -1;
+static int			ZBX_MYSQL_SVERSION = DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
@@ -92,7 +92,7 @@ typedef struct
 }
 zbx_oracle_db_handle_t;
 
-static int			ZBX_ORACLE_SVERSION = -1;
+static int			ZBX_ORACLE_SVERSION = DBVERSION_UNDEFINED;
 
 static zbx_oracle_db_handle_t	oracle;
 
@@ -101,7 +101,7 @@ static ub4	OCI_DBserver_status(void);
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
-static int			ZBX_PG_SVERSION = 0, ZBX_TSDB_VERSION = -1;
+static int			ZBX_PG_SVERSION = DBERSION_UNDEFINED, ZBX_TSDB_VERSION = -1;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
@@ -790,7 +790,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ZBX_PG_BYTEAOID = atoi(row[0]);
 	DBfree_result(result);
 
-	zbx_dbms_extract_version();
+	/* zbx_dbms_extract_version(); */
 
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
@@ -2518,8 +2518,10 @@ void	zbx_dbms_extract_version(void)
 	char	*p, *buffer = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
 
-	if (-1 != ZBX_MYSQL_SVERSION)
-		return;
+	/*
+		if (-1 != ZBX_MYSQL_SVERSION)
+			return;
+	*/
 
 	ZBX_MYSQL_SVERSION = mysql_get_server_version(conn);
 
@@ -2588,8 +2590,7 @@ if ('.' != unparsed_version[next_start_index + 1])				\
 	}									\
 	else if (' ' != unparsed_version[next_start_index + 2] && '-' != unparsed_version[next_start_index + 2])	\
 	{ \
-	zabbix_log(LOG_LEVEL_INFORMATION, "AAAA ->%c<-", unparsed_version[next_start_index + 2]);	\
-local_status = FAIL;				\
+		local_status = FAIL;				\
 	} \
 }									\
 else if ('.' == unparsed_version[next_start_index + 1])				\
@@ -2599,7 +2600,6 @@ else if ('.' == unparsed_version[next_start_index + 1])				\
 										\
 	if (0 == isdigit(a[0]))							\
 	{\
-		zabbix_log(LOG_LEVEL_INFORMATION, "HUE: %c", a[0]);	\
 		local_status = FAIL;						\
 }\
 		else							\
@@ -2607,7 +2607,6 @@ else if ('.' == unparsed_version[next_start_index + 1])				\
 }										\
 else										\
 {\
-	zabbix_log(LOG_LEVEL_INFORMATION, "dddddddddd"); \
 	local_status = FAIL;			\
 }\
 						\
@@ -2621,26 +2620,9 @@ if (FAIL == local_status)							\
 
 	if (start = strstr(unparsed_version, release_str))
 	{
-		int next_start_index = start - unparsed_version + strlen(release_str);
+		int	next_start_index;
 
-		/* char dest[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER*5+5]; */
-		/* char *h; */
-		/* if (h = strstr(unparsed_version+next_start_index, " ")) */
-		/* { */
-		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X1: %s",h); */
-		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X2: %s",unparsed_version); */
-		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X22: %s",unparsed_version+next_start_index); */
-		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X3: %d",next_start_index); */
-		/* zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X4: %d",h-unparsed_version-next_start_index); */
-		/* 	zbx_strlcpy(dest, unparsed_version+next_start_index,h-unparsed_version-next_start_index+1); */
-		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_1 DEST: %s",dest); */
-		/* } */
-		/* else */
-		/* { */
-		/* 	zabbix_log(LOG_LEVEL_CRIT, "Cannot read after Release keyword in Oracle DB version."); */
-		/* 	overall_status = FAIL; */
-		/* 	goto out; */
-		/* } */
+		next_start_index = start - unparsed_version + strlen(release_str);
 
 		DO_IT(major_release_version);
 		DO_IT(release_update_version);
@@ -2659,21 +2641,14 @@ out:
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to detect OracleDB version from the following query result: %s",
 				unparsed_version);
-		major_release_version_num = 0;
-		release_update_version_num = 0;
-		release_update_version_revision_num = 0;
-		increment_version_num = 0;
+		ZBX_ORACLE_SVERSION = DBVERSION_UNDEFINED;
 	}
-
-	ZBX_ORACLE_SVERSION = major_release_version_num * 100000000 + release_update_version_num * 1000000 +
-			release_update_version_revision_num * 10000 + increment_version_num * 100 +
-			reserved_for_future_use_num;
-
-	printf("MAJOR_RELEASE_VERSION: %d\n",major_release_version_num);
-	printf("RELEASE_UPDATE_VERSION: %d\n",release_update_version_num);
-	printf("RELEASE_UPDATE_VERSION_REVISION: %d\n",release_update_version_revision_num);
-	printf("INCREMENT_VERSION: %d\n",increment_version_num);
-	printf("FUTURE_VERSION_NUM: %d\n",reserved_for_future_use_num);
+	else
+	{
+		ZBX_ORACLE_SVERSION = major_release_version_num * 100000000 + release_update_version_num * 1000000 +
+				release_update_version_revision_num * 10000 + increment_version_num * 100 +
+				reserved_for_future_use_num;
+	}
 
 	printf("RESULT_VERSION: %d\n", ZBX_ORACLE_SVERSION);
 #else
