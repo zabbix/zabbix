@@ -91,7 +91,7 @@ foreach ($data['scripts'] as $script) {
 			if ($script['actions']) {
 				$i = 0;
 
-				foreach ($script['actions'] as $actionid => $action_name) {
+				foreach ($script['actions'] as $action) {
 					$i++;
 
 					if ($i > $data['config']['max_in_table']) {
@@ -107,14 +107,14 @@ foreach ($data['scripts'] as $script) {
 					if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS)) {
 						$url = (new CUrl('actionconf.php'))
 							->setArgument('form', 'update')
-							->setArgument('actionid', $actionid);
+							->setArgument('actionid', $action['actionid']);
 
-						$actions[] = (new CLink($action_name, $url))
+						$actions[] = (new CLink($action['name'], $url))
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY);
 					}
 					else {
-						$actions[] = (new CSpan($action_name['name']))
+						$actions[] = (new CSpan($action['name']))
 							->addClass(ZBX_STYLE_GREY);
 					}
 				}

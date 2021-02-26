@@ -93,10 +93,11 @@ class CControllerScriptList extends CController {
 				'scope' => ($filter['scope'] == -1) ? null : $filter['scope']
 			],
 			'editable' => true,
-			'limit' => $limit
+			'limit' => $limit,
+			'preservekeys' => true
 		]);
 
-		// data sort and pager
+		// Data sort and pager.
 		order_result($data['scripts'], $sortField, $sortOrder);
 
 		$page_num = getRequest('page', 1);
@@ -105,43 +106,25 @@ class CControllerScriptList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		// Get list of actions.
-		$actions = [];
 
-		if ($data['scripts']) {
-			$action_scriptids = [];
-
-			foreach ($data['scripts'] as $script) {
-				if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
-					$action_scriptids[$script['scriptid']] = true;
-				}
-			}
-
-			if ($action_scriptids) {
-				$actions = API::Action()->get([
-					'output' => ['actionid', 'name'],
-					'scriptids' => array_keys($action_scriptids),
-					'selectOperations' => ['opcommand'],
-					'selectRecoveryOperations' => ['opcommand'],
-					'selectAcknowledgeOperations' => ['opcommand']
-				]);
-			}
-		}
 
 		/*
-		 * Find script host group name and user group name. Set to '' if all host/user groups used. Find associated
-		 * actions in any of operations.
+		 * Find script host group name and user group name. Set to NULL if all host/user groups used. Find associated
+		 * actions in any of operations. Collect scriptids for action scope scripts.
 		 */
+		$action_scriptids = [];
 		$usrgrpids = [];
 		$groupids = [];
 
 		foreach ($data['scripts'] as &$script) {
+			$script['actions'] = [];
+
 			if ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
 				$script['command'] = '';
 			}
 
-			$script['userGroupName'] = null; // all user groups
-			$script['hostGroupName'] = null; // all host groups
+			$script['userGroupName'] = null;
+			$script['hostGroupName'] = null;
 
 			if ($script['usrgrpid'] != 0) {
 				$usrgrpids[] = $script['usrgrpid'];
@@ -151,48 +134,28 @@ class CControllerScriptList extends CController {
 				$groupids[] = $script['groupid'];
 			}
 
-			$script['actions'] = [];
-
-			if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION && $actions) {
-				foreach ($actions as $action) {
-					if ($action['operations']) {
-						// Find at least one usage of script in any of operations.
-						foreach ($action['operations'] as $operation) {
-							if (array_key_exists('opcommand', $operation)
-									&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
-								$script['actions'][$action['actionid']] = $action['name'];
-								break;
-							}
-						}
-					}
-
-					if ($action['recoveryOperations']) {
-						foreach ($action['recoveryOperations'] as $operation) {
-							if (array_key_exists('opcommand', $operation)
-									&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
-								$script['actions'][$action['actionid']] = $action['name'];
-								break;
-							}
-						}
-					}
-
-					if ($action['acknowledgeOperations']) {
-						foreach ($action['acknowledgeOperations'] as $operation) {
-							if (array_key_exists('opcommand', $operation)
-									&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
-								$script['actions'][$action['actionid']] = $action['name'];
-								break;
-							}
-						}
-					}
-				}
-
-				if ($script['actions']) {
-					order_result($script['actions']);
-				}
+			if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+				$action_scriptids[$script['scriptid']] = true;
 			}
 		}
 		unset($script);
+
+		if ($action_scriptids) {
+			$script_actions = API::Script()->get([
+				'output' => [],
+				'scriptids' => array_keys($action_scriptids),
+				'selectActions' => ['actionid', 'name'],
+				'preservekeys' => true
+			]);
+
+			foreach ($data['scripts'] as $scriptid => &$script) {
+				if (array_key_exists($scriptid, $script_actions)) {
+					$script['actions'] = $script_actions[$scriptid]['actions'];
+					CArrayHelper::sort($script['actions'], ['name']);
+				}
+			}
+			unset($script);
+		}
 
 		if ($usrgrpids) {
 			$userGroups = API::UserGroup()->get([
