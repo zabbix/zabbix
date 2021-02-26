@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-18 11:10+0200\n"
+"POT-Creation-Date: 2021-02-26 19:54+0200\n"
 "PO-Revision-Date: 2016-07-23 10:02+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -15213,7 +15213,7 @@ msgstr ""
 msgid "Result"
 msgstr "Výsledok"
 
-#: app/controllers/CControllerPopupItemTestSend.php:398
+#: app/controllers/CControllerPopupItemTestSend.php:406
 #, c-format
 msgid "Result converted to %1$s"
 msgstr ""
@@ -16180,7 +16180,7 @@ msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 msgid "Set custom time period"
 msgstr ""
 
-#: app/controllers/CControllerPopupItemTestSend.php:414
+#: app/controllers/CControllerPopupItemTestSend.php:422
 #: app/views/js/popup.itemtestedit.view.js.php:371 include/forms.inc.php:1507
 #: include/views/js/item.preprocessing.js.php:68
 msgid "Set error to"
