@@ -2529,6 +2529,7 @@ Changes for 4.0.30rc1
 New features:
 
 Bug fixes:
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.29
