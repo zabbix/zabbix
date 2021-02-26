@@ -1450,7 +1450,6 @@ define('WIDGET_DATA_OVER',			'dataover');
 define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
-define('WIDGET_FAV_SCREENS',		'favscreens');
 define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
