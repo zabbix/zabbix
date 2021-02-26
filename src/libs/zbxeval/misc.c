@@ -735,6 +735,8 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
 	{
 		data += zbx_deserialize_value(data, &type);
 		data += zbx_deserialize_uint31_compact(data, &opt);
+		data += zbx_deserialize_uint31_compact(data, &loc_l);
+		data += zbx_deserialize_uint31_compact(data, &loc_r);
 
 		data += zbx_deserialize_char(data, &var_type);
 
@@ -755,9 +757,6 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
 				THIS_SHOULD_NEVER_HAPPEN;
 				return;
 		}
-
-		data += zbx_deserialize_uint31_compact(data, &loc_l);
-		data += zbx_deserialize_uint31_compact(data, &loc_r);
 
 		if (ZBX_EVAL_TOKEN_FUNCTIONID == type)
 		{
