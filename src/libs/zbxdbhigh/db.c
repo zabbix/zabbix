@@ -858,8 +858,31 @@ void	DBextract_DBversion(void)
 	DBclose();
 }
 
+void doIt (int x, char* y)
+{
+
+char yy[100];
+zbx_snprintf(yy, sizeof(yy), "%d",x);
+int i = 0;
+int ii = 0;
+while(y[i++] = yy[ii++])
+{
+	if(0 == ii%2 && ii<(strlen(yy)-1))
+	y[i++] = '.';
+
+}
+
+	printf ("RES ->%s<-", y);
+}
+
+
 void	DBcheck_version_requirements(void)
 {
+#define MAX_FRIENDLY_VERSION_OUTPUT 100
+	char friendly_min_version[MAX_FRIENDLY_VERSION_OUTPUT];
+	char friendly_max_version[MAX_FRIENDLY_VERSION_OUTPUT];
+	char friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT];
+
 #if defined(HAVE_MYSQL)
 #define MYSQL_MYSQL_MIN_VERSION 50562
 #define MYSQL_MYSQL_MAX_VERSION 80000
@@ -888,7 +911,7 @@ void	DBcheck_version_requirements(void)
 	}
 
 #elif defined(HAVE_ORACLE)
-#define ORACLE_MIN_VERSION 11020000
+#define ORACLE_MIN_VERSION 1102000000
 	int version = zbx_dbms_get_version();
 
 	if (ORACLE_MIN_VERSION > version)
@@ -908,6 +931,21 @@ void	DBcheck_version_requirements(void)
 			POSTGRESQL_MIN_VERSION);
 	}
 #endif
+
+	doIt(version, friendly_current_version);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_1 version: %d, fr cur_version: ->%s<-",version, friendly_current_version);
+/*
+clean old value
+write new value
+
+database
+current
+minimum
+maximum
+flag
+*/
+
 }
 
 /******************************************************************************

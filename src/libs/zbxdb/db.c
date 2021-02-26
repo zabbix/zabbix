@@ -2549,9 +2549,10 @@ void	zbx_dbms_extract_version(void)
 	char	release_update_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER];
 	char	release_update_version_revision[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER];
 	char	increment_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER];
+	char	reserved_for_future_use[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER];
 
 	int major_release_version_num, release_update_version_num, release_update_version_revision_num,
-			increment_version_num, local_status, overall_status = SUCCEED;
+			increment_version_num, reserved_for_future_use_num, local_status, overall_status = SUCCEED;
 
 	sword	err;
 
@@ -2585,22 +2586,31 @@ if ('.' != unparsed_version[next_start_index + 1])				\
 		else								\
 			a##_num = atoi(a);					\
 	}									\
-	else									\
-		local_status = FAIL;						\
-}										\
+	else if (' ' != unparsed_version[next_start_index + 2] && '-' != unparsed_version[next_start_index + 2])	\
+	{ \
+	zabbix_log(LOG_LEVEL_INFORMATION, "AAAA ->%c<-", unparsed_version[next_start_index + 2]);	\
+local_status = FAIL;				\
+	} \
+}									\
 else if ('.' == unparsed_version[next_start_index + 1])				\
 {										\
 	a[1] = '\0';								\
 	next_start_index = next_start_index + 2;				\
 										\
 	if (0 == isdigit(a[0]))							\
+	{\
+		zabbix_log(LOG_LEVEL_INFORMATION, "HUE: %c", a[0]);	\
 		local_status = FAIL;						\
-	else									\
+}\
+		else							\
 		a##_num  = atoi(a);						\
 }										\
 else										\
-	local_status = FAIL;							\
-										\
+{\
+	zabbix_log(LOG_LEVEL_INFORMATION, "dddddddddd"); \
+	local_status = FAIL;			\
+}\
+						\
 if (FAIL == local_status)							\
 {										\
 	zabbix_log(LOG_LEVEL_CRIT,						\
@@ -2613,10 +2623,30 @@ if (FAIL == local_status)							\
 	{
 		int next_start_index = start - unparsed_version + strlen(release_str);
 
+		/* char dest[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER*5+5]; */
+		/* char *h; */
+		/* if (h = strstr(unparsed_version+next_start_index, " ")) */
+		/* { */
+		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X1: %s",h); */
+		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X2: %s",unparsed_version); */
+		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X22: %s",unparsed_version+next_start_index); */
+		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X3: %d",next_start_index); */
+		/* zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X4: %d",h-unparsed_version-next_start_index); */
+		/* 	zbx_strlcpy(dest, unparsed_version+next_start_index,h-unparsed_version-next_start_index+1); */
+		/* 	zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_1 DEST: %s",dest); */
+		/* } */
+		/* else */
+		/* { */
+		/* 	zabbix_log(LOG_LEVEL_CRIT, "Cannot read after Release keyword in Oracle DB version."); */
+		/* 	overall_status = FAIL; */
+		/* 	goto out; */
+		/* } */
+
 		DO_IT(major_release_version);
 		DO_IT(release_update_version);
 		DO_IT(release_update_version_revision);
 		DO_IT(increment_version);
+		DO_IT(reserved_for_future_use);
 
 	}
 	else
@@ -2635,13 +2665,15 @@ out:
 		increment_version_num = 0;
 	}
 
-	ZBX_ORACLE_SVERSION = major_release_version_num * 1000000 + release_update_version_num * 10000 +
-			release_update_version_revision_num * 100 + increment_version_num;
+	ZBX_ORACLE_SVERSION = major_release_version_num * 100000000 + release_update_version_num * 1000000 +
+			release_update_version_revision_num * 10000 + increment_version_num * 100 +
+			reserved_for_future_use_num;
 
 	printf("MAJOR_RELEASE_VERSION: %d\n",major_release_version_num);
 	printf("RELEASE_UPDATE_VERSION: %d\n",release_update_version_num);
 	printf("RELEASE_UPDATE_VERSION_REVISION: %d\n",release_update_version_revision_num);
 	printf("INCREMENT_VERSION: %d\n",increment_version_num);
+	printf("FUTURE_VERSION_NUM: %d\n",reserved_for_future_use_num);
 
 	printf("RESULT_VERSION: %d\n", ZBX_ORACLE_SVERSION);
 #else

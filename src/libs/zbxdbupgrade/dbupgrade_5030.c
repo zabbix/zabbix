@@ -948,6 +948,15 @@ static int	DBpatch_5030056(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_5030057(void)
+{
+	const ZBX_FIELD	field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+
 #endif
 
 DBPATCH_START(5030)
@@ -1011,5 +1020,6 @@ DBPATCH_ADD(5030053, 0, 1)
 DBPATCH_ADD(5030054, 0, 1)
 DBPATCH_ADD(5030055, 0, 1)
 DBPATCH_ADD(5030056, 0, 1)
+DBPATCH_ADD(5030057, 0, 1)
 
 DBPATCH_END()
