@@ -2292,6 +2292,14 @@ static int	DBpatch_5030062(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_5030063(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.favorite.screenids'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5030)
@@ -2361,5 +2369,6 @@ DBPATCH_ADD(5030059, 0, 1)
 DBPATCH_ADD(5030060, 0, 1)
 DBPATCH_ADD(5030061, 0, 1)
 DBPATCH_ADD(5030062, 0, 1)
+DBPATCH_ADD(5030063, 0, 1)
 
 DBPATCH_END()
