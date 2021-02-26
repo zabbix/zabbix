@@ -38,6 +38,11 @@ class CScript extends CApiService {
 	protected $sortColumns = ['scriptid', 'name'];
 
 	/**
+	 * Fields from "actions" table. Used in get() validation and addRelatedObjects() when selecting action fields.
+	 */
+	private $action_fields = ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed'];
+
+	/**
 	 * This property, if filled out, will contain all hostrgroup ids
 	 * that requested scripts did inherit from.
 	 * Keyed by scriptid.
@@ -99,6 +104,7 @@ class CScript extends CApiService {
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $script_fields), 'default' => API_OUTPUT_EXTEND],
 			'selectGroups' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_fields), 'default' => null],
 			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_fields), 'default' => null],
+			'selectActions' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $this->action_fields), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -1183,6 +1189,76 @@ class CScript extends CApiService {
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
+
+		// Adding actions.
+		if ($options['selectActions'] !== null && $options['selectActions'] != API_OUTPUT_COUNT) {
+			$action_scriptids = [];
+
+			if ($this->outputIsRequested('scope', $options['output'])) {
+				foreach ($result as $scriptid => $row) {
+					if ($row['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+						$action_scriptids[] = $scriptid;
+					}
+				}
+			}
+			else {
+				$db_scripts = API::getApiService()->select('scripts', [
+					'output' => ['scope'],
+					'filter' => ['scriptid' => array_keys($result)],
+					'preservekeys' => true
+				]);
+				$db_scripts = $this->extendFromObjects($result, $db_scripts, ['scope']);
+
+				foreach ($db_scripts as $scriptid => $db_script) {
+					if ($db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+						$action_scriptids[] = $scriptid;
+					}
+				}
+			}
+
+			if ($action_scriptids) {
+				if ($options['selectActions'] == API_OUTPUT_EXTEND) {
+					$action_fields = array_map(function($field) { return 'a.'.$field; }, $this->action_fields);
+					$action_fields = implode(',', $action_fields);
+				}
+				elseif (is_array($options['selectActions'])) {
+					$action_fields = $options['selectActions'];
+
+					if (!in_array('actionid', $options['selectActions'])) {
+						$action_fields[] = 'actionid';
+					}
+
+					$action_fields = array_map(function($field) { return 'a.'.$field; }, $action_fields);
+					$action_fields = implode(',', $action_fields);
+				}
+
+				$db_script_actions = DBfetchArray(DBselect(
+					'SELECT DISTINCT oc.scriptid,'.$action_fields.
+					' FROM actions a,operations o,opcommand oc'.
+					' WHERE a.actionid=o.actionid'.
+						' AND o.operationid=oc.operationid'.
+						' AND '.dbConditionInt('oc.scriptid', $action_scriptids)
+				));
+
+				foreach ($result as $scriptid => &$row) {
+					$row['actions'] = [];
+
+					if ($db_script_actions) {
+						foreach ($db_script_actions as $db_script_action) {
+							if (bccomp($db_script_action['scriptid'], $scriptid) == 0) {
+								unset($db_script_action['scriptid']);
+								$row['actions'][] = $db_script_action;
+							}
+						}
+
+						$row['actions'] = $this->unsetExtraFields($row['actions'], ['actionid'],
+							$options['selectActions']
+						);
+					}
+				}
+				unset($row);
+			}
+		}
 
 		if ($this->outputIsRequested('parameters', $options['output'])) {
 			foreach ($result as $scriptid => $script) {
