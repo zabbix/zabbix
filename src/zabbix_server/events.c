@@ -280,7 +280,8 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 				if (NULL != trigger_tags)
 				{
 					event->trigger.expression = zbx_strdup(NULL, trigger_expression);
-					event->trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
+					event->trigger.recovery_expression = zbx_strdup(NULL,
+							trigger_recovery_expression);
 
 					for (i = 0; i < trigger_tags->values_num; i++)
 						process_trigger_tag(event, (const zbx_tag_t *)trigger_tags->values[i]);

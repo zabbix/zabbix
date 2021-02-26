@@ -195,6 +195,7 @@ typedef struct
 	zbx_vector_ptr_t	dependent_items;
 	zbx_vector_ptr_t	item_params;
 	zbx_vector_ptr_t	item_tags;
+	zbx_vector_db_tag_ptr_t	override_tags;
 	unsigned char		status;
 	unsigned char		type;
 }
@@ -466,6 +467,8 @@ static void	lld_item_free(zbx_lld_item_t *item)
 	zbx_vector_ptr_destroy(&item->item_tags);
 	zbx_vector_ptr_destroy(&item->dependent_items);
 
+	zbx_vector_db_tag_ptr_destroy(&item->override_tags);
+
 	zbx_free(item);
 }
 
@@ -680,6 +683,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		zbx_vector_ptr_create(&item->dependent_items);
 		zbx_vector_ptr_create(&item->item_params);
 		zbx_vector_ptr_create(&item->item_tags);
+		zbx_vector_db_tag_ptr_create(&item->override_tags);
 
 		zbx_vector_ptr_append(items, item);
 	}
@@ -895,6 +899,7 @@ static int	lld_validate_item_param(zbx_uint64_t itemid, int type, size_t len, ch
  ******************************************************************************/
 static int	lld_validate_item_tag(zbx_uint64_t itemid, int type, char *tag, char **error)
 {
+	size_t	len;
 	if (SUCCEED != zbx_is_utf8(tag))
 	{
 		char	*tag_utf8;
@@ -908,11 +913,18 @@ static int	lld_validate_item_tag(zbx_uint64_t itemid, int type, char *tag, char 
 		return FAIL;
 	}
 
-	if (zbx_strlen_utf8(tag) > ITEM_TAG_FIELD_LEN)
+	len = zbx_strlen_utf8(tag);
+
+	if (ITEM_TAG_FIELD_LEN < len)
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s item: tag's %s \"%s\" is too long.\n",
 				(0 != itemid ? "update" : "create"),
 				(ZBX_ITEM_TAG_FIELD_TAG != type ? "tag" : "value"), tag);
+		return FAIL;
+	}
+	else if (0 == len && ZBX_ITEM_TAG_FIELD_TAG == type)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: empty tag name.\n", (0 != itemid ? "update" : "create"));
 		return FAIL;
 	}
 
@@ -1693,7 +1705,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 		for (j = 0; j < item->item_tags.values_num; j++)
 		{
-			zbx_lld_item_tag_t	*item_tag = (zbx_lld_item_tag_t *)item->item_tags.values[j];
+			zbx_lld_item_tag_t	*item_tag = (zbx_lld_item_tag_t *)item->item_tags.values[j], *tag_dup;
+			int			k;
 
 			if (SUCCEED != lld_validate_item_tag(item->itemid, ZBX_ITEM_TAG_FIELD_TAG, item_tag->tag,
 					error) || SUCCEED != lld_validate_item_tag(item->itemid,
@@ -1702,6 +1715,27 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 				break;
 			}
+
+			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED))
+				continue;
+
+			/* check for duplicated tag */
+			for (k = 0; k < j; k++)
+			{
+				tag_dup = (zbx_lld_item_tag_t *)item->item_tags.values[k];
+
+				if (0 == strcmp(item_tag->tag, tag_dup->tag) &&
+						0 == strcmp(item_tag->value, tag_dup->value))
+				{
+					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+					*error = zbx_strdcatf(*error, "Cannot create item tag: tag \"%s\","
+						"\"%s\" already exists.\n", item_tag->tag, item_tag->value);
+					break;
+				}
+			}
+
+			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+				break;
 		}
 	}
 
@@ -1989,7 +2023,10 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->status = item_prototype->status;
 	discover = item_prototype->discover;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->status, &discover);
+	zbx_vector_db_tag_ptr_create(&item->override_tags);
+
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags,
+			&item->status, &discover);
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
@@ -2201,7 +2238,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	trends = item_prototype->trends;
 	discover = item_prototype->discover;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, NULL, &discover);
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags, NULL,
+			&discover);
 
 	if (0 != strcmp(item->key_proto, item_prototype->key))
 	{
@@ -2948,7 +2986,9 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const z
 	zbx_lld_item_t			*item;
 	zbx_lld_item_prototype_t	*item_proto;
 	zbx_lld_item_tag_t		*itsrc, *itdst;
+	zbx_db_tag_t			*override_tags;
 	char				*buffer = NULL;
+	const char			*name, *value;
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -2965,21 +3005,43 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const z
 		}
 
 		zbx_vector_ptr_sort(&item->item_tags, lld_item_tag_sort_by_tag);
+		zbx_vector_db_tag_ptr_sort(&item->override_tags, zbx_db_tag_compare_func);
 
 		item_proto = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
-		item_tag_num = MAX(item->item_tags.values_num, item_proto->item_tags.values_num);
+		item_tag_num = MAX(item->item_tags.values_num,
+				item_proto->item_tags.values_num + item->override_tags.values_num);
 
 		for (j = 0; j < item_tag_num; j++)
 		{
-			if (j >= item->item_tags.values_num)
+			if (j < item->item_tags.values_num &&
+					j >= item_proto->item_tags.values_num + item->override_tags.values_num)
+			{
+				itdst = (zbx_lld_item_tag_t *)item->item_tags.values[j];
+				itdst->flags &= ~ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED;
+				continue;
+			}
+
+			if (j >= item_proto->item_tags.values_num)
+			{
+				override_tags = item->override_tags.values[j - item_proto->item_tags.values_num];
+				name = override_tags->tag;
+				value = override_tags->value;
+			}
+			else
 			{
 				itsrc = (zbx_lld_item_tag_t *)item_proto->item_tags.values[j];
+				name = itsrc->tag;
+				value = itsrc->value;
+			}
+
+			if (j >= item->item_tags.values_num)
+			{
 				itdst = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
 				itdst->item_tagid = 0;
 				itdst->flags = ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED | ZBX_FLAG_LLD_ITEM_TAG_UPDATE;
-				itdst->tag = zbx_strdup(NULL, itsrc->tag);
-				itdst->value = zbx_strdup(NULL, itsrc->value);
+				itdst->tag = zbx_strdup(NULL, name);
+				itdst->value = zbx_strdup(NULL, value);
 
 				substitute_lld_macros(&itdst->tag, &item->lld_row->jp_row,
 						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
@@ -2991,18 +3053,9 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const z
 			}
 
 			itdst = (zbx_lld_item_tag_t *)item->item_tags.values[j];
-
-			if (j >= item_proto->item_tags.values_num)
-			{
-				itdst->flags &= ~ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED;
-				continue;
-			}
-
-			itsrc = (zbx_lld_item_tag_t *)item_proto->item_tags.values[j];
-
 			itdst->flags |= ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED;
 
-			buffer = zbx_strdup(buffer, itsrc->tag);
+			buffer = zbx_strdup(buffer, name);
 			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
 			if (0 != strcmp(itdst->tag, buffer))
@@ -3015,7 +3068,7 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const z
 			else
 				zbx_free(buffer);
 
-			buffer = zbx_strdup(buffer, itsrc->value);
+			buffer = zbx_strdup(buffer, value);
 			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
 			if (0 != strcmp(itdst->value, buffer))
