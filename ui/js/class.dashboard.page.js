@@ -2139,11 +2139,12 @@ class CDashboardPage {
 
 		iterator.updatePager(response.page, response.page_count);
 
+		const current_children = iterator.getChildren();
 		const current_children_by_widgetid = {};
 
 		iterator.setChildren([]);
 
-		for (const child of iterator.getChildren()) {
+		for (const child of current_children) {
 			if (child.widgetid !== '') {
 				current_children_by_widgetid[child.widgetid] = child;
 			}
