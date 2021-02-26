@@ -38,6 +38,10 @@ class C52ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
 
+		if (array_key_exists('screens', $data['zabbix_export'])) {
+			unset($data['zabbix_export']['screens']);
+		}
+
 		return $data;
 	}
 

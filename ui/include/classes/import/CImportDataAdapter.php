@@ -383,23 +383,6 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get screens from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getScreens() {
-		$screens = [];
-
-		if (array_key_exists('screens', $this->data)) {
-			foreach ($this->data['screens'] as $screen) {
-				$screens[] = CArrayHelper::renameKeys($screen, ['screen_items' => 'screenitems']);
-			}
-		}
-
-		return $screens;
-	}
-
-	/**
 	 * Get template dashboards from the imported data.
 	 *
 	 * @return array

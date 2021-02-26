@@ -55,7 +55,6 @@ class CConfigurationExport {
 			'hosts' => [],
 			'templates' => [],
 			'groups' => [],
-			'screens' => [],
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => [],
@@ -72,7 +71,6 @@ class CConfigurationExport {
 			'triggerPrototypes' => [],
 			'graphs' => [],
 			'graphPrototypes' => [],
-			'screens' => [],
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => [],
@@ -166,10 +164,6 @@ class CConfigurationExport {
 				$this->builder->buildGraphs($schema['rules']['graphs'], $this->data['graphs']);
 			}
 
-			if ($this->data['screens']) {
-				$this->builder->buildScreens($this->data['screens']);
-			}
-
 			if ($this->data['images']) {
 				$this->builder->buildImages($this->data['images']);
 			}
@@ -219,10 +213,6 @@ class CConfigurationExport {
 		if ($options['templates'] || $options['hosts']) {
 			$this->gatherGraphs($options['hosts'], $options['templates']);
 			$this->gatherTriggers($options['hosts'], $options['templates']);
-		}
-
-		if ($options['screens']) {
-			$this->gatherScreens($options['screens']);
 		}
 
 		if ($options['maps']) {
@@ -1275,22 +1265,6 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get screens for export from database.
-	 *
-	 * @param array $screenIds
-	 */
-	protected function gatherScreens(array $screenIds) {
-		$screens = API::Screen()->get([
-			'screenids' => $screenIds,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
-		]);
-
-		$this->prepareScreenExport($screens);
-		$this->data['screens'] = $screens;
-	}
-
-	/**
 	 * Get value maps for export builder from database.
 	 *
 	 * @param array $valuemapids
@@ -1304,112 +1278,6 @@ class CConfigurationExport {
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
 		]);
-	}
-
-	/**
-	 * Change screen elements real database resource id to unique field references.
-	 *
-	 * @param array $exportScreens
-	 */
-	protected function prepareScreenExport(array &$exportScreens) {
-		$sysmapIds = [];
-		$groupIds = [];
-		$hostIds = [];
-		$graphIds = [];
-		$itemIds = [];
-
-		// gather element ids that must be substituted
-		foreach ($exportScreens as $screen) {
-			foreach ($screen['screenitems'] as $screenItem) {
-				if ($screenItem['resourceid'] != 0) {
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOST_INFO:
-						case SCREEN_RESOURCE_TRIGGER_INFO:
-						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$groupIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$hostIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$graphIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$sysmapIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_CLOCK:
-							if ($screenItem['style'] == TIME_TYPE_HOST) {
-								$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							}
-							break;
-					}
-				}
-			}
-		}
-
-		$sysmaps = $this->getMapsReferences($sysmapIds);
-		$groups = $this->getGroupsReferences($groupIds);
-		$hosts = $this->getHostsReferences($hostIds);
-		$graphs = $this->getGraphsReferences($graphIds);
-		$items = $this->getItemsReferences($itemIds);
-
-		foreach ($exportScreens as &$screen) {
-			unset($screen['screenid']);
-
-			foreach ($screen['screenitems'] as &$screenItem) {
-				if ($screenItem['resourceid'] != 0) {
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOST_INFO:
-						case SCREEN_RESOURCE_TRIGGER_INFO:
-						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$screenItem['resourceid'] = $groups[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$screenItem['resourceid'] = $hosts[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$screenItem['resourceid'] = $graphs[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$screenItem['resourceid'] = $items[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$screenItem['resourceid'] = $sysmaps[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_CLOCK:
-							if ($screenItem['style'] == TIME_TYPE_HOST) {
-								$screenItem['resourceid'] = $items[$screenItem['resourceid']];
-							}
-							break;
-					}
-				}
-			}
-			unset($screenItem);
-		}
-		unset($screen);
 	}
 
 	/**
