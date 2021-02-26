@@ -270,10 +270,14 @@ class CDashboardWidget extends CBaseComponent {
 
 	showPreloader() {
 		this.div.find(`.${this._css_classes.content}`).addClass('is-loading');
+
+		return this;
 	}
 
 	hidePreloader() {
 		this.div.find(`.${this._css_classes.content}`).removeClass('is-loading');
+
+		return this;
 	}
 
 	startPreloader(timeout = this._preloader_timeout) {

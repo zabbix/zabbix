@@ -55,6 +55,10 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		}
 	}
 
+	getViewMode() {
+		return this.view_mode;
+	}
+
 	setViewMode(view_mode) {
 		if (this.view_mode !== view_mode) {
 			this.view_mode = view_mode;
@@ -73,22 +77,8 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		return this;
 	}
 
-	addWidget(config) {
-		const child = new CDashboardWidget({
-			view_mode: this.view_mode,
-			...config,
-			cell_height: this._cell_height,
-			cell_width: this._cell_width,
-			parent: this,
-			is_editable: this._is_editable,
-			is_iterator: false,
-			is_new: false
-		});
-
+	addChild(child) {
 		this.children.push(child);
-
-		child.activate();
-		child.showPreloader();
 		this.content_body.append(child.getView());
 
 		return this;

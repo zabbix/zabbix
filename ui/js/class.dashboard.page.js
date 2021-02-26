@@ -264,6 +264,7 @@ class CDashboardPage {
 		};
 
 		let widget;
+
 		if (config.defaults.iterator) {
 			widget = new CDashboardWidgetIterator({
 				min_rows: this._options['widget-min-rows'],
@@ -2171,11 +2172,32 @@ class CDashboardPage {
 					reused_widgetids.push(child.widgetid);
 				}
 				else {
-					iterator.addWidget({
+					child = new CDashboardWidget({
 						...child,
 						defaults: this._data.widget_defaults[child.type],
-						uniqueid: this._generateUniqueId()
+						uniqueid: this._generateUniqueId(),
+						view_mode: iterator.getViewMode(),
+						cell_height: this._options['widget-height'],
+						cell_width: this._options['widget-width'],
+						parent: iterator,
+						is_editable: iterator.isEditable(),
+						is_new: false
 					});
+
+					child
+						.activate()
+						.showPreloader()
+						.on(WIDGET_EVENT_EDIT_CLICK, (e) => {
+							this.editWidget(e.detail.target, e.target);
+						})
+						.on(WIDGET_EVENT_ENTER, (e) => {
+							this._enterWidget(e.detail.target);
+						})
+						.on(WIDGET_EVENT_LEAVE, (e) => {
+							this._leaveWidget(e.detail.target);
+						});
+
+					iterator.addChild(child);
 				}
 			});
 
