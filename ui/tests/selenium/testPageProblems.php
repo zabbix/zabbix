@@ -373,8 +373,8 @@ class testPageProblems extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		// We remove from the result list templates that is not displayed there.
-		$filtering = $this->getTableResult('Problem');
 		if (array_key_exists('absent_problems', $data)) {
+			$filtering = $this->getTableResult('Problem');
 			foreach ($data['absent_problems'] as $absence) {
 				if (($key = array_search($absence, $filtering))) {
 					unset($filtering[$key]);
