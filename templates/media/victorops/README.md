@@ -14,7 +14,7 @@ This guide describes how to integrate Zabbix 5.2 installation with VictorOps usi
 ## Setting up the webhook in Zabbix
 1\. In the *Administration > Media types* section, import [media_victorops.yaml](media_victorops.yaml).
 
-2\. Open the newly added **VictorOps** media type and replace *&lt;PLACE ENDPOINT URL HERE&gt;* placeholder with your REST integration endpiont URL.<br>
+2\. Open the newly added **VictorOps** media type and replace *&lt;PLACE ENDPOINT URL HERE&gt;* placeholder with your REST integration endpoint URL.<br>
 The following parameters should be filled:<br>
 **vops_endpoint** - URL of your VictorOps REST endpoint.<br>
 **vops_routing_key** - routing key of the escalation policy.<br>
