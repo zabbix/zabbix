@@ -1635,22 +1635,19 @@ static int	DBpatch_5030078(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	widgetid, widget_fieldid;
-		char		*tag, *value_str;
+		char		*val;
 
 		ZBX_DBROW2UINT64(widgetid, row[0]);
-		tag = DBdyn_escape_string(row[1]);
+		val = DBdyn_escape_string(row[1]);
 		ZBX_DBROW2UINT64(widget_fieldid, row[2]);
 
-		value_str = zbx_dsprintf(NULL, "Application: %s", tag);
-
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "tags.operator.0", 0, "");
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.tag.0", 0, value_str);
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.operator.0", 0, "");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "tags.operator.0", 1, "");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.tag.0", 0, "Application");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.value.0", 0, val);
 
 		zbx_vector_uint64_append(&widget_fieldids, widget_fieldid);
 
-		zbx_free(tag);
-		zbx_free(value_str);
+		zbx_free(val);
 	}
 	DBfree_result(result);
 
