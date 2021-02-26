@@ -692,6 +692,10 @@ class CItem extends CItemGeneral {
 					unset($item['valuemapid']);
 				}
 			}
+
+			$item['tags'] = array_map(function ($tag) {
+				return $tag + ['value' => ''];
+			}, $item['tags']);
 		}
 		unset($item);
 

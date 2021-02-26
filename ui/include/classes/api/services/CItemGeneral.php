@@ -608,7 +608,7 @@ abstract class CItemGeneral extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'tags'		=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
-				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value'), 'default' => DB::getDefault('item_tag', 'value')]
+				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
 			]]
 		]];
 
