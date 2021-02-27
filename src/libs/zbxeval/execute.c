@@ -34,7 +34,7 @@
  *             output   - [IN/OUT] the output value stack                     *
  *             error    - [OUT] the error message in the case of failure      *
  *                                                                            *
- * Return value: SUCCEED - the oeprator was evaluated successfully            *
+ * Return value: SUCCEED - the operator was evaluated successfully            *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -907,7 +907,12 @@ static int	eval_execute_function_date(const zbx_eval_context_t *ctx, const zbx_e
 	}
 
 	now = ctx->ts.sec;
-	tm = localtime(&now);
+	if (NULL == (tm = localtime(&now)))
+	{
+		*error = zbx_dsprintf(*error, "cannot convert time for function at \"%s\": %s",
+				ctx->expression + token->loc.l, zbx_strerror(errno));
+		return FAIL;
+	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%.4d%.2d%.2d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday));
 	eval_function_return(0, &value, output);
 
@@ -944,7 +949,12 @@ static int	eval_execute_function_time(const zbx_eval_context_t *ctx, const zbx_e
 	}
 
 	now = ctx->ts.sec;
-	tm = localtime(&now);
+	if (NULL == (tm = localtime(&now)))
+	{
+		*error = zbx_dsprintf(*error, "cannot convert time for function at \"%s\": %s",
+				ctx->expression + token->loc.l, zbx_strerror(errno));
+		return FAIL;
+	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%.2d%.2d%.2d", tm->tm_hour, tm->tm_min, tm->tm_sec));
 	eval_function_return(0, &value, output);
 
@@ -1012,7 +1022,12 @@ static int	eval_execute_function_dayofweek(const zbx_eval_context_t *ctx, const 
 	}
 
 	now = ctx->ts.sec;
-	tm = localtime(&now);
+	if (NULL == (tm = localtime(&now)))
+	{
+		*error = zbx_dsprintf(*error, "cannot convert time for function at \"%s\": %s",
+				ctx->expression + token->loc.l, zbx_strerror(errno));
+		return FAIL;
+	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%d", 0 == tm->tm_wday ? 7 : tm->tm_wday));
 	eval_function_return(0, &value, output);
 
@@ -1048,7 +1063,12 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
 	}
 
 	now = ctx->ts.sec;
-	tm = localtime(&now);
+	if (NULL == (tm = localtime(&now)))
+	{
+		*error = zbx_dsprintf(*error, "cannot convert time for function at \"%s\": %s",
+				ctx->expression + token->loc.l, zbx_strerror(errno));
+		return FAIL;
+	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%d", tm->tm_mday));
 	eval_function_return(0, &value, output);
 

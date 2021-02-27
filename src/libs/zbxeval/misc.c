@@ -181,7 +181,7 @@ size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t m
 	{
 		const zbx_eval_token_t	*token = &ctx->stack.values[i];
 
-		/* reserve space for maximum possible for worst case scenario with empty variant:     */
+		/* reserve space for maximum possible worst case scenario with empty variant:         */
 		/*  4 bytes token type, 6 bytes per compact uint31 and 1 byte empty variant (4+3*6+1) */
 		reserve_buffer(&buffer, &buffer_size, 23, &ptr);
 
@@ -514,7 +514,6 @@ void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message)
  * Parameters: expression - [IN] the original expression                      *
  *             token      - [IN] the token                                    *
  *             functionid - [OUT] the extracted functionid                    *
- *             expression - [IN] the original expression                      *
  *                                                                            *
  * Return value: SUCCEED - functionid was extracted successfully              *
  *               FAIL    - otherwise (incorrect token or invalid data)        *
@@ -554,9 +553,9 @@ static int	expression_extract_functionid(const char *expression, zbx_eval_token_
  *                                                                            *
  * Purpose: deserialize expression and extract specified tokens into values   *
  *                                                                            *
- * Parameters: data       - [IN] serialized expression                        *
+ * Parameters: data       - [IN] the serialized expression                    *
  *             expression - [IN] the original expression                      *
- *                             triggerids                                     *
+ *             mask       - [IN] the tokens to extract                        *
  *                                                                            *
  * Return value: Expression evaluation context.                               *
  *                                                                            *
@@ -775,7 +774,7 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
  *                                                                            *
  * Function: zbx_eval_get_constant                                            *
  *                                                                            *
- * Purpose: the the Nth constant in expression                                *
+ * Purpose: the Nth constant in expression                                    *
  *                                                                            *
  * Parameters: ctx   - [IN] the evaluation context                            *
  *             index - [IN] the constant index                                *
@@ -863,7 +862,8 @@ void	zbx_eval_replace_functionid(zbx_eval_context_t *ctx, zbx_uint64_t old_funct
  * Purpose: validate parsed expression to check if all functionids were       *
  *          replaced                                                          *
  *                                                                            *
- * Parameters: ctx - [IN] the evaluation context                              *
+ * Parameters: ctx     [IN] the evaluation context                            *
+ *             error - [IN] the error message                                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_validate_replaced_functionids(zbx_eval_context_t *ctx, char **error)
@@ -894,7 +894,7 @@ int	zbx_eval_validate_replaced_functionids(zbx_eval_context_t *ctx, char **error
  *                                                                            *
  * Purpose: copy parsed expression                                            *
  *                                                                            *
- * Parameters: dst        - [IN] the destination evaluation context           *
+ * Parameters: dst        - [OUT] the destination evaluation context          *
  *             src        - [IN] the source evaluation context                *
  *             expression - [IN] copied destination expression                *
  *                                                                            *

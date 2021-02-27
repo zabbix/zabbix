@@ -1728,7 +1728,8 @@ void	zbx_clean_events(void)
  *                                                                            *
  * Function: db_trigger_get_hosts                                             *
  *                                                                            *
- * Purpose:  get hosts that are used trigger expression/recovery expression   *
+ * Purpose:  get hosts that are associated with trigger expression/recovery   *
+ *           expression                                                       *
  *                                                                            *
  ******************************************************************************/
 static void	db_trigger_get_hosts(zbx_hashset_t *hosts, DB_TRIGGER *trigger)
