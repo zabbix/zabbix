@@ -1,6 +1,7 @@
 Changes for 5.4.0beta1
 
 New features:
+.....J.... [ZBXNEXT-735] allowed multiple jmx items on one host (arimdjonoks)
 .........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
 .........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
 .........T [ZBXNEXT-6302] added new metrics to VMWare template (tuskov)
