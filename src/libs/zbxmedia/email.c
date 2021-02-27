@@ -272,11 +272,8 @@ out:
 	return ret;
 }
 
-#define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
-
 static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
-		const char *mailsubject, const char *mailbody, unsigned char content_type, char *attachment_name,
-		char *attachment_type, char *attachment, size_t attachment_size)
+		const char *mailsubject, const char *mailbody, unsigned char content_type)
 {
 	char		*tmp = NULL, *base64 = NULL, *base64_lf;
 	char		*localsubject = NULL, *localbody = NULL, *from = NULL, *to = NULL;
@@ -284,7 +281,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	struct tm	*local_time;
 	time_t		email_time;
 	int		i;
-	size_t		from_alloc = 0, from_offset = 0, to_alloc = 0, to_offset = 0, tmp_alloc = 0, tmp_offset = 0;
+	size_t		from_alloc = 0, from_offset = 0, to_alloc = 0, to_offset = 0;
 
 	/* prepare subject */
 
@@ -348,50 +345,21 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	/* e-mails are sent in 'SMTP/MIME e-mail' format because UTF-8 is used both in mailsubject and mailbody */
 	/* =?charset?encoding?encoded text?= format must be used for subject field */
 
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
+	tmp = zbx_dsprintf(tmp,
 			"From: %s\r\n"
 			"To: %s\r\n"
 			"In-Reply-To: %s\r\n"
 			"Date: %s\r\n"
 			"Subject: %s\r\n"
-			"MIME-Version: 1.0\r\n",
-			from, to, inreplyto,
-			str_time, localsubject);
-
-	if (NULL != attachment)
-	{
-		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset,
-				"Content-Type: multipart/mixed; boundary=" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n"
-				"--" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n");
-	}
-
-	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
+			"MIME-Version: 1.0\r\n"
 			"Content-Type: %s; charset=\"UTF-8\"\r\n"
 			"Content-Transfer-Encoding: base64\r\n"
 			"\r\n"
 			"%s",
+			from, to, inreplyto,
+			str_time, localsubject,
 			ZBX_MEDIA_CONTENT_TYPE_HTML == content_type ? "text/html" : "text/plain",
 			localbody);
-
-	if (NULL != attachment)
-	{
-		char	*b64_attach = NULL;
-
-		str_base64_encode_dyn(attachment, &b64_attach, attachment_size);
-
-		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
-				"\r\n"
-				"--" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n"
-				"Content-Type: %s\r\n"
-				"Content-Transfer-Encoding: base64\r\n"
-				"Content-Disposition: attachment; filename=\"%s\"\r\n"
-				"\r\n"
-				"%s\r\n"
-				"\r\n"
-				"--" ZBX_MULTIPART_MIXED_BOUNDARY "--\r\n",
-				attachment_type, attachment_name, b64_attach);
-		zbx_free(b64_attach);
-	}
 
 	zbx_free(localsubject);
 	zbx_free(localbody);
@@ -445,8 +413,7 @@ out:
 
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
-		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout,
-		char *attachment_name, char *attachment_type, char *attachment, size_t attachment_size, char *error,
+		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout, char *error,
 		size_t max_error_len)
 {
 	zbx_socket_t	s;
@@ -584,8 +551,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		goto close;
 	}
 
-	cmdp = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody, content_type,
-			attachment_name, attachment_type, attachment, attachment_size);
+	cmdp = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody, content_type);
 	err = write(s.socket, cmdp, strlen(cmdp));
 	zbx_free(cmdp);
 
@@ -641,8 +607,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char smtp_security, unsigned char
 		smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
-		const char *username, const char *password, unsigned char content_type, int timeout,
-		char *attachment_name, char *attachment_type, char *attachment, size_t attachment_size, char *error,
+		const char *username, const char *password, unsigned char content_type, int timeout, char *error,
 		size_t max_error_len)
 {
 #ifdef HAVE_SMTP_AUTHENTICATION
@@ -733,7 +698,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		goto error;
 
 	payload_status.payload = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody,
-			content_type, attachment_name, attachment_type, attachment, attachment_size);
+			content_type);
 	payload_status.payload_len = strlen(payload_status.payload);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_UPLOAD, 1L)) ||
@@ -821,8 +786,7 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type, int timeout, char *attachment_name, char *attachment_type, char *attachment,
-		size_t attachment_size, char *error, size_t max_error_len)
+		unsigned char content_type, int timeout, char *error, size_t max_error_len)
 {
 	int			ret = FAIL;
 	zbx_vector_ptr_t	from_mails, to_mails;
@@ -846,15 +810,13 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	if (SMTP_SECURITY_NONE == smtp_security && SMTP_AUTHENTICATION_NONE == smtp_authentication)
 	{
 		ret = send_email_plain(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto,
-				mailsubject, mailbody, content_type, timeout, attachment_name, attachment_type,
-				attachment, attachment_size, error, max_error_len);
+				mailsubject, mailbody, content_type, timeout, error, max_error_len);
 	}
 	else
 	{
 		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto, mailsubject,
 				mailbody, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
-				username, password, content_type, timeout, attachment_name, attachment_type,
-				attachment, attachment_size, error, max_error_len);
+				username, password, content_type, timeout, error, max_error_len);
 	}
 
 clean:

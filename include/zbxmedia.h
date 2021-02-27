@@ -38,8 +38,7 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type, int timeout, char *attachment_name, char *attachment_type, char *attachment,
-		size_t attachment_size, char *error, size_t max_error_len);
+		unsigned char content_type, int timeout, char *error, size_t max_error_len);
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
 
 #endif
