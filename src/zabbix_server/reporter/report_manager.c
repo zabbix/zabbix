@@ -26,16 +26,17 @@
 #include "zbxjson.h"
 #include "base64.h"
 #include "../../libs/zbxcrypto/aes.h"
-
+#include "zbxmedia.h"
 #include "report_manager.h"
 #include "report_protocol.h"
-
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num, CONFIG_REPORTWRITER_FORKS;
 
+/* report manager data */
 typedef struct
 {
+	/* config.url, config.session_key fields synced from database together with reprots */
 	char			*zabbix_url;
 	char			*session_key;
 
@@ -50,25 +51,37 @@ typedef struct
 	zbx_queue_ptr_t		free_writers;
 
 	zbx_hashset_t		sessions;
+	zbx_hashset_t		reports;
 
-	zbx_binary_heap_t	queue;
+	zbx_binary_heap_t	report_queue;
+
+	zbx_list_t		job_queue;
 }
 zbx_rm_t;
 
 typedef struct
 {
-	zbx_uint64_t		viewid;
+	zbx_uint64_t		reportid;
+	zbx_uint64_t		dashboardid;
 
+	zbx_vector_ptr_pair_t	params;
+
+	int			nextcheck;
+}
+zbx_rm_report_t;
+
+typedef struct
+{
 	char			*url;
 	char			*cookie;
-	int			nextcheck;
-	zbx_vector_str_t	emails;
+	zbx_vector_uint64_t	userids;
 	zbx_vector_ptr_pair_t	params;
 
 	zbx_ipc_client_t	*client;
 }
-zbx_rm_view_t;
+zbx_rm_job_t;
 
+/* user session, cached to generate authentication cookies */
 typedef struct
 {
 	zbx_uint64_t	userid;
@@ -84,7 +97,7 @@ typedef struct
 	/* the connected report writer client */
 	zbx_ipc_client_t	*client;
 
-	zbx_rm_view_t		*view;
+	zbx_rm_job_t		*job;
 }
 zbx_rm_writer_t;
 
@@ -114,8 +127,6 @@ static	zbx_rm_writer_t	*rm_get_writer(zbx_rm_t *manager, const zbx_ipc_client_t 
  *                                                                            *
  * Function: rm_writer_free                                                   *
  *                                                                            *
- * Purpose: frees report writer                                               *
- *                                                                            *
  ******************************************************************************/
 static void	rm_writer_free(zbx_rm_writer_t *writer)
 {
@@ -123,12 +134,43 @@ static void	rm_writer_free(zbx_rm_writer_t *writer)
 	zbx_free(writer);
 }
 
-static int	rm_views_compare_nextcheck(const void *d1, const void *d2)
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_report_compare_nextcheck                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	rm_report_compare_nextcheck(const void *d1, const void *d2)
 {
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	return ((zbx_rm_view_t *)e1->data)->nextcheck - ((zbx_rm_view_t *)e2->data)->nextcheck;
+	return ((zbx_rm_report_t *)e1->data)->nextcheck - ((zbx_rm_report_t *)e2->data)->nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_report_clean                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_report_clean(zbx_rm_report_t *report)
+{
+	report_destroy_params(&report->params);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_job_free                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_job_free(zbx_rm_job_t *job)
+{
+	zbx_free(job->url);
+	zbx_free(job->cookie);
+
+	zbx_vector_uint64_destroy(&job->userids);
+	report_destroy_params(&job->params);
+
+	zbx_free(job);
 }
 
 /******************************************************************************
@@ -153,7 +195,9 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	zbx_vector_ptr_create(&manager->writers);
 	zbx_queue_ptr_create(&manager->free_writers);
 	zbx_hashset_create(&manager->sessions, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_binary_heap_create(&manager->queue, rm_views_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_DIRECT);
+	zbx_hashset_create(&manager->reports, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_binary_heap_create(&manager->report_queue, rm_report_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_DIRECT);
+	zbx_list_create(&manager->job_queue);
 
 	manager->next_writer_index = 0;
 	manager->session_key = NULL;
@@ -184,11 +228,21 @@ static void	rm_destroy(zbx_rm_t *manager)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_rm_session_t	*session;
+	zbx_rm_report_t		*report;
+	zbx_rm_job_t		*job;
+
+	while (SUCCEED == zbx_list_pop(&manager->job_queue, (void **)&job))
+		rm_job_free(job);
 
 	zbx_hashset_iter_reset(&manager->sessions, &iter);
 	while (NULL != (session = (zbx_rm_session_t *)zbx_hashset_iter_next(&iter)))
 		zbx_free(session->sid);
 	zbx_hashset_destroy(&manager->sessions);
+
+	zbx_hashset_iter_reset(&manager->reports, &iter);
+	while (NULL != (report = (zbx_rm_report_t *)zbx_hashset_iter_next(&iter)))
+		rm_report_clean(report);
+	zbx_hashset_destroy(&manager->reports);
 
 	zbx_queue_ptr_destroy(&manager->free_writers);
 	zbx_vector_ptr_clear_ext(&manager->writers, (zbx_mem_free_func_t)rm_writer_free);
@@ -266,10 +320,10 @@ static char	*rm_time_to_urlfield(time_t timestamp)
  *                                                                            *
  * Purpose: create zbx_session cookie for frontend authentication             *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             client  - [IN] the session id                                  *
+ * Parameters: manager   - [IN] the manager                                   *
+ *             sessionid - [IN] the session id                                *
  *                                                                            *
- * Return value: zbx_session coookie                                          *
+ * Return value: zbx_session cookie                                           *
  *                                                                            *
  ******************************************************************************/
 static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
@@ -414,84 +468,65 @@ static void	rm_flush_sessions(zbx_rm_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_create_view                                                   *
+ * Function: rm_create_job                                                    *
  *                                                                            *
- * Purpose: create new view to be processed by report writers                 *
+ * Purpose: create new job to be processed by report writers                  *
  *                                                                            *
  * Parameters: manager       - [IN] the manager                               *
  *             dashboardid   - [IN] the dashboard to view                     *
  *             viewer_userid - [IN] the user viewing the dashboard            *
  *             report_time   - [IN] the dashboard time                        *
  *             period        - [IN] the dashboard period                      *
+ *             userids       - [IN] the recipient user identifiers            *
+ *             userids_num   - [IN] the number of recipients                  *
  *             params        - [IN] the viewing and processing parameters     *
  *                                                                            *
  ******************************************************************************/
-static zbx_rm_view_t	*rm_create_view(zbx_rm_t *manager, zbx_uint64_t dashboardid, zbx_uint64_t viewer_userid,
-		int report_time, int period, zbx_vector_ptr_pair_t *params)
+static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, zbx_uint64_t dashboardid, zbx_uint64_t viewer_userid,
+		int report_time, int period, zbx_uint64_t *userids, int userids_num, zbx_vector_ptr_pair_t *params)
 {
-	static zbx_uint64_t	last_viewid;
-	zbx_rm_view_t		*view;
+	zbx_rm_job_t		*job;
 	size_t			url_alloc = 0, url_offset = 0;
 	zbx_rm_session_t	*session;
-	char			*value = NULL;
-	struct zbx_json		j;
 
-	view = (zbx_rm_view_t *)zbx_malloc(NULL, sizeof(zbx_rm_view_t));
-	memset(view, 0, sizeof(zbx_rm_view_t));
-	view->viewid = ++last_viewid;
-	zbx_vector_str_create(&view->emails);
-	zbx_vector_ptr_pair_create(&view->params);
+	job = (zbx_rm_job_t *)zbx_malloc(NULL, sizeof(zbx_rm_job_t));
+	memset(job, 0, sizeof(zbx_rm_job_t));
 
-	zbx_snprintf_alloc(&view->url, &url_alloc, &url_offset,
-			"%s/zabbix.php?action=dashboard.view&kiosk=1&dashboardid=" ZBX_FS_UI64,
-			manager->zabbix_url, dashboardid);
-	zbx_snprintf_alloc(&view->url, &url_alloc, &url_offset, "&from=%s", rm_time_to_urlfield(report_time - period));
-	zbx_snprintf_alloc(&view->url, &url_alloc, &url_offset, "&to=%s", rm_time_to_urlfield(report_time));
-
-	zbx_vector_ptr_pair_append_array(&view->params, params->values, params->values_num);
+	zbx_vector_ptr_pair_create(&job->params);
+	/* move key-value pairs from params to job */
+	zbx_vector_ptr_pair_append_array(&job->params, params->values, params->values_num);
 	zbx_vector_ptr_pair_clear(params);
 
+	zbx_vector_uint64_create(&job->userids);
+	zbx_vector_uint64_append_array(&job->userids, userids, userids_num);
+
+	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset,
+			"%s/zabbix.php?action=dashboard.view&kiosk=1&dashboardid=" ZBX_FS_UI64,
+			manager->zabbix_url, dashboardid);
+	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&from=%s", rm_time_to_urlfield(report_time - period));
+	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&to=%s", rm_time_to_urlfield(report_time));
+
 	session = rm_get_session(manager, viewer_userid);
-	view->cookie = zbx_strdup(NULL, session->cookie);
+	job->cookie = zbx_strdup(NULL, session->cookie);
 
-	return view;
+	return job;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_view_free                                                     *
- *                                                                            *
- * Purpose: frees view and its resources                                      *
- *                                                                            *
- ******************************************************************************/
-static void	rm_view_free(zbx_rm_view_t *view)
-{
-	zbx_vector_str_clear_ext(&view->emails, zbx_str_free);
-	zbx_vector_str_destroy(&view->emails);
-
-	report_destroy_params(&view->params);
-
-	zbx_free(view->url);
-	zbx_free(view->cookie);
-	zbx_free(view);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: rm_read_reports                                                  *
+ * Function: rm_update_cache                                                  *
  *                                                                            *
  * Purpose: update configuration and report cache                             *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
  *                                                                            *
  ******************************************************************************/
-static void	rm_read_reports(zbx_rm_t *manager)
+static void	rm_update_cache(zbx_rm_t *manager)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 
 	result = DBselect("select session_key,url from config");
 
@@ -514,105 +549,58 @@ static void	rm_read_reports(zbx_rm_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: rm_queue_view                                                    *
- *                                                                            *
- * Purpose: queue view for processing                                         *
- *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             view    - [IN] the view to queue                               *
- *                                                                            *
- ******************************************************************************/
-static void	rm_queue_view(zbx_rm_t *manager, zbx_rm_view_t *view)
+typedef struct
 {
-	zbx_binary_heap_elem_t	elem = {view->viewid, view};
+	zbx_uint64_t	mediatypeid;
+	char		*recipient;
+}
+zbx_report_dst_t;
 
-	zbx_binary_heap_insert(&manager->queue, &elem);
+static void	zbx_report_dst_free(zbx_report_dst_t *dst)
+{
+	zbx_free(dst->recipient);
+	zbx_free(dst);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_writer_process_view                                           *
+ * Function: rm_writer_process_job                                            *
  *                                                                            *
- * Purpose: process view by sending it to writer                              *
+ * Purpose: process job by sending it to writer                               *
  *                                                                            *
  * Parameters: writer - [IN] the writer                                       *
- *             view   - [IN] the view to process                              *
+ *             job    - [IN] the view to process                              *
  *                                                                            *
  ******************************************************************************/
-static void	rm_writer_process_view(zbx_rm_writer_t *writer, zbx_rm_view_t *view)
+static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job)
 {
-	unsigned char	*data;
-	zbx_uint32_t	size;
+	unsigned char		*data;
+	zbx_uint32_t		size;
+	int			ret = FAIL, rc;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	mediatypeids;
+	zbx_vector_ptr_t	dsts;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_report_dst_t	*dst;
 
-	writer->view = view;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:%s", __func__, job->url);
 
-	size = report_serialize_send_request(&data, view->url, view->cookie, &view->emails, &view->params);
-	zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_SEND_REPORT, data, size);
+	zbx_vector_uint64_create(&mediatypeids);
+	zbx_vector_ptr_create(&dsts);
+
+	size = report_serialize_begin_report(&data, job->url, job->cookie, &job->params);
+	if (SUCCEED != zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_BEGIN_REPORT, data, size))
+		goto out;
 
 	zbx_free(data);
-}
 
-/******************************************************************************
- *                                                                            *
- * Function: rm_process_queue                                                 *
- *                                                                            *
- * Purpose: process queue                                                     *
- *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             now     - [IN] current time                                    *
- *                                                                            *
- ******************************************************************************/
-static void	rm_process_queue(zbx_rm_t *manager, int now)
-{
-	zbx_rm_writer_t		*writer;
-	zbx_rm_view_t		*view;
-	zbx_binary_heap_elem_t	*elem;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	while (SUCCEED != zbx_binary_heap_empty(&manager->queue))
-	{
-		elem = zbx_binary_heap_find_min(&manager->queue);
-		view = (zbx_rm_view_t *)elem->data;
-		if (now < view->nextcheck)
-			break;
-
-		if (NULL == (writer = zbx_queue_ptr_pop(&manager->free_writers)))
-			break;
-
-		zbx_binary_heap_remove_min(&manager->queue);
-		rm_writer_process_view(writer, view);
-	}
-	ZBX_UNUSED(manager);
-	ZBX_UNUSED(now);
-
-	// TODO: process reports
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: rm_get_user_emails                                               *
- *                                                                            *
- * Purpose: get emails of the specified users from database                   *
- *                                                                            *
- * Parameters: userids     - [IN] the user identifiers                        *
- *             userids_num - [IN] the number of user identifiers              *
- *             emails      - [OUT] the emails                                 *
- *                                                                            *
- ******************************************************************************/
-static void	rm_get_user_emails(zbx_uint64_t *userids, int userids_num, zbx_vector_str_t *emails)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select m.sendto from media m,media_type mt where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "m.userid", userids, userids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select m.sendto,mt.mediatypeid"
+			" from media m,media_type mt "
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "m.userid", job->userids.values, job->userids.values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and m.active=%d"
 				" and m.mediatypeid=mt.mediatypeid"
@@ -621,34 +609,179 @@ static void	rm_get_user_emails(zbx_uint64_t *userids, int userids_num, zbx_vecto
 			MEDIA_STATUS_ACTIVE, MEDIA_TYPE_EMAIL, MEDIA_TYPE_STATUS_ACTIVE);
 
 	result = DBselect("%s", sql);
-	zbx_free(sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char	*ptr;
-
-		for (ptr = row[0];; ptr++)
-		{
-			char	*delim, *email = NULL;
-			size_t	len, email_alloc = 0, email_offset = 0;
-
-			if (NULL != (delim = strchr(ptr, '\n')))
-				len = delim - ptr;
-			else
-				len = strlen(ptr);
-
-			zbx_strncpy_alloc(&email, &email_alloc, &email_offset, ptr, len);
-			if (FAIL == zbx_vector_str_search(emails, email, ZBX_DEFAULT_STR_COMPARE_FUNC))
-				zbx_vector_str_append(emails, email);
-			else
-				zbx_free(email);
-
-			ptr += len;
-			if ('\n' != *ptr)
-				break;
-		}
+		dst = (zbx_report_dst_t *)zbx_malloc(NULL, sizeof(zbx_report_dst_t));
+		ZBX_STR2UINT64(dst->mediatypeid, row[1]);
+		dst->recipient = zbx_strdup(NULL, row[0]);
+		zbx_vector_ptr_append(&dsts, dst);
+		zbx_vector_uint64_append(&mediatypeids, dst->mediatypeid);
 	}
 	DBfree_result(result);
+
+	ret = SUCCEED;
+
+	if (0 != dsts.values_num)
+	{
+		zbx_vector_str_t	recipients;
+		int			index = 0;
+
+		zbx_vector_str_create(&recipients);
+
+		zbx_vector_ptr_sort(&dsts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		sql_offset = 0;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
+					"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,"
+					"smtp_authentication,exec_params,maxsessions,maxattempts,attempt_interval,"
+					"content_type,script,timeout"
+				" from media_type"
+				" where");
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "mediatypeid", mediatypeids.values,
+				mediatypeids.values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
+		{
+			DB_MEDIATYPE	mt;
+
+			ZBX_STR2UINT64(mt.mediatypeid, row[0]);
+
+			mt.type = atoi(row[1]);
+			mt.smtp_server = zbx_strdup(NULL, row[2]);
+			mt.smtp_helo = zbx_strdup(NULL, row[3]);
+			mt.smtp_email = zbx_strdup(NULL, row[4]);
+			mt.exec_path = zbx_strdup(NULL, row[5]);
+			mt.gsm_modem = zbx_strdup(NULL, row[6]);
+			mt.username = zbx_strdup(NULL, row[7]);
+			mt.passwd = zbx_strdup(NULL, row[8]);
+			mt.smtp_port = atoi(row[9]);
+			ZBX_STR2UCHAR(mt.smtp_security, row[10]);
+			ZBX_STR2UCHAR(mt.smtp_verify_peer, row[11]);
+			ZBX_STR2UCHAR(mt.smtp_verify_host, row[12]);
+			ZBX_STR2UCHAR(mt.smtp_authentication, row[13]);
+			mt.exec_params = zbx_strdup(NULL, row[14]);
+			mt.maxsessions = atoi(row[15]);
+			mt.maxattempts = atoi(row[16]);
+			mt.attempt_interval = zbx_strdup(NULL, row[17]);
+			ZBX_STR2UCHAR(mt.content_type, row[18]);
+			mt.script = zbx_strdup(NULL, row[19]);
+			mt.timeout = zbx_strdup(NULL, row[20]);
+
+			for (; index < dsts.values_num; index++)
+			{
+				dst = (zbx_report_dst_t *)dsts.values[index];
+				if (dst->mediatypeid != mt.mediatypeid)
+					break;
+				zbx_vector_str_append(&recipients, dst->recipient);
+			}
+
+			if (0 != recipients.values_num)
+			{
+				size = report_serialize_send_report(&data, &mt, &recipients);
+				ret = zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_SEND_REPORT, data, size);
+				zbx_free(data);
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+
+			zbx_vector_str_clear(&recipients);
+			zbx_db_mediatype_clean(&mt);
+		}
+		DBfree_result(result);
+
+		zbx_vector_str_destroy(&recipients);
+	}
+
+	/* attempt to send finish request even if last sending failed */
+	rc = zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_END_REPORT, NULL, 0);
+	if (SUCCEED == ret)
+		ret = rc;
+out:
+	zbx_free(sql);
+	zbx_free(data);
+	zbx_vector_ptr_clear_ext(&dsts, (zbx_ptr_free_func_t)zbx_report_dst_free);
+	zbx_vector_ptr_destroy(&dsts);
+	zbx_vector_uint64_destroy(&mediatypeids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_schedule_jobs                                                 *
+ *                                                                            *
+ * Purpose: process queue                                                     *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *             now     - [IN] current time                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_schedule_jobs(zbx_rm_t *manager, int now)
+{
+	zbx_rm_report_t		*report;
+	zbx_binary_heap_elem_t	*elem;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED != zbx_binary_heap_empty(&manager->report_queue))
+	{
+		elem = zbx_binary_heap_find_min(&manager->report_queue);
+		report = (zbx_rm_report_t *)elem->data;
+		if (now < report->nextcheck)
+			break;
+
+		zbx_binary_heap_remove_min(&manager->report_queue);
+
+		// TODO: create jobs, reschedule report
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_process_jobs                                                  *
+ *                                                                            *
+ * Purpose: process queue                                                     *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *             now     - [IN] current time                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_process_jobs(zbx_rm_t *manager)
+{
+	zbx_rm_writer_t		*writer;
+	zbx_rm_job_t		*job;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED != zbx_queue_ptr_empty(&manager->free_writers))
+	{
+		if (SUCCEED != zbx_list_pop(&manager->job_queue, (void **)&job))
+			break;
+
+		writer = zbx_queue_ptr_pop(&manager->free_writers);
+
+		if (SUCCEED != rm_writer_process_job(writer, job))
+		{
+			rm_job_free(job);
+			zbx_queue_ptr_push(&manager->free_writers, writer);
+		}
+		else
+			writer->job = job;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -667,20 +800,17 @@ static void	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_
 	zbx_uint64_t		dashboardid, userid, viewer_userid;
 	zbx_vector_ptr_pair_t	params;
 	int			report_time, period;
-	unsigned char		*data = NULL;
-	zbx_rm_view_t		*view;
+	zbx_rm_job_t		*job;
 
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_test_request(message->data, &dashboardid, &userid, &viewer_userid, &report_time, &period,
+	report_deserialize_test_report(message->data, &dashboardid, &userid, &viewer_userid, &report_time, &period,
 			&params);
 
-	view = rm_create_view(manager, dashboardid, viewer_userid, report_time, period, &params);
-	view->client = client;
-	rm_get_user_emails(&userid, 1, &view->emails);
-	rm_queue_view(manager, view);
+	job = rm_create_job(manager, dashboardid, viewer_userid, report_time, period, &userid, 1, &params);
+	job->client = client;
 
-	zbx_free(data);
+	zbx_list_append(&manager->job_queue, job, NULL);
 	report_destroy_params(&params);
 }
 
@@ -707,11 +837,10 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 		return;
 	}
 
-	if (NULL != writer->view->client)
+	if (NULL != writer->job->client)
 	{
 		/* external test request - forward the response to the requester */
-		zbx_ipc_client_send(writer->view->client, ZBX_IPC_REPORTER_TEST_REPORT_RESULT, message->data,
-				message->size);
+		zbx_ipc_client_send(writer->job->client, ZBX_IPC_REPORTER_TEST_RESULT, message->data, message->size);
 	}
 	else
 	{
@@ -720,8 +849,8 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 		// TODO: update report in database
 	}
 
-	rm_view_free(writer->view);
-	writer->view = NULL;
+	rm_job_free(writer->job);
+	writer->job = NULL;
 	zbx_queue_ptr_push(&manager->free_writers, writer);
 }
 
@@ -789,11 +918,12 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 
 		if (time_now - time_sync >= ZBX_SYNC_INTERVAL)
 		{
-			rm_read_reports(&manager);
+			rm_update_cache(&manager);
 			time_sync = time_now;
 		}
 
-		rm_process_queue(&manager, time(NULL));
+		rm_schedule_jobs(&manager, time(NULL));
+		rm_process_jobs(&manager);
 
 		sec = zbx_time();
 		delay = (sec - time_now > 0.5 ? 0 : 1);
@@ -816,10 +946,10 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 				case ZBX_IPC_REPORTER_REGISTER:
 					rm_register_writer(&manager, client, message);
 					break;
-				case ZBX_IPC_REPORTER_TEST_REPORT:
+				case ZBX_IPC_REPORTER_TEST:
 					rm_test_report(&manager, client, message);
 					break;
-				case ZBX_IPC_REPORTER_SEND_REPORT_RESULT:
+				case ZBX_IPC_REPORTER_RESULT:
 					rm_process_result(&manager, client, message);
 					break;
 			}

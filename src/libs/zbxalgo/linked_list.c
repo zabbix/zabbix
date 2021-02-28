@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "linked_list.h"
+#include "zbxalgo.h"
 #include "log.h"
 
 /******************************************************************************

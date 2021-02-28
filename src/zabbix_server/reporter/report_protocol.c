@@ -23,6 +23,7 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"
+#include "db.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {
@@ -43,7 +44,13 @@ static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zb
 	return SUCCEED;
 }
 
-static zbx_uint32_t	report_serialize_test_request(unsigned char **data, zbx_uint64_t dashboardid,
+/******************************************************************************
+ *                                                                            *
+ * ZBX_IPC_REPORTER_TEST_REPORT message serialization/deserialization         *
+ *                                                                            *
+ ******************************************************************************/
+
+static zbx_uint32_t	report_serialize_test_report(unsigned char **data, zbx_uint64_t dashboardid,
 		zbx_uint64_t userid, zbx_uint64_t viewer_userid, int report_time, int period,
 		const zbx_vector_ptr_pair_t *params)
 {
@@ -87,7 +94,7 @@ static zbx_uint32_t	report_serialize_test_request(unsigned char **data, zbx_uint
 	return data_len;
 }
 
-void	report_deserialize_test_request(const unsigned char *data, zbx_uint64_t *dashboardid, zbx_uint64_t *userid,
+void	report_deserialize_test_report(const unsigned char *data, zbx_uint64_t *dashboardid, zbx_uint64_t *userid,
 		zbx_uint64_t *viewer_userid, int *report_time, int *period, zbx_vector_ptr_pair_t *params)
 {
 	int	params_num, i;
@@ -110,6 +117,13 @@ void	report_deserialize_test_request(const unsigned char *data, zbx_uint64_t *da
 		zbx_vector_ptr_pair_append(params, pair);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * ZBX_IPC_REPORTER_TEST_REPORT_RESULT, ZBX_IPC_REPORTER_REPORT_RESULT        *
+ * message serialization/deserialization                                      *
+ *                                                                            *
+ ******************************************************************************/
 
 zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const char *error)
 {
@@ -136,23 +150,21 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
 	(void)zbx_deserialize_str(data, error, len);
 }
 
-zbx_uint32_t	report_serialize_send_request(unsigned char **data, const char *url, const char *cookie,
-		const zbx_vector_str_t *emails, const zbx_vector_ptr_pair_t *params)
+/******************************************************************************
+ *                                                                            *
+ * ZBX_IPC_REPORTER_BEGIN_REPORT message serialization/deserialization        *
+ *                                                                            *
+ ******************************************************************************/
+
+zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *url, const char *cookie,
+		const zbx_vector_ptr_pair_t *params)
 {
-	zbx_uint32_t	data_len = 0, *len, *params_len, url_len, cookie_len;
+	zbx_uint32_t	data_len = 0, *params_len, url_len, cookie_len;
 	unsigned char	*ptr;
 	int		i;
 
 	zbx_serialize_prepare_str(data_len, url);
 	zbx_serialize_prepare_str(data_len, cookie);
-	zbx_serialize_prepare_value(data_len, emails->values_num);
-
-	len = (zbx_uint32_t *)zbx_malloc(NULL, emails->values_num * sizeof(zbx_uint32_t));
-	for (i = 0; i < emails->values_num; i++)
-	{
-		zbx_serialize_prepare_str_len(data_len, emails->values[i], len[i]);
-	}
-
 	zbx_serialize_prepare_value(data_len, params->values_num);
 
 	params_len = (zbx_uint32_t *)zbx_malloc(NULL, params->values_num * 2 * sizeof(zbx_uint32_t));
@@ -167,12 +179,6 @@ zbx_uint32_t	report_serialize_send_request(unsigned char **data, const char *url
 
 	ptr += zbx_serialize_str(ptr, url, url_len);
 	ptr += zbx_serialize_str(ptr, cookie, cookie_len);
-	ptr += zbx_serialize_value(ptr, emails->values_num);
-
-	for (i = 0; i < emails->values_num; i++)
-	{
-		ptr += zbx_serialize_str(ptr, emails->values[i], len[i]);
-	}
 
 	ptr += zbx_serialize_value(ptr, params->values_num);
 
@@ -183,39 +189,87 @@ zbx_uint32_t	report_serialize_send_request(unsigned char **data, const char *url
 	}
 
 	zbx_free(params_len);
-	zbx_free(len);
 
 	return data_len;
 }
 
-void	report_deserialize_send_request(const unsigned char *data, char **url, char **cookie, zbx_vector_str_t *emails,
+void	report_deserialize_begin_report(const unsigned char *data, char **url, char **cookie,
 		zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	len;
-	int		i, num;
+	int		i, params_num;
 
 	data += zbx_deserialize_str(data, url, len);
 	data += zbx_deserialize_str(data, cookie, len);
 
-	data += zbx_deserialize_value(data, &num);
-	zbx_vector_str_reserve(emails, num);
-	for (i = 0; i < num; i++)
-	{
-		char	*email;
-
-		data += zbx_deserialize_str(data, &email, len);
-		zbx_vector_str_append(emails, email);
-	}
-
-	data += zbx_deserialize_value(data, &num);
-	zbx_vector_ptr_pair_reserve(params, num);
-	for (i = 0; i < num; i++)
+	data += zbx_deserialize_value(data, &params_num);
+	zbx_vector_ptr_pair_reserve(params, params_num);
+	for (i = 0; i < params_num; i++)
 	{
 		zbx_ptr_pair_t	pair;
 
 		data += zbx_deserialize_str(data, (char **)&pair.first, len);
 		data += zbx_deserialize_str(data, (char **)&pair.second, len);
 		zbx_vector_ptr_pair_append(params, pair);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * ZBX_IPC_REPORTER_SEND_REPORT message serialization/deserialization        *
+ *                                                                            *
+ ******************************************************************************/
+
+zbx_uint32_t	report_serialize_send_report(unsigned char **data, const DB_MEDIATYPE *mt,
+		const zbx_vector_str_t *emails)
+{
+	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, *params_len;
+	unsigned char	*ptr;
+	int		i;
+
+	*data = zbx_malloc(NULL, data_alloc);
+	zbx_serialize_mediatype(data, &data_alloc, &data_offset, mt);
+
+	zbx_serialize_prepare_value(data_len, emails->values_num);
+	params_len = (zbx_uint32_t *)zbx_malloc(NULL, emails->values_num * sizeof(zbx_uint32_t));
+	for (i = 0; i < emails->values_num; i++)
+	{
+		zbx_serialize_prepare_str_len(data_len, emails->values[i], params_len[i]);
+	}
+
+	if (data_alloc - data_offset < data_len)
+	{
+		data_alloc = data_offset + data_len;
+		*data = (unsigned char *)zbx_realloc(*data, data_alloc);
+	}
+
+	ptr = *data + data_offset;
+	ptr += zbx_serialize_value(ptr, emails->values_num);
+	for (i = 0; i < emails->values_num; i++)
+	{
+		ptr += zbx_serialize_str(ptr, emails->values[i], params_len[i]);
+	}
+
+	zbx_free(params_len);
+
+	return data_offset + data_len;
+}
+
+void	report_deserialize_send_report(const unsigned char *data, DB_MEDIATYPE *mt, zbx_vector_str_t *sendtos)
+{
+	zbx_uint32_t	len;
+	int		i, sendto_num;
+
+	data += zbx_deserialize_mediatype(data, mt);
+
+	data += zbx_deserialize_value(data, &sendto_num);
+	zbx_vector_str_reserve(sendtos, sendto_num);
+	for (i = 0; i < sendto_num; i++)
+	{
+		char	*sendto;
+
+		data += zbx_deserialize_str(data, &sendto, len);
+		zbx_vector_str_append(sendtos, sendto);
 	}
 }
 
@@ -274,9 +328,9 @@ int	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, char *
 		}
 	}
 
-	size = report_serialize_test_request(&data, dashboardid, userid, viewer_userid, report_time, period, &params);
+	size = report_serialize_test_report(&data, dashboardid, userid, viewer_userid, report_time, period, &params);
 
-	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_REPORTER, ZBX_IPC_REPORTER_TEST_REPORT,
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_REPORTER, ZBX_IPC_REPORTER_TEST,
 			SEC_PER_MIN, data, size, &response, error))
 	{
 		goto out;

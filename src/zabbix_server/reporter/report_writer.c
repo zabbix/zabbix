@@ -24,7 +24,8 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxjson.h"
-
+#include "zbxalert.h"
+#include "db.h"
 #include "report_writer.h"
 #include "report_protocol.h"
 
@@ -39,18 +40,46 @@ typedef struct
 	size_t	alloc;
 	size_t	offset;
 }
-zbx_string_t;
+zbx_buffer_t;
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	size_t		r_size = size * nmemb;
-	zbx_string_t	*str = (zbx_string_t *)userdata;
+	size_t		r_size = size * nmemb, buf_alloc;
+	zbx_buffer_t	*buf = (zbx_buffer_t *)userdata;
 
-	zbx_strncpy_alloc(&str->data, &str->alloc, &str->offset, (const char *)ptr, r_size);
+	buf_alloc = (0 == buf->alloc ? r_size : buf->alloc);
+	while (buf_alloc - buf->offset < r_size)
+		buf_alloc *= 2;
+
+	if (buf_alloc != buf->alloc)
+	{
+		buf->data = zbx_realloc(buf->data, buf_alloc);
+		buf->alloc = buf_alloc;
+	}
+
+	memcpy(buf->data + buf->offset, (const char *)ptr, r_size);
+	buf->offset += r_size;
 
 	return r_size;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: rw_get_report                                                    *
+ *                                                                            *
+ * Purpose: get report from web service                                       *
+ *                                                                            *
+ * Parameters: url         - [IN] the report url                              *
+ *             cookie      - [IN] the authentication cookie                   *
+ *             width       - [IN] the report width                            *
+ *             height      - [IN] the report height                           *
+ *             report      - [OUT] the downloaded report                      *
+ *             report_size - [OUT] the report size                            *
+ *                                                                            *
+ * Return value: SUCCEED - the report was donwloaded successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	rw_get_report(const char *url, const char *cookie, const char *width, const char *height, char **report,
 		size_t *report_size, char **error)
 {
@@ -70,7 +99,7 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 	char			*cookie_value;
 	int			ret = FAIL;
 	long			httpret;
-	zbx_string_t		response = {NULL, 0, 0};
+	zbx_buffer_t		response = {NULL, 0, 0};
 	CURL			*curl = NULL;
 	CURLcode		err;
 	CURLoption		opt;
@@ -108,23 +137,22 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
-		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "could not connect to web service: %s", curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpret)))
 	{
-		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "could not obtain web service resonse code: %s", curl_easy_strerror(err));
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "REPORT %s -> http: %d", CONFIG_WEBSERVICE_URL, httpret);
 	if (200 != httpret)
 	{
 		struct zbx_json_parse	jp;
@@ -156,58 +184,51 @@ out:
 #endif
 }
 
-static int	rw_send_emails(const zbx_vector_str_t *emails, const char *subject, const char *message,
-		const char *format, const char *report, size_t report_size, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Function: rw_begin_report                                                  *
+ *                                                                            *
+ * Purpose: begin report dispatch                                             *
+ *                                                                            *
+ * Parameters: msg      - [IN] the begin report request message               *
+ *             dispatch - [IN] the alerter dispatch                           *
+ *             error    - [OUT] the error message                             *
+ *                                                                            *
+ * Return value: SUCCEED - the report was started successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error)
 {
-	FILE	*fp;
-
-	if (NULL != (fp = fopen("/tmp/page.pdf", "w")))
-	{
-		fwrite(report, 1, report_size, fp);
-		fclose(fp);
-	}
-
-	// TODO: send emails
-	*error = zbx_strdup(NULL, "Failed to send emails: not implemented (writer).");
-	return FAIL;
-}
-
-static void	rw_send_report(zbx_ipc_socket_t *socket, zbx_ipc_message_t *msg)
-{
-	char			*url, *cookie, *error = NULL, *report = NULL;
-	const char		*subject = NULL, *message = NULL, *format = NULL, *width = NULL, *height = NULL;
-	unsigned char		*data;
-	size_t			size, report_size;
-	int			i, ret;
-	zbx_vector_str_t	emails;
 	zbx_vector_ptr_pair_t	params;
+	int			i, ret;
+	char			*url, *cookie, *subject = NULL, *width = NULL, *height = NULL, *message = NULL,
+				*report = NULL;
+	size_t			report_size = 0;
 
-	zbx_vector_str_create(&emails);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_send_request(msg->data, &url, &cookie, &emails, &params);
+	report_deserialize_begin_report(msg->data, &url, &cookie, &params);
 
 	for (i = 0; i < params.values_num; i++)
 	{
 		if (0 == strcmp(params.values[i].first, "subject"))
 		{
-			subject = params.values[i].second;
+			subject = (char *)params.values[i].second;
 		}
-		else if (0 == strcmp(params.values[i].first, "message"))
+		else if (0 == strcmp(params.values[i].first, "body"))
 		{
-			message = params.values[i].second;
-		}
-		else if (0 == strcmp(params.values[i].first, "format"))
-		{
-			format = params.values[i].second;
+			message = (char *)params.values[i].second;
 		}
 		else if (0 == strcmp(params.values[i].first, "width"))
 		{
-			width = params.values[i].second;
+			width = (char *)params.values[i].second;
 		}
 		else if (0 == strcmp(params.values[i].first, "height"))
 		{
-			height = params.values[i].second;
+			height = (char *)params.values[i].second;
 		}
 		else
 		{
@@ -216,25 +237,110 @@ static void	rw_send_report(zbx_ipc_socket_t *socket, zbx_ipc_message_t *msg)
 		}
 	}
 
-	if (SUCCEED != (ret = rw_get_report(url, cookie, width, height, &report, &report_size, &error)))
-		goto out;
-
-	ret = rw_send_emails(&emails, subject, message, format, report, report_size, &error);
-
-out:
-	size = report_serialize_response(&data, ret, error);
-	zbx_ipc_socket_write(socket, ZBX_IPC_REPORTER_SEND_REPORT_RESULT, data, size);
+	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, error)))
+	{
+		ret = zbx_alerter_begin_dispatch(dispatch, subject, message, "zabbix-report.pdf", "application/pdf",
+				report, report_size, error);
+	}
 
 	zbx_free(report);
-	zbx_free(data);
-	zbx_free(error);
-	zbx_free(report);
-	zbx_free(cookie);
 	zbx_free(url);
+	zbx_free(cookie);
+
 	report_destroy_params(&params);
-	zbx_vector_str_clear_ext(&emails, zbx_str_free);
-	zbx_vector_str_destroy(&emails);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s report_size:" ZBX_FS_SIZE_T, __func__, zbx_result_string(ret),
+			report_size);
+
+	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rw_send_report                                                   *
+ *                                                                            *
+ * Purpose: dispatch report to the recipients using specified media type      *
+ *          parameters                                                        *
+ *                                                                            *
+ * Parameters: msg      - [IN] the send report request message                *
+ *             dispatch - [IN] the alerter dispatch                           *
+ *             error    - [OUT] the error message                             *
+ *                                                                            *
+ * Return value: SUCCEED - the report was sent successfully                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error)
+{
+	int			ret = FAIL;
+	zbx_vector_str_t	sendtos;
+	DB_MEDIATYPE		mt;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_str_create(&sendtos);
+
+	report_deserialize_send_report(msg->data, &mt, &sendtos);
+
+	ret = zbx_alerter_send_dispatch(dispatch, &mt, &sendtos, error);
+
+	zbx_db_mediatype_clean(&mt);
+	zbx_vector_str_clear_ext(&sendtos, zbx_str_free);
+	zbx_vector_str_destroy(&sendtos);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rw_end_report                                                    *
+ *                                                                            *
+ * Purpose: finish report dispatch                                            *
+ *                                                                            *
+ * Parameters: dispatch - [IN] the alerter dispatch                           *
+ *             error    - [OUT] the error message                             *
+ *                                                                            *
+ * Return value: SUCCEED - the report was finished successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	rw_end_report(zbx_alerter_dispatch_t *dispatch, char **error)
+{
+	int	ret, sent_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = zbx_alerter_end_dispatch(dispatch, &sent_num, error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s sent:%d/%d", __func__, zbx_result_string(ret), sent_num,
+			dispatch->total_num);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rw_send_result                                                   *
+ *                                                                            *
+ * Purpose: send report result back to manager                                *
+ *                                                                            *
+ * Parameters: socket - [IN] the report manager IPC socket                    *
+ *             status - [IN] the report status                                *
+ *             error  - [IN] the error message                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	rw_send_result(zbx_ipc_socket_t *socket, int status, char *error)
+{
+	unsigned char	*data;
+	zbx_uint32_t	size;
+
+	size = report_serialize_response(&data, status, error);
+	zbx_ipc_socket_write(socket, ZBX_IPC_REPORTER_RESULT, data, size);
+	zbx_free(data);
+}
+
 
 ZBX_THREAD_ENTRY(report_writer_thread, args)
 {
@@ -242,6 +348,8 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	char			*error = NULL;
 	zbx_ipc_socket_t	socket;
 	zbx_ipc_message_t	message;
+	zbx_alerter_dispatch_t	dispatch;
+	int			report_status = FAIL;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -283,8 +391,26 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 		switch (message.code)
 		{
+			case ZBX_IPC_REPORTER_BEGIN_REPORT:
+				if (SUCCEED != (report_status = rw_begin_report(&message, &dispatch, &error)))
+					zabbix_log(LOG_LEVEL_DEBUG, "failed to begin report dispatch: %s", error);
+				break;
 			case ZBX_IPC_REPORTER_SEND_REPORT:
-				rw_send_report(&socket, &message);
+				if (SUCCEED == report_status)
+				{
+					if (SUCCEED != (report_status = rw_send_report(&message, &dispatch, &error)))
+						zabbix_log(LOG_LEVEL_DEBUG, "failed to send report: %s", error);
+				}
+				break;
+			case ZBX_IPC_REPORTER_END_REPORT:
+				if (SUCCEED == report_status)
+				{
+					if (SUCCEED != (report_status = rw_end_report(&dispatch, &error)))
+						zabbix_log(LOG_LEVEL_DEBUG, "failed to end report dispatch: %s", error);
+				}
+
+				rw_send_result(&socket, report_status, error);
+				zbx_free(error);
 				break;
 		}
 
