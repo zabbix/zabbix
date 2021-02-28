@@ -22,4 +22,3 @@ libzbxalgo_a_SOURCES = \
 	queue.c \
 	vector.c \
 	vectorimpl.h
-	

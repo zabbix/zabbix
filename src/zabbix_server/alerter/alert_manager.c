@@ -2012,7 +2012,7 @@ static void	am_process_begin_dispatch(zbx_ipc_client_t *client, const unsigned c
 	zbx_ipc_client_set_userdata(client, dispatch);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() name:%s content_type:%s size:%u", __func__, dispatch->content_name,
-	                dispatch->content_type, dispatch->content_size);
+			dispatch->content_type, dispatch->content_size);
 }
 
 /******************************************************************************
