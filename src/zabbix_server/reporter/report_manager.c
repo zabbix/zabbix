@@ -27,6 +27,7 @@
 #include "base64.h"
 #include "../../libs/zbxcrypto/aes.h"
 #include "zbxmedia.h"
+#include "zbxreport.h"
 #include "report_manager.h"
 #include "report_protocol.h"
 
@@ -297,17 +298,15 @@ static void	rm_register_writer(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_
  *                                                                            *
  * Purpose: convert timestamp to range format used in URL query fields        *
  *                                                                            *
- * Parameters: timestamp - [IN] the timestamp in seconds since Epoch          *
+ * Parameters: tm - [IN] the timestamp                                        *
  *                                                                            *
  * Return value: formatted time to be used in URL query fields                *
  *                                                                            *
  ******************************************************************************/
-static char	*rm_time_to_urlfield(time_t timestamp)
+static char	*rm_time_to_urlfield(const struct tm *tm)
 {
 	static char	buf[26];
-	struct tm	*tm;
 
-	tm = localtime(&timestamp);
 	zbx_snprintf(buf, sizeof(buf), "%02d-%02d-%02d%%20%02d%%3A%02d%%3A%02d", tm->tm_year + 1900, tm->tm_mon + 1,
 			tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 
@@ -468,6 +467,40 @@ static void	rm_flush_sessions(zbx_rm_t *manager)
 
 /******************************************************************************
  *                                                                            *
+ * Function: rm_get_report_range                                              *
+ *                                                                            *
+ * Purpose: calculate report range from report time and period                *
+ *                                                                            *
+ * Parameters: report_time - [IN] the report writing time                     *
+ *             period      - [IN] the dashboard period                        *
+ *             from        - [OUT] the report start time                      *
+ *             to          - [OUT] the report end time                        *
+ *                                                                            *
+ * Return value: SUCCEED - the report range was calculated successfully       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	rm_get_report_range(time_t report_time, unsigned char period, struct tm *from, struct tm *to)
+{
+	struct tm	*tm;
+	zbx_time_unit_t	period2unit[] = {ZBX_TIME_UNIT_DAY, ZBX_TIME_UNIT_WEEK, ZBX_TIME_UNIT_MONTH, ZBX_TIME_UNIT_YEAR};
+
+	if (ARRSIZE(period2unit) <= period || NULL == (tm = localtime(&report_time)))
+		return FAIL;
+
+	*to = *tm;
+	to->tm_sec = 0;
+	to->tm_min = 0;
+	to->tm_hour = 0;
+
+	*from = *to;
+	zbx_tm_sub(from, 1, period2unit[period]);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: rm_create_job                                                    *
  *                                                                            *
  * Purpose: create new job to be processed by report writers                  *
@@ -475,19 +508,27 @@ static void	rm_flush_sessions(zbx_rm_t *manager)
  * Parameters: manager       - [IN] the manager                               *
  *             dashboardid   - [IN] the dashboard to view                     *
  *             viewer_userid - [IN] the user viewing the dashboard            *
- *             report_time   - [IN] the dashboard time                        *
- *             period        - [IN] the dashboard period                      *
+ *             report_time   - [IN] the report time                           *
+ *             period        - [IN] the report period                         *
  *             userids       - [IN] the recipient user identifiers            *
  *             userids_num   - [IN] the number of recipients                  *
  *             params        - [IN] the viewing and processing parameters     *
  *                                                                            *
  ******************************************************************************/
 static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, zbx_uint64_t dashboardid, zbx_uint64_t viewer_userid,
-		int report_time, int period, zbx_uint64_t *userids, int userids_num, zbx_vector_ptr_pair_t *params)
+		int report_time, unsigned char period, zbx_uint64_t *userids, int userids_num,
+		zbx_vector_ptr_pair_t *params, char **error)
 {
 	zbx_rm_job_t		*job;
 	size_t			url_alloc = 0, url_offset = 0;
 	zbx_rm_session_t	*session;
+	struct tm		from, to;
+
+	if (SUCCEED != rm_get_report_range(report_time, period, &from, &to))
+	{
+		*error = zbx_strdup(NULL, "invalid report time or period");
+		return NULL;
+	}
 
 	job = (zbx_rm_job_t *)zbx_malloc(NULL, sizeof(zbx_rm_job_t));
 	memset(job, 0, sizeof(zbx_rm_job_t));
@@ -503,8 +544,8 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, zbx_uint64_t dashboardid, 
 	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset,
 			"%s/zabbix.php?action=dashboard.view&kiosk=1&dashboardid=" ZBX_FS_UI64,
 			manager->zabbix_url, dashboardid);
-	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&from=%s", rm_time_to_urlfield(report_time - period));
-	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&to=%s", rm_time_to_urlfield(report_time));
+	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&from=%s", rm_time_to_urlfield(&from));
+	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&to=%s", rm_time_to_urlfield(&to));
 
 	session = rm_get_session(manager, viewer_userid);
 	job->cookie = zbx_strdup(NULL, session->cookie);
@@ -793,13 +834,18 @@ static void	rm_process_jobs(zbx_rm_t *manager)
  * Parameters: manager - [IN] the manager                                     *
  *             client  - [IN] the connected writer                            *
  *             message - [IN] the received message                            *
+ *             error   - [IN] the error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the test report job was created successfully       *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static void	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message, char **error)
 {
 	zbx_uint64_t		dashboardid, userid, viewer_userid;
 	zbx_vector_ptr_pair_t	params;
-	int			report_time, period;
+	int			report_time, ret;
+	unsigned char		period;
 	zbx_rm_job_t		*job;
 
 	zbx_vector_ptr_pair_create(&params);
@@ -807,11 +853,39 @@ static void	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_
 	report_deserialize_test_report(message->data, &dashboardid, &userid, &viewer_userid, &report_time, &period,
 			&params);
 
-	job = rm_create_job(manager, dashboardid, viewer_userid, report_time, period, &userid, 1, &params);
-	job->client = client;
+	if (NULL != (job = rm_create_job(manager, dashboardid, viewer_userid, report_time, period, &userid, 1, &params,
+			error)))
+	{
+		job->client = client;
+		zbx_list_append(&manager->job_queue, job, NULL);
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
 
-	zbx_list_append(&manager->job_queue, job, NULL);
 	report_destroy_params(&params);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_send_test_error_result                                        *
+ *                                                                            *
+ * Purpose: send error result in reponse to test request                      *
+ *                                                                            *
+ * Parameters: client - [IN] the connected trapper                            *
+ *             error  - [IN] the error message                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_send_test_error_result(zbx_ipc_client_t *client, const char *error)
+{
+	unsigned char	*data;
+	zbx_uint32_t	size;
+
+	size = report_serialize_response(&data, FAIL, error);
+	zbx_ipc_client_send(client, ZBX_IPC_REPORTER_TEST_RESULT, data, size);
+	zbx_free(data);
 }
 
 /******************************************************************************
@@ -947,7 +1021,11 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 					rm_register_writer(&manager, client, message);
 					break;
 				case ZBX_IPC_REPORTER_TEST:
-					rm_test_report(&manager, client, message);
+					if (FAIL == rm_test_report(&manager, client, message, &error))
+					{
+						rm_send_test_error_result(client, error);
+						zbx_free(error);
+					}
 					break;
 				case ZBX_IPC_REPORTER_RESULT:
 					rm_process_result(&manager, client, message);

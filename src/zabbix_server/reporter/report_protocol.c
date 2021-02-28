@@ -51,7 +51,7 @@ static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zb
  ******************************************************************************/
 
 static zbx_uint32_t	report_serialize_test_report(unsigned char **data, zbx_uint64_t dashboardid,
-		zbx_uint64_t userid, zbx_uint64_t viewer_userid, int report_time, int period,
+		zbx_uint64_t userid, zbx_uint64_t viewer_userid, int report_time, unsigned char period,
 		const zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	data_len = 0, *len;
@@ -95,7 +95,7 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, zbx_uint6
 }
 
 void	report_deserialize_test_report(const unsigned char *data, zbx_uint64_t *dashboardid, zbx_uint64_t *userid,
-		zbx_uint64_t *viewer_userid, int *report_time, int *period, zbx_vector_ptr_pair_t *params)
+		zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period, zbx_vector_ptr_pair_t *params)
 {
 	int	params_num, i;
 
