@@ -3,26 +3,6 @@
 -- Activate "Zabbix Server" host
 UPDATE hosts SET status=0 WHERE host='Zabbix server';
 
--- valuemap
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (399,50009,'API value map for update');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (400,50009,'API value map for update with mappings');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (401,50009,'API value map delete');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (402,50009,'API value map delete2');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (403,50009,'API value map delete3');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (404,50009,'API value map delete4');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (405,50009,'API value duplicate');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9904,399,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9905,400,'One','Online');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9906,400,'Two','Offline');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9907,401,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9908,402,'Three','Other');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9909,403,'Four','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9910,404,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9911,405,'1','Unknown');
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
-
 -- host groups
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
@@ -67,9 +47,12 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (19, 'API user group delete3');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (20, 'API user group in actions');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (21, 'API user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (22, 'API user group in configuration');
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-in-one-group', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 14, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 15, 6);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 16, 7);
@@ -109,6 +92,23 @@ INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (2000
 INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (200004, 'API slide show', 10, 16, 0);
 INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200022, 'API screen for slide show', 1, 1, 1, 0);
 INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200012, 200004, 200022, 0, 0);
+
+-- valuemap
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (399,50009,'API value map for update');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (400,50009,'API value map for update with mappings');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (401,50009,'API value map delete');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (402,50009,'API value map delete2');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (403,50009,'API value map delete3');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (404,50009,'API value map delete4');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (405,50009,'API value duplicate');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9904,399,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9905,400,'One','Online');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9906,400,'Two','Offline');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9907,401,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9908,402,'Three','Other');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9909,403,'Four','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9910,404,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9911,405,'1','Unknown');
 
 -- scripts
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, 'API disabled host', 'API disabled host', 1, '');
