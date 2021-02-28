@@ -48,6 +48,8 @@ struct zbx_ipc_client
 	zbx_uint64_t		id;
 	unsigned char		state;
 
+	void			*userdata;
+
 	zbx_uint32_t		refcount;
 };
 
@@ -1804,6 +1806,16 @@ int	zbx_ipc_client_connected(zbx_ipc_client_t *client)
 zbx_uint64_t	zbx_ipc_client_id(const zbx_ipc_client_t *client)
 {
 	return client->id;
+}
+
+void	zbx_ipc_client_set_userdata(zbx_ipc_client_t *client, void *userdata)
+{
+	client->userdata = userdata;
+}
+
+void	*zbx_ipc_client_get_userdata(zbx_ipc_client_t *client)
+{
+	return client->userdata;
 }
 
 /******************************************************************************

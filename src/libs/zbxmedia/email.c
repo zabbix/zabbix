@@ -859,8 +859,8 @@ clean:
 	return ret;
 }
 
-char	*zbx_email_make_body(const char *message, unsigned char content_type, const char *attachment,
-		size_t attachment_size, const char *attachment_type, const char *attachment_name)
+char	*zbx_email_make_body(const char *message, unsigned char content_type,  const char *attachment_name,
+		const char *attachment_type, const char *attachment, size_t attachment_size)
 {
 	size_t	body_alloc = 0, body_offset = 0;
 	char	*body = NULL, *localbody, *tmp, *tmp_body, *localattachment;

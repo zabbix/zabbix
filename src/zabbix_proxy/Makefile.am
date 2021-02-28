@@ -14,7 +14,6 @@ noinst_LIBRARIES = libzbxproxy.a
 libzbxproxy_a_SOURCES = \
 	events.c \
 	proxy_lld.c \
-	proxy_alerter_protocol.c\
 	servercomms.c \
 	servercomms.h
 

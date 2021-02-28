@@ -24,7 +24,7 @@
 
 #define ZBX_MEDIA_CONTENT_TYPE_TEXT	0
 #define ZBX_MEDIA_CONTENT_TYPE_HTML	1
-#define ZBX_MEDIA_CONTENT_TYPE_MULTI	2 /* multipart/mixed message with pre-formatted message body */
+#define ZBX_MEDIA_CONTENT_TYPE_MULTI	2	/* multipart/mixed message with pre-formatted message body */
 
 extern char	*CONFIG_SOURCE_IP;
 
@@ -42,7 +42,7 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		unsigned char content_type, int timeout, char *error, size_t max_error_len);
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
 
-char	*zbx_email_make_body(const char *message, unsigned char content_type, const char *attachment,
-		size_t attachment_size, const char *attachment_type, const char *attachment_name);
+char	*zbx_email_make_body(const char *message, unsigned char content_type,  const char *attachment_name,
+		const char *attachment_type, const char *attachment, size_t attachment_size);
 
 #endif

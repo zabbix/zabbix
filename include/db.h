@@ -350,11 +350,10 @@ typedef struct
 }
 DB_EVENT;
 
-typedef struct
+typedef struct DB_MEDIATYPE
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
-	char			*description;
 	char			*smtp_server;
 	char			*smtp_helo;
 	char			*smtp_email;
@@ -363,13 +362,24 @@ typedef struct
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
+	char			*script;
+	char			*attempt_interval;
+	char			*timeout;
 	unsigned short		smtp_port;
 	unsigned char		smtp_security;
 	unsigned char		smtp_verify_peer;
 	unsigned char		smtp_verify_host;
 	unsigned char		smtp_authentication;
+	unsigned char		content_type;
+	int			maxsessions;
+	int			maxattempts;
 }
 DB_MEDIATYPE;
+
+void 	zbx_db_mediatype_clean(DB_MEDIATYPE *mt);
+void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
+		const DB_MEDIATYPE *mt);
+zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *mt);
 
 typedef struct
 {
