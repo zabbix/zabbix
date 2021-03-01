@@ -29,7 +29,7 @@ import (
 
 const (
 	APPLICATION_NAME        = "Zabbix Agent"
-	ZABBIX_REVDATE          = "18 February 2021"
+	ZABBIX_REVDATE          = "1 March 2021"
 	ZABBIX_VERSION_MAJOR    = 5
 	ZABBIX_VERSION_MINOR    = 4
 	ZABBIX_VERSION_PATCH    = 0
