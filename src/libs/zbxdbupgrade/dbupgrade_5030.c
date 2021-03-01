@@ -2300,6 +2300,16 @@ static int	DBpatch_5030063(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_5030064(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from role_rule"
+			" where name like 'api.method.%%'"
+			" and (value_str like 'screen.%%' or value_str like 'screenitem.%%')"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5030)
@@ -2370,5 +2380,6 @@ DBPATCH_ADD(5030060, 0, 1)
 DBPATCH_ADD(5030061, 0, 1)
 DBPATCH_ADD(5030062, 0, 1)
 DBPATCH_ADD(5030063, 0, 1)
+DBPATCH_ADD(5030064, 0, 1)
 
 DBPATCH_END()
