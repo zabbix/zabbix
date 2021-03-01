@@ -499,6 +499,7 @@ class CDashboardPage {
 
 		const dashboard_busy_item = {};
 
+		this._data.new_widget_placeholder.hide();
 		this._setDashboardBusy('pasteWidget', dashboard_busy_item);
 
 		// Remove old widget.
