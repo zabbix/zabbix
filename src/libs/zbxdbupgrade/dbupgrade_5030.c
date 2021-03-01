@@ -1107,10 +1107,10 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 				0 == strcmp(row[2], "dayofweek") || 0 == strcmp(row[2], "now") ||
 				0 == strcmp(row[2], "time"))
 		{
-			char	replace[FUNCTION_NAME_LEN * 4 + 1];
+			char	func_name[FUNCTION_NAME_LEN * 4 + 1];
 
-			zbx_snprintf(replace, sizeof(replace), "%s()", row[2]);
-			dbpatch_update_trigger(trigger, functionid, replace);
+			zbx_snprintf(func_name, sizeof(func_name), "%s()", row[2]);
+			dbpatch_update_trigger(trigger, functionid, func_name);
 
 			func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
 			func->hostid = hostid;
