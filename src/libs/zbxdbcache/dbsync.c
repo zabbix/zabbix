@@ -2160,7 +2160,7 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
 	if (FAIL == dbsync_compare_serialized_expression(dbrow[16], trigger->expression_bin))
 		return FAIL;
 
-	if (TRIGGER_RECOVERY_MODE_EXPRESSION == atoi(dbrow[10]) &&
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == atoi(dbrow[10]) &&
 			FAIL == dbsync_compare_serialized_expression(dbrow[17], trigger->recovery_expression_bin))
 	{
 		return FAIL;
