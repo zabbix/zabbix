@@ -27,9 +27,10 @@ require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
  */
 class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 
-	const DISCOVERY_RULE_ID = 33800;			// 'Simple form test host' => 'testFormDiscoveryRule'
-	const TEMPL_DISCOVERY_RULE_ID = 15011;	// 'testInheritanceDiscoveryRule'
-	const HOST_DISCOVERY_RULE_ID	 = 15016;	// 'Template inheritance test host -> testInheritanceDiscoveryRule'
+	const DISCOVERY_RULE_ID			= 33800;	// 'Simple form test host' => 'testFormDiscoveryRule'
+	const TEMPL_DISCOVERY_RULE_ID	= 15011;	// 'testInheritanceDiscoveryRule'
+	const HOST_DISCOVERY_RULE_ID	= 15016;	// 'Template inheritance test host -> testInheritanceDiscoveryRule'
+	const INHERITED_ITEM_PROTOTYPE	= 15096;	// 'testInheritanceDiscoveryRule -> testInheritanceItemPrototypePreprocessing'
 
 	public $link = 'disc_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID;
 	public $ready_link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&itemid=';
@@ -122,5 +123,11 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 		$host_link = 'disc_prototypes.php?parent_discoveryid='.self::HOST_DISCOVERY_RULE_ID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
+	}
+
+	public function testFormPreprocessingItemPrototype_CloneTemplatedItemPrototype() {
+		$link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::HOST_DISCOVERY_RULE_ID.
+				'&itemid='.self::INHERITED_ITEM_PROTOTYPE;
+		$this->checkCloneTemplatedItem($link, 'Item prototype');
 	}
 }

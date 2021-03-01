@@ -19,14 +19,16 @@
 **/
 
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup items
  */
 class testFormPreprocessingItem extends testFormPreprocessing {
-	const HOST_ID = 40001;							// 'Simple form test host'
+	const HOST_ID					= 40001;		// 'Simple form test host'
 	const INHERITANCE_TEMPLATE_ID	= 15000;		// 'Inheritance test template'
 	const INHERITANCE_HOST_ID		= 15001;		// 'Template inheritance test host'
+	const INHERITED_ITEM_ID			= 15094;		// 'testInheritanceItemPreprocessing'
 
 	public $link = 'items.php?filter_set=1&filter_hostids[0]='.self::HOST_ID;
 	public $ready_link = 'items.php?form=update&hostid='.self::HOST_ID.'&itemid=';
@@ -35,6 +37,17 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	public $fail_message = 'Cannot add item';
 
 	use PreprocessingTrait;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
 
 	public function getItemPreprocessingPrometheusData() {
 		return array_merge($this->getPrometheusData(), [
@@ -120,11 +133,8 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 			'Target' => $target_hostname
 		]);
 		$mass_update_form->submit();
-
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Item copied', $message->getTitle());
+		$this->assertMessage(TEST_GOOD, 'Item copied');
 
 		// Open original item form and get steps text.
 		$this->page->open('items.php?form=update&hostid='.$original_hostid.'&itemid='.$itemid);
@@ -163,5 +173,10 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$host_link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_HOST_ID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
+	}
+
+	public function testFormPreprocessingItem_CloneTemplatedItem() {
+		$link = 'items.php?form=update&hostid='.self::INHERITANCE_HOST_ID.'&itemid='.self::INHERITED_ITEM_ID;
+		$this->checkCloneTemplatedItem($link, 'Item');
 	}
 }

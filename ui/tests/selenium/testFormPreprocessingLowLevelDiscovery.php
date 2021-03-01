@@ -28,6 +28,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	const HOST_ID = 40001;
 	const INHERITANCE_TEMPLATE_ID	= 15000;		// 'Inheritance test template'
 	const INHERITANCE_HOST_ID		= 15001;		// 'Template inheritance test host'
+	const INHERITANCE_LLD_ID		= 15016;		// 'Template inheritance test host' -> testInheritanceDiscoveryRule
 
 	public $link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID;
 	public $ready_link = 'host_discovery.php?form=update&itemid=';
@@ -225,5 +226,10 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 		$host_link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::INHERITANCE_HOST_ID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
+	}
+
+	public function testFormPreprocessingLowLevelDiscovery_CloneTemplatedLowLevelDiscovery() {
+		$link = 'host_discovery.php?form=update&itemid='.self::INHERITANCE_LLD_ID;
+		$this->checkCloneTemplatedItem($link, 'Discovery rule');
 	}
 }

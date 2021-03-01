@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for Preprocessing tests.
@@ -35,6 +36,17 @@ abstract class testFormPreprocessing extends CWebTest {
 	public $success_message;
 	public $button;
 	public $fail_message;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
 
 	/*
 	 * Preprocessing validation data for Item and Item prototype.
@@ -2383,6 +2395,53 @@ abstract class testFormPreprocessing extends CWebTest {
 					$this->assertFalse($step['on_fail']->isSelected());
 					break;
 			}
+		}
+	}
+
+	/**
+	 * Check cloning of inherited preprocessing steps in items, prototypes or LLD rules.
+	 */
+	protected function checkCloneTemplatedItem($link, $item) {
+		$cloned_name = 'Cloned_testInheritancePreprocessingSteps';
+
+		// Open original item on host and get its' preprocessing steps.
+		$this->page->login()->open($link);
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		// Check that right templated item is opened.
+		$label = ($item === 'Discovery rule') ? 'Parent discovery rules' : 'Parent items';
+		$this->assertEquals('Inheritance test template', $form->getField($label)->getText());
+
+		$form->selectTab('Preprocessing');
+		$original_steps = $this->listPreprocessingSteps();
+		$form->selectTab($item);
+
+		// Clone item.
+		$form->query('button:Clone')->waitUntilPresent()->one()->click();
+		$form->invalidate();
+		$form->fill([
+			'Name'	=> $cloned_name,
+			'Key' => 'cloned-preprocessing'
+		]);
+
+		$this->selectPreprocessingAndCheckSteps($form, $original_steps);
+		$form->submit();
+		$message = ($item === 'Discovery rule') ?  $item.' created' :  $item.' added';
+		$this->assertMessage(TEST_GOOD, $message);
+
+		// Open cloned item and check preprocessing steps in saved form.
+		$this->query('link', $cloned_name)->one()->click();
+		$form->invalidate();
+		$this->selectPreprocessingAndCheckSteps($form, $original_steps);
+	}
+
+	private function selectPreprocessingAndCheckSteps($form, $original_steps) {
+		$form->selectTab('Preprocessing');
+		$this->assertEquals($original_steps, $this->listPreprocessingSteps());
+
+		// Check preprocessing steps in unsaved form.
+		foreach (array_keys($this->listPreprocessingSteps()) as $i) {
+			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
+			$this->assertNull($step->getAttribute('readonly'));
 		}
 	}
 }
