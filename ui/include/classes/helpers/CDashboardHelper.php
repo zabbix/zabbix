@@ -407,7 +407,7 @@ class CDashboardHelper {
 
 			if ($widget_errors = $widget['form']->validate()) {
 				if ($widget['name'] === '') {
-					$context = $this->hasInput('templateid')
+					$context = $templateid !== null
 						? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 						: CWidgetConfig::CONTEXT_DASHBOARD;
 

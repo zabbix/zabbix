@@ -1345,10 +1345,10 @@ jQuery(function($) {
 										mapid_selector = '',
 										prev_map_selector = '';
 
-									mapid_selector = '.tree-item[data-sysmapid=' + data[0]['submapid'] + ']';
+									mapid_selector = '.tree-item[data-sysmapid=' + data['submapid'] + ']';
 
-									if (data[0]['previous_maps'].length) {
-										var prev_maps = data[0]['previous_maps'].split(','),
+									if (data['previous_maps'].length) {
+										var prev_maps = data['previous_maps'].split(','),
 											prev_maps = prev_maps.length
 												? prev_maps[prev_maps.length-1]
 												: null;
@@ -1378,7 +1378,7 @@ jQuery(function($) {
 
 									if (prev_map_selector.length && mapid_selector.length) {
 										selector = prev_map_selector + ' > .tree-list > ' + mapid_selector;
-										if (!data[0]['moving_upward']) {
+										if (!data['moving_upward']) {
 											selector = selector + ':first';
 										}
 										item = $(selector.trim(selector), $this);

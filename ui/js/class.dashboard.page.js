@@ -709,19 +709,15 @@ class CDashboardPage {
 	 *
 	 * @param {object} widget     Data origin widget
 	 * @param {string} data_name  String to identify data shared
+	 * @param {object} data       Shared data
 	 *
 	 * @returns {boolean}  Indicates either there was linked widget that was related to data origin widget
 	 */
-	widgetDataShare(widget, data_name) {
-		const args = Array.prototype.slice.call(arguments, 2);
+	widgetDataShare(widget, data_name, data) {
 		const uniqueid = widget.uniqueid;
 
 		let ret = true;
 		let index = -1;
-
-		if (!args.length) {
-			return false;
-		}
 
 		if (typeof this._data.widget_relations.relations[widget.uniqueid] === 'undefined'
 			|| this._data.widget_relations.relations[widget.uniqueid].length === 0) {
@@ -742,13 +738,13 @@ class CDashboardPage {
 		if (index === -1) {
 			this._data.data_buffer[uniqueid].push({
 				data_name: data_name,
-				args: args,
+				data: data,
 				old: []
 			});
 		}
 		else {
-			if (this._data.data_buffer[uniqueid][index].args !== args) {
-				this._data.data_buffer[uniqueid][index].args = args;
+			if (this._data.data_buffer[uniqueid][index].data !== data) {
+				this._data.data_buffer[uniqueid][index].data = data;
 				this._data.data_buffer[uniqueid][index].old = [];
 			}
 		}
@@ -783,7 +779,7 @@ class CDashboardPage {
 					if (widget.length) {
 						for (const task of this._data.widget_relations.tasks[dest_uid]) {
 							if (task.data_name === buffer_data.data_name) {
-								task.callback.apply(this, [widget[0], buffer_data.args]);
+								task.callback.apply(this, [widget[0], buffer_data.data]);
 							}
 						}
 

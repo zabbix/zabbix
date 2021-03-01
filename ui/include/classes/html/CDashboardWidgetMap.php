@@ -154,7 +154,7 @@ class CDashboardWidgetMap extends CDiv {
 					'data_name: "selected_mapid",'.
 					'callback: function(widget, data) {'.
 						'ZABBIX.Dashboard.setWidgetStorageValue('.
-							'widget.uniqueid, \'current_sysmapid\', data[0].mapid'.
+							'widget.uniqueid, \'current_sysmapid\', data.mapid'.
 						');'.
 						'ZABBIX.Dashboard.setWidgetStorageValue(widget.uniqueid, \'previous_maps\', "");'.
 						'ZABBIX.Dashboard.refreshWidget(widget.widgetid);'.
