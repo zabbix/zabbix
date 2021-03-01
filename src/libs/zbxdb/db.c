@@ -97,7 +97,7 @@ static ub4	OCI_DBserver_status(void);
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
-static int			ZBX_PG_SVERSION = 0;
+static int			ZBX_PG_SVERSION = 0, ZBX_TSDB_VERSION = -1;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
@@ -2439,7 +2439,7 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
 	return zbx_strlen_utf8_nchars(text, maxlen);
 }
 
-#ifdef HAVE_POSTGRESQL
+#if defined(HAVE_POSTGRESQL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbms_get_version                                             *
@@ -2447,7 +2447,7 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
  * Purpose: returns DBMS version as integer: MMmmuu                           *
  *          M = major version part                                            *
  *          m = minor version part                                            *
- *          u = micro version part                                            *
+ *          u = patch version part                                            *
  *                                                                            *
  * Example: 1.2.34 version will be returned as 10234                          *
  *                                                                            *
@@ -2458,4 +2458,69 @@ int	zbx_dbms_get_version(void)
 {
 	return ZBX_PG_SVERSION;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tsdb_get_version                                             *
+ *                                                                            *
+ * Purpose: returns TimescaleDB (TSDB) version as integer: MMmmuu             *
+ *          M = major version part                                            *
+ *          m = minor version part                                            *
+ *          u = patch version part                                            *
+ *                                                                            *
+ * Example: TSDB 1.5.1 version will be returned as 10501                      *
+ *                                                                            *
+ * Return value: TSDB version or 0 if unknown or the extension not installed  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tsdb_get_version(void)
+{
+	int		ver, major, minor, patch;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (-1 == ZBX_TSDB_VERSION)
+	{
+		/* catalog pg_extension not available */
+		if (90001 > ZBX_PG_SVERSION)
+		{
+			ver = ZBX_TSDB_VERSION = 0;
+			goto out;
+		}
+
+		result = zbx_db_select("select extversion from pg_extension where extname = 'timescaledb'");
+
+		/* database down, can re-query in the next call */
+		if ((DB_RESULT)ZBX_DB_DOWN == result)
+		{
+			ver = 0;
+			goto out;
+		}
+
+		/* extension is not installed */
+		if (NULL == result)
+		{
+			ver = ZBX_TSDB_VERSION = 0;
+			goto out;
+		}
+
+		if (NULL != (row = zbx_db_fetch(result)) &&
+				3 == sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch))
+		{
+			ver = major * 10000;
+			ver += minor * 100;
+			ver += patch;
+			ZBX_TSDB_VERSION = ver;
+		}
+		else
+			ver = ZBX_TSDB_VERSION = 0;
+
+		DBfree_result(result);
+	}
+	else
+		ver = ZBX_TSDB_VERSION;
+out:
+	return ver;
+}
+
 #endif

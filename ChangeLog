@@ -1,3 +1,22 @@
+Changes for 5.0.10rc1
+
+New features:
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
+
+Bug fixes:
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9
+
+5.0.9rc2 was released as 5.0.9 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.9rc2
 
 Bug fixes:
@@ -1965,6 +1984,19 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.30rc1
+
+New features:
+
+Bug fixes:
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29
+
+4.0.29rc1 was released as 4.0.29 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.29rc1
@@ -5040,8 +5072,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.32rc1
-
-New features:
 
 Bug fixes:
 ...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
