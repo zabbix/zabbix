@@ -32,7 +32,7 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-extern char *CONFIG_WEBSERVICE_URL;
+extern char	*CONFIG_WEBSERVICE_URL;
 
 typedef struct
 {
@@ -115,8 +115,8 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 	zbx_json_close(&j);
 
 	zbx_json_addobject(&j, ZBX_PROTO_TAG_PARAMETERS);
-	zbx_json_addstring(&j, "width", width, ZBX_JSON_TYPE_INT);
-	zbx_json_addstring(&j, "height", height, ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(&j, "width", width, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, "height", height, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&j);
 
 	if (NULL == (curl = curl_easy_init()))
@@ -149,7 +149,7 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpret)))
 	{
-		*error = zbx_dsprintf(*error, "could not obtain web service resonse code: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "could not obtain web service response code: %s", curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -157,10 +157,23 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 	{
 		struct zbx_json_parse	jp;
 
-		zbx_json_open(response.data, &jp);
+		if (response.offset == response.alloc)
+			response.data = zbx_realloc(response.data, response.alloc + 1);
 
-		*error = response.data;
-		response.data = NULL;
+		response.data[response.offset] = '\0';
+
+		if (SUCCEED != zbx_json_open(response.data, &jp))
+		{
+			*error = response.data;
+			response.data = NULL;
+		}
+		else
+		{
+			size_t	*error_alloc = NULL;
+
+			zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_DETAIL, error, &error_alloc, NULL);
+		}
+
 		goto out;
 	}
 
