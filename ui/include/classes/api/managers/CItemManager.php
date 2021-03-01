@@ -193,17 +193,6 @@ class CItemManager {
 			CTriggerPrototypeManager::delete($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
 
-		DB::delete('screens_items', [
-			'resourceid' => $del_itemids,
-			'resourcetype' => [SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_CLOCK]
-		]);
-
-		DB::delete('profiles', [
-			'idx' => 'web.favorite.graphids',
-			'source' => 'itemid',
-			'value_id' => $del_itemids
-		]);
-
 		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
 			'history', 'events'
 		];

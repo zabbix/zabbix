@@ -143,12 +143,6 @@ class CItemPrototypeManager {
 			CTriggerPrototypeManager::delete($del_triggerids);
 		}
 
-		// Screen items.
-		DB::delete('screens_items', [
-			'resourceid' => $del_itemids,
-			'resourcetype' => [SCREEN_RESOURCE_LLD_SIMPLE_GRAPH]
-		]);
-
 		// Unlink application prototypes and delete those who are no longer linked to any other item prototypes.
 		$del_application_prototypeids = DBfetchColumn(DBselect(
 			'SELECT DISTINCT iap.application_prototypeid'.
