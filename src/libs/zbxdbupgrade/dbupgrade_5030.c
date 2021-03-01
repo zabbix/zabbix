@@ -1679,50 +1679,62 @@ out:
 
 static int	DBpatch_5030079(void)
 {
-	return DBdrop_foreign_key("httptest", 1);
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from role_rule where name like 'api.method.%%'"
+			" and value_str like 'application.%%'"))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_5030080(void)
 {
-	return DBdrop_index("httptest", "httptest_1");
+	return DBdrop_foreign_key("httptest", 1);
 }
 
 static int	DBpatch_5030081(void)
 {
-	return DBdrop_field("httptest", "applicationid");
+	return DBdrop_index("httptest", "httptest_1");
 }
 
 static int	DBpatch_5030082(void)
 {
-	return DBdrop_field("sysmaps_elements", "application");
+	return DBdrop_field("httptest", "applicationid");
 }
 
 static int	DBpatch_5030083(void)
 {
-	return DBdrop_table("application_discovery");
+	return DBdrop_field("sysmaps_elements", "application");
 }
 
 static int	DBpatch_5030084(void)
 {
-	return DBdrop_table("item_application_prototype");
+	return DBdrop_table("application_discovery");
 }
 
 static int	DBpatch_5030085(void)
 {
-	return DBdrop_table("application_prototype");
+	return DBdrop_table("item_application_prototype");
 }
 
 static int	DBpatch_5030086(void)
 {
-	return DBdrop_table("application_template");
+	return DBdrop_table("application_prototype");
 }
 
 static int	DBpatch_5030087(void)
 {
-	return DBdrop_table("items_applications");
+	return DBdrop_table("application_template");
 }
 
 static int	DBpatch_5030088(void)
+{
+	return DBdrop_table("items_applications");
+}
+
+static int	DBpatch_5030089(void)
 {
 	return DBdrop_table("applications");
 }
@@ -1821,5 +1833,6 @@ DBPATCH_ADD(5030085, 0, 1)
 DBPATCH_ADD(5030086, 0, 1)
 DBPATCH_ADD(5030087, 0, 1)
 DBPATCH_ADD(5030088, 0, 1)
+DBPATCH_ADD(5030089, 0, 1)
 
 DBPATCH_END()
