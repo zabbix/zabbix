@@ -23,6 +23,9 @@
 #include "zbxserver.h"
 #include "eval.h"
 
+/* exit code in addition to SUCCEED/FAIL */
+#define UNKNOWN		1
+
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_op_unary                                            *
