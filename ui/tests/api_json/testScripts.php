@@ -58,7 +58,10 @@ class testScripts extends CAPITest {
 					'type' => 999999,
 					'command' => 'reboot server'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.', '.ZBX_SCRIPT_TYPE_IPMI.', '.ZBX_SCRIPT_TYPE_SSH.', '.ZBX_SCRIPT_TYPE_TELNET.', '.ZBX_SCRIPT_TYPE_WEBHOOK.'.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK
+					]).'.'
 			],
 			// Check script command.
 			'Test missing command' => [
@@ -149,7 +152,8 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'scope' => 0
 				],
-				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.ZBX_SCRIPT_SCOPE_ACTION.', '.ZBX_SCRIPT_SCOPE_HOST.', '.ZBX_SCRIPT_SCOPE_EVENT.'.'
+				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
 			],
 			// Check script menu path.
 			'Test invalid menu_path for host scope' => [
@@ -259,7 +263,8 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
 			],
 			'Test invalid host_access for event scope (empty)' => [
 				'script' => [
@@ -289,7 +294,8 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
 			],
 			// Check script user group.
 			'Test unexpected usrgrpid for action scope (default, string)' => [
@@ -465,7 +471,10 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of '.ZBX_SCRIPT_EXECUTE_ON_AGENT.', '.ZBX_SCRIPT_EXECUTE_ON_SERVER.', '.ZBX_SCRIPT_EXECUTE_ON_PROXY.'.'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
+						ZBX_SCRIPT_EXECUTE_ON_PROXY
+					]).'.'
 			],
 			'Test unexpected execute_on field for IPMI type (empty)' => [
 				'script' => [
@@ -530,7 +539,8 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'port' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
+				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.
+					ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
 			],
 			'Test unexpected port field for custom script type (empty)' => [
 				'script' => [
@@ -594,7 +604,8 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'authtype' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.ITEM_AUTHTYPE_PASSWORD.', '.ITEM_AUTHTYPE_PUBLICKEY.'.'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
+					implode(', ', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]).'.'
 			],
 			'Test unexpected authtype field for custom script type (empty)' => [
 				'script' => [
@@ -1224,7 +1235,8 @@ class testScripts extends CAPITest {
 						'type' => ZBX_SCRIPT_TYPE_SSH,
 						'command' => 'reboot server',
 						'scope' => ZBX_SCRIPT_SCOPE_HOST,
-						'description' => 'SSH host script for Zabbix administrators and all host groups with write permissions',
+						'description' =>
+							'SSH host script for Zabbix administrators and all host groups with write permissions',
 						'usrgrpid' => 7,
 						'groupid' => 0,
 						'host_access' => PERM_READ_WRITE,
@@ -1634,8 +1646,6 @@ class testScripts extends CAPITest {
 				}
 			}
 		}
-
-		$this->markTestIncomplete('This test has not been fully implemented yet.');
 	}
 
 	/**
@@ -2022,7 +2032,10 @@ class testScripts extends CAPITest {
 					'scriptid' => 15,
 					'type' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.', '.ZBX_SCRIPT_TYPE_IPMI.', '.ZBX_SCRIPT_TYPE_SSH.', '.ZBX_SCRIPT_TYPE_TELNET.', '.ZBX_SCRIPT_TYPE_WEBHOOK.'.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK
+					]).'.'
 			],
 			// Check script scope.
 			'Test invalid scope (empty)' => [
@@ -2044,7 +2057,8 @@ class testScripts extends CAPITest {
 					'scriptid' => 15,
 					'scope' => 0
 				],
-				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.ZBX_SCRIPT_SCOPE_ACTION.', '.ZBX_SCRIPT_SCOPE_HOST.', '.ZBX_SCRIPT_SCOPE_EVENT.'.'
+				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
 			],
 			'Test scope change assigned to action' => [
 				'script' => [
@@ -2149,7 +2163,8 @@ class testScripts extends CAPITest {
 					'scriptid' => 16,
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
 			],
 			'Test invalid host_access for host scope (change of scope)' => [
 				'script' => [
@@ -2157,7 +2172,8 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
 			],
 			'Test invalid host_access for event scope (empty)' => [
 				'script' => [
@@ -2178,7 +2194,8 @@ class testScripts extends CAPITest {
 					'scriptid' => 17,
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
 			],
 			'Test invalid host_access for event scope (change of scope)' => [
 				'script' => [
@@ -2186,7 +2203,8 @@ class testScripts extends CAPITest {
 					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 					'host_access' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
 			],
 			// Check script user group.
 			'Test unexpected usrgrpid for action scope (string)' => [
@@ -2336,7 +2354,10 @@ class testScripts extends CAPITest {
 					'scriptid' => 15,
 					'execute_on' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of '.ZBX_SCRIPT_EXECUTE_ON_AGENT.', '.ZBX_SCRIPT_EXECUTE_ON_SERVER.', '.ZBX_SCRIPT_EXECUTE_ON_PROXY.'.'
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
+						ZBX_SCRIPT_EXECUTE_ON_PROXY
+					]).'.'
 			],
 			'Test unexpected execute_on field for IPMI type (empty)' => [
 				'script' => [
@@ -2387,7 +2408,8 @@ class testScripts extends CAPITest {
 					'scriptid' => 21,
 					'port' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
+				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.
+					ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
 			],
 			'Test unexpected port field for custom script type (empty)' => [
 				'script' => [
@@ -2437,7 +2459,8 @@ class testScripts extends CAPITest {
 					'scriptid' => 21,
 					'authtype' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.ITEM_AUTHTYPE_PASSWORD.', '.ITEM_AUTHTYPE_PUBLICKEY.'.'
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
+					implode(', ', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]).'.'
 			],
 			'Test unexpected authtype field for custom script type (empty)' => [
 				'script' => [
