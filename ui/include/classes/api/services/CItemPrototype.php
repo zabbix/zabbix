@@ -578,9 +578,11 @@ class CItemPrototype extends CItemGeneral {
 				}
 			}
 
-			$item['tags'] = array_map(function ($tag) {
-				return $tag + ['value' => ''];
-			}, $item['tags']);
+			if (array_key_exists('tags', $item)) {
+				$item['tags'] = array_map(function ($tag) {
+					return $tag + ['value' => ''];
+				}, $item['tags']);
+			}
 		}
 		unset($item);
 
