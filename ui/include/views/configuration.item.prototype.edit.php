@@ -728,38 +728,32 @@ $form_list
 		'row_logtimefmt'
 	);
 
-// Append valuemap to form list.
-if ($readonly) {
-	if ($data['valuemaps']) {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => $data['valuemaps']]];
-	}
-	else {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => _('As is')]];
-	}
-}
-else {
-	$valuemaps = $data['valuemaps'];
-	array_unshift($valuemaps, ['valuemapid' => 0, 'name' => _('As is')]);
-}
-
-$valuemap_select = (new CSelect('valuemapid'))
-	->setId('valuemapid')
-	->setValue($data['valuemapid'])
-	->setFocusableElementId('label-valuemap')
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setReadonly($readonly);
-
-foreach ($valuemaps as $valuemap) {
-	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
+if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	$form_list->addRow(new CLabel(_('Value mapping'), 'valuemapid_ms'),
+		(new CMultiSelect([
+			'name' => 'valuemapid',
+			'object_name' => 'valuemaps',
+			'disabled' => $readonly,
+			'multiple' => false,
+			'data' => $data['valuemap'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'valuemapid',
+					'hostids' => [$data['hostid']],
+					'context' => $data['context'],
+					'editable' => true
+				]
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'row_valuemap'
+	);
 }
 
 $form_list
-	->addRow(new CLabel(_('Show value'), 'label-valuemap'), [$valuemap_select, SPACE,
-		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'valuemap.list')
-			->getUrl()
-		))->setAttribute('target', '_blank')], 'row_valuemap'
-	)
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		(new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))

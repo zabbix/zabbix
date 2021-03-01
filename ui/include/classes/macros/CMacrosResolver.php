@@ -136,7 +136,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		if ($this->isTypeAvailable('user_data')) {
-			$types['macros']['user_data'] = ['{USER.ALIAS}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'];
+			// {USER.ALIAS} is deprecated in version 5.4.
+			$types['macros']['user_data'] = ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}',
+				'{USER.SURNAME}'
+			];
 		}
 
 		if ($this->isTypeAvailable('user')) {
@@ -177,8 +180,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						&& $matched_macros['macros']['user_data']) {
 					foreach ($matched_macros['macros']['user_data'] as $macro) {
 						switch ($macro) {
-							case '{USER.ALIAS}':
-								$macros[$hostid][$macro] = CWebUser::$data['alias'];
+							case '{USER.ALIAS}': // Deprecated in version 5.4.
+							case '{USER.USERNAME}':
+								$macros[$hostid][$macro] = CWebUser::$data['username'];
 								break;
 
 							case '{USER.FULLNAME}':
@@ -191,8 +195,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								}
 
 								$macros[$hostid][$macro] = $fullname
-									? implode(' ', array_merge($fullname, ['('.CWebUser::$data['alias'].')']))
-									: CWebUser::$data['alias'];
+									? implode(' ', array_merge($fullname, ['('.CWebUser::$data['username'].')']))
+									: CWebUser::$data['username'];
 								break;
 
 							case '{USER.NAME}':
@@ -1297,6 +1301,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				' AND ('.join(' OR ', $queryParts).')'
 		), 'itemid');
 
+		foreach ($matches['functions'] as $function) {
+			if ($function[0] === 'last') {
+				$items = self::getItemsValueMaps($items);
+				break;
+			}
+		}
+
 		// Get items for which user has permission.
 		$allowedItems = API::Item()->get([
 			'itemids' => array_keys($items),
@@ -1906,15 +1917,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$itemHost = $expressionData->expressions[0]['host'];
 				$key = $expressionData->expressions[0]['item'];
 				$function = $expressionData->expressions[0]['functionName'];
-
-				$item = API::Item()->get([
-					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'lastvalue', 'lastclock'],
+				$options = [
+					'output' => ['itemid', 'value_type', 'units', 'lastvalue', 'lastclock'],
 					'webitems' => true,
 					'filter' => [
 						'host' => $itemHost,
 						'key_' => $key
 					]
-				]);
+				];
+
+				if ($function === 'last') {
+					$options['selectValueMap'] = ['mappings'];
+				}
+
+				$item = API::Item()->get($options);
 
 				$item = reset($item);
 

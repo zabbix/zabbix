@@ -366,7 +366,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestInputType('history', '54d');
 		$this->zbxTestInputType('trends', '55d');
 		$this->zbxTestInputType('description', 'description');
-		$this->zbxTestDropdownSelect('valuemapid', 'APC Battery Status');
+		$this->query('id:item-prototype-form')->asForm()->one()->getField('Value mapping')->fill('Template value mapping');
 		$this->zbxTestCheckboxSelect('status', false);
 		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
@@ -397,7 +397,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('trends', '55d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
-		$this->zbxTestDropdownAssertSelected('valuemapid', 'APC Battery Status');
+		$this->assertEquals(['Template value mapping'], $this->query('id:item-prototype-form')->asForm()->one()->
+				getField('Value mapping')->getValue());
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:07Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -898,6 +898,16 @@ zabbix_export:
           macro: '{$SQUID.SNMP.PORT}'
           value: '3401'
           description: 'snmp_port configured in squid.conf (Default: 3401)'
+      valuemaps:
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '{Squid SNMP:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}'
@@ -1110,13 +1120,3 @@ zabbix_export:
           item:
             host: 'Squid SNMP'
             key: 'squid[cacheDnsSvcTime.60]'
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-28T10:57:12Z'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -2773,6 +2773,25 @@ zabbix_export:
                   value:
                     name: 'Vault: Token lookup'
                     host: 'HashiCorp Vault by HTTP'
+      valuemaps:
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          name: 'Vault flag'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'False'
+            -
+              value: '1'
+              newvalue: 'True'
   triggers:
     -
       expression: '{HashiCorp Vault by HTTP:vault.metrics.process.open.fds.min(5m)}/{HashiCorp Vault by HTTP:vault.metrics.process.max.fds.last()}*100>{$VAULT.OPEN.FDS.MAX.WARN}'
@@ -2879,22 +2898,3 @@ zabbix_export:
           item:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.token
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
-    -
-      name: 'Vault flag'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'False'
-        -
-          value: '1'
-          newvalue: 'True'

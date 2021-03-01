@@ -142,7 +142,7 @@ class CControllerTokenList extends CController {
 
 		$users = $userids
 			? API::User()->get([
-				'output' => ['alias', 'name', 'surname'],
+				'output' => ['username', 'name', 'surname'],
 				'userids' => array_keys($userids),
 				'preservekeys' => true
 			])
