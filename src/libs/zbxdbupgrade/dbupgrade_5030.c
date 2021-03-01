@@ -1152,7 +1152,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	/* the trigger is still linked to the same hosts                              */
 	if (0 != common_functions.values_num)
 	{
-		int	i, extended = 0;
+		int	extended = 0;
 
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
