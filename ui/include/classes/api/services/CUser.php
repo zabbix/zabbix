@@ -1198,21 +1198,6 @@ class CUser extends CApiService {
 			);
 		}
 
-		// Check if deleted users have a screen.
-		$db_screens = API::Screen()->get([
-			'output' => ['name', 'userid'],
-			'userids' => $userids,
-			'limit' => 1
-		]);
-
-		if ($db_screens) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('User "%1$s" is screen "%2$s" owner.', $db_users[$db_screens[0]['userid']]['alias'],
-					$db_screens[0]['name']
-				)
-			);
-		}
-
 		// Check if deleted users have a slide show.
 		$db_slideshows = DB::select('slideshows', [
 			'output' => ['name', 'userid'],
