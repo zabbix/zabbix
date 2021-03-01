@@ -91,6 +91,7 @@ sass/stylesheets/themes
 sass/wide-table.html
 sbin/zabbix_agent2
 sbin/zabbix_agentd
+sbin/zabbix_web_service
 sbin/zabbix_java/bin/zabbix-java-gateway-4.4.0alpha1.jar
 sbin/zabbix_java/lib/android-json-4.3_r3.1.jar
 sbin/zabbix_java/lib/logback-classic-0.9.27.jar

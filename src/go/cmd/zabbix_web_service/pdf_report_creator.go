@@ -1,0 +1,142 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/chromedp/cdproto/emulation"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/cdproto/page"
+	"github.com/chromedp/chromedp"
+	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/zbxerr"
+)
+
+type requestBody struct {
+	URL        string            `json:"url"`
+	Header     map[string]string `json:"headers"`
+	Parameters map[string]string `json:"parameters"`
+}
+
+func newRequestBody() *requestBody {
+	return &requestBody{"", make(map[string]string), make(map[string]string)}
+}
+
+func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
+	log.Infof("%s", errMsg)
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(map[string]string{"detail": errMsg})
+}
+
+func (h *handler) report(w http.ResponseWriter, r *http.Request) {
+	{
+		host, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			logAndWriteError(w, fmt.Sprintf("Cannot remove port from host for incoming ip %s.", err.Error()), http.StatusInternalServerError)
+			return
+		}
+
+		if !h.allowedPeers.CheckPeer(net.ParseIP(host)) {
+			logAndWriteError(w, fmt.Sprintf("Cannot accept incoming connection for peer: %s.", r.RemoteAddr), http.StatusInternalServerError)
+			return
+		}
+
+		if r.Method != http.MethodPost {
+			logAndWriteError(w, "Method is not supported.", http.StatusMethodNotAllowed)
+			return
+		}
+
+		if r.Header.Get("Content-Type") != "application/json" {
+			logAndWriteError(w, "Content Type is not application/json.", http.StatusMethodNotAllowed)
+			return
+		}
+
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			logAndWriteError(w, "Can not read body data.", http.StatusInternalServerError)
+			return
+		}
+
+		req := newRequestBody()
+		if err = json.Unmarshal(b, &req); err != nil {
+			logAndWriteError(w, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err).Error(), http.StatusInternalServerError)
+			return
+		}
+
+		ctx, cancel := chromedp.NewContext(context.Background())
+		defer cancel()
+
+		width, err := strconv.ParseInt(req.Parameters["width"], 10, 64)
+		if err != nil {
+			logAndWriteError(w, zbxerr.ErrorInvalidParams.Wrap(err).Error(), http.StatusBadRequest)
+			return
+		}
+
+		height, err := strconv.ParseInt(req.Parameters["height"], 10, 64)
+		if err != nil {
+			logAndWriteError(w, zbxerr.ErrorInvalidParams.Wrap(err).Error(), http.StatusBadRequest)
+			return
+		}
+
+		var buf []byte
+
+		if err = chromedp.Run(ctx, chromedp.Tasks{
+			network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
+			chromedp.Navigate(req.URL),
+			emulation.SetDeviceMetricsOverride(width, height, 1, false),
+			chromedp.WaitReady("body"),
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
+				defer cancel()
+				var err error
+				buf, _, err = page.PrintToPDF().
+					WithPrintBackground(true).
+					WithPreferCSSPageSize(true).
+					WithPaperWidth(pixels2inches(width)).
+					WithPaperHeight(pixels2inches(height)).
+					Do(timeoutContext)
+				return err
+			}),
+		}); err != nil {
+			logAndWriteError(w, zbxerr.ErrorCannotFetchData.Wrap(err).Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-type", "application/pdf")
+		w.Write(buf)
+
+		return
+	}
+
+}
+
+func pixels2inches(value int64) float64 {
+	return float64(value) * 0.0104166667
+}
