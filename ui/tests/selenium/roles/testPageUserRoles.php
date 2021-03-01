@@ -133,18 +133,54 @@ class testPageUserRoles extends CWebTest {
 		$this->assertEquals($roles_count-1, $selected);
 		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
 
-		// Check that number displayed near Users and # columns are equal.
-		foreach ($db_roles as $role) {
-			$users_count = $table->findRow('Name', $role['name'])->getColumn('Users')->query('xpath:./a[contains(@class, "link-alt")]')->count();
-			$this->assertEquals($users_count, CDBHelper::getCount('SELECT * FROM users WHERE roleid='.zbx_dbstr($role['roleid'])));
-			if ($users_count !== 0) {
-				$users_amount = $table->findRow('Name', $role['name'])->getColumn('#')->query('xpath:./sup')->one()->getText();
-				$this->assertEquals($users_count, intval($users_amount));
-			}
-			else {
-				$this->assertFalse($table->query('xpath://td/a[text()="Users"]/sup')->one(false)->isValid());
-			}
-		}
+		$table_data = [
+			[
+				'Name' => '$^&#%*',
+				'#' => 'Users',
+				'Users' => ''
+			],
+			[
+				'Name' => 'Admin role',
+				'#' => 'Users 2',
+				'Users' => 'admin-zabbix, http-auth-admin'
+			],
+			[
+				'Name' => 'Guest role',
+				'#' => 'Users 1',
+				'Users' => 'guest'
+			],
+			[
+				'Name' => 'Remove_role_1',
+				'#' => 'Users',
+				'Users' => ''
+			],
+			[
+				'Name' => 'Remove_role_2',
+				'#' => 'Users',
+				'Users' => ''
+			],
+			[
+				'Name' => 'Remove_role_3',
+				'#' => 'Users',
+				'Users' => ''
+			],
+			[
+				'Name' => 'role_with_min end',
+				'#' => 'Users',
+				'Users' => ''
+			],
+			[
+				'Name' => 'Super admin role',
+				'#' => 'Users 5',
+				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, test-timezone'
+			],
+			[
+				'Name' => 'User role',
+				'#' => 'Users 6',
+				'Users' => 'disabled-user, no-access-to-the-frontend, Tag-user, test-user, user-for-blocking, user-zabbix'
+			],
+		];
+		$this->assertTableData($table_data);
 	}
 
 	public static function getFilterData() {
