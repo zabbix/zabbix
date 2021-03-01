@@ -100,8 +100,8 @@ class testPageUserRoles extends CWebTest {
 		$name_header->click();
 
 		// Check that check boxes for all roles are enabled except Super admin.
-		$roleids = CDBHelper::getAll('SELECT roleid, name FROM role');
-		foreach ($roleids as $id) {
+		$db_roles = CDBHelper::getAll('SELECT roleid, name FROM role');
+		foreach ($db_roles as $id) {
 			if ($id['name'] === 'Super admin role') {
 				$this->assertFalse($this->query('id:roleids_'.$id['roleid'])->one()->isEnabled());
 			}
@@ -134,7 +134,7 @@ class testPageUserRoles extends CWebTest {
 		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
 
 		// Check that number displayed near Users and # columns are equal.
-		foreach ($roleids as $role) {
+		foreach ($db_roles as $role) {
 			$users_count = $table->findRow('Name', $role['name'])->getColumn('Users')->query('xpath:./a[contains(@class, "link-alt")]')->count();
 			$this->assertEquals($users_count, CDBHelper::getCount('SELECT * FROM users WHERE roleid='.zbx_dbstr($role['roleid'])));
 			if ($users_count !== 0) {
