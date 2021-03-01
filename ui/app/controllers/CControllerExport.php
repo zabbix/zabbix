@@ -57,9 +57,6 @@ class CControllerExport extends CController {
 			case 'export.templates':
 				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-			case 'export.screens':
-				return $this->checkAccess(CRoleHelper::UI_MONITORING_SCREENS);
-
 			case 'export.sysmaps':
 				return $this->checkAccess(CRoleHelper::UI_MONITORING_MAPS);
 
@@ -87,10 +84,6 @@ class CControllerExport extends CController {
 
 			case 'export.mediatypes':
 				$params['options']['mediaTypes'] = $this->getInput('mediatypeids', []);
-				break;
-
-			case 'export.screens':
-				$params['options']['screens'] = $this->getInput('screens', []);
 				break;
 
 			case 'export.sysmaps':
