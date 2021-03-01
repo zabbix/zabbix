@@ -189,14 +189,8 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_GRAPH:
 				return new CScreenGraph($options);
 
-			case SCREEN_RESOURCE_SIMPLE_GRAPH:
-				return new CScreenSimpleGraph($options);
-
 			case SCREEN_RESOURCE_MAP:
 				return new CScreenMap($options);
-
-			case SCREEN_RESOURCE_PLAIN_TEXT:
-				return new CScreenPlainText($options);
 
 			case SCREEN_RESOURCE_HOST_INFO:
 				return new CScreenHostsInfo($options);

@@ -164,11 +164,6 @@
 					self.refreshMap(id);
 					break;
 
-				// SCREEN_RESOURCE_PLAIN_TEXT
-				case 3:
-					self.refreshHtml(id, ajax_url);
-					break;
-
 				// SCREEN_RESOURCE_CLOCK
 				case 7:
 					// don't refresh anything
