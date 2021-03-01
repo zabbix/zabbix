@@ -1500,7 +1500,7 @@ static int	DBpatch_parse_applications_json(struct zbx_json_parse *jp, struct zbx
 							patch_filtertag_t	tag;
 
 							tag.tag = zbx_strdup(NULL, "Application");
-							tag.op = zbx_strdup(NULL, "1");
+							tag.op = zbx_strdup(NULL, "0");
 							tag.value = zbx_strdup(NULL, *app);
 
 							zbx_vector_patch_filtertag_append(tags, tag);
@@ -1641,7 +1641,7 @@ static int	DBpatch_5030078(void)
 		val = DBdyn_escape_string(row[1]);
 		ZBX_DBROW2UINT64(widget_fieldid, row[2]);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "tags.operator.0", 1, "");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "tags.operator.0", 0, "");
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.tag.0", 0, "Application");
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.value.0", 0, val);
 
