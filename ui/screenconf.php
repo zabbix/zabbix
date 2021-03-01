@@ -141,12 +141,6 @@ if (hasRequest('add') || hasRequest('update')) {
 		$screenOld = reset($screenOld);
 
 		$result = API::Screen()->update($screen);
-
-		if ($result) {
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'screens',
-				$screenOld, $screen
-			);
-		}
 	}
 	else {
 		$screen = [
@@ -192,8 +186,6 @@ if (hasRequest('add') || hasRequest('update')) {
 		if ($result) {
 			$screenid = reset($screenids);
 			$screenid = reset($screenid);
-
-			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCREEN, $screenid, $screen['name']);
 		}
 	}
 
@@ -231,9 +223,6 @@ elseif ((hasRequest('delete') && hasRequest('screenid'))
 	$result = DBend($result);
 
 	if ($result) {
-		foreach ($screens as $screen) {
-			add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name']);
-		}
 		unset($_REQUEST['screenid'], $_REQUEST['form']);
 		uncheckTableRows($parent_id);
 	}

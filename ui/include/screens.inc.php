@@ -80,11 +80,6 @@ function addScreenRow(array $screen, $row_num) {
 
 	$result = API::Screen()->update($options);
 
-	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			_('Row added')
-		);
-	}
 	DBend($result);
 }
 
@@ -111,11 +106,6 @@ function addScreenColumn(array $screen, $col_num) {
 
 	$result = API::Screen()->update($options);
 
-	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			_('Column added')
-		);
-	}
 	DBend($result);
 }
 
@@ -145,11 +135,6 @@ function delScreenRow(array $screen, $row_num) {
 
 	$result = API::Screen()->update($options);
 
-	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			_('Row deleted')
-		);
-	}
 	DBend($result);
 }
 
@@ -179,11 +164,6 @@ function delScreenColumn(array $screen, $col_num) {
 
 	$result = API::Screen()->update($options);
 
-	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			_('Column deleted')
-		);
-	}
 	DBend($result);
 }
 

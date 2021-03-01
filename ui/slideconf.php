@@ -164,7 +164,6 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		add_audit($auditAction, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.getRequest('name').'" ');
 		unset($_REQUEST['form'], $_REQUEST['slideshowid']);
 	}
 
@@ -184,9 +183,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 
 	$result = delete_slideshow($_REQUEST['slideshowid']);
 
-	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$db_slideshow['name'].'" ');
-	}
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 
 	$result = DBend($result);

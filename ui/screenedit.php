@@ -165,7 +165,6 @@ if (!empty($_REQUEST['ajaxAction']) && $_REQUEST['ajaxAction'] == 'sw_pos') {
 							' AND screenitemid='.zbx_dbstr($sitem['screenitemid'])
 			);
 		}
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Screen items switched');
 
 		DBend(true);
 	}
@@ -218,11 +217,6 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Cell changed '.
-			(hasRequest('screenitemid') ? 'screen itemid "'.getRequest('screenitemid').'"' : '').
-			(hasRequest('x') && hasRequest('y') ? ' coordinates "'.getRequest('x').','.getRequest('y').'"' : '').
-			(hasRequest('resourcetype') ? ' resource type "'.getRequest('resourcetype').'"' : '')
-		);
 		unset($_REQUEST['form']);
 	}
 
@@ -237,9 +231,6 @@ elseif (hasRequest('delete')) {
 	if ($screenitemid) {
 		$screenitemid = reset($screenitemid);
 		$screenitemid = reset($screenitemid);
-		add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			'Screen itemid "'.$screenitemid.'"'
-		);
 	}
 	unset($_REQUEST['x']);
 
