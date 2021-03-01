@@ -986,12 +986,12 @@ zabbix_export:
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
                   expression: '{Linux memory SNMP:vm.memory.available[snmp].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}>0'
       macros:
         -
@@ -1205,20 +1205,20 @@ zabbix_export:
   triggers:
     -
       expression: '{Linux memory SNMP:system.swap.pfree[snmp].min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Linux memory SNMP:system.swap.total[memTotalSwap.0].last()}>0'
-      name: 'High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'This trigger is ignored, if there is no swap configured'
       dependencies:
         -
-          name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+          name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
           expression: '{Linux memory SNMP:vm.memory.util[snmp].min(5m)}>{$MEMORY.UTIL.MAX}'
         -
-          name: 'Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
           expression: '{Linux memory SNMP:vm.memory.available[snmp].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}>0'
     -
       expression: '{Linux memory SNMP:vm.memory.available[snmp].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}>0'
-      name: 'Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
     -

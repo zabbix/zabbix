@@ -1,8 +1,21 @@
 Changes for 5.4.0beta1
 
 New features:
+.....J.... [ZBXNEXT-735] allowed multiple jmx items on one host (arimdjonoks)
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+.........T [ZBXNEXT-6302] added new metrics to VMWare template (tuskov)
+.........T [ZBXNEXT-6433] added template "Microsoft SharePoint by HTTP" (abakaldin)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
+A.F.I..PS. [ZBXNEXT-1215,ZBXNEXT-6474] changed field "alias" into "username" (talbergs, viktors)
 
 Bug fixes:
+..F....... [ZBX-18906] fixed main menu hidden mode, fixed menu items selection on the actions configuration pages (ashubin)
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB version validation, TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
+..F....... [ZBX-18803] fixed test item form ignoring empty status code input (talbergs)
+A......... [ZBX-18929] fixed tag filtering by multiple negated conditions (miks)
 ...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
 
 --------------------------------------------------------------------------------
@@ -110,8 +123,18 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.6rc1
 
 New features:
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+.........T [ZBXNEXT-6302] added new metrics to VMWare template (tuskov)
+.........T [ZBXNEXT-6433] added template "Microsoft SharePoint by HTTP" (abakaldin)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
+..F....... [ZBX-18803] fixed test item form ignoring empty status code input (talbergs)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.5
@@ -546,8 +569,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.10rc1
 
 New features:
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.9
@@ -2529,6 +2559,7 @@ Changes for 4.0.30rc1
 New features:
 
 Bug fixes:
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.29
@@ -5609,8 +5640,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.32rc1
-
-New features:
 
 Bug fixes:
 ...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
