@@ -504,7 +504,7 @@ static int	eval_validate_function_args(const zbx_eval_context_t *ctx, const zbx_
 	{
 		if (ZBX_VARIANT_ERR == output->values[i].type)
 		{
-			zbx_variant_t	value = value = output->values[i];
+			zbx_variant_t	value = output->values[i];
 
 			/* first error argument is used as function return value */
 			zbx_variant_set_none(&output->values[i]);

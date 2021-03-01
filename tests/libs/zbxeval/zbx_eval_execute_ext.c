@@ -98,12 +98,12 @@ static void	mock_read_callbacks(const char *path)
 		}
 		else if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hcb, "reterr", &hdata))
 		{
-			const char	*err;
+			const char	*errmsg;
 
-			if (ZBX_MOCK_SUCCESS != zbx_mock_string(hdata, &err))
+			if (ZBX_MOCK_SUCCESS != zbx_mock_string(hdata, &errmsg))
 				fail_msg("invalid token error");
 
-			zbx_variant_set_error(&cb->retval, zbx_strdup(NULL, err));
+			zbx_variant_set_error(&cb->retval, zbx_strdup(NULL, errmsg));
 		}
 		else
 			fail_msg("invalid token contents");
