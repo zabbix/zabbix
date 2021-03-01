@@ -578,17 +578,6 @@ class CScreenBuilder {
 	}
 
 	/**
-	 * Insert javascript to init screens.
-	 *
-	 * @static
-	 *
-	 * @param string $screenid
-	 */
-	public static function insertInitScreenJs($screenid) {
-		zbx_add_post_js('init_screen("'.$screenid.'", "'.self::makeScreenTableId($screenid).'", "'.$screenid.'");');
-	}
-
-	/**
 	 * Insert javascript to start time control rendering.
 	 *
 	 * @static
