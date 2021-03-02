@@ -790,8 +790,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ZBX_PG_BYTEAOID = atoi(row[0]);
 	DBfree_result(result);
 
-	/* zbx_dbms_extract_version(); */
-
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
 		ret = ZBX_DB_OK;
@@ -2568,58 +2566,57 @@ void	zbx_dbms_extract_version(void)
 	zabbix_log(LOG_LEVEL_INFORMATION,"ORACLE VERSION: %s", unparsed_version);
 
 	jjj = strlen(unparsed_version);
-	zabbix_log(LOG_LEVEL_INFORMATION, "JJJ: %d", jjj);
 
-#define DO_IT(a)									\
-	if (FAIL != overall_status && jjj > (next_start_index + 2))			\
-	{										\
-		local_status = SUCCEED;						\
-		a[0] = unparsed_version[next_start_index];				\
-											\
-		if ('.' != unparsed_version[next_start_index + 1])			\
-		{									\
-			if ('.' == unparsed_version[next_start_index + 2])		\
-			{								\
-				a[1] = unparsed_version[next_start_index + 1];		\
-				a[2] = '\0';						\
-				next_start_index = next_start_index + 3;		\
-											\
-				if (0 == isdigit(a[0]) || 0 == isdigit(a[1]))		\
-					local_status = FAIL;				\
-				else							\
-					a##_num = atoi(a);				\
-			}								\
-			else if (' ' != unparsed_version[next_start_index + 2] &&	\
-					'-' != unparsed_version[next_start_index + 2])	\
-			{								\
-				local_status = FAIL;					\
-			}								\
-		}									\
-		else if ('.' == unparsed_version[next_start_index + 1])		\
-		{									\
-			a[1] = '\0';							\
-			next_start_index = next_start_index + 2;			\
-											\
-			if (0 == isdigit(a[0]))					\
-			{								\
-				local_status = FAIL;					\
-			}								\
-			else								\
-				a##_num  = atoi(a);					\
-		}									\
-		else									\
-		{									\
-			local_status = FAIL;						\
-		}									\
-											\
-		if (FAIL == local_status)						\
-		{									\
-			zabbix_log(LOG_LEVEL_CRIT,					\
-					"Cannot determine %s in Oracle DB version", #a);\
-			a##_num = 0;							\
-			overall_status = FAIL;						\
-		}									\
-	}										\
+#define DO_IT(a)								\
+if (FAIL != overall_status && jjj > (next_start_index + 2))			\
+{										\
+	local_status = SUCCEED;						\
+	a[0] = unparsed_version[next_start_index];				\
+										\
+	if ('.' != unparsed_version[next_start_index + 1])			\
+	{									\
+		if ('.' == unparsed_version[next_start_index + 2])		\
+		{								\
+			a[1] = unparsed_version[next_start_index + 1];		\
+			a[2] = '\0';						\
+			next_start_index = next_start_index + 3;		\
+										\
+			if (0 == isdigit(a[0]) || 0 == isdigit(a[1]))		\
+				local_status = FAIL;				\
+			else							\
+				a##_num = atoi(a);				\
+		}								\
+		else if (' ' != unparsed_version[next_start_index + 2] &&	\
+				'-' != unparsed_version[next_start_index + 2])	\
+		{								\
+			local_status = FAIL;					\
+		}								\
+	}									\
+	else if ('.' == unparsed_version[next_start_index + 1])		\
+	{									\
+		a[1] = '\0';							\
+		next_start_index = next_start_index + 2;			\
+										\
+		if (0 == isdigit(a[0]))					\
+		{								\
+			local_status = FAIL;					\
+		}								\
+		else								\
+			a##_num  = atoi(a);					\
+	}									\
+	else									\
+	{									\
+		local_status = FAIL;						\
+	}									\
+										\
+	if (FAIL == local_status)						\
+	{									\
+		zabbix_log(LOG_LEVEL_CRIT,					\
+				"Cannot determine %s in Oracle DB version", #a);\
+		a##_num = 0;							\
+		overall_status = FAIL;						\
+	}									\
+}										\
 
 	if (start = strstr(unparsed_version, release_str))
 	{
@@ -2721,4 +2718,5 @@ int	zbx_tsdb_get_version(void)
 out:
 	return ver;
 }
+
 #endif

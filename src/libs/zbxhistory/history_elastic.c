@@ -1027,9 +1027,10 @@ void init_string(struct string *s)
 {
 	s->len = 0;
 	s->ptr = malloc(s->len+1);
-	if (s->ptr == NULL) {
-	fprintf(stderr, "malloc() failed\n");
-	exit(EXIT_FAILURE);
+	if (s->ptr == NULL)
+	{
+		zbx_error("malloc() failed\n");
+		exit(EXIT_FAILURE);
 	}
 	s->ptr[0] = '\0';
 }
@@ -1040,7 +1041,7 @@ size_t writefunc(void *ptr, size_t size, size_t nmemb, struct string *s)
 	s->ptr = realloc(s->ptr, new_len+1);
 	if (s->ptr == NULL)
 	{
-		fprintf(stderr, "realloc() failed\n");
+		zbx_error("realloc() failed\n");
 		exit(EXIT_FAILURE);
 	}
 	memcpy(s->ptr+s->len, ptr, size*nmemb);
@@ -1142,14 +1143,14 @@ clean:
 
 out:
 #define DO_IT_E(a)									\
-if (FAIL != overall_status && xxx>next_start_index)					\
+if (FAIL != overall_status && xxx > next_start_index)					\
 {											\
-	local_status = SUCCEED;							\
+	local_status = SUCCEED;								\
 	a[0] = version_number[next_start_index];					\
 											\
-	if (xxx>next_start_index+1 && '.' != version_number[next_start_index + 1])	\
+	if (xxx > next_start_index + 1 && '.' != version_number[next_start_index + 1])	\
 	{										\
-		if (xxx>next_start_index+1)						\
+		if (xxx > next_start_index + 1)						\
 		{									\
 			if ('.' == version_number[next_start_index + 2])		\
 			{								\

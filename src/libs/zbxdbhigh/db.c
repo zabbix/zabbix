@@ -852,9 +852,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 void	DBextract_DBversion(void)
 {
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	zbx_dbms_extract_version();
-
 	DBclose();
 }
 
@@ -872,9 +870,7 @@ typedef enum
 void	doIt(int x, char* y)
 {
 	char	yy[MAX_FRIENDLY_VERSION_OUTPUT];
-	size_t	i = 0;
-	size_t	ii = 0;
-	size_t b;
+	size_t	b, i = 0, ii = 0;
 
 	if (VERSION_REQUIREMENT_NOT_DEFINED == x)
 	{
@@ -888,8 +884,8 @@ void	doIt(int x, char* y)
 	b = strlen(yy);
 	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN of %s is %lu", yy, b);
 
-	y[b+((b-1)/2)] = '\0';
-	while((y[b+((b-1)/2)-1-i++] = yy[b-1-ii++]))
+	y[b + ((b - 1) / 2)] = '\0';
+	while((y[b + ((b - 1) / 2) - 1 - i++] = yy[b - 1 - ii++]))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "y at position: %lu, is %c",(b+((b-1)/2)-i), y[b+((b-1)/2)-i]);
 		zabbix_log(LOG_LEVEL_INFORMATION, "yy at position: %lu, is %c",b-ii, yy[b-ii]);
@@ -932,16 +928,8 @@ static void	fillIt(struct zbx_json *json, char *database, int current_version, i
 	doIt(min_version, friendly_min_version);
 	doIt(max_version, friendly_max_version);
 
-	//	zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_1 version: %d, fr cur_version: ->%s<-", current_version, friendly_current_version);
-	//zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_2 min_version: %d, fr cur_version: ->%s<-", min_version, friendly_min_version);
-	//zabbix_log(LOG_LEVEL_INFORMATION, "STRATIX_1 max_version: %d, fr cur_version: ->%s<-", max_version, friendly_max_version);
-
 	zbx_json_addobject(json, NULL);
 	zbx_json_addstring(json, "database", database, ZBX_JSON_TYPE_STRING);
-
-	//zabbix_log(LOG_LEVEL_INFORMATION, "VBADGER CVL %s", friendly_current_version);
-	//zabbix_log(LOG_LEVEL_INFORMATION, "VBADGER min %s", friendly_min_version);
-	//zabbix_log(LOG_LEVEL_INFORMATION, "VBADGER  max %s", friendly_max_version);
 
 	if (DB_VERSION_FAILED_TO_RETRIEVE != flag)
 		zbx_json_addstring(json, "current_version", friendly_current_version, ZBX_JSON_TYPE_STRING);
