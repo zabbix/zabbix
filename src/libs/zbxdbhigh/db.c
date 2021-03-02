@@ -874,7 +874,7 @@ void	doIt(int x, char* y)
 	char	yy[MAX_FRIENDLY_VERSION_OUTPUT];
 	size_t	i = 0;
 	size_t	ii = 0;
-	int b;
+	size_t b;
 
 	if (VERSION_REQUIREMENT_NOT_DEFINED == x)
 	{
@@ -885,18 +885,17 @@ void	doIt(int x, char* y)
 
 	zbx_snprintf(yy, sizeof(yy), "%d", x);
 
-	b = strlen(yy)-1;
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN of %s is %d", yy, b);
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN NEXT: %c", yy[b]);
+	b = strlen(yy);
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN of %s is %lu", yy, b);
 
-	y[b+(b/2)+1] = '\0';
-	while((y[b+(b/2)-i++] = yy[b-ii++]))
+	y[b+((b-1)/2)] = '\0';
+	while((y[b+((b-1)/2)-1-i++] = yy[b-1-ii++]))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "yy at position: %d, is %c",b-(ii-1), yy[b-(ii-1)]);
-		zabbix_log(LOG_LEVEL_INFORMATION, "y at position: %d, is %c",b+(b/2)-(i-1), y[b+(b/2)-(i-1)]);
+		zabbix_log(LOG_LEVEL_INFORMATION, "y at position: %lu, is %c",(b+((b-1)/2)-i), y[b+((b-1)/2)-i]);
+		zabbix_log(LOG_LEVEL_INFORMATION, "yy at position: %lu, is %c",b-ii, yy[b-ii]);
 
-		if (0 == ii % 2 && ii < (strlen(yy) ))
-			y[b+b/2-i++] = '.';
+		if (0 == ii % 2 && ii < b )
+			y[b+((b-1)/2)-1-i++] = '.';
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "RES ->%s<-", y);
