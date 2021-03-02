@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-26T10:45:52Z</date>
+   <date>2021-03-02T15:46:04Z</date>
    <groups>
       <group>
          <name>Templates/Power</name>
@@ -622,7 +622,7 @@ An 8-character string identifying the serial number of&#13;
          </items>
          <discovery_rules>
             <discovery_rule>
-               <name>External battery packs bad discovery</name>
+               <name>External bad battery packs discovery</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>discovery[{#EXTERNAL_PACKS},1.3.6.1.4.1.318.1.1.1.2.2.5]</snmp_oid>
                <key>battery.packs.bad.discovery</key>
@@ -638,6 +638,7 @@ An 8-character string identifying the serial number of&#13;
                      </condition>
                   </conditions>
                </filter>
+               <description>Discovery of the number of external defective battery packs.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPINDEX}: External battery packs bad</name>
@@ -1088,6 +1089,29 @@ The sensor's current temperature reading in degrees Celsius.&#13;
                <description>The input phase identifier. OID upsPhaseInputPhaseIndex.1.1</description>
                <item_prototypes>
                   <item_prototype>
+                     <name>{#PHASEINDEX}: Phase input current</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.2.3.1.6.1.1.{#PHASEINDEX}</snmp_oid>
+                     <key>phase.input.current[upsPhaseInputCurrent.1.1.{#PHASEINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>A</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The input current in 0.1 amperes, or -1 if it's&#13;
+ unsupported by this UPS.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
                      <name>{#PHASEINDEX}: Phase input voltage</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.2.3.1.3.1.1.{#PHASEINDEX}</snmp_oid>
@@ -1109,6 +1133,14 @@ The input voltage in VAC, or -1 if it's unsupported&#13;
                            <params>6h</params>
                         </step>
                      </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(15m)} &gt; {$UPS.INPUT_VOLT.MAX.WARN} or {max(15m)} &lt; {$UPS.INPUT_VOLT.MIN.WARN}</expression>
+                           <name>{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for 15m)</name>
+                           <opdata>Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
