@@ -1017,136 +1017,38 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	return SUCCEED;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-struct string {
-  char *ptr;
-  size_t len;
+struct string
+{
+	char *ptr;
+	size_t len;
 };
 
-void init_string(struct string *s) {
-  s->len = 0;
-  s->ptr = malloc(s->len+1);
-  if (s->ptr == NULL) {
-    fprintf(stderr, "malloc() failed\n");
-    exit(EXIT_FAILURE);
-  }
-  s->ptr[0] = '\0';
+void init_string(struct string *s)
+{
+	s->len = 0;
+	s->ptr = malloc(s->len+1);
+	if (s->ptr == NULL) {
+	fprintf(stderr, "malloc() failed\n");
+	exit(EXIT_FAILURE);
+	}
+	s->ptr[0] = '\0';
 }
 
 size_t writefunc(void *ptr, size_t size, size_t nmemb, struct string *s)
 {
-  size_t new_len = s->len + size*nmemb;
-  s->ptr = realloc(s->ptr, new_len+1);
-  if (s->ptr == NULL) {
-    fprintf(stderr, "realloc() failed\n");
-    exit(EXIT_FAILURE);
-  }
-  memcpy(s->ptr+s->len, ptr, size*nmemb);
-  s->ptr[new_len] = '\0';
-  s->len = new_len;
+	size_t new_len = s->len + size*nmemb;
+	s->ptr = realloc(s->ptr, new_len+1);
+	if (s->ptr == NULL)
+	{
+		fprintf(stderr, "realloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	memcpy(s->ptr+s->len, ptr, size*nmemb);
+	s->ptr[new_len] = '\0';
+	s->len = new_len;
 
-  return size*nmemb;
+	return size*nmemb;
 }
-
-
-
-
-
-
-
-
-/* struct MemoryStruct { */
-/*   char *memory; */
-/*   size_t size; */
-/* }; */
-
-/* static size_t */
-/* WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) */
-/* { */
-/*   size_t realsize = size * nmemb; */
-/*   struct MemoryStruct *mem = (struct MemoryStruct *)userp; */
- 
-/*   char *ptr = realloc(mem->memory, mem->size + realsize + 1); */
-/*   if(ptr == NULL) { */
-/*     /\* out of memory! *\/  */
-/*     printf("not enough memory (realloc returned NULL)\n"); */
-/*     return 0; */
-/*   } */
- 
-/*   mem->memory = ptr; */
-/*   memcpy(&(mem->memory[mem->size]), contents, realsize); */
-/*   mem->size += realsize; */
-/*   mem->memory[mem->size] = 0; */
- 
-/*   return realsize; */
-/* } */
-
 
 /************************************************************************************
  *                                                                                  *
@@ -1159,29 +1061,11 @@ size_t writefunc(void *ptr, size_t size, size_t nmemb, struct string *s)
  ************************************************************************************/
 void	zbx_elastic_check_version(void)
 {
-
-  //	size_t			id_alloc = 0;
-  	int	elasticDB_version;
+	int			elasticDB_version;
+	int xxx;
 	char			errbuf[CURL_ERROR_SIZE];
-	//char *version_number = NULL;
 	char version_number[MAX_STRING_LEN];
-	//zbx_elastic_data_t curl_res = {0};
-	//char *curl_res = NULL;
-
-	//char curl_res[MAX_STRING_LEN];
-	//struct MemoryStruct chunk;
-	//chunk.memory = malloc(1);
-	//chunk.size = 0;
-	//chunk = (struct MemoryStruct *)zbx_malloc(NULL, sizeof(struct MemoryStruct));
-	//memset(chunk, 0, sizeof(struct MemoryStruct));
-
-	//char curl_res[MAX_STRING_LEN];
-	//zbx_httppage_t page_r2;
-
-struct string s;
-init_string(&s);
-
-
+	struct string		s;
 	struct zbx_json_parse	jp, jp_values, jp_sub;
 	struct curl_slist	*curl_headers;
 	CURLcode		err;
@@ -1190,13 +1074,15 @@ init_string(&s);
 
 	int next_start_index = 0;
 	int local_status, overall_status = SUCCEED;
-	#define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E		3
+#define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E		3
 	char	major_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E];
 	char	minor_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E];
 	char	increment_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E];
 	int major_version_num, minor_version_num, increment_version_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	init_string(&s);
 
 	if (0 != curl_global_init(CURL_GLOBAL_ALL))
 	{
@@ -1237,14 +1123,12 @@ init_string(&s);
 
 	}
 
-	//zbx_snprintf(curl_res, sizeof(curl_res), "%s",chunk.memory);
-
 zabbix_log(LOG_LEVEL_INFORMATION, "BADGER RECEIVED: ->%s<-", s.ptr);
 
 	if (SUCCEED != zbx_json_open(s.ptr, &jp) ||
 		SUCCEED != zbx_json_brackets_open(jp.start, &jp_values) ||
 		SUCCEED != zbx_json_brackets_by_name(&jp_values, "version", &jp_sub) ||
-	    SUCCEED != zbx_json_value_by_name(&jp_sub, "number", version_number, sizeof(version_number), NULL))
+		SUCCEED != zbx_json_value_by_name(&jp_sub, "number", version_number, sizeof(version_number), NULL))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to parse elasticsearch version result");
 		overall_status = FAIL;
@@ -1313,7 +1197,7 @@ if (FAIL != overall_status && xxx>next_start_index)					\
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Elasticsearch version retrieved: %s", version_number);
 
-		int xxx = strlen(version_number);
+		xxx = strlen(version_number);
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN: %d", xxx);
 
 		DO_IT_E(major_version);
@@ -1356,6 +1240,10 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for Elasticsearch history backend");
 
 	return FAIL;
+}
+
+void	zbx_elastic_check_version(void)
+{
 }
 
 int	zbx_elastic_get_version(void)

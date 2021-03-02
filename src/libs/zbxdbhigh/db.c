@@ -874,6 +874,7 @@ void	doIt(int x, char* y)
 	char	yy[MAX_FRIENDLY_VERSION_OUTPUT];
 	size_t	i = 0;
 	size_t	ii = 0;
+	int b;
 
 	if (VERSION_REQUIREMENT_NOT_DEFINED == x)
 	{
@@ -884,7 +885,7 @@ void	doIt(int x, char* y)
 
 	zbx_snprintf(yy, sizeof(yy), "%d", x);
 
-	int b = strlen(yy)-1;
+	b = strlen(yy)-1;
 	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN of %s is %d", yy, b);
 	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN NEXT: %c", yy[b]);
 
@@ -964,7 +965,7 @@ void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
 #if defined(HAVE_MYSQL)
 #define MYSQL_MYSQL_MIN_VERSION 50562
 #define MYSQL_MYSQL_MAX_VERSION 80000
-#define MARIA_MYSQL_MIN_VERSION 10037
+#define MARIA_MYSQL_MIN_VERSION 100037
 	if (ON == zbx_dbms_mariadb_used())
 		fillIt(&json, "MariaDB", current_version, MARIA_MYSQL_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
 	else
@@ -973,7 +974,7 @@ void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
 #define ORACLE_MIN_VERSION 1102000000
 	fillIt(&json, "Oracle", current_version, ORACLE_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
 #elif defined(HAVE_POSTGRESQL)
-#define POSTGRESQL_MIN_VERSION 92924
+#define POSTGRESQL_MIN_VERSION 90224
 	fillIt(&json, "PostgreSQL", current_version, POSTGRESQL_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
 #endif
 
