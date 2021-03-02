@@ -4695,64 +4695,6 @@ $form-icon-btn: (
 	}
 }
 
-// Maps, Screens, Graphs.
-.screen-table {
-	background-color: $ui-bg-color;
-	width: 100%;
-
-	td {
-		padding: 2px 3px;
-	}
-
-	.table-forms {
-		text-align: left;
-	}
-
-	.list-table {
-		border: 0;
-
-		td {
-			text-align: left;
-			padding: 6px 5px;
-			border: 0;
-			border-bottom: 1px solid $table-border-color;
-
-			&.list-table-footer {
-				color: $font-alt-color;
-				text-align: right;
-			}
-		}
-	}
-
-	.dashbrd-widget {
-		margin: 0;
-		border: 0;
-
-		th {
-			padding: 6px 5px;
-		}
-	}
-
-	.dashbrd-widget-head {
-		text-align: left;
-		padding: 4px 5px;
-
-		li {
-			line-height: 2.9em;
-		}
-	}
-
-	.dashbrd-widget-foot {
-		margin: 0;
-	}
-
-	.nothing-to-show {
-		td {
-			text-align: center !important;
-		}
-	}
-}
-
 .dashed-border {
 	td {
 		border: 1px dashed $table-border-color;

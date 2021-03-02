@@ -110,33 +110,6 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for refresh time menu popup.
-	 *
-	 * @param string $widgetName
-	 * @param string $currentRate
-	 * @param bool   $multiplier   Multiplier or time mode.
-	 * @param array  $params       (optional) URL parameters.
-	 *
-	 * @return array
-	 */
-	public static function getRefresh($widgetName, $currentRate, $multiplier = false, array $params = []) {
-		$data = [
-			'type' => 'refresh',
-			'data' => [
-				'widgetName' => $widgetName,
-				'currentRate' => $currentRate,
-				'multiplier' => $multiplier ? '1' : '0'
-			]
-		];
-
-		if ($params) {
-			$data['data']['params'] = $params;
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Prepare data for Ajax trigger menu popup.
 	 *
 	 * @param string $triggerid

@@ -4171,38 +4171,6 @@ z-select[disabled] button,
     display: inline-block;
     margin: 0 2px 0 0; }
 
-.screen-table {
-  background-color: #000000;
-  width: 100%; }
-  .screen-table td {
-    padding: 2px 3px; }
-  .screen-table .table-forms {
-    text-align: left; }
-  .screen-table .list-table {
-    border: 0; }
-    .screen-table .list-table td {
-      text-align: left;
-      padding: 6px 5px;
-      border: 0;
-      border-bottom: 1px solid #333333; }
-      .screen-table .list-table td.list-table-footer {
-        color: #cacaca;
-        text-align: right; }
-  .screen-table .dashbrd-widget {
-    margin: 0;
-    border: 0; }
-    .screen-table .dashbrd-widget th {
-      padding: 6px 5px; }
-  .screen-table .dashbrd-widget-head {
-    text-align: left;
-    padding: 4px 5px; }
-    .screen-table .dashbrd-widget-head li {
-      line-height: 2.9em; }
-  .screen-table .dashbrd-widget-foot {
-    margin: 0; }
-  .screen-table .nothing-to-show td {
-    text-align: center !important; }
-
 .dashed-border td {
   border: 1px dashed #333333; }
 
