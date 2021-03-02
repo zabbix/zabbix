@@ -20,8 +20,12 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -64,7 +68,7 @@ func main() {
 		fatalExit("", err)
 	}
 
-	var logType int
+	var logType, logLevel int
 	switch options.LogType {
 	case "system":
 		logType = log.System
@@ -74,14 +78,29 @@ func main() {
 		logType = log.File
 	}
 
-	if err := log.Open(logType, log.Info, options.LogFile, options.LogFileSize); err != nil {
+	switch options.DebugLevel {
+	case 0:
+		logLevel = log.Info
+	case 1:
+		logLevel = log.Crit
+	case 2:
+		logLevel = log.Err
+	case 3:
+		logLevel = log.Warning
+	case 4:
+		logLevel = log.Debug
+	case 5:
+		logLevel = log.Trace
+	}
+
+	if err := log.Open(logType, logLevel, options.LogFile, options.LogFileSize); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	log.Infof("Starting Zabbix web service")
+	log.Infof("starting Zabbix web service")
 
 	go func() {
 		if err := run(options.TLSAccept); err != nil {
@@ -102,11 +121,6 @@ func main() {
 func run(tls string) error {
 	var h handler
 	var err error
-	var isTLS bool
-
-	if tls == "cert" {
-		isTLS = true
-	}
 
 	if h.allowedPeers, err = zbxcomms.GetAllowedPeers(options.AllowedIP); err != nil {
 		return err
@@ -114,11 +128,19 @@ func run(tls string) error {
 
 	http.HandleFunc("/report", h.report)
 
-	if isTLS {
-		return http.ListenAndServeTLS(":"+options.ListenPort, options.TLSCertFile, options.TLSKeyFile, nil)
-	}
+	switch options.TLSAccept {
+	case "cert":
+		server, err := createTLSServer()
+		if err != nil {
+			return err
+		}
 
-	return http.ListenAndServe(":"+options.ListenPort, nil)
+		return server.ListenAndServeTLS(options.TLSCertFile, options.TLSKeyFile)
+	case "", "unencrypted":
+		return http.ListenAndServe(":"+options.ListenPort, nil)
+	default:
+		return errors.New("invalid TLSAccept configuration parameter")
+	}
 }
 
 func fatalExit(message string, err error) {
@@ -129,9 +151,28 @@ func fatalExit(message string, err error) {
 	}
 
 	if options.LogType == "file" {
-		log.Infof("%s", message)
+		log.Critf("%s", message)
 	}
 
 	fmt.Fprintf(os.Stderr, "zabbix_web_service [%d]: ERROR: %s\n", os.Getpid(), message)
 	os.Exit(1)
+}
+
+func createTLSServer() (*http.Server, error) {
+	caCert, err := ioutil.ReadFile(options.TLSCAFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read CA cert file: %s", err.Error())
+	}
+
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	tlsConfig := &tls.Config{
+		ClientCAs:  caCertPool,
+		ClientAuth: tls.RequireAndVerifyClientCert,
+	}
+
+	tlsConfig.BuildNameToCertificate()
+
+	return &http.Server{Addr: ":" + options.ListenPort, TLSConfig: tlsConfig}, nil
 }

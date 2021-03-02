@@ -48,7 +48,7 @@ func newRequestBody() *requestBody {
 }
 
 func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
-	log.Infof("%s", errMsg)
+	log.Errf("%s", errMsg)
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
@@ -56,85 +56,89 @@ func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
 }
 
 func (h *handler) report(w http.ResponseWriter, r *http.Request) {
-	{
-		host, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			logAndWriteError(w, fmt.Sprintf("Cannot remove port from host for incoming ip %s.", err.Error()), http.StatusInternalServerError)
-			return
-		}
+	log.Infof("received report request from %s", r.RemoteAddr)
 
-		if !h.allowedPeers.CheckPeer(net.ParseIP(host)) {
-			logAndWriteError(w, fmt.Sprintf("Cannot accept incoming connection for peer: %s.", r.RemoteAddr), http.StatusInternalServerError)
-			return
-		}
-
-		if r.Method != http.MethodPost {
-			logAndWriteError(w, "Method is not supported.", http.StatusMethodNotAllowed)
-			return
-		}
-
-		if r.Header.Get("Content-Type") != "application/json" {
-			logAndWriteError(w, "Content Type is not application/json.", http.StatusMethodNotAllowed)
-			return
-		}
-
-		b, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			logAndWriteError(w, "Can not read body data.", http.StatusInternalServerError)
-			return
-		}
-
-		req := newRequestBody()
-		if err = json.Unmarshal(b, &req); err != nil {
-			logAndWriteError(w, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err).Error(), http.StatusInternalServerError)
-			return
-		}
-
-		ctx, cancel := chromedp.NewContext(context.Background())
-		defer cancel()
-
-		width, err := strconv.ParseInt(req.Parameters["width"], 10, 64)
-		if err != nil {
-			logAndWriteError(w, zbxerr.ErrorInvalidParams.Wrap(err).Error(), http.StatusBadRequest)
-			return
-		}
-
-		height, err := strconv.ParseInt(req.Parameters["height"], 10, 64)
-		if err != nil {
-			logAndWriteError(w, zbxerr.ErrorInvalidParams.Wrap(err).Error(), http.StatusBadRequest)
-			return
-		}
-
-		var buf []byte
-
-		if err = chromedp.Run(ctx, chromedp.Tasks{
-			network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
-			chromedp.Navigate(req.URL),
-			emulation.SetDeviceMetricsOverride(width, height, 1, false),
-			chromedp.WaitReady("body"),
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
-				defer cancel()
-				var err error
-				buf, _, err = page.PrintToPDF().
-					WithPrintBackground(true).
-					WithPreferCSSPageSize(true).
-					WithPaperWidth(pixels2inches(width)).
-					WithPaperHeight(pixels2inches(height)).
-					Do(timeoutContext)
-				return err
-			}),
-		}); err != nil {
-			logAndWriteError(w, zbxerr.ErrorCannotFetchData.Wrap(err).Error(), http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("Content-type", "application/pdf")
-		w.Write(buf)
-
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		logAndWriteError(w, fmt.Sprintf("Cannot remove port from host for incoming ip %s.", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
+	if !h.allowedPeers.CheckPeer(net.ParseIP(host)) {
+		logAndWriteError(w, fmt.Sprintf("Cannot accept incoming connection for peer: %s.", r.RemoteAddr), http.StatusInternalServerError)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		logAndWriteError(w, "Method is not supported.", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if r.Header.Get("Content-Type") != "application/json" {
+		logAndWriteError(w, "Content Type is not application/json.", http.StatusMethodNotAllowed)
+		return
+	}
+
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logAndWriteError(w, "Can not read body data.", http.StatusInternalServerError)
+		return
+	}
+
+	req := newRequestBody()
+	if err = json.Unmarshal(b, &req); err != nil {
+		logAndWriteError(w, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err).Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ctx, cancel := chromedp.NewContext(context.Background())
+	defer cancel()
+
+	width, err := strconv.ParseInt(req.Parameters["width"], 10, 64)
+	if err != nil {
+		logAndWriteError(w, fmt.Sprintf("Incorrect parameter width: %s", err.Error()), http.StatusBadRequest)
+		return
+	}
+
+	height, err := strconv.ParseInt(req.Parameters["height"], 10, 64)
+	if err != nil {
+		logAndWriteError(w, fmt.Sprintf("Incorrect parameter height: %s", err.Error()), http.StatusBadRequest)
+		return
+	}
+
+	log.Tracef(
+		"making chrome headless request with parameters url: %s, width: %s, height: %s for report request from %s",
+		req.URL, req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
+
+	var buf []byte
+	if err = chromedp.Run(ctx, chromedp.Tasks{
+		network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
+		chromedp.Navigate(req.URL),
+		emulation.SetDeviceMetricsOverride(width, height, 1, false),
+		chromedp.WaitReady("body"),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
+			defer cancel()
+			var err error
+			buf, _, err = page.PrintToPDF().
+				WithPrintBackground(true).
+				WithPreferCSSPageSize(true).
+				WithPaperWidth(pixels2inches(width)).
+				WithPaperHeight(pixels2inches(height)).
+				Do(timeoutContext)
+			return err
+		}),
+	}); err != nil {
+		logAndWriteError(w, zbxerr.ErrorCannotFetchData.Wrap(err).Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Infof("writing response for report request from %s", r.RemoteAddr)
+
+	w.Header().Set("Content-type", "application/pdf")
+	w.Write(buf)
+
+	return
 }
 
 func pixels2inches(value int64) float64 {

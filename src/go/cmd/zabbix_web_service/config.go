@@ -19,13 +19,6 @@
 
 package main
 
-import (
-	"errors"
-	"strings"
-
-	"zabbix.com/pkg/tls"
-)
-
 var options serviceOptions
 
 type serviceOptions struct {
@@ -35,66 +28,9 @@ type serviceOptions struct {
 	LogFile     string `conf:"optional,default=/tmp/zabbix_agent2.log"`
 	LogFileSize int    `conf:"optional,range=0:1024,default=1"`
 	Timeout     int    `conf:"optional,range=1:30,default=3"`
+	DebugLevel  int    `conf:"range=0:5,default=3"`
 	TLSAccept   string `conf:"optional"`
 	TLSCAFile   string `conf:"optional"`
 	TLSCertFile string `conf:"optional"`
 	TLSKeyFile  string `conf:"optional"`
-}
-
-func GetTLSConfig(options *serviceOptions) (cfg *tls.Config, err error) {
-	c := &tls.Config{}
-	switch options.TLSAccept {
-	case "", "unencrypted":
-		c.Connect = tls.ConnUnencrypted
-	case "cert":
-		c.Connect = tls.ConnCert
-	default:
-		return nil, errors.New("invalid TLSConnect configuration parameter")
-	}
-
-	if options.TLSAccept != "" {
-		opts := strings.Split(options.TLSAccept, ",")
-		for _, o := range opts {
-			switch strings.Trim(o, " \t") {
-			case "unencrypted":
-				c.Accept |= tls.ConnUnencrypted
-			case "cert":
-				c.Accept |= tls.ConnCert
-			default:
-				return nil, errors.New("invalid TLSAccept configuration parameter")
-			}
-		}
-	} else {
-		c.Accept = tls.ConnUnencrypted
-	}
-
-	if (c.Accept|c.Connect)&tls.ConnCert != 0 {
-		if options.TLSCAFile != "" {
-			c.CAFile = options.TLSCAFile
-		} else {
-			return nil, errors.New("missing TLSCAFile configuration parameter")
-		}
-		if options.TLSCertFile != "" {
-			c.CertFile = options.TLSCertFile
-		} else {
-			return nil, errors.New("missing TLSCertFile configuration parameter")
-		}
-		if options.TLSKeyFile != "" {
-			c.KeyFile = options.TLSKeyFile
-		} else {
-			return nil, errors.New("missing TLSKeyFile configuration parameter")
-		}
-	} else {
-		if options.TLSCAFile != "" {
-			return nil, errors.New("TLSCAFile configuration parameter set without certificates being used")
-		}
-		if options.TLSCertFile != "" {
-			return nil, errors.New("TLSCertFile configuration parameter set without certificates being used")
-		}
-		if options.TLSKeyFile != "" {
-			return nil, errors.New("TLSKeyFile configuration parameter set without certificates being used")
-		}
-	}
-
-	return c, nil
 }
