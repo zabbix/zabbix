@@ -162,9 +162,6 @@ class CScreenBuilder {
 
 		// get screen
 		switch ($options['resourcetype']) {
-			case SCREEN_RESOURCE_GRAPH:
-				return new CScreenGraph($options);
-
 			case SCREEN_RESOURCE_MAP:
 				return new CScreenMap($options);
 

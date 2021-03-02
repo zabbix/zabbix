@@ -743,31 +743,10 @@ define('CONDITION_EVAL_TYPE_EXPRESSION', 	3);
 define('SCREEN_RESOURCE_GRAPH',				0);
 define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
 define('SCREEN_RESOURCE_MAP',				2);
-define('SCREEN_RESOURCE_PLAIN_TEXT',		3);
-define('SCREEN_RESOURCE_HOST_INFO',		4);
-define('SCREEN_RESOURCE_TRIGGER_INFO',		5);
-define('SCREEN_RESOURCE_SERVER_INFO',		6);
-define('SCREEN_RESOURCE_CLOCK',				7);
-define('SCREEN_RESOURCE_SCREEN',			8); // Not supported since Zabbix 4.4.
-define('SCREEN_RESOURCE_TRIGGER_OVERVIEW',	9);
-define('SCREEN_RESOURCE_DATA_OVERVIEW',		10);
-define('SCREEN_RESOURCE_URL',				11);
-define('SCREEN_RESOURCE_ACTIONS',			12);
-define('SCREEN_RESOURCE_EVENTS',			13);
-define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
-define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
-define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
-// used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
-define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
-define('SCREEN_RESOURCE_LLD_GRAPH',			20);
-// used in Monitoring > Web > Details (httpdetails.php)
 define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
-// used in Monitoring > Discovery
 define('SCREEN_RESOURCE_DISCOVERY',			22);
-// used in Monitoring > Web
 define('SCREEN_RESOURCE_HTTPTEST',			23);
-// used in Monitoring > Problems
 define('SCREEN_RESOURCE_PROBLEM',			24);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
@@ -793,12 +772,6 @@ define('SCREEN_MODE_JS',		3);
 
 define('SCREEN_SIMPLE_ITEM',	0);
 define('SCREEN_DYNAMIC_ITEM',	1);
-
-define('SCREEN_REFRESH_RESPONSIVENESS',	10);
-
-define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
-define('SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT', 3);
-define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
 
 define('SCREEN_MIN_SIZE', 1);
 define('SCREEN_MAX_SIZE', 100);
