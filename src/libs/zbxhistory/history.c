@@ -27,6 +27,8 @@
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
+
+
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern char	*CONFIG_HISTORY_STORAGE_OPTS;
 
@@ -431,6 +433,9 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
 
 int	zbx_history_get_version(void)
 {
-	return  NULL == CONFIG_HISTORY_STORAGE_URL ? DBVERSION_UNDEFINED : ZBX_ELASTIC_SVERSION;
+
+  zabbix_log(LOG_LEVEL_INFORMATION, "CONFIG_HISTORY_STAGE_URL: %s", CONFIG_HISTORY_STORAGE_URL);
+  zabbix_log(LOG_LEVEL_INFORMATION, "ZBX_ELASTIC_SVERSION: %d", zbx_elastic_get_version());
+  return  NULL == CONFIG_HISTORY_STORAGE_URL ? DBVERSION_UNDEFINED : zbx_elastic_get_version();
 }
 

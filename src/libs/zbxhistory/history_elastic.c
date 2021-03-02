@@ -1,3 +1,4 @@
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -38,6 +39,8 @@ const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
+
+static int		ZBX_ELASTIC_SVERSION = DBVERSION_UNDEFINED;
 
 typedef struct
 {
@@ -1014,6 +1017,137 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	return SUCCEED;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct string {
+  char *ptr;
+  size_t len;
+};
+
+void init_string(struct string *s) {
+  s->len = 0;
+  s->ptr = malloc(s->len+1);
+  if (s->ptr == NULL) {
+    fprintf(stderr, "malloc() failed\n");
+    exit(EXIT_FAILURE);
+  }
+  s->ptr[0] = '\0';
+}
+
+size_t writefunc(void *ptr, size_t size, size_t nmemb, struct string *s)
+{
+  size_t new_len = s->len + size*nmemb;
+  s->ptr = realloc(s->ptr, new_len+1);
+  if (s->ptr == NULL) {
+    fprintf(stderr, "realloc() failed\n");
+    exit(EXIT_FAILURE);
+  }
+  memcpy(s->ptr+s->len, ptr, size*nmemb);
+  s->ptr[new_len] = '\0';
+  s->len = new_len;
+
+  return size*nmemb;
+}
+
+
+
+
+
+
+
+
+/* struct MemoryStruct { */
+/*   char *memory; */
+/*   size_t size; */
+/* }; */
+
+/* static size_t */
+/* WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) */
+/* { */
+/*   size_t realsize = size * nmemb; */
+/*   struct MemoryStruct *mem = (struct MemoryStruct *)userp; */
+ 
+/*   char *ptr = realloc(mem->memory, mem->size + realsize + 1); */
+/*   if(ptr == NULL) { */
+/*     /\* out of memory! *\/  */
+/*     printf("not enough memory (realloc returned NULL)\n"); */
+/*     return 0; */
+/*   } */
+ 
+/*   mem->memory = ptr; */
+/*   memcpy(&(mem->memory[mem->size]), contents, realsize); */
+/*   mem->size += realsize; */
+/*   mem->memory[mem->size] = 0; */
+ 
+/*   return realsize; */
+/* } */
+
+
 /************************************************************************************
  *                                                                                  *
  * Function: elastic_check_version                                                  *
@@ -1025,8 +1159,29 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
  ************************************************************************************/
 void	zbx_elastic_check_version(void)
 {
-	size_t			id_alloc = 0;
-	char			errbuf[CURL_ERROR_SIZE], *version_number = NULL, *curl_res = NULL;
+
+  //	size_t			id_alloc = 0;
+  	int	elasticDB_version;
+	char			errbuf[CURL_ERROR_SIZE];
+	//char *version_number = NULL;
+	char version_number[MAX_STRING_LEN];
+	//zbx_elastic_data_t curl_res = {0};
+	//char *curl_res = NULL;
+
+	//char curl_res[MAX_STRING_LEN];
+	//struct MemoryStruct chunk;
+	//chunk.memory = malloc(1);
+	//chunk.size = 0;
+	//chunk = (struct MemoryStruct *)zbx_malloc(NULL, sizeof(struct MemoryStruct));
+	//memset(chunk, 0, sizeof(struct MemoryStruct));
+
+	//char curl_res[MAX_STRING_LEN];
+	//zbx_httppage_t page_r2;
+
+struct string s;
+init_string(&s);
+
+
 	struct zbx_json_parse	jp, jp_values, jp_sub;
 	struct curl_slist	*curl_headers;
 	CURLcode		err;
@@ -1060,8 +1215,8 @@ void	zbx_elastic_check_version(void)
 	curl_headers = curl_slist_append(NULL, "Content-Type: application/json");
 
 	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_URL, CONFIG_HISTORY_STORAGE_URL)) ||
-			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
-			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEDATA, &curl_res)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEFUNCTION, writefunc)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEDATA, &s)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_FAILONERROR, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_ERRORBUFFER, errbuf)))
@@ -1073,103 +1228,124 @@ void	zbx_elastic_check_version(void)
 
 	*errbuf = '\0';
 
+
 	if (CURLE_OK != (err = curl_easy_perform(handle)))
 	{
 		elastic_log_error(handle, err, errbuf);
 		overall_status = FAIL;
 		goto clean;
+
 	}
 
-	if (SUCCEED != zbx_json_open(curl_res, &jp) ||
+	//zbx_snprintf(curl_res, sizeof(curl_res), "%s",chunk.memory);
+
+zabbix_log(LOG_LEVEL_INFORMATION, "BADGER RECEIVED: ->%s<-", s.ptr);
+
+	if (SUCCEED != zbx_json_open(s.ptr, &jp) ||
 		SUCCEED != zbx_json_brackets_open(jp.start, &jp_values) ||
 		SUCCEED != zbx_json_brackets_by_name(&jp_values, "version", &jp_sub) ||
-		SUCCEED != zbx_json_value_by_name_dyn(&jp_sub, "number", &version_number, &id_alloc, NULL))
+	    SUCCEED != zbx_json_value_by_name(&jp_sub, "number", version_number, sizeof(version_number), NULL))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to parse elasticsearch version result");
 		overall_status = FAIL;
 		goto clean;
 	}
+	zabbix_log(LOG_LEVEL_INFORMATION, "NN: FAU: %s", version_number);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Elasticsearch version retrieved: %s", version_number);
-
-	//status = SUCCEED;
 clean:
 	curl_easy_cleanup(handle);
 	curl_slist_free_all(curl_headers);
+
 out:
-
-#define DO_IT_E(a)								\
-local_status = SUCCEED;								\
-a[0] = version_number[next_start_index];					\
-										\
-if ('.' != version_number[next_start_index + 1])				\
-{										\
-	if ('.' == version_number[next_start_index + 2])			\
-	{									\
-		a[1] = version_number[next_start_index + 1];			\
-		a[2] = '\0';							\
-		next_start_index = next_start_index + 3;			\
-										\
-		if (0 == isdigit(a[0]) || 0 == isdigit(a[1]))			\
-			local_status = FAIL;					\
-		else								\
-			a##_num = atoi(a);					\
-	}									\
-	else if (' ' != version_number[next_start_index + 2] && '\0' != version_number[next_start_index + 2])	\
-	{ \
-		local_status = FAIL;				\
-	} \
-}									\
-else if ('.' == version_number[next_start_index + 1])				\
-{										\
-	a[1] = '\0';								\
-	next_start_index = next_start_index + 2;				\
-										\
-	if (0 == isdigit(a[0]))							\
-	{\
-		local_status = FAIL;						\
-}\
-		else							\
-		a##_num  = atoi(a);						\
-}										\
-else										\
-{\
-	local_status = FAIL;			\
-}\
-						\
-if (FAIL == local_status)							\
-{										\
-	zabbix_log(LOG_LEVEL_CRIT,						\
-			"Cannot determine %s in ElasticDB version", #a);	\
-	a##_num = 0;							\
-	overall_status = FAIL;							\
-} \
-
-
-	if (FAIL != overall_status)
-	{
-		DO_IT_E(major_version);
-		DO_IT_E(minor_version);
-		DO_IT_E(increment_version);
-	}
-	int elasticDB_version;
+#define DO_IT_E(a)									\
+if (FAIL != overall_status && xxx>next_start_index)					\
+{											\
+	local_status = SUCCEED;							\
+	a[0] = version_number[next_start_index];					\
+											\
+	if (xxx>next_start_index+1 && '.' != version_number[next_start_index + 1])	\
+	{										\
+		if (xxx>next_start_index+1)						\
+		{									\
+			if ('.' == version_number[next_start_index + 2])		\
+			{								\
+				a[1] = version_number[next_start_index + 1];		\
+				a[2] = '\0';						\
+				next_start_index = next_start_index + 3;		\
+											\
+				if (0 == isdigit(a[0]) || 0 == isdigit(a[1]))		\
+					local_status = FAIL;				\
+				else							\
+					a##_num = atoi(a);				\
+			}								\
+			else								\
+			{								\
+				local_status = FAIL;					\
+			}								\
+		}									\
+	}										\
+	else										\
+	{										\
+		a[1] = '\0';								\
+		next_start_index = next_start_index + 2;				\
+											\
+		if (0 == isdigit(a[0]))						\
+			local_status = FAIL;						\
+		else									\
+			a##_num  = atoi(a);						\
+	}										\
+											\
+	if (FAIL == local_status)							\
+	{										\
+		zabbix_log(LOG_LEVEL_CRIT,						\
+			"Cannot determine %s in ElasticDB version", #a);		\
+		a##_num = 0;								\
+		overall_status = FAIL;							\
+	}										\
+}											\
 
 	if (FAIL == overall_status)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Failed to detect elastic_DB version from the following query result: %s",
-				NULL == version_number ? "(null)" : version_number);
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to extract elastic_DB version");
 		elasticDB_version = DBVERSION_UNDEFINED;
 	}
 	else
 	{
-		elasticDB_version = major_version_num * 10000 + minor_version_num * 100 +
-				increment_version_num;
+		zabbix_log(LOG_LEVEL_DEBUG, "Elasticsearch version retrieved: %s", version_number);
+
+		int xxx = strlen(version_number);
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN: %d", xxx);
+
+		DO_IT_E(major_version);
+		DO_IT_E(minor_version);
+		DO_IT_E(increment_version);
+
+		if (FAIL == overall_status)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Failed to detect elastic_DB version from the "
+					"following query result: %s", version_number);
+			elasticDB_version = DBVERSION_UNDEFINED;
+		}
+		else
+		{
+			elasticDB_version = major_version_num * 10000 + minor_version_num * 100 +
+					increment_version_num;
+		}
 	}
 
-	printf("RESULT_VERSION: %d\n", elasticDB_version);
+	zabbix_log(LOG_LEVEL_INFORMATION, "RESULT_VERSION: %d\n", elasticDB_version);
 
 	ZBX_ELASTIC_SVERSION = elasticDB_version;
+
+	zbx_free(s.ptr);
 }
+
+
+int	zbx_elastic_get_version(void)
+{
+	return ZBX_ELASTIC_SVERSION;
+}
+
 #else
 
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
@@ -1181,5 +1357,11 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 
 	return FAIL;
 }
+
+int	zbx_elastic_get_version(void)
+{
+	return DBVERSION_UNDEFINED;
+}
+
 
 #endif
