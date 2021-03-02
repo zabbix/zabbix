@@ -440,12 +440,19 @@ void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expressio
  *             hostids     - [IN] the linked hostids                          *
  *             hostids_num - [IN] the number of linked hostids                *
  *             resolver_cb - [IN] the resolver callback                       *
+ *             error       - [OUT] the error message, optional. If specified  *
+ *                                 the function will return failure at the    *
+ *                                 first failed macro expansion               *
+ *                                                                            *
+ * Return value: SUCCEED - the macros were expanded successfully              *
+ *               FAIL    - error parameter was given and at least one of      *
+ *                         macros was not expanded                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_resolve_func_t resolver_cb)
+int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *hostids, int hostids_num,
+		zbx_macro_resolve_func_t resolver_cb, char **error)
 {
-	int	i;
+	int	i, ret = SUCCEED;
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{
@@ -456,8 +463,8 @@ void	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *ho
 		switch (token->type)
 		{
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-				value = resolver_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
-						hostids, hostids_num);
+				ret = resolver_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
+						hostids, hostids_num, &value, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				if (NULL == (ptr = strstr(ctx->expression + token->loc.l, "{$")) ||
@@ -467,15 +474,20 @@ void	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *ho
 					continue;
 				}
 				tmp = zbx_substr(ctx->expression, token->loc.l, token->loc.r);
-				value = resolver_cb(tmp, strlen(tmp), hostids, hostids_num);
+				ret = resolver_cb(tmp, strlen(tmp), hostids, hostids_num, &value, error);
 				zbx_free(tmp);
 				break;
 			default:
 				continue;
 		}
 
+		if (SUCCEED != ret)
+			return FAIL;
+
 		zbx_variant_set_str(&token->value, value);
 	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************

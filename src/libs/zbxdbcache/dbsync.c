@@ -2244,7 +2244,15 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
 	if (NULL != ctx.expression)
-		zbx_eval_expand_user_macros(&ctx, hostids.values, hostids.values_num, dc_expand_user_macros_len);
+	{
+		if (SUCCEED != zbx_eval_expand_user_macros(&ctx, hostids.values, hostids.values_num,
+				dc_expand_user_macros_len, &error))
+		{
+			zbx_eval_clear(&ctx);
+			zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "cannot evaluate expression: %s", error));
+			zbx_free(error);
+		}
+	}
 
 	row[16] = encode_expression(&ctx);
 	zbx_eval_clear(&ctx);
@@ -2253,8 +2261,14 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	{
 		if (NULL != ctx_r.expression)
 		{
-			zbx_eval_expand_user_macros(&ctx_r, hostids.values, hostids.values_num,
-					dc_expand_user_macros_len);
+			if (SUCCEED != zbx_eval_expand_user_macros(&ctx_r, hostids.values, hostids.values_num,
+					dc_expand_user_macros_len, &error))
+			{
+				zbx_eval_clear(&ctx_r);
+				zbx_eval_set_exception(&ctx_r, zbx_dsprintf(NULL, "cannot evaluate recovery"
+						" expression: %s", error));
+				zbx_free(error);
+			}
 		}
 		row[17] = encode_expression(&ctx_r);
 		zbx_eval_clear(&ctx_r);

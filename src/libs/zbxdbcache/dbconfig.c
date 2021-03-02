@@ -10823,27 +10823,37 @@ out:
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
  *                                                                            *
- * Parameters: text           - [IN] the text value to expand                 *
- *             len            - [IN] the text length                          *
- *             hostids        - [IN] an array of related hostids              *
- *             hostids_num    - [IN] the number of hostids                    *
+ * Parameters: text         - [IN] the text value to expand                   *
+ *             len          - [IN] the text length                            *
+ *             hostids      - [IN] an array of related hostids                *
+ *             hostids_num  - [IN] the number of hostids                      *
+ *             value        - [IN] the expanded macro with expanded user      *
+ *                                 macros. Unknown or invalid macros will be  *
+ *                                 left unresolved.                           *
+ *             error        - [IN] the error message, optional. If specified  *
+ *                                 the function will return failure on first  *
+ *                                 unknown user macro                         *
  *                                                                            *
- * Return value: The text value with expanded user macros. Unknown or invalid *
- *               macros will be left unresolved.                              *
+ * Return value: SUCCEED - the macros were expanded successfully              *
+ *               FAIL    - error parameter was given and at least one of      *
+ *                         macros was not expanded                            *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *
- *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num)
+int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
+		char **value, char **error)
 {
 	zbx_token_t	token;
 	int		len;
-	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL;
+	char		*str = NULL, *name = NULL, *context = NULL, *macro_value = NULL;
 	size_t		str_alloc = 0, str_offset = 0, pos = 0, last_pos = 0;
 
 	if ('\0' == *text)
-		return zbx_strdup(NULL, text);
+	{
+		*value = zbx_strdup(NULL, text);
+		return SUCCEED;
+	}
 
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC) && token.loc.r < text_len; pos++)
 	{
@@ -10856,21 +10866,28 @@ char	*dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t 
 		if (last_pos < token.loc.l)
 			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 
-		dc_get_user_macro(hostids, hostids_num, name, context, &value);
-
-		if (NULL != value)
-		{
-			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
-			zbx_free(value);
-		}
-		else
-		{
-			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
-					token.loc.r - token.loc.l + 1);
-		}
+		dc_get_user_macro(hostids, hostids_num, name, context, &macro_value);
 
 		zbx_free(name);
 		zbx_free(context);
+
+		if (NULL != macro_value)
+		{
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, macro_value);
+			zbx_free(macro_value);
+		}
+		else
+		{
+			if (NULL != error)
+			{
+				*error = zbx_dsprintf(NULL, "unknown user macro \"%.*s\"",
+						(int)(token.loc.r - token.loc.l + 1), text + token.loc.l);
+				zbx_free(str);
+				return FAIL;
+			}
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
+		}
 
 		pos = token.loc.r;
 		last_pos = pos + 1;
@@ -10879,7 +10896,9 @@ char	*dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t 
 	if (last_pos < text_len)
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, text_len - last_pos);
 
-	return str;
+	*value = str;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -14000,7 +14019,7 @@ void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx)
 	RDLOCK_CACHE;
 
 	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
-	zbx_eval_expand_user_macros(ctx, hostids.values, hostids.values_num, dc_expand_user_macros_len);
+	(void)zbx_eval_expand_user_macros(ctx, hostids.values, hostids.values_num, dc_expand_user_macros_len, NULL);
 
 	UNLOCK_CACHE;
 
