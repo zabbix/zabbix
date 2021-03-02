@@ -145,7 +145,6 @@ class CControllerActionOperationGet extends CController {
 
 		return [
 			'operation_types' => $operation_types,
-			'operation_type' => $operation['operationtype'],
 			'operation_steps' => $operation_steps,
 			'operation_message' => $operation_message,
 			'operation_command' => $operation_command,
@@ -199,7 +198,7 @@ class CControllerActionOperationGet extends CController {
 			if ($db_scripts) {
 				foreach ($db_scripts as $db_script) {
 					$operation_type_options[] = [
-						'value' => 'id['.$db_script['scriptid'].']',
+						'value' => 'scriptid['.$db_script['scriptid'].']',
 						'name' => $db_script['name']
 					];
 				}
@@ -210,7 +209,7 @@ class CControllerActionOperationGet extends CController {
 			'options' => $operation_type_options,
 			'selected' => ($operation['opcommand']['scriptid'] == 0)
 				? 'cmd['.$operation['operationtype'].']'
-				: 'id['.$operation['opcommand']['scriptid'].']'
+				: 'scriptid['.$operation['opcommand']['scriptid'].']'
 		];
 	}
 

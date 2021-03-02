@@ -212,7 +212,7 @@
 		this.operation_opcommand_scriptid = this.$obj.find('[id^="operation_opcommand_scriptid"]');
 
 		this.operation_type_row.onchange = (operations) => {
-			var script_pattern = /^id\[([\d]+)\]|cmd\[([\d]+)\]$/,
+			var script_pattern = /^scriptid\[([\d]+)\]|cmd\[([\d]+)\]$/,
 				command_pattern = /^cmd\[([\d]+)\]$/,
 				script_match = script_pattern.exec(operations),
 				command_match = command_pattern.exec(operations);
@@ -283,7 +283,7 @@
 	 * Each of config fields must contain default values as they will be set into view.
 	 *
 	 * @param {object}      conf
-	 * @param {object|null} conf['operation_type']       See OperationViewType.setConfig doc-block.
+	 * @param {object|null} conf['operation_types']      See OperationViewType.setConfig doc-block.
 	 * @param {object|null} conf['operation_steps']      See OperationViewSteps.setConfig doc-block.
 	 * @param {object|null} conf['operation_message']    See OperationViewMessage.setConfig doc-block.
 	 * @param {object|null} conf['operation_command']    See OperationViewCommand.setConfig doc-block.
@@ -330,7 +330,6 @@
 			this.operation_type.attach = this.operation_type.detach;
 		}
 		else {
-			this.props.operation_type = conf.operation_type;
 			this.operation_type_row.setConfig(conf.operation_types);
 		}
 	};
