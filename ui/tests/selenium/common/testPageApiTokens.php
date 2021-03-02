@@ -62,7 +62,7 @@ class testPageApiTokens extends CWebTest {
 
 		// Open API tokens page and check header.
 		$this->page->login()->open($url);
-		$this->assertEquals('API tokens', $this->query('tag:h1')->one()->getText());
+		$this->page->assertHeader('API tokens');
 
 		// Check status of buttons on the API tokens page.
 		$form_buttons = [
@@ -114,11 +114,12 @@ class testPageApiTokens extends CWebTest {
 		$this->assertSame($reference_headers, $headers);
 
 		foreach ($headers as $header) {
+			$text = CXPathHelper::escapeQuotes($header);
 			if ($header === 'Created at') {
-				$this->assertFalse($table->query('xpath:.//a[text()="'.$header.'"]')->one(false)->isValid());
+				$this->assertFalse($table->query('xpath:.//a[text()='.$text.']')->one(false)->isValid());
 			}
 			else {
-				$this->assertTrue($table->query('xpath:.//a[contains(text(), "'.$header.'")]')->one()->isClickable());
+				$this->assertTrue($table->query('xpath:.//a[contains(text(), '.$text.')]')->one()->isClickable());
 			}
 		}
 
@@ -149,18 +150,13 @@ class testPageApiTokens extends CWebTest {
 		$this->checkTokenStatus($row, 'enabled', $token);
 
 		// Disable API token via button.
-		$row->select();
-		$this->query('button:Disable')->one()->waitUntilClickable()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->checkTokenStatus($row, 'disabled', $token);
-
-		// Enable API token via button.
-		$row->select();
-		$this->query('button:Enable')->one()->waitUntilClickable()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->checkTokenStatus($row, 'enabled', $token);
+		foreach (['Disable' => 'disabled', 'Enable' => 'enabled'] as $button => $status) {
+			$row->select();
+			$this->query('button', $button)->one()->waitUntilClickable()->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			$this->checkTokenStatus($row, $status, $token);
+		}
 	}
 
 	/**
@@ -184,7 +180,7 @@ class testPageApiTokens extends CWebTest {
 
 		$this->assertMessage(TEST_GOOD, $message_title );
 		$this->assertEquals($column_status, $row->getColumn('Status')->getText());
-		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM token WHERE name=\''.$token.'\''));
+		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM token WHERE name='.zbx_dbstr($token)));
 	}
 
 	/**
@@ -239,21 +235,17 @@ class testPageApiTokens extends CWebTest {
 		$this->page->login()->open($url);
 		$table = $this->query('class:list-table')->asTable()->one();
 		$header = $table->query('xpath:.//a[text()="'.$data['sort_field'].'"]')->one();
-		$header->click();
 
-		$sorted_once = [];
-		foreach ($table->getRows() as $row) {
-			$sorted_once[] = $row->getColumn($data['sort_field'])->getText();
-		}
-		$this->assertEquals($data['expected'], $sorted_once);
+		foreach(['asc', 'desc'] as $sorting) {
+			$expected = ($sorting === 'asc') ? $data['expected'] : array_reverse($data['expected']);
+			$values = [];
 
-		// Check column sorting in the oposite direction.
-		$header->click();
-		$sorted_twice = [];
-		foreach ($table->getRows() as $row) {
-			$sorted_twice[] = $row->getColumn($data['sort_field'])->getText();
+			$header->click();
+			foreach ($table->getRows() as $row) {
+				$values[] = $row->getColumn($data['sort_field'])->getText();
+			}
+			$this->assertEquals($expected, $values);
 		}
-		$this->assertEquals(array_reverse($data['expected']), $sorted_twice);
 	}
 
 	/**
@@ -272,6 +264,6 @@ class testPageApiTokens extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Check that token is deleted from DB.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT tokenid FROM token WHERE name = \''.$token.'\''));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT tokenid FROM token WHERE name='.zbx_dbstr($token)));
 	}
 }

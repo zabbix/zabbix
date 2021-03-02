@@ -28,11 +28,6 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testFormApiTokensUserSettings extends testFormApiTokens {
 
-	const UPDATE_TOKEN = 'Admin reference token';	// Token for update.
-	const DELETE_TOKEN = 'Token to be deleted';		// Token for deletion.
-
-	public static $tokenid;
-
 	/**
 	 * Function creates the given API tokens in the test branch.
 	 */
@@ -59,22 +54,6 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 		// Generate token strings for the created tokens.
 		foreach ($responce['tokenids'] as $tokenid) {
 			CDataHelper::call('token.generate', ['tokenids' => $tokenid]);
-		}
-	}
-
-	/**
-	 * Function retrieves the tokenid based on token name.
-	 *
-	 * @param string $token_name	The name of the token for which the ID is obtained.
-	 * @param boolean $return		Flag that specifies whether token id should be returned by this method.
-	 *
-	 * @return string
-	 */
-	public function getTokenId($token_name = self::UPDATE_TOKEN, $return = false) {
-		self::$tokenid = CDBHelper::getValue('SELECT tokenid FROM token WHERE name = \''.$token_name.'\'');
-
-		if ($return) {
-			return self::$tokenid;
 		}
 	}
 
@@ -232,7 +211,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 	 * @on-before-once getTokenId
 	 */
 	public function testFormApiTokensUserSettings_RegenerationFormLayout() {
-		$this->checkTokensRegenerateFormLayout('user settings', self::$tokenid);
+		$this->checkTokensRegenerateFormLayout('user settings');
 	}
 
 	/**
@@ -271,7 +250,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 	}
 
 	public function testFormApiTokensUserSettings_Delete() {
-		$token_id = $this->getTokenId(self::DELETE_TOKEN, true);
+		$token_id = $this->getTokenId(self::DELETE_TOKEN);
 		$this->checkTokenDelete('zabbix.php?action=user.token.edit&tokenid='.$token_id, self::DELETE_TOKEN);
 	}
 

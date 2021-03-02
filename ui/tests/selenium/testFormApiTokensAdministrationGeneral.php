@@ -28,12 +28,6 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 
-	const UPDATE_TOKEN = 'Admin reference token';	// Token for update.
-	const DELETE_TOKEN = 'Token to be deleted';		// Token for delete.
-	const USER_ZABBIX_TOKEN = 'user-zabbix token';	// Token to be updated that belongs to user-zabbix.
-
-	public static $tokenid;
-
 	/**
 	 * Function creates the given API tokens in the test branch.
 	 */
@@ -67,22 +61,6 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 		// Generate token strings for the created tokens.
 		foreach ($responce['tokenids'] as $tokenid) {
 			CDataHelper::call('token.generate', ['tokenids' => $tokenid]);
-		}
-	}
-
-	/**
-	 * Function retrieves the tokenid based on token name.
-	 *
-	 * @param string $token_name	The name of the token for which the ID is obtained.
-	 * @param boolean $return		Flag that specifies whether token id should be returned by this method.
-	 *
-	 * @return string
-	 */
-	public function getTokenId($token_name = self::UPDATE_TOKEN, $return = false) {
-		self::$tokenid = CDBHelper::getValue('SELECT tokenid FROM token WHERE name = \''.$token_name.'\'');
-
-		if ($return) {
-			return self::$tokenid;
 		}
 	}
 
@@ -280,7 +258,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	 * @on-before-once getTokenId
 	 */
 	public function testFormApiTokensAdministrationGeneral_RegenerationFormLayout() {
-		$this->checkTokensRegenerateFormLayout('administration', self::$tokenid);
+		$this->checkTokensRegenerateFormLayout('administration'); // , self::$tokenid);
 	}
 
 	/**
@@ -318,7 +296,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 				'Enabled' => false
 			]
 		];
-		$token_id = $this->getTokenId(self::USER_ZABBIX_TOKEN, true);
+		$token_id = $this->getTokenId(self::USER_ZABBIX_TOKEN);
 		$this->checkTokensAction($data, 'zabbix.php?action=token.edit&tokenid='.$token_id, 'update');
 	}
 
@@ -338,7 +316,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	}
 
 	public function testFormApiTokensAdministrationGeneral_Delete() {
-		$token_id = $this->getTokenId(self::DELETE_TOKEN, true);
+		$token_id = $this->getTokenId(self::DELETE_TOKEN);
 		$this->checkTokenDelete('zabbix.php?action=token.edit&tokenid='.$token_id, self::DELETE_TOKEN);
 	}
 

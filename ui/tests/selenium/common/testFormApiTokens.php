@@ -37,15 +37,33 @@ class testFormApiTokens extends CWebTest {
 		];
 	}
 
+	const UPDATE_TOKEN = 'Admin reference token';	// Token for update.
+	const DELETE_TOKEN = 'Token to be deleted';		// Token for deletion.
+	const USER_ZABBIX_TOKEN = 'user-zabbix token';	// Token to be updated that belongs to user-zabbix.
+
+	public static $tokenid;
+
+	/**
+	 * Function retrieves the tokenid based on token name.
+	 *
+	 * @param string $token_name	The name of the token for which the ID is obtained.
+	 * @param boolean $return		Flag that specifies whether token id should be returned by this method.
+	 *
+	 * @return string
+	 */
+	public function getTokenId($token_name = self::UPDATE_TOKEN) {
+		self::$tokenid = CDBHelper::getValue('SELECT tokenid FROM token WHERE name='.zbx_dbstr($token_name));
+
+		return self::$tokenid;
+	}
+
 	/**
 	 * Function that checks the layout of the API token configuration form in Administration or User settings section.
 	 *
 	 * @param string $source	Section from which the scenario is executed.
 	 */
 	public function checkTokensFormLayout($source) {
-		$url = ($source === 'user settings') ? 'zabbix.php?action=user.token.edit' : 'zabbix.php?action=token.edit';
-
-		$this->page->login()->open($url);
+		$this->page->login()->open('zabbix.php?action='.(($source === 'user settings') ? 'user.token.edit' : 'token.edit'));
 		$this->page->assertTitle('API tokens');
 		$this->page->assertHeader('API tokens');
 
@@ -93,10 +111,7 @@ class testFormApiTokens extends CWebTest {
 	 * @param string	$source		Section from which the scenario is executed.
 	 * @param integer	$tokenid	ID of the token for which the regenerate form is opened.
 	 */
-	public function checkTokensRegenerateFormLayout($source, $tokenid) {
-		$url = ($source === 'user settings')
-			? 'zabbix.php?action=user.token.edit&tokenid='.$tokenid
-			: 'zabbix.php?action=token.edit&tokenid='.$tokenid;
+	public function checkTokensRegenerateFormLayout($source) {
 		$values = [
 			'Name:' => 'Admin reference token',
 			'User:' => 'Admin (Zabbix Administrator)',
@@ -109,7 +124,10 @@ class testFormApiTokens extends CWebTest {
 			unset($values['User:']);
 		}
 
-		$this->page->login()->open($url);
+		$this->page->login()->open('zabbix.php?&tokenid='.self::$tokenid.'&action='.(($source === 'user settings')
+			? 'user.token.edit'
+			: 'token.edit'));
+
 		$this->query('button:Regenerate')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -134,7 +152,7 @@ class testFormApiTokens extends CWebTest {
 
 		// Check the hintbox text in the Auth token field.
 		$auth_token->query('xpath:./span[@data-hintbox]')->one()->click();
-		$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilReady()->getText();
+		$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText();
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
 				$hintbox_text);
 		$this->assertTrue($form->query('button:Close')->one()->isClickable());
@@ -153,15 +171,13 @@ class testFormApiTokens extends CWebTest {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
-		if ($action === 'regenerate') {
-			$old_token = CDBHelper::getValue('SELECT token FROM token WHERE tokenid ='.$data['tokenid']);
-		}
-
 		$this->page->login()->open($url);
 		$form = $this->query('id:token_form')->asForm()->one();
 
 		// Fill form or press appropriate button depending on the action.
 		if ($action === 'regenerate') {
+			$old_token = CDBHelper::getValue('SELECT token FROM token WHERE tokenid='.$data['tokenid']);
+
 			$form->query('button:Regenerate')->one()->click();
 			$this->page->acceptAlert();
 		}
@@ -205,7 +221,7 @@ class testFormApiTokens extends CWebTest {
 				// Check warning in case if token is already expired.
 				if (CTestArrayHelper::get($data, 'already_expired')) {
 					$form->getField('Expires at:')->query('xpath:./span[@data-hintbox]')->one()->click();
-					$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilReady()->getText();
+					$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText();
 					$this->assertEquals('The token has expired. Please update the expiry date to use the token.', $hintbox_text);
 
 					// In case if token is expired an empty space (separator) is added to the value in token generate form.
@@ -229,7 +245,7 @@ class testFormApiTokens extends CWebTest {
 			}
 
 			// Open token configuration and check field values.
-			$this->query('xpath://a[text()="'.$data['fields']['Name'].'"]')->one()->waitUntilVisible()->click();
+			$this->query('xpath://a[text()='.CXPathHelper::escapeQuotes($data['fields']['Name']).']')->one()->click();
 			$this->page->waitUntilReady();
 			$form->invalidate();
 
@@ -296,7 +312,7 @@ class testFormApiTokens extends CWebTest {
 	 * @param string $token_name	The name of the token to be deleted.
 	 */
 	public function checkTokenDelete($url, $token_name) {
-		$sql = 'SELECT tokenid FROM token WHERE name = \''.$token_name.'\'';
+		$sql = 'SELECT tokenid FROM token WHERE name = '.zbx_dbstr($token_name);
 
 		$this->page->login()->open($url);
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
