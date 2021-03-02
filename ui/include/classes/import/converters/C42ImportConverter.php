@@ -24,6 +24,11 @@
  */
 class C42ImportConverter extends CConverter {
 
+	/**
+	 * Legacy screen resource types.
+	 */
+	private const SCREEN_RESOURCE_TYPE_SCREEN = 8;
+
 	public function convert($data) {
 		$data['zabbix_export']['version'] = '4.4';
 
@@ -119,7 +124,7 @@ class C42ImportConverter extends CConverter {
 	 */
 	protected function convertScreenItems(array $screen_items) {
 		foreach ($screen_items as $index => $screen_item) {
-			if ($screen_item['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
+			if ($screen_item['resourcetype'] == self::SCREEN_RESOURCE_TYPE_SCREEN) {
 				unset($screen_items[$index]);
 			}
 		}
