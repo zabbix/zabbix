@@ -407,6 +407,29 @@ out:
   return: SUCCEED
   value: 3
 ---
+test case: Evaluate count(5m,iregexp) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: Five
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: count
+  params: '5m,iregexp'
+out:
+  return: SUCCEED
+  value: 3
+---
 test case: Evaluate count(5m,band,1/3) 
 in:
   history:
