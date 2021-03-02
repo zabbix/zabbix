@@ -2518,11 +2518,6 @@ void	zbx_dbms_extract_version(void)
 	char	*p, *buffer = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
 
-	/*
-		if (-1 != ZBX_MYSQL_SVERSION)
-			return;
-	*/
-
 	ZBX_MYSQL_SVERSION = mysql_get_server_version(conn);
 
 	zbx_snprintf_alloc(&buffer, &str_alloc, &str_offset, "%s", mysql_get_server_info(conn));
@@ -2556,6 +2551,7 @@ void	zbx_dbms_extract_version(void)
 	int major_release_version_num, release_update_version_num, release_update_version_revision_num,
 			increment_version_num, reserved_for_future_use_num, local_status, overall_status = SUCCEED;
 
+	int jjj;
 	sword	err;
 
 	char unparsed_version[MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT];
@@ -2571,52 +2567,59 @@ void	zbx_dbms_extract_version(void)
 
 	zabbix_log(LOG_LEVEL_INFORMATION,"ORACLE VERSION: %s", unparsed_version);
 
-#define DO_IT(a)								\
-local_status = SUCCEED;								\
-a[0] = unparsed_version[next_start_index];					\
-										\
-if ('.' != unparsed_version[next_start_index + 1])				\
-{										\
-	if ('.' == unparsed_version[next_start_index + 2])			\
-	{									\
-		a[1] = unparsed_version[next_start_index + 1];			\
-		a[2] = '\0';							\
-		next_start_index = next_start_index + 3;			\
-										\
-		if (0 == isdigit(a[0]) || 0 == isdigit(a[1]))			\
-			local_status = FAIL;					\
-		else								\
-			a##_num = atoi(a);					\
-	}									\
-	else if (' ' != unparsed_version[next_start_index + 2] && '-' != unparsed_version[next_start_index + 2])	\
-	{ \
-		local_status = FAIL;				\
-	} \
-}									\
-else if ('.' == unparsed_version[next_start_index + 1])				\
-{										\
-	a[1] = '\0';								\
-	next_start_index = next_start_index + 2;				\
-										\
-	if (0 == isdigit(a[0]))							\
-	{\
-		local_status = FAIL;						\
-}\
-		else							\
-		a##_num  = atoi(a);						\
-}										\
-else										\
-{\
-	local_status = FAIL;			\
-}\
-						\
-if (FAIL == local_status)							\
-{										\
-	zabbix_log(LOG_LEVEL_CRIT,						\
-			"Cannot determine %s in Oracle DB version", #a);	\
-	a##_num = 0;								\
-	overall_status = FAIL;							\
-}
+	jjj = strlen(unparsed_version);
+	zabbix_log(LOG_LEVEL_INFORMATION, "JJJ: %d", jjj);
+
+#define DO_IT(a)									\
+	if (FAIL != overall_status && jjj > (next_start_index + 2))			\
+	{										\
+		local_status = SUCCEED;						\
+		a[0] = unparsed_version[next_start_index];				\
+											\
+		if ('.' != unparsed_version[next_start_index + 1])			\
+		{									\
+			if ('.' == unparsed_version[next_start_index + 2])		\
+			{								\
+				a[1] = unparsed_version[next_start_index + 1];		\
+				a[2] = '\0';						\
+				next_start_index = next_start_index + 3;		\
+											\
+				if (0 == isdigit(a[0]) || 0 == isdigit(a[1]))		\
+					local_status = FAIL;				\
+				else							\
+					a##_num = atoi(a);				\
+			}								\
+			else if (' ' != unparsed_version[next_start_index + 2] &&	\
+					'-' != unparsed_version[next_start_index + 2])	\
+			{								\
+				local_status = FAIL;					\
+			}								\
+		}									\
+		else if ('.' == unparsed_version[next_start_index + 1])		\
+		{									\
+			a[1] = '\0';							\
+			next_start_index = next_start_index + 2;			\
+											\
+			if (0 == isdigit(a[0]))					\
+			{								\
+				local_status = FAIL;					\
+			}								\
+			else								\
+				a##_num  = atoi(a);					\
+		}									\
+		else									\
+		{									\
+			local_status = FAIL;						\
+		}									\
+											\
+		if (FAIL == local_status)						\
+		{									\
+			zabbix_log(LOG_LEVEL_CRIT,					\
+					"Cannot determine %s in Oracle DB version", #a);\
+			a##_num = 0;							\
+			overall_status = FAIL;						\
+		}									\
+	}										\
 
 	if (start = strstr(unparsed_version, release_str))
 	{
@@ -2629,7 +2632,6 @@ if (FAIL == local_status)							\
 		DO_IT(release_update_version_revision);
 		DO_IT(increment_version);
 		DO_IT(reserved_for_future_use);
-
 	}
 	else
 	{
@@ -2650,7 +2652,7 @@ out:
 				reserved_for_future_use_num;
 	}
 
-	printf("RESULT_VERSION: %d\n", ZBX_ORACLE_SVERSION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "RESULT_VERSION: %d\n", ZBX_ORACLE_SVERSION);
 #else
 #endif
 }

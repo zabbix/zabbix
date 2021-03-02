@@ -84,6 +84,7 @@ COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_history_sql_init \
 	-Wl,--wrap=zbx_history_elastic_init \
 	-Wl,--wrap=zbx_elastic_check_version \
+	-Wl,--wrap=zbx_elastic_get_version \
 	-Wl,--wrap=time
 
 zbx_vc_get_values_SOURCES = \
