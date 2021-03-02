@@ -127,4 +127,18 @@ trait TableTrait {
 				$this->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
 	}
+
+	/**
+	 * Get data from chosen column.
+	 *
+	 * @param string $column		Column name, where value should be checked
+	 */
+	private function getTableResult($column) {
+		$table = $this->query('class:list-table')->asTable()->one();
+		$result = [];
+		foreach ($table->getRows() as $row) {
+			$result[] = $row->getColumn($column)->getText();
+		}
+		return $result;
+	}
 }
