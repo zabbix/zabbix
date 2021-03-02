@@ -2226,7 +2226,7 @@ class CDashboardPage {
 
 			let update_policy = 'refresh';
 
-			if (!reused_widgetids.includes(child.widgetid) && 'update_policy' in options) {
+			if (reused_widgetids.includes(child.widgetid) && 'update_policy' in options) {
 				// Allow to override update_policy only for existing (not new) widgets.
 				update_policy = options['update_policy'];
 			}
