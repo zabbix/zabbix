@@ -110,7 +110,6 @@ $availableJScripts = [
 	'class.svg.canvas.js' => 'vector/',
 	'class.svg.map.js' => 'vector/',
 	'class.cviewswitcher.js' => '',
-	'class.pmaster.js' => '',
 	'class.rpc.js' => '',
 	'class.tabfilter.js' => '',
 	'class.tabfilteritem.js' => '',
