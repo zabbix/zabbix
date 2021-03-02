@@ -631,27 +631,30 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *                                                                            *
  * Function: evaluate_COUNT                                                   *
  *                                                                            *
- * Purpose: evaluate function 'count' for the item                            *
+ * Purpose: evaluate functions 'count' and 'find' for the item                *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - up to four comma-separated fields:                *
- *                            (1) number of seconds/values                    *
- *                            (2) value to compare with (optional)            *
+ * Parameters: item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] up to three comma-separated fields:          *
+ *                            (1) number of seconds/values + timeshift        *
+ *                            (2) comparison operator (optional)              *
+ *                            (3) value to compare with (optional)            *
  *                                Becomes mandatory for numeric items if 3rd  *
  *                                parameter is specified and is not "regexp"  *
  *                                or "iregexp". With "band" can take one of   *
  *                                2 forms:                                    *
  *                                  - value_to_compare_with/mask              *
  *                                  - mask                                    *
- *                            (3) comparison operator (optional)              *
- *                            (4) time shift (optional)                       *
+ *             ts         - [IN] the function evaluation time                 *
+ *             limit      - [IN] the limit of counted values, will return     *
+ *                              when the limit is reached                     *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, int limit,
-		char **error)
+static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		int limit, char **error)
 {
 	int				arg1, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
 	int				seconds = 0, nvalues = 0, time_shift;
