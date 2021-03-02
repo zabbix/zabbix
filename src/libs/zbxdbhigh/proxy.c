@@ -4682,7 +4682,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		unsigned char proxy_status, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
-	int			ret = SUCCEED, flags_old;
+	int			ret = SUCCEED, proxy_check = SUCCEED, flags_old;
 	char			*error_step = NULL, value[MAX_STRING_LEN];
 	size_t			error_alloc = 0, error_offset = 0;
 	zbx_proxy_diff_t	proxy_diff;

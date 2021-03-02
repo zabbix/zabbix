@@ -194,7 +194,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 				}
 				else
 				{
-					ret = zbx_send_proxy_data_response(proxy, &s, NULL);
+					ret = zbx_send_proxy_data_response(proxy, &s, NULL, 0);
 
 					if (SUCCEED == ret)
 						*data = zbx_strdup(*data, s.buffer);
@@ -510,7 +510,11 @@ static int	process_proxy(void)
 
 			if (proxy.proxy_data_nextcheck <= now)
 			{
+
 				int	more;
+
+				if (FAIL == zbx_hc_check_proxy(proxy.hostid))
+					goto error;
 
 				do
 				{
