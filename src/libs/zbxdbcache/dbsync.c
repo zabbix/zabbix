@@ -2065,7 +2065,7 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: compare serialized expression                                     *
  *                                                                            *
- * Parameter: data1 - [IN] the base64 encoded expression                      *
+ * Parameter: col   - [IN] the base64 encoded expression                      *
  *            data2 - [IN] the serialized expression in cache                 *
  *                                                                            *
  * Return value: SUCCEED - the expressions are identical                      *
@@ -2160,7 +2160,7 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
 	if (FAIL == dbsync_compare_serialized_expression(dbrow[16], trigger->expression_bin))
 		return FAIL;
 
-	if (TRIGGER_RECOVERY_MODE_EXPRESSION == atoi(dbrow[10]) &&
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == atoi(dbrow[10]) &&
 			FAIL == dbsync_compare_serialized_expression(dbrow[17], trigger->recovery_expression_bin))
 	{
 		return FAIL;
@@ -2234,9 +2234,9 @@ static char	**dbsync_trigger_preproc_row(char **row)
 		}
 		else
 		{
-			zbx_eval_get_functionids(&ctx, &functionids);
+			zbx_eval_get_functionids(&ctx_r, &functionids);
 
-			if (SUCCEED == zbx_eval_check_timer_functions(&ctx))
+			if (SUCCEED == zbx_eval_check_timer_functions(&ctx_r))
 				timer |= ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION;
 		}
 	}

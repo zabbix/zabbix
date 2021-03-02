@@ -23,6 +23,9 @@
 #include "zbxserver.h"
 #include "eval.h"
 
+/* exit code in addition to SUCCEED/FAIL */
+#define UNKNOWN		1
+
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_op_unary                                            *
@@ -34,7 +37,7 @@
  *             output   - [IN/OUT] the output value stack                     *
  *             error    - [OUT] the error message in the case of failure      *
  *                                                                            *
- * Return value: SUCCEED - the oeprator was evaluated successfully            *
+ * Return value: SUCCEED - the operator was evaluated successfully            *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -504,7 +507,7 @@ static int	eval_validate_function_args(const zbx_eval_context_t *ctx, const zbx_
 	{
 		if (ZBX_VARIANT_ERR == output->values[i].type)
 		{
-			zbx_variant_t	value = value = output->values[i];
+			zbx_variant_t	value = output->values[i];
 
 			/* first error argument is used as function return value */
 			zbx_variant_set_none(&output->values[i]);
@@ -907,7 +910,12 @@ static int	eval_execute_function_date(const zbx_eval_context_t *ctx, const zbx_e
 	}
 
 	now = ctx->ts.sec;
-	tm = localtime(&now);
+	if (NULL == (tm = localtime(&now)))
+	{
+		*error = zbx_dsprintf(*error, "cannot convert time for function at \"%s\": %s",
+				ctx->expression + token->loc.l, zbx_strerror(errno));
+		return FAIL;
+	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%.4d%.2d%.2d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday));
 	eval_function_return(0, &value, output);
 
@@ -944,7 +952,12 @@ static int	eval_execute_function_time(const zbx_eval_context_t *ctx, const zbx_e
 	}
 
 	now = ctx->ts.sec;
-	tm = localtime(&now);
+	if (NULL == (tm = localtime(&now)))
+	{
+		*error = zbx_dsprintf(*error, "cannot convert time for function at \"%s\": %s",
+				ctx->expression + token->loc.l, zbx_strerror(errno));
+		return FAIL;
+	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%.2d%.2d%.2d", tm->tm_hour, tm->tm_min, tm->tm_sec));
 	eval_function_return(0, &value, output);
 
@@ -1012,7 +1025,12 @@ static int	eval_execute_function_dayofweek(const zbx_eval_context_t *ctx, const 
 	}
 
 	now = ctx->ts.sec;
-	tm = localtime(&now);
+	if (NULL == (tm = localtime(&now)))
+	{
+		*error = zbx_dsprintf(*error, "cannot convert time for function at \"%s\": %s",
+				ctx->expression + token->loc.l, zbx_strerror(errno));
+		return FAIL;
+	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%d", 0 == tm->tm_wday ? 7 : tm->tm_wday));
 	eval_function_return(0, &value, output);
 
@@ -1048,7 +1066,12 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
 	}
 
 	now = ctx->ts.sec;
-	tm = localtime(&now);
+	if (NULL == (tm = localtime(&now)))
+	{
+		*error = zbx_dsprintf(*error, "cannot convert time for function at \"%s\": %s",
+				ctx->expression + token->loc.l, zbx_strerror(errno));
+		return FAIL;
+	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%d", tm->tm_mday));
 	eval_function_return(0, &value, output);
 
@@ -1191,7 +1214,7 @@ static int	eval_execute_hist_function(const zbx_eval_context_t *ctx, const zbx_e
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_throw_execption                                             *
+ * Function: eval_throw_exception                                             *
  *                                                                            *
  * Purpose: throw exception by returning the specified error                  *
  *                                                                            *
@@ -1199,7 +1222,7 @@ static int	eval_execute_hist_function(const zbx_eval_context_t *ctx, const zbx_e
  *             error  - [OUT] the error message in the case of failure        *
  *                                                                            *
  ******************************************************************************/
-static void	eval_throw_execption(zbx_vector_var_t *output, char **error)
+static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
 {
 	zbx_variant_t	*arg;
 
@@ -1289,7 +1312,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_EXCEPTION:
-					eval_throw_execption(&output, error);
+					eval_throw_exception(&output, error);
 					goto out;
 				default:
 					*error = zbx_dsprintf(*error, "unknown token at \"%s\"",

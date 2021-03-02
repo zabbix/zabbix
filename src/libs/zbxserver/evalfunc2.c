@@ -767,6 +767,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 								" value", arg3);
 						goto out;
 					}
+					arg3_2_ui64 = 0;
 				}
 				else
 				{

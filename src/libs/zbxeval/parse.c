@@ -742,7 +742,7 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 		if (0 == token.type)
 			break;
 
-		/* serialization used to for parsed expression caching has limits expression to 0x7fffffff */
+		/* serialization used for parsed expression caching has limits expression to 0x7fffffff */
 		if ((zbx_uint32_t)0x7fffffff < token.loc.r)
 		{
 			*error = zbx_strdup(*error, "too long expression");

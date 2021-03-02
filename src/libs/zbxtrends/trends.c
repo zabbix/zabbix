@@ -227,8 +227,8 @@ int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char 
  *                                                                            *
  * Parameters: from         - [IN] the time the period shift is calculated    *
  *                                 from                                       *
- *             period       - [IN] the history period                         *
- *             period_shift - [IN] the history period shift                   *
+ *             param        - [IN] the history period parameter:              *
+ *                                     <period>:<period_shift>                *
  *             start        - [OUT] the period start time in seconds since    *
  *                                  Epoch                                     *
  *             end          - [OUT] the period end time in seconds since      *

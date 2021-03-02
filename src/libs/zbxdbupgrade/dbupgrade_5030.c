@@ -1107,10 +1107,10 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 				0 == strcmp(row[2], "dayofweek") || 0 == strcmp(row[2], "now") ||
 				0 == strcmp(row[2], "time"))
 		{
-			char	replace[FUNCTION_NAME_LEN * 4 + 1];
+			char	func_name[FUNCTION_NAME_LEN * 4 + 1];
 
-			zbx_snprintf(replace, sizeof(replace), "%s()", row[2]);
-			dbpatch_update_trigger(trigger, functionid, replace);
+			zbx_snprintf(func_name, sizeof(func_name), "%s()", row[2]);
+			dbpatch_update_trigger(trigger, functionid, func_name);
 
 			func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
 			func->hostid = hostid;
@@ -1152,7 +1152,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	/* the trigger is still linked to the same hosts                              */
 	if (0 != common_functions.values_num)
 	{
-		int	i, extended = 0;
+		int	extended = 0;
 
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
