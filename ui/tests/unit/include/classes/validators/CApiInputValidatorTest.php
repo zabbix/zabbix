@@ -2025,67 +2025,6 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'8388608T'
 			],
 			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'Detect operating system',
-				'/1/name',
-				'Detect operating system'
-			],
-			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'Detect operating system+',
-				'/1/name',
-				'Invalid parameter "/1/name": value is too long.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				[],
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				true,
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				null,
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				// broken UTF-8 byte sequence
-				'Detect '."\xd1".'perating system',
-				'/1/name',
-				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'',
-				'/1/name',
-				'Invalid parameter "/1/name": cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'script_name/',
-				'/1/name',
-				'Invalid parameter "/1/name": contains invalid characters.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'a/b/c/',
-				'/1/name',
-				'Invalid parameter "/1/name": contains invalid characters.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'a/'.'/c',
-				'/1/name',
-				'Invalid parameter "/1/name": contains invalid characters.'
-			],
-			[
 				['type' => API_SCRIPT_MENU_PATH],
 				[],
 				'/1/menu_path',

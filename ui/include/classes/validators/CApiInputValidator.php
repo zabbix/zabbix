@@ -142,9 +142,6 @@ class CApiInputValidator {
 			case API_NUMERIC:
 				return self::validateNumeric($rule, $data, $path, $error);
 
-			case API_SCRIPT_NAME:
-				return self::validateScriptName($rule, $data, $path, $error);
-
 			case API_SCRIPT_MENU_PATH:
 				return self::validateScriptMenuPath($rule, $data, $path, $error);
 
@@ -227,7 +224,6 @@ class CApiInputValidator {
 			case API_HG_NAME:
 			case API_H_NAME:
 			case API_NUMERIC:
-			case API_SCRIPT_NAME:
 			case API_SCRIPT_MENU_PATH:
 			case API_USER_MACRO:
 			case API_LLD_MACRO:
@@ -1343,37 +1339,6 @@ class CApiInputValidator {
 
 		// Add leading zero.
 		$data = preg_replace('/^(-)?(\..*)$/', '${1}0${2}', $data);
-
-		return true;
-	}
-
-	/**
-	 * Global script name validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateScriptName($rule, &$data, $path, &$error) {
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		$slash = stripos($data, '/');
-		if ($slash !== false) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('contains invalid characters'));
-
-			return false;
-		}
 
 		return true;
 	}

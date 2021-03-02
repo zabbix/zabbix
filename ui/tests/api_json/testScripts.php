@@ -95,14 +95,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			'Test invalid name' => [
-				'script' => [
-					'name' => 'API/Script/',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'command' => 'reboot server'
-				],
-				'expected_error' => 'Invalid parameter "/1/name": contains invalid characters.'
-			],
 			'Test existing name' => [
 				'script' => [
 					'name' => 'Ping',
@@ -1976,13 +1968,6 @@ class testScripts extends CAPITest {
 					'name' => ''
 				]],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
-			],
-			'Test invalid name' => [
-				'script' => [[
-					'scriptid' => 15,
-					'name' => 'API/Update/'
-				]],
-				'expected_error' => 'Invalid parameter "/1/name": contains invalid characters.'
 			],
 			'Test existing name' => [
 				'script' => [[

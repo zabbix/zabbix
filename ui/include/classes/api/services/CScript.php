@@ -705,7 +705,7 @@ class CScript extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => []];
 
 		$common_fields = [
-			'name' =>			['type' => API_SCRIPT_NAME, 'length' => DB::getFieldLength('scripts', 'name')],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK])],
 			'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
 			'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
@@ -716,7 +716,7 @@ class CScript extends CApiService {
 		if ($method === 'create') {
 			$common_fields['scope']['default'] = ZBX_SCRIPT_SCOPE_ACTION;
 			$api_input_rules['uniq'] = [['name']];
-			$common_fields['name']['flags'] = API_REQUIRED;
+			$common_fields['name']['flags'] |= API_REQUIRED;
 			$common_fields['type']['flags'] = API_REQUIRED;
 			$common_fields['command']['flags'] |= API_REQUIRED;
 		}

@@ -122,7 +122,7 @@ class CControllerMenuPopup extends CController {
 				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
 				: [];
 
-			// Filter only host scope scripts and get rid of excess spaces and create full name with menu path included.
+			// Filter only host scope scripts, get rid of excess spaces and unify slashes in menu path.
 			if ($scripts) {
 				foreach ($scripts as $num => &$script) {
 					if ($script['scope'] != ZBX_SCRIPT_SCOPE_HOST) {
@@ -138,21 +138,30 @@ class CControllerMenuPopup extends CController {
 							$script['menu_path'] = substr($script['menu_path'], 1);
 						}
 
+						$script['sort'] = $script['menu_path'];
+
 						// If there is something more, check if last slash is present.
 						if (strlen($script['menu_path']) > 0) {
 							if (substr($script['menu_path'], -1) !== '/') {
-								$script['menu_path'] .= '/';
+								$script['sort'] = $script['menu_path'].'/';
+							}
+							else {
+								$script['sort'] = $script['menu_path'];
+							}
+
+							if (substr($script['menu_path'], -1) === '/') {
+								$script['menu_path'] = substr($script['menu_path'], 0, -1);
 							}
 						}
 					}
 
-					$script['name'] = $script['menu_path'].$script['name'];
+					$script['sort'] = $script['sort'].$script['name'];
 				}
 				unset($script);
 			}
 
 			if ($scripts) {
-				CArrayHelper::sort($scripts, ['name']);
+				CArrayHelper::sort($scripts, ['sort']);
 			}
 
 			$menu_data = [
@@ -183,6 +192,7 @@ class CControllerMenuPopup extends CController {
 			foreach (array_values($scripts) as $script) {
 				$menu_data['scripts'][] = [
 					'name' => $script['name'],
+					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				];

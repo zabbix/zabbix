@@ -1330,7 +1330,7 @@ define('API_FLOATS',				13);
 define('API_UINTS64',				14);
 // specific types
 define('API_HG_NAME',				15);
-define('API_SCRIPT_NAME',			16);
+define('API_SCRIPT_MENU_PATH',		16);
 define('API_USER_MACRO',			17);
 define('API_TIME_PERIOD',			18);
 define('API_REGEX',					19);
@@ -1352,7 +1352,6 @@ define('API_DNS',					34);
 define('API_PORT',					35);
 define('API_TRIGGER_EXPRESSION',	36);
 define('API_EVENT_NAME',			37);
-define('API_SCRIPT_MENU_PATH',		38);
 
 // flags
 define('API_REQUIRED',					0x0001);
