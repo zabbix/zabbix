@@ -1200,6 +1200,12 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() subject:\"%s\" content_name:%s content_size:%u", __func__,
 			subject, ZBX_NULL2EMPTY_STR(content_type), content_size);
 
+	if (SUCCEED == zbx_ipc_async_socket_connected(&dispatch->alerter))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_ipc_async_socket_close(&dispatch->alerter);
+	}
+
 	if (FAIL == zbx_ipc_async_socket_open(&dispatch->alerter, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, error))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;

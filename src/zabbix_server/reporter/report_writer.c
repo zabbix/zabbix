@@ -272,8 +272,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
  *                                                                            *
  * Function: rw_send_report                                                   *
  *                                                                            *
- * Purpose: dispatch report to the recipients using specified media type      *
- *          parameters                                                        *
+ * Purpose: send report to the recipients using specified media type          *
  *                                                                            *
  * Parameters: msg      - [IN] the send report request message                *
  *             dispatch - [IN] the alerter dispatch                           *
@@ -286,20 +285,25 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error)
 {
 	int			ret = FAIL;
-	zbx_vector_str_t	sendtos;
+	zbx_vector_str_t	recipients;
 	DB_MEDIATYPE		mt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_str_create(&sendtos);
+	zbx_vector_str_create(&recipients);
 
-	report_deserialize_send_report(msg->data, &mt, &sendtos);
-
-	ret = zbx_alerter_send_dispatch(dispatch, &mt, &sendtos, error);
+	/* The message data is identical (mediatype + recipients) so currently it */
+	/* could be forwarded without deserializing/serializing it. Also it could */
+	/* have been directly sent from report manager to alert manager, however  */
+	/* then 'dispatch' message could be delivered before 'begin' message.     */
+	/* While sending through writer does add overhead, it also adds           */
+	/* synchronization. And the overhead is only at writer's side.            */
+	report_deserialize_send_report(msg->data, &mt, &recipients);
+	ret = zbx_alerter_send_dispatch(dispatch, &mt, &recipients, error);
 
 	zbx_db_mediatype_clean(&mt);
-	zbx_vector_str_clear_ext(&sendtos, zbx_str_free);
-	zbx_vector_str_destroy(&sendtos);
+	zbx_vector_str_clear_ext(&recipients, zbx_str_free);
+	zbx_vector_str_destroy(&recipients);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -354,14 +358,18 @@ static void	rw_send_result(zbx_ipc_socket_t *socket, int status, char *error)
 	zbx_free(data);
 }
 
-
+/******************************************************************************
+ *                                                                            *
+ * Function: report_writer_thread                                             *
+ *                                                                            *
+ ******************************************************************************/
 ZBX_THREAD_ENTRY(report_writer_thread, args)
 {
 	pid_t			ppid;
 	char			*error = NULL;
 	zbx_ipc_socket_t	socket;
 	zbx_ipc_message_t	message;
-	zbx_alerter_dispatch_t	dispatch;
+	zbx_alerter_dispatch_t	dispatch = {0};
 	int			report_status = FAIL;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
