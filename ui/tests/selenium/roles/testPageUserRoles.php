@@ -83,7 +83,7 @@ class testPageUserRoles extends CWebTest {
 		$this->assertEquals(['Name', '#', 'Users'], $headers);
 
 		// Filter form fields.
-		$this->assertEquals(['Name'], $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->getLabels()->asText());
+		$this->assertEquals(['Name'], $this->query('name:zbx_filter')->asForm()->one()->getLabels()->asText());
 
 		// Check that non-sortable headers is not clickable.
 		foreach (['#', 'Users'] as $header) {
@@ -122,7 +122,7 @@ class testPageUserRoles extends CWebTest {
 
 		// Filters buttons are enabled.
 		foreach (['Apply', 'Reset', 'Create user role'] as $button) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
+			$this->assertTrue($this->query('button', $button)->one()->isClickable());
 		}
 
 		// Check selected rows counter.
