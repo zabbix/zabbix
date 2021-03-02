@@ -169,7 +169,7 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 		}
 		else
 		{
-			size_t	*error_alloc = NULL;
+			size_t	error_alloc = 0;
 
 			zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_DETAIL, error, &error_alloc, NULL);
 		}
