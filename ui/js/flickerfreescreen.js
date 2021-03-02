@@ -164,11 +164,6 @@
 					self.refreshMap(id);
 					break;
 
-				// SCREEN_RESOURCE_CLOCK
-				case 7:
-					// don't refresh anything
-					break;
-
 				// SCREEN_RESOURCE_HISTORY
 				case 17:
 					if (screen.data.action == 'showgraph') {
@@ -201,9 +196,6 @@
 					}
 					break;
 
-				// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-				// SCREEN_RESOURCE_LLD_GRAPH
-				case 20:
 				case 19:
 					self.refreshProfile(id, ajax_url);
 					break;

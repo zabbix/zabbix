@@ -116,21 +116,6 @@ class CScreenBuilder {
 		if (!empty($options['screen'])) {
 			$this->screen = $options['screen'];
 		}
-		elseif (array_key_exists('screenid', $options) && $options['screenid'] > 0) {
-			$this->screen = API::Screen()->get([
-				'screenids' => $options['screenid'],
-				'output' => API_OUTPUT_EXTEND,
-				'selectScreenItems' => API_OUTPUT_EXTEND,
-				'editable' => ($this->mode == SCREEN_MODE_EDIT)
-			]);
-
-			if (!empty($this->screen)) {
-				$this->screen = reset($this->screen);
-			}
-			else {
-				access_deny();
-			}
-		}
 
 		// calculate time
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
@@ -162,15 +147,6 @@ class CScreenBuilder {
 		if (!array_key_exists('resourcetype', $options)) {
 			$options['resourcetype'] = null;
 
-			// get resourcetype from screenitem
-			if (!array_key_exists('screenitem', $options) && array_key_exists('screenitemid', $options)) {
-				$options['screenitem'] = API::ScreenItem()->get([
-					'screenitemids' => $options['screenitemid'],
-					'output' => API_OUTPUT_EXTEND
-				]);
-				$options['screenitem'] = reset($options['screenitem']);
-			}
-
 			if (is_array($options['screenitem']) && array_key_exists('screenitem', $options)
 					&& array_key_exists('resourcetype', $options['screenitem'])) {
 				$options['resourcetype'] = $options['screenitem']['resourcetype'];
@@ -192,50 +168,8 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_MAP:
 				return new CScreenMap($options);
 
-			case SCREEN_RESOURCE_HOST_INFO:
-				return new CScreenHostsInfo($options);
-
-			case SCREEN_RESOURCE_TRIGGER_INFO:
-				return new CScreenTriggersInfo($options);
-
-			case SCREEN_RESOURCE_SERVER_INFO:
-				return new CScreenServerInfo($options);
-
-			case SCREEN_RESOURCE_CLOCK:
-				return new CScreenClock($options);
-
-			case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-				return new CScreenTriggersOverview($options);
-
-			case SCREEN_RESOURCE_DATA_OVERVIEW:
-				return new CScreenDataOverview($options);
-
-			case SCREEN_RESOURCE_URL:
-				return new CScreenUrl($options);
-
-			case SCREEN_RESOURCE_ACTIONS:
-				return new CScreenActions($options);
-
-			case SCREEN_RESOURCE_EVENTS:
-				return new CScreenEvents($options);
-
-			case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-				return new CScreenHostgroupTriggers($options);
-
-			case SCREEN_RESOURCE_SYSTEM_STATUS:
-				return new CScreenSystemStatus($options);
-
-			case SCREEN_RESOURCE_HOST_TRIGGERS:
-				return new CScreenHostTriggers($options);
-
 			case SCREEN_RESOURCE_HISTORY:
 				return new CScreenHistory($options);
-
-			case SCREEN_RESOURCE_LLD_GRAPH:
-				return new CScreenLldGraph($options);
-
-			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-				return new CScreenLldSimpleGraph($options);
 
 			case SCREEN_RESOURCE_HTTPTEST_DETAILS:
 				return new CScreenHttpTestDetails($options);

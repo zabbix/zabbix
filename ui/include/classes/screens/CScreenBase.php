@@ -269,21 +269,6 @@ class CScreenBase {
 		if (array_key_exists('screenitem', $options) && is_array($options['screenitem'])) {
 			$this->screenitem = $options['screenitem'];
 		}
-		elseif (array_key_exists('screenitemid', $options) && $options['screenitemid'] > 0) {
-			$screenitem_output = ['screenitemid', 'screenid', 'resourcetype', 'resourceid', 'width', 'height',
-				'elements', 'halign', 'valign', 'style', 'url', 'dynamic', 'sort_triggers', 'application',
-				'max_columns'
-			];
-
-			$this->screenitem = API::ScreenItem()->get([
-				'output' => $screenitem_output,
-				'screenitemids' => $options['screenitemid']
-			]);
-
-			if ($this->screenitem) {
-				$this->screenitem = reset($this->screenitem);
-			}
-		}
 
 		// Get resourcetype.
 		if ($this->resourcetype === null && array_key_exists('resourcetype',$this->screenitem)) {
