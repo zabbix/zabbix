@@ -82,9 +82,8 @@ class testPageUserRoles extends CWebTest {
 		array_shift($headers);
 		$this->assertEquals(['Name', '#', 'Users'], $headers);
 
-		// Forms fields.
+		// Filter form fields.
 		$this->assertEquals(['Name'], $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->getLabels()->asText());
-
 
 		// Check that non-sortable headers is not clickable.
 		foreach (['#', 'Users'] as $header) {
@@ -115,22 +114,24 @@ class testPageUserRoles extends CWebTest {
 		$this->assertTableStats($roles_count);
 
 		// Check filter collapse/expand.
-		foreach (['true', 'false'] as $status) {
-			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
+		$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
+		foreach ([true, false] as $status) {
+			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "filter-container")]')->one()->isDisplayed());
+			$filter_tab->click();
 		}
 
 		// Filters buttons are enabled.
-		$this->assertTrue($this->query('button:Apply')->one()->isEnabled());
-		$this->assertTrue($this->query('button:Reset')->one()->isEnabled());
-		$this->assertTrue($this->query('button:Create user role')->one()->isEnabled());
+		foreach (['Apply', 'Reset', 'Create user role'] as $button) {
+			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
+		}
 
 		// Check selected rows counter.
-		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
+		$delete_button = $this->query('button:Delete')->one();
+		$this->assertFalse($delete_button->isEnabled());
 		$this->query('id:all_roles')->asCheckbox()->one()->check();
-		$this->assertTrue($this->query('button:Delete')->one()->isEnabled());
+		$this->assertTrue($delete_button->isEnabled());
 		$selected = $table->query('class:row-selected')->all()->count();
-		$this->assertEquals($roles_count-1, $selected);
+		$this->assertEquals($roles_count - 1, $selected);
 		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
 
 		$table_data = [
@@ -178,7 +179,7 @@ class testPageUserRoles extends CWebTest {
 				'Name' => 'User role',
 				'#' => 'Users 6',
 				'Users' => 'disabled-user, no-access-to-the-frontend, Tag-user, test-user, user-for-blocking, user-zabbix'
-			],
+			]
 		];
 		$this->assertTableData($table_data);
 	}
@@ -341,9 +342,12 @@ class testPageUserRoles extends CWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageUserRoles_Delete($data) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$hash_before = CDBHelper::getHash('SELECT * FROM role');
+		}
+
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('button:Reset')->one()->click();
-		$hash_before = CDBHelper::getHash('SELECT * FROM role');
 		$before_delete = $this->getTableResult('Name');
 		$table = $this->query('class:list-table')->asTable()->one();
 
