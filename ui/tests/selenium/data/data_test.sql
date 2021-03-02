@@ -2844,38 +2844,3 @@ INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, descri
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (200, 0, 'Script for Update', 'test', 2, NULL, NULL, 'update description');
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (201, 0, 'Script for Clone','test', 2, NULL, NULL, 'clone description');
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (202, 0, 'Script for Delete','test', 2, NULL, NULL, 'delete description');
-
--- preprocessing steps for testFormPreprocessingLowLevelDiscovery_CloneTemplatedLowLevelDiscovery
--- Inheritance test template
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67004,15011,5,5,'regular expression pattern
-output formatting template');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67009,15011,10,11,'/document/item/value/text()');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67010,15011,11,12,'$.document.item.value parameter.');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67013,15011,14,15,'regular expression pattern for not matching');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67014,15011,15,16,'/json/path');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67015,15011,16,17,'/xml/path');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67017,15011,18,20,'7');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67019,15011,20,24,'.
-/
-1');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67005,15011,19,25,'1
-2');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67020,15011,21,21,'test script');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67021,15011,22,23,'metric');
-
--- Template inheritance test host
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67022,15016,5,5,'regular expression pattern
-output formatting template');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67023,15016,10,11,'/document/item/value/text()');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67024,15016,11,12,'$.document.item.value parameter.');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67025,15016,14,15,'regular expression pattern for not matching');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67026,15016,15,16,'/json/path');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67027,15016,16,17,'/xml/path');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67028,15016,18,20,'7');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67029,15016,20,24,'.
-/
-1');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67030,15016,19,25,'1
-2');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67031,15016,21,21,'test script');
-INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (67032,15016,22,23,'metric');

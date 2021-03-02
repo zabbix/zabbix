@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
@@ -228,6 +229,86 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}
 
+	/**
+	 * Add preprocessing steps to inherited LLD for copying.
+	 */
+	public function preparePreprocessingData() {
+		CDataHelper::call('discoveryrule.update', [
+			'itemid' => '15011',
+			'preprocessing' => [
+				[
+					'type' => '5',
+					'params' => "regular expression pattern \noutput template",
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '11',
+					'params' => '/document/item/value/text()',
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '12',
+					'params' => '$.document.item.value parameter.',
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '15',
+					'params' => 'regular expression pattern for not matching',
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '16',
+					'params' => '/json/path',
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '17',
+					'params' => '/xml/path',
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '20',
+					'params' => '7',
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '24',
+					'params' => ".\n/\n1",
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '25',
+					'params' => "1\n2",
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '21',
+					'params' => 'test script',
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				],
+				[
+					'type' => '23',
+					'params' => 'metric',
+					'error_handler' => 0,
+					'error_handler_params' => ''
+				]
+			]
+		]);
+	}
+
+	/**
+	 * @on-before preparePreprocessingData
+	 */
 	public function testFormPreprocessingLowLevelDiscovery_CloneTemplatedLowLevelDiscovery() {
 		$link = 'host_discovery.php?form=update&itemid='.self::INHERITANCE_LLD_ID;
 		$this->checkCloneTemplatedItem($link, 'Discovery rule');
