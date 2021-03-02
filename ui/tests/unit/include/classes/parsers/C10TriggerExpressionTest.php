@@ -3281,28 +3281,28 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				'((-12 + {host:item.str(ГУГЛ)} or {$USERMACRO} and not {TRIGGER.VALUE} or {#LLD} or {{#LLD}.regsub("^([0-9]+)", "{#LLD}: \1")} or 10m))',
 				[
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
 						'value' => '(',
 						'data' => null,
 						'pos' => 0,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
 						'value' => '(',
 						'data' => null,
 						'pos' => 1,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => '-',
 						'data' => null,
 						'pos' => 2,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_NUMBER,
 						'value' => '12',
 						'pos' => 3,
 						'length' => 2,
@@ -3311,14 +3311,14 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => '+',
 						'data' => null,
 						'pos' => 6,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO,
 						'value' => '{host:item.str(ГУГЛ)}',
 						'pos' => 8,
 						'length' => 25,
@@ -3331,77 +3331,77 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => 'or',
 						'data' => null,
 						'pos' => 34,
 						'length' => 2
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_USER_MACRO,
 						'value' => '{$USERMACRO}',
 						'data' => null,
 						'pos' => 37,
 						'length' => 12
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => 'and',
 						'data' => null,
 						'pos' => 50,
 						'length' => 3
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => 'not',
 						'data' => null,
 						'pos' => 54,
 						'length' => 3
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_MACRO,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_MACRO,
 						'value' => '{TRIGGER.VALUE}',
 						'data' => null,
 						'pos' => 58,
 						'length' => 15
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => 'or',
 						'data' => null,
 						'pos' => 74,
 						'length' => 2
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_LLD_MACRO,
 						'value' => '{#LLD}',
 						'data' => null,
 						'pos' => 77,
 						'length' => 6
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => 'or',
 						'data' => null,
 						'pos' => 84,
 						'length' => 2
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_LLD_MACRO,
 						'value' => '{{#LLD}.regsub("^([0-9]+)", "{#LLD}: \1")}',
 						'data' => null,
 						'pos' => 87,
 						'length' => 42
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => 'or',
 						'data' => null,
 						'pos' => 130,
 						'length' => 2
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_NUMBER,
 						'value' => '10m',
 						'pos' => 133,
 						'length' => 3,
@@ -3410,14 +3410,14 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
 						'value' => ')',
 						'data' => null,
 						'pos' => 136,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
 						'value' => ')',
 						'data' => null,
 						'pos' => 137,
@@ -3429,21 +3429,21 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				'(-1.15w + str(host:item, ГУГЛ) or {$USERMACRO}) or {#LLD}',
 				[
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
 						'value' => '(',
 						'data' => null,
 						'pos' => 0,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => '-',
 						'data' => null,
 						'pos' => 1,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_NUMBER,
 						'value' => '1.15w',
 						'pos' => 2,
 						'length' => 5,
@@ -3452,14 +3452,14 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => '+',
 						'data' => null,
 						'pos' => 8,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_FUNCTION,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION,
 						'value' => 'str(host:item, ГУГЛ)',
 						'pos' => 10,
 						'length' => 24,
@@ -3469,35 +3469,35 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						]
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => 'or',
 						'data' => null,
 						'pos' => 35,
 						'length' => 2
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_USER_MACRO,
 						'value' => '{$USERMACRO}',
 						'data' => null,
 						'pos' => 38,
 						'length' => 12
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
 						'value' => ')',
 						'data' => null,
 						'pos' => 50,
 						'length' => 1
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_OPERATOR,
 						'value' => 'or',
 						'data' => null,
 						'pos' => 52,
 						'length' => 2
 					],
 					[
-						'type' => CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO,
+						'type' => C10TriggerExprParserResult::TOKEN_TYPE_LLD_MACRO,
 						'value' => '{#LLD}',
 						'data' => null,
 						'pos' => 55,
