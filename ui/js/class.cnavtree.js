@@ -1272,8 +1272,8 @@ jQuery(function($) {
 					});
 				},
 
-				// onEditStart trigger method
-				onEditStart: function() {
+				// DASHBOARD_PAGE_EVENT_EDIT trigger method
+				DASHBOARD_PAGE_EVENT_EDIT: function() {
 					var $this = $(this);
 					return this.each(function() {
 						switchToEditMode($this);
@@ -1319,7 +1319,7 @@ jQuery(function($) {
 							lastId: 0
 						});
 
-						var	triggers = ['onEditStart', 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad',
+						var	triggers = [DASHBOARD_PAGE_EVENT_EDIT, 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad',
 							'onDashboardReady'
 						];
 

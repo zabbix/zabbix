@@ -47,6 +47,7 @@
 					dashboardid: data.dashboardid,
 					display_period: data.display_period,
 					auto_start: data.auto_start,
+					time_selector: time_selector,
 					dynamic_hostid: dynamic.host ? dynamic.host.id : null
 				},
 				options: {

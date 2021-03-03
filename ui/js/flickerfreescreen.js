@@ -43,6 +43,8 @@
 		},
 
 		add: function(screen) {
+			console.log(['flickerfreeScreen::add', screen]);
+
 			// switch off time control refreshing using full page refresh
 			timeControl.refreshPage = false;
 

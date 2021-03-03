@@ -17,37 +17,40 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
-const WIDGET_EVENT_ENTER      = 'enter';
-const WIDGET_EVENT_LEAVE      = 'leave';
+const WIDGET_EVENT_EDIT_CLICK = 'widget-edit-click';
+const WIDGET_EVENT_ENTER      = 'widget-enter';
+const WIDGET_EVENT_LEAVE      = 'widget-leave';
+
+const WIDGET_EVENT_ACTIVATE   = 'widget-activate';
+const WIDGET_EVENT_DEACTIVATE = 'widget-deactivate';
+const WIDGET_EVENT_REFRESH    = 'widget-refresh';
+const WIDGET_EVENT_DELETE     = 'widget-delete';
+const WIDGET_EVENT_RESIZE     = 'widget-resize';
 
 class CDashboardWidget extends CBaseComponent {
 
 	constructor({
-		defaults,
-		widgetid = '',
-		uniqueid,
-		index = 0,
-		type = '',
+		type,
+		header,
+		view_mode,
+		pos,
 		fields,
 		configuration,
-		storage = {},
-		header = '',
-		dynamic_hostid = null,
-		view_mode = ZBX_WIDGET_VIEW_MODE_NORMAL,
+		defaults,
+		uniqueid,
+		index,
+		cell_width,
+		cell_height,
+		is_editable,
+		dynamic_hostid,
+
+		widgetid = '',
 		rf_rate = 0,
+
+		storage = {},
 		preloader_timeout = 10000,
-		pos = {x: 0, y: 0, width: 1, height: 1},
-		cell_width = 0,
-		cell_height = 0,
-		parent = false,
-		update_paused = false,
-		initial_load = true,
-		is_editable = false,
-		is_edit_mode = false,
-		is_iterator = false,
+		parent = null,
 		is_new = !widgetid.length,
-		is_ready = false,
 		css_classes = {
 			actions: 'dashbrd-grid-widget-actions',
 			container: 'dashbrd-grid-widget-container',
@@ -61,39 +64,49 @@ class CDashboardWidget extends CBaseComponent {
 	} = {}) {
 		super(document.createElement('div'));
 
-		this.defaults = defaults;
-		this.widgetid = widgetid;
-		this.uniqueid = uniqueid;
-		this._index = index;
 		this.type = type;
+		this.header = header;
+		this.view_mode = view_mode;
+		this.pos = pos;
+
+		// Patch JSON-decoded empty array to an empty object.
+		this.fields = (typeof fields === 'object') ? fields : {};
+
+		// Patch JSON-decoded empty array to an empty object.
+		this.configuration = (typeof configuration === 'object') ? configuration : {};
+
+		this.defaults = defaults;
+		this.uniqueid = uniqueid;
+		this.index = index;
+
+		// Private properties.
+
+		this._cell_width = cell_width;
+		this._cell_height = cell_height;
+		this._is_editable = is_editable;
+
+		this.dynamic_hostid = (!this.fields.dynamic || this.fields.dynamic != 1) ? null : dynamic_hostid;
+
+		this.widgetid = widgetid;
 
 		// Replace empty arrays (or anything non-object) with empty objects.
-		this.fields = (typeof fields === 'object') ? fields : {};
-		this.configuration = (typeof configuration === 'object') ? configuration : {};
+
 		this.storage = storage;
 
-		this.header = header;
+
 		// TODO Remove dynamic_hostid from widget class
-		this.dynamic_hostid = (!this.fields.dynamic || this.fields.dynamic != 1) ? null : dynamic_hostid;
-		this.view_mode = view_mode;
 
 		this.rf_rate = rf_rate;
 		this._preloader_timeout = preloader_timeout;
 
-		this.pos = pos;
-		this._cell_width = cell_width;
-		this._cell_height = cell_height;
 
 		this.parent = parent;
-		this.update_paused = update_paused;
-		this.initial_load = initial_load;
+		this.update_paused = false;
+		this.initial_load = true;
 
 		this._is_active = false;
-		this._is_iterator = is_iterator;
-		this._is_editable = is_editable;
-		this._is_edit_mode = is_edit_mode;
 		this._is_new = is_new;
-		this._is_ready = is_ready;
+		this.is_ready = false;
 
 		this._css_classes = css_classes;
 	}
@@ -105,19 +118,24 @@ class CDashboardWidget extends CBaseComponent {
 			if (!this._target.hasChildNodes()) {
 				this._makeView();
 				this.setDivPosition(this.pos);
-				this.showPreloader();
+//				this.showPreloader();
 			}
 
 			this._registerEvents();
+//			this.fire(WIDGET_EVENT_ACTIVATE);
 		}
 
 		return this;
 	}
 
 	deactivate() {
-		this._is_active = false;
+		if (this._is_active) {
+			this._is_active = false;
 
-		this._unregisterEvents();
+			this._unregisterEvents();
+			this.clearUpdateContentTimer();
+//			this.fire(WIDGET_EVENT_DEACTIVATE);
+		}
 
 		return this;
 	}
@@ -130,33 +148,17 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	/**
-	 * Focus specified child widget of iterator.
-	 */
-	enterIteratorWidget() {
-		this.div.addClass(this._css_classes.focus);
-
-		if (this.parent.div.hasClass('dashbrd-grid-iterator-hidden-header')) {
-			this.parent.div.toggleClass('iterator-double-header', this.div.position().top === 0);
-		}
-	}
-
-	/**
 	 * Blur specified top-level widget.
 	 */
 	leave() {
-		// Widget placeholder doesn't have header.
-		if (!this.content_header) {
-			return;
-		}
-
-		if (this.content_header.has(document.activeElement).length) {
+		if (this.content_header.has(document.activeElement).length != 0) {
 			document.activeElement.blur();
 		}
 
 		this.div.removeClass(this._css_classes.focus);
 	}
 
-	update({body, messages, info, debug, script_inline}) {
+	update({body, messages, info, debug}) {
 		this.content_body.empty();
 
 		if (messages !== undefined) {
@@ -169,15 +171,9 @@ class CDashboardWidget extends CBaseComponent {
 		}
 
 		this.removeInfoButtons();
-		if (info !== undefined && !this._is_edit_mode) {
-			this.addInfoButtons(info);
-		}
 
-		// Creates new script elements and removes previous ones to force their re-execution.
-		this.content_script.empty();
-		if (script_inline !== undefined) {
-			// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
-			this.content_script.append($('<script>').text(script_inline));
+		if (info !== undefined) {
+			this.addInfoButtons(info);
 		}
 	}
 
@@ -189,57 +185,35 @@ class CDashboardWidget extends CBaseComponent {
 		return this._is_editable;
 	}
 
-	isEditMode() {
-		return this._is_edit_mode;
-	}
-
-	setEditMode(is_edit_mode) {
-		this._is_edit_mode = is_edit_mode;
-
-		return this;
-	}
-
-	isReady() {
-		return this._is_ready;
-	}
-
 	getView() {
 		return this.div;
 	}
 
 	/**
-	 * Update widget to ready state.
+	 * Update ready state of the widget.
 	 *
-	 * @returns {boolean}  Returns true, if status updated.
+	 * @returns {boolean}  True, if status was updated.
 	 */
 	updateReady() {
 		let is_ready_updated = false;
 
-		if (this._is_iterator) {
-			if (!this.children.length) {
-				// Set empty iterator to ready state.
-
-				is_ready_updated = !this._is_ready;
-				this._is_ready = true;
-			}
-		}
-		else if (this.parent) {
-			this._is_ready = true;
+		if (this.parent !== null) {
+			this.is_ready = true;
 
 			const children_not_ready = this.parent.children.filter((w) => {
-				return !w._is_ready;
+				return !w.is_ready;
 			});
 
-			if (!children_not_ready.length) {
+			if (children_not_ready.length == 0) {
 				// Set parent iterator to ready state.
 
-				is_ready_updated = !this.parent._is_ready;
-				this.parent._is_ready = true;
+				is_ready_updated = !this.parent.is_ready;
+				this.parent.is_ready = true;
 			}
 		}
 		else {
-			is_ready_updated = !this._is_ready;
-			this._is_ready = true;
+			is_ready_updated = !this.is_ready;
+			this.is_ready = true;
 		}
 
 		return is_ready_updated;
@@ -293,7 +267,7 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	stopPreloader() {
-		if (typeof this._preloader_timeoutid !== 'undefined') {
+		if (this._preloader_timeoutid !== undefined) {
 			clearTimeout(this._preloader_timeoutid);
 			delete this._preloader_timeoutid;
 		}
@@ -309,7 +283,7 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	clearUpdateContentTimer() {
-		if (typeof this.rf_timeoutid !== 'undefined') {
+		if (this.rf_timeoutid !== undefined) {
 			clearTimeout(this.rf_timeoutid);
 			delete this.rf_timeoutid;
 		}
@@ -332,7 +306,7 @@ class CDashboardWidget extends CBaseComponent {
 	addInfoButtons(buttons) {
 		// Note: this function is used only for widgets and not iterators.
 
-		const $widget_actions = $('.dashbrd-grid-widget-actions', this.content_header);
+		const $widget_actions = $(`.${this._css_classes.actions}`, this.content_header);
 
 		for (const button of buttons) {
 			$widget_actions.prepend(
@@ -365,8 +339,10 @@ class CDashboardWidget extends CBaseComponent {
 		this.content_header = $('<div>', {'class': this._css_classes.head})
 			.append($('<h4>').text((this.header !== '') ? this.header : this.defaults.header));
 
-		if (!this.parent) {
-			const widget_actions = {
+		if (this.parent === null) {
+			// Do not add action buttons for child widgets of iterators.
+
+			const widget_actions_data = {
 				'widgetType': this.type,
 				'currentRate': this.rf_rate,
 				'widget_uniqueid': this.uniqueid,
@@ -374,99 +350,68 @@ class CDashboardWidget extends CBaseComponent {
 			};
 
 			// TODO Remove graphid, itemid, dynamic_hostid from widget class
+			// Fields must be accessed through a request to a widget method.
+
 			if ('graphid' in this.fields) {
-				widget_actions.graphid = this.fields['graphid'];
+				widget_actions_data.graphid = this.fields['graphid'];
 			}
 
 			if ('itemid' in this.fields) {
-				widget_actions.itemid = this.fields['itemid'];
+				widget_actions_data.itemid = this.fields['itemid'];
 			}
 
 			if (this.dynamic_hostid !== null) {
-				widget_actions.dynamic_hostid = this.dynamic_hostid;
+				widget_actions_data.dynamic_hostid = this.dynamic_hostid;
 			}
 
-			if (this._is_iterator) {
-				this.$button_previous_page = $('<button>', {
-					'type': 'button',
-					'class': 'btn-iterator-page-previous',
-					'title': t('Previous page')
-				});
-				this.$button_next_page = $('<button>', {
-					'type': 'button',
-					'class': 'btn-iterator-page-next',
-					'title': t('Next page')
-				});
-			}
+			const actions = $('<ul>', {'class': this._css_classes.actions});
 
 			if (this._is_editable) {
-				this.$button_edit = $('<button>', {
-					'type': 'button',
-					'class': 'btn-widget-edit',
-					'title': t('Edit')
-				});
-			}
-
-			// Do not add action buttons for child widgets of iterators.
-			this.content_header
-				.append(this._is_iterator
-					? $('<div>', {'class': 'dashbrd-grid-iterator-pager'}).append(
-						this.$button_previous_page,
-						$('<span>', {'class': 'dashbrd-grid-iterator-pager-info'}),
-						this.$button_next_page
-					)
-					: ''
-				)
-
-				.append($('<ul>', {'class': this._css_classes.actions})
-					.append(this._is_editable
-						? $('<li>').append(this.$button_edit)
-						: ''
-					)
-					.append(
-						$('<li>').append(
-							$('<button>', {
-								'type': 'button',
-								'class': 'btn-widget-action',
-								'title': t('Actions'),
-								'data-menu-popup': JSON.stringify({
-									'type': 'widget_actions',
-									'data': widget_actions
-								}),
-								'attr': {
-									'aria-expanded': false,
-									'aria-haspopup': true
-								}
-							})
-						)
+				actions.append(
+					$('<li>').append(
+						$('<button>', {
+							'type': 'button',
+							'class': 'btn-widget-edit',
+							'title': t('Edit')
+						})
 					)
 				);
+			}
+
+			actions.append(
+				$('<li>').append(
+					$('<button>', {
+						'type': 'button',
+						'class': 'btn-widget-action',
+						'title': t('Actions'),
+						'data-menu-popup': JSON.stringify({
+							'type': 'widget_actions',
+							'data': widget_actions_data
+						}),
+						'attr': {
+							'aria-expanded': false,
+							'aria-haspopup': true
+						}
+					})
+				)
+			);
+
+			this.content_header.append(actions);
 		}
 
 		this.content_body = $('<div>', {'class': this._css_classes.content})
-			.toggleClass('no-padding', !this._is_iterator && !this.configuration['padding']);
+			.toggleClass('no-padding', !this.configuration['padding']);
 
 		this.container = $('<div>', {'class': this._css_classes.container})
 			.append(this.content_header)
 			.append(this.content_body);
-
-		if (this._is_iterator) {
-			this.container
-				.append($('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
-					.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
-				);
-		}
-		else {
-			this.content_script = $('<div>');
-			this.container.append(this.content_script);
-		}
 
 		this.div = $(this._target)
 			.addClass(this._css_classes.root)
 			.toggleClass(this._css_classes.hidden_header, this.view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 			.toggleClass('new-widget', this._is_new);
 
-		if (!this.parent) {
+		if (this.parent === null) {
 			this.div.css({
 				'min-height': `${this._cell_height}px`,
 				'min-width': `${this._cell_width}%`
@@ -480,6 +425,8 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	setDivPosition(pos) {
+		console.log(this, pos);
+
 		this.div.css({
 			left: `${this._cell_width * pos.x}%`,
 			top: `${this._cell_height * pos.y}px`,
@@ -488,9 +435,14 @@ class CDashboardWidget extends CBaseComponent {
 		});
 	}
 
+	fire(event_type) {
+		console.log('WIDGET', event_type);
+
+		return !super.fire(event_type, {}, {cancelable: true});
+	}
+
 	_registerEvents() {
 		this._events = {
-
 			edit: () => {
 				this.fire(WIDGET_EVENT_EDIT_CLICK);
 			},
@@ -533,9 +485,9 @@ class CDashboardWidget extends CBaseComponent {
 			}
 		};
 
-		if (!this.parent) {
+		if (this.parent === null) {
 			if (this._is_editable) {
-				this.$button_edit.on('click', this._events.edit);
+//				this.$button_edit.on('click', this._events.edit);
 			}
 		}
 
@@ -550,9 +502,9 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	_unregisterEvents() {
-		if (!this.parent) {
+		if (this.parent === null) {
 			if (this._is_editable) {
-				this.$button_edit.off('click', this._events.edit);
+//				this.$button_edit.off('click', this._events.edit);
 			}
 		}
 

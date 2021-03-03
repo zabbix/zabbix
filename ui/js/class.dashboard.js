@@ -32,7 +32,12 @@ class CDashboard extends CBaseComponent {
 
 		this._containers = containers;
 		this._buttons = buttons;
-		this._dashboard = dashboard;
+		this._dashboard = {
+			templateid: null,
+			dashboardid: null,
+			dynamic_hostid: null,
+			...dashboard
+		};
 		this._options = options;
 
 		this._init();
@@ -40,22 +45,21 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_init() {
-		const div = document.createElement('div');
-		this._containers.navigation_tabs.appendChild(div);
-		this._tabs = new CSortable(div, {is_vertical: false});
-		this._tabs_data = new Map();
+		const sortable = document.createElement('div');
+
+		this._containers.navigation_tabs.appendChild(sortable);
+		this._tabs = new CSortable(sortable, {is_vertical: false});
 		this._selected_tab = null;
 
-		// TODO: Temporary solution.
-		this._selected_page = new CDashboardPage($(this._containers.grid), {
-			dashboard: this._dashboard,
-			options: this._options
-		});
+		this._tabs_data = new Map();
+
+		this._widget_defaults = {};
 	}
 
 	_addTab(title, data) {
 		const tab = document.createElement('li');
 		const tab_contents = document.createElement('div');
+
 		tab.appendChild(tab_contents);
 
 		if (title !== '') {
@@ -64,6 +68,7 @@ class CDashboard extends CBaseComponent {
 		}
 		else {
 			let max_index = this._tabs_data.size;
+
 			for (const tab_data of this._tabs_data.values()) {
 				if (tab_data.index !== null && tab_data.index > max_index) {
 					max_index = tab_data.index;
@@ -100,12 +105,39 @@ class CDashboard extends CBaseComponent {
 		this._buttons.previous_page.style.display = is_scrollable ? 'inline-block' : 'none';
 		this._buttons.next_page.style.display = is_scrollable ? 'inline-block' : 'none';
 
-		this._buttons.previous_page.disabled = (this._selected_tab === null
-				|| this._selected_tab.previousSibling === null);
+		this._buttons.previous_page.disabled = this._selected_tab === null
+			|| this._selected_tab.previousSibling === null;
 
-		this._buttons.next_page.disabled = (this._selected_tab === null
-				|| this._selected_tab.nextSibling === null);
+		this._buttons.next_page.disabled = this._selected_tab === null
+			|| this._selected_tab.nextSibling === null;
 	}
+
+	addPage(data) {
+		const page = new CDashboardPage($(this._containers.grid), {
+			dashboard: {
+				templateid: this._dashboard.templateid !== undefined ? this._dashboard.templateid : null,
+				dashboardid: this._dashboard.dashboardid !== undefined ? this._dashboard.dashboardid : null,
+				dynamic_hostid: this._dashboard.dynamic_hostid !== undefined ? this._dashboard.dynamic_hostid : null
+			},
+			options: this._options
+		});
+
+		page.setWidgetDefaults(this._widget_defaults);
+		page.addWidgets(data.widgets);
+
+		this._addTab(data.name, {page: page});
+	}
+
+	activate() {
+		this._selectTab(this._tabs.getList().children[0]);
+
+		return this.getSelectedPage().activate();
+	}
+
+	getSelectedPage() {
+		return this._tabs_data.get(this._selected_tab).page;
+	}
+
 
 	_registerEvents() {
 
@@ -142,6 +174,20 @@ class CDashboard extends CBaseComponent {
 
 			nextPageClick: () => {
 				this._selectTab(this._selected_tab.nextSibling);
+			},
+
+			timeSelectorRangeUpdate: (e, data) => {
+				this._dashboard.time_selector = {
+					...this._dashboard.time_selector,
+					from: data.from,
+					to: data.to,
+					from_ts: data.from_ts,
+					to_ts: data.to_ts
+				};
+			},
+
+			windowResize: () => {
+				this.getSelectedPage().fire(DASHBOARD_PAGE_EVENT_RESIZE);
 			}
 		};
 
@@ -154,119 +200,130 @@ class CDashboard extends CBaseComponent {
 
 		this._buttons.previous_page.addEventListener('click', this._events.previousPageClick);
 		this._buttons.next_page.addEventListener('click', this._events.nextPageClick);
+
+		if (this._dashboard.time_selector !== null) {
+			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
+		}
+
+		window.addEventListener('resize', this._events.windowResize);
 	}
+
+
+
+
+
+
+
+	getTimeSelector() {
+		return this._dashboard.time_selector;
+	}
+
+	// =================================================================================================================
+	// =================================================================================================================
+	// =================================================================================================================
+	// TODO: Temporary solution.
 
 	addPages(pages) {
 		for (const page of pages) {
 			this.addPage(page);
+
+			break;
 		}
 
 		return this;
 	}
 
-	addPage(page) {
-		this._addTab(page.name, {dashboard_pageid: page.dashboard_pageid});
-
-		// TODO: Temporary solution.
-		if (this._tabs_data.size == 1) {
-			this._selected_page.addWidgets(page.widgets);
-
-			this._selectTab(this._tabs.getList().children[0]);
-		}
-	}
-
-	// TODO: Temporary solution.
-
-	activate() {
-		return this._selected_page.activate();
-	}
-
 	getDashboardData() {
-		return this._selected_page.getDashboardData();
+		return this.getSelectedPage().getDashboardData();
 	}
 
 	getWidgets() {
-		return this._selected_page.getWidgets();
+		return this.getSelectedPage().getWidgets();
 	}
 
 	getOptions() {
 		return this._options;
 	}
 
+
+	deactivate() {
+		return this.getSelectedPage().activate();
+	}
+
 	getCopiedWidget() {
-		return this._selected_page.getCopiedWidget();
+		return this.getSelectedPage().getCopiedWidget();
 	}
 
 	updateDynamicHost(hostid) {
-		return this._selected_page.updateDynamicHost(hostid);
+		return this.getSelectedPage().updateDynamicHost(hostid);
 	}
 
 	setWidgetDefaults(defaults) {
-		return this._selected_page.setWidgetDefaults(defaults);
+		this._widget_defaults = defaults;
 	}
 
 	addWidgets(widgets) {
-		return this._selected_page.addWidgets(widgets);
+		return this.getSelectedPage().addWidgets(widgets);
 	}
 
 	addNewWidget(trigger_element, pos) {
-		return this._selected_page.addNewWidget(trigger_element, pos);
+		return this.getSelectedPage().addNewWidget(trigger_element, pos);
 	}
 
 	setWidgetRefreshRate(widgetid, rf_rate) {
-		return this._selected_page.setWidgetRefreshRate(widgetid, rf_rate);
+		return this.getSelectedPage().setWidgetRefreshRate(widgetid, rf_rate);
 	}
 
 	refreshWidget(widgetid) {
-		return this._selected_page.refreshWidget(widgetid);
+		return this.getSelectedPage().refreshWidget(widgetid);
 	}
 
 	pauseWidgetRefresh(widgetid) {
-		return this._selected_page.pauseWidgetRefresh(widgetid);
+		return this.getSelectedPage().pauseWidgetRefresh(widgetid);
 	}
 
 	unpauseWidgetRefresh(widgetid) {
-		return this._selected_page.unpauseWidgetRefresh(widgetid);
+		return this.getSelectedPage().unpauseWidgetRefresh(widgetid);
 	}
 
 	setWidgetStorageValue(uniqueid, field, value) {
-		return this._selected_page.setWidgetStorageValue(uniqueid, field, value);
+		return this.getSelectedPage().setWidgetStorageValue(uniqueid, field, value);
 	}
 
 	editDashboard() {
-		return this._selected_page.editDashboard();
+		return this.getSelectedPage().editDashboard();
 	}
 
 	isDashboardUpdated() {
-		return this._selected_page.isDashboardUpdated();
+		return this.getSelectedPage().isDashboardUpdated();
 	}
 
 	saveDashboard() {
-		return this._selected_page.saveDashboard();
+		return this.getSelectedPage().saveDashboard();
 	}
 
 	copyWidget(widget) {
-		return this._selected_page.copyWidget(widget);
+		return this.getSelectedPage().copyWidget(widget);
 	}
 
 	pasteWidget(widget, pos) {
-		return this._selected_page.pasteWidget(widget, pos);
+		return this.getSelectedPage().pasteWidget(widget, pos);
 	}
 
 	deleteWidget(widget) {
-		return this._selected_page.deleteWidget(widget);
+		return this.getSelectedPage().deleteWidget(widget);
 	}
 
 	updateWidgetConfigDialogue() {
-		return this._selected_page.updateWidgetConfigDialogue();
+		return this.getSelectedPage().updateWidgetConfigDialogue();
 	}
 
 	getWidgetsBy(key, value) {
-		return this._selected_page.getWidgetsBy(key, value);
+		return this.getSelectedPage().getWidgetsBy(key, value);
 	}
 
 	registerDataExchange(obj) {
-		return this._selected_page.registerDataExchange(obj);
+		return this.getSelectedPage().registerDataExchange(obj);
 	}
 
 	widgetDataShare(widget, data_name, data) {
@@ -274,18 +331,18 @@ class CDashboard extends CBaseComponent {
 	}
 
 	callWidgetDataShare() {
-		return this._selected_page.callWidgetDataShare();
+		return this.getSelectedPage().callWidgetDataShare();
 	}
 
 	makeReference() {
-		return this._selected_page.makeReference();
+		return this.getSelectedPage().makeReference();
 	}
 
 	isEditMode() {
-		return this._selected_page.isEditMode();
+		return this.getSelectedPage().isEditMode();
 	}
 
 	addAction(hook_name, function_to_call, uniqueid = null, options = {}) {
-		return this._selected_page.addAction(hook_name, function_to_call, uniqueid, options);
+		return this.getSelectedPage().addAction(hook_name, function_to_call, uniqueid, options);
 	}
 }

@@ -43,7 +43,7 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 					grid['widget']['content_body'].html(data['html']);
 				}
 				break;
-			case 'onEditStart':
+			case DASHBOARD_PAGE_EVENT_EDIT:
 				ZABBIX.Dashboard.refreshWidget(grid['widget']['widgetid']);
 				break;
 		}

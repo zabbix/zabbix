@@ -32,7 +32,7 @@ function zbx_svggraph_widget_trigger(hook_name) {
 			ZABBIX.Dashboard.refreshWidget(grid.widget['uniqueid']);
 			break;
 
-		case 'onEditStart':
+		case DASHBOARD_PAGE_EVENT_EDIT:
 			jQuery('svg', grid.widget['content_body']).svggraph('disableSBox');
 			break;
 	}

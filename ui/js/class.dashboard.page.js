@@ -21,10 +21,19 @@
 const ZBX_WIDGET_VIEW_MODE_NORMAL        = 0;
 const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
 
-class CDashboardPage {
+const DASHBOARD_PAGE_EVENT_EDIT            = 'dashboard-page-edit';
+const DASHBOARD_PAGE_EVENT_RESIZE          = 'dashboard-page-resize';
+const DASHBOARD_PAGE_EVENT_ADD_WIDGET      = 'dashboard-page-add-widget';
+const DASHBOARD_PAGE_EVENT_DELETE_WIDGET   = 'dashboard-page-delete-widget';
+const DASHBOARD_PAGE_EVENT_POSITION_WIDGET = 'dashboard-page-position-widget';
 
-	constructor($target, data) {
-		this._$target = $target;
+
+class CDashboardPage extends CBaseComponent {
+
+	constructor(target, data) {
+		super(document.createElement('div'));
+
+		this._$target = $(target);
 
 		this._data = {
 			dashboard: {
@@ -57,7 +66,7 @@ class CDashboardPage {
 		this._is_active = false;
 
 		const add_new_widget_callback = (e) => {
-			if (!this.isEditMode()) {
+			if (!this.this._options.edit_mode) {
 				this.editDashboard();
 			}
 			this.addNewWidget(e.target);
@@ -90,7 +99,7 @@ class CDashboardPage {
 		this._data.new_widget_placeholder.showAtDefaultPosition();
 
 		if (this._options.edit_mode) {
-			this._doAction('onEditStart');
+			this.fire(DASHBOARD_PAGE_EVENT_EDIT);
 			this._editDashboard();
 		}
 	}
@@ -108,48 +117,57 @@ class CDashboardPage {
 	}
 
 	activate() {
-		if (!this._is_active) {
-			this._is_active = true;
-
-			for (const w of this._widgets) {
-				// TODO temporary solution
-				if (this._data.pos_action !== 'updateWidgetConfig') {
-					this._resetCurrentPositions();
-					if (!this._posEquals(w.pos, w.current_pos)) {
-						w.pos = w.current_pos;
-					}
-				}
-
-				w.activate();
-				delete w.current_pos;
-
-				w.getView().appendTo(this._$target);
-
-				// TODO check this
-				if (this._options.edit_mode) {
-					w.rf_rate = 0;
-					this._setWidgetModeEdit(w);
-				}
-
-				this._doAction('onWidgetActivate', w);
-			}
-
-			// TODO check if needs if (this._data.pos_action !== 'updateWidgetConfig') {
-			this._resizeDashboardGrid();
-
-			for (const w of this._widgets) {
-				this._updateWidgetContent(w);
-			}
-
-			this._registerEvents();
+		if (this._is_active) {
+			return;
 		}
+
+		this._is_active = true;
+
+		for (const w of this._widgets) {
+			// TODO temporary solution
+			if (this._data.pos_action !== 'updateWidgetConfig') {
+				this._resetCurrentPositions();
+				if (!this._posEquals(w.pos, w.current_pos)) {
+					w.pos = w.current_pos;
+				}
+			}
+
+			delete w.current_pos;
+
+//			w._makeView();
+
+//			console.log(w.getView());
+			w.activate();
+			w.getView().appendTo(this._$target);
+
+
+			// TODO check this
+			if (this._options.edit_mode) {
+				w.rf_rate = 0;
+				this._setWidgetModeEdit(w);
+			}
+		}
+
+		// TODO check if needs if (this._data.pos_action !== 'updateWidgetConfig') {
+		this._resizeDashboardGrid();
+
+		for (const w of this._widgets) {
+			this._updateWidgetContent(w);
+		}
+
+		this._registerEvents();
 	}
 
 	deactivate() {
+		if (!this._is_active) {
+			return;
+		}
+
 		this._is_active = false;
 
 		for (const w of this._widgets) {
 			w.deactivate();
+
 			// TODO temporary solution
 			w.getView().detach();
 		}
@@ -159,9 +177,12 @@ class CDashboardPage {
 
 	_registerEvents() {
 		this._events = {
+			resize_timeout: null,
+
 			resize: () => {
-				clearTimeout(this._events._resize_timeout);
-				this._events._resize_timeout = setTimeout(() => {
+				clearTimeout(this._events.resize_timeout);
+
+				this._events.resize_timeout = setTimeout(() => {
 					for (const w of this._widgets) {
 						this._resizeWidget(w);
 					}
@@ -172,38 +193,26 @@ class CDashboardPage {
 				this._data.cell_width = this._getCurrentCellWidth();
 				this._data.new_widget_placeholder.resize();
 				this._resizeDashboardGrid();
+			},
+
+			hideMessageExhausted: () => {
+				this._hideMessageExhausted();
 			}
 		}
 
-		for (const action of ['onWidgetActivate', 'onWidgetDelete', 'onWidgetPosition']) {
-			this.addAction(action, this._hideMessageExhausted);
-		}
-
-		for (const w of this._widgets) {
-			if (w instanceof CDashboardWidgetIterator) {
-				this.addAction('onResizeEnd', this._onIteratorResizeEnd, w.uniqueid, {
-					trigger_name: `onIteratorResizeEnd_${w.uniqueid}`,
-					parameters: [w]
-				});
-			}
-		}
-
-		$(window).on('resize', this._events.resize);
+		this.on(DASHBOARD_PAGE_EVENT_RESIZE, this._events.resize);
+		this.on(DASHBOARD_PAGE_EVENT_ADD_WIDGET, this._events.hideMessageExhausted);
+		this.on(DASHBOARD_PAGE_EVENT_DELETE_WIDGET, this._events.hideMessageExhausted);
+		this.on(DASHBOARD_PAGE_EVENT_POSITION_WIDGET, this._events.hideMessageExhausted);
 	}
 
 	_unregisterEvents() {
-		for (const action of ['onWidgetActivate', 'onWidgetDelete', 'onWidgetPosition']) {
-			this.removeAction(action, this._hideMessageExhausted);
-		}
+		this.off(DASHBOARD_PAGE_EVENT_RESIZE, this._events.resize);
+		this.off(DASHBOARD_PAGE_EVENT_ADD_WIDGET, this._events.hideMessageExhausted);
+		this.off(DASHBOARD_PAGE_EVENT_DELETE_WIDGET, this._events.hideMessageExhausted);
+		this.off(DASHBOARD_PAGE_EVENT_POSITION_WIDGET, this._events.hideMessageExhausted);
 
-		for (const w of this._widgets) {
-			if (w instanceof CDashboardWidgetIterator) {
-				this.removeAction('onResizeEnd', this._onIteratorResizeEnd);
-			}
-		}
-
-		$(window).off('resize', this._events.resize);
-		clearTimeout(this._events._resize_timeout);
+		clearTimeout(this._events.resize_timeout);
 	}
 
 	/**
@@ -242,7 +251,7 @@ class CDashboardPage {
 	}
 
 	setWidgetDefaults(defaults) {
-		this._data.widget_defaults = {...this._data.widget_defaults, ...defaults};
+		this._data.widget_defaults = defaults;
 	}
 
 	addWidgets(widgets) {
@@ -288,6 +297,11 @@ class CDashboardPage {
 						this._updateWidgetContent(w);
 					}
 				})
+				.on(WIDGET_EVENT_RESIZE, (e) => {
+					const w = e.detail.target;
+
+					this._onIteratorResizeEnd(w);
+				});
 		}
 		else {
 			widget = new CDashboardWidget(config);
@@ -308,7 +322,7 @@ class CDashboardPage {
 
 		this._data.new_widget_placeholder.hide();
 
-		this._doAction('onWidgetAdd', widget);
+		this.fire(DASHBOARD_PAGE_EVENT_ADD_WIDGET);
 	}
 
 	addNewWidget(trigger_element, pos) {
@@ -377,10 +391,10 @@ class CDashboardPage {
 	}
 
 	editDashboard() {
-		// Set before firing "onEditStart" for isEditMode to work correctly.
+		// Set before firing DASHBOARD_PAGE_EVENT_EDIT for isEditMode to work correctly.
 		this._options.edit_mode = true;
 
-		this._doAction('onEditStart');
+		this.fire(DASHBOARD_PAGE_EVENT_EDIT);
 		this._editDashboard();
 
 		// Event must not fire if the dashboard was initially loaded in edit mode.
@@ -400,7 +414,7 @@ class CDashboardPage {
 	 * After pressing "Edit" button on widget.
 	 */
 	editWidget(widget, trigger_element) {
-		if (!this.isEditMode()) {
+		if (!this._options.edit_mode) {
 			this.editDashboard();
 		}
 
@@ -413,7 +427,7 @@ class CDashboardPage {
 	 * @param {object} widget  Widget object copied.
 	 */
 	copyWidget(widget) {
-		this._doAction('onWidgetCopy', widget);
+		widget.fire('onWidgetCopy');
 
 		this._data.storage.writeKey('dashboard.copied_widget', {
 			dashboard: {
@@ -831,6 +845,8 @@ class CDashboardPage {
 	 * @param {int}    options['trigger_name']    Unique name. There can be only one trigger with this name for each hook.
 	 */
 	addAction(hook_name, function_to_call, uniqueid = null, options = {}) {
+		return;
+
 		let found = false;
 
 		if (typeof this._data.triggers[hook_name] === 'undefined') {
@@ -881,11 +897,6 @@ class CDashboardPage {
 		}
 
 		for (const w of this._widgets) {
-			// Widget placeholder doesn't have header.
-			if (!w.content_header) {
-				continue;
-			}
-
 			// Widget popup open (refresh rate)?
 			if (w.content_header.find('[data-expanded="true"]').length > 0
 				// Widget being dragged or resized in dashboard edit mode?
@@ -915,8 +926,8 @@ class CDashboardPage {
 		}
 
 		if (widget.parent) {
-			widget.parent.leaveIteratorWidgetsExcept(widget);
-			widget.enterIteratorWidget();
+			widget.parent.leaveChildrenExcept(widget);
+			widget.parent.enterChild(widget);
 		}
 		else {
 			this._doLeaveWidgetsExcept(widget);
@@ -952,14 +963,12 @@ class CDashboardPage {
 	 * @param {object} except_widget  Dashboard widget object.
 	 */
 	_doLeaveWidgetsExcept(except_widget) {
-		if (this._widgets) {
-			for (const w of this._widgets) {
-				if (except_widget !== null && w.uniqueid === except_widget.uniqueid) {
-					continue;
-				}
-
-				w.leave();
+		for (const w of this._widgets) {
+			if (except_widget !== null && w.uniqueid === except_widget.uniqueid) {
+				continue;
 			}
+
+			w.leave();
 		}
 	}
 
@@ -1245,7 +1254,7 @@ class CDashboardPage {
 				return w1.pos.y - w2.pos.y;
 			})
 			.forEach((w, index) => {
-				w.setIndex(index);
+				w.index = index;
 			});
 
 		return widgets;
@@ -1854,7 +1863,7 @@ class CDashboardPage {
 		widget.setDivPosition(widget.pos);
 		this._resizeDashboardGrid();
 
-		this._doAction('onWidgetPosition', widget);
+		this.fire(DASHBOARD_PAGE_EVENT_POSITION_WIDGET);
 	}
 
 	_makeDraggable(widget) {
@@ -2073,10 +2082,14 @@ class CDashboardPage {
 
 		if (rf_rate > 0) {
 			widget.rf_timeoutid = setTimeout(() => {
+				if (!widget.isActive()) {
+					return;
+				}
+
 				// Do not update widget if displaying static hintbox.
 				const active = widget.content_body.find('[data-expanded="true"]');
 
-				if (!active.length && !this._doAction('timer_refresh', widget)) {
+				if (!active.length && !widget.fire(WIDGET_EVENT_REFRESH)) {
 					// No active popup or hintbox AND no triggers executed => update now.
 					this._updateWidgetContent(widget);
 				}
@@ -2136,10 +2149,10 @@ class CDashboardPage {
 
 		iterator.updatePager(response.page, response.page_count);
 
-		const current_children = iterator.getChildren();
+		const current_children = iterator.children;
 		const current_children_by_widgetid = {};
 
-		iterator.setChildren([]);
+		iterator.children = [];
 
 		for (const child of current_children) {
 			if (child.widgetid !== '') {
@@ -2181,11 +2194,8 @@ class CDashboardPage {
 					});
 
 					child
-						.activate()
-						.showPreloader()
-						.on(WIDGET_EVENT_EDIT_CLICK, (e) => {
-							this.editWidget(e.detail.target, e.target);
-						})
+//						.activate()
+//						.showPreloader()
 						.on(WIDGET_EVENT_ENTER, (e) => {
 							this._enterWidget(e.detail.target);
 						})
@@ -2193,7 +2203,8 @@ class CDashboardPage {
 							this._leaveWidget(e.detail.target);
 						});
 
-					iterator.addChild(child);
+					iterator.children.push(child);
+					iterator.content_body.append(child.getView());
 				}
 			});
 
@@ -2203,7 +2214,7 @@ class CDashboardPage {
 			}
 		}
 
-		iterator._addPlaceholders(iterator.getNumColumns() * iterator.getNumRows() - iterator.getChildren().length);
+		iterator._addPlaceholders(iterator.getNumColumns() * iterator.getNumRows() - iterator.children.length);
 		if (this._options['kioskmode'] && iterator.getView().position().top === 0) {
 			this._slideKiosk();
 		}
@@ -2212,15 +2223,15 @@ class CDashboardPage {
 			this._updateWidgetContent(iterator);
 		}
 
-		for (const child of iterator.getChildren()) {
+		for (const child of iterator.children) {
 			/* Possible update policies for the child widgets:
 				resize: execute 'onResizeEnd' action (widget won't update if there's no trigger or size hasn't changed).
 					- Is used to propagate iterator's resize event.
 
-				refresh: either execute 'timer_refresh' action (if trigger exists) or updateWidgetContent.
+				refresh: either execute WIDGET_EVENT_REFRESH action (if trigger exists) or updateWidgetContent.
 					- Is used when widget surely hasn't been resized, but needs to be refreshed.
 
-				resize_or_refresh: either execute 'onResizeEnd' or 'timer_refresh' action, or updateWidgetContent.
+				resize_or_refresh: either execute 'onResizeEnd' or WIDGET_EVENT_REFRESH action, or updateWidgetContent.
 					- Is used when widget might have been resized, and needs to be refreshed anyway.
 			*/
 
@@ -2245,7 +2256,7 @@ class CDashboardPage {
 				// No break here.
 
 				case 'refresh':
-					success = this._doAction('timer_refresh', child);
+					success = child.fire(WIDGET_EVENT_REFRESH);
 					break;
 			}
 
@@ -2264,7 +2275,7 @@ class CDashboardPage {
 				return true;
 			}
 
-			search_widgets = widget.parent.getChildren();
+			search_widgets = widget.parent.children;
 		}
 
 		const widgets_found = search_widgets.filter(function(w) {
@@ -2428,6 +2439,10 @@ class CDashboardPage {
 
 				widget.stopPreloader();
 
+				if (!this._is_active) {
+					return $.Deferred().reject();
+				}
+
 				if (this._isDeletedWidget(widget)) {
 					return $.Deferred().reject();
 				}
@@ -2447,35 +2462,33 @@ class CDashboardPage {
 						body: response.body,
 						messages: response.messages,
 						info: response.info,
-						debug: response.debug,
-						script_inline: response.script_inline
+						debug: response.debug
 					});
 				}
 
-				this._doAction('onContentUpdated');
-			})
-			.then(() => {
-				// Separate 'then' section allows to execute JavaScripts added by widgets in previous section first.
+				if (widget.initial_load && response.scripts !== undefined) {
+					eval(response.scripts)(widget, this, response.scripts_data);
+				}
 
-				if (!widget.isReady()) {
+				if (!widget.is_ready) {
 					const dashboard_was_ready = !this._widgets.filter((w) => {
-						return !w.isReady();
+						return !w.is_ready;
 					}).length;
 
 					if (widget.updateReady()) {
 						/*
-					 * The conception:
-					 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.
-					 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' once, as soon as all widgets are loaded.
-					 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' for each new widget added in edit mode.
-					 */
+						 * The conception:
+						 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.
+						 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' once, as soon as all widgets are loaded.
+						 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' for each new widget added in edit mode.
+						 */
 
 						if (dashboard_was_ready) {
 							this._registerDataExchangeCommit();
 						}
 						else {
 							const dashboard_is_ready = !this._widgets.filter(function(w) {
-								return !w.isReady();
+								return !w.is_ready;
 							}).length;
 
 							if (dashboard_is_ready) {
@@ -2510,7 +2523,10 @@ class CDashboardPage {
 
 		request.fail(() => {
 			delete widget.updating_content;
-			this._setUpdateWidgetContentTimer(widget, 3);
+
+			if (widget.isActive()) {
+				this._setUpdateWidgetContentTimer(widget, 3);
+			}
 		});
 	}
 
@@ -2674,33 +2690,36 @@ class CDashboardPage {
 					if (widget && 'pos' in widget) {
 						pos = {...this._data.widget_defaults[type].size, ...widget.pos};
 
-						this._widgets.filter((w) => {
-							return this._rectOverlap(w.pos, pos);
-						}).forEach((w) => {
-							if (this._rectOverlap(w.pos, pos)) {
-								if (pos.x + pos.width > w.pos.x && pos.x < w.pos.x) {
-									pos.width = w.pos.x - pos.x;
+						this._widgets
+							.filter((w) => {
+								return this._rectOverlap(w.pos, pos);
+							})
+							.forEach((w) => {
+								if (this._rectOverlap(w.pos, pos)) {
+									if (pos.x + pos.width > w.pos.x && pos.x < w.pos.x) {
+										pos.width = w.pos.x - pos.x;
+									}
+									else if (pos.y + pos.height > w.pos.y && pos.y < w.pos.y) {
+										pos.height = w.pos.y - pos.y;
+									}
 								}
-								else if (pos.y + pos.height > w.pos.y && pos.y < w.pos.y) {
-									pos.height = w.pos.y - pos.y;
-								}
-							}
-						});
+							});
 
 						pos.width = Math.min(this._options['max-columns'] - pos.x, pos.width);
 						pos.height = Math.min(this._options['max-rows'] - pos.y, pos.height);
 					}
 
 					const widget_data = {
-						'type': type,
-						'header': name,
-						'view_mode': view_mode,
-						'pos': pos,
-						'fields': fields,
-						'configuration': configuration
+						type: type,
+						header: name,
+						view_mode: view_mode,
+						pos: pos,
+						fields: fields,
+						configuration: configuration
 					};
 
-					this._promiseScrollIntoView(pos)
+					this
+						._promiseScrollIntoView(pos)
 						.then(() => {
 							this._addWidget(widget_data);
 							this._data.pos_action = '';
@@ -2813,7 +2832,7 @@ class CDashboardPage {
 	}
 
 	_openConfigDialogue(widget, trigger_element) {
-		this._doAction('beforeConfigLoad', widget);
+//		widget.fire('beforeConfigLoad');
 
 		this._options['config_dialogue_active'] = true;
 
@@ -3134,13 +3153,13 @@ class CDashboardPage {
 	}
 
 	_setWidgetModeEdit(widget) {
-		widget.setEditMode(true);
 		widget.clearUpdateContentTimer();
 
 		if (!(widget instanceof CDashboardWidgetIterator)) {
 			widget.removeInfoButtons();
 		}
 
+		// TODO: The widget shoud already be activated. This method must not interact with widget activation.
 		if (!widget.isActive()) {
 			widget.activate();
 			widget.getView().appendTo(this._$target);
@@ -3171,30 +3190,32 @@ class CDashboardPage {
 	 */
 	_removeWidget(widget) {
 		if (widget instanceof CDashboardWidgetIterator) {
-			for (const child of widget.getChildren()) {
-				this._doAction('onWidgetDelete', child);
-				this._removeWidgetActions(child);
+			for (const child of widget.children) {
+				child.fire(WIDGET_EVENT_DELETE);
+//				this._removeWidgetActions(child);
 				child.getView().remove();
 			}
 		}
 
 		if (widget.parent) {
-			this._doAction('onWidgetDelete', widget);
-			this._removeWidgetActions(widget);
+			widget.fire(WIDGET_EVENT_DELETE);
+//			this._removeWidgetActions(widget);
 			widget.getView().remove();
 		}
 		else {
-			const index = widget.getIndex();
+			const index = widget.index;
 
-			this._doAction('onWidgetDelete', widget);
-			this._removeWidgetActions(widget);
+			widget.fire(WIDGET_EVENT_DELETE);
+//			this._removeWidgetActions(widget);
 			widget.getView().remove();
 
 			this._widgets.splice(index, 1);
 
 			for (let i = index; i < this._widgets.length; i++) {
-				this._widgets[i].setIndex(i);
+				this._widgets[i].index = i;
 			}
+
+			this.fire(DASHBOARD_PAGE_EVENT_DELETE_WIDGET);
 		}
 	}
 
@@ -3236,9 +3257,7 @@ class CDashboardPage {
 			return;
 		}
 
-		this._updateWidgetContent(iterator, {
-			update_policy: 'resize'
-		});
+		this._updateWidgetContent(iterator, {update_policy: 'resize'});
 	}
 
 	_resizeWidget(widget) {
@@ -3246,14 +3265,14 @@ class CDashboardPage {
 
 		if (widget instanceof CDashboardWidgetIterator) {
 			// Iterators will sync first, then selectively propagate the resize event to the child widgets.
-			success = this._doAction('onResizeEnd', widget);
+			success = widget.fire('onResizeEnd');
 		}
 		else {
 			const size_old = widget.content_size;
 			const size_new = widget.getContentSize();
 
 			if (!this._isEqualContentSize(size_old, size_new)) {
-				success = this._doAction('onResizeEnd', widget);
+				success = widget.fire('onResizeEnd');
 
 				if (success) {
 					widget.content_size = size_new;
@@ -3359,7 +3378,16 @@ class CDashboardPage {
 		}
 	}
 
+	fire(event_type) {
+		console.log('PAGE', event_type);
+
+		return !super.fire(event_type, {}, {cancelable: true});
+	}
+
+
 	/**
+	 * TODO: Replace this method with just .fire(DASHBOARD_PAGE_EVENT_*).
+
 	 * Performs action added by addAction function.
 	 *
 	 * @param {string} hook_name    Name of trigger that is currently being called.
@@ -3367,7 +3395,12 @@ class CDashboardPage {
 	 *
 	 * @returns {int}  Number of triggers, that were called.
 	 */
-	_doAction(hook_name, widget = null) {
+	_doAction(hook_name) {
+		console.log('page::doAction', hook_name);
+
+//		this.fire(hook_name);
+
+/*
 		if (typeof this._data.triggers[hook_name] === 'undefined') {
 			return 0;
 		}
@@ -3444,5 +3477,6 @@ class CDashboardPage {
 		}
 
 		return triggers.length;
+		*/
 	}
 }

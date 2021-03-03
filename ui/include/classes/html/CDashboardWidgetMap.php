@@ -127,7 +127,7 @@ class CDashboardWidgetMap extends CDiv {
 
 		if ($this->initial_load) {
 			$script_run .=
-				'ZABBIX.Dashboard.addAction("timer_refresh", '.
+				'ZABBIX.Dashboard.addAction(WIDGET_EVENT_REFRESH, '.
 					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
 						'parameters: ["onWidgetRefresh"],'.
 						'grid: {widget: 1},'.
@@ -163,9 +163,9 @@ class CDashboardWidgetMap extends CDiv {
 
 				'ZABBIX.Dashboard.callWidgetDataShare();'.
 
-				'ZABBIX.Dashboard.addAction("onEditStart", '.
+				'ZABBIX.Dashboard.addAction(DASHBOARD_PAGE_EVENT_EDIT, '.
 					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
-						'parameters: ["onEditStart"],'.
+						'parameters: [DASHBOARD_PAGE_EVENT_EDIT],'.
 						'grid: {widget: 1},'.
 					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
 				'});';

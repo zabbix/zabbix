@@ -33,7 +33,7 @@ if (!$data['preview']) {
 		'script_inline' => $data['script_inline']
 	];
 
-	if ($data['info']) {
+	if ($data['info'] !== null) {
 		$output += [
 			'info' => $data['info']
 		];

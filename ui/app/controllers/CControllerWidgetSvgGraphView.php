@@ -163,9 +163,9 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 			// Disable SBox when switch to edit mode.
 			$script_inline .=
-				'ZABBIX.Dashboard.addAction("onEditStart",'.
+				'ZABBIX.Dashboard.addAction(DASHBOARD_PAGE_EVENT_EDIT,'.
 					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
-						'parameters: ["onEditStart"],'.
+						'parameters: [DASHBOARD_PAGE_EVENT_EDIT],'.
 						'grid: {widget: 1},'.
 						'trigger_name: "svggraph_widget_edit_start_'.$uniqueid.'"'.
 					'});';
