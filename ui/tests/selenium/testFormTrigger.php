@@ -441,7 +441,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => '6 and 0 or 0',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Trigger expression must contain at least one host:key reference.'
+						'Trigger expression must contain at least one /host/key reference.'
 					]
 				]
 			],

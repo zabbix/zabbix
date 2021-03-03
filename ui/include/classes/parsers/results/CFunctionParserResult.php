@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -29,6 +29,7 @@ class CFunctionParserResult extends CParserResult {
 	public $function;
 	public $parameters;
 	public $params_raw;
+	public $type = CTriggerExprParserResult::TOKEN_TYPE_FUNCTION;
 
 	public function __construct() {
 		$this->match = '';

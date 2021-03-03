@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -216,7 +216,6 @@ class C30TriggerConverter extends CConverter {
 			: $param;
 	}
 
-	// TODO miks: do we need a separate converter only because time siffixes can differ? Validation is not converter's job.
 	private static function convertParamPeriod(string $param): string {
 		return (preg_match('/^(?<num>\d+)(?<suffix>[hdwMy]{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')

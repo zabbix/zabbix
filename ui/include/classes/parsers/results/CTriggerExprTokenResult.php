@@ -18,21 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 /**
- * Class to store functionid parser results.
+ * Class used to store details of trigger expression tokens.
  */
-class CFunctionIdParserResult extends CParserResult {
+class CTriggerExprTokenResult extends CParserResult {
 
-	public $functionid;
-
+	/**
+	 * Token type. One of CTriggerExprParserResult supported token types.
+	 *
+	 * @var	int
+	 */
 	public $type;
 
-	public function __construct() {
-		$this->type = CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO;
-		$this->functionid = '';
-		$this->match = '';
-		$this->pos = 0;
-		$this->length = 0;
+	public function __construct(array $data) {
+		$data = array_intersect_key($data, array_flip(['type', 'source', 'match', 'pos', 'length']));
+		foreach ($data as $propery => $value) {
+			$this->$propery = $value;
+		}
 	}
 }

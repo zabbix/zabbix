@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -59,14 +59,13 @@ class CFunctionIdParser extends CParser {
 
 		$functionid = substr($source, $pos + 1, $p - $pos - 2);
 
-		if (bccomp(1, $functionid) > 0 ||  bccomp($functionid, ZBX_DB_MAX_ID) > 0) {
+		if (bccomp('1', $functionid) > 0 ||  bccomp($functionid, ZBX_DB_MAX_ID) > 0) {
 			return CParser::PARSE_FAIL;
 		}
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
-		// TODO miks: 'match' shouldn't duplicate.
 		$this->result->length = $this->length;
 		$this->result->match = $this->match;
 		$this->result->functionid = $functionid;

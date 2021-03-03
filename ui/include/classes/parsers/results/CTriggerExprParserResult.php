@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Class for storing the result returned by the trigger expression parser.
  */
@@ -36,24 +37,7 @@ class CTriggerExprParserResult extends CParserResult {
 	const TOKEN_TYPE_FUNCTION = 10;
 
 	/**
-	 * Array of expression tokens.
-	 *
-	 * Each token contains the following values:
-	 * - type   - token type
-	 * - value  - the token string itself
-	 * - pos    - position of the token in the source string
-	 * - length - length of the token
-	 * - data   - an array containing additional information about the token
-	 *
-	 * The following "data" information can be available depending on the type of the token.
-	 * For self::TOKEN_TYPE_FUNCTION_MACRO tokens:
-	 * - host           - host name
-	 * - item           - item key
-	 * - function       - the function string, e.g., "function(param1, param2)"
-	 * - functionName   - function name without parameters
-	 * - functionParams - array of function parameters
-	 * For self::TOKEN_TYPE_NUMBER tokens:
-	 * - suffix         - a time or byte suffix
+	 * Array of tokens.
 	 *
 	 * @var array
 	 */
@@ -73,29 +57,10 @@ class CTriggerExprParserResult extends CParserResult {
 	/**
 	 * Add a token to the result.
 	 *
-	 * @param string        $type       token type
-	 * @param string        $value      token string
-	 * @param string        $pos        position of the token in the source string
-	 * @param string        $length     length of the token
-	 * @param array|null    $data       additional token information
+	 * @param CParserResult $token
 	 */
-	public function addToken($type, $value, $pos, $length, array $data = null) {
-		$this->tokens[] = [
-			'type' => $type,
-			'value' => $value,
-			'pos' => $pos,
-			'length' => $length,
-			'data' => $data
-		];
-	}
-
-	/**
-	 * Add function a token to the result.
-	 *
-	 * @param CParserResult  $fn_result
-	 */
-	public function addFunctionToken(CParserResult $fn_result) {
-		$this->tokens[] = $fn_result;
+	public function addToken(CParserResult $token) {
+		$this->tokens[] = $token;
 	}
 
 	/**
@@ -106,10 +71,11 @@ class CTriggerExprParserResult extends CParserResult {
 	 * @return array
 	 */
 	public function getTokensByType($type) {
+		// This function will be addopted for new parser together with changes in trigger constructor and trigger test popup.
 		$result = [];
 
 		foreach ($this->tokens as $token) {
-			if ($token['type'] == $type) { // TODO miks: $this->tokens may contain objects.
+			if ($token['type'] == $type) {
 				$result[] = $token;
 			}
 		}
@@ -125,6 +91,7 @@ class CTriggerExprParserResult extends CParserResult {
 	 * @return bool
 	 */
 	public function hasTokenOfType($type) {
+		// This function will be addopted for new parser together with changes in trigger constructor and trigger test popup.
 		foreach ($this->tokens as $token) {
 			if ($type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO
 					&& $token instanceof CFunctionParserResult) {
@@ -172,8 +139,11 @@ class CTriggerExprParserResult extends CParserResult {
 			if ($param instanceof CFunctionParserResult) {
 				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
 			}
-			elseif ($param instanceof CFunctionIdParserResult
-					|| (is_array($param) && $param['type'] == CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO )) {
+			elseif ($param instanceof CTriggerExprTokenResult
+					&& $param->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO) {
+				$return[] = $param;
+			}
+			elseif ($param instanceof CFunctionIdParserResult) {
 				$return[] = $param;
 			}
 		}
@@ -195,7 +165,8 @@ class CTriggerExprParserResult extends CParserResult {
 			if ($param instanceof CFunctionParserResult) {
 				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
 			}
-			elseif (is_array($param) && $param['type'] == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO) {
+			elseif ($param instanceof CTriggerExprTokenResult
+					&& $param->type == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO) {
 				$return[] = $param;
 			}
 		}

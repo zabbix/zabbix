@@ -35,11 +35,16 @@ class CFunctionParser extends CParser {
 	public const PARAM_QUOTED = 2;
 
 	/**
-	 * An array of options.
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'collapsed_expression' => false  Short trigger expression.
 	 *
 	 * @var array
 	 */
-	protected $options = [];
+	protected $options = [
+		'collapsed_expression' => false
+	];
 
 	/**
 	 * Object of parsed function.
@@ -55,7 +60,12 @@ class CFunctionParser extends CParser {
 	 */
 	public $depth;
 
-	public function __construct(int $depth = 1) {
+	/**
+	 * @param array $options
+	 * @param bool  $options['collapsed_expression']
+	 */
+	public function __construct(array $options = [], int $depth = 1) {
+		$this->options = $options + $this->options;
 		$this->depth = $depth;
 	}
 
@@ -135,10 +145,11 @@ class CFunctionParser extends CParser {
 		$num = 0;
 
 		$query_parser = new CQueryParser();
-		$function_parser = new self($this->depth + 1);
+		$function_parser = new self($this->options, $this->depth + 1);
 
-		// TODO miks: invent $this->options['collapsed_expression'] to check if this parser is needed.
-		$functionid_parser = new CFunctionIdParser();
+		if ($this->options['collapsed_expression']) {
+			$functionid_parser = new CFunctionIdParser();
+		}
 
 		while (isset($source[$p])) {
 			switch ($state) {
@@ -182,9 +193,8 @@ class CFunctionParser extends CParser {
 								$state = self::STATE_NEW;
 								$p--;
 							}
-							// TODO miks: invent $this->options['collapsed_expression'].
-							elseif (/*$this->options['collapsed_expression'] && */
-									$functionid_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+							elseif ($this->options['collapsed_expression']
+									&& $functionid_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $functionid_parser->getLength();
 								$_parameters[$num++] = $functionid_parser->result;
 								$state = self::STATE_NEW;

@@ -781,9 +781,9 @@ abstract class CTriggerGeneral extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 		}
 
-		if (!$expressionData->expressions) {
+		if (count($expressionData->result->getItems()) == 0) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_('Trigger expression must contain at least one host:key reference.')
+				_('Trigger expression must contain at least one /host/key reference.')
 			);
 		}
 
@@ -793,9 +793,9 @@ abstract class CTriggerGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 			}
 
-			if (!$expressionData->expressions) {
+			if (count($expressionData->result->getItems()) == 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Trigger recovery expression must contain at least one host:key reference.')
+					_('Trigger recovery expression must contain at least one /host/key reference.')
 				);
 			}
 		}
@@ -1606,12 +1606,18 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$expressionData->parse($trigger['expression']);
-			$expressions = $expressionData->expressions;
-			$hosts_keys = $expressionData->result->getItemsGroupedByHosts();
+
+			foreach ($expressionData->result->getItemsGroupedByHosts() as $key => $host) {
+				if (array_key_exists($key, $hosts_keys)) {
+					$hosts_keys[$key]['keys'] += $host['keys'];
+				}
+				else {
+					$hosts_keys[$key] = $host;
+				}
+			}
 
 			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$expressionData->parse($trigger['recovery_expression']);
-				$expressions = array_merge($expressions, $expressionData->expressions);
 
 				foreach ($expressionData->result->getItemsGroupedByHosts() as $key => $host) {
 					if (array_key_exists($key, $hosts_keys)) {
@@ -1911,9 +1917,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 				for ($i = count($triggers_function_occurances[$tnum][$expr_field])-1; $i>=0; $i--) {
 					$occurance = $triggers_function_occurances[$tnum][$expr_field][$i];
-					$functionid = $triggers_functions[$tnum][$occurance['match']]['functionid'];
-					$trigger[$expr_field] = substr_replace($trigger[$expr_field], '{'.$functionid.'}',
-						$occurance['pos'], $occurance['length']
+					$trigger[$expr_field] = substr_replace($trigger[$expr_field],
+						'{'.$triggers_functions[$tnum][$occurance['match']]['functionid'].'}', $occurance['pos'],
+						$occurance['length']
 					);
 				}
 			}

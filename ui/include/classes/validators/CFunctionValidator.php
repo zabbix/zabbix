@@ -351,15 +351,18 @@ class CFunctionValidator extends CValidator {
 
 		foreach ($this->allowed[$value['functionName']]['args'] as $num => $arg) {
 			// Mandatory check.
-			if (!($arg['mandat'] & 0x00) && !array_key_exists($num, $value['functionParamList'])) {
+			if ($arg['mandat'] && !array_key_exists($num, $value['functionParamList'])) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.
 					_('Mandatory parameter is missing.'));
 				return false;
 			}
+			elseif (!array_key_exists($num, $value['functionParamList'])) {
+				continue;
+			}
 
 			$param = ($value['functionParamList'][$num] instanceof CParserResult)
 					? $value['functionParamList'][$num]->match
-					: $value['functionParamList'][$num];
+					: $value['functionParamList'][$num]['raw'];
 
 			if (($arg['mandat'] & 0x02) && strstr($param, ':') === false) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.

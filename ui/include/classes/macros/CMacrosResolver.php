@@ -884,16 +884,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$texts = [];
 			foreach ($options['sources'] as $source) {
 				if ($trigger[$source] !== '' && $expression_data->parse($trigger[$source]) !== false) {
-					// TODO miks: both objects and arrays can be mixed. Would be nice to rework to objects only.
-					$functionid_macros = array_merge($functionid_macros, array_map(function ($macro) {
-						return ($macro instanceof CFunctionIdParserResult) ? $macro->match : $macro['value'];
-					}, $expression_data->result->getFunctionIds()));
-
-					/*
-					 * TODO miks: $texts should contain also tokens of type CTriggerExprParserResult::TOKEN_TYPE_STRING.
-					 * Add once it is clear if I can rework old array tokens as objects.
-					 */
-					$texts = array_merge($texts, array_column($expression_data->result->getUserMacros(), 'value'));
+					$functionid_macros = array_merge($functionid_macros,
+						array_column($expression_data->result->getFunctionIds(), 'match')
+					);
+					$texts = array_merge($texts, array_column($expression_data->result->getUserMacros(), 'match'));
 				}
 			}
 
@@ -1183,23 +1177,24 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if ($token instanceof CFunctionParserResult) {
 				$expression[] = self::makeTriggerFunctionExpression($token, $macro_values, $usermacro_values, $options);
 			}
-			elseif ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO) {
-				$expression[] = $options['resolve_functionids'] ? $macro_values[$token['value']] : $token['value'];
+			elseif ($token->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO) {
+				$expression[] = $options['resolve_functionids'] ? $macro_values[$token->match] : $token->match;
 			}
-			elseif ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO) {
-				if (array_key_exists($token['value'], $usermacro_values)) {
-					$expression[] = CTriggerExpression::quoteString($usermacro_values[$token['value']], false);
+			elseif ($token->type == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO) {
+				if (array_key_exists($token->match, $usermacro_values)) {
+					$expression[] = CTriggerExpression::quoteString($usermacro_values[$token->match], false);
 				}
 				else {
 					$expression[] = ($options['resolve_usermacros'] && $options['html'])
 						? (new CSpan('*ERROR*'))->addClass(ZBX_STYLE_RED)
-						: $token['value'];
+						: $token->match;
 				}
 			}
-			elseif (is_array($token)) {
-				$expression[] = ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING)
-					? CTriggerExpression::quoteString($string, false, true)
-					: $token['value'];
+			elseif ($token->type == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
+				$expression[] = CTriggerExpression::quoteString($token->match, false, true);
+			}
+			else {
+				$expression[] = $token->match;
 			}
 
 			$pos_left = $token_pos + $token_length;

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -217,7 +217,9 @@ class CTriggerExpression {
 		elseif ($this->options['host_macro']) {
 			$this->host_macro_parser = new CSetParser($this->options['host_macro']);
 		}
-		$this->function_parser = new CFunctionParser();
+		$this->function_parser = new CFunctionParser([
+			'collapsed_expression' => $this->options['collapsed_expression']
+		]);
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
 		$this->user_macro_parser = new CUserMacroParser();
@@ -225,13 +227,13 @@ class CTriggerExpression {
 	}
 
 	/**
-	 * Parse a trigger expression and set public variables $this->is_valid, $this->error, $this->expressions,
-	 *   $this->macros
+	 * Parse a trigger expression and set public variables $this->is_valid, $this->error, $this->macros, $this->result
 	 *
 	 * Examples:
 	 *   expression:
 	 *     last(/Zabbix server/agent.ping,0)=1 and {TRIGGER.VALUE}={$TRIGGER.VALUE}
 	 *   results:
+	 *     $this->result : CTriggerExprParserResult
 	 *     $this->is_valid : true
 	 *     $this->error : ''
 	 *     $this->expressions : array(
@@ -286,16 +288,22 @@ class CTriggerExpression {
 					switch ($char) {
 						case '-':
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							break;
 
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$level++;
 							break;
 
@@ -317,16 +325,22 @@ class CTriggerExpression {
 					switch ($char) {
 						case '-':
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							break;
 
 						case '(':
 							$state = self::STATE_AFTER_OPEN_BRACE;
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$level++;
 							break;
 
@@ -356,16 +370,22 @@ class CTriggerExpression {
 							if (!$after_space) {
 								break 3;
 							}
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
 							break;
 
 						case '(':
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
@@ -394,9 +414,12 @@ class CTriggerExpression {
 							if ($level == 0) {
 								break 3;
 							}
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$level--;
 							break;
 
@@ -422,9 +445,12 @@ class CTriggerExpression {
 							if ($level == 0) {
 								break 3;
 							}
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$level--;
 							$state = self::STATE_AFTER_CLOSE_BRACE;
 							break;
@@ -456,16 +482,22 @@ class CTriggerExpression {
 							if (!$after_space) {
 								break 3;
 							}
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$state = self::STATE_AFTER_MINUS_OPERATOR;
 							break;
 
 						case '(':
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
@@ -487,9 +519,12 @@ class CTriggerExpression {
 				case self::STATE_AFTER_MINUS_OPERATOR:
 					switch ($char) {
 						case '(':
-							$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
-								$char, $this->pos, 1
-							);
+							$this->result->addToken(new CTriggerExprTokenResult([
+								'type' => CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE,
+								'match' => $char,
+								'pos' => $this->pos,
+								'length' => 1
+							]));
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$level++;
 							break;
@@ -557,8 +592,12 @@ class CTriggerExpression {
 		if ($parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
-
-		$this->result->addToken($token_type, $parser->getMatch(), $this->pos, $parser->getLength());
+		$this->result->addToken(new CTriggerExprTokenResult([
+			'type' => $token_type,
+			'match' => $parser->getMatch(),
+			'pos' => $this->pos,
+			'length' => $parser->getLength()
+		]));
 		$this->pos += $parser->getLength() - 1;
 
 		return true;
@@ -628,7 +667,7 @@ class CTriggerExpression {
 			$function_param_list[] = $this->function_parser->getParam($n);
 		}
 
-		$this->result->addFunctionToken($this->function_parser->result);
+		$this->result->addToken($this->function_parser->result);
 
 		$this->expressions[] = [
 			'expression' => $this->function_parser->result->match,
@@ -657,17 +696,15 @@ class CTriggerExpression {
 			return false;
 		}
 
-		$token_data = [
-			'suffix' => $this->number_parser->getSuffix()
-		];
-
-		$this->result->addToken(
-			CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
-			$this->number_parser->getMatch(),
-			$this->pos,
-			$this->number_parser->getLength(),
-			$token_data
-		);
+		$this->result->addToken(new CTriggerExprTokenResult([
+			'type' => CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
+			'match' => $this->number_parser->getMatch(),
+			'pos' => $this->pos,
+			'length' => $this->number_parser->getLength(),
+			'data' => [
+				'suffix' => $this->number_parser->getSuffix()
+			]
+		]));
 
 		$this->pos += $this->number_parser->getLength() - 1;
 
@@ -687,9 +724,15 @@ class CTriggerExpression {
 
 		$len = strlen($matches[0]);
 
-		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_STRING, $matches[0], $this->pos, $len,
-			['string' => self::unquoteString($matches[0])]
-		);
+		$this->result->addToken(new CTriggerExprTokenResult([
+			'type' => CTriggerExprParserResult::TOKEN_TYPE_STRING,
+			'match' => $matches[0],
+			'pos' => $this->pos,
+			'length' => $len,
+			'data' => [
+				'string' => self::unquoteString($matches[0])
+			]
+		]));
 
 		$this->pos += $len - 1;
 
