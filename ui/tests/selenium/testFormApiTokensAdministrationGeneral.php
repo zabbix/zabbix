@@ -258,7 +258,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	 * @on-before-once getTokenId
 	 */
 	public function testFormApiTokensAdministrationGeneral_RegenerationFormLayout() {
-		$this->checkTokensRegenerateFormLayout('administration'); // , self::$tokenid);
+		$this->checkTokensRegenerateFormLayout('administration');
 	}
 
 	/**
