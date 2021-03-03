@@ -70,9 +70,7 @@
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
 				window.addEventListener('popstate', events.popState);
 
-				document
-					.getElementById('dynamic_hostid')
-					.addEventListener('change', events.dynamicHostChange);
+				$('#dynamic_hostid').on('change', events.dynamicHostChange);
 			}
 
 			jqBlink.blink();
@@ -310,6 +308,7 @@
 			},
 
 			dynamicHostChange: () => {
+				console.log('Change');
 				const hosts = $('#dynamic_hostid').multiSelect('getData');
 				const host = hosts.length ? hosts[0] : null;
 				const url = new Curl('zabbix.php', false);
