@@ -2439,9 +2439,9 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
  * Return value: the string length in bytes                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_strlen_n(const char *text, size_t maxlen)
+int	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
 {
-	return zbx_strlen_utf8_nchars(text, maxlen);
+	return zbx_strlen_utf8_nchars(text_loc, maxlen);
 }
 
 /******************************************************************************
@@ -2556,7 +2556,7 @@ void	zbx_dbms_extract_version(void)
 #elif defined(HAVE_ORACLE)
 #define MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT	200
 #define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER		3
-	char	*start, *end, *match, *release_str = "Release ";
+	char	*start, *release_str = "Release ";
 	char	major_release_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER],
 		release_update_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER],
 		release_update_version_revision[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER],
@@ -2569,7 +2569,7 @@ void	zbx_dbms_extract_version(void)
 	sword	err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	err = OCIServerVersion(oracle.svchp, oracle.errhp, unparsed_version,
+	err = OCIServerVersion(oracle.svchp, oracle.errhp, (OraText *) unparsed_version,
 			MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT, OCI_HTYPE_SVCCTX);
 
 	if (OCI_SUCCESS != err)
@@ -2632,9 +2632,9 @@ if (FAIL != overall_status && unparsed_version_len > (next_start_index + 2))		\
 	}										\
 }											\
 
-	if (start = strstr(unparsed_version, release_str))
+	if ((start = strstr(unparsed_version, release_str)))
 	{
-		int	next_start_index;
+		size_t	next_start_index;
 
 		next_start_index = start - unparsed_version + strlen(release_str);
 
