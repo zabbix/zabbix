@@ -673,6 +673,7 @@ class CDashboardPage extends CBaseComponent {
 
 			const $overlay = jQuery('[data-dialogueid="widgetConfg"]');
 
+			// TODO move to CWidgetConfig.
 			$overlay.toggleClass('sticked-to-top', this._data.dialogue.widget_type === 'svggraph');
 
 			Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});

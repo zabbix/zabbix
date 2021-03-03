@@ -27,7 +27,7 @@ const WIDGET_EVENT_REFRESH    = 'widget-refresh';
 const WIDGET_EVENT_DELETE     = 'widget-delete';
 const WIDGET_EVENT_RESIZE     = 'widget-resize';
 
-class CDashboardWidget extends CBaseComponent {
+class CWidget extends CBaseComponent {
 
 	constructor({
 		type,
@@ -118,6 +118,7 @@ class CDashboardWidget extends CBaseComponent {
 			if (!this._target.hasChildNodes()) {
 				this._makeView();
 				this.setDivPosition(this.pos);
+
 //				this.showPreloader();
 			}
 
