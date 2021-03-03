@@ -753,10 +753,12 @@ ZBX_VECTOR_IMPL(char2, char);
 
 #define COLLISIONS_MAX_NUMBER	(100)
 #define REFERENCE_MAX_LEN	(5)
+#define DASHBOARD_NAME_LEN	(255)
 
 static int DBpatch_dashboard_name(char *name, char **new_name)
 {
-	int		affix = 0, ret = FAIL;
+	int		affix = 0, ret = FAIL, trim;
+	char		*affix_string = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -781,10 +783,16 @@ static int DBpatch_dashboard_name(char *name, char **new_name)
 			break;
 		}
 
-		*new_name = zbx_dsprintf(*new_name, "(%d)%s", affix + 1, name);
+		affix_string = zbx_dsprintf(affix_string, " (%d)", affix + 1);
+		trim = (int)strlen(name) + (int)strlen(affix_string) - DASHBOARD_NAME_LEN;
+		if (0 < trim )
+			name[strlen(name) - trim] = '\0';
+
+		*new_name = zbx_dsprintf(*new_name, "%s%s", name, affix_string);
 	} while (COLLISIONS_MAX_NUMBER > affix++);
 
 	DBfree_result(result);
+	zbx_free(affix_string);
 
 	return ret;
 }
@@ -2007,7 +2015,8 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t userid
 	if (SUCCEED != DBpatch_init_dashboard(&dashboard, name, userid, private))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen '%s'due to name collision.", name);
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
 
 	ret = DBpatch_add_dashboard(&dashboard);
@@ -2018,11 +2027,11 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t userid
 	if (SUCCEED == ret)
 		ret = DBpatch_convert_screen_items(result, dashboard_page.dashboard_pageid);
 
-	DBfree_result(result);
-
 	ret = DBpatch_set_permissions_screen(dashboard.dashboardid, screenid);
 
 	zbx_free(dashboard.name);
+out:
+	DBfree_result(result);
 
 	return ret;
 }
@@ -2082,7 +2091,8 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 	if (SUCCEED != DBpatch_init_dashboard(&dashboard, name, userid, private))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen '%s'due to name collision.", name);
-		return FAIL;
+		ret = FAIL;
+		goto exit;
 	}
 
 	dashboard.display_period = delay;
@@ -2125,12 +2135,13 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 	}
 
 out:
-	DBfree_result(result);
 	ret = DBpatch_set_permissions_slideshow(dashboard.dashboardid, slideshowid);
 
 	zbx_free(dashboard.name);
+exit:
+	DBfree_result(result);
 
-	return SUCCEED;
+	return ret;
 }
 
 #undef OFFSET_ARRAY_SIZE
@@ -2310,6 +2321,14 @@ static int	DBpatch_5030064(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_5030065(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from role_rule where name='ui.monitoring.screens'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5030)
@@ -2381,5 +2400,6 @@ DBPATCH_ADD(5030061, 0, 1)
 DBPATCH_ADD(5030062, 0, 1)
 DBPATCH_ADD(5030063, 0, 1)
 DBPATCH_ADD(5030064, 0, 1)
+DBPATCH_ADD(5030065, 0, 1)
 
 DBPATCH_END()
