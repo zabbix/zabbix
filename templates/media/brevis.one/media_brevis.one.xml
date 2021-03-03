@@ -9,7 +9,7 @@
             <parameters>
                 <parameter>
                     <name>endpoint</name>
-                    <value>&lt;PALCE HTTP API URL&gt;</value>
+                    <value>&lt;PLACE HTTP API URL&gt;</value>
                 </parameter>
                 <parameter>
                     <name>flash</name>
