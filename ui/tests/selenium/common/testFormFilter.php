@@ -219,7 +219,7 @@ class testFormFilter extends CWebTest {
 		// Checking if home tab is selected.
 		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
 		if ($this->query($xpath)->one()->getAttribute('class') === 'tabfilter-item-label') {
-			$this->query($xpath.'/a')->one()->click();
+			$this->query($xpath.'/a')->waitUntilClickable()->one()->click();
 		}
 
 		$this->page->waitUntilReady();
