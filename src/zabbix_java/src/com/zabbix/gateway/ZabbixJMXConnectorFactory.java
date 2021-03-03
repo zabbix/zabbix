@@ -19,6 +19,7 @@
 
 package com.zabbix.gateway;
 
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.SocketTimeoutException;
@@ -58,7 +59,7 @@ class ZabbixJMXConnectorFactory
 		}
 	}
 
-	static JMXConnector connect(final JMXServiceURL url, final HashMap<String, String[]> env) throws IOException
+	static JMXConnector connect(final JMXServiceURL url, final HashMap<String, Object> env) throws IOException
 	{
 		logger.debug("connecting to JMX agent at '{}'", url);
 

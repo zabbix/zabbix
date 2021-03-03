@@ -23,6 +23,7 @@
 #include "global.h"
 #include "duktape.h"
 #include "base64.h"
+#include "sha256crypt.h"
 
 /******************************************************************************
  *                                                                            *
@@ -127,6 +128,45 @@ static duk_ret_t	es_md5(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
+ * Function: es_sha256                                                        *
+ *                                                                            *
+ * Purpose: compute a sha256 checksum                                         *
+ *                                                                            *
+ * Parameters: ctx - [IN] pointer to duk_context                              *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is not a string        *
+ *               - if the value stack is empty                                *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_sha256(duk_context *ctx)
+{
+	char	*str = NULL, hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	int	i;
+
+	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+
+	zbx_sha256_hash(str, hash_res);
+
+	for (i = 0 ; i < ZBX_SHA256_DIGEST_SIZE; i++)
+	{
+		char z[3];
+
+		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res[i]);
+		hash_res_stringhexes[i * 2] = z[0];
+		hash_res_stringhexes[i * 2 + 1] = z[1];
+	}
+
+	hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2] = '\0';
+
+	duk_push_string(ctx, hash_res_stringhexes);
+	zbx_free(str);
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: es_init_global_functions                                         *
  *                                                                            *
  * Purpose: initializes additional global functions                           *
@@ -144,4 +184,7 @@ void	es_init_global_functions(zbx_es_t *es)
 
 	duk_push_c_function(es->env->ctx, es_md5, 1);
 	duk_put_global_string(es->env->ctx, "md5");
+
+	duk_push_c_function(es->env->ctx, es_sha256, 1);
+	duk_put_global_string(es->env->ctx, "sha256");
 }

@@ -2069,9 +2069,6 @@ int	DBtxn_ongoing(void)
 int	DBtable_exists(const char *table_name)
 {
 	char		*table_name_esc;
-#ifdef HAVE_POSTGRESQL
-	char		*table_schema_esc;
-#endif
 	DB_RESULT	result;
 	int		ret;
 
@@ -2087,18 +2084,12 @@ int	DBtable_exists(const char *table_name)
 				" and lower(tname)='%s'",
 			table_name_esc);
 #elif defined(HAVE_POSTGRESQL)
-	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
-			"public" : CONFIG_DBSCHEMA);
-
 	result = DBselect(
 			"select 1"
 			" from information_schema.tables"
 			" where table_name='%s'"
 				" and table_schema='%s'",
-			table_name_esc, table_schema_esc);
-
-	zbx_free(table_schema_esc);
-
+			table_name_esc, zbx_db_get_schema_esc());
 #elif defined(HAVE_SQLITE3)
 	result = DBselect(
 			"select 1"
@@ -2127,7 +2118,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_POSTGRESQL)
-	char		*table_name_esc, *field_name_esc, *table_schema_esc;
+	char		*table_name_esc, *field_name_esc;
 	int		ret;
 #elif defined(HAVE_SQLITE3)
 	char		*table_name_esc;
@@ -2164,8 +2155,6 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	DBfree_result(result);
 #elif defined(HAVE_POSTGRESQL)
-	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
-			"public" : CONFIG_DBSCHEMA);
 	table_name_esc = DBdyn_escape_string(table_name);
 	field_name_esc = DBdyn_escape_string(field_name);
 
@@ -2175,11 +2164,10 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 			" where table_name='%s'"
 				" and column_name='%s'"
 				" and table_schema='%s'",
-			table_name_esc, field_name_esc, table_schema_esc);
+			table_name_esc, field_name_esc, zbx_db_get_schema_esc());
 
 	zbx_free(field_name_esc);
 	zbx_free(table_name_esc);
-	zbx_free(table_schema_esc);
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
@@ -2209,9 +2197,6 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 int	DBindex_exists(const char *table_name, const char *index_name)
 {
 	char		*table_name_esc, *index_name_esc;
-#if defined(HAVE_POSTGRESQL)
-	char		*table_schema_esc;
-#endif
 	DB_RESULT	result;
 	int		ret;
 
@@ -2231,18 +2216,13 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 				" and lower(index_name)='%s'",
 			table_name_esc, index_name_esc);
 #elif defined(HAVE_POSTGRESQL)
-	table_schema_esc = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
-				"public" : CONFIG_DBSCHEMA);
-
 	result = DBselect(
 			"select 1"
 			" from pg_indexes"
 			" where tablename='%s'"
 				" and indexname='%s'"
 				" and schemaname='%s'",
-			table_name_esc, index_name_esc, table_schema_esc);
-
-	zbx_free(table_schema_esc);
+			table_name_esc, index_name_esc, zbx_db_get_schema_esc());
 #endif
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
@@ -2438,12 +2418,11 @@ void	DBcheck_character_set(void)
 #elif defined(HAVE_POSTGRESQL)
 #define OID_LENGTH_MAX		20
 
-	char		*database_name_esc, *schema_name_esc, oid[OID_LENGTH_MAX];
+	char		*database_name_esc, oid[OID_LENGTH_MAX];
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
-	schema_name_esc = (NULL != CONFIG_DBSCHEMA) ? DBdyn_escape_string(CONFIG_DBSCHEMA) : strdup("public");
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
@@ -2470,7 +2449,7 @@ void	DBcheck_character_set(void)
 			"select oid"
 			" from pg_namespace"
 			" where nspname='%s'",
-			schema_name_esc);
+			zbx_db_get_schema_esc());
 
 	if (NULL == result || NULL == (row = DBfetch(result)) || '\0' == **row)
 	{
@@ -2535,7 +2514,6 @@ void	DBcheck_character_set(void)
 out:
 	DBfree_result(result);
 	DBclose();
-	zbx_free(schema_name_esc);
 	zbx_free(database_name_esc);
 #endif
 }
@@ -3584,3 +3562,25 @@ int	zbx_db_check_instanceid(void)
 
 	return ret;
 }
+
+#if defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_get_schema_esc                                            *
+ *                                                                            *
+ * Purpose: returns escaped DB schema name                                    *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_get_schema_esc(void)
+{
+	static char	*name;
+
+	if (NULL == name)
+	{
+		name = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
+				"public" : CONFIG_DBSCHEMA);
+	}
+
+	return name;
+}
+#endif

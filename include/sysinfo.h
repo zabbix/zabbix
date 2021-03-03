@@ -104,6 +104,7 @@ do									\
 }									\
 while (0)
 
+/* AR_META is always excluded */
 #define UNSET_RESULT_EXCLUDING(res, exc_type) 					\
 										\
 do										\

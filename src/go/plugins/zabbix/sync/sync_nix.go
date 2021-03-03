@@ -28,9 +28,7 @@ func getMetrics() []string {
 		"proc.num", "The number of processes.",
 		"system.hw.chassis", "Chassis information.",
 		"system.hw.devices", "Listing of PCI or USB devices.",
-		"system.sw.packages", "Listing of installed packages.",
 		"vfs.dir.count", "Directory entry count.",
 		"vfs.dir.size", "Directory size (in bytes).",
-		"vm.memory.size", "Memory size in bytes or in percentage from total.",
 	}
 }

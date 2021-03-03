@@ -30,6 +30,8 @@ import (
 	_ "zabbix.com/plugins/oracle"
 	_ "zabbix.com/plugins/postgres"
 	_ "zabbix.com/plugins/redis"
+	_ "zabbix.com/plugins/smart"
+	_ "zabbix.com/plugins/system/sw"
 	_ "zabbix.com/plugins/system/users"
 	_ "zabbix.com/plugins/systemrun"
 	_ "zabbix.com/plugins/web"

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-01-13T10:34:03Z'
+  date: '2021-02-10T14:59:31Z'
   groups:
     -
       name: Templates/Databases
@@ -648,7 +648,7 @@ zabbix_export:
           master_item:
             key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
         -
-          name: 'Oracle: FRA, Used space in %'
+          name: 'Oracle: FRA, Usable space in %'
           type: DEPENDENT
           key: oracle.fra_usable_pct
           delay: '0'
@@ -1624,6 +1624,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$[?(@.DEST_NAME==''{#DEST_NAME}'')].ERROR.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]'
             -
@@ -1660,6 +1664,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$[?(@.DEST_NAME==''{#DEST_NAME}'')].STATUS.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]'
               trigger_prototypes:
