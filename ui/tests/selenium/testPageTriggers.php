@@ -181,6 +181,253 @@ class testPageTriggers extends CLegacyWebTest {
 						'Third trigger for tag filtering'
 					]
 				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'First trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'First trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Exists'],
+							['name' => 'TagK', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Exists'],
+							['name' => 'TagK', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'First trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Does not exist'],
+							['name' => 'TagK', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Does not exist'],
+							['name' => 'TagK', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'First trigger for tag filtering',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'A', 'operator' => 'Does not equal']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'A', 'operator' => 'Does not equal']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'A', 'operator' => 'Does not equal'],
+							['name' => 'TagT', 'value' => 't', 'operator' => 'Does not equal']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Second trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'A', 'operator' => 'Does not equal'],
+							['name' => 'TagT', 'value' => 't', 'operator' => 'Does not equal']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'First trigger for tag filtering',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'a', 'operator' => 'Does not contain']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'a', 'operator' => 'Does not contain']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'a', 'operator' => 'Does not contain'],
+							['name' => 'TagB', 'value' => 'b', 'operator' => 'Does not contain']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'TagA', 'value' => 'a', 'operator' => 'Does not contain'],
+							['name' => 'TagB', 'value' => 'b', 'operator' => 'Does not contain']
+						]
+					],
+					'result' => [
+						'Fifth trigger for tag filtering (no tags)',
+						'Fourth trigger for tag filtering',
+						'Second trigger for tag filtering',
+						'Third trigger for tag filtering'
+					]
+				]
 			]
 		];
 	}
