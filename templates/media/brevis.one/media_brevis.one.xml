@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-03-03T14:54:13Z</date>
+    <date>2021-03-03T16:15:17Z</date>
     <media_types>
         <media_type>
             <name>Brevis.one</name>
@@ -47,7 +47,11 @@
         BrevisOne.params.push(name + '=' + encodeURIComponent(value));&#13;
     },&#13;
 &#13;
-    createPayloadString: function (params) {&#13;
+    setProxy: function (HTTPProxy) {&#13;
+        BrevisOne.HTTPProxy = HTTPProxy;&#13;
+    },&#13;
+&#13;
+    setPayload: function (params) {&#13;
         var parts = params.send_to.split(':'),&#13;
             defaultValues = {&#13;
                 ring: 'true',&#13;
@@ -73,19 +77,17 @@
                     BrevisOne.addParam(key, defaultValues[key]);&#13;
                 }&#13;
             });&#13;
-&#13;
-        return '?' + BrevisOne.params.join('&amp;');&#13;
     },&#13;
 &#13;
     request: function () {&#13;
         var response,&#13;
             request = new CurlHttpRequest(),&#13;
-            data = BrevisOne.createPayloadString(params);&#13;
+            data = '?' + BrevisOne.params.join('&amp;');&#13;
 &#13;
         request.AddHeader('Content-Type: multipart/form-data');&#13;
 &#13;
-        if (typeof params.HTTPProxy !== 'undefined' &amp;&amp; params.HTTPProxy !== '') {&#13;
-            request.SetProxy(params.HTTPProxy);&#13;
+        if (typeof BrevisOne.HTTPProxy !== 'undefined' &amp;&amp; BrevisOne.HTTPProxy !== '') {&#13;
+            request.SetProxy(BrevisOne.HTTPProxy);&#13;
         }&#13;
 &#13;
         Zabbix.Log(4, '[ BrevisOne Webhook ] Sending request.');&#13;
@@ -117,6 +119,8 @@ try {&#13;
         }&#13;
     });&#13;
 &#13;
+    BrevisOne.setProxy(params.HTTPProxy);&#13;
+    BrevisOne.setPayload(params);&#13;
     BrevisOne.request();&#13;
 &#13;
     return 'OK';&#13;
