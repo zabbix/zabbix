@@ -2454,16 +2454,18 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
  *          m = minor version part                                            *
  *          u = patch version part                                            *
  *                                                                            *
- * Example: 1.2.34 version will be returned as 10234                          *
+ * Example: if the original DB version was 1.2.34 then 10234 gets returned    *
  *                                                                            *
-* Purpose: For OracleDB:                                                      *
- *          returns DBMS version as integer: MRruRRiv                         *
+ * Purpose: For OracleDB:                                                      *
+ *          returns DBMS version as integer: MRruRRivUU                       *
  *          MR = major release version part                                   *
  *          ru = release update version part                                  *
  *          RR = release update version revision part                         *
  *          iv = increment version part                                       *
+ *          UU = unused, reserved for future use                              *
  *                                                                            *
- * Example: 18.1.0.0.7 will be returned as 18010000                           *
+ * Example: if the OracleDB version was 18.1.0.0.7 then 1801000007 gets       *
+ *          returned                                                          *
  *                                                                            *
  * Return value: DBMS version or 0 if unknown                                 *
  *                                                                            *
@@ -2488,28 +2490,36 @@ int	zbx_dbms_mariadb_used(void)
 }
 #endif
 
-/*********************************************************************************************************
- *                                                                                                       *
- * Function: zbx_dbms_extract_version                                                                    *
- *                                                                                                       *
- * Purpose: tries to identify ORACLE version from the OCI version function result                        *
- * Oracle DB format is like 18.1.2.3.0 where                                                             *
- * 18 - major release version                                                                            *
- * 1 - release update version                                                                            *
- * 2 - release update version revision                                                                   *
- * 3 - increment version                                                                                 *
- * 0 - unused, reserved for future use                                                                   *
- *                                                                                                       *
- * Examples:                                                                                             *
- * For "Oracle Database 18c Express Edition Release 1.0.0.0.0 - Production"		=> 1000000       *
- * For "Oracle Database 18c Express Edition Release 18.2.0.0.7 - Production"		=> 18020000      *
- * For "Oracle Database 18c Express Edition Release 0.0.34.123.7 - Production"		=> 0 (log error) *
- * For "Oracle Database 18c Express Edition Release 1.0.3.x.7 - Production"		=> 0 (log error) *
- * For "Oracle Database 18c Expres"							=> 0 (log error) *
- * For ""										=> 0 (log error) *
- * For "Oracle Database 18c Express Edition Release 4.42520.34.653610.1560 - Production"=> 0 (log error) *
- *                                                                                                       *
- **********************************************************************************************************/
+/***************************************************************************************************************
+ *                                                                                                             *
+ * Function: zbx_dbms_extract_version                                                                          *
+ *                                                                                                             *
+ * Purpose: retrieves the DB version and makes sure it is stored in the numeric format                         *
+ *                                                                                                             *
+ *          For PostgreSQL:                                                                                    *
+ *          numeric version is available from the API                                                          *
+ *                                                                                                             *
+ *          For MySQL and MariaDB:                                                                             *
+ *          numeric version is available from the API, but also the additional processing is required          *
+ *          to determine if it is a MySQL or MariaDB and save this result as well                              *
+ *                                                                                                             *
+ *          For Oracle:                                                                                        *
+ *          numeric version needs to be manually parsed from the string result                                 *
+ *          Oracle DB format is like 18.1.2.3.0 where                                                          *
+ *            18 - major release version                                                                       *
+ *            1 - release update version                                                                       *
+ *            2 - release update version revision                                                              *
+ *            3 - increment version                                                                            *
+ *            0 - unused, reserved for future use                                                              *
+ *                                                                                                             *
+ *          Oracle Examples:                                                                                   *
+ *          For "Oracle Database 18c Express Edition Release 1.0.0.0.0 - Production"    => 100000000           *
+ *          For "Oracle Database 18c Express Edition Release 18.2.0.0.7 - Production"   => 1802000007          *
+ *          For "Oracle Database 18c Express Edition Release 0.0.34.123.7 - Production" => DBVERSION_UNDEFINED *
+ *          For "Oracle Database 18c Express Edition Release 1.0.3.x.7 - Production"    => DBVERISON_UNDEFINED *
+ *          For "<anything else>"                                                       => DBVERSION_UNDEFINED *
+ *                                                                                                             *
+ **************************************************************************************************************/
 void	zbx_dbms_extract_version(void)
 {
 #if defined(HAVE_MYSQL)
@@ -2549,7 +2559,7 @@ void	zbx_dbms_extract_version(void)
 	int major_release_version_num, release_update_version_num, release_update_version_revision_num,
 			increment_version_num, reserved_for_future_use_num, local_status, overall_status = SUCCEED;
 
-	int jjj;
+	size_t	unparsed_version_len;
 	sword	err;
 
 	char unparsed_version[MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT];
@@ -2563,12 +2573,12 @@ void	zbx_dbms_extract_version(void)
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION,"ORACLE VERSION: %s", unparsed_version);
+	zabbix_log(LOG_LEVEL_DEBUG, "OracleDB version retrieved unparsed: %s", unparsed_version);
 
-	jjj = strlen(unparsed_version);
+	unparsed_version_len = strlen(unparsed_version);
 
 #define DO_IT(a)								\
-if (FAIL != overall_status && jjj > (next_start_index + 2))			\
+if (FAIL != overall_status && unparsed_version_len > (next_start_index + 2))			\
 {										\
 	local_status = SUCCEED;						\
 	a[0] = unparsed_version[next_start_index];				\
@@ -2649,7 +2659,7 @@ out:
 				reserved_for_future_use_num;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "RESULT_VERSION: %d\n", ZBX_ORACLE_SVERSION);
+	zabbix_log(LOG_LEVEL_DEBUG, "OracleDB version result: %s", ZBX_ORACLE_SVERSION);
 #else
 #endif
 }

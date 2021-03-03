@@ -429,6 +429,17 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
 	return d2->timestamp.sec - d1->timestamp.sec;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_history_get_version                                          *
+ *                                                                            *
+ * Purpose: relays the version retrieval logic to the history implementation  *
+ *          functions                                                         *
+ *                                                                            *
+ * Return value: X.Y.Z format for the elastic search if it could be retrieved *
+ *               DBVERSION_UNDEFINED otherwise                                *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_history_get_version(void)
 {
 	return  NULL == CONFIG_HISTORY_STORAGE_URL ? DBVERSION_UNDEFINED : zbx_elastic_get_version();
