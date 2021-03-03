@@ -589,7 +589,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		editMode = ZABBIX.Dashboard.isEditMode(),
 		widget = ZABBIX.Dashboard.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
-		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
+		loading = (!widget.isReady() || widget.content_body.find('.is-loading').length > 0),
 		widget_actions = [],
 		menu;
 
@@ -645,7 +645,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 			},
 			refreshCallback: function(widget) {
 				if (widget['widgetid'] == widgetid && options.download) {
-					this.disabled = !widget['ready'];
+					this.disabled = !widget.isReady();
 				}
 			}
 		});
