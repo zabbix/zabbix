@@ -86,14 +86,14 @@ class CDashboardPage extends CBaseComponent {
 
 		if (this._options['editable']) {
 			if (this._options['kioskmode']) {
-				this._data.new_widget_placeholder.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_KIOSK_MODE);
+				this._data.new_widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_KIOSK_MODE);
 			}
 			else {
-				this._data.new_widget_placeholder.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_ADD_NEW);
+				this._data.new_widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW);
 			}
 		}
 		else {
-			this._data.new_widget_placeholder.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_READONLY);
+			this._data.new_widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_READONLY);
 		}
 
 		this._data.new_widget_placeholder.showAtDefaultPosition();
@@ -281,7 +281,7 @@ class CDashboardPage extends CBaseComponent {
 			});
 
 			widget
-				.on(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK, (e) => {
+				.on(WIDGET_ITERATOR_EVENT_PREVIOUS_PAGE_CLICK, (e) => {
 					const w = e.detail.target;
 
 					if (w.page > 1) {
@@ -289,7 +289,7 @@ class CDashboardPage extends CBaseComponent {
 						this._updateWidgetContent(w);
 					}
 				})
-				.on(WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK, (e) => {
+				.on(WIDGET_ITERATOR_EVENT_NEXT_PAGE_CLICK, (e) => {
 					const w = e.detail.target;
 
 					if (w.page < w.page_count) {
@@ -2976,7 +2976,7 @@ class CDashboardPage extends CBaseComponent {
 				delete this._data.add_widget_dimension.top;
 
 				this._data.new_widget_placeholder
-					.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_RESIZING)
+					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
 					.showAtPosition(this._data.add_widget_dimension);
 
 				return false;
@@ -3146,8 +3146,8 @@ class CDashboardPage extends CBaseComponent {
 
 				this._data.new_widget_placeholder
 					.setState((this._data.pos_action === 'add')
-						? DASHBOARD_WIDGET_PLACEHOLDER_STATE_RESIZING
-						: DASHBOARD_WIDGET_PLACEHOLDER_STATE_POSITIONING
+						? WIDGET_PLACEHOLDER_STATE_RESIZING
+						: WIDGET_PLACEHOLDER_STATE_POSITIONING
 					)
 					.showAtPosition(this._data.add_widget_dimension);
 			});
@@ -3374,7 +3374,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 		else {
 			this._data.new_widget_placeholder
-				.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_ADD_NEW)
+				.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW)
 				.showAtDefaultPosition();
 		}
 	}

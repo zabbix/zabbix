@@ -18,8 +18,8 @@
 **/
 
 
-const WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK = 'iterator-previous-page-click';
-const WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK     = 'iterator-next-page-click';
+const WIDGET_ITERATOR_EVENT_PREVIOUS_PAGE_CLICK = 'iterator-previous-page-click';
+const WIDGET_ITERATOR_EVENT_NEXT_PAGE_CLICK     = 'iterator-next-page-click';
 
 class CDashboardWidgetIterator extends CDashboardWidget {
 
@@ -335,11 +335,11 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 			...this._events,
 
 			previousPage: () => {
-				this.fire(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK);
+				this.fire(WIDGET_ITERATOR_EVENT_PREVIOUS_PAGE_CLICK);
 			},
 
 			nextPage: () => {
-				this.fire(WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK);
+				this.fire(WIDGET_ITERATOR_EVENT_NEXT_PAGE_CLICK);
 			}
 		}
 
