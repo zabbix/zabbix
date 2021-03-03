@@ -394,14 +394,4 @@ out:
   start: 2020-09-07 00:00:00.000000000 +03:00
   end:   2020-09-07 00:00:00.000000000 +03:00
   return: SUCCEED
----
-test case: Valid parameters '"1h:now/M+6d/w+1h"' from 2020-09-23 00:59:46.000000000 +03:00
-in:
-  param: '"1h:now/M+6d/w+1h"'
-  timezone: :Europe/Riga
-  time: 2020-09-23 00:59:46.000000000 +03:00
-out:
-  start: 2020-09-07 00:00:00.000000000 +03:00
-  end:   2020-09-07 00:00:00.000000000 +03:00
-  return: SUCCEED
 ...
