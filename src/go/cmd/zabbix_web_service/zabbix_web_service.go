@@ -33,13 +33,13 @@ import (
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/zbxcomms"
+	"zabbix.com/pkg/zbxnet"
 )
 
 var confDefault string
 
 type handler struct {
-	allowedPeers *zbxcomms.AllowedPeers
+	allowedPeers *zbxnet.AllowedPeers
 }
 
 func main() {
@@ -122,7 +122,7 @@ func run(tls string) error {
 	var h handler
 	var err error
 
-	if h.allowedPeers, err = zbxcomms.GetAllowedPeers(options.AllowedIP); err != nil {
+	if h.allowedPeers, err = zbxnet.GetAllowedPeers(options.AllowedIP); err != nil {
 		return err
 	}
 
