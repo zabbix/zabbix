@@ -265,17 +265,17 @@ class CDashboardPage extends CBaseComponent {
 			...config,
 			defaults: this._data.widget_defaults[config.type],
 			uniqueid: this._generateUniqueId(),
-			index: this._widgets.length,
-			cell_height: this._options['widget-height'],
 			cell_width: this._options['widget-width'],
+			cell_height: this._options['widget-height'],
 			is_editable: this._options['editable'] && !this._options['kioskmode'],
-			dynamic_hostid: this._data.dashboard.dynamic_hostid
+			dynamic_hostid: this._data.dashboard.dynamic_hostid,
+			index: this._widgets.length
 		};
 
 		let widget;
 
 		if (config.defaults.iterator) {
-			widget = new CDashboardWidgetIterator({
+			widget = new CWidgetIterator({
 				min_rows: this._options['widget-min-rows'],
 				...config
 			});
@@ -304,7 +304,7 @@ class CDashboardPage extends CBaseComponent {
 				});
 		}
 		else {
-			widget = new CDashboardWidget(config);
+			widget = new CWidget(config);
 		}
 
 		widget
@@ -435,12 +435,12 @@ class CDashboardPage extends CBaseComponent {
 			},
 			widget: {
 				type: widget.type,
+				header: widget.header,
+				view_mode: widget.view_mode,
 				pos: {
 					width: widget.pos.width,
 					height: widget.pos.height
 				},
-				header: widget.header,
-				view_mode: widget.view_mode,
 				rf_rate: widget.rf_rate,
 				fields: widget.fields,
 				configuration: widget.configuration
@@ -991,7 +991,7 @@ class CDashboardPage extends CBaseComponent {
 				break;
 			}
 
-			if (widget instanceof CDashboardWidgetIterator) {
+			if (widget instanceof CWidgetIterator) {
 				slide_lines = widget.getView().hasClass('iterator-double-header') ? 2 : 1;
 			}
 			else if (widget.getView().hasClass(widget.getCssClass('hidden_header'))) {
@@ -1048,7 +1048,7 @@ class CDashboardPage extends CBaseComponent {
 	_setWidgetPadding(widget, padding) {
 		// Note: this function is used only for widgets and not iterators.
 
-		if (!(widget instanceof CDashboardWidgetIterator) && widget.configuration['padding'] !== padding) {
+		if (!(widget instanceof CWidgetIterator) && widget.configuration['padding'] !== padding) {
 			widget.configuration['padding'] = padding;
 			widget.content_body.toggleClass('no-padding', !padding);
 			this._resizeWidget(widget);
@@ -1764,7 +1764,7 @@ class CDashboardPage extends CBaseComponent {
 			widget.current_pos = pos;
 			this._realignResize(widget);
 
-			if (widget instanceof CDashboardWidgetIterator) {
+			if (widget instanceof CWidgetIterator) {
 				if (widget.alignContents(widget.current_pos)) {
 					this._updateWidgetContent(widget);
 				}
@@ -1772,7 +1772,7 @@ class CDashboardPage extends CBaseComponent {
 
 			for (const w of this._widgets) {
 				if (widget.uniqueid !== w.uniqueid) {
-					if (w instanceof CDashboardWidgetIterator) {
+					if (w instanceof CWidgetIterator) {
 						const box_pos = this._calcDivPosition(w.getView());
 
 						if (box_pos.width !== w.current_pos.width || box_pos.height !== w.current_pos.height) {
@@ -1917,7 +1917,7 @@ class CDashboardPage extends CBaseComponent {
 				this._setResizableState('enable');
 				this._stopWidgetPositioning(widget);
 
-				if (widget instanceof CDashboardWidgetIterator && !widget.getView().is(':hover')) {
+				if (widget instanceof CWidgetIterator && !widget.getView().is(':hover')) {
 					widget.getView().removeClass('iterator-double-header');
 				}
 
@@ -2026,7 +2026,7 @@ class CDashboardPage extends CBaseComponent {
 
 				widget.container.removeAttr('style');
 
-				if (widget instanceof CDashboardWidgetIterator) {
+				if (widget instanceof CWidgetIterator) {
 					if (widget.alignContents(widget.pos)) {
 						this._updateWidgetContent(widget);
 					}
@@ -2184,13 +2184,13 @@ class CDashboardPage extends CBaseComponent {
 				else {
 					child = new CDashboardWidget({
 						...child,
+						view_mode: iterator.getViewMode(),
 						defaults: this._data.widget_defaults[child.type],
 						uniqueid: this._generateUniqueId(),
-						view_mode: iterator.getViewMode(),
-						cell_height: this._options['widget-height'],
 						cell_width: this._options['widget-width'],
-						parent: iterator,
+						cell_height: this._options['widget-height'],
 						is_editable: iterator.isEditable(),
+						parent: iterator,
 						is_new: false
 					});
 
@@ -2368,7 +2368,7 @@ class CDashboardPage extends CBaseComponent {
 			return;
 		}
 
-		if (widget instanceof CDashboardWidgetIterator) {
+		if (widget instanceof CWidgetIterator) {
 			const pos = (typeof widget.current_pos === 'object') ? widget.current_pos : widget.pos;
 
 			if (widget.isTooSmall(pos)) {
@@ -2410,7 +2410,7 @@ class CDashboardPage extends CBaseComponent {
 
 		widget.content_size = widget.getContentSize();
 
-		if (widget instanceof CDashboardWidgetIterator) {
+		if (widget instanceof CWidgetIterator) {
 			ajax_data.page = widget.page;
 		}
 		else {
@@ -2455,7 +2455,7 @@ class CDashboardPage extends CBaseComponent {
 					$content_header.attr('aria-label', (response.aria_label !== '') ? response.aria_label : null);
 				}
 
-				if (widget instanceof CDashboardWidgetIterator) {
+				if (widget instanceof CWidgetIterator) {
 					this._updateIteratorCallback(widget, response, options);
 				}
 				else {
@@ -2508,7 +2508,7 @@ class CDashboardPage extends CBaseComponent {
 				// The widget is loaded now, although possibly already resized.
 				widget.initial_load = false;
 
-				if (!(widget instanceof CDashboardWidgetIterator)) {
+				if (!(widget instanceof CWidgetIterator)) {
 					// Update the widget, if it was resized before it was fully loaded.
 					this._resizeWidget(widget);
 				}
@@ -2745,7 +2745,7 @@ class CDashboardPage extends CBaseComponent {
 					this._applyWidgetConfiguration(widget, configuration);
 					this._doAction('afterUpdateWidgetConfig');
 
-					if (widget instanceof CDashboardWidgetIterator) {
+					if (widget instanceof CWidgetIterator) {
 						this._updateWidgetContent(widget, {
 							'update_policy': 'resize_or_refresh'
 						});
@@ -3156,7 +3156,7 @@ class CDashboardPage extends CBaseComponent {
 	_setWidgetModeEdit(widget) {
 		widget.clearUpdateContentTimer();
 
-		if (!(widget instanceof CDashboardWidgetIterator)) {
+		if (!(widget instanceof CWidgetIterator)) {
 			widget.removeInfoButtons();
 		}
 
@@ -3190,7 +3190,7 @@ class CDashboardPage extends CBaseComponent {
 	 * Remove the widget without updating the dashboard.
 	 */
 	_removeWidget(widget) {
-		if (widget instanceof CDashboardWidgetIterator) {
+		if (widget instanceof CWidgetIterator) {
 			for (const child of widget.children) {
 				child.fire(WIDGET_EVENT_DELETE);
 //				this._removeWidgetActions(child);
@@ -3264,7 +3264,7 @@ class CDashboardPage extends CBaseComponent {
 	_resizeWidget(widget) {
 		let success = false;
 
-		if (widget instanceof CDashboardWidgetIterator) {
+		if (widget instanceof CWidgetIterator) {
 			// Iterators will sync first, then selectively propagate the resize event to the child widgets.
 			success = widget.fire('onResizeEnd');
 		}
