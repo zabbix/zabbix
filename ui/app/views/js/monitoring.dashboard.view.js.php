@@ -308,7 +308,6 @@
 			},
 
 			dynamicHostChange: () => {
-				console.log('Change');
 				const hosts = $('#dynamic_hostid').multiSelect('getData');
 				const host = hosts.length ? hosts[0] : null;
 				const url = new Curl('zabbix.php', false);
