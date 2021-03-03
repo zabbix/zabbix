@@ -876,7 +876,4 @@ void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_oper
 
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
 		zbx_vector_ptr_t *ops);
-
-
-
 #endif

@@ -1237,7 +1237,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
 
-	DBcheck_version_requirements(NULL != CONFIG_HISTORY_STORAGE_URL, zbx_history_get_version());
+	DBcheck_version_requirements(NULL == CONFIG_HISTORY_STORAGE_URL ? OFF : ON, zbx_history_get_version());
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS

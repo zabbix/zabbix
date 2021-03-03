@@ -849,6 +849,13 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBextract_DBversion                                              *
+ *                                                                            *
+ * Purpose: connects to DB and tries to detect DB version                     *
+ *                                                                            *
+ ******************************************************************************/
 void	DBextract_DBversion(void)
 {
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -867,42 +874,36 @@ typedef enum
 
 #define VERSION_REQUIREMENT_NOT_DEFINED	-1
 
-void	doIt(int x, char* y)
+static void	convert_numeric_version_to_user_friendly(int numeric_version, char* friendly_version)
 {
-	char	yy[MAX_FRIENDLY_VERSION_OUTPUT];
-	size_t	b, i = 0, ii = 0;
+	size_t	buf_str_len, i = 0, j = 0;
+	char	buf[MAX_FRIENDLY_VERSION_OUTPUT];
 
-	if (VERSION_REQUIREMENT_NOT_DEFINED == x)
+	if (VERSION_REQUIREMENT_NOT_DEFINED == numeric_version)
 	{
-		y[0] = '\0';
-
+		friendly_version[0] = '\0';
 		return;
 	}
 
-	zbx_snprintf(yy, sizeof(yy), "%d", x);
+	zbx_snprintf(buf, sizeof(buf), "%d", numeric_version);
 
-	b = strlen(yy);
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRLEN of %s is %lu", yy, b);
+	buf_str_len = strlen(buf);
 
-	y[b + ((b - 1) / 2)] = '\0';
-	while((y[b + ((b - 1) / 2) - 1 - i++] = yy[b - 1 - ii++]))
+	friendly_version[buf_str_len + ((buf_str_len - 1) / 2)] = '\0';
+	while((friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = buf[buf_str_len - 1 - j++]))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "y at position: %lu, is %c",(b+((b-1)/2)-i), y[b+((b-1)/2)-i]);
-		zabbix_log(LOG_LEVEL_INFORMATION, "yy at position: %lu, is %c",b-ii, yy[b-ii]);
-
-		if (0 == ii % 2 && ii < b )
-			y[b+((b-1)/2)-1-i++] = '.';
+		if (0 == j % 2 && j < buf_str_len )
+			friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = '.';
 	}
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "RES ->%s<-", y);
 }
 
-static void	fillIt(struct zbx_json *json, char *database, int current_version, int min_version, int max_version)
+static void	create_json_entry_for_DBversion(struct zbx_json *json, char *database, int current_version,
+		int min_version, int max_version)
 {
-	char	friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT];
-	char	friendly_min_version[MAX_FRIENDLY_VERSION_OUTPUT];
-	char	friendly_max_version[MAX_FRIENDLY_VERSION_OUTPUT];
 	int	flag;
+	char	friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT],
+		friendly_min_version[MAX_FRIENDLY_VERSION_OUTPUT],
+		friendly_max_version[MAX_FRIENDLY_VERSION_OUTPUT];
 
 	if (DBVERSION_UNDEFINED == current_version)
 	{
@@ -924,9 +925,9 @@ static void	fillIt(struct zbx_json *json, char *database, int current_version, i
 	else
 		flag = DB_VERSION_SUPPORTED;
 
-	doIt(current_version, friendly_current_version);
-	doIt(min_version, friendly_min_version);
-	doIt(max_version, friendly_max_version);
+	convert_numeric_version_to_user_friendly(current_version, friendly_current_version);
+	convert_numeric_version_to_user_friendly(min_version, friendly_min_version);
+	convert_numeric_version_to_user_friendly(max_version, friendly_max_version);
 
 	zbx_json_addobject(json, NULL);
 	zbx_json_addstring(json, "database", database, ZBX_JSON_TYPE_STRING);
@@ -937,14 +938,28 @@ static void	fillIt(struct zbx_json *json, char *database, int current_version, i
 	zbx_json_addstring(json, "max_version", friendly_max_version, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(json, "flag", flag);
 	zbx_json_close(json);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "KRONEG 1: %s\n", json->buffer);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcheck_version_requirements                                     *
+ *                                                                            *
+ * Purpose: check if the main DB version (and also ElasticDB if it is used)   *
+ *          satisfies the version requirements and 1) logs if it is not       *
+ *          2) writes a json entry in DB with the result for the front-end    *
+ *                                                                            *
+ * Parameters: elastic_is_used        - [IN] elasticDB is configured          *
+ *             elastic_version        - [IN] detected version of the          *
+ *                                           elasticDB used                   *
+ *                                                                            *
+ ******************************************************************************/
 void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
 {
 	int current_version;
 	struct zbx_json	json;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -954,30 +969,26 @@ void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
 #define MYSQL_MYSQL_MAX_VERSION 80000
 #define MARIA_MYSQL_MIN_VERSION 100037
 	if (ON == zbx_dbms_mariadb_used())
-		fillIt(&json, "MariaDB", current_version, MARIA_MYSQL_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
+		create_json_entry_for_DBversion(&json, "MariaDB", current_version, MARIA_MYSQL_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
 	else
-		fillIt(&json, "MySQL", current_version, MYSQL_MYSQL_MIN_VERSION, MYSQL_MYSQL_MAX_VERSION);
+		create_json_entry_for_DBversion(&json, "MySQL", current_version, MYSQL_MYSQL_MIN_VERSION, MYSQL_MYSQL_MAX_VERSION);
 #elif defined(HAVE_ORACLE)
 #define ORACLE_MIN_VERSION 1102000000
-	fillIt(&json, "Oracle", current_version, ORACLE_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
+	create_json_entry_for_DBversion(&json, "Oracle", current_version, ORACLE_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
 #elif defined(HAVE_POSTGRESQL)
 #define POSTGRESQL_MIN_VERSION 90224
-	fillIt(&json, "PostgreSQL", current_version, POSTGRESQL_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
+	create_json_entry_for_DBversion(&json, "PostgreSQL", current_version, POSTGRESQL_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
 #endif
-
 #if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
 #define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION 70000
-	if (1 == elastic_is_used)
+	if (ON == elastic_is_used)
 	{
-		fillIt(&json, "ElasticDB", elastic_version, SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION,
+		create_json_entry_for_DBversion(&json, "ElasticDB", elastic_version, SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION,
 				VERSION_REQUIREMENT_NOT_DEFINED);
 	}
 #endif
-
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BUFFER X: ->%s<-", json.buffer);
-
 	DBbegin();
+
 	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", json.buffer))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
@@ -985,9 +996,9 @@ void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
 
 	DBcommit();
 	DBclose();
-
 	zbx_json_free(&json);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
