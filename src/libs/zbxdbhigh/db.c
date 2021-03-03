@@ -886,10 +886,9 @@ static void	convert_numeric_version_to_user_friendly(int numeric_version, char* 
 	}
 
 	zbx_snprintf(buf, sizeof(buf), "%d", numeric_version);
-
 	buf_str_len = strlen(buf);
-
 	friendly_version[buf_str_len + ((buf_str_len - 1) / 2)] = '\0';
+
 	while((friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = buf[buf_str_len - 1 - j++]))
 	{
 		if (0 == j % 2 && j < buf_str_len )
@@ -945,7 +944,7 @@ static void	create_json_entry_for_DBversion(struct zbx_json *json, char *databas
  * Function: DBcheck_version_requirements                                     *
  *                                                                            *
  * Purpose: check if the main DB version (and also ElasticDB if it is used)   *
- *          satisfies the version requirements and 1) logs if it is not       *
+ *          satisfies the version requirements and 1) logs if it does not     *
  *          2) writes a json entry in DB with the result for the front-end    *
  *                                                                            *
  * Parameters: elastic_is_used        - [IN] elasticDB is configured          *
@@ -961,7 +960,6 @@ void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	current_version = zbx_dbms_get_version();
 #if defined(HAVE_MYSQL)

@@ -3091,6 +3091,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
 				'default' => ''
+			],
+			'dbversion_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => ''
 			]
 		]
 	],

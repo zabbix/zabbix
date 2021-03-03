@@ -1,4 +1,3 @@
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -1049,20 +1048,20 @@ static size_t	single_curl_response_write_func(void *ptr, size_t size, size_t nme
 		zbx_error("realloc() failed");
 		exit(EXIT_FAILURE);
 	}
+
 	memcpy(s->ptr + s->len, ptr, size * nmemb);
 	s->ptr[new_len] = '\0';
 	s->len = new_len;
 
-	return size*nmemb;
+	return size * nmemb;
 }
 
 /************************************************************************************
  *                                                                                  *
  * Function: elastic_check_version                                                  *
  *                                                                                  *
- * Purpose: queries elastic search version and logs a warning if it is invalid      *
- * format is X.Y.Z where X is the major version, Y is the minor version and Z is    *
- * the patch level                                                                  *
+ * Purpose: queries elastic search version and extract the numeric version from the *
+ *          response string                                                         *
  *                                                                                  *
  ************************************************************************************/
 void	zbx_elastic_check_version(void)
@@ -1118,7 +1117,6 @@ void	zbx_elastic_check_version(void)
 
 	*errbuf = '\0';
 
-
 	if (CURLE_OK != (err = curl_easy_perform(handle)))
 	{
 		elastic_log_error(handle, err, errbuf);
@@ -1143,7 +1141,7 @@ out:
 #define PROCESS_VERSION_SUBBLOCK(cur_ver)						\
 if (FAIL != overall_status && version_number_len > next_start_index)			\
 {											\
-	local_status = SUCCEED;							\
+	local_status = SUCCEED;								\
 	cur_ver[0] = version_number[next_start_index];					\
 											\
 	if (version_number_len > next_start_index + 1 &&				\
@@ -1157,7 +1155,7 @@ if (FAIL != overall_status && version_number_len > next_start_index)			\
 				cur_ver[2] = '\0';					\
 				next_start_index = next_start_index + 3;		\
 											\
-				if (0 == isdigit(cur_ver[0]) ||			\
+				if (0 == isdigit(cur_ver[0]) ||				\
 						0 == isdigit(cur_ver[1]))		\
 				{							\
 					local_status = FAIL;				\
@@ -1181,7 +1179,7 @@ if (FAIL != overall_status && version_number_len > next_start_index)			\
 		if (0 == isdigit(cur_ver[0]))						\
 			local_status = FAIL;						\
 		else									\
-			cur_ver##_num  = atoi(cur_ver);				\
+			cur_ver##_num  = atoi(cur_ver);					\
 	}										\
 											\
 	if (FAIL == local_status)							\
@@ -1230,9 +1228,7 @@ int	zbx_elastic_get_version(void)
 {
 	return ZBX_ELASTIC_SVERSION;
 }
-
 #else
-
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
 {
 	ZBX_UNUSED(hist);
@@ -1251,6 +1247,4 @@ int	zbx_elastic_get_version(void)
 {
 	return DBVERSION_UNDEFINED;
 }
-
-
 #endif

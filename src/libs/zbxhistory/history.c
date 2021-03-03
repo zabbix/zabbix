@@ -436,7 +436,8 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
  * Purpose: relays the version retrieval logic to the history implementation  *
  *          functions                                                         *
  *                                                                            *
- * Return value: X.Y.Z format for the elastic search if it could be retrieved *
+ * Return value: XX.YY.ZZ format for the elastic search if it could be        *
+ *               retrieved                                                    *
  *               DBVERSION_UNDEFINED otherwise                                *
  *                                                                            *
  ******************************************************************************/

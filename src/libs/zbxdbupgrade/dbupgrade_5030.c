@@ -955,8 +955,6 @@ static int	DBpatch_5030057(void)
 
 	return DBadd_field("config", &field);
 }
-
-
 #endif
 
 DBPATCH_START(5030)
