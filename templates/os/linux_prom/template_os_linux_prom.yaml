@@ -958,7 +958,7 @@ zabbix_export:
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
                   expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
       discovery_rules:
         -
@@ -1314,7 +1314,7 @@ zabbix_export:
               recovery_expression: |
                 {Linux by Prom:net.if.in[node_exporter,"{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()} and
                 {Linux by Prom:net.if.out[node_exporter,"{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (> {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1332,7 +1332,7 @@ zabbix_export:
               recovery_expression: |
                 {Linux by Prom:net.if.in.errors[node_exporter,"{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and {Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (> {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -2181,11 +2181,11 @@ zabbix_export:
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
           expression: '{Linux by Prom:vm.memory.util[node_exporter].min(5m)}>{$MEMORY.UTIL.MAX}'
         -
-          name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
           expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
     -
       expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
-      name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
     -

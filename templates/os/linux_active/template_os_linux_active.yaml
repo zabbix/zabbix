@@ -1284,7 +1284,7 @@ zabbix_export:
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
                   expression: '{Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux memory by Zabbix agent active:vm.memory.size[total].last()}>0'
       macros:
         -
@@ -1539,7 +1539,7 @@ zabbix_export:
               recovery_expression: |
                 {Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and {Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}: High error rate (> {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1648,11 +1648,11 @@ zabbix_export:
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
           expression: '{Linux memory by Zabbix agent active:vm.memory.utilization.min(5m)}>{$MEMORY.UTIL.MAX}'
         -
-          name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
           expression: '{Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux memory by Zabbix agent active:vm.memory.size[total].last()}>0'
     -
       expression: '{Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux memory by Zabbix agent active:vm.memory.size[total].last()}>0'
-      name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
     -
