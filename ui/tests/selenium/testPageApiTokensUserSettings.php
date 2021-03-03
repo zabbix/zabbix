@@ -239,7 +239,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 			[
 				[
 					'filter' => [
-						'Status' => 'Enabled',
+						'Status' => 'Enabled'
 					],
 					'Expires in less than' => 12,
 					'expected' => [
