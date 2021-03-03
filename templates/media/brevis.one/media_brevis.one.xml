@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-03-02T08:05:26Z</date>
+    <date>2021-03-03T12:11:30Z</date>
     <media_types>
         <media_type>
             <name>Brevis.one</name>
@@ -37,48 +37,50 @@
                 </parameter>
                 <parameter>
                     <name>username</name>
-                    <value>{PLACE USERNAME}</value>
+                    <value>&lt;PLACE USERNAME&gt;</value>
                 </parameter>
             </parameters>
             <script>var BrevisOne = {&#13;
-    addParam: function (prefix, name, value) {&#13;
-        return prefix + name + '=' + encodeURIComponent(value);&#13;
+    params: [],&#13;
+&#13;
+    addParam: function (name, value) {&#13;
+        BrevisOne.params.push(name + '=' + encodeURIComponent(value));&#13;
     },&#13;
 &#13;
-    setFields: function (data) {&#13;
-        if (params.send_to.trim() &amp;&amp; params.send_to !== '{ALERT.SENDTO}') {&#13;
-            var parts = params.send_to.split(':');&#13;
+    setPayload: function () {&#13;
+        var parts = params.send_to.split(':'),&#13;
+            defaultValues = {&#13;
+                ring: 'true',&#13;
+                flash: 'true',&#13;
+                telauto: 'false'&#13;
+            };&#13;
 &#13;
-            if (parts.length &gt; 1) {&#13;
-                data += BrevisOne.addParam('&amp;', 'mode', parts[0]);&#13;
-                data += BrevisOne.addParam('&amp;', 'to', parts[1]);&#13;
-            }&#13;
-            else {&#13;
-                data += BrevisOne.addParam('&amp;', 'to', parts[0]);&#13;
-            }&#13;
+        BrevisOne.addParam('username', params.username);&#13;
+        BrevisOne.addParam('password', params.password);&#13;
+        BrevisOne.addParam('text', params.text);&#13;
+&#13;
+        if (parts.length &gt; 1) {&#13;
+            BrevisOne.addParam('mode', parts[0]);&#13;
+            BrevisOne.addParam('to', parts[1]);&#13;
         }&#13;
         else {&#13;
-            throw 'Required parameter is not set: &quot;send_to&quot;.';&#13;
+            BrevisOne.addParam('to', parts[0]);&#13;
         }&#13;
 &#13;
-        if (params.ring &amp;&amp; params.ring.trim() &amp;&amp; params.ring.toLowerCase() === 'true') {&#13;
-            data += BrevisOne.addParam('&amp;', 'ring', 'true');&#13;
-        }&#13;
+        Object.keys(defaultValues)&#13;
+            .forEach(function (key) {&#13;
+                if (params[key] &amp;&amp; params[key].trim() &amp;&amp; params[key].toLowerCase() === defaultValues[key]) {&#13;
+                    BrevisOne.addParam(key, defaultValues[key]);&#13;
+                }&#13;
+            });&#13;
 &#13;
-        if (params.flash &amp;&amp; params.flash.trim() &amp;&amp; params.flash.toLowerCase() === 'true') {&#13;
-            data += BrevisOne.addParam('&amp;', 'flash', 'true');&#13;
-        }&#13;
-&#13;
-        if (params.telauto &amp;&amp; params.telauto.trim() &amp;&amp; params.telauto.toLowerCase() === 'false') {&#13;
-            data += BrevisOne.addParam('&amp;', 'telauto', 'false');&#13;
-        }&#13;
-&#13;
-        return data;&#13;
+        return '?' + BrevisOne.params.join('&amp;');&#13;
     },&#13;
 &#13;
-    request: function (data) {&#13;
+    request: function () {&#13;
         var response,&#13;
-            request = new CurlHttpRequest();&#13;
+            request = new CurlHttpRequest(),&#13;
+            data = BrevisOne.setPayload();&#13;
 &#13;
         request.AddHeader('Content-Type: multipart/form-data');&#13;
 &#13;
@@ -86,8 +88,7 @@
             request.SetProxy(params.HTTPProxy);&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[ BrevisOne Webhook ] Sending request: ' + params.endpoint +&#13;
-            ((typeof data === 'string') ? (data) : ''));&#13;
+        Zabbix.Log(4, '[ BrevisOne Webhook ] Sending request.');&#13;
 &#13;
         response = request.Post(params.endpoint + data);&#13;
 &#13;
@@ -103,26 +104,20 @@
 &#13;
             throw message + '. Check debug log for more information.';&#13;
         }&#13;
-&#13;
-        return response;&#13;
     }&#13;
 };&#13;
 &#13;
 try {&#13;
-    var params = JSON.parse(value),&#13;
-        data = '';&#13;
+    var params = JSON.parse(value);&#13;
 &#13;
     ['endpoint', 'password', 'username', 'text', 'send_to'].forEach(function (field) {&#13;
         if (typeof params !== 'object' || typeof params[field] === 'undefined'&#13;
-                || params[field] === '' ) {&#13;
+                || !params[field].trim() || params[field] === '{ALERT.SENDTO}') {&#13;
             throw 'Required parameter is not set: &quot;' + field + '&quot;.';&#13;
         }&#13;
     });&#13;
 &#13;
-    data += BrevisOne.addParam('?', 'username', params.username);&#13;
-    data += BrevisOne.addParam('&amp;', 'password', params.password);&#13;
-    data += BrevisOne.addParam('&amp;', 'text', params.text);&#13;
-    BrevisOne.request(BrevisOne.setFields(data));&#13;
+    BrevisOne.request();&#13;
 &#13;
     return 'OK';&#13;
 }&#13;
@@ -147,7 +142,7 @@ Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&amp;eventid={EVEN
                     <operation_mode>RECOVERY</operation_mode>
                     <subject>Resolved in {EVENT.DURATION}: {EVENT.NAME}</subject>
                     <message>[{EVENT.STATUS}] {EVENT.NAME}&#13;
-Resoled in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+Resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
 Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
 Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&amp;eventid={EVENT.ID}</message>
