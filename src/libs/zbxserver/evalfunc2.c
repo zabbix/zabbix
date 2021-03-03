@@ -1131,7 +1131,7 @@ out:
  *                                                                            *
  * Function: evaluate_LAST                                                    *
  *                                                                            *
- * Purpose: evaluate functions 'last' and 'prev' for the item                 *
+ * Purpose: evaluate function 'last' for the item                             *
  *                                                                            *
  * Parameters: value - dynamic buffer                                         *
  *             item - item (performance metric)                               *
@@ -2186,10 +2186,6 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	if (0 == strcmp(function, "last"))
 	{
 		ret = evaluate_LAST(value, item, parameter, ts, error);
-	}
-	else if (0 == strcmp(function, "prev"))
-	{
-		ret = evaluate_LAST(value, item, "#2", ts, error);
 	}
 	else if (0 == strcmp(function, "min"))
 	{
