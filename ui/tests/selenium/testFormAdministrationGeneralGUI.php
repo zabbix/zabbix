@@ -1012,8 +1012,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			case 'Max period for time selector':
 				$this->query('id:from')->one()->fill('now-5y');
 				$this->query('button:Apply')->one()->click();
-				$this->assertEquals('Maximum time period to display is 366 days.',
-				$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
+				// Days count for the case when current or past year is leap year.
+				$days_count = (new DateTime())->diff((new DateTime())->sub(new DateInterval('P1Y')))->days;
+				$this->assertEquals('Maximum time period to display is '.$days_count.' days.',
+						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
 				break;
 		}
 	}
