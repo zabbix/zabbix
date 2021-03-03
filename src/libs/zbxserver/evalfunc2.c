@@ -2093,7 +2093,7 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 		const zbx_timespec_t *ts, char **error)
 {
 	int		ret = FAIL, start, end;
-	char		*period = NULL, *period_shift = NULL;
+	char		*period = NULL;
 	const char	*table;
 	double		value_dbl;
 
@@ -2155,7 +2155,6 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 		zbx_variant_set_dbl(value, value_dbl);
 out:
 	zbx_free(period);
-	zbx_free(period_shift);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
