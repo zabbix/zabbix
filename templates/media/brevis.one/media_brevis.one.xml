@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-03-03T12:11:30Z</date>
+    <date>2021-03-03T14:43:40Z</date>
     <media_types>
         <media_type>
             <name>Brevis.one</name>
@@ -47,7 +47,7 @@
         BrevisOne.params.push(name + '=' + encodeURIComponent(value));&#13;
     },&#13;
 &#13;
-    setPayload: function () {&#13;
+    createPayloadString: function (params) {&#13;
         var parts = params.send_to.split(':'),&#13;
             defaultValues = {&#13;
                 ring: 'true',&#13;
@@ -80,7 +80,7 @@
     request: function () {&#13;
         var response,&#13;
             request = new CurlHttpRequest(),&#13;
-            data = BrevisOne.setPayload();&#13;
+            data = BrevisOne.createPayloadString();&#13;
 &#13;
         request.AddHeader('Content-Type: multipart/form-data');&#13;
 &#13;
