@@ -36,6 +36,8 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
+require_once dirname(__FILE__).'/testPageApiTokensAdministrationGeneral.php';
+require_once dirname(__FILE__).'/testPageApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDashboardList.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
@@ -91,6 +93,8 @@ require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
+require_once dirname(__FILE__).'/testFormApiTokensAdministrationGeneral.php';
+require_once dirname(__FILE__).'/testFormApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/testFormFilterProblems.php';
@@ -182,6 +186,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageAdministrationScripts');
+		$suite->addTestSuite('testPageApiTokensAdministrationGeneral');
+		$suite->addTestSuite('testPageApiTokensUserSettings');
 		$suite->addTestSuite('testPageAvailabilityReport');
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDashboardList');
@@ -244,6 +250,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
+		$suite->addTestSuite('testFormApiTokensAdministrationGeneral');
+		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormFilterHosts');
 		$suite->addTestSuite('testFormFilterProblems');
