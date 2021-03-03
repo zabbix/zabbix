@@ -73,8 +73,8 @@ class testPageUserRoles extends CWebTest {
 	 */
 	public function testPageUserRoles_Layout() {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
-		$this->assertPageTitle('Configuration of user roles');
-		$this->assertPageHeader('User roles');
+		$this->page->assertTitle('Configuration of user roles');
+		$this->page->assertHeader('User roles');
 
 		// Table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -377,19 +377,5 @@ class testPageUserRoles extends CWebTest {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM role WHERE name='.zbx_dbstr($role_name)));
 			}
 		}
-	}
-
-	/**
-	 * Get data from chosen column.
-	 *
-	 * @param string $column		Column name, where value should be get
-	 */
-	private function getTableResult($column) {
-		$table = $this->query('class:list-table')->asTable()->one();
-		$result = [];
-		foreach ($table->getRows() as $row) {
-			$result[] = $row->getColumn($column)->getText();
-		}
-		return $result;
 	}
 }
