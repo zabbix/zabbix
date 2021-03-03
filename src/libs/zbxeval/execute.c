@@ -874,7 +874,7 @@ static int	eval_execute_function_length(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	zbx_variant_set_dbl(&value, strlen(arg->data.str));
+	zbx_variant_set_dbl(&value, zbx_strlen_utf8(arg->data.str));
 	eval_function_return(1, &value, output);
 
 	return SUCCEED;
