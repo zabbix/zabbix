@@ -736,7 +736,7 @@ zbx_db_widget_t;
 #define ZBX_WIDGET_TYPE_DATA_OVERVIEW		("dataover")
 #define ZBX_WIDGET_TYPE_PROBLEMS		("problems")
 #define ZBX_WIDGET_TYPE_HOST_INFO		("hostavail")
-#define ZBX_WIDGET_TYPE_MAP			("maps")
+#define ZBX_WIDGET_TYPE_MAP			("map")
 #define ZBX_WIDGET_TYPE_SYSTEM_STATUS		("problemsbysv")
 #define ZBX_WIDGET_TYPE_SERVER_INFO		("systeminfo")
 #define ZBX_WIDGET_TYPE_TRIGGER_OVERVIEW	("trigover")
