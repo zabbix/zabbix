@@ -20,6 +20,14 @@
 const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
 const WIDGET_EVENT_ENTER = 'enter';
 const WIDGET_EVENT_LEAVE = 'leave';
+const WIDGET_EVENT_UPDATE_START = 'update-start';
+const WIDGET_EVENT_UPDATE_END = 'update-end';
+
+const WIDGET_STATE_NEW = 'new';
+const WIDGET_STATE_STARTED = 'started';
+const WIDGET_STATE_RESUMED = 'resumed';
+const WIDGET_STATE_PAUSED = 'paused';
+const WIDGET_STATE_STOPPED = 'stopped';
 
 class CWidget extends CBaseComponent {
 
@@ -34,12 +42,13 @@ class CWidget extends CBaseComponent {
 		cell_width,
 		cell_height,
 		is_editable,
+		is_edit_mode,
+		dashboard_data,
 		rf_rate = 0,
 		parent = null,
 		index = null,
-		widgetid = '',
-		is_new = (widgetid.length == 0),
-		dynamic_hostid = null,
+		widgetid = null,
+		is_new = (widgetid === null),
 		pos = null
 	}) {
 		super(document.createElement('div'));
@@ -59,12 +68,12 @@ class CWidget extends CBaseComponent {
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
 		this._is_editable = is_editable;
+		this._dashboard_data = dashboard_data;
 		this._rf_rate = rf_rate;
 		this._parent = parent;
 		this._index = index;
 		this._widgetid = widgetid;
 		this._is_new = is_new;
-		this._dynamic_hostid = dynamic_hostid;
 		this._pos = pos;
 
 		this._create();
@@ -82,42 +91,224 @@ class CWidget extends CBaseComponent {
 			root: 'dashbrd-grid-widget'
 		};
 
+		this._state = WIDGET_STATE_NEW;
+
+		this._content_size = {};
+
+		this._is_updating_paused = false;
+		this._update_abort_controller = null;
+		this._update_timeout = null;
+		this._update_retry_sec = 3;
+
+		this._is_ready = false;
+
 		this._preloader_timeout = null;
-		this._preloader_timeout_ms = 10000;
+		this._preloader_timeout_sec = 10;
+
+		this._storage = {};
 	}
 
 	start() {
+		if (this._state !== WIDGET_STATE_NEW) {
+			throw new Error('Wrong state.');
+		}
+		this._state = WIDGET_STATE_STARTED;
+
 		this._makeView();
 
 		if (this._pos !== null) {
 			this.setPosition(this._pos);
 		}
-
-		return this;
 	}
 
 	resume() {
-		this._registerEvents();
+		if (this._state !== WIDGET_STATE_NEW && this._state !== WIDGET_STATE_PAUSED) {
+			throw new Error('Wrong state.');
+		}
+		this._state = WIDGET_STATE_RESUMED;
 
-		return this;
+		this._registerEvents();
+		this._update();
 	}
 
 	pause() {
+		if (this._state !== WIDGET_STATE_RESUMED) {
+			throw new Error('Wrong state.');
+		}
+		this._state = WIDGET_STATE_PAUSED;
+
 		this._unregisterEvents();
+		this._clearScheduledUpdate();
+	}
+
+	stop() {
+		if (this._state !== WIDGET_STATE_PAUSED) {
+			throw new Error('Wrong state.');
+		}
+		this._state = WIDGET_STATE_STOPPED;
+
+		this._stopUpdate();
+	}
+
+	getState() {
+		return this._state;
+	}
+
+	_update() {
+		this._clearScheduledUpdate();
+
+		if (this._update_abort_controller !== null) {
+			// Waiting for another AJAX request to either complete or fail.
+			return;
+		}
+
+		if (this._is_updating_paused) {
+			// Re-schedule update as soon as the widget gets unpaused.
+			this._scheduleUpdate(1);
+
+			return;
+		}
+
+		const is_expanded = this._$content_body.find('[data-expanded="true"]');
+
+		if (is_expanded) {
+			// Re-schedule update as soon as the expanded items are removed.
+			this._scheduleUpdate(1);
+
+			return;
+		}
+
+		this.fire(WIDGET_EVENT_UPDATE_START);
+
+		// The content size might be included in the request data.
+		this._content_size = this._getContentSize();
+
+		this._update_abort_controller = new AbortController();
+		this._schedulePreloader();
+
+		this
+			._promiseUpdate()
+			.then(() => this._hidePreloader())
+			.catch(() => {
+				if (this._update_abort_controller.signal.aborted) {
+					this._hidePreloader();
+				}
+				else {
+					this._scheduleUpdate(this._update_retry_sec);
+				}
+			})
+			.finally(() => {
+				this._update_abort_controller = null;
+
+				this.fire(WIDGET_EVENT_UPDATE_END);
+			});
+	}
+
+	_promiseUpdate() {
+		const url = new Curl('zabbix.php');
+
+		url.setArgument('action', `widget.${this._type}.view`);
+
+		return fetch(url.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(this._getUpdateRequestData()),
+			signal: this._update_abort_controller.signal
+		})
+			.then((response) => response.json())
+			.then((response) => this._processUpdateResponse(response));
+	}
+
+	_processUpdateResponse(response) {
+
+	}
+
+	_pauseUpdate() {
+		this._is_updating_paused = true;
+	}
+
+	_unpauseUpdate() {
+		this._is_updating_paused = false;
+	}
+
+	_stopUpdate() {
+		this._clearScheduledUpdate();
+
+		if (this._update_abort_controller !== null) {
+			this._update_abort_controller.abort();
+		}
+	}
+
+	_scheduleUpdate(rf_rate = null) {
+		this._clearScheduledUpdate();
+
+		if (this._update_abort_controller !== null) {
+			// Waiting for another AJAX request to either complete or fail.
+			return;
+		}
+
+		if (rf_rate === null) {
+			rf_rate = this._rf_rate;
+		}
+
+		if (rf_rate > 0) {
+			this._update_timeout = setTimeout(() => this._update(), rf_rate * 1000);
+		}
+	}
+
+	_clearScheduledUpdate() {
+		if (this._update_timeout !== null) {
+			clearTimeout(this._update_timeout);
+			this._update_timeout = null;
+		}
 
 		return this;
 	}
 
-	delete() {
-		return this;
+	_getUpdateRequestData() {
+		return {
+			templateid: this._dashboard_data.templateid !== null ? this._dashboard_data.templateid : undefined,
+			dashboardid: this._dashboard_data.dashboardid !== null ? this._dashboard_data.dashboardid : undefined,
+			dynamic_hostid: this._dashboard_data.dynamic_hostid !== null
+				? this._dashboard_data.dynamic_hostid
+				: undefined,
+			widgetid: (this._widgetid !== null) ? this._widgetid : undefined,
+			uniqueid: this._uniqueid,
+			name: (this._header !== '') ? this._header : undefined,
+			fields: (Object.keys(this._fields).length != 0) ? JSON.stringify(this._fields) : undefined,
+			view_mode: this._view_mode,
+			edit_mode: this._is_edit_mode ? 1 : 0,
+			storage: this._storage,
+			...this._content_size
+		};
 	}
 
-	refresh() {
-		return this;
+	_getContentSize() {
+		return {
+			content_width: Math.floor(this._$content_body.width()),
+			content_height: Math.floor(this._$content_body.height())
+		};
+	}
+
+	ready() {
+		this._is_ready = true;
+	}
+
+	isReady() {
+		return this._is_ready;
 	}
 
 	resize() {
-		return this;
+	}
+
+	setEditMode() {
+		this._is_edit_mode = true;
+	}
+
+	storeValue(key, value) {
+		this._storage[key] = value;
 	}
 
 	/**
@@ -125,8 +316,6 @@ class CWidget extends CBaseComponent {
 	 */
 	enter() {
 		this._$view.addClass(this._css_classes.focus);
-
-		return this;
 	}
 
 	/**
@@ -138,15 +327,11 @@ class CWidget extends CBaseComponent {
 		}
 
 		this._$view.removeClass(this._css_classes.focus);
-
-		return this;
 	}
 
 	setViewMode(view_mode) {
 		this._view_mode = view_mode;
 		this._$view.toggleClass(this._css_classes.hidden_header, this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
-
-		return this;
 	}
 
 	/**
@@ -156,8 +341,6 @@ class CWidget extends CBaseComponent {
 		this._$content_header
 			.find('button')
 			.prop('disabled', false);
-
-		return this;
 	}
 
 	/**
@@ -167,8 +350,6 @@ class CWidget extends CBaseComponent {
 		this._$content_header
 			.find('button')
 			.prop('disabled', true);
-
-		return this;
 	}
 
 	setContents({body, messages, info, debug}) {
@@ -189,8 +370,6 @@ class CWidget extends CBaseComponent {
 		if (info !== undefined) {
 			this.addInfoButtons(info);
 		}
-
-		return this;
 	}
 
 	addInfoButtons(buttons) {
@@ -217,14 +396,10 @@ class CWidget extends CBaseComponent {
 		}
 
 		this._$actions.prepend(html_buttons);
-
-		return this;
 	}
 
 	removeInfoButtons() {
 		this._$actions.find('.widget-info-button').remove();
-
-		return this;
 	}
 
 	setPosition(pos) {
@@ -234,11 +409,9 @@ class CWidget extends CBaseComponent {
 			width: `${this._cell_width * pos.width}%`,
 			height: `${this._cell_height * pos.height}px`
 		});
-
-		return this;
 	}
 
-	showPreloader() {
+	_showPreloader() {
 		if (this._preloader_timeout !== null) {
 			clearTimeout(this._preloader_timeout);
 			this._preloader_timeout = null;
@@ -247,11 +420,9 @@ class CWidget extends CBaseComponent {
 		this._$view
 			.find(`.${this._css_classes.content}`)
 			.addClass('is-loading');
-
-		return this;
 	}
 
-	hidePreloader() {
+	_hidePreloader() {
 		if (this._preloader_timeout !== null) {
 			clearTimeout(this._preloader_timeout);
 			this._preloader_timeout = null;
@@ -260,11 +431,9 @@ class CWidget extends CBaseComponent {
 		this._$view
 			.find(`.${this._css_classes.content}`)
 			.removeClass('is-loading');
-
-		return this;
 	}
 
-	schedulePreloader(timeout = this._preloader_timeout_ms) {
+	_schedulePreloader(timeout = this._preloader_timeout_sec * 1000) {
 		if (this._preloader_timeout !== null) {
 			return;
 		}
@@ -280,10 +449,8 @@ class CWidget extends CBaseComponent {
 
 		this._preloader_timeout = setTimeout(() => {
 			this._preloader_timeout = null;
-			this.showPreloader();
+			this._showPreloader();
 		}, timeout);
-
-		return this;
 	}
 
 	getIndex() {
@@ -292,8 +459,6 @@ class CWidget extends CBaseComponent {
 
 	setIndex(index) {
 		this._index = index;
-
-		return this;
 	}
 
 	getView() {
