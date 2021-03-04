@@ -2099,13 +2099,19 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
+	if (1 != num_param(parameters))
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
+		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
-	if (SUCCEED != zbx_trends_parse_range(ts->sec, parameters, &start, &end, error))
+	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
+	{
+		*error = zbx_strdup(*error, "invalid first parameter");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_trends_parse_range(ts->sec, period, &start, &end, error))
 		goto out;
 
 	switch (item->value_type)
