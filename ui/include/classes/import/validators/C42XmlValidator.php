@@ -25,6 +25,16 @@
 class C42XmlValidator extends CXmlValidatorGeneral {
 
 	/**
+	 * Legacy screen resource types.
+	 */
+	private const SCREEN_RESOURCE_TYPE_GRAPH = 0;
+	private const SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH = 1;
+	private const SCREEN_RESOURCE_TYPE_PLAIN_TEXT = 3;
+	private const SCREEN_RESOURCE_TYPE_CLOCK = 7;
+	private const SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH = 19;
+	private const SCREEN_RESOURCE_TYPE_LLD_GRAPH = 20;
+
+	/**
 	 * Base validation function.
 	 *
 	 * @param array  $data  Import data.
@@ -1045,9 +1055,11 @@ class C42XmlValidator extends CXmlValidatorGeneral {
 							'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
 							'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
 								'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
+									// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_validate' method.
 									'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
+									// The tag 'style' should be validated before the 'resource' because it is used in 'ex_validate' method.
 									'style' =>					['type' => XML_STRING | XML_REQUIRED],
-									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array']],
+									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
 									'width' =>					['type' => XML_STRING | XML_REQUIRED],
 									'height' =>					['type' => XML_STRING | XML_REQUIRED],
 									'x' =>						['type' => XML_STRING | XML_REQUIRED],
@@ -1373,6 +1385,53 @@ class C42XmlValidator extends CXmlValidatorGeneral {
 
 				default:
 					$rules = ['type' => XML_ARRAY, 'rules' => []];
+			}
+
+			$data = $this->doValidate($rules, $data, $path);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate "screen_item/resource" tag.
+	 *
+	 * @param array|string $data         Import data.
+	 * @param array        $parent_data  Data's parent array.
+	 * @param string       $path         XML path.
+	 *
+	 * @throws Exception if the map element is invalid.
+	 *
+	 * @return array|string
+	 */
+	public function validateScreenItemResource($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['resourcetype'])) {
+			switch ($parent_data['resourcetype']) {
+				case self::SCREEN_RESOURCE_TYPE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_LLD_GRAPH:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'name' =>			['type' => XML_STRING | XML_REQUIRED],
+						'host' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				case self::SCREEN_RESOURCE_TYPE_CLOCK:
+					if ($parent_data['style'] != TIME_TYPE_HOST) {
+						return $data;
+					}
+					// break; is not missing here
+
+				case self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_PLAIN_TEXT:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'key' =>			['type' => XML_STRING | XML_REQUIRED],
+						'host' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				default:
+					return $data;
 			}
 
 			$data = $this->doValidate($rules, $data, $path);
