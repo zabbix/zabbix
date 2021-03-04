@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-04T09:56:22Z</date>
+   <date>2021-03-04T18:37:03Z</date>
    <groups>
       <group>
          <name>Templates/Power</name>
@@ -235,8 +235,8 @@ The current internal UPS temperature expressed in&#13;
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{min(15m)} &gt; {$BATTERY.TEMP.MAX.WARN}</expression>
-                     <name>Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for 15m)</name>
+                     <expression>{min({$TIME.PERIOD})} &gt; {$BATTERY.TEMP.MAX.WARN}</expression>
+                     <name>Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})</name>
                      <opdata>Current temperature: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -313,26 +313,6 @@ the line voltage.</description>
                      <params>6h</params>
                   </step>
                </preprocessing>
-               <triggers>
-                  <trigger>
-                     <expression>{last()}=3</expression>
-                     <name>UPS has decrease in voltage levels</name>
-                     <priority>AVERAGE</priority>
-                     <description>A decrease in voltage levels. Sometimes this is not visually noticeable.</description>
-                  </trigger>
-                  <trigger>
-                     <expression>{last()}=2</expression>
-                     <name>UPS has over voltage</name>
-                     <priority>AVERAGE</priority>
-                     <description>An over voltage greater than the high transfer voltage.</description>
-                  </trigger>
-                  <trigger>
-                     <expression>{last()}=4</expression>
-                     <name>UPS has total loss of utility power</name>
-                     <priority>AVERAGE</priority>
-                     <description>A total loss of utility power.</description>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>Input frequency</name>
@@ -361,8 +341,8 @@ The current input frequency to the UPS system in Hz.</description>
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{min(15m)} &gt; {$UPS.INPUT_FREQ.MAX.WARN} or {max(15m)} &lt; {$UPS.INPUT_FREQ.MIN.WARN}</expression>
-                     <name>Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for 15m)</name>
+                     <expression>{min({$TIME.PERIOD})} &gt; 0 and ({min({$TIME.PERIOD})} &gt; {$UPS.INPUT_FREQ.MAX.WARN} or {max({$TIME.PERIOD})} &lt; {$UPS.INPUT_FREQ.MIN.WARN})</expression>
+                     <name>Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})</name>
                      <opdata>Current frequency: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -395,8 +375,8 @@ The current utility line voltage in VAC.</description>
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{min(15m)} &gt; {$UPS.INPUT_VOLT.MAX.WARN} or {max(15m)} &lt; {$UPS.INPUT_VOLT.MIN.WARN}</expression>
-                     <name>Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for 15m)</name>
+                     <expression>{min({$TIME.PERIOD})} &gt; 0 and ({min({$TIME.PERIOD})} &gt; {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} &lt; {$UPS.INPUT_VOLT.MIN.WARN})</expression>
+                     <name>Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})</name>
                      <opdata>Current voltage: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                   </trigger>
@@ -456,8 +436,8 @@ of rated capacity.</description>
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{min(15m)} &gt; {$UPS.OUTPUT.MAX.WARN}</expression>
-                     <name>Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for 15m)</name>
+                     <expression>{min({$TIME.PERIOD})} &gt; {$UPS.OUTPUT.MAX.WARN}</expression>
+                     <name>Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})</name>
                      <opdata>Current load: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>A battery installed has an internal error condition.</description>
@@ -737,6 +717,22 @@ The battery cartridge health.&#13;
                            <params>6h</params>
                         </step>
                      </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{regexp("^(0)[0|1]{15}$")}=1</expression>
+                           <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay</name>
+                           <opdata>Current bit set: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>The battery cartridge health.&#13;
+  bit 0 Battery lifetime okay&#13;
+  bit 1 Battery lifetime near end, order replacement cartridge&#13;
+  bit 2 Battery lifetime exceeded, replace battery&#13;
+  bit 3 Battery lifetime near end acknowledged, order replacement cartridge&#13;
+  bit 4 Battery lifetime exceeded acknowledged, replace battery&#13;
+  bit 5 Battery measured lifetime near end, order replacement cartridge&#13;
+  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status</name>
@@ -771,6 +767,27 @@ bit 11 FirmwareMismatch</description>
                            <params>6h</params>
                         </step>
                      </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{regexp("^(0{16})$")}=1</expression>
+                           <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay</name>
+                           <opdata>Current bit set: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>The battery cartridge status:&#13;
+bit 0 Disconnected&#13;
+bit 1 Overvoltage&#13;
+bit 2 NeedsReplacement&#13;
+bit 3 OvertemperatureCritical&#13;
+bit 4 Charger&#13;
+bit 5 TemperatureSensor&#13;
+bit 6 BusSoftStart&#13;
+bit 7 OvertemperatureWarning&#13;
+bit 8 GeneralError&#13;
+bit 9 Communication&#13;
+bit 10 DisconnectedFrame&#13;
+bit 11 FirmwareMismatch</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery temperature</name>
@@ -799,8 +816,8 @@ The battery pack temperature measured in Celsius.</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(15m)} &gt; {$BATTERY.TEMP.MAX.WARN}</expression>
-                           <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for 15m)</name>
+                           <expression>{min({$TIME.PERIOD})} &gt; {$BATTERY.TEMP.MAX.WARN}</expression>
+                           <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})</name>
                            <opdata>Current temperature: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                         </trigger_prototype>
@@ -1150,8 +1167,8 @@ The input voltage in VAC, or -1 if it's unsupported&#13;
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(15m)} &gt; {$UPS.INPUT_VOLT.MAX.WARN} or {max(15m)} &lt; {$UPS.INPUT_VOLT.MIN.WARN}</expression>
-                           <name>{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for 15m)</name>
+                           <expression>{min({$TIME.PERIOD})} &gt; {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} &lt; {$UPS.INPUT_VOLT.MIN.WARN}</expression>
+                           <name>{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})</name>
                            <opdata>Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                         </trigger_prototype>
@@ -1165,26 +1182,37 @@ The input voltage in VAC, or -1 if it's unsupported&#13;
             <macro>
                <macro>{$BATTERY.TEMP.MAX.WARN}</macro>
                <value>55</value>
+               <description>Maximum battery temperature for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$TIME.PERIOD}</macro>
+               <value>15m</value>
+               <description>Time period for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$UPS.INPUT_FREQ.MAX.WARN}</macro>
                <value>50.3</value>
+               <description>Maximum input frequency for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$UPS.INPUT_FREQ.MIN.WARN}</macro>
                <value>49.7</value>
+               <description>Minimum input frequency for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$UPS.INPUT_VOLT.MAX.WARN}</macro>
                <value>243</value>
+               <description>Maximum input voltage for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$UPS.INPUT_VOLT.MIN.WARN}</macro>
                <value>197</value>
+               <description>Minimum input voltage for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$UPS.OUTPUT.MAX.WARN}</macro>
                <value>80</value>
+               <description>Maximum output load in % for trigger expression.</description>
             </macro>
          </macros>
          <screens>

@@ -30,12 +30,13 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$BATTERY.TEMP.MAX.WARN} |<p>-</p> |`55` |
-|{$UPS.INPUT_FREQ.MAX.WARN} |<p>-</p> |`50.3` |
-|{$UPS.INPUT_FREQ.MIN.WARN} |<p>-</p> |`49.7` |
-|{$UPS.INPUT_VOLT.MAX.WARN} |<p>-</p> |`243` |
-|{$UPS.INPUT_VOLT.MIN.WARN} |<p>-</p> |`197` |
-|{$UPS.OUTPUT.MAX.WARN} |<p>-</p> |`80` |
+|{$BATTERY.TEMP.MAX.WARN} |<p>Maximum battery temperature for trigger expression.</p> |`55` |
+|{$TIME.PERIOD} |<p>Time period for trigger expression.</p> |`15m` |
+|{$UPS.INPUT_FREQ.MAX.WARN} |<p>Maximum input frequency for trigger expression.</p> |`50.3` |
+|{$UPS.INPUT_FREQ.MIN.WARN} |<p>Minimum input frequency for trigger expression.</p> |`49.7` |
+|{$UPS.INPUT_VOLT.MAX.WARN} |<p>Maximum input voltage for trigger expression.</p> |`243` |
+|{$UPS.INPUT_VOLT.MIN.WARN} |<p>Minimum input voltage for trigger expression.</p> |`197` |
+|{$UPS.OUTPUT.MAX.WARN} |<p>Maximum output load in % for trigger expression.</p> |`80` |
 
 ## Template links
 
@@ -96,13 +97,10 @@ No specific Zabbix configuration is required.
 |Battery has an internal error condition |<p>A battery installed has an internal error condition.</p> |`{TEMPLATE_NAME:battery.status[upsBasicBatteryStatus].last()}=4` |AVERAGE | |
 |Battery is Low |<p>The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.</p> |`{TEMPLATE_NAME:battery.status[upsBasicBatteryStatus].last()}=3` |AVERAGE | |
 |Battery needs replacement |<p>A battery installed has an internal error condition.</p> |`{TEMPLATE_NAME:battery.replace_indicator[upsAdvBatteryReplaceIndicator].last()}=2` |HIGH | |
-|Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for 15m) | |`{TEMPLATE_NAME:battery.temperature[upsHighPrecBatteryTemperature].min(15m)} > {$BATTERY.TEMP.MAX.WARN}` |HIGH | |
-|Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for 15m) | |`{TEMPLATE_NAME:input.voltage[upsHighPrecInputLineVoltage].min(15m)} > {$UPS.INPUT_VOLT.MAX.WARN} or {TEMPLATE_NAME:input.voltage[upsHighPrecInputLineVoltage].max(15m)} < {$UPS.INPUT_VOLT.MIN.WARN}` |HIGH | |
-|Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for 15m) | |`{TEMPLATE_NAME:input.frequency[upsHighPrecInputFrequency].min(15m)} > {$UPS.INPUT_FREQ.MAX.WARN} or {TEMPLATE_NAME:input.frequency[upsHighPrecInputFrequency].max(15m)} < {$UPS.INPUT_FREQ.MIN.WARN}` |HIGH | |
-|UPS has decrease in voltage levels |<p>A decrease in voltage levels. Sometimes this is not visually noticeable.</p> |`{TEMPLATE_NAME:input.fail[upsAdvInputLineFailCause].last()}=3` |AVERAGE | |
-|UPS has over voltage |<p>An over voltage greater than the high transfer voltage.</p> |`{TEMPLATE_NAME:input.fail[upsAdvInputLineFailCause].last()}=2` |AVERAGE | |
-|UPS has total loss of utility power |<p>A total loss of utility power.</p> |`{TEMPLATE_NAME:input.fail[upsAdvInputLineFailCause].last()}=4` |AVERAGE | |
-|Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for 15m) |<p>A battery installed has an internal error condition.</p> |`{TEMPLATE_NAME:output.load[upsHighPrecOutputLoad].min(15m)} > {$UPS.OUTPUT.MAX.WARN}` |HIGH | |
+|Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:battery.temperature[upsHighPrecBatteryTemperature].min({$TIME.PERIOD})} > {$BATTERY.TEMP.MAX.WARN}` |HIGH | |
+|Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:input.voltage[upsHighPrecInputLineVoltage].min({$TIME.PERIOD})} > 0 and ({TEMPLATE_NAME:input.voltage[upsHighPrecInputLineVoltage].min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {TEMPLATE_NAME:input.voltage[upsHighPrecInputLineVoltage].max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN})` |HIGH | |
+|Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:input.frequency[upsHighPrecInputFrequency].min({$TIME.PERIOD})} > 0 and ({TEMPLATE_NAME:input.frequency[upsHighPrecInputFrequency].min({$TIME.PERIOD})} > {$UPS.INPUT_FREQ.MAX.WARN} or {TEMPLATE_NAME:input.frequency[upsHighPrecInputFrequency].max({$TIME.PERIOD})} < {$UPS.INPUT_FREQ.MIN.WARN})` |HIGH | |
+|Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD}) |<p>A battery installed has an internal error condition.</p> |`{TEMPLATE_NAME:output.load[upsHighPrecOutputLoad].min({$TIME.PERIOD})} > {$UPS.OUTPUT.MAX.WARN}` |HIGH | |
 |UPS is Timed Sleeping | |`{TEMPLATE_NAME:output.status[upsBasicOutputStatus].last()}=5` |AVERAGE | |
 |UPS is Switched Bypass | |`{TEMPLATE_NAME:output.status[upsBasicOutputStatus].last()}=9` |AVERAGE | |
 |UPS is Software Bypass | |`{TEMPLATE_NAME:output.status[upsBasicOutputStatus].last()}=6` |AVERAGE | |
@@ -114,8 +112,10 @@ No specific Zabbix configuration is required.
 |UPS is Off | |`{TEMPLATE_NAME:output.status[upsBasicOutputStatus].last()}=7` |AVERAGE | |
 |UPS is Emergency Static Bypass | |`{TEMPLATE_NAME:output.status[upsBasicOutputStatus].last()}=16` |AVERAGE | |
 |UPS is Hardware Failure Bypass | |`{TEMPLATE_NAME:output.status[upsBasicOutputStatus].last()}=10` |AVERAGE | |
-|{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for 15m) | |`{TEMPLATE_NAME:phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}].min(15m)} > {$UPS.INPUT_VOLT.MAX.WARN} or {TEMPLATE_NAME:phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}].max(15m)} < {$UPS.INPUT_VOLT.MIN.WARN}` |HIGH | |
-|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for 15m) | |`{TEMPLATE_NAME:battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}].min(15m)} > {$BATTERY.TEMP.MAX.WARN}` |HIGH | |
+|{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}].min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {TEMPLATE_NAME:phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}].max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN}` |HIGH | |
+|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay |<p>The battery cartridge status:</p><p>bit 0 Disconnected</p><p>bit 1 Overvoltage</p><p>bit 2 NeedsReplacement</p><p>bit 3 OvertemperatureCritical</p><p>bit 4 Charger</p><p>bit 5 TemperatureSensor</p><p>bit 6 BusSoftStart</p><p>bit 7 OvertemperatureWarning</p><p>bit 8 GeneralError</p><p>bit 9 Communication</p><p>bit 10 DisconnectedFrame</p><p>bit 11 FirmwareMismatch</p> |`{TEMPLATE_NAME:battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}].regexp("^(0{16})$")}=1` |WARNING | |
+|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}].min({$TIME.PERIOD})} > {$BATTERY.TEMP.MAX.WARN}` |HIGH | |
+|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay |<p>The battery cartridge health.</p><p>  bit 0 Battery lifetime okay</p><p>  bit 1 Battery lifetime near end, order replacement cartridge</p><p>  bit 2 Battery lifetime exceeded, replace battery</p><p>  bit 3 Battery lifetime near end acknowledged, order replacement cartridge</p><p>  bit 4 Battery lifetime exceeded acknowledged, replace battery</p><p>  bit 5 Battery measured lifetime near end, order replacement cartridge</p><p>  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</p> |`{TEMPLATE_NAME:battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}].regexp("^(0)[0|1]{15}$")}=1` |WARNING | |
 |{#EXTERNAL_SENSOR1_NAME}: Sensor has status Not Applicable |<p>The external sensor is not work or not connected.</p> |`{TEMPLATE_NAME:external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}].last()}=4` |INFO | |
 |{#EXTERNAL_SENSOR1_NAME}: Sensor has status Warning |<p>The external sensor has returned a value greater than the warning threshold.</p> |`{TEMPLATE_NAME:external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}].last()}=2` |AVERAGE | |
 |{#EXTERNAL_SENSOR1_NAME}: Sensor has status Critical |<p>The external sensor has returned a value greater than the critical threshold.</p> |`{TEMPLATE_NAME:external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}].last()}=3` |HIGH | |
