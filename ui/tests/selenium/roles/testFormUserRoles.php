@@ -22,8 +22,8 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup-once role
- * @backup-once role_rule
+ * @backup role
+ * @backup role_rule
  */
 class testFormUserRoles extends CWebTest {
 
@@ -127,9 +127,9 @@ class testFormUserRoles extends CWebTest {
 						'Name' => [
 							'disabled_monitoring'
 						],
-						'Monitoring' => ['uncheck_all'],
-						'Inventory' => ['uncheck_all'],
-						'Reports' => ['uncheck_all']
+						'Monitoring' => ['all' => false],
+						'Inventory' => ['all' => false],
+						'Reports' => ['all' => false]
 					],
 					'message_header' => 'Cannot create user role',
 					'message_details' => 'At least one UI element must be checked.'
@@ -143,10 +143,10 @@ class testFormUserRoles extends CWebTest {
 						'Name' => [
 							'disabled_monitoring'
 						],
-						'Monitoring' => ['uncheck_all'],
-						'Inventory' => ['uncheck_all'],
-						'Reports' => ['uncheck_all'],
-						'Configuration' => ['uncheck_all']
+						'Monitoring' => ['all' => false],
+						'Inventory' => ['all' => false],
+						'Reports' => ['all' => false],
+						'Configuration' => ['all' => false]
 					],
 					'message_header' => 'Cannot create user role',
 					'message_details' => 'At least one UI element must be checked.'
@@ -160,11 +160,11 @@ class testFormUserRoles extends CWebTest {
 						'Name' => [
 							'disabled_monitoring'
 						],
-						'Monitoring' => ['uncheck_all'],
-						'Inventory' => ['uncheck_all'],
-						'Reports' => ['uncheck_all'],
-						'Configuration' => ['uncheck_all'],
-						'Administration' => ['uncheck_all']
+						'Monitoring' => ['all' => false],
+						'Inventory' => ['all' => false],
+						'Reports' => ['all' => false],
+						'Configuration' => ['all' => false],
+						'Administration' => ['all' => false]
 					],
 					'message_header' => 'Cannot create user role',
 					'message_details' => 'At least one UI element must be checked.'
@@ -212,10 +212,10 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'user_type' => 'User',
+					'user_type' => 'Super admin',
 					'fields' => [
 						'Name' => [
-							'user_role'
+							'super_admin_role'
 						]
 					],
 					'message_header' => 'User role created'
@@ -236,11 +236,292 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'user_role'
+						]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'user_1_monitoring'
+						],
+						'Monitoring' => [
+							'Dashboard' => false,
+							'Problems' => false,
+							'Hosts' => false,
+							'Overview' => false,
+							'Latest data' => false,
+							'Screens' => false,
+							'Maps' => false,
+							'Services' => true],
+						'Inventory' => ['all' => false],
+						'Reports' => ['all' => false],
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Admin',
+					'fields' => [
+						'Name' => [
+							'admin_1_monitoring'
+						],
+						'Monitoring' => [
+							'Dashboard' => false,
+							'Problems' => false,
+							'Hosts' => false,
+							'Overview' => false,
+							'Latest data' => false,
+							'Screens' => false,
+							'Maps' => false,
+							'Discovery' => false,
+							'Services' => true],
+						'Inventory' => ['all' => false],
+						'Reports' => ['all' => false],
+						'Configuration' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
 					'user_type' => 'Super admin',
 					'fields' => [
 						'Name' => [
-							'super_admin_role'
+							'super_admin_1_monitoring'
+						],
+						'Monitoring' => [
+							'Dashboard' => false,
+							'Problems' => false,
+							'Hosts' => false,
+							'Overview' => false,
+							'Latest data' => false,
+							'Screens' => false,
+							'Maps' => false,
+							'Discovery' => false,
+							'Services' => true],
+						'Inventory' => ['all' => false],
+						'Reports' => ['all' => false],
+						'Configuration' => ['all' => false],
+						'Administration' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Super admin',
+					'fields' => [
+						'Name' => [
+							'super_admin_new_elements'
+						],
+						'Default access to new UI elements' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Admin',
+					'fields' => [
+						'Name' => [
+							'admin_new_elements'
+						],
+						'Default access to new UI elements' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'user_new_elements'
+						],
+						'Default access to new UI elements' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Super admin',
+					'fields' => [
+						'Name' => [
+							'super_admin_new_modules'
+						],
+						'Default access to new modules' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Admin',
+					'fields' => [
+						'Name' => [
+							'admin_new_modules'
+						],
+						'Default access to new modules' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'user_new_modules'
+						],
+						'Default access to new modules' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Super admin',
+					'fields' => [
+						'Name' => [
+							'super_admin_api_access'
+						],
+						'Enabled' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Admin',
+					'fields' => [
+						'Name' => [
+							'admin_api_access'
+						],
+						'Enabled' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'user_api_access'
+						],
+						'Enabled' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Super admin',
+					'fields' => [
+						'Name' => [
+							'super_admin_new_actions'
+						],
+						'Default access to new actions' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Admin',
+					'fields' => [
+						'Name' => [
+							'admin_new_actions'
+						],
+						'Default access to new actions' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'user_new_actions'
+						],
+						'Default access to new actions' => ['all' => false]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'user_api_methods'
 						]
+					],
+					'api_methods' => [
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'admin_api_methods'
+						]
+					],
+					'api_methods' => [
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'super_admin_api_methods'
+						]
+					],
+					'api_methods' => [
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -255,7 +536,10 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.edit');
 
 		$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($data['user_type']);
-		$this->fillFluidform($data['fields']);
+		$this->fillFluidForm($data['fields']);
+		if (CTestArrayHelper::get($data, 'api_methods')) {
+				$this->fillMultiselect($data['api_methods']);
+			}
 
 		$this->query('button:Add')->one()->click();
 		switch ($data['expected']) {
@@ -270,51 +554,64 @@ class testFormUserRoles extends CWebTest {
 
 	}
 
-	public function fillText($field, $value) {
+	public function fillText($section, $value) {
 		$prefix = 'xpath:.//'.self::TABLE_FORM;
-		$input_text_field = $this->query($prefix.'/label[text()="'.$field.'"]//following::input[@type="text" and @aria-required="true"]')->one();
+		$input_text_field = $this->query($prefix.'/label[text()="'.$section.'"]//following::input[@type="text" and @aria-required="true"]')->one();
 		$input_text_field->fill($value);
 	}
 
-	public function fillCheckbox($field, $value, $set = null) {
+	public function fillCheckbox($section, $element, $status = true) {
 		$prefix = 'xpath:.//'.self::TABLE_FORM;
-		if ($value === 'uncheck_all') {
-			$input_text_field[] = $this->query($prefix.'/label[text()="'.$field.'"]'.self::TABLE_CONTAINER.'//label/preceding-sibling::input[@type!="hidden"]')->all()->asCheckbox()->uncheck();
+		if ($element === 'all') {
+			$all_checkbox = $this->query($prefix.'/label[text()="'.$section.'"]'.self::TABLE_CONTAINER.'//label/preceding-sibling::input[@type!="hidden"]')->all()->asCheckbox();
+			$all_checkbox->check();
+			if ($status !== true) {
+				$all_checkbox->uncheck();
+			}
 		}
 		else {
-			$input_text_field = $this->query($prefix.'/label[text()="'.$field.'"]'.self::TABLE_CONTAINER.'//label[text()="'.$value.'"]/preceding-sibling::input[@type!="hidden"]');
-			$input_text_field->one()->asCheckbox()->check();
-				if ($set !== null) {
+			$input_text_field = $this->query($prefix.'/label[text()="'.$section.'"]'.self::TABLE_CONTAINER.'//label[text()="'.$element.'"]/preceding-sibling::input[@type!="hidden"]');
+			if ($status !== true) {
 				$input_text_field->one()->asCheckbox()->uncheck();
+			}
+			else {
+				$input_text_field->one()->asCheckbox()->check();
 			}
 		}
 	}
 
-	public function fillRadio($field, $value) {
+	public function fillRadio($section, $element) {
 		$prefix = 'xpath:.//'.self::TABLE_FORM;
-		$this->query($prefix.'/label[text()="'.$field.'"]'.self::TABLE_CONTAINER.'//label[text()="'.$value.'"]/preceding-sibling::input[@type!="hidden"]')->one()->click();
+		$this->query($prefix.'/label[text()="'.$section.'"]'.self::TABLE_CONTAINER.'//label[text()="'.$element.'"]/preceding-sibling::input[@type!="hidden"]')->one()->click();
 	}
 
-	public function findAttribute($label) {
-		$prefix = 'xpath:.//'.self::TABLE_FORM.'/label[text()="'.$label.'"]';
+	public function findAttribute($section) {
+		$prefix = 'xpath:.//'.self::TABLE_FORM.'/label[text()="'.$section.'"]';
 		$finded_container = $this->query($prefix.self::TABLE_CONTAINER.'//input[not(@type="hidden")]')->one()->getAttribute('type');
 		return $finded_container;
 	}
 
-	public function fillFluidform($field, $uncheck = null) {
-		foreach ($field as $fieldi => $fields) {
-			$found = $this->findAttribute($fieldi);
-			foreach ($fields as $fieldss) {
+	public function fillFluidForm($fields) {
+		foreach ($fields as $section => $elements) {
+			$found = $this->findAttribute($section);
+			foreach ($elements as $element) {
 				if ($found === 'text') {
-					$this->fillText($fieldi, $fieldss);
+					$this->fillText($section, $element);
 				}
-				if ($found === 'checkbox') {
-					$this->fillCheckbox($fieldi, $fieldss, $uncheck);
+				elseif ($found === 'checkbox') {
+					foreach ($elements as $element => $status) {
+						$this->fillCheckbox($section, $element, $status);
+					}
 				}
-				if ($found === 'radio') {
-					$this->fillRadio($fieldi, $fieldss);
+				elseif ($found === 'radio') {
+					$this->fillRadio($section, $element);
 				}
 			}
 		}
+	}
+
+	public function fillMultiselect($methods) {
+		$api_field = $this->query('class:multiselect-control')->asMultiselect()->one();
+		$api_field->fill($methods);
 	}
 }
