@@ -28,7 +28,6 @@ class CTriggerExprParserResult extends CParserResult {
 	const TOKEN_TYPE_CLOSE_BRACE = 1;
 	const TOKEN_TYPE_OPERATOR = 2;
 	const TOKEN_TYPE_NUMBER = 3;
-	const TOKEN_TYPE_FUNCTION_MACRO = 4;
 	const TOKEN_TYPE_MACRO = 5;
 	const TOKEN_TYPE_USER_MACRO = 6;
 	const TOKEN_TYPE_LLD_MACRO = 7;

@@ -22,7 +22,7 @@
 class CFunctionMacroParserTest extends CParserTest {
 
 	protected function getParser() {
-		return new CFunctionMacroParser();
+		return new C10FunctionMacroParser();
 	}
 
 	public function testProvider() {
@@ -143,7 +143,7 @@ class CFunctionMacroParserTest extends CParserTest {
 		static $parser = null;
 
 		if ($parser === null) {
-			$parser = new CFunctionMacroParser(['18_simple_checks' => true]);
+			$parser = new C10FunctionMacroParser(['18_simple_checks' => true]);
 		}
 
 		$this->assertSame($expected, [

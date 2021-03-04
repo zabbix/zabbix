@@ -145,7 +145,7 @@ class C10TriggerExpression {
 	/**
 	 * Parser for function macros.
 	 *
-	 * @var CFunctionMacroParser
+	 * @var C10FunctionMacroParser
 	 */
 	protected $function_macro_parser;
 
