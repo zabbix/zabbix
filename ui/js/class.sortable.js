@@ -66,7 +66,7 @@ class CSortable extends CBaseComponent {
 	 * @returns {CSortable}
 	 */
 	activate() {
-		if (this._is_connected) {
+		if (this._is_activated) {
 			throw Error('Instance already activated.');
 		}
 
@@ -74,7 +74,7 @@ class CSortable extends CBaseComponent {
 
 		this._activateEvents();
 
-		this._is_connected = true;
+		this._is_activated = true;
 
 		return this;
 	}
@@ -85,7 +85,7 @@ class CSortable extends CBaseComponent {
 	 * @returns {CSortable}
 	 */
 	deactivate() {
-		if (!this._is_connected) {
+		if (!this._is_activated) {
 			throw Error('Instance already deactivated.');
 		}
 
@@ -93,7 +93,7 @@ class CSortable extends CBaseComponent {
 
 		this._deactivateEvents();
 
-		this._is_connected = false;
+		this._is_activated = false;
 
 		return this;
 	}
@@ -211,7 +211,7 @@ class CSortable extends CBaseComponent {
 		this._drag_item = null;
 		this._drag_scroll_timeout = null;
 
-		this._is_connected = false;
+		this._is_activated = false;
 	}
 
 	/**
