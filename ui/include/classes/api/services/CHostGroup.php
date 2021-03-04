@@ -397,11 +397,12 @@ class CHostGroup extends CApiService {
 		$parent_names = [];
 
 		foreach ($groups as $group) {
-			if (($pos = strrpos($group['name'], '/')) === false) {
-				continue;
-			}
+			$name = $group['name'];
 
-			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$parent_names[$name][] = $group['groupid'];
+			}
 		}
 
 		if ($parent_names) {
