@@ -1090,8 +1090,8 @@ class DB {
 	 *
 	 * @param string $table_name
 	 * @param array  $options
-	 * @param string $table_alias
 	 * @param array  $sql_parts
+	 * @param string $table_alias
 	 *
 	 * @return bool
 	 */
