@@ -273,7 +273,7 @@ void	report_deserialize_send_report(const unsigned char *data, DB_MEDIATYPE *mt,
 	}
 }
 
-void	report_destroy_params(zbx_vector_ptr_pair_t *params)
+static void	report_clear_ptr_pairs(zbx_vector_ptr_pair_t *params)
 {
 	int	i;
 
@@ -282,6 +282,17 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
 		zbx_free(params->values[i].first);
 		zbx_free(params->values[i].second);
 	}
+}
+
+void	report_clear_params(zbx_vector_ptr_pair_t *params)
+{
+	report_clear_ptr_pairs(params);
+	zbx_vector_ptr_pair_clear(params);
+}
+
+void	report_destroy_params(zbx_vector_ptr_pair_t *params)
+{
+	report_clear_ptr_pairs(params);
 	zbx_vector_ptr_pair_destroy(params);
 }
 

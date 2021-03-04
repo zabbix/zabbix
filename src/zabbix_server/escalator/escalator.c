@@ -493,7 +493,10 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	tz = NULL == user_timezone || 0 == strcmp(user_timezone, "default") ? default_timezone : user_timezone;
+	if (NULL == user_timezone || 0 == strcmp(user_timezone, ZBX_TIMEZONE_DEFAULT_VALUE))
+		tz = default_timezone;
+	else
+		tz = user_timezone;
 
 	if (0 != operationid)
 	{

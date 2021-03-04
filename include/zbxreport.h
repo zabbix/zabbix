@@ -21,6 +21,9 @@
 
 #include "zbxjson.h"
 
+#define ZBX_REPORT_STATUS_ENABLED	0
+#define ZBX_REPORT_STATUS_DIABLED	1
+
 #define ZBX_REPORT_PERIOD_DAY		0
 #define ZBX_REPORT_PERIOD_WEEK		0
 #define ZBX_REPORT_PERIOD_MONTH		0

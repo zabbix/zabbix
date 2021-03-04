@@ -25,11 +25,18 @@
 #include "db.h"
 #include "zbxjson.h"
 #include "base64.h"
-#include "../../libs/zbxcrypto/aes.h"
+#include "zbxalgo.h"
 #include "zbxmedia.h"
+#include "dbcache.h"
 #include "zbxreport.h"
+#include "../../libs/zbxcrypto/aes.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
+
 #include "report_manager.h"
 #include "report_protocol.h"
+
+#define ZBX_REPORT_INCLUDE_USER		0
+#define ZBX_REPORT_EXCLUDE_USER		1
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num, CONFIG_REPORTWRITER_FORKS;
@@ -62,12 +69,34 @@ zbx_rm_t;
 
 typedef struct
 {
+	zbx_uint64_t	id;
+	zbx_uint64_t	access_userid;
+}
+zbx_rm_recipient_t;
+
+ZBX_VECTOR_DECL(recipient, zbx_rm_recipient_t);
+ZBX_VECTOR_IMPL(recipient, zbx_rm_recipient_t);
+
+typedef struct
+{
 	zbx_uint64_t		reportid;
+	zbx_uint64_t		userid;
 	zbx_uint64_t		dashboardid;
+	char			*name;
+	char			*timezone;
+	unsigned char		period;
+	unsigned char		cycle;
+	unsigned char		weekdays;
+	int			start_time;
+	time_t			nextcheck;
+	time_t			active_since;
+	time_t			active_till;
+	time_t			lastsent;
 
 	zbx_vector_ptr_pair_t	params;
-
-	int			nextcheck;
+	zbx_vector_recipient_t	usergroups;
+	zbx_vector_recipient_t	users;
+	zbx_vector_uint64_t	users_excl;
 }
 zbx_rm_report_t;
 
@@ -155,7 +184,14 @@ static int	rm_report_compare_nextcheck(const void *d1, const void *d2)
  ******************************************************************************/
 static void	rm_report_clean(zbx_rm_report_t *report)
 {
+	zbx_free(report->name);
+	zbx_free(report->timezone);
+
 	report_destroy_params(&report->params);
+
+	zbx_vector_recipient_destroy(&report->usergroups);
+	zbx_vector_recipient_destroy(&report->users);
+	zbx_vector_uint64_destroy(&report->users_excl);
 }
 
 /******************************************************************************
@@ -489,9 +525,7 @@ static int	rm_get_report_range(time_t report_time, unsigned char period, struct 
 		return FAIL;
 
 	*to = *tm;
-	to->tm_sec = 0;
-	to->tm_min = 0;
-	to->tm_hour = 0;
+	zbx_tm_round_down(to, ZBX_TIME_UNIT_DAY);
 
 	*from = *to;
 	zbx_tm_sub(from, 1, period2unit[period]);
@@ -555,14 +589,125 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, zbx_uint64_t dashboardid, 
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_update_cache                                                  *
+ * Function: rm_report_calc_nextcheck                                         *
  *                                                                            *
- * Purpose: update configuration and report cache                             *
+ * Purpose: calculate time when report must be generated                      *
+ *                                                                            *
+ * Parameters: report - [IN] the report                                       *
+ *             now    - [IN] the current time                                 *
+ *                                                                            *
+ ******************************************************************************/
+static time_t	rm_report_calc_nextcheck(const zbx_rm_report_t *report, time_t now)
+{
+	return zbx_get_report_nextcheck(now, report->cycle, report->weekdays, report->start_time, report->timezone);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_report_update_params                                          *
+ *                                                                            *
+ * Purpose: update report parameters                                          *
+ *                                                                            *
+ * Parameters: report - [IN] the report                                       *
+ *             params - [IN] the report parameters                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_report_update_params(zbx_rm_report_t *report, zbx_vector_ptr_pair_t *params)
+{
+	zbx_vector_ptr_pair_t	old_params;
+	int			i, j;
+
+	zbx_vector_ptr_pair_create(&old_params);
+
+	zbx_vector_ptr_pair_append_array(&old_params, report->params.values, report->params.values_num);
+	zbx_vector_ptr_pair_clear(&report->params);
+
+	for (i = 0; i < params->values_num; i++)
+	{
+		zbx_ptr_pair_t	pair = {0};
+		zbx_ptr_pair_t	*new_param = &params->values[i];
+
+		for (j = 0; j < old_params.values_num; j++)
+		{
+			zbx_ptr_pair_t	*old_param = &old_params.values[j];
+
+			if (0 == strcmp(new_param->first, old_param->first))
+			{
+				pair.first = old_param->first;
+				old_param->first = NULL;
+
+				if (0 == strcmp(new_param->second, old_param->second))
+				{
+					pair.second = old_param->second;
+					old_param->second = NULL;
+				}
+				else
+					pair.second = zbx_strdup(old_param->second, new_param->second);
+
+				zbx_vector_ptr_pair_remove_noorder(&old_params, j);
+				break;
+			}
+		}
+
+		if (NULL == pair.first)
+		{
+			pair.first = zbx_strdup(NULL, new_param->first);
+			pair.second = zbx_strdup(NULL, new_param->second);
+		}
+
+		zbx_vector_ptr_pair_append(&report->params, pair);
+	}
+
+	report_destroy_params(&old_params);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_report_update_users                                           *
+ *                                                                            *
+ * Purpose: update report recipient users                                     *
+ *                                                                            *
+ * Parameters: report     - [IN] the report                                   *
+ *             users      - [IN] the recipient users                          *
+ *             users_excl - [IN] the excluded user ids                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_report_update_users(zbx_rm_report_t *report, const zbx_vector_recipient_t *users,
+		const zbx_vector_uint64_t *users_excl)
+{
+	zbx_vector_recipient_clear(&report->users);
+	zbx_vector_recipient_append_array(&report->users, users->values, users->values_num);
+
+	zbx_vector_uint64_clear(&report->users_excl);
+	zbx_vector_uint64_append_array(&report->users_excl, users_excl->values, users_excl->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_report_update_usergroups                                      *
+ *                                                                            *
+ * Purpose: update report recipient user groups                               *
+ *                                                                            *
+ * Parameters: report     - [IN] the report                                   *
+ *             usergroups - [IN] the recipient user groups                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_report_update_usergroups(zbx_rm_report_t *report, const zbx_vector_recipient_t *usergroups)
+{
+	zbx_vector_recipient_clear(&report->usergroups);
+	zbx_vector_recipient_append_array(&report->usergroups, usergroups->values, usergroups->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_update_cache_settings                                         *
+ *                                                                            *
+ * Purpose: update general settings cache                                     *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
  *                                                                            *
  ******************************************************************************/
-static void	rm_update_cache(zbx_rm_t *manager)
+static void	rm_update_cache_settings(zbx_rm_t *manager)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -583,11 +728,445 @@ static void	rm_update_cache(zbx_rm_t *manager)
 	}
 	DBfree_result(result);
 
-	ZBX_UNUSED(manager);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
 
-	// TODO: sync report cache with database
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_update_cache_reports                                          *
+ *                                                                            *
+ * Purpose: update reports cache                                              *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *             now     - [IN] the current time                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_update_cache_reports(zbx_rm_t *manager, time_t now)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	reportids;
+	zbx_hashset_iter_t	iter;
+	zbx_rm_report_t		*report, report_local;
+	zbx_config_t		cfg;
+	const char		*timezone;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE);
+
+	zbx_vector_uint64_create(&reportids);
+
+	result = DBselect("select r.reportid,r.userid,r.name,r.dashboardid,r.period,r.cycle,r.weekdays,r.start_time,"
+				"r.active_since,r.active_till,u.timezone,r.lastsent"
+			" from report r,users u"
+			" where status=%d"
+				" and r.userid=u.userid",
+			ZBX_REPORT_STATUS_ENABLED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	reportid;
+		time_t		nextcheck;
+
+		ZBX_STR2UINT64(reportid, row[0]);
+		zbx_vector_uint64_append(&reportids, reportid);
+
+		timezone = row[10];
+		if (0 == strcmp(timezone, ZBX_TIMEZONE_DEFAULT_VALUE))
+			timezone = cfg.default_timezone;
+
+		if (NULL == (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &reportid)))
+		{
+			report_local.reportid = reportid;
+			report = (zbx_rm_report_t *)zbx_hashset_insert(&manager->reports, &report_local,
+					sizeof(report_local));
+
+			zbx_vector_ptr_pair_create(&report->params);
+			zbx_vector_recipient_create(&report->usergroups);
+			zbx_vector_recipient_create(&report->users);
+			zbx_vector_uint64_create(&report->users_excl);
+			report->name = zbx_strdup(NULL, row[2]);
+			report->timezone = zbx_strdup(NULL, timezone);
+			report->nextcheck = 0;
+		}
+		else
+		{
+			if (0 != strcmp(report->name, row[2]))
+				report->name = zbx_strdup(report->name, row[2]);
+			if (0 != strcmp(report->timezone, timezone))
+				report->name = zbx_strdup(report->name, timezone);
+		}
+
+		ZBX_STR2UINT64(report->userid, row[1]);
+		ZBX_STR2UINT64(report->dashboardid, row[3]);
+		ZBX_STR2UCHAR(report->period, row[4]);
+		ZBX_STR2UCHAR(report->cycle, row[5]);
+		ZBX_STR2UCHAR(report->weekdays, row[6]);
+		report->start_time = atoi(row[7]);
+		report->active_since = atoi(row[8]);
+		report->active_till = atoi(row[9]);
+		report->lastsent = atoi(row[11]);
+
+		if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now)))
+		{
+			if (nextcheck != report->nextcheck)
+			{
+				zbx_binary_heap_elem_t	elem = {report->reportid, (void *)report};
+				time_t			nextcheck_old = report->nextcheck;
+
+				report->nextcheck = nextcheck;
+
+				if (0 != nextcheck_old)
+					zbx_binary_heap_update_direct(&manager->report_queue, &elem);
+				else
+					zbx_binary_heap_insert(&manager->report_queue, &elem);
+			}
+		}
+		else
+		{
+			if (0 != report->nextcheck)
+				zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
+
+			zabbix_log(LOG_LEVEL_WARNING, "cannot calculate report start time: %s", zbx_strerror(errno));
+
+			// TODO: update report error status in database
+		}
+	}
+	DBfree_result(result);
+
+	/* remove deleted reports from cache */
+	zbx_vector_uint64_sort(&reportids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_iter_reset(&manager->reports, &iter);
+	while (NULL != (report = (zbx_rm_report_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL == zbx_vector_uint64_bsearch(&reportids, report->reportid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
+			rm_report_clean(report);
+			zbx_hashset_iter_remove(&iter);
+		}
+	}
+
+	zbx_vector_uint64_destroy(&reportids);
+
+	zbx_config_clean(&cfg);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_update_cache_report_param                                     *
+ *                                                                            *
+ * Purpose: update cached report parameters                                   *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_update_cache_reports_params(zbx_rm_t *manager)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_rm_report_t		*report = NULL;
+	zbx_vector_ptr_pair_t	params;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_pair_create(&params);
+
+	result = DBselect("select rp.reportid,rp.name,rp.value"
+			" from report_param rp,report r"
+			" where rp.reportid=r.reportid"
+				" and r.status=%d"
+			" order by r.reportid",
+				ZBX_REPORT_STATUS_ENABLED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	reportid;
+		zbx_ptr_pair_t	pair;
+
+		ZBX_STR2UINT64(reportid, row[0]);
+		if (NULL != report)
+		{
+			if (reportid != report->reportid)
+			{
+				rm_report_update_params(report, &params);
+				report_clear_params(&params);
+			}
+			report = NULL;
+		}
+
+		if (NULL == report)
+		{
+			if (NULL == (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &reportid)))
+				continue;
+		}
+
+		pair.first = zbx_strdup(NULL, row[1]);
+		pair.second = zbx_strdup(NULL, row[2]);
+		zbx_vector_ptr_pair_append(&params, pair);
+	}
+	DBfree_result(result);
+
+	if (0 != params.values_num)
+		rm_report_update_params(report, &params);
+
+	report_destroy_params(&params);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_update_cache_reports_users                                    *
+ *                                                                            *
+ * Purpose: update cached report recipient users                              *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_update_cache_reports_users(zbx_rm_t *manager)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_rm_report_t		*report = NULL;
+	zbx_vector_recipient_t	users;
+	zbx_vector_uint64_t	users_excl;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_recipient_create(&users);
+	zbx_vector_uint64_create(&users_excl);
+
+	result = DBselect("select ru.reportid,ru.userid,ru.exclude,ru.access_userid"
+			" from report_user ru,report r"
+			" where ru.reportid=r.reportid"
+				" and r.status=%d"
+			" order by r.reportid",
+				ZBX_REPORT_STATUS_ENABLED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	reportid, userid;
+
+		ZBX_STR2UINT64(reportid, row[0]);
+		if (NULL != report)
+		{
+			if (reportid != report->reportid)
+			{
+				rm_report_update_users(report, &users, &users_excl);
+				zbx_vector_recipient_clear(&users);
+				zbx_vector_uint64_clear(&users_excl);
+			}
+			report = NULL;
+		}
+
+		if (NULL == report)
+		{
+			if (NULL == (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &reportid)))
+				continue;
+		}
+
+		ZBX_STR2UINT64(userid, row[1]);
+		if (ZBX_REPORT_INCLUDE_USER == atoi(row[2]))
+		{
+			zbx_rm_recipient_t	user;
+
+			user.id = userid;
+			ZBX_DBROW2UINT64(user.access_userid, row[3]);
+			zbx_vector_recipient_append(&users, user);
+		}
+		else
+			zbx_vector_uint64_append(&users_excl, userid);
+	}
+	DBfree_result(result);
+
+	if (0 != users.values_num || 0 != users_excl.values_num)
+		rm_report_update_users(report, &users, &users_excl);
+
+	zbx_vector_uint64_destroy(&users_excl);
+	zbx_vector_recipient_destroy(&users);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_update_cache_reports_usergroups                               *
+ *                                                                            *
+ * Purpose: update cached report recipient user groups                        *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_rm_report_t		*report = NULL;
+	zbx_vector_recipient_t	usergroups;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_recipient_create(&usergroups);
+
+	result = DBselect("select rg.reportid,rg.usrgrpid,rg.access_userid"
+			" from report_usrgrp rg,report r"
+			" where rg.reportid=r.reportid"
+				" and r.status=%d"
+			" order by r.reportid",
+				ZBX_REPORT_STATUS_ENABLED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t		reportid;
+		zbx_rm_recipient_t	usergroup;
+
+		ZBX_STR2UINT64(reportid, row[0]);
+		if (NULL != report)
+		{
+			if (reportid != report->reportid)
+			{
+				rm_report_update_usergroups(report, &usergroups);
+				zbx_vector_recipient_clear(&usergroups);
+			}
+			report = NULL;
+		}
+
+		if (NULL == report)
+		{
+			if (NULL == (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &reportid)))
+				continue;
+		}
+
+		ZBX_STR2UINT64(usergroup.id, row[1]);
+		ZBX_DBROW2UINT64(usergroup.access_userid, row[2]);
+		zbx_vector_recipient_append(&usergroups, usergroup);
+	}
+	DBfree_result(result);
+
+	if (0 != usergroups.values_num)
+		rm_report_update_usergroups(report, &usergroups);
+
+	zbx_vector_recipient_destroy(&usergroups);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_dump_cache                                                    *
+ *                                                                            *
+ * Purpose: dump cached reports into log                                      *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_dump_cache(zbx_rm_t *manager)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_rm_report_t		*report;
+	char			*str = NULL;
+	size_t			str_alloc = 0, str_offset;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&manager->reports, &iter);
+	while (NULL != (report = (zbx_rm_report_t *)zbx_hashset_iter_next(&iter)))
+	{
+		str_offset = 0;
+
+		zabbix_log(LOG_LEVEL_TRACE, "reportid:" ZBX_FS_UI64 ", name:%s, userid:" ZBX_FS_UI64 ", dashboardid:"
+				ZBX_FS_UI64 ", period:%d, cycle:%d, weekdays:0x%x",
+				report->reportid, report->name, report->userid, report->dashboardid, report->period,
+				report->cycle, report->weekdays);
+
+		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, "active:");
+		if (0 != report->active_since)
+		{
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s %s",
+					zbx_date2str(report->active_since, NULL),
+					zbx_time2str(report->active_since, NULL));
+		}
+
+		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, " - ");
+		if (0 != report->active_till)
+		{
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s %s",
+					zbx_date2str(report->active_till, NULL),
+					zbx_time2str(report->active_till, NULL));
+		}
+
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ", start_time:%d:%02d:%02d, timezone:%s",
+				report->start_time / SEC_PER_HOUR, report->start_time % SEC_PER_HOUR / SEC_PER_MIN,
+				report->start_time % SEC_PER_MIN, report->timezone);
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ", nextcheck:%s %s",
+				zbx_date2str(report->nextcheck, NULL), zbx_time2str(report->nextcheck, NULL));
+		zabbix_log(LOG_LEVEL_TRACE, "  %s", str);
+
+		zabbix_log(LOG_LEVEL_TRACE, "  params:");
+		for (i = 0; i < report->params.values_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "    %s:%s", (char *)report->params.values[i].first,
+					(char *)report->params.values[i].second);
+		}
+
+		zabbix_log(LOG_LEVEL_TRACE, "  users:");
+		for (i = 0; i < report->users.values_num; i++)
+		{
+			zbx_rm_recipient_t	*user = (zbx_rm_recipient_t *)&report->users.values[i];
+
+			zabbix_log(LOG_LEVEL_TRACE, "    userid:" ZBX_FS_UI64 ", acess_userid:" ZBX_FS_UI64,
+					user->id, user->access_userid);
+		}
+
+		zabbix_log(LOG_LEVEL_TRACE, "  usergroups:");
+		for (i = 0; i < report->usergroups.values_num; i++)
+		{
+			zbx_rm_recipient_t	*usergroup = (zbx_rm_recipient_t *)&report->usergroups.values[i];
+
+			zabbix_log(LOG_LEVEL_TRACE, "    usrgrpid:" ZBX_FS_UI64 ", acess_userid:" ZBX_FS_UI64,
+					usergroup->id, usergroup->access_userid);
+		}
+
+		zabbix_log(LOG_LEVEL_TRACE, "  exclude:");
+		for (i = 0; i < report->users_excl.values_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "    userid:" ZBX_FS_UI64, report->users_excl.values[i]);
+		}
+	}
+
+	zbx_free(str);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_update_cache                                                  *
+ *                                                                            *
+ * Purpose: update configuration and report cache                             *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_update_cache(zbx_rm_t *manager)
+{
+	time_t	now;
+
+	now = time(NULL);
+
+	rm_update_cache_settings(manager);
+	rm_update_cache_reports(manager, now);
+	rm_update_cache_reports_params(manager);
+	rm_update_cache_reports_users(manager);
+	rm_update_cache_reports_usergroups(manager);
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		rm_dump_cache(manager);
 }
 
 typedef struct
@@ -965,6 +1544,10 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	time_stat = zbx_time();
 	time_sync = 0;
 	time_flush_sessions = time_stat;
+
+#undef ZBX_SYNC_INTERVAL
+#define ZBX_SYNC_INTERVAL 1
+	zabbix_log(LOG_LEVEL_DEBUG, "wake to sync: kill -SIGALRM %d", getpid());
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 

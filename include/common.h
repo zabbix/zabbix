@@ -1680,7 +1680,6 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
 		int *nextcheck, char **error);
-
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
 
@@ -1741,5 +1740,17 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
+
+/* report scheduling */
+
+#define ZBX_REPORT_CYCLE_DAILY		0
+#define ZBX_REPORT_CYCLE_WEEKLY		1
+#define ZBX_REPORT_CYCLE_MONTHLY	2
+#define ZBX_REPORT_CYCLE_YEARLY		3
+
+time_t	zbx_get_report_nextcheck(time_t now, unsigned char cycle, unsigned char weekdays, int start_time,
+		const char *timezone);
+
+
 
 #endif

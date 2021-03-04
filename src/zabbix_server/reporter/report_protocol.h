@@ -41,6 +41,7 @@
 /* manager -> process */
 #define ZBX_IPC_REPORTER_TEST_RESULT		1011
 
+void	report_clear_params(zbx_vector_ptr_pair_t *params);
 void	report_destroy_params(zbx_vector_ptr_pair_t *params);
 
 void	report_deserialize_test_report(const unsigned char *data, zbx_uint64_t *dashboardid, zbx_uint64_t *userid,
