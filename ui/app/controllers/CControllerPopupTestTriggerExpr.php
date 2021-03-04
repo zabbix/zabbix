@@ -32,7 +32,8 @@ class CControllerPopupTestTriggerExpr extends CController {
 		CTriggerExprParserResult::TOKEN_TYPE_MACRO => 1,
 		CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO => 1,
 		CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO => 1,
-		CTriggerExprParserResult::TOKEN_TYPE_STRING => 1
+		CTriggerExprParserResult::TOKEN_TYPE_STRING => 1,
+		CTriggerExprParserResult::TOKEN_TYPE_FUNCTION => 1
 	];
 
 	protected function init() {
@@ -60,14 +61,13 @@ class CControllerPopupTestTriggerExpr extends CController {
 		if ($result) {
 			$this->macros_data = [];
 
-			foreach ($result->getTokens() as $token) {
-				if (!($token instanceof CFunctionParserResult)
-						&& !array_key_exists($token['type'], $this->supported_token_types)) {
+			foreach ($result->getTokensOfTypes(array_keys($this->supported_token_types)) as $token) {
+				if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION
+						&& $token->getFunctionTriggerQuery() === null) {
 					continue;
 				}
-
-				if (is_array($token) && $token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
-					$matched_macros = CMacrosResolverGeneral::extractMacros([$token['data']['string']], [
+				elseif ($token->type == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
+					$matched_macros = CMacrosResolverGeneral::extractMacros([$token->data['string']], [
 						'macros' => [
 							'trigger' => ['{TRIGGER.VALUE}']
 						],
@@ -78,9 +78,6 @@ class CControllerPopupTestTriggerExpr extends CController {
 					$macros = array_merge(array_keys($matched_macros['usermacros'] + $matched_macros['lldmacros']),
 						$matched_macros['macros']['trigger']
 					);
-				}
-				elseif (is_array($token)) {
-					$macros = [$token['value']];
 				}
 				else {
 					$macros = [$token->match];
@@ -173,28 +170,18 @@ class CControllerPopupTestTriggerExpr extends CController {
 					$expression = [];
 					$pos_left = 0;
 
-					foreach ($result->getTokens() as $token) {
-						if (!($token instanceof CFunctionParserResult)
-								&& !array_key_exists($token['type'], $this->supported_token_types)) {
-							continue;
+					foreach ($result->getTokensOfTypes(array_keys($this->supported_token_types)) as $token) {
+						if ($pos_left != $token->pos) {
+							$expression[] = substr($original_expression, $pos_left, $token->pos - $pos_left);
 						}
+						$pos_left = $token->pos + $token->length;
 
-						$pos = is_array($token) ? $token['pos'] : $token->pos;
-						$length = is_array($token) ? $token['length'] : $token->length;
-
-						if ($pos_left != $pos) {
-							$expression[] = substr($original_expression, $pos_left, $pos - $pos_left);
-						}
-						$pos_left = $pos + $length;
-
-						if (is_array($token) && $token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
-							$value = strtr($token['data']['string'], $this->macros_data);
+						if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
+							$value = strtr($token->data['string'], $this->macros_data);
 							$expression[] = CTriggerExpression::quoteString($value, false, true);
 						}
 						else {
-							$value = is_array($token)
-								? strtr($token['value'], $this->macros_data)
-								: strtr($token->match, $this->macros_data);
+							$value = strtr($token->match, $this->macros_data);
 							$expression[] = CTriggerExpression::quoteString($value, false);
 						}
 					}

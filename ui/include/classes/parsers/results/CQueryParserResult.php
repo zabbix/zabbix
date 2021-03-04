@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -38,7 +38,15 @@ class CQueryParserResult extends CParserResult {
 	 */
 	public $item;
 
+	/**
+	 * Token type.
+	 *
+	 * @var int
+	 */
+	public $type;
+
 	public function __construct() {
+		$this->type = CTriggerExprParserResult::TOKEN_TYPE_QUERY;
 		$this->host = '';
 		$this->item = '';
 		$this->match = '';

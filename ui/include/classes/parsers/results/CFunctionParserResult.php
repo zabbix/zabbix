@@ -24,14 +24,50 @@
  */
 class CFunctionParserResult extends CParserResult {
 
+	/**
+	 * Token string length.
+	 *
+	 * @var int
+	 */
 	public $length;
+
+	/**
+	 * String matched.
+	 *
+	 * @var string
+	 */
 	public $match;
+
+	/**
+	 * Function name.
+	 *
+	 * @var string
+	 */
 	public $function;
+
+	/**
+	 * Function parameters string.
+	 *
+	 * @var string
+	 */
 	public $parameters;
+
+	/**
+	 * Function parameters.
+	 *
+	 * @var array
+	 */
 	public $params_raw;
-	public $type = CTriggerExprParserResult::TOKEN_TYPE_FUNCTION;
+
+	/**
+	 * Token type.
+	 *
+	 * @var int
+	 */
+	public $type;
 
 	public function __construct() {
+		$this->type = CTriggerExprParserResult::TOKEN_TYPE_FUNCTION;
 		$this->match = '';
 		$this->length = 0;
 		$this->function = '';

@@ -506,9 +506,9 @@ class CControllerPopupTriggerExpr extends CController {
 			$result = $expression_data->parse($expression);
 
 			if ($result) {
-				$function_macro_tokens = $result->getTokensByType(
+				$function_macro_tokens = $result->getTokensOfTypes([
 					CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO
-				);
+				]);
 
 				if ($function_macro_tokens) {
 					$function_macro_token = $function_macro_tokens[0];

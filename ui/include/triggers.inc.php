@@ -1496,8 +1496,8 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 				case '"':
 					// Skip any previously found tokens starting with brace or double quote.
 					foreach ($expressionData->result->getTokens() as $expression_token) {
-						if ($expression_token['pos'] == $i) {
-							$i += $expression_token['length'] - 1;
+						if ($expression_token->pos == $i) {
+							$i += $expression_token->length - 1;
 							break;
 						}
 					}
@@ -1929,7 +1929,7 @@ function get_item_function_info($expr) {
 			$result = $rule_any;
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION)):
 			$expr_part = reset($expr_data->expressions);
 
 			if (!array_key_exists($expr_part['functionName'], $functions)) {
@@ -1950,7 +1950,7 @@ function get_item_function_info($expr) {
 
 			$item = API::Item()->get([
 				'output' => ['value_type'],
-				'hostids' => array_column($host, 'hostid'),
+				'hostids' => $host[0]['hostid'],
 				'filter' => [
 					'key_' => $expr_data->result->getItems()[0]
 				],
@@ -1960,7 +1960,7 @@ function get_item_function_info($expr) {
 			if (!$item) {
 				$item = API::ItemPrototype()->get([
 					'output' => ['value_type'],
-					'hostids' => array_keys($hosts),
+					'hostids' => $host[0]['hostid'],
 					'filter' => [
 						'key_' => $item_keys
 					]

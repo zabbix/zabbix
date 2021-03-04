@@ -35,6 +35,7 @@ class CTriggerExprParserResult extends CParserResult {
 	const TOKEN_TYPE_STRING = 8;
 	const TOKEN_TYPE_FUNCTIONID_MACRO = 9;
 	const TOKEN_TYPE_FUNCTION = 10;
+	const TOKEN_TYPE_QUERY = 11;
 
 	/**
 	 * Array of tokens.
@@ -64,21 +65,29 @@ class CTriggerExprParserResult extends CParserResult {
 	}
 
 	/**
-	 * Returns all tokens of the given type.
+	 * Returns all tokens of the given types.
 	 *
-	 * @param $type
+	 * @param array  $types
 	 *
 	 * @return array
 	 */
-	public function getTokensByType($type) {
-		// This function will be addopted for new parser together with changes in trigger constructor and trigger test popup.
+	public function getTokensOfTypes(array $types): array {
+		$params_stack = $this->tokens;
 		$result = [];
 
-		foreach ($this->tokens as $token) {
-			if ($token['type'] == $type) {
-				$result[] = $token;
+		while ($params_stack) {
+			$param = array_shift($params_stack);
+			if ($param instanceof CFunctionParserResult) {
+				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
+			}
+			if (($param instanceof CParserResult) && in_array($param->type, $types)) {
+				$result[] = $param;
 			}
 		}
+
+		usort($result, function ($a, $b) {
+			return $a->pos <=> $b->pos;
+		});
 
 		return $result;
 	}
@@ -91,18 +100,7 @@ class CTriggerExprParserResult extends CParserResult {
 	 * @return bool
 	 */
 	public function hasTokenOfType($type) {
-		// This function will be addopted for new parser together with changes in trigger constructor and trigger test popup.
-		foreach ($this->tokens as $token) {
-			if ($type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO
-					&& $token instanceof CFunctionParserResult) {
-				return true;
-			}
-			elseif (is_array($token) && $token['type'] == $type) {
-				return true;
-			}
-		}
-
-		return false;
+		return (bool) $this->getTokensOfTypes([$type]);
 	}
 
 	/**
