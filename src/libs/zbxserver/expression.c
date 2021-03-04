@@ -4133,22 +4133,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type)
-				{
-					/* When processing trigger expressions the user macros are already expanded. */
-					/* An unexpanded user macro means either unknown macro or macro value        */
-					/* validation failure.                                                       */
-
-					if (NULL != error)
-					{
-						zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value or type",
-								(int)(token.loc.r - token.loc.l + 1),
-								*data + token.loc.l);
-					}
-
-					res = FAIL;
-				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
+				if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 			}
 		}

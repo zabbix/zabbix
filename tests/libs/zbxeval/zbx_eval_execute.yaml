@@ -581,6 +581,14 @@ out:
   result: SUCCEED
   value: '1'
 ---
+test case: Expression 'length("ы")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'length("ы")'
+out:
+  result: SUCCEED
+  value: '1'
+---
 test case: Expression 'length()'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]

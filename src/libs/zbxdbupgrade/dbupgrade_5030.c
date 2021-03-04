@@ -786,16 +786,22 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 			case ZBX_DBPATCH_ARG_TREND:
 				if (params->values_num > (index = va_arg(args, int)))
 				{
+					char	*str;
+
 					loc = &params->values[index];
-					zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-							loc->r - loc->l + 1);
+					str = zbx_substr(parameter, loc->l, loc->r);
+					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+					zbx_free(str);
 				}
 				if (params->values_num > (index = va_arg(args, int)))
 				{
+					char	*str;
+
 					loc = &params->values[index];
+					str = zbx_substr(parameter, loc->l, loc->r);
 					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ':');
-					zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-							loc->r - loc->l + 1);
+					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+					zbx_free(str);
 				}
 				break;
 			case ZBX_DBPATCH_ARG_CONST_STR:

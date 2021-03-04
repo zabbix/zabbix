@@ -911,16 +911,9 @@ char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostid
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
 
-/******************************************************************************
- *                                                                            *
- * dc_expand_user_macros - has no autoquoting                                 *
- * for triggers and calculated items use                                      *
- * dc_expand_user_macros_in_expression - which autoquotes macros that are     *
- * not already quoted and cannot be casted to a double                        *
- *                                                                            *
- ******************************************************************************/
 char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
-char	*dc_expand_user_macros_len(const char *text, size_t len, zbx_uint64_t *hostids, int hostids_num);
+int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
+		char **value, char **error);
 
 #define ZBX_TRIGGER_TIMER_NONE			0x0000
 #define ZBX_TRIGGER_TIMER_TRIGGER		0x0001

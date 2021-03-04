@@ -157,8 +157,8 @@ typedef struct
 }
 zbx_eval_context_t;
 
-typedef char *(*zbx_macro_resolve_func_t)(const char *str, size_t length, zbx_uint64_t *hostids,
-		int hostids_num);
+typedef int (*zbx_macro_resolve_func_t)(const char *str, size_t length, zbx_uint64_t *hostids,
+		int hostids_num, char **value, char **error);
 
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
 zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_uint64_t rules, char **error);
@@ -174,8 +174,8 @@ int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_
 		zbx_variant_t *value, char **error);
 void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
 void	zbx_eval_get_functionids_ordered(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
-void	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx,  zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_resolve_func_t resolver_cb);
+int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *hostids, int hostids_num,
+		zbx_macro_resolve_func_t resolver_cb, char **error);
 void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message);
 
 #define ZBX_EVAL_EXTRACT_FUNCTIONID	0x0001

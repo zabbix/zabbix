@@ -631,33 +631,36 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *                                                                            *
  * Function: evaluate_COUNT                                                   *
  *                                                                            *
- * Purpose: evaluate function 'count' for the item                            *
+ * Purpose: evaluate functions 'count' and 'find' for the item                *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - up to four comma-separated fields:                *
- *                            (1) number of seconds/values                    *
- *                            (2) value to compare with (optional)            *
+ * Parameters: item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] up to three comma-separated fields:          *
+ *                            (1) number of seconds/values + timeshift        *
+ *                            (2) comparison operator (optional)              *
+ *                            (3) value to compare with (optional)            *
  *                                Becomes mandatory for numeric items if 3rd  *
  *                                parameter is specified and is not "regexp"  *
  *                                or "iregexp". With "band" can take one of   *
  *                                2 forms:                                    *
  *                                  - value_to_compare_with/mask              *
  *                                  - mask                                    *
- *                            (3) comparison operator (optional)              *
- *                            (4) time shift (optional)                       *
+ *             ts         - [IN] the function evaluation time                 *
+ *             limit      - [IN] the limit of counted values, will return     *
+ *                              when the limit is reached                     *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, int limit,
-		char **error)
+static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		int limit, char **error)
 {
 	int				arg1, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
 	int				seconds = 0, nvalues = 0, time_shift;
-	char				*arg2 = NULL, *arg3_2 = NULL, *arg3 = NULL, buf[ZBX_MAX_UINT64_LEN];
+	char				*operator = NULL, *pattern2 = NULL, *pattern = NULL, buf[ZBX_MAX_UINT64_LEN];
 	double				arg3_dbl;
-	zbx_uint64_t			arg3_ui64, arg3_2_ui64;
+	zbx_uint64_t			pattern_ui64, pattern2_ui64;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
@@ -682,46 +685,51 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 		goto out;
 	}
 
-	if (2 <= nparams && SUCCEED != get_function_parameter_str(parameters, 2, &arg2))
+	if (2 <= nparams && SUCCEED != get_function_parameter_str(parameters, 2, &operator))
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
 	}
 
-	if (3 <= nparams && SUCCEED != get_function_parameter_str(parameters, 3, &arg3))
+	if (3 <= nparams)
 	{
-		*error = zbx_strdup(*error, "invalid fourth parameter");
-		goto out;
+		if (SUCCEED != get_function_parameter_str(parameters, 3, &pattern))
+		{
+			*error = zbx_strdup(*error, "invalid fourth parameter");
+			goto out;
+		}
 	}
+	else
+		pattern = zbx_strdup(NULL, "");
 
 	ts_end.sec -= time_shift;
 
-	if (NULL == arg2 || '\0' == *arg2)
+	if (NULL == operator || '\0' == *operator)
 		op = (0 != numeric_search ? OP_EQ : OP_LIKE);
-	else if (0 == strcmp(arg2, "eq"))
+	else if (0 == strcmp(operator, "eq"))
 		op = OP_EQ;
-	else if (0 == strcmp(arg2, "ne"))
+	else if (0 == strcmp(operator, "ne"))
 		op = OP_NE;
-	else if (0 == strcmp(arg2, "gt"))
+	else if (0 == strcmp(operator, "gt"))
 		op = OP_GT;
-	else if (0 == strcmp(arg2, "ge"))
+	else if (0 == strcmp(operator, "ge"))
 		op = OP_GE;
-	else if (0 == strcmp(arg2, "lt"))
+	else if (0 == strcmp(operator, "lt"))
 		op = OP_LT;
-	else if (0 == strcmp(arg2, "le"))
+	else if (0 == strcmp(operator, "le"))
 		op = OP_LE;
-	else if (0 == strcmp(arg2, "like"))
+	else if (0 == strcmp(operator, "like"))
 		op = OP_LIKE;
-	else if (0 == strcmp(arg2, "regexp"))
+	else if (0 == strcmp(operator, "regexp"))
 		op = OP_REGEXP;
-	else if (0 == strcmp(arg2, "iregexp"))
+	else if (0 == strcmp(operator, "iregexp"))
 		op = OP_IREGEXP;
-	else if (0 == strcmp(arg2, "band"))
+	else if (0 == strcmp(operator, "band"))
 		op = OP_BAND;
 
 	if (OP_UNKNOWN == op)
 	{
-		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for function COUNT", arg2);
+		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for function COUNT", operator);
 		goto out;
 	}
 
@@ -729,7 +737,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 
 	if (0 != numeric_search)
 	{
-		if (NULL != arg2 && '\0' != *arg2 && '\0' == *arg3)
+		if (NULL != operator && '\0' != *operator && '\0' == *pattern)
 		{
 			*error = zbx_strdup(*error, "pattern must be provided along with operator for numeric values");
 			goto out;
@@ -738,85 +746,85 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 		if (OP_LIKE == op)
 		{
 			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting numeric values",
-					arg3);
+					operator);
 			goto out;
 		}
 
 		if (OP_BAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
 			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting float values",
-					arg3);
+					operator);
 			goto out;
 		}
 
-		if (OP_BAND == op && NULL != (arg3_2 = strchr(arg3, '/')))
+		if (OP_BAND == op && NULL != (pattern2 = strchr(pattern, '/')))
 		{
-			*arg3_2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
-			arg3_2++;	/* start of the 2nd part of the 2nd parameter (mask) */
+			*pattern2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
+			pattern2++;	/* start of the 2nd part of the 2nd parameter (mask) */
 		}
 
-		if (NULL != arg3 && '\0' != *arg3)
+		if (NULL != pattern && '\0' != *pattern)
 		{
 			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			{
 				if (OP_BAND != op)
 				{
-					if (SUCCEED != str2uint64(arg3, ZBX_UNIT_SYMBOLS, &arg3_ui64))
+					if (SUCCEED != str2uint64(pattern, ZBX_UNIT_SYMBOLS, &pattern_ui64))
 					{
 						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
-								" value", arg3);
+								" value", pattern);
 						goto out;
 					}
-					arg3_2_ui64 = 0;
+					pattern2_ui64 = 0;
 				}
 				else
 				{
-					if (SUCCEED != is_uint64(arg3, &arg3_ui64))
+					if (SUCCEED != is_uint64(pattern, &pattern_ui64))
 					{
 						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
-								" value", arg3);
+								" value", pattern);
 						goto out;
 					}
 
-					if (NULL != arg3_2)
+					if (NULL != pattern2)
 					{
-						if (SUCCEED != is_uint64(arg3_2, &arg3_2_ui64))
+						if (SUCCEED != is_uint64(pattern2, &pattern2_ui64))
 						{
 							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric"
-									" unsigned value", arg3_2);
+									" unsigned value", pattern2);
 							goto out;
 						}
 					}
 					else
-						arg3_2_ui64 = arg3_ui64;
+						pattern2_ui64 = pattern_ui64;
 				}
 			}
 			else
 			{
-				if (SUCCEED != is_double_suffix(arg3, ZBX_FLAG_DOUBLE_SUFFIX))
+				if (SUCCEED != is_double_suffix(pattern, ZBX_FLAG_DOUBLE_SUFFIX))
 				{
 					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
-							arg3);
+							pattern);
 					goto out;
 				}
 
-				arg3_dbl = str2double(arg3);
+				arg3_dbl = str2double(pattern);
 			}
 		}
 	}
 	else if (OP_LIKE != op && OP_REGEXP != op && OP_IREGEXP != op && OP_EQ != op && OP_NE != op)
 	{
-		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting textual values", arg2);
+		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting textual values", operator);
 		goto out;
 	}
 
-	if ((OP_REGEXP == op || OP_IREGEXP == op) && '@' == *arg3)
+	if ((OP_REGEXP == op || OP_IREGEXP == op) && NULL != pattern && '@' == *pattern)
 	{
-		DCget_expressions_by_name(&regexps, arg3 + 1);
+		DCget_expressions_by_name(&regexps, pattern + 1);
 
 		if (0 == regexps.values_num)
 		{
-			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", arg3 + 1);
+			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", pattern + 1);
 			goto out;
 		}
 	}
@@ -843,7 +851,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 	}
 
 	/* skip counting values one by one if both pattern and operator are empty or "" is searched in text values */
-	if ((NULL != arg3 && '\0' != *arg3) || (NULL != arg2 && '\0' != *arg2 &&
+	if ((NULL != pattern && '\0' != *pattern) || (NULL != operator && '\0' != *operator &&
 			OP_LIKE != op && OP_REGEXP != op && OP_IREGEXP != op))
 	{
 		switch (item->value_type)
@@ -853,8 +861,8 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 				{
 					for (i = 0; i < values.values_num && count < limit; i++)
 					{
-						count_one_ui64(&count, op, values.values[i].value.ui64, arg3_ui64,
-								arg3_2_ui64);
+						count_one_ui64(&count, op, values.values[i].value.ui64, pattern_ui64,
+								pattern2_ui64);
 					}
 				}
 				else
@@ -863,7 +871,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 					{
 						zbx_snprintf(buf, sizeof(buf), ZBX_FS_UI64,
 								values.values[i].value.ui64);
-						count_one_str(&count, op, buf, arg3, &regexps);
+						count_one_str(&count, op, buf, pattern, &regexps);
 					}
 				}
 				break;
@@ -879,17 +887,17 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 					{
 						zbx_snprintf(buf, sizeof(buf), ZBX_FS_DBL_EXT(4),
 								values.values[i].value.dbl);
-						count_one_str(&count, op, buf, arg3, &regexps);
+						count_one_str(&count, op, buf, pattern, &regexps);
 					}
 				}
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				for (i = 0; i < values.values_num && FAIL != count && count < limit; i++)
-					count_one_str(&count, op, values.values[i].value.log->value, arg3, &regexps);
+					count_one_str(&count, op, values.values[i].value.log->value, pattern, &regexps);
 				break;
 			default:
 				for (i = 0; i < values.values_num && FAIL != count && count < limit; i++)
-					count_one_str(&count, op, values.values[i].value.str, arg3, &regexps);
+					count_one_str(&count, op, values.values[i].value.str, pattern, &regexps);
 		}
 
 		if (FAIL == count)
@@ -908,8 +916,8 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 
 	ret = SUCCEED;
 out:
-	zbx_free(arg2);
-	zbx_free(arg3);
+	zbx_free(operator);
+	zbx_free(pattern);
 
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
@@ -1123,7 +1131,7 @@ out:
  *                                                                            *
  * Function: evaluate_LAST                                                    *
  *                                                                            *
- * Purpose: evaluate functions 'last' and 'prev' for the item                 *
+ * Purpose: evaluate function 'last' for the item                             *
  *                                                                            *
  * Parameters: value - dynamic buffer                                         *
  *             item - item (performance metric)                               *
@@ -2085,7 +2093,7 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 		const zbx_timespec_t *ts, char **error)
 {
 	int		ret = FAIL, start, end;
-	char		*period = NULL, *period_shift = NULL;
+	char		*period = NULL;
 	const char	*table;
 	double		value_dbl;
 
@@ -2147,7 +2155,6 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 		zbx_variant_set_dbl(value, value_dbl);
 out:
 	zbx_free(period);
-	zbx_free(period_shift);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2179,10 +2186,6 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	if (0 == strcmp(function, "last"))
 	{
 		ret = evaluate_LAST(value, item, parameter, ts, error);
-	}
-	else if (0 == strcmp(function, "prev"))
-	{
-		ret = evaluate_LAST(value, item, "#2", ts, error);
 	}
 	else if (0 == strcmp(function, "min"))
 	{
