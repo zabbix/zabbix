@@ -1146,7 +1146,7 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: timeleft
-  params: '5m,65'
+  params: '5m,65,test'
 out:
   return: FAIL
   value: 3600

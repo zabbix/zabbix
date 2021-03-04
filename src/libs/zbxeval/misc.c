@@ -955,7 +955,7 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 	if (NULL != parameter && '\0' != *parameter)
 		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, ",%s", parameter);
 
-	zbx_chrcpy_alloc(&msg, &msg_alloc, &msg_offset, ')');
+	zbx_strcpy_alloc(&msg, &msg_alloc, &msg_offset, ")\"");
 
 	if (NULL != error && '\0' != *error)
 		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, ": %s", error);
