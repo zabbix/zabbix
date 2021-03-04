@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:22Z'
+  date: '2021-02-16T06:28:24Z'
   groups:
     -
       name: Templates/Databases
@@ -1621,7 +1621,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '12'
-              height: '6'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1630,11 +1630,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1645,7 +1641,7 @@ zabbix_export:
               type: GRAPH_PROTOTYPE
               x: '12'
               width: '12'
-              height: '6'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1654,11 +1650,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1667,9 +1659,9 @@ zabbix_export:
                     host: PostgreSQL
             -
               type: GRAPH_PROTOTYPE
-              'y': '6'
+              'y': '12'
               width: '12'
-              height: '6'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1678,11 +1670,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1692,9 +1680,9 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               x: '12'
-              'y': '6'
+              'y': '12'
               width: '12'
-              height: '6'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1703,11 +1691,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1716,9 +1700,9 @@ zabbix_export:
                     host: PostgreSQL
             -
               type: GRAPH_PROTOTYPE
-              'y': '12'
+              'y': '24'
               width: '12'
-              height: '6'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1727,11 +1711,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1741,9 +1721,9 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               x: '12'
-              'y': '12'
+              'y': '24'
               width: '12'
-              height: '6'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1752,11 +1732,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1765,9 +1741,9 @@ zabbix_export:
                     host: PostgreSQL
             -
               type: GRAPH_PROTOTYPE
-              'y': '18'
+              'y': '36'
               width: '12'
-              height: '6'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1776,11 +1752,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1790,9 +1762,9 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               x: '12'
-              'y': '18'
+              'y': '36'
               width: '12'
-              height: '6'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1801,11 +1773,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1821,10 +1789,6 @@ zabbix_export:
               height: '6'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -1837,10 +1801,6 @@ zabbix_export:
               height: '6'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -1852,10 +1812,6 @@ zabbix_export:
               width: '12'
               height: '6'
               fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
                 -
                   type: GRAPH
                   name: graphid
@@ -1870,10 +1826,6 @@ zabbix_export:
               height: '6'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -1885,10 +1837,6 @@ zabbix_export:
               width: '12'
               height: '6'
               fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
                 -
                   type: GRAPH
                   name: graphid
@@ -1903,10 +1851,6 @@ zabbix_export:
               height: '6'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -1918,10 +1862,6 @@ zabbix_export:
               width: '12'
               height: '6'
               fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
                 -
                   type: GRAPH
                   name: graphid
@@ -1935,10 +1875,6 @@ zabbix_export:
               width: '12'
               height: '6'
               fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
                 -
                   type: GRAPH
                   name: graphid
