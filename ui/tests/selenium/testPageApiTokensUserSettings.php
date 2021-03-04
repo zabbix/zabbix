@@ -39,7 +39,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 
 		self::$timestamp = time() + 172800;
 
-		$responce = CDataHelper::call('token.create', [
+		$response = CDataHelper::call('token.create', [
 			[
 				'name' => 'Future token for admin',
 				'userid' => 1,
@@ -73,7 +73,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 
 		// Update token "Last accessed" timestamp to be different for each token.
 		$i = 1;
-		foreach ($responce['tokenids'] as $tokenid) {
+		foreach ($response['tokenids'] as $tokenid) {
 			DBexecute('UPDATE token SET lastaccess='.(1609452001+$i).' WHERE tokenid='.$tokenid);
 			$i++;
 		}
@@ -310,7 +310,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 	 * @dataProvider getSortData
 	 */
 	public function testPageApiTokensUserSettings_Sort($data) {
-		// Place $timestamp variable value in data provider as the data providers are formed befor execution of on-before.
+		// Place $timestamp variable value in data provider as the data providers are formed before execution of on-before.
 		if ($data['sort_field'] === 'Expires at') {
 			foreach ($data['expected'] as $i => $value) {
 				if ($value === '2 days in the future') {

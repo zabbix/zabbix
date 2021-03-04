@@ -34,7 +34,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	public static function prepareTokenData() {
 		CDataHelper::setSessionId(null);
 
-		$responce = CDataHelper::call('token.create', [
+		$response = CDataHelper::call('token.create', [
 			[
 				'name' => 'Admin reference token',
 				'userid' => 1,
@@ -59,7 +59,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 		]);
 
 		// Generate token strings for the created tokens.
-		foreach ($responce['tokenids'] as $tokenid) {
+		foreach ($response['tokenids'] as $tokenid) {
 			CDataHelper::call('token.generate', ['tokenids' => $tokenid]);
 		}
 	}
