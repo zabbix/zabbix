@@ -751,7 +751,8 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 				break;
 		}
 
-		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\n%s", error, row[3]);
+		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\nLast message sent:\n%s", error,
+				row[3]);
 
 		add_user_msg(userid, mediatypeid, user_msg, row[2], message_dyn, actionid, event, NULL, NULL,
 				MACRO_TYPE_MESSAGE_NORMAL, ZBX_ALERT_MESSAGE_ERR_NONE);
