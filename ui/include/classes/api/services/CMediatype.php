@@ -1015,10 +1015,7 @@ class CMediatype extends CApiService {
 			foreach ($db_webhooks_params as $param) {
 				$mediatypeid = $param['mediatypeid'];
 
-				if (!array_key_exists($mediatypeid, $webhooks_params)) {
-					$del_media_type_param[] = $param['mediatype_paramid'];
-				}
-				elseif (!array_key_exists($param['name'], $webhooks_params[$mediatypeid])) {
+				if (!array_key_exists($param['name'], $webhooks_params[$mediatypeid])) {
 					$del_media_type_param[] = $param['mediatype_paramid'];
 				}
 				elseif ($webhooks_params[$mediatypeid][$param['name']] !== $param['value']) {
