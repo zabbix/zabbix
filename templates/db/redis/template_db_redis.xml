@@ -1991,7 +1991,7 @@ https://redis.io/topics/clients</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(5m)}/{Template DB Redis:redis.memory.used_memory.last()}*100&gt;{$REDIS.MEM.PUSED.MAX.WARN}</expression>
+                           <expression>{Template DB Redis:redis.memory.used_memory.last()}/{Template DB Redis:redis.memory.maxmemory[{#SINGLETON}].min(5m)}*100&gt;{$REDIS.MEM.PUSED.MAX.WARN}</expression>
                            <name>Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)</name>
                            <priority>WARNING</priority>
                         </trigger_prototype>

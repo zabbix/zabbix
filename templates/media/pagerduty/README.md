@@ -106,7 +106,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 8\. Use the PagerDuty User in any Actions of your choice.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
 
 # Supported Versions
 

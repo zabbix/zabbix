@@ -1347,7 +1347,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>vm.memory.size[available]</key>
                <history>7d</history>
                <units>B</units>
-               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1361,7 +1361,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1407,12 +1407,12 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
-                     <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                     <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                      <priority>AVERAGE</priority>
                      <description>The system is running out of free memory.</description>
                      <dependencies>
                         <dependency>
-                           <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+                           <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                            <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -1718,7 +1718,7 @@ or {Template Module Linux network interfaces by Zabbix agent active:net.if.out["
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Module Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}: High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}: High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -2103,24 +2103,24 @@ Template tooling version used: 0.38</description>
       </trigger>
       <trigger>
          <expression>{Template Module Linux memory by Zabbix agent active:system.swap.size[,pfree].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
-         <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
+         <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
          <description>This trigger is ignored, if there is no swap configured</description>
          <dependencies>
             <dependency>
-               <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+               <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.utilization.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
-               <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+               <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
          <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
-         <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+         <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>

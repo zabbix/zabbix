@@ -86,11 +86,15 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			while (NULL != fgets(tmp_line, sizeof(tmp_line), f))
 			{
+				char	line2[MAX_STRING_LEN];
+
 				if (0 != strncmp(tmp_line, SW_OS_OPTION_PRETTY_NAME,
 						ZBX_CONST_STRLEN(SW_OS_OPTION_PRETTY_NAME)))
 					continue;
 
-				if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", line))
+				if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", line) ||
+						1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=%[^ \t\n] %s",
+								line, line2))
 				{
 					line_read = SUCCEED;
 					break;

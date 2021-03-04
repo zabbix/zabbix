@@ -28,19 +28,13 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyCustomQuery = "oracle.custom.query"
-const customQueryMinParams = 1
-
 // customQueryHandler executes custom user queries
-func customQueryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	if len(params) < customQueryMinParams {
-		return nil, zbxerr.ErrorInvalidParams
-	}
+func customQueryHandler(ctx context.Context, conn OraClient,
+	params map[string]string, extraParams ...string) (interface{}, error) {
+	queryName := params["QueryName"]
 
-	queryName := params[0]
-	queryArgs := make([]interface{}, len(params[1:]))
-
-	for i, v := range params[1:] {
+	queryArgs := make([]interface{}, len(extraParams))
+	for i, v := range extraParams {
 		queryArgs[i] = v
 	}
 

@@ -1077,7 +1077,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>B</units>
-               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1136,12 +1136,12 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
-                     <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                     <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                      <priority>AVERAGE</priority>
                      <description>The system is running out of free memory.</description>
                      <dependencies>
                         <dependency>
-                           <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+                           <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                            <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -1559,7 +1559,7 @@ and&#13;
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template OS Linux by Prom:net.if.in[node_exporter,"{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()} and&#13;
 {Template OS Linux by Prom:net.if.out[node_exporter,"{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
@@ -1578,7 +1578,7 @@ or {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].min(5m
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template OS Linux by Prom:net.if.in.errors[node_exporter,"{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -2663,24 +2663,24 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
    <triggers>
       <trigger>
          <expression>{Template OS Linux by Prom:system.swap.pfree[node_exporter].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template OS Linux by Prom:system.swap.total[node_exporter].last()}&gt;0</expression>
-         <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
+         <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
          <description>This trigger is ignored, if there is no swap configured</description>
          <dependencies>
             <dependency>
-               <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+               <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                <expression>{Template OS Linux by Prom:vm.memory.util[node_exporter].min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
-               <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+               <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
          <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
-         <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+         <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>

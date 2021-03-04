@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keySGA = "oracle.sga.stats"
-
-const SGAMaxParams = 0
-
-func SGAHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func sgaHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var SGA string
-
-	if len(params) > SGAMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT

@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-02-02T14:26:22Z</date>
+    <media_types>
+        <media_type>
+            <name>VictorOps</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>event_info</name>
+                    <value>{$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&amp;eventid={EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>event_nseverity</name>
+                    <value>{EVENT.NSEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>event_recovery_value</name>
+                    <value>{EVENT.RECOVERY.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_source</name>
+                    <value>{EVENT.SOURCE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_status</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_value</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>field:entity_display_name</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>field:entity_id</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>field:hostname</name>
+                    <value>{HOST.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>field:monitoring_tool</name>
+                    <value>Zabbix</value>
+                </parameter>
+                <parameter>
+                    <name>field:operational_data</name>
+                    <value>{EVENT.OPDATA}</value>
+                </parameter>
+                <parameter>
+                    <name>field:severity</name>
+                    <value>{EVENT.SEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>field:state_message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>field_p:trigger_description</name>
+                    <value>{TRIGGER.DESCRIPTION}</value>
+                </parameter>
+                <parameter>
+                    <name>field_r:event_duration</name>
+                    <value>{EVENT.DURATION}</value>
+                </parameter>
+                <parameter>
+                    <name>field_r:recovery time</name>
+                    <value>{EVENT.RECOVERY.DATE} {EVENT.RECOVERY.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>priority_average</name>
+                    <value>WARNING</value>
+                </parameter>
+                <parameter>
+                    <name>priority_default</name>
+                    <value>INFO</value>
+                </parameter>
+                <parameter>
+                    <name>priority_disaster</name>
+                    <value>CRITICAL</value>
+                </parameter>
+                <parameter>
+                    <name>priority_high</name>
+                    <value>WARNING</value>
+                </parameter>
+                <parameter>
+                    <name>priority_information</name>
+                    <value>INFO</value>
+                </parameter>
+                <parameter>
+                    <name>priority_not_classified</name>
+                    <value>INFO</value>
+                </parameter>
+                <parameter>
+                    <name>priority_resolved</name>
+                    <value>OK</value>
+                </parameter>
+                <parameter>
+                    <name>priority_update</name>
+                    <value>INFO</value>
+                </parameter>
+                <parameter>
+                    <name>priority_warning</name>
+                    <value>INFO</value>
+                </parameter>
+                <parameter>
+                    <name>vops_endpoint</name>
+                    <value>&lt;PLACE ENDPOINT URL HERE&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>vops_routing_key</name>
+                    <value>{ALERT.SENDTO}</value>
+                </parameter>
+            </parameters>
+            <script>var VictorOps = {&#13;
+    params: {},&#13;
+&#13;
+    setParams: function (params) {&#13;
+        if (typeof params !== 'object') {&#13;
+            return;&#13;
+        }&#13;
+&#13;
+        VictorOps.params = params;&#13;
+        if (VictorOps.params.endpoint) {&#13;
+            if (!VictorOps.params.endpoint.endsWith('/')) {&#13;
+                VictorOps.params.endpoint += '/';&#13;
+            }&#13;
+&#13;
+            if (typeof VictorOps.params.routing_key !== 'undefined'&#13;
+                    &amp;&amp; VictorOps.params.routing_key !== '{ALERT.SENDTO}'&#13;
+                    &amp;&amp; VictorOps.params.routing_key !== 'Default') {&#13;
+                VictorOps.params.endpoint += VictorOps.params.routing_key;&#13;
+            }&#13;
+        }&#13;
+    },&#13;
+&#13;
+    setProxy: function (HTTPProxy) {&#13;
+        VictorOps.HTTPProxy = HTTPProxy;&#13;
+    },&#13;
+&#13;
+    addFields: function (fields) {&#13;
+        var data = {};&#13;
+&#13;
+        if (typeof fields === 'object') {&#13;
+            Object.keys(fields)&#13;
+                .forEach(function(field) {&#13;
+                    if (fields[field] === '') {&#13;
+                        Zabbix.Log(4, '[ VictorOps Webhook ] Field &quot;' + field +&#13;
+                            '&quot; can\'t be empty. The field ignored.');&#13;
+                    }&#13;
+                    else {&#13;
+                        try {&#13;
+                            var parts = field.split(':'),&#13;
+                                prefix = parts[0].split('_');&#13;
+&#13;
+                            if (typeof prefix[1] === 'undefined'&#13;
+                                    || (prefix[1] === 'p' &amp;&amp; params.event_value === '1'&#13;
+                                        &amp;&amp; (params.event_update_status === '0'&#13;
+                                            || params.event_update_status === '{EVENT.UPDATE.STATUS}'))&#13;
+                                    || (prefix[1] === 'r' &amp;&amp; params.event_value === '0'&#13;
+                                        &amp;&amp; (params.event_update_status === '0'&#13;
+                                            || params.event_update_status === '{EVENT.UPDATE.STATUS}'))&#13;
+                                    || (prefix[1] === 'u' &amp;&amp; params.event_update_status === '1')) {&#13;
+                                data[field.substring(field.indexOf(':') + 1)] = fields[field];&#13;
+                            }&#13;
+                        }&#13;
+                        catch (error) {&#13;
+                            Zabbix.Log(4, '[ VictorOps Webhook ] Can\'t parse field &quot;' + field +&#13;
+                                '&quot;. The field ignored.');&#13;
+                        }&#13;
+                    }&#13;
+                });&#13;
+        }&#13;
+&#13;
+        return data;&#13;
+    },&#13;
+&#13;
+    request: function (data) {&#13;
+        if (typeof VictorOps.params !== 'object' || typeof VictorOps.params.endpoint === 'undefined'&#13;
+                || VictorOps.params.endpoint === '' ) {&#13;
+            throw 'Required parameter is not set: &quot;vops_endpoint&quot;.';&#13;
+        }&#13;
+&#13;
+        var response,&#13;
+            url = VictorOps.params.endpoint,&#13;
+            request = new CurlHttpRequest();&#13;
+&#13;
+        request.AddHeader('Content-Type: application/json');&#13;
+&#13;
+        if (typeof VictorOps.HTTPProxy !== 'undefined' &amp;&amp; VictorOps.HTTPProxy !== '') {&#13;
+            request.SetProxy(VictorOps.HTTPProxy);&#13;
+        }&#13;
+&#13;
+        if (typeof data !== 'undefined') {&#13;
+            data = JSON.stringify(data);&#13;
+        }&#13;
+&#13;
+        Zabbix.Log(4, '[ VictorOps Webhook ] Sending request: ' + url +&#13;
+            ((typeof data === 'string') ? ('\n' + data) : ''));&#13;
+&#13;
+        response = request.Post(url, data);&#13;
+&#13;
+        Zabbix.Log(4, '[ VictorOps Webhook ] Received response with status code ' +&#13;
+            request.Status() + '\n' + response);&#13;
+&#13;
+        if (response !== null) {&#13;
+            try {&#13;
+                response = JSON.parse(response);&#13;
+            }&#13;
+            catch (error) {&#13;
+                Zabbix.Log(4, '[ VictorOps Webhook ] Failed to parse response received from VictorOps');&#13;
+                response = null;&#13;
+            }&#13;
+        }&#13;
+&#13;
+        if (request.Status() &lt; 200 || request.Status() &gt;= 300) {&#13;
+            var message = 'Request failed with status code ' + request.Status();&#13;
+&#13;
+            if (response !== null &amp;&amp; typeof response.messages !== 'undefined') {&#13;
+                message += ': ' + JSON.stringify(response.messages);&#13;
+            }&#13;
+&#13;
+            throw message + '. Check debug log for more information.';&#13;
+        }&#13;
+&#13;
+        return response;&#13;
+    }&#13;
+};&#13;
+&#13;
+try {&#13;
+    var params = JSON.parse(value),&#13;
+        fields = {},&#13;
+        vops = {},&#13;
+        required_params = ['event_source', 'event_value', 'priority_update'],&#13;
+        severities = [&#13;
+            {name: 'not_classified', color: '#97AAB3'},&#13;
+            {name: 'information', color: '#7499FF'},&#13;
+            {name: 'warning', color: '#FFC859'},&#13;
+            {name: 'average', color: '#FFA059'},&#13;
+            {name: 'high', color: '#E97659'},&#13;
+            {name: 'disaster', color: '#E45959'},&#13;
+            {name: 'resolved', color: '#009900'},&#13;
+            {name: 'default', color: '#000000'}&#13;
+        ];&#13;
+&#13;
+    Object.keys(params)&#13;
+        .forEach(function (key) {&#13;
+            if (key.startsWith('vops_')) {&#13;
+                vops[key.substring(5)] = params[key];&#13;
+            }&#13;
+            else if (key.startsWith('field')) {&#13;
+                fields[key.substring(5)] = params[key];&#13;
+            }&#13;
+            else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
+                throw 'Parameter &quot;' + key + '&quot; can\'t be empty.';&#13;
+            }&#13;
+        });&#13;
+&#13;
+    if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {&#13;
+        throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
+    }&#13;
+&#13;
+    // Check {EVENT.VALUE} for trigger-based and internal events.&#13;
+    if (params.event_value !== '0' &amp;&amp; params.event_value !== '1'&#13;
+            &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {&#13;
+        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    // Check {EVENT.UPDATE.STATUS} only for trigger-based events.&#13;
+    if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
+        throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {&#13;
+        params.event_nseverity = '7';&#13;
+    }&#13;
+&#13;
+    if (params.event_value === '0') {&#13;
+        params.event_nseverity = '6';&#13;
+    }&#13;
+&#13;
+    if (params.event_update_status === '1') {&#13;
+        fields[':message_type'] = params.priority_update;&#13;
+    }&#13;
+    else {&#13;
+        fields[':message_type'] = params['priority_' + severities[params.event_nseverity].name]&#13;
+            || 'INFO';&#13;
+    }&#13;
+&#13;
+    if (params.event_info &amp;&amp; params.event_source === '0') {&#13;
+        fields[':event_info'] = params.event_info;&#13;
+    }&#13;
+&#13;
+    VictorOps.setParams(vops);&#13;
+    VictorOps.setProxy(params.HTTPProxy);&#13;
+    VictorOps.request(VictorOps.addFields(fields));&#13;
+&#13;
+    return 'OK';&#13;
+}&#13;
+catch (error) {&#13;
+    Zabbix.Log(3, '[ VictorOps Webhook ] ERROR: ' + error);&#13;
+    throw 'Sending failed: ' + error;&#13;
+}</script>
+            <message_templates>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Problem: {EVENT.NAME}</subject>
+                    <message>Problem started at {EVENT.TIME} on {EVENT.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Operational data: {EVENT.OPDATA}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>RECOVERY</operation_mode>
+                    <subject>Resolved in {EVENT.DURATION}: {EVENT.NAME}</subject>
+                    <message>Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Problem duration: {EVENT.DURATION}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>UPDATE</operation_mode>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
+                    <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
+{EVENT.UPDATE.MESSAGE}&#13;
+&#13;
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.</message>
+                </message_template>
+                <message_template>
+                    <event_source>DISCOVERY</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}</subject>
+                    <message>Discovery rule: {DISCOVERY.RULE.NAME}&#13;
+&#13;
+Device IP: {DISCOVERY.DEVICE.IPADDRESS}&#13;
+Device DNS: {DISCOVERY.DEVICE.DNS}&#13;
+Device status: {DISCOVERY.DEVICE.STATUS}&#13;
+Device uptime: {DISCOVERY.DEVICE.UPTIME}&#13;
+&#13;
+Device service name: {DISCOVERY.SERVICE.NAME}&#13;
+Device service port: {DISCOVERY.SERVICE.PORT}&#13;
+Device service status: {DISCOVERY.SERVICE.STATUS}&#13;
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
+                </message_template>
+                <message_template>
+                    <event_source>AUTOREGISTRATION</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Autoregistration: {HOST.HOST}</subject>
+                    <message>Host name: {HOST.HOST}&#13;
+Host IP: {HOST.IP}&#13;
+Agent port: {HOST.PORT}</message>
+                </message_template>
+            </message_templates>
+        </media_type>
+    </media_types>
+</zabbix_export>

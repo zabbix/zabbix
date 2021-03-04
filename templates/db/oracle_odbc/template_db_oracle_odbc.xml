@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-09-14T14:08:40Z</date>
+   <date>2021-02-10T14:35:58Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -22,7 +22,7 @@
 The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.&#13;
 &#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -245,7 +245,7 @@ UNION
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT df.tablespace_name AS tablespace, df.type AS TYPE, SUM(df.bytes) AS used_bytes, SUM(df.max_bytes) AS max_bytes, SUM(f.free) AS free_bytes, ROUND(SUM(df.bytes)/ SUM(df.max_bytes)* 100, 2) AS used_pct, DECODE(df.status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status FROM ( SELECT ddf.file_id, dt.contents AS TYPE, dt.STATUS , ddf.file_name, ddf.tablespace_name, TRUNC(ddf.bytes) AS bytes, TRUNC(GREATEST(ddf.bytes, ddf.maxbytes)) AS max_bytes FROM dba_data_files ddf, dba_tablespaces dt WHERE ddf.tablespace_name = dt.tablespace_name ) df, ( SELECT TRUNC(SUM(bytes)) AS FREE, file_id FROM dba_free_space GROUP BY file_id ) f WHERE df.file_id = f.file_id (+) GROUP BY df.tablespace_name, df.TYPE, df.status UNION ALL SELECT Y.name AS tablespace_name, Y.type AS TYPE, SUM(Y.bytes) AS bytes, SUM(Y.max_bytes) AS max_bytes, MAX(NVL(Y.free_bytes, 0)) AS FREE, ROUND(SUM(Y.bytes)/ SUM(Y.max_bytes)* 100, 2) AS used_pct, DECODE(Y.tbs_status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status FROM ( SELECT dtf.tablespace_name AS name, dt.contents AS TYPE, dt.STATUS AS tbs_status, dtf.status AS status, dtf.bytes AS bytes, (SELECT ((f.total_blocks - s.tot_used_blocks)* vp.value) FROM ( SELECT tablespace_name, SUM(used_blocks) tot_used_blocks FROM gv$sort_segment WHERE tablespace_name != 'DUMMY' GROUP BY tablespace_name) s, ( SELECT tablespace_name, SUM(blocks) total_blocks FROM dba_temp_files WHERE tablespace_name != 'DUMMY' GROUP BY tablespace_name) f, ( SELECT value FROM v$parameter WHERE name = 'db_block_size') vp WHERE f.tablespace_name = s.tablespace_name AND f.tablespace_name = dtf.tablespace_name ) AS free_bytes, CASE WHEN dtf.maxbytes = 0 THEN dtf.bytes ELSE dtf.maxbytes END AS max_bytes FROM sys.dba_temp_files dtf, sys.dba_tablespaces dt WHERE dtf.tablespace_name = dt.tablespace_name ) Y GROUP BY Y.name, Y.TYPE, Y.tbs_status ORDER BY tablespace;</params>
+               <params>SELECT df.tablespace_name AS TABLESPACE, df.type AS TYPE, NVL(SUM(df.BYTES), 0) AS FILE_BYTES, NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES, NVL(SUM(f.FREE), 0) AS FREE_BYTES, SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES, ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, ROUND(DECODE(SUM(df.BYTES), 0, 0,(SUM(df.BYTES)-SUM(f.FREE))/ SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT, DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS FROM ( SELECT ddf.file_id, dt.contents AS TYPE, dt.STATUS , ddf.file_name, ddf.tablespace_name, TRUNC(ddf.bytes) AS bytes, TRUNC(GREATEST(ddf.bytes, ddf.maxbytes)) AS max_bytes FROM dba_data_files ddf, dba_tablespaces dt WHERE ddf.tablespace_name = dt.tablespace_name ) df, ( SELECT TRUNC(SUM(bytes)) AS FREE, file_id FROM dba_free_space GROUP BY file_id ) f WHERE df.file_id = f.file_id (+) GROUP BY df.tablespace_name, df.TYPE, df.status UNION ALL SELECT Y.name AS TABLESPACE, Y.type AS TYPE, NVL(SUM(Y.BYTES), 0) AS FILE_BYTES, NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES, NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE, SUM(Y.BYTES)-SUM(Y.FREE_BYTES) AS USED_BYTES, ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, ROUND(DECODE(SUM(Y.BYTES), 0, 0,(SUM(Y.BYTES)-SUM(Y.FREE_BYTES))/ SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT, DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS FROM ( SELECT dtf.tablespace_name AS name, dt.contents AS TYPE, dt.STATUS AS tbs_status, dtf.status AS status, dtf.bytes AS bytes, (SELECT ((f.total_blocks - s.tot_used_blocks)* vp.value) FROM ( SELECT tablespace_name, SUM(used_blocks) tot_used_blocks FROM gv$sort_segment WHERE tablespace_name != 'DUMMY' GROUP BY tablespace_name) s, ( SELECT tablespace_name, SUM(blocks) total_blocks FROM dba_temp_files WHERE tablespace_name != 'DUMMY' GROUP BY tablespace_name) f, ( SELECT value FROM v$parameter WHERE name = 'db_block_size') vp WHERE f.tablespace_name = s.tablespace_name AND f.tablespace_name = dtf.tablespace_name ) AS free_bytes, CASE WHEN dtf.maxbytes = 0 THEN dtf.bytes ELSE dtf.maxbytes END AS max_bytes FROM sys.dba_temp_files dtf, sys.dba_tablespaces dt WHERE dtf.tablespace_name = dt.tablespace_name ) Y GROUP BY Y.name, Y.TYPE, Y.tbs_status;</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
                <description>Get tablespaces stats.</description>
@@ -724,7 +724,7 @@ UNION
                </master_item>
             </item>
             <item>
-               <name>Oracle: FRA, Used space in %</name>
+               <name>Oracle: FRA, Usable space in %</name>
                <type>DEPENDENT</type>
                <key>oracle.fra_usable_pct</key>
                <delay>0</delay>
@@ -1958,6 +1958,10 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                            <type>JSONPATH</type>
                            <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].ERROR.first()</params>
                         </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
                      </preprocessing>
                      <master_item>
                         <key>db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]</key>
@@ -2004,6 +2008,10 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                         <step>
                            <type>JSONPATH</type>
                            <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].STATUS.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2446,7 +2454,7 @@ contents  FROM DBA_TABLESPACES;</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</params>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].FILE_BYTES.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2546,7 +2554,72 @@ contents  FROM DBA_TABLESPACES;</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage percent</name>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace used, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Currently used bytes for tablespace (current size of datafiles-free space).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage, percent</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_file_pct["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>Used bytes/Allocated bytes*100</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_FILE_PCT.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
+                                 <expression>{Template DB Oracle by ODBC:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocated, percent</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_used_pct["{#TABLESPACE}"]</key>
                      <delay>0</delay>
@@ -2562,7 +2635,7 @@ contents  FROM DBA_TABLESPACES;</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_PCT.first()</params>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_PCT_MAX.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2571,18 +2644,18 @@ contents  FROM DBA_TABLESPACES;</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
-                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
                            <priority>WARNING</priority>
                            <dependencies>
                               <dependency>
-                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
-                                 <expression>{Template DB Oracle by ODBC:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
+                                 <expression>{Template DB Oracle by ODBC:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
-                           <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -2606,6 +2679,14 @@ contents  FROM DBA_TABLESPACES;</params>
                            <item>
                               <host>Template DB Oracle by ODBC</host>
                               <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB Oracle by ODBC</host>
+                              <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2662,7 +2743,7 @@ contents  FROM DBA_TABLESPACES;</params>
             <macro>
                <macro>{$ORACLE.PGA.USE.MAX.WARN}</macro>
                <value>90</value>
-               <description>Maximum percentage of PGA usage alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of PGA usage alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.PORT}</macro>
@@ -2672,12 +2753,12 @@ contents  FROM DBA_TABLESPACES;</params>
             <macro>
                <macro>{$ORACLE.PROCESSES.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of active processes alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of active processes alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.REDO.MIN.WARN}</macro>
                <value>3</value>
-               <description>Minimum number of REDO logs alert treshold (for trigger expression).</description>
+               <description>Minimum number of REDO logs alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSION.LOCK.MAX.TIME}</macro>
@@ -2687,22 +2768,22 @@ contents  FROM DBA_TABLESPACES;</params>
             <macro>
                <macro>{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</macro>
                <value>3</value>
-               <description>Maximum number of the prolongely locked sessions alert treshold (for trigger expression).</description>
+               <description>Maximum number of the prolongely locked sessions alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSIONS.LOCK.MAX.WARN}</macro>
                <value>20</value>
-               <description>Maximum percentage of locked sessions alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of locked sessions alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSIONS.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of active sessions alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of active sessions alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SHARED.FREE.MIN.WARN}</macro>
                <value>5</value>
-               <description>Minimum percentage of free shared pool alert treshold (for trigger expression).</description>
+               <description>Minimum percentage of free shared pool alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TABLESPACE.NAME.MATCHES}</macro>
@@ -2716,13 +2797,23 @@ contents  FROM DBA_TABLESPACES;</params>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.USED.PCT.MAX.HIGH}</macro>
-               <value>90</value>
-               <description>Maximum percentage of used tablespace high severity alert treshold (for trigger expression).</description>
+               <value>95</value>
+               <description>Maximum percentage of used (Used bytes/Allocated bytes) tablespace high severity alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.USED.PCT.MAX.WARN}</macro>
+               <value>90</value>
+               <description>Maximum percentage of used (Used bytes/Allocated bytes) tablespace warning severity alert threshold (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</macro>
+               <value>90</value>
+               <description>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace high severity alert threshold (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of used tablespace warning severity alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace warning severity alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.USER}</macro>

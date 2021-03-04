@@ -1,6 +1,74 @@
+Changes for 5.0.10rc1
+
+New features:
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
+
+Bug fixes:
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9
+
+5.0.9rc2 was released as 5.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9rc2
+
+Bug fixes:
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9rc1
+
+New features:
+.........T [ZBXNEXT-6385] added template "Apache Ignite by JMX" (ychukina)
+...G...... [ZBXNEXT-6339] added smart plugin to support S.M.A.R.T monitoring in Zabbix Agent 2 (esneiders)
+...G...... [ZBXNEXT-6437] added native support for system.sw.packages plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6306] added native linux support for key vm.memory.size in Zabbix agent 2 (esneiders)
+.......PS. [ZBXNEXT-6443] added sha256() function to JavaScript preprocessing (viktors)
+.........T [ZBXNEXT-5809] added VictorOps media (tuskov)
+.......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
+.......PS. [ZBXNEXT-6441] added function to configure HTTP authentication for embedded scripts (wiper)
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
+
+Bug fixes:
+A......... [ZBX-18966] fixed interface related errors when changing proxy type from passive to active (Ivo)
+.........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
+...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
+.........T [ZBX-18963] fixed preprocessing for archivelog items in Oracle Templates (ychukina)
+...G...... [ZBX-17543] fixed error in case if wmi.getall returned no items (dgoloscapov)
+..F....... [ZBX-18825] fixed last year period calculation in service availability report daily mode (miks)
+.........T [ZBX-18638] removed triggers of the "Temperature" items, added the "Temperature sensor condition" items with triggers, removed unnecessary macros (mchudinov)
+A......... [ZBX-18449] reworked trigger API validation (miks)
+..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
+..F....... [ZBX-18209] fixed RegEx delimiter not being escaped in macro resolver (talbergs)
+..F....... [ZBX-18237] fixed problem description icon in Monitoring->Problems in compact view mode being displayed above problem name (agriscenko)
+...G...... [ZBX-18945] fixed Zabbix agent 2 build Raspbian 10 (esneiders)
+...G...... [ZBX-18309] fixed reading log files with NULL character in log line (viktors)
+...G...... [ZBX-18872] fixed system.sw.os[name] for cases without quotation mark in /etc/os-release (akozlovs)
+.......PS. [ZBX-18885] fixed SNMP agent item not accepting values that are bigger than 2KB (vso)
+.........T [ZBX-18874] fixed incorrect links in templates and webhooks documentation (tuskov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.8
+
+5.0.8rc1 was released as 5.0.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.8rc1
 
 New features:
+...G.....T [ZBXCTR-13] added custom query support for PostgreSQL plugin and template, fixed unix-socket support (afayantsev, Daria_V, vadimipatov)
+.........T [ZBXNEXT-5862] added Rocket.Chat media (tuskov)
+.........T [ZBXNEXT-6389] added template for NetApp FAS3220 (tuskov)
+...G.....T [ZBXNEXT-6419] added tablespace metrics to Oracle Templates (ychukina)
+...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
+...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
 .........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
 .........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
 .........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
@@ -8,6 +76,23 @@ New features:
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 
 Bug fixes:
+..F....... [ZBX-18942] fixed missing SID valiadion in authentication update route (talbergs)
+..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
+...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
+A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
+.........T [ZBX-18853] removed hardcoded teams_endpoint check (tuskov)
+..F....... [ZBX-18556] fixed gaps in time labels of classic graphs related to DST transitions (averza, Sasha)
+...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)
+..F....... [ZBX-18815] fixed displaying incomplete list of inherited trigger tags under rare circumstances (ozdancuka)
+.........T [ZBX-18468] changed preprocessing for item "PHP-FPM: Ping" in PHP-FPM templates (mchudinov)
+...G...... [ZBX-17369] fixed retrieval of decimal values from WMI (dgoloscapov)
+........S. [ZBX-18410] fixed retrieval of Nth most recent values in trigger function strlen (dgoloscapov)
+A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+...G...... [ZBX-17716] fixed 'UserParameter' parsing and possible buffer overrun (viktors)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update(), itemprototype.update() and discoveryrule.update() methods (Sasha)
 .........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 ........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
@@ -1901,6 +1986,39 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.30rc1
+
+New features:
+
+Bug fixes:
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29
+
+4.0.29rc1 was released as 4.0.29 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29rc1
+
+Bug fixes:
+A......... [ZBX-18966] fixed interface related errors when changing proxy type from passive to active (Ivo)
+...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
+..F....... [ZBX-18825] fixed last year period calculation in service availability report daily mode (miks)
+...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
+A......... [ZBX-18449] reworked trigger API validation (miks)
+..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
+...G...... [ZBX-18309] fixed reading log files with NULL character in log line (viktors)
+..F....... [ZBX-18931] fixed PHP runtime errors in CLineGraphDraw.php (Sasha)
+...G...... [ZBX-18872] fixed system.sw.os[name] for cases without quotation mark in /etc/os-release (akozlovs)
+.......PS. [ZBX-18885] fixed SNMP agent item not accepting values that are bigger than 2KB (vso)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.28
+
+4.0.28rc1 was released as 4.0.28 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.28rc1
 
 New features:
@@ -1908,6 +2026,16 @@ New features:
 .....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+..F....... [ZBX-18942] fixed missing SID valiadion in authentication update route (talbergs)
+..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
+...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
+A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
+...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)
+..F....... [ZBX-18556] fixed gaps in time labels of classic graphs related to DST transitions (averza, Sasha)
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update() and itemprototype.update() methods (Sasha)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 .......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
 .......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
@@ -4945,9 +5073,8 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.32rc1
 
-New features:
-
 Bug fixes:
+...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
 ..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 
 --------------------------------------------------------------------------------

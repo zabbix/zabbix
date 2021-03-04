@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-09-14T15:10:30Z</date>
+   <date>2021-02-10T14:36:17Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template DB Oracle by Zabbix Agent 2</template>
          <name>Template DB Oracle by Zabbix Agent 2</name>
-         <description>Template tooling version used: 0.37</description>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -500,7 +500,7 @@
                </master_item>
             </item>
             <item>
-               <name>Oracle: FRA, Used space in %</name>
+               <name>Oracle: FRA, Usable space in %</name>
                <type>DEPENDENT</type>
                <key>oracle.fra_usable_pct</key>
                <delay>0</delay>
@@ -1815,7 +1815,11 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DEST_NAME}'].log_sequence.first()</params>
+                           <params>$..['{#DEST_NAME}'].error.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1862,7 +1866,11 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DEST_NAME}'].log_sequence.first()</params>
+                           <params>$..['{#DEST_NAME}'].status.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2291,7 +2299,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.used_bytes.first()</params>
+                           <params>$..['{#TABLESPACE}'].file_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2314,7 +2322,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.free_bytes.first()</params>
+                           <params>$..['{#TABLESPACE}'].free_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2337,7 +2345,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.max_bytes.first()</params>
+                           <params>$..['{#TABLESPACE}'].max_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2362,7 +2370,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.status.first()</params>
+                           <params>$..['{#TABLESPACE}'].status.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2391,7 +2399,72 @@
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage percent</name>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace used, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Currently used bytes for tablespace (current size of datafiles-free space).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$..['{#TABLESPACE}'].used_bytes.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage, percent</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_file_pct["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>Used bytes/Allocated bytes*100</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$..['{#TABLESPACE}'].used_file_pct.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
+                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocated, percent</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_used_pct["{#TABLESPACE}"]</key>
                      <delay>0</delay>
@@ -2407,7 +2480,7 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.used_pct.first()</params>
+                           <params>$..['{#TABLESPACE}'].used_pct_max.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2416,18 +2489,18 @@
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
-                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
                            <priority>WARNING</priority>
                            <dependencies>
                               <dependency>
-                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
+                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
-                           <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -2451,6 +2524,14 @@
                            <item>
                               <host>Template DB Oracle by Zabbix Agent 2</host>
                               <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB Oracle by Zabbix Agent 2</host>
+                              <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2506,17 +2587,17 @@
             <macro>
                <macro>{$ORACLE.PGA.USE.MAX.WARN}</macro>
                <value>90</value>
-               <description>Maximum percentage of PGA usage alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of PGA usage alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.PROCESSES.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of active processes alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of active processes alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.REDO.MIN.WARN}</macro>
                <value>3</value>
-               <description>Minimum number of REDO logs alert treshold (for trigger expression).</description>
+               <description>Minimum number of REDO logs alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SERVICE}</macro>
@@ -2531,22 +2612,22 @@
             <macro>
                <macro>{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</macro>
                <value>3</value>
-               <description>Maximum number of the prolongely locked sessions alert treshold (for trigger expression).</description>
+               <description>Maximum number of the prolongely locked sessions alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSIONS.LOCK.MAX.WARN}</macro>
                <value>20</value>
-               <description>Maximum percentage of locked sessions alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of locked sessions alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSIONS.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of active sessions alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of active sessions alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SHARED.FREE.MIN.WARN}</macro>
                <value>5</value>
-               <description>Minimum percentage of free shared pool alert treshold (for trigger expression).</description>
+               <description>Minimum percentage of free shared pool alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TABLESPACE.NAME.MATCHES}</macro>
@@ -2560,13 +2641,23 @@
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.USED.PCT.MAX.HIGH}</macro>
-               <value>90</value>
-               <description>Maximum percentage of used tablespace high severity alert treshold (for trigger expression).</description>
+               <value>95</value>
+               <description>Maximum percentage of used (Used bytes/Allocated bytes) tablespace high severity alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.USED.PCT.MAX.WARN}</macro>
+               <value>90</value>
+               <description>Maximum percentage of used (Used bytes/Allocated bytes) tablespace warning severity alert threshold (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</macro>
+               <value>90</value>
+               <description>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace high severity alert threshold (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of used tablespace warning severity alert treshold (for trigger expression).</description>
+               <description>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace warning severity alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.USER}</macro>

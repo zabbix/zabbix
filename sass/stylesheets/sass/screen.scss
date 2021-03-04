@@ -573,6 +573,7 @@ form {
 			.link-action {
 				height: 16px;
 				min-width: 1em;
+				@extend %overflow-ellipsis;
 			}
 
 			.separator {
@@ -983,6 +984,11 @@ form {
 
 .wordwrap {
 	word-break: break-all;
+}
+
+.wordbreak {
+	white-space: pre-wrap;
+	word-break: break-word;
 }
 
 .overflow-table {
@@ -6814,7 +6820,7 @@ $range-input-width: 31px;
 	}
 }
 
-table.preprocessing-test-results {
+.preprocessing-test-results {
 	td {
 		vertical-align: top !important;
 	}
