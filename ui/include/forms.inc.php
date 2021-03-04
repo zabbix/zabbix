@@ -1656,6 +1656,57 @@ function getCopyElementsFormData($elements_field, $title = null) {
 	return $data;
 }
 
+function getTriggerMassupdateFormData() {
+	$data = [
+		'visible' => getRequest('visible', []),
+		'dependencies' => getRequest('dependencies', []),
+		'tags' => getRequest('tags', []),
+		'mass_update_tags' => getRequest('mass_update_tags', ZBX_ACTION_ADD),
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
+		'massupdate' => getRequest('massupdate', 1),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'g_triggerid' => getRequest('g_triggerid', []),
+		'priority' => getRequest('priority', 0),
+		'hostid' => getRequest('hostid', 0),
+		'context' => getRequest('context')
+	];
+
+	if ($data['dependencies']) {
+		$dependencyTriggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description', 'flags'],
+			'selectHosts' => ['hostid', 'name'],
+			'triggerids' => $data['dependencies'],
+			'preservekeys' => true
+		]);
+
+		if ($data['parent_discoveryid']) {
+			$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
+				'output' => ['triggerid', 'description', 'flags'],
+				'selectHosts' => ['hostid', 'name'],
+				'triggerids' => $data['dependencies'],
+				'preservekeys' => true
+			]);
+			$data['dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
+		}
+		else {
+			$data['dependencies'] = $dependencyTriggers;
+		}
+	}
+
+	foreach ($data['dependencies'] as &$dependency) {
+		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+	}
+	unset($dependency);
+
+	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
+
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+
+	return $data;
+}
+
 /**
  * Generate data for the trigger configuration form.
  *
