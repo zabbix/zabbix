@@ -65,7 +65,7 @@ class C20ImportConverter extends CConverter {
 			$data['zabbix_export']['triggers'] = $this->convertTriggers($data['zabbix_export']['triggers']);
 		}
 		if (array_key_exists('screens', $data['zabbix_export'])) {
-			$data['zabbix_export']['screens'] = $this->convertScreens($data['zabbix_export']['screens']);
+			unset($data['zabbix_export']['screens']);
 		}
 		if (array_key_exists('maps', $data['zabbix_export'])) {
 			$data['zabbix_export']['maps'] = $this->convertMaps($data['zabbix_export']['maps']);

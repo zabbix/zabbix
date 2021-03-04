@@ -1629,34 +1629,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 					]]
 				]]
 			]],
-			'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
-				'screen' =>					['type' => XML_ARRAY, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'hsize' =>					['type' => XML_STRING | XML_REQUIRED],
-					'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
-					'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
-						'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
-							'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'style' =>					['type' => XML_STRING | XML_REQUIRED],
-							'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array']],
-							'width' =>					['type' => XML_STRING | XML_REQUIRED],
-							'height' =>					['type' => XML_STRING | XML_REQUIRED],
-							'x' =>						['type' => XML_STRING | XML_REQUIRED],
-							'y' =>						['type' => XML_STRING | XML_REQUIRED],
-							'colspan' =>				['type' => XML_STRING | XML_REQUIRED],
-							'rowspan' =>				['type' => XML_STRING | XML_REQUIRED],
-							'elements' =>				['type' => XML_STRING | XML_REQUIRED],
-							'valign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'halign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
-							'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
-							'url' =>					['type' => XML_STRING | XML_REQUIRED],
-							'application' =>			['type' => XML_STRING | XML_REQUIRED],
-							'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]]
-				]]
-			]],
 			'images' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'image', 'rules' => [
 				'image' =>					['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
