@@ -1545,10 +1545,6 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	time_sync = 0;
 	time_flush_sessions = time_stat;
 
-#undef ZBX_SYNC_INTERVAL
-#define ZBX_SYNC_INTERVAL 1
-	zabbix_log(LOG_LEVEL_DEBUG, "wake to sync: kill -SIGALRM %d", getpid());
-
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
 	while (ZBX_IS_RUNNING())
