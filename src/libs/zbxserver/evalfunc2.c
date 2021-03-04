@@ -2107,7 +2107,7 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 
 	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
