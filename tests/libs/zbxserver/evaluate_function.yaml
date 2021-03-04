@@ -1127,5 +1127,28 @@ in:
 out:
   return: SUCCEED
   value: 3600
+---
+test case: Evaluate timeleft(5m,65,test) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,65'
+out:
+  return: FAIL
+  value: 3600
 ...
 
