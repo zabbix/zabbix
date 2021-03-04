@@ -8709,7 +8709,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'send_time' => [
+			'start_time' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
