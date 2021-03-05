@@ -36,12 +36,7 @@ if ($data['is_resource_available']) {
 		)
 		->toString();
 
-	$output['scripts'] = $this->readJsFile('monitoring.widget.graph.view.js.php');
-	$output['scripts_data'] = [
-		'graph_url' => $data['widget']['graph_url'],
-		'time_control_data' => $data['widget']['time_control_data'],
-		'flickerfreescreen_data' => $data['widget']['flickerfreescreen_data']
-	];
+	$output['async_data'] = $data['widget'];
 }
 else {
 	$output['body'] = (new CTableInfo())

@@ -20,40 +20,114 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/forms.inc.php';
-require_once dirname(__FILE__).'/include/actions.inc.php';
-require_once dirname(__FILE__).'/include/triggers.inc.php';
 
-$ids = API::Dashboard()->get([
-	'output' => API_OUTPUT_EXTEND,
-	'preservekeys' => true,
+$page['scripts'] = ['class.widget.js', 'class.graph.widget.js', 'flickerfreescreen.js', 'gtlc.js'];
+
+require_once dirname(__FILE__).'/include/page_header.php';
+
+$dashboards = API::Dashboard()->get([
+	'output' => ['dashboardid'],
+	'sortfield' => 'name',
+	'limit' => 1
 ]);
-$r = API::Dashboard()->delete(array_keys($ids));
-$m = CMessageHelper::getMessages();
+
+$dashboardid = $dashboards[0]['dashboardid'];
+
+$widget = (new CWidget())
+	->setTitle('TESTING')
+	->setWebLayoutMode(ZBX_LAYOUT_NORMAL)
+	->addItem(
+		(new CFilter(new CUrl()))
+			->setProfile('web.dashbrd.filter', $dashboardid)
+			->setActiveTab(1)
+			->addTimeSelector('now-1h', 'now', true)
+	);
+
+$widget->show();
+
+$dashboards = API::Dashboard()->get([
+	'output' => ['dashboardid', 'name', 'userid', 'display_period', 'auto_start'],
+	'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
+	'dashboardids' => [$dashboardid],
+	'preservekeys' => true
+]);
+
+CDashboardHelper::updateEditableFlag($dashboards);
+
+$dashboard = array_shift($dashboards);
+$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
+
+$widget = $dashboard['pages'][0]['widgets'][0];
+$widget += [
+	'dashboard_data' => [
+		'templateid' => null,
+		'dashboardid' => $dashboardid,
+		'dynamic_hostid' => null,
+	],
+	'defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD)[$widget['type']],
+	'uniqueid' => 'UNIQ123',
+	'cell_width' => 100/24,
+	'cell_height' => 70,
+	'is_editable' => true,
+	'index' => 0
+];
 
 
 
-$pages = [];
-for ($i = 1; $i < 10; $i++) {
-	$pages[] = [
-		'name' => 'Verza Page '.$i,
-		'widgets' => [
-			[
-				'type' => 'clock',
-				'width' => 4,
-				'height' => 3,
-				'x' => $i * 2 - 2,
-			]
-		],
-	];
+?>
+
+<main>
+	<div>
+		<button onclick="w.activate();">Activate</button>
+		<button onclick="w.deactivate();">Deactivate</button>
+	</div>
+
+	<div id="test_stand" style="position: relative; padding: 50px; height: 500px;"></div>
+</main>
+
+
+<script>
+
+let time_selector = {
+	profileIdx: 'web.dashbrd.filter',
+	profileIdx2: '<?= $dashboardid ?>',
+	from: 'now-1h',
+	to: 'now',
+	from_ts: <?= strtotime('now-1h') ?>,
+	to_ts: <?= strtotime('now') ?>
+};
+
+jQuery.subscribe('timeselector.rangeupdate', (e, data) => {
+	time_selector = {
+		...time_selector,
+		from: data.from,
+		to: data.to,
+		from_ts: data.from_ts,
+		to_ts: data.to_ts
+	};
+});
+
+if (!ZABBIX) {
+	ZABBIX = {};
 }
+if (!ZABBIX.Dashboard) {
+	ZABBIX.Dashboard = {};
+}
+ZABBIX.Dashboard.getTimeSelector = () => {
+	return time_selector;
+};
 
-$r = API::Dashboard()->create([
-	[
-		'name' => 'Big Ben 123',
-		'auto_start' => 0,
-		'display_period' => 1800,
-		'pages' => $pages,
-	]
-]);
-var_dump(($m = CMessageHelper::getMessages()) ? $m : $r);
+// =====================================================================================================================
+
+var w = new CGraphWidget(<?= json_encode($widget); ?>);
+
+w.start();
+document.getElementById('test_stand').appendChild(w.getView());
+
+window.addEventListener('resize', () => w.resize());
+
+</script>
+
+<?php
+
+require_once dirname(__FILE__).'/include/page_footer.php';

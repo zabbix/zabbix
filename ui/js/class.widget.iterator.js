@@ -18,6 +18,8 @@
 **/
 
 
+
+
 const WIDGET_ITERATOR_EVENT_PREVIOUS_PAGE_CLICK = 'iterator-previous-page-click';
 const WIDGET_ITERATOR_EVENT_NEXT_PAGE_CLICK     = 'iterator-next-page-click';
 
@@ -204,7 +206,7 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 	updateReady() {
 		let is_ready_updated = false;
 
-		if (!this.children.length) {
+		if (this.children.length == 0) {
 			// Set empty iterator to ready state.
 
 			is_ready_updated = !this._is_ready;

@@ -17,6 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+const ZBX_WIDGET_VIEW_MODE_NORMAL = 0;
+const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
+
 const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
 const WIDGET_EVENT_ENTER = 'enter';
 const WIDGET_EVENT_LEAVE = 'leave';
@@ -114,6 +117,10 @@ class CWidget extends CBaseComponent {
 		}
 		this._state = WIDGET_STATE_INACTIVE;
 
+		this._doStart();
+	}
+
+	_doStart() {
 		this._makeView();
 
 		if (this._pos !== null) {
@@ -127,8 +134,12 @@ class CWidget extends CBaseComponent {
 		}
 		this._state = WIDGET_STATE_ACTIVE;
 
+		this._doActivate();
+	}
+
+	_doActivate() {
 		this._registerEvents();
-		this.startUpdating();
+		this._startUpdating();
 	}
 
 	deactivate() {
@@ -137,8 +148,12 @@ class CWidget extends CBaseComponent {
 		}
 		this._state = WIDGET_STATE_INACTIVE;
 
+		this._doDeactivate();
+	}
+
+	_doDeactivate() {
 		this._unregisterEvents();
-		this.stopUpdating();
+		this._stopUpdating();
 	}
 
 	destroy() {
@@ -149,14 +164,19 @@ class CWidget extends CBaseComponent {
 			throw new Error('Incorrect state change.');
 		}
 		this._state = WIDGET_STATE_DESTROYED;
+
+		this._doDestroy();
+	}
+
+	_doDestroy() {
 	}
 
 	getState() {
 		return this._state;
 	}
 
-	startUpdating(delay_sec = 0) {
-		this.stopUpdating(false);
+	_startUpdating(delay_sec = 0) {
+		this._stopUpdating(false);
 
 		if (delay_sec > 0) {
 			this._update_timeout = setTimeout(() => {
@@ -176,7 +196,7 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	stopUpdating(do_abort = true) {
+	_stopUpdating(do_abort = true) {
 		if (this._update_timeout !== null) {
 			clearTimeout(this._update_timeout);
 			this._update_timeout = null;
@@ -190,6 +210,14 @@ class CWidget extends CBaseComponent {
 		if (do_abort && this._update_abort_controller !== null) {
 			this._update_abort_controller.abort();
 		}
+	}
+
+	pauseUpdating() {
+		this._is_updating_paused = true;
+	}
+
+	resumeUpdating() {
+		this._is_updating_paused = false;
 	}
 
 	_update() {
@@ -224,7 +252,6 @@ class CWidget extends CBaseComponent {
 
 				this.fire(WIDGET_EVENT_AFTER_UPDATE);
 			});
-
 	}
 
 	_promiseUpdate() {
@@ -234,38 +261,60 @@ class CWidget extends CBaseComponent {
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(this._getUpdateRequestData()),
+			body: this._getUpdateFormData(),
 			signal: this._update_abort_controller.signal
 		})
 			.then((response) => response.json())
 			.then((response) => this._processUpdateResponse(response));
 	}
 
-	_getUpdateRequestData() {
-		return {
-			templateid: this._dashboard_data.templateid !== null ? this._dashboard_data.templateid : undefined,
-			dashboardid: this._dashboard_data.dashboardid !== null ? this._dashboard_data.dashboardid : undefined,
-			dynamic_hostid: this._dashboard_data.dynamic_hostid !== null
-				? this._dashboard_data.dynamic_hostid
-				: undefined,
-			widgetid: (this._widgetid !== null) ? this._widgetid : undefined,
-			uniqueid: this._uniqueid,
-			name: (this._header !== '') ? this._header : undefined,
-			fields: (Object.keys(this._fields).length != 0) ? JSON.stringify(this._fields) : undefined,
-			view_mode: this._view_mode,
-			edit_mode: this._is_edit_mode ? 1 : 0,
-			storage: this._storage,
-			...this._content_size
-		};
+	_getUpdateFormData() {
+		const form_data = new FormData();
+
+		if (this._dashboard_data.templateid !== null) {
+			form_data.append('templateid', this._dashboard_data.templateid);
+		}
+
+		if (this._dashboard_data.dashboardid !== null) {
+			form_data.append('dashboardid', this._dashboard_data.dashboardid);
+		}
+
+		if (this._dashboard_data.dynamic_hostid !== null) {
+			form_data.append('dynamic_hostid', this._dashboard_data.dynamic_hostid);
+		}
+
+		if (this._widgetid !== null) {
+			form_data.append('widgetid', this._widgetid);
+		}
+
+		form_data.append('uniqueid', this._uniqueid);
+
+		if (this._header !== '') {
+			form_data.append('name', this._header);
+		}
+
+		if (Object.keys(this._fields).length > 0) {
+			form_data.append('fields', JSON.stringify(this._fields));
+		}
+
+		form_data.append('view_mode', this._view_mode);
+		form_data.append('edit_mode', this._is_edit_mode ? 1 : 0);
+
+		Object.keys(this._storage).forEach((key) => form_data.append(`storage[${key}]`, this._storage[key]));
+		Object.keys(this._content_size).forEach((key) => form_data.append(key, this._content_size[key]));
+
+		return form_data;
 	}
 
 	_processUpdateResponse(response) {
-
-
-
+		this._setContents({
+			header: response.header,
+			aria_label: response.aria_label,
+			body: response.body,
+			messages: response.messages,
+			info: response.info,
+			debug: response.debug
+		});
 	}
 
 	_getContentSize() {
@@ -275,14 +324,6 @@ class CWidget extends CBaseComponent {
 		};
 	}
 
-	ready() {
-		this._is_ready = true;
-	}
-
-	isReady() {
-		return this._is_ready;
-	}
-
 	resize() {
 	}
 
@@ -290,8 +331,17 @@ class CWidget extends CBaseComponent {
 		this._is_edit_mode = true;
 	}
 
+	isEditMode() {
+		return this._is_edit_mode;
+	}
+
 	storeValue(key, value) {
-		this._storage[key] = value;
+		if (value !== undefined) {
+			this._storage[key] = value;
+		}
+		else {
+			delete this._storage[key];
+		}
 	}
 
 	/**
@@ -335,7 +385,18 @@ class CWidget extends CBaseComponent {
 			.prop('disabled', true);
 	}
 
-	setContents({body, messages, info, debug}) {
+	_setContents({header, aria_label, body, messages, info, debug}) {
+		const $content_header_h4 = this._$content_header.find('h4');
+
+		$content_header_h4.text(header);
+
+		if (aria_label !== undefined && aria_label !== '') {
+			$content_header_h4.attr('aria-label', aria_label);
+		}
+		else {
+			$content_header_h4.removeAttr('aria-label');
+		}
+
 		this._$content_body.empty();
 
 		if (messages !== undefined) {
@@ -348,14 +409,14 @@ class CWidget extends CBaseComponent {
 			this._$content_body.append(debug);
 		}
 
-		this.removeInfoButtons();
+		this._removeInfoButtons();
 
 		if (info !== undefined) {
-			this.addInfoButtons(info);
+			this._addInfoButtons(info);
 		}
 	}
 
-	addInfoButtons(buttons) {
+	_addInfoButtons(buttons) {
 		let html_buttons = [];
 
 		for (const button of buttons) {
@@ -381,7 +442,7 @@ class CWidget extends CBaseComponent {
 		this._$actions.prepend(html_buttons);
 	}
 
-	removeInfoButtons() {
+	_removeInfoButtons() {
 		this._$actions.find('.widget-info-button').remove();
 	}
 
@@ -445,7 +506,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	getView() {
-		return this._$target;
+		return this._target;
 	}
 
 	_makeView() {

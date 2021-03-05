@@ -18,9 +18,6 @@
 **/
 
 
-const ZBX_WIDGET_VIEW_MODE_NORMAL        = 0;
-const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
-
 const DASHBOARD_PAGE_EVENT_EDIT            = 'dashboard-page-edit';
 const DASHBOARD_PAGE_EVENT_RESIZE          = 'dashboard-page-resize';
 const DASHBOARD_PAGE_EVENT_ADD_WIDGET      = 'dashboard-page-add-widget';
