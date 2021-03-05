@@ -20,8 +20,8 @@
 const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
 const WIDGET_EVENT_ENTER = 'enter';
 const WIDGET_EVENT_LEAVE = 'leave';
-const WIDGET_EVENT_BEFORE_UPDATE = 'update-start';
-const WIDGET_EVENT_AFTER_UPDATE = 'update-end';
+const WIDGET_EVENT_BEFORE_UPDATE = 'before-update';
+const WIDGET_EVENT_AFTER_UPDATE = 'after-update';
 
 const WIDGET_STATE_INITIAL = 'initial';
 const WIDGET_STATE_ACTIVE = 'active';
