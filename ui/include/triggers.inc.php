@@ -580,7 +580,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 
 /**
  * Purpose: Replaces host in trigger expression.
- * {localhost:agent.ping.nodata(5m)}  =>  {localhost6:agent.ping.nodata(5m)}
+ * nodata(/localhost/agent.ping, 5m)  =>  nodata(/localhost6/agent.ping, 5m)
  *
  * @param string $expression	full expression with host names and item keys
  * @param string $src_host
@@ -588,48 +588,20 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
  *
  * @return string
  */
-function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
-	$new_expression = '';
-
-	$function_macro_parser = new CFunctionMacroParser();
-	$user_macro_parser = new CUserMacroParser();
-	$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
-	$lld_macro_parser = new CLLDMacroParser();
-	$lld_macro_function_parser = new CLLDMacroFunctionParser();
-
-	for ($pos = 0, $pos_left = 0; isset($expression[$pos]); $pos++) {
-		if ($function_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
-			$host = $function_macro_parser->getHost();
-			$item = $function_macro_parser->getItem();
-			$function = $function_macro_parser->getFunction();
-
-			if ($host === $src_host) {
-				$host = $dst_host;
+function triggerExpressionReplaceHost(string $expression, string $src_host, string $dst_host): string {
+	$trigger_expression_parser = new CTriggerExpression();
+	if (($result = $trigger_expression_parser->parse($expression)) !== false) {
+		$queries = $result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_QUERY]);
+		for ($i = count($queries)-1; $i >= 0; $i--) {
+			if ($queries[$i]->host === $src_host) {
+				$expression = substr_replace($expression, '/'.$dst_host.'/'.$queries[$i]->item, $queries[$i]->pos,
+					$queries[$i]->length
+				);
 			}
-
-			$new_expression .= substr($expression, $pos_left, $pos - $pos_left);
-			$new_expression .= '{'.$host.':'.$item.'.'.$function.'}';
-			$pos_left = $pos + $function_macro_parser->getLength();
-
-			$pos += $function_macro_parser->getLength() - 1;
-		}
-		elseif ($user_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
-			$pos += $user_macro_parser->getLength() - 1;
-		}
-		elseif ($macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
-			$pos += $macro_parser->getLength() - 1;
-		}
-		elseif ($lld_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
-			$pos += $lld_macro_parser->getLength() - 1;
-		}
-		elseif ($lld_macro_function_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
-			$pos += $lld_macro_function_parser->getLength() - 1;
 		}
 	}
 
-	$new_expression .= substr($expression, $pos_left, $pos - $pos_left);
-
-	return $new_expression;
+	return $expression;
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
