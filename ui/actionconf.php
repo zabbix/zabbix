@@ -89,7 +89,7 @@ CDashboardHelper::updateEditableFlag($dashboards);
 $dashboard = array_shift($dashboards);
 $dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
 
-$widget = $dashboard['pages'][0]['widgets'][1];
+$widget = $dashboard['pages'][0]['widgets'][0];
 $widget += [
 	'dashboard_data' => [
 		'templateid' => null,
@@ -125,7 +125,7 @@ let time_selector = {
 	profileIdx2: '<?= $dashboardid ?>',
 	from: 'now-1h',
 	to: 'now',
-	from_ts: <?= strtotime('now-1h') ?>,
+	from_ts: <?= strtotime('now-1hour') ?>,
 	to_ts: <?= strtotime('now') ?>
 };
 
