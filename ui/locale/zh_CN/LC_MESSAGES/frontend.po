@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-26 19:54+0200\n"
+"POT-Creation-Date: 2021-03-05 19:54+0200\n"
 "PO-Revision-Date: 2017-10-11 11:47+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2133,7 +2133,7 @@ msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[0] "无法删除主机因为维护 \"%1$s\" 必须包含至少一个主机或一个主机群组。无法删除所选主机因为维护 \"%1$s\" 必须包含至少一个主机或一个主机群组。"
 
-#: include/classes/api/services/CHostGroup.php:1542
+#: include/classes/api/services/CHostGroup.php:1543
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2866,7 +2866,7 @@ msgstr "无法对图片\"%1$s\"更新\"图片类型\"."
 msgid "Cannot update a discovered graph."
 msgstr "无法更新一个被自动发现的数据图"
 
-#: include/classes/api/services/CHostGroup.php:842
+#: include/classes/api/services/CHostGroup.php:843
 msgid "Cannot update a discovered host group."
 msgstr "无法更新一个被自动发现的主机组."
 
@@ -2930,9 +2930,9 @@ msgstr "无法更新数据图模板"
 msgid "Cannot update group"
 msgstr "无法更新群组"
 
-#: include/classes/api/services/CHostGroup.php:1048
-#: include/classes/api/services/CHostGroup.php:1152
-#: include/classes/api/services/CHostGroup.php:1288
+#: include/classes/api/services/CHostGroup.php:1049
+#: include/classes/api/services/CHostGroup.php:1153
+#: include/classes/api/services/CHostGroup.php:1289
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "对于被自动发现的主机\"%1$s\"无法更新其主机组"
@@ -6533,7 +6533,7 @@ msgstr "字段 \"%1$s\"不能被设置为空"
 #: include/classes/api/services/CDRule.php:325
 #: include/classes/api/services/CDRule.php:528
 #: include/classes/api/services/CDRule.php:538
-#: include/classes/api/services/CHostGroup.php:959
+#: include/classes/api/services/CHostGroup.php:960
 #: include/classes/api/services/CHost.php:951
 #: include/classes/api/services/CTemplate.php:882
 #: include/classes/validators/CNewValidator.php:262
@@ -7200,12 +7200,12 @@ msgstr "网格"
 msgid "Group"
 msgstr "群组"
 
-#: include/classes/api/services/CHostGroup.php:765
+#: include/classes/api/services/CHostGroup.php:766
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "组\"%1$s\" 不可以被删除，因为它正在被主机模板使用"
 
-#: include/classes/api/services/CHostGroup.php:809
+#: include/classes/api/services/CHostGroup.php:810
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "\"%1$s\" 组因为他的关联条件无法删除。"
@@ -7550,7 +7550,7 @@ msgstr[0] "主机"
 msgid "Host \"%1$s\" already exists."
 msgstr "主机 \"%1$s\" 已存在."
 
-#: include/classes/api/services/CHostGroup.php:1505
+#: include/classes/api/services/CHostGroup.php:1506
 #: include/classes/api/services/CHost.php:1017
 #: include/classes/api/services/CHost.php:1954
 #: include/classes/api/services/CHost.php:2149
@@ -7632,17 +7632,17 @@ msgstr[0] "主机已启用"
 msgid "Host group"
 msgstr "主机群组"
 
-#: include/classes/api/services/CHostGroup.php:693
+#: include/classes/api/services/CHostGroup.php:694
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "主机群组 \"%1$s\" 已存在."
 
-#: include/classes/api/services/CHostGroup.php:794
+#: include/classes/api/services/CHostGroup.php:795
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "主机群组“%1$s”不能被删除，因为它被用于全局脚本"
 
-#: include/classes/api/services/CHostGroup.php:751
+#: include/classes/api/services/CHostGroup.php:752
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "主机群组 \"%1$s\" 为内建的且不能被删除"
@@ -12486,13 +12486,13 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:718
 #: include/classes/api/services/CHostBase.php:56
 #: include/classes/api/services/CHostGeneral.php:66
-#: include/classes/api/services/CHostGroup.php:746
-#: include/classes/api/services/CHostGroup.php:850
-#: include/classes/api/services/CHostGroup.php:1089
-#: include/classes/api/services/CHostGroup.php:1120
-#: include/classes/api/services/CHostGroup.php:1221
-#: include/classes/api/services/CHostGroup.php:1343
-#: include/classes/api/services/CHostGroup.php:1363
+#: include/classes/api/services/CHostGroup.php:747
+#: include/classes/api/services/CHostGroup.php:851
+#: include/classes/api/services/CHostGroup.php:1090
+#: include/classes/api/services/CHostGroup.php:1121
+#: include/classes/api/services/CHostGroup.php:1222
+#: include/classes/api/services/CHostGroup.php:1344
+#: include/classes/api/services/CHostGroup.php:1364
 #: include/classes/api/services/CHostInterface.php:301
 #: include/classes/api/services/CHostInterface.php:321
 #: include/classes/api/services/CHostInterface.php:595
@@ -13084,7 +13084,7 @@ msgstr "一次"
 msgid "One"
 msgstr "壹"
 
-#: include/classes/api/services/CHostGroup.php:1231
+#: include/classes/api/services/CHostGroup.php:1232
 msgid "One of the objects is left without a host group."
 msgstr "其中的一个对象被留下没有主机组."
 
@@ -13097,7 +13097,7 @@ msgstr "一次性"
 msgid "One-time downtime"
 msgstr "单次停机"
 
-#: include/classes/api/services/CHostGroup.php:705
+#: include/classes/api/services/CHostGroup.php:706
 msgid "Only Super Admins can create host groups."
 msgstr "只有超级管理员可以创建主机群组."
 
@@ -17023,7 +17023,7 @@ msgstr "模板"
 msgid "Template \"%1$s\" already exists."
 msgstr "模板 \"%1$s\" 已存在."
 
-#: include/classes/api/services/CHostGroup.php:1510
+#: include/classes/api/services/CHostGroup.php:1511
 #: include/classes/api/services/CTemplate.php:384
 #: include/classes/api/services/CTemplate.php:1086
 #, c-format
