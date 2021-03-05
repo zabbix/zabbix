@@ -21,8 +21,6 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -30,6 +28,9 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  * Base class for "Test item" function tests.
  */
 class testItemTest extends CWebTest {
+
+	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
+	const TEMPLATE_ID = 99137;	//'Test Item Template'
 
 	use MacrosTrait;
 	use PreprocessingTrait;
@@ -124,15 +125,12 @@ class testItemTest extends CWebTest {
 					$enabled = false;
 				}
 				else {
-					$enabled = (!in_array($type, ['Zabbix agent (active)','SNMP trap', 'Zabbix trapper','Dependent item']));
+					$enabled = (!in_array($type, ['Zabbix agent (active)', 'SNMP trap', 'Zabbix trapper', 'Dependent item']));
 				}
 
 				$this->checkTestButtonInPreprocessing($item_type, $enabled, $i);
 
-				/*
-				 * Check "Execute now" button only in host case item saved form
-				 * and then change type.
-				 */
+				// Check "Execute now" button only in host case item saved form and then change type.
 				if ($i === 0) {
 					if ($check_now) {
 						$execute_button = $this->query('id:check_now')->waitUntilVisible()->one();
@@ -594,7 +592,7 @@ class testItemTest extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertEquals('Test item', $dialog->getTitle());
-				$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one()->waitUntilReady();
+				$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
 				// Check "Get value from host" checkbox.
 				$get_host_value = $test_form->getField('Get value from host');
 				$this->assertTrue($get_host_value->isEnabled());
@@ -688,24 +686,28 @@ class testItemTest extends CWebTest {
 				// Click Get value button.
 				$button = $test_form->query('button:Get value')->one();
 				$button->click();
-				$this->checkServerMessage($details);
+				$this->assertMessage(TEST_BAD, null, $details);
+				$test_form->getOverlayMessage()->close();
 
 				// Click Test button in test form.
 				$test_form->submit();
-				$this->checkServerMessage($details);
+				$this->assertMessage(TEST_BAD, null, $details);
+				$test_form->getOverlayMessage()->close();
 
 				// Check empty interface fields.
 				if (in_array($data['fields']['Type'], ['Zabbix agent', 'SNMP agent', 'IPMI agent'])) {
 					$elements['address']->clear();
 					$elements['port']->clear();
 					$button->click();
-					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.',
+					$this->assertMessage(TEST_BAD, null, ['Incorrect value for field "Host address": cannot be empty.',
 							'Incorrect value for field "Port": cannot be empty.']);
+					$test_form->getOverlayMessage()->close();
 				}
 				if ($data['fields']['Type'] === 'Simple check') {
 					$elements['address']->clear();
 					$button->click();
-					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.']);
+					$this->assertMessage(TEST_BAD, null, ['Incorrect value for field "Host address": cannot be empty.']);
+					$test_form->getOverlayMessage()->close();
 				}
 
 				$dialog->query('button:Get value and test')->waitUntilVisible()->one();
@@ -722,10 +724,7 @@ class testItemTest extends CWebTest {
 					$this->assertFalse($dialog->query('button:Get value and test')->one(false)->isValid());
 					$dialog->query('button:Test')->waitUntilVisible()->one();
 
-					/*
-					 * Check that value fields still present after "Get value
-					 * from host" checkbox is unset.
-					 */
+					// Check that value fields still present after "Get value from host" checkbox is unset.
 					$this->checkValueFields($data);
 				}
 
@@ -820,13 +819,6 @@ class testItemTest extends CWebTest {
 		$this->assertTrue($test_form->query('id:prev_time')->one()->isEnabled($checked && $prev_enabled));
 		$this->assertFalse($test_form->query('id:time')->one()->isEnabled());
 		$this->assertTrue($test_form->getField('End of line sequence')->isEnabled());
-	}
-
-	private function checkServerMessage($details) {
-		$test_form = $this->query('id:preprocessing-test-form')->asForm()->one();
-		$message = $test_form->getOverlayMessage();
-		$this->assertMessage(TEST_BAD, null, $details);
-		$message->close();
 	}
 
 	private function checkTestButtonInPreprocessing($item_type, $enabled = true, $i = 0) {
