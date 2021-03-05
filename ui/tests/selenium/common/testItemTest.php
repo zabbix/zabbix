@@ -41,9 +41,7 @@ class testItemTest extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return ['class' => CMessageBehavior::class];
 	}
 
 	/**
@@ -772,8 +770,7 @@ class testItemTest extends CWebTest {
 					$preprocessing_table = $test_form->getField('Preprocessing steps')->asTable();
 
 					foreach ($data['preprocessing'] as $i => $step) {
-						$this->assertEquals(($i+1).': '.$step['type'],
-							$preprocessing_table->getRow($i)->getText());
+						$this->assertEquals(($i+1).': '.$step['type'], $preprocessing_table->getRow($i)->getText());
 					}
 				}
 				break;
@@ -785,10 +782,11 @@ class testItemTest extends CWebTest {
 	}
 
 	/**
-	 * Function for checking presence of fields and their editability
-	 * depending on specific preprocessing steps.
+	 * Function for checking presence of fields and their editability, depending on specific preprocessing steps.
 	 *
-	 * @param array $data data provider
+	 * @param array				$data data		provider
+	 * @param CCheckboxElement	$not_supported	"Not supported" checkbox
+	 * @param boolean			$lld			true if lld, false if item or prototype
 	 */
 	private function checkValueFields($data) {
 		$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one()->waitUntilReady();
@@ -821,6 +819,13 @@ class testItemTest extends CWebTest {
 		$this->assertTrue($test_form->getField('End of line sequence')->isEnabled());
 	}
 
+	/**
+	 * Function for checking if Test button is enabled  or disabled.
+	 *
+	 * @param string	$item_type	type of an item: item, prototype or lld rule
+	 * @param boolean	$enabled	status of an element, true is enabled, false if disabled
+	 * @param int		$i			index number of preprocessing step
+	 */
 	private function checkTestButtonInPreprocessing($item_type, $enabled = true, $i = 0) {
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$test_button = $this->query('id:test_item')->waitUntilVisible()->one();
