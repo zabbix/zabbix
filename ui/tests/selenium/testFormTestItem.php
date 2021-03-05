@@ -27,9 +27,6 @@ require_once dirname(__FILE__).'/common/testItemTest.php';
  */
 class testFormTestItem extends testItemTest{
 
-	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
-	const TEMPLATE_ID = 99137;	//'Test Item Template'
-
 	/**
 	 * Check Test item Button enabled/disabled state depending on item type for Host.
 	 *
@@ -44,7 +41,7 @@ class testFormTestItem extends testItemTest{
 	 * Check Test item Button enabled/disabled state depending on item type for Template.
 	 */
 	public function testFormTestItem_CheckButtonStateTemplate() {
-		$this->checkTestButtonState($this->getItemTestButtonStateData(),'Item for Test Button check', 'Item',
+		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item for Test Button check', 'Item',
 				' added', false, false, self::TEMPLATE_ID, 'items');
 	}
 
