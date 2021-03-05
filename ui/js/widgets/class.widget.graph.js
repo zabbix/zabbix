@@ -49,11 +49,7 @@ class CWidgetGraph extends CWidget {
 			const image = document.getElementById('graph_' + this._uniqueid);
 
 			if (image.src === '') {
-				image.addEventListener('load', () => {
-					if (this.getState() === WIDGET_STATE_ACTIVE) {
-						this.resize();
-					}
-				}, {once: true});
+				image.addEventListener('load', () => this.resize(), {once: true});
 
 				return;
 			}
@@ -63,12 +59,12 @@ class CWidgetGraph extends CWidget {
 			timeControl.objectList['graph_' + this._uniqueid].objDims.width = graph_size.width;
 			timeControl.objectList['graph_' + this._uniqueid].objDims.graphHeight = graph_size.height;
 
-			const image_url = new Curl(image.src, false);
+			const image_curl = new Curl(image.src, false);
 
-			image_url.setArgument('width', graph_size.width);
-			image_url.setArgument('height', graph_size.height);
-			image_url.setArgument('_', (new Date).getTime().toString(34));
-			image.src = image_url.getUrl();
+			image_curl.setArgument('width', graph_size.width);
+			image_curl.setArgument('height', graph_size.height);
+			image_curl.setArgument('_', (new Date).getTime().toString(34));
+			image.src = image_curl.getUrl();
 		}
 	}
 
@@ -164,17 +160,11 @@ class CWidgetGraph extends CWidget {
 
 	_getGraphSize() {
 		const content = this._$content_body[0];
-		const content_style = getComputedStyle(content);
-		const graph_width = Math.floor(content.clientWidth - parseFloat(content_style.paddingLeft)
-			- parseFloat(content_style.paddingRight)
-		);
-		const graph_height = Math.floor(content.clientHeight - parseFloat(content_style.paddingTop)
-			- parseFloat(content_style.paddingBottom)
-		);
+		const style = getComputedStyle(content);
 
 		return {
-			width: graph_width,
-			height: graph_height
+			width: Math.floor(content.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)),
+			height: Math.floor(content.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
 		};
 	}
 }

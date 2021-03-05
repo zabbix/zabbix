@@ -21,7 +21,40 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['scripts'] = ['class.widget.js', 'class.graph.widget.js', 'flickerfreescreen.js', 'gtlc.js'];
+$page['scripts'] = [
+	'flickerfreescreen.js',
+	'gtlc.js',
+	'class.dashboard.js',
+	'class.dashboard.loader.js',
+	'class.dashboard.page.js',
+//	'class.dashboard.widget.iterator.js',
+	'class.dashboard.widget.placeholder.js',
+	'class.widget.js',
+	'class.widget.clock.js',
+	'class.widget.graph.js',
+	'class.widget.map.js',
+	'class.widget.navtree.js',
+	'class.widget.problems.js',
+	'class.widget.problemsbysv.js',
+	'class.widget.svggraph.js',
+	'class.widget.trigerover.js',
+	'class.calendar.js',
+	'multiselect.js',
+	'layout.mode.js',
+	'class.coverride.js',
+	'class.cverticalaccordion.js',
+	'class.crangecontrol.js',
+	'colorpicker.js',
+	'class.csvggraph.js',
+	'csvggraphwidget.js',
+	'class.cclock.js',
+	'class.cnavtree.js',
+	'class.mapWidget.js',
+	'class.svg.canvas.js',
+	'class.svg.map.js',
+	'class.tab-indicators.js',
+	'class.sortable.js',
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -119,7 +152,7 @@ ZABBIX.Dashboard.getTimeSelector = () => {
 
 // =====================================================================================================================
 
-var w = new CGraphWidget(<?= json_encode($widget); ?>);
+var w = new CWidgetGraph(<?= json_encode($widget); ?>);
 
 w.start();
 document.getElementById('test_stand').appendChild(w.getView());
