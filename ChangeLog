@@ -1,8 +1,11 @@
 Changes for 5.4.0beta2
 
 New features:
+.........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 
 Bug fixes:
+A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+........S. [ZBX-19071] fixed server crash after "Check for not supported value" preprocessing step (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.0beta1
