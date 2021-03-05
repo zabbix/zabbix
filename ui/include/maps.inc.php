@@ -1455,8 +1455,8 @@ function checkIfProblemTagsMatches(array $filter_tag, array $tags): bool {
 		case TAG_OPERATOR_NOT_LIKE:
 			$tags_count = count($tags);
 			$tags = array_filter($tags, function ($tag) use ($filter_tag) {
-				return ($filter_tag['tag'] === $tag['tag']
-					&& mb_stripos($tag['value'], $filter_tag['value']) === false
+				return !($filter_tag['tag'] === $tag['tag']
+					&& mb_stripos($tag['value'], $filter_tag['value']) !== false
 				);
 			});
 			return (count($tags) == $tags_count);
@@ -1464,7 +1464,7 @@ function checkIfProblemTagsMatches(array $filter_tag, array $tags): bool {
 		case TAG_OPERATOR_NOT_EQUAL:
 			$tags_count = count($tags);
 			$tags = array_filter($tags, function ($tag) use ($filter_tag) {
-				return ($filter_tag['tag'] === $tag['tag'] && $filter_tag['value'] === $tag['value']);
+				return !($filter_tag['tag'] === $tag['tag'] && $filter_tag['value'] === $tag['value']);
 			});
 			return (count($tags) == $tags_count);
 
