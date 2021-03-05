@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * Base class for Tags function tests.
+ * Base class for API tokens page function tests.
  */
 class testPageApiTokens extends CWebTest {
 
