@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 19:53+0200\n"
+"POT-Creation-Date: 2021-03-05 19:53+0200\n"
 "PO-Revision-Date: 2021-01-26 02:34+0300\n"
 "Last-Translator: Imagunet <soporte@imagunet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2039,7 +2039,7 @@ msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must con
 msgstr[0] "No es posible eliminar el equipo porque el mantenimiento \"%1$s\" debe contener al menos un equipo o grupo de equipos."
 msgstr[1] "No es posible eliminar los equipos seleccionados porque el mantenimiento \"%1$s\" debe contener al menos un equipo o grupo de equipos."
 
-#: include/classes/api/services/CHostGroup.php:1532
+#: include/classes/api/services/CHostGroup.php:1533
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2788,7 +2788,7 @@ msgstr "No es posible actualizar el \"templateid\" de la plantilla de pantalla \
 msgid "Cannot update a discovered graph."
 msgstr "No es posible actualizar una gráfico descubierta."
 
-#: include/classes/api/services/CHostGroup.php:832
+#: include/classes/api/services/CHostGroup.php:833
 msgid "Cannot update a discovered host group."
 msgstr "No es posible actualizar un grupo de equipos descubierto."
 
@@ -2857,9 +2857,9 @@ msgstr "No es posible actualizar el prototipo de gráfico"
 msgid "Cannot update group"
 msgstr "No es posible actualizar el grupo"
 
-#: include/classes/api/services/CHostGroup.php:1038
-#: include/classes/api/services/CHostGroup.php:1142
-#: include/classes/api/services/CHostGroup.php:1278
+#: include/classes/api/services/CHostGroup.php:1039
+#: include/classes/api/services/CHostGroup.php:1143
+#: include/classes/api/services/CHostGroup.php:1279
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "No es posible actualizar los grupos del equipo descubierto \"%1$s\"."
@@ -6335,7 +6335,7 @@ msgstr "El campo \"%1$s\" no puede estar vacío."
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
-#: include/classes/api/services/CHostGroup.php:949
+#: include/classes/api/services/CHostGroup.php:950
 #: include/classes/api/services/CHost.php:961
 #: include/classes/api/services/CTemplate.php:893
 #: include/classes/validators/CNewValidator.php:262
@@ -6986,12 +6986,12 @@ msgstr "Cuadrícula"
 msgid "Group"
 msgstr "Grupo"
 
-#: include/classes/api/services/CHostGroup.php:755
+#: include/classes/api/services/CHostGroup.php:756
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "El grupo \"%1$s\" no puede ser eliminado porque está siendo usado por un prototipo de equipo."
 
-#: include/classes/api/services/CHostGroup.php:799
+#: include/classes/api/services/CHostGroup.php:800
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "El grupo \"%1$s\" no puede ser eliminado, porque está siendo usado en una condición de correlación."
@@ -7333,7 +7333,7 @@ msgstr[1] "Equipos"
 msgid "Host \"%1$s\" already exists."
 msgstr "El equipo \"%1$s\" ya existe."
 
-#: include/classes/api/services/CHostGroup.php:1495
+#: include/classes/api/services/CHostGroup.php:1496
 #: include/classes/api/services/CHost.php:1027
 #: include/classes/api/services/CHost.php:1959
 #: include/classes/api/services/CHost.php:2153
@@ -7418,17 +7418,17 @@ msgstr[1] "Equipos habilitados"
 msgid "Host group"
 msgstr "Grupo del equipo"
 
-#: include/classes/api/services/CHostGroup.php:683
+#: include/classes/api/services/CHostGroup.php:684
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Ya existe el grupo de equipos \"%1$s\"."
 
-#: include/classes/api/services/CHostGroup.php:784
+#: include/classes/api/services/CHostGroup.php:785
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "El grupo de equipos \"%1$s\" no puede ser eliminado, porque está siendo usado en un script global."
 
-#: include/classes/api/services/CHostGroup.php:741
+#: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "El grupo de equipos \"%1$s\" es interno y no puede ser eliminado."
@@ -12211,13 +12211,13 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:718
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
-#: include/classes/api/services/CHostGroup.php:736
-#: include/classes/api/services/CHostGroup.php:840
-#: include/classes/api/services/CHostGroup.php:1079
-#: include/classes/api/services/CHostGroup.php:1110
-#: include/classes/api/services/CHostGroup.php:1211
-#: include/classes/api/services/CHostGroup.php:1333
-#: include/classes/api/services/CHostGroup.php:1353
+#: include/classes/api/services/CHostGroup.php:737
+#: include/classes/api/services/CHostGroup.php:841
+#: include/classes/api/services/CHostGroup.php:1080
+#: include/classes/api/services/CHostGroup.php:1111
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1334
+#: include/classes/api/services/CHostGroup.php:1354
 #: include/classes/api/services/CHostInterface.php:291
 #: include/classes/api/services/CHostInterface.php:311
 #: include/classes/api/services/CHostInterface.php:585
@@ -12801,7 +12801,7 @@ msgstr "Una vez"
 msgid "One"
 msgstr "Uno"
 
-#: include/classes/api/services/CHostGroup.php:1221
+#: include/classes/api/services/CHostGroup.php:1222
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -12814,7 +12814,7 @@ msgstr ""
 msgid "One-time downtime"
 msgstr "Una vez inoperativo"
 
-#: include/classes/api/services/CHostGroup.php:695
+#: include/classes/api/services/CHostGroup.php:696
 msgid "Only Super Admins can create host groups."
 msgstr ""
 
@@ -16609,7 +16609,7 @@ msgstr "Plantilla"
 msgid "Template \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:1500
+#: include/classes/api/services/CHostGroup.php:1501
 #: include/classes/api/services/CTemplate.php:391
 #: include/classes/api/services/CTemplate.php:1097
 #, c-format

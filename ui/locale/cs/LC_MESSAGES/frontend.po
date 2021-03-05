@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 19:53+0200\n"
+"POT-Creation-Date: 2021-03-05 19:53+0200\n"
 "PO-Revision-Date: 2019-05-06 14:01+0300\n"
 "Last-Translator: martinds <kotyk@datasys.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2071,7 +2071,7 @@ msgstr[0] "Nelze odstranit hosta, protože údržba \"%1$s\" musí obsahovat min
 msgstr[1] "Nelze odstranit vybrané hosty, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta nebo skupinu hostů."
 msgstr[2] "Nelze odstranit vybrané hosty, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta nebo skupinu hostů."
 
-#: include/classes/api/services/CHostGroup.php:1532
+#: include/classes/api/services/CHostGroup.php:1533
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2850,7 +2850,7 @@ msgstr "Není možné aktualizovat \"templateid\" pro šablonu obrazovky \"%1$s\
 msgid "Cannot update a discovered graph."
 msgstr "Není možné aktualizovat objevený graf."
 
-#: include/classes/api/services/CHostGroup.php:832
+#: include/classes/api/services/CHostGroup.php:833
 msgid "Cannot update a discovered host group."
 msgstr "Není možné aktualizovat objevenou skupinu hostů."
 
@@ -2920,9 +2920,9 @@ msgstr "Není možné aktualizovat prototyp grafu"
 msgid "Cannot update group"
 msgstr "Nelze upravit skupinu"
 
-#: include/classes/api/services/CHostGroup.php:1038
-#: include/classes/api/services/CHostGroup.php:1142
-#: include/classes/api/services/CHostGroup.php:1278
+#: include/classes/api/services/CHostGroup.php:1039
+#: include/classes/api/services/CHostGroup.php:1143
+#: include/classes/api/services/CHostGroup.php:1279
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Není možné aktualizovat skupiny pro objeveného hosta \"%1$s\"."
@@ -6409,7 +6409,7 @@ msgstr "Pole \"%1$s\" nemůže být nastavené na NULL."
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
-#: include/classes/api/services/CHostGroup.php:949
+#: include/classes/api/services/CHostGroup.php:950
 #: include/classes/api/services/CHost.php:961
 #: include/classes/api/services/CTemplate.php:893
 #: include/classes/validators/CNewValidator.php:262
@@ -7061,12 +7061,12 @@ msgstr "Mřížka"
 msgid "Group"
 msgstr "Skupina"
 
-#: include/classes/api/services/CHostGroup.php:755
+#: include/classes/api/services/CHostGroup.php:756
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Skupina \"%1$s\" nemůže být smazána, protože je používána prototypem hosta."
 
-#: include/classes/api/services/CHostGroup.php:799
+#: include/classes/api/services/CHostGroup.php:800
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "Skupina \"%1$s\" nemůže být odstraněna, protože je použita v korelační podmínce."
@@ -7410,7 +7410,7 @@ msgstr[2] "Hostitelé"
 msgid "Host \"%1$s\" already exists."
 msgstr "Host \"%1$s\" již existuje."
 
-#: include/classes/api/services/CHostGroup.php:1495
+#: include/classes/api/services/CHostGroup.php:1496
 #: include/classes/api/services/CHost.php:1027
 #: include/classes/api/services/CHost.php:1959
 #: include/classes/api/services/CHost.php:2153
@@ -7497,17 +7497,17 @@ msgstr[2] "Hosty povoleny"
 msgid "Host group"
 msgstr "Skupina hostitele"
 
-#: include/classes/api/services/CHostGroup.php:683
+#: include/classes/api/services/CHostGroup.php:684
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Skupina hostů \"%1$s\" již existuje."
 
-#: include/classes/api/services/CHostGroup.php:784
+#: include/classes/api/services/CHostGroup.php:785
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Skupinu hostů \"%1$s\" není možné smazat, je použitá v globálním skriptu."
 
-#: include/classes/api/services/CHostGroup.php:741
+#: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Skupina hostů \"%1$s\" je interní a nemůže byt smazána."
@@ -12310,13 +12310,13 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #: include/classes/api/services/CGraphPrototype.php:718
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
-#: include/classes/api/services/CHostGroup.php:736
-#: include/classes/api/services/CHostGroup.php:840
-#: include/classes/api/services/CHostGroup.php:1079
-#: include/classes/api/services/CHostGroup.php:1110
-#: include/classes/api/services/CHostGroup.php:1211
-#: include/classes/api/services/CHostGroup.php:1333
-#: include/classes/api/services/CHostGroup.php:1353
+#: include/classes/api/services/CHostGroup.php:737
+#: include/classes/api/services/CHostGroup.php:841
+#: include/classes/api/services/CHostGroup.php:1080
+#: include/classes/api/services/CHostGroup.php:1111
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1334
+#: include/classes/api/services/CHostGroup.php:1354
 #: include/classes/api/services/CHostInterface.php:291
 #: include/classes/api/services/CHostInterface.php:311
 #: include/classes/api/services/CHostInterface.php:585
@@ -12900,7 +12900,7 @@ msgstr "Jednou"
 msgid "One"
 msgstr "Jedna"
 
-#: include/classes/api/services/CHostGroup.php:1221
+#: include/classes/api/services/CHostGroup.php:1222
 msgid "One of the objects is left without a host group."
 msgstr "Jeden z objektů je bez skupiny hostů."
 
@@ -12913,7 +12913,7 @@ msgstr "Pouze jednou"
 msgid "One-time downtime"
 msgstr "Jednorázový downtime"
 
-#: include/classes/api/services/CHostGroup.php:695
+#: include/classes/api/services/CHostGroup.php:696
 msgid "Only Super Admins can create host groups."
 msgstr "Jen super administrátoři mohou vytvořit skupiny."
 
@@ -16712,7 +16712,7 @@ msgstr "Šablona"
 msgid "Template \"%1$s\" already exists."
 msgstr "Šablona \"%1$s\" již existuje."
 
-#: include/classes/api/services/CHostGroup.php:1500
+#: include/classes/api/services/CHostGroup.php:1501
 #: include/classes/api/services/CTemplate.php:391
 #: include/classes/api/services/CTemplate.php:1097
 #, c-format

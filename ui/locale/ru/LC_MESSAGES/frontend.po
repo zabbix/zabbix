@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 19:53+0200\n"
+"POT-Creation-Date: 2021-03-05 19:53+0200\n"
 "PO-Revision-Date: 2021-02-18 23:23+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2071,7 +2071,7 @@ msgstr[0] "Не удалось удалить узел сети так как о
 msgstr[1] "Не удалось удалить выбранные узлы сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 msgstr[2] "Не удалось удалить выбранные узлы сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 
-#: include/classes/api/services/CHostGroup.php:1532
+#: include/classes/api/services/CHostGroup.php:1533
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2850,7 +2850,7 @@ msgstr "Не удалось обновить \"templateid\" для шаблон�
 msgid "Cannot update a discovered graph."
 msgstr "Невозможно обновить обнаруженный график."
 
-#: include/classes/api/services/CHostGroup.php:832
+#: include/classes/api/services/CHostGroup.php:833
 msgid "Cannot update a discovered host group."
 msgstr "Невозможно обновить обнаруженную группу узлов сети."
 
@@ -2920,9 +2920,9 @@ msgstr "Не удалось обновить прототип графиков"
 msgid "Cannot update group"
 msgstr "Не удалось обновить группу"
 
-#: include/classes/api/services/CHostGroup.php:1038
-#: include/classes/api/services/CHostGroup.php:1142
-#: include/classes/api/services/CHostGroup.php:1278
+#: include/classes/api/services/CHostGroup.php:1039
+#: include/classes/api/services/CHostGroup.php:1143
+#: include/classes/api/services/CHostGroup.php:1279
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не удалось обновить группы для обнаруженного узла сети \"%1$s\"."
@@ -6420,7 +6420,7 @@ msgstr "Поле \"%1$s\" не может быть NULL."
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
-#: include/classes/api/services/CHostGroup.php:949
+#: include/classes/api/services/CHostGroup.php:950
 #: include/classes/api/services/CHost.php:961
 #: include/classes/api/services/CTemplate.php:893
 #: include/classes/validators/CNewValidator.php:262
@@ -7072,12 +7072,12 @@ msgstr "Сетка"
 msgid "Group"
 msgstr "Группа"
 
-#: include/classes/api/services/CHostGroup.php:755
+#: include/classes/api/services/CHostGroup.php:756
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Группа \"%1$s\" не может быть удалена, так как используется прототипом узлов сети."
 
-#: include/classes/api/services/CHostGroup.php:799
+#: include/classes/api/services/CHostGroup.php:800
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как она используется в условии корреляции."
@@ -7421,7 +7421,7 @@ msgstr[2] "Узлы сети"
 msgid "Host \"%1$s\" already exists."
 msgstr "Узел сети \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHostGroup.php:1495
+#: include/classes/api/services/CHostGroup.php:1496
 #: include/classes/api/services/CHost.php:1027
 #: include/classes/api/services/CHost.php:1959
 #: include/classes/api/services/CHost.php:2153
@@ -7508,17 +7508,17 @@ msgstr[2] "Узлы сети активированы"
 msgid "Host group"
 msgstr "Группа узлов сети"
 
-#: include/classes/api/services/CHostGroup.php:683
+#: include/classes/api/services/CHostGroup.php:684
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Группа узлов сети \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHostGroup.php:784
+#: include/classes/api/services/CHostGroup.php:785
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как используется в глобальном скрипте."
 
-#: include/classes/api/services/CHostGroup.php:741
+#: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Группа узлов сети \"%1$s\" является внутренней и не может быть удалена."
@@ -12321,13 +12321,13 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CGraphPrototype.php:718
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
-#: include/classes/api/services/CHostGroup.php:736
-#: include/classes/api/services/CHostGroup.php:840
-#: include/classes/api/services/CHostGroup.php:1079
-#: include/classes/api/services/CHostGroup.php:1110
-#: include/classes/api/services/CHostGroup.php:1211
-#: include/classes/api/services/CHostGroup.php:1333
-#: include/classes/api/services/CHostGroup.php:1353
+#: include/classes/api/services/CHostGroup.php:737
+#: include/classes/api/services/CHostGroup.php:841
+#: include/classes/api/services/CHostGroup.php:1080
+#: include/classes/api/services/CHostGroup.php:1111
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1334
+#: include/classes/api/services/CHostGroup.php:1354
 #: include/classes/api/services/CHostInterface.php:291
 #: include/classes/api/services/CHostInterface.php:311
 #: include/classes/api/services/CHostInterface.php:585
@@ -12911,7 +12911,7 @@ msgstr "Один раз"
 msgid "One"
 msgstr "Одна"
 
-#: include/classes/api/services/CHostGroup.php:1221
+#: include/classes/api/services/CHostGroup.php:1222
 msgid "One of the objects is left without a host group."
 msgstr "Один из объектов остался без группы узлов сети."
 
@@ -12924,7 +12924,7 @@ msgstr "Единовременно"
 msgid "One-time downtime"
 msgstr "Однократная недоступность"
 
-#: include/classes/api/services/CHostGroup.php:695
+#: include/classes/api/services/CHostGroup.php:696
 msgid "Only Super Admins can create host groups."
 msgstr "Только Супер Администраторы могут создавать группы узлов сети."
 
@@ -16723,7 +16723,7 @@ msgstr "Шаблон"
 msgid "Template \"%1$s\" already exists."
 msgstr "Шаблон \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHostGroup.php:1500
+#: include/classes/api/services/CHostGroup.php:1501
 #: include/classes/api/services/CTemplate.php:391
 #: include/classes/api/services/CTemplate.php:1097
 #, c-format

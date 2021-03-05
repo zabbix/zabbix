@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 19:53+0200\n"
+"POT-Creation-Date: 2021-03-05 19:53+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -2044,7 +2044,7 @@ msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must con
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/api/services/CHostGroup.php:1532
+#: include/classes/api/services/CHostGroup.php:1533
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2797,7 +2797,7 @@ msgstr ""
 msgid "Cannot update a discovered graph."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:832
+#: include/classes/api/services/CHostGroup.php:833
 msgid "Cannot update a discovered host group."
 msgstr ""
 
@@ -2866,9 +2866,9 @@ msgstr ""
 msgid "Cannot update group"
 msgstr "Не може да се актуализира групата"
 
-#: include/classes/api/services/CHostGroup.php:1038
-#: include/classes/api/services/CHostGroup.php:1142
-#: include/classes/api/services/CHostGroup.php:1278
+#: include/classes/api/services/CHostGroup.php:1039
+#: include/classes/api/services/CHostGroup.php:1143
+#: include/classes/api/services/CHostGroup.php:1279
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -6350,7 +6350,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
-#: include/classes/api/services/CHostGroup.php:949
+#: include/classes/api/services/CHostGroup.php:950
 #: include/classes/api/services/CHost.php:961
 #: include/classes/api/services/CTemplate.php:893
 #: include/classes/validators/CNewValidator.php:262
@@ -7001,12 +7001,12 @@ msgstr "Решетка"
 msgid "Group"
 msgstr "Група"
 
-#: include/classes/api/services/CHostGroup.php:755
+#: include/classes/api/services/CHostGroup.php:756
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:799
+#: include/classes/api/services/CHostGroup.php:800
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr ""
@@ -7349,7 +7349,7 @@ msgstr[1] "Хост"
 msgid "Host \"%1$s\" already exists."
 msgstr "Хост \"%1$s\" вече съществува."
 
-#: include/classes/api/services/CHostGroup.php:1495
+#: include/classes/api/services/CHostGroup.php:1496
 #: include/classes/api/services/CHost.php:1027
 #: include/classes/api/services/CHost.php:1959
 #: include/classes/api/services/CHost.php:2153
@@ -7434,17 +7434,17 @@ msgstr[1] ""
 msgid "Host group"
 msgstr "Хост група"
 
-#: include/classes/api/services/CHostGroup.php:683
+#: include/classes/api/services/CHostGroup.php:684
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Хост група \"%1$s\" вече съществува."
 
-#: include/classes/api/services/CHostGroup.php:784
+#: include/classes/api/services/CHostGroup.php:785
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:741
+#: include/classes/api/services/CHostGroup.php:742
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr ""
@@ -12235,13 +12235,13 @@ msgstr "Нямате право на достъп до системата."
 #: include/classes/api/services/CGraphPrototype.php:718
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
-#: include/classes/api/services/CHostGroup.php:736
-#: include/classes/api/services/CHostGroup.php:840
-#: include/classes/api/services/CHostGroup.php:1079
-#: include/classes/api/services/CHostGroup.php:1110
-#: include/classes/api/services/CHostGroup.php:1211
-#: include/classes/api/services/CHostGroup.php:1333
-#: include/classes/api/services/CHostGroup.php:1353
+#: include/classes/api/services/CHostGroup.php:737
+#: include/classes/api/services/CHostGroup.php:841
+#: include/classes/api/services/CHostGroup.php:1080
+#: include/classes/api/services/CHostGroup.php:1111
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1334
+#: include/classes/api/services/CHostGroup.php:1354
 #: include/classes/api/services/CHostInterface.php:291
 #: include/classes/api/services/CHostInterface.php:311
 #: include/classes/api/services/CHostInterface.php:585
@@ -12825,7 +12825,7 @@ msgstr "Веднъж"
 msgid "One"
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:1221
+#: include/classes/api/services/CHostGroup.php:1222
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -12838,7 +12838,7 @@ msgstr "Само един път"
 msgid "One-time downtime"
 msgstr "Еднократна недостъпност"
 
-#: include/classes/api/services/CHostGroup.php:695
+#: include/classes/api/services/CHostGroup.php:696
 msgid "Only Super Admins can create host groups."
 msgstr "Само Супер Администраторите могат да създават хост групи."
 
@@ -16634,7 +16634,7 @@ msgstr "Шаблон"
 msgid "Template \"%1$s\" already exists."
 msgstr "Шаблон \"%1$s\" вече съществува."
 
-#: include/classes/api/services/CHostGroup.php:1500
+#: include/classes/api/services/CHostGroup.php:1501
 #: include/classes/api/services/CTemplate.php:391
 #: include/classes/api/services/CTemplate.php:1097
 #, c-format
