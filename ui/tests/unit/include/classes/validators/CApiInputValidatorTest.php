@@ -3207,6 +3207,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
+					'mixed' =>	['type' => API_MIXED]
+				]],
+				[
+					[]
+				],
+				'/',
+				[
+					[]
+				],
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
 					'mixed' =>	['type' => API_MIXED, 'flags' => API_REQUIRED]
 				]],
 				[
@@ -3231,7 +3243,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 					[],
 				],
 				'/',
-				'Invalid parameter "/": the parameter "mixed" is missing.'
+				'Invalid parameter "/1": the parameter "mixed" is missing.'
 			]
 		];
 	}
