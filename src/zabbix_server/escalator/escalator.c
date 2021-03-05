@@ -385,7 +385,7 @@ out:
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg, const char *subj,
 		const char *msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACKNOWLEDGE *ack, int macro_type, int err_type)
+		const DB_ACKNOWLEDGE *ack, int expand_macros, int macro_type, int err_type)
 {
 	ZBX_USER_MSG	*p, **pnext;
 	char		*subject, *message;
@@ -395,10 +395,13 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	subject = zbx_strdup(NULL, subj);
 	message = zbx_strdup(NULL, msg);
 
-	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
-			&subject, macro_type, NULL, 0);
-	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
-			&message, macro_type, NULL, 0);
+	if (MACRO_EXPAND_YES == expand_macros)
+	{
+		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, &subject,
+				macro_type, NULL, 0);
+		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, &message,
+				macro_type, NULL, 0);
+	}
 
 	if (0 == mediatypeid)
 	{
@@ -452,7 +455,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACKNOWLEDGE *ack, int macro_t, unsigned char evt_src, unsigned char op_mode)
+		const DB_ACKNOWLEDGE *ack, int macro_type, unsigned char evt_src, unsigned char op_mode)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -474,7 +477,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 		if (atoi(row[1]) != 1)
 		{
 			add_user_msg(userid, mediatypeid, user_msg, row[2], row[3], actionid, event, r_event, ack,
-					macro_t, ZBX_ALERT_MESSAGE_ERR_NONE);
+					MACRO_EXPAND_YES, macro_type, ZBX_ALERT_MESSAGE_ERR_NONE);
 			goto out;
 		}
 
@@ -515,18 +518,18 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 		if (0 != mtmid)
 		{
 			add_user_msg(userid, mediatypeid, user_msg, row[1], row[2], actionid, event, r_event, ack,
-					macro_t, ZBX_ALERT_MESSAGE_ERR_NONE);
+					MACRO_EXPAND_YES, macro_type, ZBX_ALERT_MESSAGE_ERR_NONE);
 		}
 		else
 		{
-			add_user_msg(userid, mediatypeid, user_msg, "", "", actionid, event, r_event, ack, macro_t,
-					ZBX_ALERT_MESSAGE_ERR_MSG);
+			add_user_msg(userid, mediatypeid, user_msg, "", "", actionid, event, r_event, ack,
+					MACRO_EXPAND_NO, 0, ZBX_ALERT_MESSAGE_ERR_MSG);
 		}
 	}
 
 	if (0 == mediatypeid)
 	{
-		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, macro_t,
+		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, MACRO_EXPAND_NO, 0,
 				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG);
 	}
 
@@ -755,7 +758,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 				row[3]);
 
 		add_user_msg(userid, mediatypeid, user_msg, row[2], message_dyn, actionid, event, NULL, NULL,
-				MACRO_TYPE_MESSAGE_NORMAL, ZBX_ALERT_MESSAGE_ERR_NONE);
+				MACRO_EXPAND_NO, 0, ZBX_ALERT_MESSAGE_ERR_NONE);
 
 		zbx_free(message_dyn);
 	}
