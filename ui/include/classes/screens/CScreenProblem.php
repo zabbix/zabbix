@@ -160,7 +160,7 @@ class CScreenProblem extends CScreenBase {
 			? $filter['triggerids']
 			: null;
 
-		if (array_key_exists('exclude_groupids', $filter)) {
+		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
 
 			if ($filter_hostids === null) {
