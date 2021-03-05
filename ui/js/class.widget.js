@@ -128,7 +128,7 @@ class CWidget extends CBaseComponent {
 		this._state = WIDGET_STATE_ACTIVE;
 
 		this._registerEvents();
-		this._update();
+		this.startUpdating();
 	}
 
 	deactivate() {
@@ -138,7 +138,7 @@ class CWidget extends CBaseComponent {
 		this._state = WIDGET_STATE_INACTIVE;
 
 		this._unregisterEvents();
-		this._clearScheduledUpdate();
+		this.stopUpdating();
 	}
 
 	destroy() {
@@ -149,24 +149,14 @@ class CWidget extends CBaseComponent {
 			throw new Error('Incorrect state change.');
 		}
 		this._state = WIDGET_STATE_DESTROYED;
-
-		this._stopUpdate();
 	}
 
 	getState() {
 		return this._state;
 	}
 
-	pauseUpdating() {
-		this._is_updating_paused = true;
-	}
-
-	unpauseUpdating() {
-		this._is_updating_paused = false;
-	}
-
-	_startUpdating(delay_sec = 0) {
-		this._stopUpdating(false);
+	startUpdating(delay_sec = 0) {
+		this.stopUpdating(false);
 
 		if (delay_sec > 0) {
 			this._update_timeout = setTimeout(() => {
@@ -186,7 +176,7 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	_stopUpdating(do_abort = true) {
+	stopUpdating(do_abort = true) {
 		if (this._update_timeout !== null) {
 			clearTimeout(this._update_timeout);
 			this._update_timeout = null;
@@ -273,6 +263,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	_processUpdateResponse(response) {
+
 
 
 	}
