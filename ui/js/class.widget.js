@@ -20,14 +20,13 @@
 const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
 const WIDGET_EVENT_ENTER = 'enter';
 const WIDGET_EVENT_LEAVE = 'leave';
-const WIDGET_EVENT_UPDATE_START = 'update-start';
-const WIDGET_EVENT_UPDATE_END = 'update-end';
+const WIDGET_EVENT_BEFORE_UPDATE = 'update-start';
+const WIDGET_EVENT_AFTER_UPDATE = 'update-end';
 
-const WIDGET_STATE_NEW = 'new';
-const WIDGET_STATE_STARTED = 'started';
-const WIDGET_STATE_RESUMED = 'resumed';
-const WIDGET_STATE_PAUSED = 'paused';
-const WIDGET_STATE_STOPPED = 'stopped';
+const WIDGET_STATE_INITIAL = 'initial';
+const WIDGET_STATE_ACTIVE = 'active';
+const WIDGET_STATE_INACTIVE = 'inactive';
+const WIDGET_STATE_DESTROYED = 'destroyed';
 
 class CWidget extends CBaseComponent {
 
@@ -76,10 +75,10 @@ class CWidget extends CBaseComponent {
 		this._is_new = is_new;
 		this._pos = pos;
 
-		this._create();
+		this._init();
 	}
 
-	_create() {
+	_init() {
 		this._css_classes = {
 			actions: 'dashbrd-grid-widget-actions',
 			container: 'dashbrd-grid-widget-container',
@@ -91,13 +90,14 @@ class CWidget extends CBaseComponent {
 			root: 'dashbrd-grid-widget'
 		};
 
-		this._state = WIDGET_STATE_NEW;
+		this._state = WIDGET_STATE_INITIAL;
 
 		this._content_size = {};
 
-		this._is_updating_paused = false;
-		this._update_abort_controller = null;
 		this._update_timeout = null;
+		this._update_interval = null;
+		this._update_abort_controller = null;
+		this._is_updating_paused = false;
 		this._update_retry_sec = 3;
 
 		this._is_ready = false;
@@ -109,10 +109,10 @@ class CWidget extends CBaseComponent {
 	}
 
 	start() {
-		if (this._state !== WIDGET_STATE_NEW) {
-			throw new Error('Wrong state.');
+		if (this._state !== WIDGET_STATE_INITIAL) {
+			throw new Error('Incorrect state change.');
 		}
-		this._state = WIDGET_STATE_STARTED;
+		this._state = WIDGET_STATE_INACTIVE;
 
 		this._makeView();
 
@@ -121,31 +121,34 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	resume() {
-		if (this._state !== WIDGET_STATE_NEW && this._state !== WIDGET_STATE_PAUSED) {
-			throw new Error('Wrong state.');
+	activate() {
+		if (this._state !== WIDGET_STATE_INACTIVE) {
+			throw new Error('Incorrect state change.');
 		}
-		this._state = WIDGET_STATE_RESUMED;
+		this._state = WIDGET_STATE_ACTIVE;
 
 		this._registerEvents();
 		this._update();
 	}
 
-	pause() {
-		if (this._state !== WIDGET_STATE_RESUMED) {
-			throw new Error('Wrong state.');
+	deactivate() {
+		if (this._state !== WIDGET_STATE_ACTIVE) {
+			throw new Error('Incorrect state change.');
 		}
-		this._state = WIDGET_STATE_PAUSED;
+		this._state = WIDGET_STATE_INACTIVE;
 
 		this._unregisterEvents();
 		this._clearScheduledUpdate();
 	}
 
-	stop() {
-		if (this._state !== WIDGET_STATE_PAUSED) {
-			throw new Error('Wrong state.');
+	destroy() {
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this.deactivate();
 		}
-		this._state = WIDGET_STATE_STOPPED;
+		if (this._state !== WIDGET_STATE_INACTIVE) {
+			throw new Error('Incorrect state change.');
+		}
+		this._state = WIDGET_STATE_DESTROYED;
 
 		this._stopUpdate();
 	}
@@ -154,33 +157,62 @@ class CWidget extends CBaseComponent {
 		return this._state;
 	}
 
+	pauseUpdating() {
+		this._is_updating_paused = true;
+	}
+
+	unpauseUpdating() {
+		this._is_updating_paused = false;
+	}
+
+	_startUpdating(delay_sec = 0) {
+		this._stopUpdating(false);
+
+		if (delay_sec > 0) {
+			this._update_timeout = setTimeout(() => {
+				this._update_timeout = null;
+				this._startUpdating();
+			}, delay_sec * 1000);
+		}
+		else {
+			if (this._rf_rate > 0) {
+				this._update_interval = setInterval(() => {
+					this._update_interval = null;
+					this._update();
+				}, this._rf_rate * 1000);
+			}
+
+			this._update();
+		}
+	}
+
+	_stopUpdating(do_abort = true) {
+		if (this._update_timeout !== null) {
+			clearTimeout(this._update_timeout);
+			this._update_timeout = null;
+		}
+
+		if (this._update_interval !== null) {
+			clearInterval(this._update_interval);
+			this._update_interval = null;
+		}
+
+		if (do_abort && this._update_abort_controller !== null) {
+			this._update_abort_controller.abort();
+		}
+	}
+
 	_update() {
-		this._clearScheduledUpdate();
-
-		if (this._update_abort_controller !== null) {
-			// Waiting for another AJAX request to either complete or fail.
-			return;
-		}
-
-		if (this._is_updating_paused) {
-			// Re-schedule update as soon as the widget gets unpaused.
-			this._scheduleUpdate(1);
+		if (this._update_abort_controller !== null || this._is_updating_paused
+				|| this._$content_body.find('[data-expanded="true"]').length > 0) {
+			this._startUpdating(1);
 
 			return;
 		}
 
-		const is_expanded = this._$content_body.find('[data-expanded="true"]');
+		this.fire(WIDGET_EVENT_BEFORE_UPDATE);
 
-		if (is_expanded) {
-			// Re-schedule update as soon as the expanded items are removed.
-			this._scheduleUpdate(1);
-
-			return;
-		}
-
-		this.fire(WIDGET_EVENT_UPDATE_START);
-
-		// The content size might be included in the request data.
+		// Save the content size upon updating.
 		this._content_size = this._getContentSize();
 
 		this._update_abort_controller = new AbortController();
@@ -194,22 +226,23 @@ class CWidget extends CBaseComponent {
 					this._hidePreloader();
 				}
 				else {
-					this._scheduleUpdate(this._update_retry_sec);
+					this._startUpdating(this._update_retry_sec);
 				}
 			})
 			.finally(() => {
 				this._update_abort_controller = null;
 
-				this.fire(WIDGET_EVENT_UPDATE_END);
+				this.fire(WIDGET_EVENT_AFTER_UPDATE);
 			});
+
 	}
 
 	_promiseUpdate() {
-		const url = new Curl('zabbix.php');
+		const curl = new Curl('zabbix.php');
 
-		url.setArgument('action', `widget.${this._type}.view`);
+		curl.setArgument('action', `widget.${this._type}.view`);
 
-		return fetch(url.getUrl(), {
+		return fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -219,52 +252,6 @@ class CWidget extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => this._processUpdateResponse(response));
-	}
-
-	_processUpdateResponse(response) {
-
-	}
-
-	_pauseUpdate() {
-		this._is_updating_paused = true;
-	}
-
-	_unpauseUpdate() {
-		this._is_updating_paused = false;
-	}
-
-	_stopUpdate() {
-		this._clearScheduledUpdate();
-
-		if (this._update_abort_controller !== null) {
-			this._update_abort_controller.abort();
-		}
-	}
-
-	_scheduleUpdate(rf_rate = null) {
-		this._clearScheduledUpdate();
-
-		if (this._update_abort_controller !== null) {
-			// Waiting for another AJAX request to either complete or fail.
-			return;
-		}
-
-		if (rf_rate === null) {
-			rf_rate = this._rf_rate;
-		}
-
-		if (rf_rate > 0) {
-			this._update_timeout = setTimeout(() => this._update(), rf_rate * 1000);
-		}
-	}
-
-	_clearScheduledUpdate() {
-		if (this._update_timeout !== null) {
-			clearTimeout(this._update_timeout);
-			this._update_timeout = null;
-		}
-
-		return this;
 	}
 
 	_getUpdateRequestData() {
@@ -283,6 +270,11 @@ class CWidget extends CBaseComponent {
 			storage: this._storage,
 			...this._content_size
 		};
+	}
+
+	_processUpdateResponse(response) {
+
+
 	}
 
 	_getContentSize() {
@@ -315,7 +307,7 @@ class CWidget extends CBaseComponent {
 	 * Focus specified top-level widget.
 	 */
 	enter() {
-		this._$view.addClass(this._css_classes.focus);
+		this._$target.addClass(this._css_classes.focus);
 	}
 
 	/**
@@ -326,12 +318,12 @@ class CWidget extends CBaseComponent {
 			document.activeElement.blur();
 		}
 
-		this._$view.removeClass(this._css_classes.focus);
+		this._$target.removeClass(this._css_classes.focus);
 	}
 
 	setViewMode(view_mode) {
 		this._view_mode = view_mode;
-		this._$view.toggleClass(this._css_classes.hidden_header, this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
+		this._$target.toggleClass(this._css_classes.hidden_header, this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
 	}
 
 	/**
@@ -403,7 +395,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	setPosition(pos) {
-		this._$view.css({
+		this._$target.css({
 			left: `${this._cell_width * pos.x}%`,
 			top: `${this._cell_height * pos.y}px`,
 			width: `${this._cell_width * pos.width}%`,
@@ -417,7 +409,7 @@ class CWidget extends CBaseComponent {
 			this._preloader_timeout = null;
 		}
 
-		this._$view
+		this._$target
 			.find(`.${this._css_classes.content}`)
 			.addClass('is-loading');
 	}
@@ -428,18 +420,18 @@ class CWidget extends CBaseComponent {
 			this._preloader_timeout = null;
 		}
 
-		this._$view
+		this._$target
 			.find(`.${this._css_classes.content}`)
 			.removeClass('is-loading');
 	}
 
-	_schedulePreloader(timeout = this._preloader_timeout_sec * 1000) {
+	_schedulePreloader(delay_sec = this._preloader_timeout_sec * 1000) {
 		if (this._preloader_timeout !== null) {
 			return;
 		}
 
 		const is_showing_preloader =
-			this._$view
+			this._$target
 				.find(`.${this._css_classes.content}`)
 				.hasClass('is-loading');
 
@@ -450,7 +442,7 @@ class CWidget extends CBaseComponent {
 		this._preloader_timeout = setTimeout(() => {
 			this._preloader_timeout = null;
 			this._showPreloader();
-		}, timeout);
+		}, delay_sec);
 	}
 
 	getIndex() {
@@ -462,11 +454,11 @@ class CWidget extends CBaseComponent {
 	}
 
 	getView() {
-		return this._$view;
+		return this._$target;
 	}
 
 	_makeView() {
-		this._$view = $(this._target);
+		this._$target = $(this._target);
 
 		this._$content_header =
 			$('<div>', {'class': this._css_classes.head})
@@ -539,14 +531,14 @@ class CWidget extends CBaseComponent {
 		// Used for disabling widget interactivity in edit mode while resizing.
 		this._$mask = $('<div>', {'class': this._css_classes.mask});
 
-		this._$view
+		this._$target
 			.append(this._$container, this._$mask)
 			.addClass(this._css_classes.root)
 			.toggleClass(this._css_classes.hidden_header, this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 			.toggleClass('new-widget', this._is_new);
 
 		if (this._parent === null) {
-			this._$view.css({
+			this._$target.css({
 				minWidth: `${this._cell_width}%`,
 				minHeight: `${this._cell_height}px`
 			});
@@ -591,7 +583,7 @@ class CWidget extends CBaseComponent {
 
 			loadImage: () => {
 				// Call refreshCallback handler for expanded popup menu items.
-				const $menu_popup = this._$view.find('[data-expanded="true"][data-menu-popup]');
+				const $menu_popup = this._$target.find('[data-expanded="true"][data-menu-popup]');
 
 				if ($menu_popup.length) {
 					$menu_popup.menuPopup('refresh', this);
@@ -609,7 +601,7 @@ class CWidget extends CBaseComponent {
 			.on('focusin', this._events.focusin)
 			.on('focusout', this._events.focusout);
 
-		this._$view
+		this._$target
 			.on('mouseenter mousemove', this._events.enter)
 			.on('mouseleave', this._events.leave)
 			.on('load.image', this._events.loadImage);
@@ -626,7 +618,7 @@ class CWidget extends CBaseComponent {
 			.off('focusin', this._events.focusin)
 			.off('focusout', this._events.focusout);
 
-		this._$view
+		this._$target
 			.off('mouseenter mousemove', this._events.enter)
 			.off('mouseleave', this._events.leave)
 			.off('load.image', this._events.loadImage);
