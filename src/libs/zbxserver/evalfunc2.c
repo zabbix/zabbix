@@ -1829,7 +1829,7 @@ static int	evaluate_FORECAST(zbx_variant_t *value, DC_ITEM *item, const char *pa
 		goto out;
 	}
 
-	if (4 <= nparams)
+	if (3 <= nparams)
 	{
 		if (SUCCEED != get_function_parameter_str(parameters, 3, &fit_str) ||
 				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
@@ -1976,13 +1976,13 @@ static int	evaluate_TIMELEFT(zbx_variant_t *value, DC_ITEM *item, const char *pa
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_float( parameters, 2, ZBX_FLAG_DOUBLE_SUFFIX, &threshold))
+	if (SUCCEED != get_function_parameter_float(parameters, 2, ZBX_FLAG_DOUBLE_SUFFIX, &threshold))
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
 	}
 
-	if (4 == nparams)
+	if (3 == nparams)
 	{
 		if (SUCCEED != get_function_parameter_str(parameters, 3, &fit_str) ||
 				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
@@ -2099,13 +2099,19 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (1 != num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
 	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
-	if (SUCCEED != zbx_trends_parse_range(ts->sec, parameters, &start, &end, error))
+	if (SUCCEED != zbx_trends_parse_range(ts->sec, period, &start, &end, error))
 		goto out;
 
 	switch (item->value_type)

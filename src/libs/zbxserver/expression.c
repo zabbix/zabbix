@@ -5080,7 +5080,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 		{
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, NULL, NULL, func->parameter,
-					" item does not exist");
+					"item does not exist");
 			continue;
 		}
 
@@ -5090,7 +5090,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 		{
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, items[i].host.host,
-					items[i].key_orig, func->parameter, " item is disabled");
+					items[i].key_orig, func->parameter, "item is disabled");
 			continue;
 		}
 
@@ -5098,7 +5098,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 		{
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, items[i].host.host,
-					items[i].key_orig, func->parameter, " item belongs to a disabled host");
+					items[i].key_orig, func->parameter, "item belongs to a disabled host");
 			continue;
 		}
 

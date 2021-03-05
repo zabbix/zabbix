@@ -5776,7 +5776,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 	{
 		zbx_trigger_timer_t	timer_local, *timer;
 
-		if (ZBX_FUNCTION_TYPE_TRENDS != atoi(row[1]))
+		if (ZBX_TRIGGER_TIMER_FUNCTION_TREND != atoi(row[1]))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
