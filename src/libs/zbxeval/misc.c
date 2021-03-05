@@ -949,13 +949,13 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 	char	*msg = NULL;
 	size_t	msg_alloc = 0, msg_offset = 0;
 
-	zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "Cannot evaluate function \"%s(/%s/%s",
+	zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "Cannot evaluate function %s(/%s/%s",
 			function, (NULL != host ? host : "?"), (NULL != key ? key : "?"));
 
 	if (NULL != parameter && '\0' != *parameter)
 		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, ",%s", parameter);
 
-	zbx_strcpy_alloc(&msg, &msg_alloc, &msg_offset, ")\"");
+	zbx_chrcpy_alloc(&msg, &msg_alloc, &msg_offset, ')');
 
 	if (NULL != error && '\0' != *error)
 		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, ": %s", error);
