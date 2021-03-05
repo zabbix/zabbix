@@ -98,28 +98,16 @@ class CJsonRpc {
 	}
 
 	public function validate($call) {
-		if (!isset($call['jsonrpc'])) {
-			$this->jsonError($call['id'], '-32600', _('JSON-rpc version is not specified.'), null, true);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'id' =>				['type' => API_ID, 'flags' => API_NOT_EMPTY],
+			'jsonrpc' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => self::VERSION],
+			'method' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'params' =>			['type' => API_MIXED, 'flags' => API_REQUIRED],
+			'auth' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+		]];
 
-			return false;
-		}
-
-		if ($call['jsonrpc'] != self::VERSION) {
-			$this->jsonError($call['id'], '-32600',
-				_s('Expecting JSON-rpc version 2.0, "%1$s" is given.', $call['jsonrpc']), null, true
-			);
-
-			return false;
-		}
-
-		if (!isset($call['method'])) {
-			$this->jsonError($call['id'], '-32600', _('JSON-rpc method is not defined.'));
-
-			return false;
-		}
-
-		if (isset($call['params']) && !is_array($call['params'])) {
-			$this->jsonError($call['id'], '-32602', _('JSON-rpc params is not an Array.'));
+		if (!CApiInputValidator::validate($api_input_rules, $call, '/', $error)) {
+			$this->jsonError($call['id'], '-32600', $error, null, true);
 
 			return false;
 		}

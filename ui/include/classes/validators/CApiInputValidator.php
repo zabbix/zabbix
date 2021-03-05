@@ -174,6 +174,9 @@ class CApiInputValidator {
 
 			case API_TRIGGER_EXPRESSION:
 				return self::validateTriggerExpression($rule, $data, $path, $error);
+
+			case API_MIXED:
+				return self::validateMixed($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -223,6 +226,7 @@ class CApiInputValidator {
 			case API_VARIABLE_NAME:
 			case API_URL:
 			case API_TRIGGER_EXPRESSION:
+			case API_MIXED:
 				return true;
 
 			case API_OBJECT:
@@ -1849,6 +1853,10 @@ class CApiInputValidator {
 			return false;
 		}
 
+		return true;
+	}
+
+	private static function validateMixed($rule, &$data, $path, &$error) {
 		return true;
 	}
 }

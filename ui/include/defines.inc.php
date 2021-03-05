@@ -1340,6 +1340,7 @@ define('API_PSK',					30);
 define('API_SORTORDER',				31);
 define('API_CALC_FORMULA',			32);
 define('API_TRIGGER_EXPRESSION',	33);
+define('API_MIXED',					34);
 
 // flags
 define('API_REQUIRED',					0x0001);
