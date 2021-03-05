@@ -707,15 +707,14 @@ class CControllerPopupTriggerExpr extends CController {
 					// Validate trigger expression.
 					$trigger_expression = new CTriggerExpression();
 
-					if ($trigger_expression->parse($data['expression'])) {
-						$expression_data = reset($trigger_expression->expressions);
-
+					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
 						// Validate trigger function.
 						$trigger_function_validator = new CFunctionValidator();
+						$function_token = $result->getTokens()[0];
 						$is_valid = $trigger_function_validator->validate([
-							'function' => $expression_data['expression'],
-							'functionName' => $expression_data['functionName'],
-							'functionParamList' => $expression_data['functionParamList'],
+							'function' => $function_token->match,
+							'functionName' => $function_token->function,
+							'functionParamList' => $function_token->params_raw['parameters'],
 							'valueType' => $data['itemValueType']
 						]);
 
