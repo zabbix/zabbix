@@ -604,9 +604,9 @@ typedef struct
 	int		elements;
 	int		style;
 	char		*url;
-	int		max_columns;
 	int		sort_triggers;
 	char		*application;
+	int		dynamic;
 }
 zbx_db_screen_item_t;
 
@@ -936,13 +936,27 @@ static void	DBpatch_get_preferred_widget_size(zbx_db_screen_item_t *item, int *w
 	*h = item->height;
 
 	if (SCREEN_RESOURCE_LLD_GRAPH == item->resourcetype || SCREEN_RESOURCE_LLD_SIMPLE_GRAPH == item->resourcetype ||
-			SCREEN_RESOURCE_GRAPH == item->resourcetype || SCREEN_RESOURCE_SIMPLE_GRAPH == item->resourcetype)
+			SCREEN_RESOURCE_GRAPH == item->resourcetype ||
+			SCREEN_RESOURCE_SIMPLE_GRAPH == item->resourcetype)
 	{
 		*h += 215;	/* SCREEN_LEGEND_HEIGHT */
 	}
 
+	if (SCREEN_RESOURCE_PLAIN_TEXT == item->resourcetype || SCREEN_RESOURCE_HOST_INFO == item->resourcetype ||
+			SCREEN_RESOURCE_TRIGGER_INFO == item->resourcetype ||
+			SCREEN_RESOURCE_SERVER_INFO == item->resourcetype ||
+			SCREEN_RESOURCE_ACTIONS == item->resourcetype ||
+			SCREEN_RESOURCE_EVENTS == item->resourcetype ||
+			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS == item->resourcetype ||
+			SCREEN_RESOURCE_SYSTEM_STATUS == item->resourcetype ||
+			SCREEN_RESOURCE_HOST_TRIGGERS== item->resourcetype)
+	{
+		*h = 2 + 2 * MIN(25, item->elements) / 5;
+	}
+	else
+		*h = (int)round((double)*h / 70);				/* WIDGET_ROW_HEIGHT */
+
 	*w = (int)round((double)*w / 1920 * DASHBOARD_MAX_COLS);	/* DISPLAY_WIDTH */
-	*h = (int)round((double)*h / 70);				/* WIDGET_ROW_HEIGHT */
 
 	*w = MIN(DASHBOARD_MAX_COLS, MAX(1, *w));
 	*h = MIN(DASHBOARD_WIDGET_MAX_ROWS, MAX(DASHBOARD_WIDGET_MIN_ROWS, *h));
@@ -959,24 +973,26 @@ static void	DBpatch_get_min_widget_size(zbx_db_screen_item_t *item, int *w, int 
 		case SCREEN_RESOURCE_SIMPLE_GRAPH:
 		case SCREEN_RESOURCE_LLD_GRAPH:
 		case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+		case SCREEN_RESOURCE_MAP:
 			*w = 4; *h = 4;
 			break;
 		case SCREEN_RESOURCE_PLAIN_TEXT:
 		case SCREEN_RESOURCE_URL:
-			*w = 4; *h = 2;
-			break;
-		case SCREEN_RESOURCE_MAP:
 		case SCREEN_RESOURCE_HOST_INFO:
 		case SCREEN_RESOURCE_TRIGGER_INFO:
 		case SCREEN_RESOURCE_SERVER_INFO:
-		case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-		case SCREEN_RESOURCE_DATA_OVERVIEW:
 		case SCREEN_RESOURCE_ACTIONS:
 		case SCREEN_RESOURCE_EVENTS:
 		case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 		case SCREEN_RESOURCE_SYSTEM_STATUS:
 		case SCREEN_RESOURCE_HOST_TRIGGERS:
-			*w = 1; *h = 1;
+			*w = 4; *h = 2;
+			break;
+		case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
+			*w = 4; *h = 7;
+			break;
+		case SCREEN_RESOURCE_DATA_OVERVIEW:
+			*w = 4; *h = 5;
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_WARNING, "%s: unknown resource type %d", __func__, item->resourcetype);
@@ -1451,12 +1467,18 @@ do {							\
 			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_GRAPH_CLASSIC);
 			/* source_type = ZBX_WIDGET_FIELD_RESOURCE_GRAPH (0); don't add because it's default */
 			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_GRAPH, "graphid", (void *)&si->resourceid);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
 			break;
 		case SCREEN_RESOURCE_SIMPLE_GRAPH:
 			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_GRAPH_CLASSIC);
 			tmp = 1;	/* source_type = ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH */
 			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "source_type", (void *)&tmp);
 			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_ITEM, "itemid", (void *)&si->resourceid);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
 			break;
 		case SCREEN_RESOURCE_LLD_GRAPH:
 			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_GRAPH_PROTOTYPE);
@@ -1465,6 +1487,9 @@ do {							\
 			/* add field "columns" because the default value is 2 */
 			tmp = 1;
 			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "columns", (void *)&tmp);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
 			/* don't add field "rows" because 1 is default */
 			break;
 		case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
@@ -1474,6 +1499,9 @@ do {							\
 			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, "itemid", (void *)&si->resourceid);
 			tmp = 1;
 			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "columns", (void *)&tmp);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
 			/* don't add field "rows" because 1 is default */
 			break;
 		case SCREEN_RESOURCE_PLAIN_TEXT:
@@ -1483,10 +1511,16 @@ do {							\
 				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_as_html", (void *)&si->style);
 			if (25 != si->elements)
 				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_lines", (void *)&si->elements);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
 			break;
 		case SCREEN_RESOURCE_URL:
 			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_URL);
 			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_STR, "url", (void *)si->url);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
 			break;
 		case SCREEN_RESOURCE_ACTIONS:
 			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_ACTIONS);
@@ -1892,9 +1926,9 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 		scr_item->elements = atoi(row[10]);
 		scr_item->style = atoi(row[11]);
 		scr_item->url = zbx_strdup(NULL, row[12]);
-		scr_item->max_columns = atoi(row[13]);
-		scr_item->sort_triggers = atoi(row[14]);
-		scr_item->application = zbx_strdup(NULL, row[15]);
+		scr_item->sort_triggers = atoi(row[13]);
+		scr_item->application = zbx_strdup(NULL, row[14]);
+		scr_item->dynamic = atoi(row[15]);
 
 		DBpatch_trace_screen_item(scr_item);
 
@@ -2006,7 +2040,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t userid
 
 	result = DBselect(
 			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
-			",elements,style,url,max_columns,sort_triggers,application from screens_items"
+			",elements,style,url,sort_triggers,application,dynamic from screens_items"
 			" where screenid=" ZBX_FS_UI64, screenid);
 
 	if (NULL == result)
@@ -2124,7 +2158,7 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 
 		result3 = DBselect(
 			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
-			",elements,style,url,max_columns,sort_triggers,application from screens_items"
+			",elements,style,url,sort_triggers,application,dynamic from screens_items"
 			" where screenid=" ZBX_FS_UI64, screenid);
 
 		if (NULL != result3)
