@@ -151,10 +151,14 @@ class CScreenProblem extends CScreenBase {
 	 * @return array
 	 */
 	public static function getData(array $filter, $resolve_comments = false, $resolve_urls = false) {
+		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids']
+			? getSubGroups($filter['groupids'])
+			: null;
+		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
-		$filter_groupids = array_key_exists('groupids', $filter) ? getSubGroups($filter['groupids']) : null;
-		$filter_hostids = array_key_exists('hostids', $filter) ? $filter['hostids'] : null;
-		$filter_triggerids = array_key_exists('triggerids', $filter) ? $filter['triggerids'] : null;
+		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
+			? $filter['triggerids']
+			: null;
 
 		if (array_key_exists('exclude_groupids', $filter)) {
 			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
