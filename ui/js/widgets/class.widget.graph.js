@@ -23,11 +23,11 @@ class CWidgetGraph extends CWidget {
 	_init() {
 		super._init();
 
-		this._is_async = false;
+		this._is_graph_mode = false;
 	}
 
 	_doActivate() {
-		if (this._is_async) {
+		if (this._is_graph_mode) {
 			this._activateGraph();
 		}
 
@@ -35,7 +35,7 @@ class CWidgetGraph extends CWidget {
 	}
 
 	_doDeactivate() {
-		if (this._is_async) {
+		if (this._is_graph_mode) {
 			this._deactivateGraph();
 		}
 
@@ -45,7 +45,7 @@ class CWidgetGraph extends CWidget {
 	resize() {
 		super.resize();
 
-		if (this._is_async && this.getState() === WIDGET_STATE_ACTIVE) {
+		if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
 			const image = document.getElementById('graph_' + this._uniqueid);
 
 			if (image.src === '') {
@@ -71,14 +71,14 @@ class CWidgetGraph extends CWidget {
 	setEditMode() {
 		super.setEditMode();
 
-		if (this._is_async && this._graph_url !== null) {
+		if (this._is_graph_mode && this._graph_url !== null) {
 			this._flickerfreescreen_container.href = 'javascript:void(0)';
 			this._flickerfreescreen_container.setAttribute('role', 'button');
 		}
 	}
 
 	_promiseUpdate() {
-		if (this._is_async) {
+		if (this._is_graph_mode) {
 			timeControl.refreshObject('graph_' + this._uniqueid);
 
 			return Promise.resolve();
@@ -90,15 +90,15 @@ class CWidgetGraph extends CWidget {
 	_processUpdateResponse(response) {
 		super._processUpdateResponse(response);
 
-		if (!this._is_async && response.async_data !== undefined) {
-			this._is_async = true;
+		if (!this._is_graph_mode && response.async_data !== undefined) {
+			this._is_graph_mode = true;
 
 			this._graph_url = response.async_data.graph_url;
 
-			this._flickerfreescreen = this._$content_body[0].firstElementChild;
+			this._flickerfreescreen = this._$content_body[0].querySelector('.flickerfreescreen');
 			this._flickerfreescreen.id = 'flickerfreescreen_graph_' + this._uniqueid;
 
-			this._flickerfreescreen_container = this._flickerfreescreen.firstElementChild;
+			this._flickerfreescreen_container = this._flickerfreescreen.querySelector('.dashbrd-widget-graph-link');
 			this._flickerfreescreen_container.id = 'graph_container_' + this._uniqueid;
 
 			if (this._graph_url !== null && this.isEditMode()) {

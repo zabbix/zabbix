@@ -47,7 +47,6 @@ $page['scripts'] = [
 	'colorpicker.js',
 	'class.csvggraph.js',
 	'csvggraphwidget.js',
-	'class.cclock.js',
 	'class.cnavtree.js',
 	'class.mapWidget.js',
 	'class.svg.canvas.js',
@@ -90,7 +89,7 @@ CDashboardHelper::updateEditableFlag($dashboards);
 $dashboard = array_shift($dashboards);
 $dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
 
-$widget = $dashboard['pages'][0]['widgets'][0];
+$widget = $dashboard['pages'][0]['widgets'][1];
 $widget += [
 	'dashboard_data' => [
 		'templateid' => null,
@@ -152,11 +151,11 @@ ZABBIX.Dashboard.getTimeSelector = () => {
 
 // =====================================================================================================================
 
+//var w = new CWidgetClock(<?= json_encode($widget); ?>);
 var w = new CWidgetGraph(<?= json_encode($widget); ?>);
 
 w.start();
 document.getElementById('test_stand').appendChild(w.getView());
-
 window.addEventListener('resize', () => w.resize());
 
 </script>

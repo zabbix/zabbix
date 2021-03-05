@@ -53,7 +53,6 @@ $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');
 $this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.cclock.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.host.dashboard.view.js.php');

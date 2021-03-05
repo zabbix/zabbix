@@ -97,13 +97,11 @@ class CWidget extends CBaseComponent {
 
 		this._content_size = {};
 
-		this._update_timeout = null;
-		this._update_interval = null;
+		this._update_timeout_id = null;
+		this._update_interval_id = null;
 		this._update_abort_controller = null;
 		this._is_updating_paused = false;
 		this._update_retry_sec = 3;
-
-		this._is_ready = false;
 
 		this._preloader_timeout = null;
 		this._preloader_timeout_sec = 10;
@@ -179,15 +177,14 @@ class CWidget extends CBaseComponent {
 		this._stopUpdating(false);
 
 		if (delay_sec > 0) {
-			this._update_timeout = setTimeout(() => {
-				this._update_timeout = null;
+			this._update_timeout_id = setTimeout(() => {
+				this._update_timeout_id = null;
 				this._startUpdating();
 			}, delay_sec * 1000);
 		}
 		else {
 			if (this._rf_rate > 0) {
-				this._update_interval = setInterval(() => {
-					this._update_interval = null;
+				this._update_interval_id = setInterval(() => {
 					this._update();
 				}, this._rf_rate * 1000);
 			}
@@ -197,14 +194,14 @@ class CWidget extends CBaseComponent {
 	}
 
 	_stopUpdating(do_abort = true) {
-		if (this._update_timeout !== null) {
-			clearTimeout(this._update_timeout);
-			this._update_timeout = null;
+		if (this._update_timeout_id !== null) {
+			clearTimeout(this._update_timeout_id);
+			this._update_timeout_id = null;
 		}
 
-		if (this._update_interval !== null) {
-			clearInterval(this._update_interval);
-			this._update_interval = null;
+		if (this._update_interval_id !== null) {
+			clearInterval(this._update_interval_id);
+			this._update_interval_id = null;
 		}
 
 		if (do_abort && this._update_abort_controller !== null) {
@@ -221,7 +218,8 @@ class CWidget extends CBaseComponent {
 	}
 
 	_update() {
-		if (this._update_abort_controller !== null || this._is_updating_paused
+		if (this._update_abort_controller !== null
+				|| this._is_updating_paused
 				|| this._$content_body.find('[data-expanded="true"]').length > 0) {
 			this._startUpdating(1);
 
@@ -477,7 +475,7 @@ class CWidget extends CBaseComponent {
 			.removeClass('is-loading');
 	}
 
-	_schedulePreloader(delay_sec = this._preloader_timeout_sec * 1000) {
+	_schedulePreloader(delay_sec = this._preloader_timeout_sec) {
 		if (this._preloader_timeout !== null) {
 			return;
 		}
@@ -494,7 +492,7 @@ class CWidget extends CBaseComponent {
 		this._preloader_timeout = setTimeout(() => {
 			this._preloader_timeout = null;
 			this._showPreloader();
-		}, delay_sec);
+		}, delay_sec * 1000);
 	}
 
 	getIndex() {

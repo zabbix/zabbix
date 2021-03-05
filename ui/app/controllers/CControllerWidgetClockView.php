@@ -37,7 +37,6 @@ class CControllerWidgetClockView extends CControllerWidget {
 
 		$time = null;
 		$name = $this->getDefaultHeader();
-		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;
 		$critical_error = null;
@@ -94,7 +93,6 @@ class CControllerWidgetClockView extends CControllerWidget {
 							try {
 								$now = new DateTime($last_value['value']);
 
-								$time_zone_string = _s('GMT%1$s', $now->format('P'));
 								$time_zone_offset = $now->format('Z');
 
 								$time = time() - ($last_value['clock'] - $now->getTimestamp());
@@ -118,7 +116,6 @@ class CControllerWidgetClockView extends CControllerWidget {
 
 				$now = new DateTime();
 				$time = $now->getTimestamp();
-				$time_zone_string = _s('GMT%1$s', $now->format('P'));
 				$time_zone_offset = $now->format('Z');
 				break;
 
@@ -131,7 +128,6 @@ class CControllerWidgetClockView extends CControllerWidget {
 			'name' => $this->getInput('name', $name),
 			'clock' => [
 				'time' => $time,
-				'time_zone_string' => $time_zone_string,
 				'time_zone_offset' => $time_zone_offset,
 				'error' => $error,
 				'critical_error' => $critical_error

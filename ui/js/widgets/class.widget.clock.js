@@ -20,39 +20,61 @@
 
 class CWidgetClock extends CWidget {
 
-	constructor({
-		...config,
-		time,
-		time_zone_string,
-		time_zone_offset
-	}) {
-		super(config);
+	_init() {
+		super._init();
 
-		this._time = time;
-		this._time_zone_string = time_zone_string;
-		this._time_zone_offset = time_zone_offset;
+		this._time = null;
+		this._time_zone_offset = null;
+		this._is_clock_active = false;
+		this._interval_id = null;
 	}
 
-	start() {
-		super.start();
+	_doActivate() {
+		super._doActivate();
 
-	// 	'$("#'.$this->getId().'").zbx_clock('.
-	// 	json_encode([
-	// 		'time' => $this->time,
-	// 		'time_zone_string' => $this->time_zone_string,
-	// 		'time_zone_offset' => $this->time_zone_offset,
-	// 		'clock_id' => $this->getId()
-	// ]).
-	// 	');'.
+		this._startClock();
 	}
 
-	activate() {
-		super.activate();
+	_doDeactivate() {
+		super._doDeactivate();
 
-		this._clock_hands_rotate();
+		this._stopClock();
 	}
 
-	_clock_hands_rotate() {
+	_processUpdateResponse(response) {
+		super._processUpdateResponse(response);
+
+		this._stopClock();
+
+		if (response.clock_data !== undefined) {
+			this._time = response.clock_data.time;
+			this._time_zone_offset = response.clock_data.time_zone_offset;
+			this._is_clock_active = true;
+
+			this._startClock();
+		}
+		else {
+			this._time = null;
+			this._time_zone_offset = null;
+			this._is_clock_active = false;
+		}
+	}
+
+	_startClock() {
+		if (this._is_clock_active) {
+			this._interval_id = setInterval(() => this._clockHandsRotate(), 1000);
+			this._clockHandsRotate();
+		}
+	}
+
+	_stopClock() {
+		if (this._interval_id !== null) {
+			clearTimeout(this._interval_id);
+			this._interval_id = null;
+		}
+	}
+
+	_clockHandsRotate() {
 		const now = new Date();
 
 		let time_offset = 0;
@@ -62,43 +84,21 @@ class CWidgetClock extends CWidget {
 		}
 
 		if (this._time_zone_offset !== null) {
-			time_offset += (- now.getTimezoneOffset() * 60 - this._time_zone_offset) * 1000;
+			time_offset -= (now.getTimezoneOffset() * 60 + this._time_zone_offset) * 1000;
 		}
 
-		if (time_offset != 0) {
-			now.setTime(now.getTime() - time_offset);
-		}
+		now.setTime(now.getTime() - time_offset);
 
 		let h = now.getHours() % 12;
 		let m = now.getMinutes();
 		let s = now.getSeconds();
 
-		this._clock_hand_rotate(this._target.querySelector('.clock-hand-h'), 30 * (h + m / 60 + s / 3600));
-		this._clock_hand_rotate(this._target.querySelector('.clock-hand-m'), 6 * (m + s / 60));
-		this._clock_hand_rotate(this._target.querySelector('.clock-hand-s'), 6 * s);
+		this._clockHandRotate(this._target.querySelector('.clock-hand-h'), 30 * (h + m / 60 + s / 3600));
+		this._clockHandRotate(this._target.querySelector('.clock-hand-m'), 6 * (m + s / 60));
+		this._clockHandRotate(this._target.querySelector('.clock-hand-s'), 6 * s);
 	}
 
-	_clock_hand_rotate(clock_hand, degree) {
+	_clockHandRotate(clock_hand, degree) {
 		clock_hand.setAttribute('transform', `rotate(${degree} 50 50)`);
-	}
-
-	_registerEvents() {
-		super._registerEvents();
-
-		this._events = {
-			...this._events,
-
-			tick: () => {
-				this._clock_hands_rotate();
-			}
-		}
-
-		this._interval_id = setInterval(this._events.tick, 1000);
-	}
-
-	_unregisterEvents() {
-		super._unregisterEvents();
-
-		clearInterval(this._interval_id);
 	}
 }
