@@ -1080,7 +1080,7 @@ class testItemTest extends CWebTest {
 	}
 
 	/**
-	 * Function for checking presence of fields and their editability, depending on specific preprocessing steps.
+	 * Function for checking if Test button is enabled  or disabled.
 	 *
 	 * @param string	$item_type	type of an item: item, prototype or lld rule
 	 * @param boolean	$enabled	status of an element, true is enabled, false if disabled
