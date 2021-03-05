@@ -124,9 +124,8 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
-					'host_prototype_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
+					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
 				]
 			],
 			[
@@ -145,9 +144,8 @@ class testFormTags extends CWebTest {
 							'value' => 'value'
 						]
 					],
-					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
-					'trigger_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.',
-					'host_prototype_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
+					'host_and_template_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.',
 				]
 			],
 			[
@@ -261,9 +259,8 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.',
-					'host_prototype_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
+					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.',
 				]
 			],
 			[
@@ -277,9 +274,8 @@ class testFormTags extends CWebTest {
 							'value' => 'update'
 						]
 					],
-					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
-					'trigger_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.',
-					'host_prototype_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
+					'host_and_template_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.',
 				]
 			],
 			[
@@ -392,39 +388,35 @@ class testFormTags extends CWebTest {
 	 * @param string    $old_hash    db hash before changes
 	 */
 	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
-
-		switch ($object) {
-			case 'host':
-			case 'template':
-				$error_details = CTestArrayHelper::get($data, 'error_details');
-				$success_sql = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
-				break;
-
-			case 'trigger':
-			case 'trigger prototype':
-				$error_details = CTestArrayHelper::get($data, 'trigger_error_details');
-				$success_sql = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name']);
-				break;
-
-			case 'host prototype':
-				$error_details = CTestArrayHelper::get($data, 'host_prototype_error_details');
-				$success_sql = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
-				break;
-
-			case 'item':
-			case 'item prototype':
-				$error_details = CTestArrayHelper::get($data, 'host_prototype_error_details');
-				$success_sql = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($data['name']);
-				break;
-		}
-
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$error_details = ($object === 'host' || $object === 'template')
+					? CTestArrayHelper::get($data, 'host_and_template_error_details')
+					: CTestArrayHelper::get($data, 'error_details');
 			$title = ($action === 'add') ? 'Cannot add '.$object : 'Cannot update '.$object;
+
 			$this->assertMessage(TEST_BAD, $title, $error_details);
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
 		else {
+			switch ($object) {
+				case 'host':
+				case 'template':
+				case 'host prototype':
+					$success_sql = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
+					break;
+
+				case 'trigger':
+				case 'trigger prototype':
+					$success_sql = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name']);
+					break;
+
+				case 'item':
+				case 'item prototype':
+					$success_sql = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($data['name']);
+					break;
+			}
+
 			$title = ($action === 'add') ? ucfirst($object).' added' : ucfirst($object).' updated';
 			$this->assertMessage(TEST_GOOD, $title);
 			$this->assertEquals(1, CDBHelper::getCount($success_sql));
@@ -509,6 +501,8 @@ class testFormTags extends CWebTest {
 
 			case 'trigger prototype':
 			case 'trigger':
+			case 'item prototype':
+			case 'item':
 				$this->assertEquals($new_name, $form->getField('Name')->getValue());
 				break;
 		}
