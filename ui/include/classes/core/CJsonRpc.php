@@ -81,9 +81,7 @@ class CJsonRpc {
 			}
 
 			list($api, $method) = array_merge(explode('.', $call['method']), [null, null]);
-			$result = $this->apiClient->callMethod($api, $method, $call['params'],
-				array_key_exists('auth', $call) ? $call['auth'] : null
-			);
+			$result = $this->apiClient->callMethod($api, $method, $call['params'], $call['auth']);
 
 			$this->processResult($call, $result);
 		}
@@ -97,13 +95,13 @@ class CJsonRpc {
 		return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 	}
 
-	public function validate($call) {
+	public function validate(&$call) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'id' =>				['type' => API_ID, 'flags' => API_NOT_EMPTY],
 			'jsonrpc' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => self::VERSION],
 			'method' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'params' =>			['type' => API_MIXED, 'flags' => API_REQUIRED],
-			'auth' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+			'auth' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $call, '/', $error)) {
@@ -159,14 +157,11 @@ class CJsonRpc {
 			$error['debug'] = $debug;
 		}
 
-
-		$formed_error = [
+		$this->_response[] = [
 			'jsonrpc' => self::VERSION,
 			'error' => $error,
 			'id' => $id
 		];
-
-		$this->_response[] = $formed_error;
 	}
 
 	private function initErrors() {
