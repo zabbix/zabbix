@@ -1,0 +1,2127 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-03-05T15:41:32Z'
+  groups:
+    -
+      name: Templates/SAN
+  templates:
+    -
+      template: 'NetApp AFF A700 by HTTP'
+      name: 'NetApp AFF A700 by HTTP'
+      description: |
+        The template to monitor SAN NetApp AFF A700 cluster by Zabbix HTTP agent.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/SAN
+      applications:
+        -
+          name: General
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Get chassis'
+          type: HTTP_AGENT
+          key: netapp.chassis.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/cluster/chassis?fields=id,state'
+        -
+          name: 'Get cluster'
+          type: HTTP_AGENT
+          key: netapp.cluster.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/cluster'
+        -
+          name: 'Cluster location'
+          type: DEPENDENT
+          key: netapp.cluster.location
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The location of the cluster.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.location
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster name'
+          type: DEPENDENT
+          key: netapp.cluster.name
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The name of the cluster.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.name
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster IOPS, other rate'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.iops.other.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.iops_raw.other
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster IOPS, read rate'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.iops.read.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'The number of I/O operations observed at the storage object. Performance metric for read I/O operations.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.iops_raw.read
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster IOPS, total rate'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.iops.total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.iops_raw.total
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster IOPS, write rate'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.iops.write.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!iops'
+          description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.iops_raw.write
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster IOPS raw, other'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.iops_raw.other
+          delay: '0'
+          history: 7d
+          units: '!iops'
+          description: 'The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.iops_raw.other
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster IOPS raw, read'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.iops_raw.read
+          delay: '0'
+          history: 7d
+          units: '!iops'
+          description: 'The number of I/O operations observed at the storage object. Performance metric for read I/O operations.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.iops_raw.read
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster IOPS raw, total'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.iops_raw.total
+          delay: '0'
+          history: 7d
+          units: '!iops'
+          description: 'The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.iops_raw.total
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster IOPS raw, write'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.iops_raw.write
+          delay: '0'
+          history: 7d
+          units: '!iops'
+          description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.iops_raw.write
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster latency, other'
+          type: CALCULATED
+          key: netapp.cluster.statistics.latency.other
+          history: 7d
+          value_type: FLOAT
+          units: '!ms'
+          params: |
+            (last(netapp.cluster.statistics.latency_raw.other) - prev(netapp.cluster.statistics.latency_raw.other)) /
+            (last(netapp.cluster.statistics.iops_raw.other) - prev(netapp.cluster.statistics.iops_raw.other) +
+            (last(netapp.cluster.statistics.iops_raw.other) - prev(netapp.cluster.statistics.iops_raw.other) = 0) ) * 0.001
+          description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+          applications:
+            -
+              name: General
+        -
+          name: 'Cluster latency, read'
+          type: CALCULATED
+          key: netapp.cluster.statistics.latency.read
+          history: 7d
+          value_type: FLOAT
+          units: '!ms'
+          params: |
+            (last(netapp.cluster.statistics.latency_raw.read) - prev(netapp.cluster.statistics.latency_raw.read)) /
+            ( last(netapp.cluster.statistics.iops_raw.read) - prev(netapp.cluster.statistics.iops_raw.read) +
+            (last(netapp.cluster.statistics.iops_raw.read) - prev(netapp.cluster.statistics.iops_raw.read) = 0) ) * 0.001
+          description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.'
+          applications:
+            -
+              name: General
+        -
+          name: 'Cluster latency, total'
+          type: CALCULATED
+          key: netapp.cluster.statistics.latency.total
+          history: 7d
+          value_type: FLOAT
+          units: '!ms'
+          params: |
+            (last(netapp.cluster.statistics.latency_raw.total) - prev(netapp.cluster.statistics.latency_raw.total)) /
+            ( last(netapp.cluster.statistics.iops_raw.total) - prev(netapp.cluster.statistics.iops_raw.total) +
+            (last(netapp.cluster.statistics.iops_raw.total) - prev(netapp.cluster.statistics.iops_raw.total) = 0) ) * 0.001
+          description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+          applications:
+            -
+              name: General
+        -
+          name: 'Cluster latency, write'
+          type: CALCULATED
+          key: netapp.cluster.statistics.latency.write
+          history: 7d
+          value_type: FLOAT
+          units: '!ms'
+          params: |
+            (last(netapp.cluster.statistics.latency_raw.write) - prev(netapp.cluster.statistics.latency_raw.write)) /
+            ( last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) +
+            (last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) = 0) ) * 0.001
+          description: 'The average latency per I/O operation in milliseconds observed at the storage object. Peformance metric for write I/O operations.'
+          applications:
+            -
+              name: General
+        -
+          name: 'Cluster latency raw, other'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.latency_raw.other
+          delay: '0'
+          history: 7d
+          units: '!mcs'
+          description: 'The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.latency_raw.other
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster latency raw, read'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.latency_raw.read
+          delay: '0'
+          history: 7d
+          units: '!mcs'
+          description: 'The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for read I/O operations.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.latency_raw.read
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster latency raw, total'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.latency_raw.total
+          delay: '0'
+          history: 7d
+          units: '!mcs'
+          description: 'The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric aggregated over all types of I/O operations.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.latency_raw.total
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster latency raw, write'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.latency_raw.write
+          delay: '0'
+          history: 7d
+          units: '!mcs'
+          description: 'The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Peformance metric for write I/O operations.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.latency_raw.write
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster throughput, other rate'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.throughput.other.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Throughput bytes observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.throughput_raw.other
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster throughput, read rate'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.throughput.read.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Throughput bytes observed at the storage object. Performance metric for read I/O operations.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.throughput_raw.read
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster throughput, total rate'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.throughput.total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Throughput bytes observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.throughput_raw.total
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster throughput, write rate'
+          type: DEPENDENT
+          key: netapp.cluster.statistics.throughput.write.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Throughput bytes observed at the storage object. Peformance metric for write I/O operations.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.throughput_raw.write
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: netapp.cluster.get
+        -
+          name: 'Cluster status'
+          type: DEPENDENT
+          key: netapp.cluster.status
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The status of the cluster: ok, error, partial_no_data, partial_no_response, partial_other_error, negative_delta, backfilled_data, inconsistent_delta_time, inconsistent_old_data.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.statistics.status
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: netapp.cluster.get
+          triggers:
+            -
+              expression: '({last()}<>"ok")'
+              name: 'Cluster status is abnormal'
+              priority: AVERAGE
+              description: 'Any errors associated with the sample. For example, if the aggregation of data over multiple nodes fails then any of the partial errors might be returned, “ok” on success, or “error” on any internal uncategorized failure. Whenever a sample collection is missed but done at a later time, it is back filled to the previous 15 second timestamp and tagged with "backfilled_data". “Inconsistent_ delta_time” is encountered when the time between two collections is not the same for all nodes. Therefore, the aggregated value might be over or under inflated. “Negative_delta” is returned when an expected monotonically increasing value has decreased in value. “Inconsistent_old_data” is returned when one or more nodes do not have the latest data.'
+        -
+          name: 'Cluster software version'
+          type: DEPENDENT
+          key: netapp.cluster.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'This returns the cluster version information. When the cluster has more than one node, the cluster version is equivalent to the lowest of generation, major, and minor versions on all nodes.'
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version.full
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: netapp.cluster.get
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: '__RESOURCE__ version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Get disks'
+          type: HTTP_AGENT
+          key: netapp.disks.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/storage/disks?fields=state,node.name'
+        -
+          name: 'Get FRUs'
+          type: HTTP_AGENT
+          key: netapp.frus.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function(chassis) {
+                      chassis.frus.forEach(function(frus) {
+                          frus.chassisId = chassis.id;
+                          result.push(frus);
+                      })
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/cluster/chassis?fields=id,frus.id,frus.state'
+        -
+          name: 'Get LUNs'
+          type: HTTP_AGENT
+          key: netapp.luns.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state'
+        -
+          name: 'Get nodes'
+          type: HTTP_AGENT
+          key: netapp.nodes.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/cluster/nodes?fields=*'
+        -
+          name: 'Get ehternet ports'
+          type: HTTP_AGENT
+          key: netapp.ports.eth.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/network/ethernet/ports?fields=name,type,node.name,broadcast_domain.name,enabled,state,mtu,speed'
+        -
+          name: 'Get FC ports'
+          type: HTTP_AGENT
+          key: netapp.ports.fc.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/network/fc/ports?fields=name,node.name,description,enabled,fabric.switch_port,state'
+        -
+          name: 'Get SVMs'
+          type: HTTP_AGENT
+          key: netapp.svms.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/svm/svms?fields=name,state,comment'
+        -
+          name: 'Get volumes'
+          type: HTTP_AGENT
+          key: netapp.volumes.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/storage/volumes?fields=name,comment,state,type,svm.name,space.size,space.available,space.used,statistics'
+      discovery_rules:
+        -
+          name: 'Chassis discovery'
+          type: HTTP_AGENT
+          key: netapp.chassis.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: '{#ID}: State'
+              type: DEPENDENT
+              key: 'netapp.chassis.state[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The chassis state: ok, error.'
+              application_prototypes:
+                -
+                  name: 'Chassis "{#ID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.id==''{#ID}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.chassis.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}="error")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="ok")'
+                  name: '{#ID}: Chassis has something errors'
+                  priority: AVERAGE
+                  description: 'Something is wrong with the chassis.'
+                  manual_close: 'YES'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/cluster/chassis?fields=id'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function (chassis) {
+                      result.push({"{#ID}": chassis.id});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+        -
+          name: 'Disks discovery'
+          type: HTTP_AGENT
+          key: netapp.disks.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: '{#DISKNAME}: State'
+              type: DEPENDENT
+              key: 'netapp.disk.state[{#NODENAME},{#DISKNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The state of the disk. Possible values: broken, copy, maintenance, partner, pending, present, reconstructing, removed, spare, unfail, zeroing'
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}" disks'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#DISKNAME}''&&@.node.name==''{#NODENAME}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.disks.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}<>"present")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="present")'
+                  name: '{#DISKNAME}: Disk of the Node "{#NODENAME}" has state different from "present"'
+                  priority: AVERAGE
+                  description: 'Something is wrong with the disk.'
+                  manual_close: 'YES'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/storage/disks?fields=name,node.name'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function (disk) {
+                      result.push({"{#DISKNAME}": disk.name, "{#NODENAME}": disk.node.name});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+        -
+          name: 'FRUs discovery'
+          type: DEPENDENT
+          key: netapp.frus.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              name: '{#FRUID}: State'
+              type: DEPENDENT
+              key: 'netapp.chassis.fru.state[{#CHASSISID},{#FRUID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The FRU state: ok, error.'
+              application_prototypes:
+                -
+                  name: 'Chassis "{#CHASSISID}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.id==''{#FRUID}''&&@.chassisId==''{#CHASSISID}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.frus.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}="error")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="ok")'
+                  name: '{#FRUID}: FRU of the chassis "{#ID}" state is error'
+                  priority: AVERAGE
+                  description: 'Something is wrong with the FRU.'
+                  manual_close: 'YES'
+          master_item:
+            key: netapp.frus.get
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).forEach(function (fru) {
+                      result.push({"{#CHASSISID}": fru.chassisId, "{#FRUID}": fru.id});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'LUNs discovery'
+          type: HTTP_AGENT
+          key: netapp.luns.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: '{#LUNNAME}: Space size'
+              type: DEPENDENT
+              key: 'netapp.lun.space.size[{#SVMNAME},{#LUNNAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The total provisioned size of the LUN.'
+              application_prototypes:
+                -
+                  name: 'SVM "{#SVMNAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.svm.name==''{#SVMNAME}''&&@.name==''{#LUNNAME}'')].space.size.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.luns.get
+            -
+              name: '{#LUNNAME}: Space used'
+              type: DEPENDENT
+              key: 'netapp.lun.space.used[{#SVMNAME},{#LUNNAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The amount of space consumed by the main data stream of the LUN.'
+              application_prototypes:
+                -
+                  name: 'SVM "{#SVMNAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.svm.name==''{#SVMNAME}''&&@.name==''{#LUNNAME}'')].space.used.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.luns.get
+            -
+              name: '{#LUNNAME}: Container state'
+              type: DEPENDENT
+              key: 'netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The state of the volume and aggregate that contain the LUN: online, aggregate_offline, volume_offline. LUNs are only available when their containers are available.'
+              application_prototypes:
+                -
+                  name: 'SVM "{#SVMNAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.svm.name==''{#SVMNAME}''&&@.name==''{#LUNNAME}'')].status.container_state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.luns.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}<>"online")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="online")'
+                  name: '{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal container state'
+                  priority: AVERAGE
+                  description: 'LUNs are only available when their containers are available.'
+                  manual_close: 'YES'
+            -
+              name: '{#LUNNAME}: State'
+              type: DEPENDENT
+              key: 'netapp.lun.status.state[{#SVMNAME},{#LUNNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The state of the LUN. Normal states for a LUN are online and offline. Other states indicate errors. Possible values: foreign_lun_error, nvfail, offline, online, space_error.'
+              application_prototypes:
+                -
+                  name: 'SVM "{#SVMNAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.svm.name==''{#SVMNAME}''&&@.name==''{#LUNNAME}'')].status.state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.luns.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}<>"online")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="online")'
+                  name: '{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal state'
+                  priority: AVERAGE
+                  description: 'Normal states for a LUN are online and offline. Other states indicate errors.'
+                  manual_close: 'YES'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function (lun) {
+                      result.push({"{#LUNNAME}": lun.name, "{#SVMNAME}": lun.svm.name});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+        -
+          name: 'Nodes discovery'
+          type: HTTP_AGENT
+          key: netapp.nodes.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: '{#NODENAME}: Software version'
+              type: DEPENDENT
+              key: 'netapp.node.version[{#NODENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'This returns the cluster version information. When the cluster has more than one node, the cluster version is equivalent to the lowest of generation, major, and minor versions on all nodes.'
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#NODENAME}'')].version.full.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.nodes.get
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '{#NODENAME}: Version has changed (new version: {ITEM.VALUE})'
+                  priority: INFO
+                  description: '{#NODENAME} version has changed. Ack to close.'
+                  manual_close: 'YES'
+            -
+              name: '{#NODENAME}: Controller over temperature'
+              type: DEPENDENT
+              key: 'netapp.nodes.controller.over_temperature[{#NODENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Specifies whether the hardware is currently operating outside of its recommended temperature range. The hardware shuts down if the temperature exceeds critical thresholds. Possible values: over, normal'
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#NODENAME}'')].controller.over_temperature.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.nodes.get
+              trigger_prototypes:
+                -
+                  expression: '({last()}<>"normal")'
+                  name: '{#NODENAME}: Node has over temperature'
+                  priority: AVERAGE
+                  description: 'The hardware shuts down if the temperature exceeds critical thresholds(item''s value is "over").'
+            -
+              name: '{#NODENAME}: Location'
+              type: DEPENDENT
+              key: 'netapp.nodes.location[{#NODENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The location of the node.'
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#NODENAME}'')].location.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.nodes.get
+            -
+              name: '{#NODENAME}: Membership'
+              type: DEPENDENT
+              key: 'netapp.nodes.membership[{#NODENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Possible values:
+                  available - If a node is available, this means it is detected on the internal cluster network and can be added to the cluster. Nodes that have a membership of “available” are not returned when a GET request is called when the cluster exists. A query on the “membership” property for available must be provided to scan for nodes on the cluster network. Nodes that have a membership of “available” are returned automatically before a cluster is created.
+                  joining - Joining nodes are in the process of being added to the cluster. The node may be progressing through the steps to become a member or might have failed. The job to add the node or create the cluster provides details on the current progress of the node.
+                  member - Nodes that are members have successfully joined the cluster.
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#NODENAME}'')].membership.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.nodes.get
+            -
+              name: '{#NODENAME}: State'
+              type: DEPENDENT
+              key: 'netapp.nodes.state[{#NODENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                State of the node:
+                up - Node is up and operational.
+                booting - Node is booting up.
+                down - Node has stopped or is dumping core.
+                taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.
+                waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.
+                degraded - Node has one or more critical services offline.
+                unknown - Node or its HA partner cannot be contacted and there is no information on the node’s state.
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#NODENAME}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.nodes.get
+              trigger_prototypes:
+                -
+                  expression: '({last()}<>"up")'
+                  name: '{#NODENAME}: Node state is abnormal'
+                  priority: AVERAGE
+                  description: |
+                    The state of the node is different from up:
+                    booting - Node is booting up.
+                    down - Node has stopped or is dumping core.
+                    taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.
+                    waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.
+                    degraded - Node has one or more critical services offline.
+                    unknown - Node or its HA partner cannot be contacted and there is no information on the node’s state.
+            -
+              name: '{#NODENAME}: Uptime'
+              type: DEPENDENT
+              key: 'netapp.nodes.uptime[{#NODENAME}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'The total time, in seconds, that the node has been up.'
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#NODENAME}'')].uptime.first()'
+              master_item:
+                key: netapp.nodes.get
+              trigger_prototypes:
+                -
+                  expression: '{last()}<10m'
+                  name: '{#NODENAME}: Node has been restarted (uptime < 10m)'
+                  priority: INFO
+                  description: 'Uptime is less than 10 minutes'
+                  manual_close: 'YES'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/cluster/nodes?fields=name'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function (node) {
+                      result.push({"{#NODENAME}": node.name});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+        -
+          name: 'Ethernet ports discovery'
+          type: HTTP_AGENT
+          key: netapp.ports.ether.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: '{#ETHPORTNAME}: State'
+              type: DEPENDENT
+              key: 'netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The operational state of the port. Possible values: up, down.'
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}" Ethernet ports'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#ETHPORTNAME}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.ports.eth.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}="down")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="up")'
+                  name: '{#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down'
+                  priority: AVERAGE
+                  description: 'Something is wrong with the ethernet port.'
+                  manual_close: 'YES'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/network/ethernet/ports?fields=name,state,node.name'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function (port) {
+                      result.push({"{#NODENAME}": port.node.name, "{#ETHPORTNAME}": port.name, "{#ETHPORTSTATE}": port.state});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+        -
+          name: 'FC ports discovery'
+          type: HTTP_AGENT
+          key: netapp.ports.fc.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: '{#FCPORTNAME}: Description'
+              type: DEPENDENT
+              key: 'netapp.port.fc.description[{#NODENAME},{#FCPORTNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'A description of the FC port.'
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}" FC ports'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#FCPORTNAME}'')].description.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.ports.fc.get
+            -
+              name: '{#FCPORTNAME}: State'
+              type: DEPENDENT
+              key: 'netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                The operational state of the FC port. Possible values:
+                startup - The port is booting up.
+                link_not_connected - The port has finished initialization, but a link with the fabric is not established.
+                online - The port is initialized and a link with the fabric has been established.
+                link_disconnected - The link was present at one point on this port but is currently not established.
+                offlined_by_user - The port is administratively disabled.
+                offlined_by_system - The port is set to offline by the system. This happens when the port encounters too many errors.
+                node_offline - The state information for the port cannot be retrieved. The node is offline or inaccessible.
+              application_prototypes:
+                -
+                  name: 'Node "{#NODENAME}" FC ports'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#FCPORTNAME}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.ports.fc.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}<>"online")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="online")'
+                  name: '{#FCPORTNAME}: FC port of the Node "{#NODENAME}" has state different from "online"'
+                  priority: AVERAGE
+                  description: 'Something is wrong with the FC port.'
+                  manual_close: 'YES'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/network/fc/ports?fields=node.name,name,state'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function (port) {
+                      result.push({"{#NODENAME}": port.node.name, "{#FCPORTNAME}": port.name, "{#FCPORTSTATE}": port.state});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+        -
+          name: 'SVMs discovery'
+          type: HTTP_AGENT
+          key: netapp.svms.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: '{#SVMNAME}: Comment'
+              type: DEPENDENT
+              key: 'netapp.svm.comment[{#SVMNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The comment for the SVM.'
+              application_prototypes:
+                -
+                  name: 'SVM "{#SVMNAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#SVMNAME}'')].comment.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.svms.get
+            -
+              name: '{#SVMNAME}: State'
+              type: DEPENDENT
+              key: 'netapp.svm.state[{#SVMNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'SVM state: starting, running, stopping, stopped, deleting.'
+              application_prototypes:
+                -
+                  name: 'SVM "{#SVMNAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#SVMNAME}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.svms.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}<>"running")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="running")'
+                  name: '{#SVMNAME}: SVM state is abnormal'
+                  priority: AVERAGE
+                  description: 'Something is wrong with the SVM.'
+                  manual_close: 'YES'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/svm/svms?fields=name'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function (svm) {
+                      result.push({"{#SVMNAME}": svm.name});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+        -
+          name: 'Volumes discovery'
+          type: HTTP_AGENT
+          key: netapp.volumes.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$USERNAME}'
+          password: '{$PASSWORD}'
+          item_prototypes:
+            -
+              name: '{#VOLUMENAME}: Comment'
+              type: DEPENDENT
+              key: 'netapp.volume.comment[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'A comment for the volume.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].comment.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Available size'
+              type: DEPENDENT
+              key: 'netapp.volume.space_available[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The available space, in bytes.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].space.available.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Space size'
+              type: DEPENDENT
+              key: 'netapp.volume.space_size[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total provisioned size. The default size is equal to the minimum size of 20MB, in bytes.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].space.size.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Used size'
+              type: DEPENDENT
+              key: 'netapp.volume.space_used[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The virtual space used (includes volume reserves) before storage efficiency, in bytes.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].space.used.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: State'
+              type: DEPENDENT
+              key: 'netapp.volume.state[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Volume state. A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.volumes.get
+              trigger_prototypes:
+                -
+                  expression: '({diff()}=1 and {last()}<>"online")'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '({diff()}=1 and {last()}="online")'
+                  name: '{#VOLUMENAME}: Volume state is abnormal'
+                  priority: AVERAGE
+                  description: 'A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.'
+                  manual_close: 'YES'
+            -
+              name: '{#VOLUMENAME}: Volume IOPS, other rate'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.iops.other.rate[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!iops'
+              description: 'The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.iops_raw.other.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume IOPS, read rate'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.iops.read.rate[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!iops'
+              description: 'The number of I/O operations observed at the storage object. Performance metric for read I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.iops_raw.read.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume IOPS, total rate'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.iops.total.rate[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!iops'
+              description: 'The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.iops_raw.total.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume IOPS, write rate'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.iops.write.rate[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!iops'
+              description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.iops_raw.write.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume IOPS raw, other'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: '!iops'
+              description: 'The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.iops_raw.other.first()'
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume IOPS raw, read'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: '!iops'
+              description: 'The number of I/O operations observed at the storage object. Performance metric for read I/O operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.iops_raw.read.first()'
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume IOPS raw, total'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: '!iops'
+              description: 'The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.iops_raw.total.first()'
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume IOPS raw, write'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: '!iops'
+              description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.iops_raw.write.first()'
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume latency, other'
+              type: CALCULATED
+              key: 'netapp.volume.statistics.latency.other[{#VOLUMENAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!ms'
+              params: |
+                (last(netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}])) /
+                ( last(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) +
+                (last(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) = 0) ) * 0.001
+              description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+            -
+              name: '{#VOLUMENAME}: Volume latency, read'
+              type: CALCULATED
+              key: 'netapp.volume.statistics.latency.read[{#VOLUMENAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!ms'
+              params: |
+                (last(netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}])) /
+                ( last(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) +
+                (last(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) = 0)) * 0.001
+              description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+            -
+              name: '{#VOLUMENAME}: Volume latency, total'
+              type: CALCULATED
+              key: 'netapp.volume.statistics.latency.total[{#VOLUMENAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!ms'
+              params: |
+                (last(netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}])) /
+                ( last(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) +
+                (last(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) = 0) ) * 0.001
+              description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+            -
+              name: '{#VOLUMENAME}: Volume latency, write'
+              type: CALCULATED
+              key: 'netapp.volume.statistics.latency.write[{#VOLUMENAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!ms'
+              params: |
+                (last(netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}])) /
+                ( last(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) +
+                (last(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) = 0) ) * 0.001
+              description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+            -
+              name: '{#VOLUMENAME}: Volume latency raw, other'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: '!mcs'
+              description: 'The raw latency in microseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.latency_raw.other.first()'
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume latency raw, read'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: '!mcs'
+              description: 'The raw latency in microseconds observed at the storage object. Performance metric for read I/O operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.latency_raw.read.first()'
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume latency raw, total'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: '!mcs'
+              description: 'The raw latency in microseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.latency_raw.total.first()'
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume latency raw, write'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              units: '!mcs'
+              description: 'The raw latency in microseconds observed at the storage object. Peformance metric for write I/O operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.latency_raw.write.first()'
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume throughput, other rate'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.throughput.other.rate[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Throughput bytes observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.throughput_raw.other.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume throughput, read rate'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.throughput.read.rate[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Throughput bytes observed at the storage object. Performance metric for read I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.throughput_raw.read.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume throughput, total rate'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.throughput.total.rate[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Throughput bytes observed at the storage object. Performance metric aggregated over all types of I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.throughput_raw.total.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Volume throughput, write rate'
+              type: DEPENDENT
+              key: 'netapp.volume.statistics.throughput.write.rate[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Throughput bytes observed at the storage object. Peformance metric for write I/O operations.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].statistics.throughput_raw.write.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: SVM name'
+              type: DEPENDENT
+              key: 'netapp.volume.svm_name[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The volume belongs this SVM.'
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].svm.name.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.volumes.get
+            -
+              name: '{#VOLUMENAME}: Type'
+              type: DEPENDENT
+              key: 'netapp.volume.type[{#VOLUMENAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Type of the volume.
+                rw ‐ read-write volume.
+                dp ‐ data-protection volume.
+                ls ‐ load-sharing dp volume.
+              application_prototypes:
+                -
+                  name: 'Volume "{#VOLUMENAME}"'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#VOLUMENAME}'')].type.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.volumes.get
+          graph_prototypes:
+            -
+              name: '{#VOLUMENAME}: Volume latency'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'NetApp AFF A700 by HTTP'
+                    key: 'netapp.volume.statistics.latency.other[{#VOLUMENAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'NetApp AFF A700 by HTTP'
+                    key: 'netapp.volume.statistics.latency.read[{#VOLUMENAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'NetApp AFF A700 by HTTP'
+                    key: 'netapp.volume.statistics.latency.write[{#VOLUMENAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'NetApp AFF A700 by HTTP'
+                    key: 'netapp.volume.statistics.latency.total[{#VOLUMENAME}]'
+            -
+              name: '{#VOLUMENAME}: Volume size'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'NetApp AFF A700 by HTTP'
+                    key: 'netapp.volume.space_used[{#VOLUMENAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'NetApp AFF A700 by HTTP'
+                    key: 'netapp.volume.space_available[{#VOLUMENAME}]'
+          timeout: '{$HTTP.AGENT.TIMEOUT}'
+          url: '{$URL}/api/storage/volumes?fields=name'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).records.forEach(function (volume) {
+                      result.push({"{#VOLUMENAME}": volume.name});
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+      macros:
+        -
+          macro: '{$HTTP.AGENT.TIMEOUT}'
+          value: 3s
+          description: 'The HTTP agent timeout to wait for a response from AFF700.'
+        -
+          macro: '{$PASSWORD}'
+          description: 'AFF700 user password.'
+        -
+          macro: '{$URL}'
+          description: 'AFF700 cluster URL address.'
+        -
+          macro: '{$USERNAME}'
+          description: 'AFF700 user name.'
+  graphs:
+    -
+      name: 'Cluster IOPS'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.iops.other.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.iops.read.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.iops.write.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.iops.total.rate
+    -
+      name: 'Cluster latency'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.latency.other
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.latency.read
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.latency.write
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.latency.total
+    -
+      name: 'Cluster throughput'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.throughput.other.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.throughput.read.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.throughput.write.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'NetApp AFF A700 by HTTP'
+            key: netapp.cluster.statistics.throughput.total.rate
