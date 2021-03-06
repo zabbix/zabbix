@@ -1,0 +1,2596 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-02-12T15:39:19Z</date>
+   <groups>
+      <group>
+         <name>Templates/SAN</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template SAN NetApp AFF A700 by HTTP</template>
+         <name>Template SAN NetApp AFF A700 by HTTP</name>
+         <description>The template to monitor SAN NetApp AFF A700 cluster by Zabbix HTTP agent.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/SAN</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>General</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Get chassis</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.chassis.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/cluster/chassis?fields=id,state</url>
+            </item>
+            <item>
+               <name>Get cluster</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.cluster.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/cluster</url>
+            </item>
+            <item>
+               <name>Cluster location</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.location</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>The location of the cluster.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.location</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster name</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.name</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>The name of the cluster.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.name</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS raw, other</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.iops_raw.other</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>!iops</units>
+               <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.other</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS raw, read</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.iops_raw.read</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>!iops</units>
+               <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.read</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS raw, total</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.iops_raw.total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>!iops</units>
+               <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.total</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS raw, write</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.iops_raw.write</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>!iops</units>
+               <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.write</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS, other rate</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.iops.other.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!iops</units>
+               <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.other</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS, read rate</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.iops.read.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!iops</units>
+               <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.read</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS, total rate</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.iops.total.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!iops</units>
+               <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.total</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS, write rate</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.iops.write.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!iops</units>
+               <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.write</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster latency raw, other</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.latency_raw.other</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>!mcs</units>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.latency_raw.other</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster latency raw, read</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.latency_raw.read</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>!mcs</units>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for read I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.latency_raw.read</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster latency raw, total</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.latency_raw.total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>!mcs</units>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric aggregated over all types of I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.latency_raw.total</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster latency raw, write</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.latency_raw.write</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>!mcs</units>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Peformance metric for write I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.latency_raw.write</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster latency, other</name>
+               <type>CALCULATED</type>
+               <key>netapp.cluster.statistics.latency.other</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!ms</units>
+               <params>(last(netapp.cluster.statistics.latency_raw.other) - prev(netapp.cluster.statistics.latency_raw.other)) /
+(last(netapp.cluster.statistics.iops_raw.other) - prev(netapp.cluster.statistics.iops_raw.other) +
+(last(netapp.cluster.statistics.iops_raw.other) - prev(netapp.cluster.statistics.iops_raw.other) = 0) ) * 0.001</params>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Cluster latency, read</name>
+               <type>CALCULATED</type>
+               <key>netapp.cluster.statistics.latency.read</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!ms</units>
+               <params>(last(netapp.cluster.statistics.latency_raw.read) - prev(netapp.cluster.statistics.latency_raw.read)) /
+( last(netapp.cluster.statistics.iops_raw.read) - prev(netapp.cluster.statistics.iops_raw.read) +
+(last(netapp.cluster.statistics.iops_raw.read) - prev(netapp.cluster.statistics.iops_raw.read) = 0) ) * 0.001</params>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Cluster latency, total</name>
+               <type>CALCULATED</type>
+               <key>netapp.cluster.statistics.latency.total</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!ms</units>
+               <params>(last(netapp.cluster.statistics.latency_raw.total) - prev(netapp.cluster.statistics.latency_raw.total)) /
+( last(netapp.cluster.statistics.iops_raw.total) - prev(netapp.cluster.statistics.iops_raw.total) +
+(last(netapp.cluster.statistics.iops_raw.total) - prev(netapp.cluster.statistics.iops_raw.total) = 0) ) * 0.001</params>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Cluster latency, write</name>
+               <type>CALCULATED</type>
+               <key>netapp.cluster.statistics.latency.write</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!ms</units>
+               <params>(last(netapp.cluster.statistics.latency_raw.write) - prev(netapp.cluster.statistics.latency_raw.write)) /
+( last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) +
+(last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) = 0) ) * 0.001</params>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Peformance metric for write I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Cluster throughput, other rate</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.throughput.other.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Throughput bytes observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.throughput_raw.other</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster throughput, read rate</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.throughput.read.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Throughput bytes observed at the storage object. Performance metric for read I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.throughput_raw.read</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster throughput, total rate</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.throughput.total.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Throughput bytes observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.throughput_raw.total</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster throughput, write rate</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.statistics.throughput.write.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Throughput bytes observed at the storage object. Peformance metric for write I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.throughput_raw.write</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster status</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.status</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>The status of the cluster: ok, error, partial_no_data, partial_no_response, partial_other_error, negative_delta, backfilled_data, inconsistent_delta_time, inconsistent_old_data.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.status</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>({last()}&lt;&gt;"ok")</expression>
+                     <name>Cluster status is abnormal</name>
+                     <priority>AVERAGE</priority>
+                     <description>Any errors associated with the sample. For example, if the aggregation of data over multiple nodes fails then any of the partial errors might be returned, “ok” on success, or “error” on any internal uncategorized failure. Whenever a sample collection is missed but done at a later time, it is back filled to the previous 15 second timestamp and tagged with "backfilled_data". “Inconsistent_ delta_time” is encountered when the time between two collections is not the same for all nodes. Therefore, the aggregated value might be over or under inflated. “Negative_delta” is returned when an expected monotonically increasing value has decreased in value. “Inconsistent_old_data” is returned when one or more nodes do not have the latest data.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Cluster software version</name>
+               <type>DEPENDENT</type>
+               <key>netapp.cluster.version</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>This returns the cluster version information. When the cluster has more than one node, the cluster version is equivalent to the lowest of generation, major, and minor versions on all nodes.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.version.full</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.cluster.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Version has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>__RESOURCE__ version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Get disks</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.disks.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/storage/disks?fields=state,node.name</url>
+            </item>
+            <item>
+               <name>Get FRUs</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.frus.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function(chassis) {
+    chassis.frus.forEach(function(frus) {
+        frus.chassisId = chassis.id;
+        result.push(frus);
+    })
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/cluster/chassis?fields=id,frus.id,frus.state</url>
+            </item>
+            <item>
+               <name>Get LUNs</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.luns.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state</url>
+            </item>
+            <item>
+               <name>Get nodes</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.nodes.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/cluster/nodes?fields=*</url>
+            </item>
+            <item>
+               <name>Get ehternet ports</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.ports.eth.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/network/ethernet/ports?fields=name,type,node.name,broadcast_domain.name,enabled,state,mtu,speed</url>
+            </item>
+            <item>
+               <name>Get FC ports</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.ports.fc.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/network/fc/ports?fields=name,node.name,description,enabled,fabric.switch_port,state</url>
+            </item>
+            <item>
+               <name>Get SVMs</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.svms.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/svm/svms?fields=name,state,comment</url>
+            </item>
+            <item>
+               <name>Get volumes</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.volumes.get</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/storage/volumes?fields=name,comment,state,type,svm.name,space.size,space.available,space.used,statistics</url>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Chassis discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.chassis.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/cluster/chassis?fields=id</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ID}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.chassis.state[{#ID}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The chassis state: ok, error.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Chassis "{#ID}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.id=='{#ID}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.chassis.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}="error")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="ok")</recovery_expression>
+                           <name>{#ID}: Chassis has something errors</name>
+                           <priority>AVERAGE</priority>
+                           <description>Something is wrong with the chassis.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function (chassis) {
+    result.push({"{#ID}": chassis.id});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Disks discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.disks.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/storage/disks?fields=name,node.name</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#DISKNAME}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.disk.state[{#NODENAME},{#DISKNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The state of the disk. Possible values: broken, copy, maintenance, partner, pending, present, reconstructing, removed, spare, unfail, zeroing</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}" disks</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#DISKNAME}'&amp;&amp;@.node.name=='{#NODENAME}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.disks.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}&lt;&gt;"present")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="present")</recovery_expression>
+                           <name>{#DISKNAME}: Disk of the Node "{#NODENAME}" has state different from "present"</name>
+                           <priority>AVERAGE</priority>
+                           <description>Something is wrong with the disk.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function (disk) {
+    result.push({"{#DISKNAME}": disk.name, "{#NODENAME}": disk.node.name});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>FRUs discovery</name>
+               <type>DEPENDENT</type>
+               <key>netapp.frus.discovery</key>
+               <delay>0</delay>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#FRUID}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.chassis.fru.state[{#CHASSISID},{#FRUID}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The FRU state: ok, error.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Chassis "{#CHASSISID}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.id=='{#FRUID}'&amp;&amp;@.chassisId=='{#CHASSISID}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.frus.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}="error")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="ok")</recovery_expression>
+                           <name>{#FRUID}: FRU of the chassis "{#ID}" state is error</name>
+                           <priority>AVERAGE</priority>
+                           <description>Something is wrong with the FRU.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <master_item>
+                  <key>netapp.frus.get</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).forEach(function (fru) {
+    result.push({"{#CHASSISID}": fru.chassisId, "{#FRUID}": fru.id});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>LUNs discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.luns.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#LUNNAME}: Space size</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.lun.space.size[{#SVMNAME},{#LUNNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The total provisioned size of the LUN.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>SVM "{#SVMNAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.svm.name=='{#SVMNAME}'&amp;&amp;@.name=='{#LUNNAME}')].space.size.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.luns.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#LUNNAME}: Space used</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.lun.space.used[{#SVMNAME},{#LUNNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The amount of space consumed by the main data stream of the LUN.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>SVM "{#SVMNAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.svm.name=='{#SVMNAME}'&amp;&amp;@.name=='{#LUNNAME}')].space.used.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.luns.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#LUNNAME}: Container state</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The state of the volume and aggregate that contain the LUN: online, aggregate_offline, volume_offline. LUNs are only available when their containers are available.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>SVM "{#SVMNAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.svm.name=='{#SVMNAME}'&amp;&amp;@.name=='{#LUNNAME}')].status.container_state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.luns.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}&lt;&gt;"online")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
+                           <name>{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal container state</name>
+                           <priority>AVERAGE</priority>
+                           <description>LUNs are only available when their containers are available.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#LUNNAME}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.lun.status.state[{#SVMNAME},{#LUNNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The state of the LUN. Normal states for a LUN are online and offline. Other states indicate errors. Possible values: foreign_lun_error, nvfail, offline, online, space_error.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>SVM "{#SVMNAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.svm.name=='{#SVMNAME}'&amp;&amp;@.name=='{#LUNNAME}')].status.state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.luns.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}&lt;&gt;"online")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
+                           <name>{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal state</name>
+                           <priority>AVERAGE</priority>
+                           <description>Normal states for a LUN are online and offline. Other states indicate errors.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function (lun) {
+    result.push({"{#LUNNAME}": lun.name, "{#SVMNAME}": lun.svm.name});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Nodes discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.nodes.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/cluster/nodes?fields=name</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#NODENAME}: Software version</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.node.version[{#NODENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>This returns the cluster version information. When the cluster has more than one node, the cluster version is equivalent to the lowest of generation, major, and minor versions on all nodes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#NODENAME}')].version.full.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.nodes.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>{#NODENAME}: Version has changed (new version: {ITEM.VALUE})</name>
+                           <priority>INFO</priority>
+                           <description>{#NODENAME} version has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#NODENAME}: Controller over temperature</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.nodes.controller.over_temperature[{#NODENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>Specifies whether the hardware is currently operating outside of its recommended temperature range. The hardware shuts down if the temperature exceeds critical thresholds. Possible values: over, normal</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#NODENAME}')].controller.over_temperature.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.nodes.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({last()}&lt;&gt;"normal")</expression>
+                           <name>{#NODENAME}: Node has over temperature</name>
+                           <priority>AVERAGE</priority>
+                           <description>The hardware shuts down if the temperature exceeds critical thresholds(item's value is "over").</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#NODENAME}: Location</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.nodes.location[{#NODENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The location of the node.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#NODENAME}')].location.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.nodes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#NODENAME}: Membership</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.nodes.membership[{#NODENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>Possible values:&#13;
+  available - If a node is available, this means it is detected on the internal cluster network and can be added to the cluster. Nodes that have a membership of “available” are not returned when a GET request is called when the cluster exists. A query on the “membership” property for available must be provided to scan for nodes on the cluster network. Nodes that have a membership of “available” are returned automatically before a cluster is created.&#13;
+  joining - Joining nodes are in the process of being added to the cluster. The node may be progressing through the steps to become a member or might have failed. The job to add the node or create the cluster provides details on the current progress of the node.&#13;
+  member - Nodes that are members have successfully joined the cluster.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#NODENAME}')].membership.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.nodes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#NODENAME}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.nodes.state[{#NODENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>State of the node:&#13;
+up - Node is up and operational.&#13;
+booting - Node is booting up.&#13;
+down - Node has stopped or is dumping core.&#13;
+taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.&#13;
+waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.&#13;
+degraded - Node has one or more critical services offline.&#13;
+unknown - Node or its HA partner cannot be contacted and there is no information on the node’s state.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#NODENAME}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.nodes.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({last()}&lt;&gt;"up")</expression>
+                           <name>{#NODENAME}: Node state is abnormal</name>
+                           <priority>AVERAGE</priority>
+                           <description>The state of the node is different from up:&#13;
+booting - Node is booting up.&#13;
+down - Node has stopped or is dumping core.&#13;
+taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.&#13;
+waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.&#13;
+degraded - Node has one or more critical services offline.&#13;
+unknown - Node or its HA partner cannot be contacted and there is no information on the node’s state.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#NODENAME}: Uptime</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.nodes.uptime[{#NODENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>s</units>
+                     <description>The total time, in seconds, that the node has been up.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#NODENAME}')].uptime.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.nodes.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>{#NODENAME}: Node has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function (node) {
+    result.push({"{#NODENAME}": node.name});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Ethernet ports discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.ports.ether.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/network/ethernet/ports?fields=name,state,node.name</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#ETHPORTNAME}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The operational state of the port. Possible values: up, down.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}" Ethernet ports</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#ETHPORTNAME}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.ports.eth.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}="down")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="up")</recovery_expression>
+                           <name>{#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down</name>
+                           <priority>AVERAGE</priority>
+                           <description>Something is wrong with the ethernet port.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function (port) {
+    result.push({"{#NODENAME}": port.node.name, "{#ETHPORTNAME}": port.name, "{#ETHPORTSTATE}": port.state});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>FC ports discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.ports.fc.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/network/fc/ports?fields=node.name,name,state</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#FCPORTNAME}: Description</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.port.fc.description[{#NODENAME},{#FCPORTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>A description of the FC port.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}" FC ports</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#FCPORTNAME}')].description.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.ports.fc.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#FCPORTNAME}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The operational state of the FC port. Possible values:&#13;
+startup - The port is booting up.&#13;
+link_not_connected - The port has finished initialization, but a link with the fabric is not established.&#13;
+online - The port is initialized and a link with the fabric has been established.&#13;
+link_disconnected - The link was present at one point on this port but is currently not established.&#13;
+offlined_by_user - The port is administratively disabled.&#13;
+offlined_by_system - The port is set to offline by the system. This happens when the port encounters too many errors.&#13;
+node_offline - The state information for the port cannot be retrieved. The node is offline or inaccessible.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Node "{#NODENAME}" FC ports</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#FCPORTNAME}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.ports.fc.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}&lt;&gt;"online")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
+                           <name>{#FCPORTNAME}: FC port of the Node "{#NODENAME}" has state different from "online"</name>
+                           <priority>AVERAGE</priority>
+                           <description>Something is wrong with the FC port.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function (port) {
+    result.push({"{#NODENAME}": port.node.name, "{#FCPORTNAME}": port.name, "{#FCPORTSTATE}": port.state});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>SVMs discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.svms.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/svm/svms?fields=name</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SVMNAME}: Comment</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.svm.comment[{#SVMNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The comment for the SVM.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>SVM "{#SVMNAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#SVMNAME}')].comment.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.svms.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SVMNAME}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.svm.state[{#SVMNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>SVM state: starting, running, stopping, stopped, deleting.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>SVM "{#SVMNAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#SVMNAME}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.svms.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}&lt;&gt;"running")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="running")</recovery_expression>
+                           <name>{#SVMNAME}: SVM state is abnormal</name>
+                           <priority>AVERAGE</priority>
+                           <description>Something is wrong with the SVM.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function (svm) {
+    result.push({"{#SVMNAME}": svm.name});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Volumes discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>netapp.volumes.discovery</key>
+               <delay>1h</delay>
+               <authtype>BASIC</authtype>
+               <username>{$USERNAME}</username>
+               <password>{$PASSWORD}</password>
+               <timeout>{$HTTP.AGENT.TIMEOUT}</timeout>
+               <url>{$URL}/api/storage/volumes?fields=name</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Comment</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.comment[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>A comment for the volume.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].comment.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Available size</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.space_available[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The available space, in bytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].space.available.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Space size</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.space_size[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Total provisioned size. The default size is equal to the minimum size of 20MB, in bytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].space.size.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Used size</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.space_used[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The virtual space used (includes volume reserves) before storage efficiency, in bytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].space.used.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.state[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>Volume state. A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>({diff()}=1 and {last()}&lt;&gt;"online")</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
+                           <name>{#VOLUMENAME}: Volume state is abnormal</name>
+                           <priority>AVERAGE</priority>
+                           <description>A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS raw, other</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.other.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS raw, read</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.read.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS raw, total</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.total.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS raw, write</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.write.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS, other rate</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.iops.other.rate[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.other.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS, read rate</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.iops.read.rate[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.read.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS, total rate</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.iops.total.rate[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.total.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS, write rate</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.iops.write.rate[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.write.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency raw, other</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!mcs</units>
+                     <description>The raw latency in microseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.latency_raw.other.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency raw, read</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!mcs</units>
+                     <description>The raw latency in microseconds observed at the storage object. Performance metric for read I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.latency_raw.read.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency raw, total</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!mcs</units>
+                     <description>The raw latency in microseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.latency_raw.total.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency raw, write</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!mcs</units>
+                     <description>The raw latency in microseconds observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.latency_raw.write.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency, other</name>
+                     <type>CALCULATED</type>
+                     <key>netapp.volume.statistics.latency.other[{#VOLUMENAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!ms</units>
+                     <params>(last(netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}])) /
+( last(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) +
+(last(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency, read</name>
+                     <type>CALCULATED</type>
+                     <key>netapp.volume.statistics.latency.read[{#VOLUMENAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!ms</units>
+                     <params>(last(netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}])) /
+( last(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) +
+(last(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) = 0)) * 0.001</params>
+                     <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency, total</name>
+                     <type>CALCULATED</type>
+                     <key>netapp.volume.statistics.latency.total[{#VOLUMENAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!ms</units>
+                     <params>(last(netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}])) /
+( last(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) +
+(last(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency, write</name>
+                     <type>CALCULATED</type>
+                     <key>netapp.volume.statistics.latency.write[{#VOLUMENAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!ms</units>
+                     <params>(last(netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}])) /
+( last(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) +
+(last(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume throughput, other rate</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.throughput.other.rate[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>Bps</units>
+                     <description>Throughput bytes observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.throughput_raw.other.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume throughput, read rate</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.throughput.read.rate[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>Bps</units>
+                     <description>Throughput bytes observed at the storage object. Performance metric for read I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.throughput_raw.read.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume throughput, total rate</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.throughput.total.rate[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>Bps</units>
+                     <description>Throughput bytes observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.throughput_raw.total.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume throughput, write rate</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.statistics.throughput.write.rate[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>Bps</units>
+                     <description>Throughput bytes observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.throughput_raw.write.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: SVM name</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.svm_name[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The volume belongs this SVM.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].svm.name.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Type</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.volume.type[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>Type of the volume.&#13;
+rw ‐ read-write volume.&#13;
+dp ‐ data-protection volume.&#13;
+ls ‐ load-sharing dp volume.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].type.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#VOLUMENAME}: Volume latency</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.volume.statistics.latency.other[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.volume.statistics.latency.read[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.volume.statistics.latency.write[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.volume.statistics.latency.total[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>{#VOLUMENAME}: Volume size</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.volume.space_used[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.volume.space_available[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var result = [];
+
+JSON.parse(value).records.forEach(function (volume) {
+    result.push({"{#VOLUMENAME}": volume.name});
+});
+
+return JSON.stringify(result);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$HTTP.AGENT.TIMEOUT}</macro>
+               <value>3s</value>
+               <description>The HTTP agent timeout to wait for a response from AFF700.</description>
+            </macro>
+            <macro>
+               <macro>{$PASSWORD}</macro>
+               <description>AFF700 user password.</description>
+            </macro>
+            <macro>
+               <macro>{$URL}</macro>
+               <description>AFF700 cluster URL address.</description>
+            </macro>
+            <macro>
+               <macro>{$USERNAME}</macro>
+               <description>AFF700 user name.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>Cluster IOPS</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.iops.other.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.iops.read.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.iops.write.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.iops.total.rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Cluster latency</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.latency.other</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.latency.read</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.latency.write</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.latency.total</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Cluster throughput</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.throughput.other.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.throughput.read.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.throughput.write.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.cluster.statistics.throughput.total.rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+</zabbix_export>
