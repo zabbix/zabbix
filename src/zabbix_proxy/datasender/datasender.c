@@ -71,9 +71,9 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_UPLOAD, value, sizeof(value), NULL))
 	{
-		if (0 != strcmp(value, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED))
+		if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED))
 			*state = ZBX_PROXY_UPLOAD_ENABLED;
-		else if (0 != strcmp(value, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED))
+		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED))
 			*state = ZBX_PROXY_UPLOAD_DISABLED;
 	}
 }
@@ -109,30 +109,28 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp)
+	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp &&
+			ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
 	{
 		if (SUCCEED == get_interface_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-		if (ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
+		history_records = proxy_get_hist_data(&j, &history_lastid, &more_history);
+		if (0 != history_lastid)
+			flags |= ZBX_DATASENDER_HISTORY;
+
+		discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
+		if (0 != discovery_records)
+			flags |= ZBX_DATASENDER_DISCOVERY;
+
+		areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+		if (0 != areg_records)
+			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
+
+		if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&
+						ZBX_PROXY_DATA_MORE != more_areg)
 		{
-			history_records = proxy_get_hist_data(&j, &history_lastid, &more_history);
-			if (0 != history_lastid)
-				flags |= ZBX_DATASENDER_HISTORY;
-
-			discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
-			if (0 != discovery_records)
-				flags |= ZBX_DATASENDER_DISCOVERY;
-
-			areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg);
-			if (0 != areg_records)
-				flags |= ZBX_DATASENDER_AUTOREGISTRATION;
-
-			if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&
-							ZBX_PROXY_DATA_MORE != more_areg)
-			{
-				data_timestamp = now;
-			}
+			data_timestamp = now;
 		}
 	}
 

@@ -38,26 +38,34 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 {
 	struct zbx_json		json;
 	zbx_vector_ptr_t	tasks;
-	int			ret, flags = ZBX_TCP_PROTOCOL;
+	int			ret, flags = ZBX_TCP_PROTOCOL, status;
 
 	zbx_vector_ptr_create(&tasks);
 
-	zbx_tm_get_remote_tasks(&tasks, proxy->hostid);
-
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (ZBX_PROXY_UPLOAD_DISABLED == upload_status)
+	switch (upload_status)
 	{
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED,
-				ZBX_JSON_TYPE_STRING);
+		case ZBX_PROXY_UPLOAD_DISABLED:
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED,
+					ZBX_JSON_TYPE_STRING);
+			status = FAIL;
+			break;
+		case ZBX_PROXY_UPLOAD_ENABLED:
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED,
+					ZBX_JSON_TYPE_STRING);
+			ZBX_FALLTHROUGH;
+		default:
+			status = SUCCEED;
 	}
-	else
+
+	if (SUCCEED == status)
 	{
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED,
-				ZBX_JSON_TYPE_STRING);
+		zbx_tm_get_remote_tasks(&tasks, proxy->hostid);
 	}
+	else
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 
 	if (NULL != info && '\0' != *info)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, info, ZBX_JSON_TYPE_STRING);

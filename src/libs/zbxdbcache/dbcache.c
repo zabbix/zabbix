@@ -130,7 +130,6 @@ typedef struct
 	unsigned char		db_trigger_queue_lock;
 
 	zbx_hc_proxyqueue_t     proxyqueue;
-	int			active_proxy_status;
 }
 ZBX_DC_CACHE;
 
@@ -4450,10 +4449,6 @@ int	init_database_cache(char **error)
 		if (SUCCEED != (ret = init_trend_cache(error)))
 			goto out;
 	}
-	else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
-	{
-		cache->active_proxy_status = 0;
-	}
 
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
@@ -4462,7 +4457,6 @@ int	init_database_cache(char **error)
 
 	if (NULL == sql)
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -4748,8 +4742,6 @@ static void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid)
 		zbx_uint64_t *ptr;
 
 		ptr = zbx_hashset_insert(&cache->proxyqueue.index, &proxyid, sizeof(proxyid));
-		*ptr = proxyid;
-
 		zbx_list_append(&cache->proxyqueue.list, ptr, NULL);
 	}
 }
@@ -4769,18 +4761,17 @@ static void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid)
 static int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid)
 {
 	zbx_uint64_t	top_val;
-	zbx_uint64_t	*rem_val = 0;
+	void		*rem_val = 0;
 
 	top_val = zbx_hc_proxyqueue_peek();
 
 	if (proxyid != top_val)
 		return FAIL;
 
-	if (FAIL == zbx_list_pop(&cache->proxyqueue.list, (void**)&rem_val))
+	if (FAIL == zbx_list_pop(&cache->proxyqueue.list, &rem_val))
 		return FAIL;
 
-	if (NULL != zbx_hashset_search(&cache->proxyqueue.index, rem_val))
-		zbx_hashset_remove(&cache->proxyqueue.index, rem_val);
+	zbx_hashset_remove_direct(&cache->proxyqueue.index, rem_val);
 
 	return SUCCEED;
 }
@@ -4794,18 +4785,8 @@ static int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid)
  ******************************************************************************/
 static void	zbx_hc_proxyqueue_clear(void)
 {
-	zbx_list_item_t	*item = cache->proxyqueue.list.head;
-	zbx_list_item_t	*nextitem = 0;
-
+	zbx_list_destroy(&cache->proxyqueue.list);
 	zbx_hashset_clear(&cache->proxyqueue.index);
-
-	while (NULL != item)
-	{
-		cache->proxyqueue.list.mem_free_func(item->data);
-		nextitem = item->next;
-		cache->proxyqueue.list.mem_free_func(item);
-		item = nextitem;
-	}
 }
 
 /******************************************************************************

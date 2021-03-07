@@ -23,12 +23,10 @@
 #include "db.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "dbcache.h"
 
 #include "comms.h"
 #include "servercomms.h"
 #include "daemon.h"
-#include "proxy.h"
 
 extern unsigned int	configured_tls_connect_mode;
 
