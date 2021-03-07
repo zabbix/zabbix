@@ -1197,8 +1197,8 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 	zbx_uint32_t	size;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() subject:\"%s\" content_name:%s content_size:%u", __func__,
-			subject, ZBX_NULL2EMPTY_STR(content_type), content_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() subject:\"%s\" content_name:%s content_size:%u message:%s", __func__,
+			subject, ZBX_NULL2EMPTY_STR(content_type), content_size, message);
 
 	if (SUCCEED == zbx_ipc_async_socket_connected(&dispatch->alerter))
 	{

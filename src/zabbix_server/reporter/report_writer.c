@@ -105,6 +105,9 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 	CURLoption		opt;
 	struct curl_slist	*headers = NULL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:%s width:%s height:%s", __func__, url, ZBX_NULL2EMPTY_STR(width),
+			ZBX_NULL2EMPTY_STR(height));
+
 	cookie_value = zbx_dsprintf(NULL, "zbx_session=%s", cookie);
 
 	zbx_json_init(&j, 1024);
@@ -215,7 +218,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 {
 	zbx_vector_ptr_pair_t	params;
 	int			i, ret;
-	char			*url, *cookie, *subject = NULL, *width = NULL, *height = NULL, *message = NULL,
+	char			*url, *cookie, *subject = "", *width = "1920", *height = "1080", *message = "",
 				*report = NULL;
 	size_t			report_size = 0;
 
@@ -353,9 +356,13 @@ static void	rw_send_result(zbx_ipc_socket_t *socket, int status, char *error)
 	unsigned char	*data;
 	zbx_uint32_t	size;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() status:%d error:%s", __func__, status, ZBX_NULL2EMPTY_STR(error));
+
 	size = report_serialize_response(&data, status, error);
 	zbx_ipc_socket_write(socket, ZBX_IPC_REPORTER_RESULT, data, size);
 	zbx_free(data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
