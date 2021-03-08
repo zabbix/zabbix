@@ -36,6 +36,141 @@ abstract class testFormPreprocessing extends CWebTest {
 	public $button;
 	public $fail_message;
 
+	const CLONE_PREPROCESSING = [
+		[
+			'type' => '1',
+			'params' => '123',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '2',
+			'params' => 'abc',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '3',
+			'params' => 'def',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '4',
+			'params' => '1a2b3c',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '5',
+			'params' => "regular expression pattern \noutput template",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '6',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '7',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '8',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '9',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '11',
+			'params' => '/document/item/value/text()',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '12',
+			'params' => '$.document.item.value parameter.',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '13',
+			'params' => "-5\n3",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '14',
+			'params' => 'regular expression pattern for matching',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '15',
+			'params' => 'regular expression pattern for not matching',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '16',
+			'params' => '/json/path',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '17',
+			'params' => '/xml/path',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '18',
+			'params' => "regular expression pattern for error matching \ntest output",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '20',
+			'params' => '7',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+						[
+			'type' => '21',
+			'params' => 'test script',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '23',
+			'params' => 'metric',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '24',
+			'params' => ".\n/\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '25',
+			'params' => "1\n2",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		]
+	];
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -2329,6 +2464,9 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	/**
 	 * Check inheritance of preprocessing steps in items or LLD rules.
+	 *
+	 * @param array		$data		data provider
+	 * @param string	$host_link	URL of host configuration
 	 */
 	protected function checkPreprocessingInheritance($data, $host_link) {
 		// Create item on template.
@@ -2382,16 +2520,23 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	/**
 	 * Check cloning of inherited preprocessing steps in items, prototypes or LLD rules.
+	 *
+	 * @param string $link    cloned item, prototype or LLD URL
+	 * @param string $item    what is being cloned: item, prototype or LLD rule
 	 */
-	protected function checkCloneTemplatedItem($link, $item) {
-		$cloned_name = 'Cloned_testInheritancePreprocessingSteps';
+	protected function checkCloneTemplatedItem($link, $item, $templated = false) {
+		$cloned_name = 'Cloned_testInheritancePreprocessingSteps'.time();
+		$cloned_key = 'cloned-preprocessing'.time();
 
 		// Open original item on host and get its' preprocessing steps.
 		$this->page->login()->open($link);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		// Check that right templated item is opened.
-		$label = ($item === 'Discovery rule') ? 'Parent discovery rules' : 'Parent items';
-		$this->assertEquals('Inheritance test template', $form->getField($label)->getText());
+
+		if ($templated) {
+			// Check that right templated item is opened.
+			$label = ($item === 'Discovery rule') ? 'Parent discovery rules' : 'Parent items';
+			$this->assertEquals('Inheritance test template', $form->getField($label)->getText());
+		}
 
 		$form->selectTab('Preprocessing');
 		$original_steps = $this->listPreprocessingSteps();
@@ -2402,7 +2547,7 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->invalidate();
 		$form->fill([
 			'Name'	=> $cloned_name,
-			'Key' => 'cloned-preprocessing'
+			'Key' => $cloned_key
 		]);
 
 		$this->selectPreprocessingAndCheckSteps($form, $original_steps);
@@ -2411,11 +2556,20 @@ abstract class testFormPreprocessing extends CWebTest {
 		$this->assertMessage(TEST_GOOD, $message);
 
 		// Open cloned item and check preprocessing steps in saved form.
-		$this->query('link', $cloned_name)->one()->click();
+		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($cloned_key));
+		$this->page->open($this->ready_link.$id);
 		$form->invalidate();
+		$this->assertEquals($cloned_name, $form->getField('Name')->getValue());
 		$this->selectPreprocessingAndCheckSteps($form, $original_steps);
 	}
 
+	/**
+	 * Select Preprocessing tab in cloned item, prototype or LLD form and assert
+	 * that steps are the same as in original item.
+	 *
+	 * @param CFormElement	$form				item, prototype or LLD configuration form
+	 * @param array			$original_steps		preprocessing steps of original item
+	 */
 	private function selectPreprocessingAndCheckSteps($form, $original_steps) {
 		$form->selectTab('Preprocessing');
 		$this->assertEquals($original_steps, $this->listPreprocessingSteps());

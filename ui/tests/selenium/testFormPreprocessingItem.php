@@ -25,16 +25,18 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  * @backup items
  */
 class testFormPreprocessingItem extends testFormPreprocessing {
-	const HOST_ID					= 40001;		// 'Simple form test host'
-	const INHERITANCE_TEMPLATE_ID	= 15000;		// 'Inheritance test template'
-	const INHERITANCE_HOST_ID		= 15001;		// 'Template inheritance test host'
-	const INHERITED_ITEM_ID			= 15094;		// 'testInheritanceItemPreprocessing'
 
-	public $link = 'items.php?filter_set=1&filter_hostids[0]='.self::HOST_ID;
-	public $ready_link = 'items.php?form=update&hostid='.self::HOST_ID.'&itemid=';
+	public $link = 'items.php?filter_set=1&filter_hostids[0]='.self::HOSTID;
+	public $ready_link = 'items.php?form=update&hostid='.self::HOSTID.'&itemid=';
 	public $button = 'Create item';
 	public $success_message = 'Item added';
 	public $fail_message = 'Cannot add item';
+
+	const HOSTID					= 40001;	// 'Simple form test host'
+	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
+	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
+	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
+	const CLONE_ITEMID			= 99102;	// 'Simple form test host' -> 'testFormItem'
 
 	use PreprocessingTrait;
 
@@ -44,9 +46,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return ['class' => CMessageBehavior::class];
 	}
 
 	public function getItemPreprocessingPrometheusData() {
@@ -142,7 +142,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$form->selectTab('Preprocessing');
 		$original_steps = $this->listPreprocessingSteps();
 		// Open copied item form, get steps text and compare to original.
-		$this->page->open('items.php?filter_set=1&filter_hostids[0]='.self::HOST_ID);
+		$this->page->open('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
 		$this->query('link', $item_name)->one()->click();
 		$form->invalidate();
 		$this->assertEquals($item_name, $form->getField('Name')->getValue());
@@ -159,6 +159,31 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	}
 
 	/**
+	 * Add preprocessing steps to item for cloning.
+	 */
+	public function prepareCloneItemPreprocessing() {
+		CDataHelper::call('item.update', [
+			'itemid' => self::CLONE_ITEMID,
+			'preprocessing' => self::CLONE_PREPROCESSING
+		]);
+	}
+
+	/**
+	 * @on-before prepareCloneItemPreprocessing
+	 *
+	 * @backup profiles
+	 */
+	public function testFormPreprocessingItem_CloneItem() {
+		$link = 'items.php?form=update&hostid='.self::HOSTID.'&itemid='.self::CLONE_ITEMID;
+		$this->checkCloneTemplatedItem($link, 'Item');
+	}
+
+	public function testFormPreprocessingItem_CloneTemplatedItem() {
+		$link = 'items.php?form=update&hostid='.self::INHERITANCE_HOSTID.'&itemid='.self::INHERITED_ITEMID;
+		$this->checkCloneTemplatedItem($link, 'Item', $templated = true);
+	}
+
+	/**
 	 * @dataProvider getItemCustomOnFailData
 	 */
 	public function testFormPreprocessingItem_CustomOnFail($data) {
@@ -169,14 +194,9 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
 	public function testFormPreprocessingItem_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_TEMPLATE_ID;
-		$host_link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_HOST_ID;
+		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_TEMPLATEID;
+		$host_link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_HOSTID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
-	}
-
-	public function testFormPreprocessingItem_CloneTemplatedItem() {
-		$link = 'items.php?form=update&hostid='.self::INHERITANCE_HOST_ID.'&itemid='.self::INHERITED_ITEM_ID;
-		$this->checkCloneTemplatedItem($link, 'Item');
 	}
 }
