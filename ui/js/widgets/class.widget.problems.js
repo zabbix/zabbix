@@ -20,4 +20,23 @@
 
 class CWidgetProblems extends CWidget {
 
+	_registerEvents() {
+		super._registerEvents();
+
+		this._events = {
+			...this._events,
+
+			acknowledgeCreated: (e, response, overlay) => {
+				refreshWidgetOnAcknowledgeCreate("problems", response, overlay);
+			}
+		}
+
+		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
+	}
+
+	_unregisterEvents() {
+		super._unregisterEvents();
+
+		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
+	}
 }
