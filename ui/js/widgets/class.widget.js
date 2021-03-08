@@ -57,6 +57,8 @@ class CWidget extends CBaseComponent {
 	}) {
 		super(document.createElement('div'));
 
+		this._$target = $(this._target);
+
 		this._type = type;
 		this._header = header;
 		this._view_mode = view_mode;
@@ -177,6 +179,10 @@ class CWidget extends CBaseComponent {
 	_doDestroy() {
 	}
 
+	isEntered() {
+		return this._$target.hasClass(this._css_classes.focus);
+	}
+
 	/**
 	 * Focus specified top-level widget.
 	 */
@@ -208,6 +214,10 @@ class CWidget extends CBaseComponent {
 
 	isReady() {
 		return this._is_ready;
+	}
+
+	isInteracting() {
+		return (this._$target.find('[data-expanded="true"], [aria-expanded="true"]').length > 0);
 	}
 
 	setViewMode(view_mode) {
@@ -362,9 +372,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	_update() {
-		if (this._update_abort_controller !== null
-				|| this._is_updating_paused
-				|| this._$content_body.find('[data-expanded="true"]').length > 0) {
+		if (this._update_abort_controller !== null || this._is_updating_paused || this.isInteracting()) {
 			this._startUpdating(1);
 
 			return;
@@ -568,8 +576,6 @@ class CWidget extends CBaseComponent {
 	}
 
 	_makeView() {
-		this._$target = $(this._target);
-
 		this._$content_header =
 			$('<div>', {'class': this._css_classes.head})
 				.append($('<h4>').text((this._header !== '') ? this._header : this._defaults.header));
