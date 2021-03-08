@@ -133,7 +133,30 @@ static int	eval_parse_macro(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 	{
 		token->type = ZBX_EVAL_TOKEN_VAR_LLDMACRO;
 	}
-	else
+	else if ('{' == ctx->expression[pos + 1] && SUCCEED == zbx_token_parse_nested_macro(ctx->expression,
+			ctx->expression + pos, &tok))
+	{
+		switch (tok.type)
+		{
+			case ZBX_TOKEN_FUNC_MACRO:
+				if (0 != (ctx->rules & ZBX_EVAL_PARSE_MACRO))
+				{
+					token->type = ZBX_EVAL_TOKEN_VAR_MACRO;
+					eval_update_const_variable(ctx, token);
+				}
+				break;
+			case ZBX_TOKEN_SIMPLE_MACRO:
+				if (0 != (ctx->rules & ZBX_EVAL_PARSE_MACRO))
+					token->type = ZBX_EVAL_TOKEN_VAR_MACRO;
+				break;
+			case ZBX_TOKEN_LLD_FUNC_MACRO:
+				if (0 != (ctx->rules & ZBX_EVAL_PARSE_LLDMACRO))
+					token->type = ZBX_EVAL_TOKEN_VAR_LLDMACRO;
+				break;
+		}
+	}
+
+	if (0 == token->type)
 	{
 		*error = zbx_dsprintf(*error, "invalid token starting with \"%s\"", ctx->expression + pos);
 		return FAIL;

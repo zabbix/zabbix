@@ -11,7 +11,7 @@ in:
   rules: []
   expression: '0'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
     token: '0'
     opt: 0
@@ -22,7 +22,7 @@ in:
   rules: []
   expression: '0.1'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
     token: '0.1'
     opt: 0
@@ -33,7 +33,7 @@ in:
   rules: []
   expression: '.1'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
     token: '.1'
     opt: 0
@@ -44,7 +44,7 @@ in:
   rules: []
   expression: '1.'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
     token: '1.'
     opt: 0
@@ -62,7 +62,7 @@ in:
   rules: []
   expression: '1e10'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
     token: '1e10'
     opt: 0
@@ -80,7 +80,7 @@ in:
   rules: []
   expression: '"xyz"'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_STR
     token: '"xyz"'
     opt: 0
@@ -91,7 +91,7 @@ in:
   rules: []
   expression: '"x\\\"y\"z/"'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_STR
     token: '"x\\\"y\"z/"'
     opt: 0
@@ -109,7 +109,7 @@ in:
   rules: []
   expression: '""'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_STR
     token: '""'
     opt: 0
@@ -134,7 +134,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTIONID]
   expression: '{1}'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_FUNCTIONID
     token: '{1}'
     opt: 0
@@ -145,7 +145,7 @@ in:
   rules: [ZBX_EVAL_PARSE_MACRO]
   expression: '{1}'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_MACRO
     token: '{1}'
     opt: 0
@@ -163,9 +163,20 @@ in:
   rules: [ZBX_EVAL_PARSE_MACRO]
   expression: '{MACRO}'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_MACRO
     token: '{MACRO}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{{MACRO}.func()}'
+in:
+  rules: [ZBX_EVAL_PARSE_MACRO]
+  expression: '{{MACRO}.func()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_MACRO
+    token: '{{MACRO}.func()}'
     opt: 0
   result: SUCCEED
 --- # user macros
@@ -174,7 +185,7 @@ in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$MACRO}'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_USERMACRO
     token: '{$MACRO}'
     opt: 0
@@ -185,7 +196,7 @@ in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$MACRO:context}'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_USERMACRO
     token: '{$MACRO:context}'
     opt: 0
@@ -203,7 +214,7 @@ in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$MACRO:"context:\"context\""}'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_USERMACRO
     token: '{$MACRO:"context:\"context\""}'
     opt: 0
@@ -221,7 +232,7 @@ in:
   rules: [ZBX_EVAL_PARSE_LLDMACRO]
   expression: '{#LLD}'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_LLDMACRO
     token: '{#LLD}'
     opt: 0
@@ -240,6 +251,16 @@ in:
   expression: '{#LLD'
 out:
   result: FAIL
+test case: Succeed '{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_LLDMACRO
+    token: '{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
 --- # parenthesis
 test case: Fail '()'
 in:
@@ -253,7 +274,7 @@ in:
   rules: []
   expression: '(0)'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
     token: '0'
     opt: 0
@@ -278,7 +299,7 @@ in:
   rules: []
   expression: '((0))'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
   result: SUCCEED
 --- # unary minus operations
@@ -294,7 +315,7 @@ in:
   rules: []
   expression: '-1'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
   result: SUCCEED
@@ -304,7 +325,7 @@ in:
   rules: []
   expression: '-(1)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
   result: SUCCEED
@@ -314,7 +335,7 @@ in:
   rules: [ZBX_EVAL_PARSE_MACRO]
   expression: '-{MACRO}'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_MACRO, token: '{MACRO}', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
   result: SUCCEED
@@ -324,7 +345,7 @@ in:
   rules: []
   expression: '--1'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
@@ -335,7 +356,7 @@ in:
   rules: []
   expression: '- - 1'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
@@ -346,7 +367,7 @@ in:
   rules: []
   expression: '-(-1)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
@@ -434,7 +455,7 @@ in:
   rules: []
   expression: '1+2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
@@ -445,7 +466,7 @@ in:
   rules: []
   expression: '1+2-3'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
@@ -458,7 +479,7 @@ in:
   rules: []
   expression: '1-2+3'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_SUB, token: '-', opt: 0}
@@ -492,7 +513,7 @@ in:
   rules: []
   expression: '2--1'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
@@ -504,7 +525,7 @@ in:
   rules: []
   expression: '1+2*3'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
@@ -517,7 +538,7 @@ in:
   rules: []
   expression: '1*2+3'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MUL, token: '*', opt: 0}
@@ -530,7 +551,7 @@ in:
   rules: []
   expression: '1+2*3-4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
@@ -545,7 +566,7 @@ in:
   rules: []
   expression: '1/2+3*4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_DIV, token: '/', opt: 0}
@@ -560,7 +581,7 @@ in:
   rules: []
   expression: '1/(2+3)*4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
@@ -575,7 +596,7 @@ in:
   rules: []
   expression: '1+(2-(3+4))'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
@@ -590,7 +611,7 @@ in:
   rules: []
   expression: '((1+2)-3)+4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
@@ -605,7 +626,7 @@ in:
   rules: []
   expression: '1=2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
@@ -616,7 +637,7 @@ in:
   rules: []
   expression: '1<>2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_NE, token: '<>', opt: 0}
@@ -627,7 +648,7 @@ in:
   rules: []
   expression: '1<2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_LT, token: '<', opt: 0}
@@ -638,7 +659,7 @@ in:
   rules: []
   expression: '1<=2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_LE, token: '<=', opt: 0}
@@ -649,7 +670,7 @@ in:
   rules: []
   expression: '1>2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_GT, token: '>', opt: 0}
@@ -660,7 +681,7 @@ in:
   rules: []
   expression: '1>=2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_GE, token: '>=', opt: 0}
@@ -776,7 +797,7 @@ in:
   rules: []
   expression: '3 > 2 <> 1'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_GT, token: '>', opt: 0}
@@ -789,7 +810,7 @@ in:
   rules: []
   expression: '3 = 2 + 1'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
@@ -802,7 +823,7 @@ in:
   rules: []
   expression: '(3 = 2) + 1'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
@@ -829,7 +850,7 @@ in:
   rules: []
   expression: '1=-2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_MINUS, token: '-', opt: 0}
@@ -841,7 +862,7 @@ in:
   rules: []
   expression: 'not 1'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
   result: SUCCEED
@@ -858,7 +879,7 @@ in:
   rules: []
   expression: 'not(1)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
   result: SUCCEED
@@ -868,7 +889,7 @@ in:
   rules: []
   expression: 'not 1 + 2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
@@ -880,7 +901,7 @@ in:
   rules: []
   expression: 'not (1 + 2)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
@@ -892,7 +913,7 @@ in:
   rules: []
   expression: '(not 1)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
   result: SUCCEED
@@ -902,7 +923,7 @@ in:
   rules: []
   expression: '1 = not 2'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_NOT, token: 'not', opt: 0}
@@ -922,7 +943,7 @@ in:
   expression: '1 +not 2'
 out:
 out:
-  stack: 
+  stack:
   result: FAIL
 --- # constant variable index
 test case: Succeed '1+2*3-{MACRO}'
@@ -930,7 +951,7 @@ in:
   rules: [ZBX_EVAL_PARSE_CONST_INDEX,ZBX_EVAL_PARSE_MACRO]
   expression: '1+2*3-{MACRO}'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 1}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 2}
@@ -945,7 +966,7 @@ in:
   rules: []
   expression: '1=2 or 3<4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
@@ -960,7 +981,7 @@ in:
   rules: []
   expression: '1=2 and 3<4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
@@ -975,7 +996,7 @@ in:
   rules: []
   expression: '1 or 2 and 3 or 4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
@@ -990,7 +1011,7 @@ in:
   rules: []
   expression: '1 and 2 or 3 and 4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
@@ -1047,7 +1068,7 @@ in:
   rules: []
   expression: '(1)and(2)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
@@ -1058,7 +1079,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min()'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 0}
   result: SUCCEED
 ---
@@ -1074,7 +1095,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(1)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 1}
   result: SUCCEED
@@ -1084,7 +1105,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(1,2)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
@@ -1095,7 +1116,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(1,)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
@@ -1106,7 +1127,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(,)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
@@ -1117,7 +1138,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(1,"xyz")'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
@@ -1128,7 +1149,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_USERMACRO]
   expression: 'min(1,{$MACRO:context,})'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_USERMACRO, token: '{$MACRO:context,}', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
@@ -1139,7 +1160,7 @@ in:
   rules: [ZBX_EVAL_PARSE_CONST_INDEX,ZBX_EVAL_PARSE_FUNCTION]
   expression: '1 + min(2, 3) - 4'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3', opt: 0}
@@ -1154,7 +1175,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
   expression: 'avg(min(1, 2), 3, max(4, 5, 6))'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
@@ -1171,7 +1192,7 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(1, , 2)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2', opt: 0}
@@ -1183,7 +1204,7 @@ in:
   rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(/host/key,1)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
@@ -1208,7 +1229,7 @@ in:
   rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(/host/key,5m)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '5m', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
@@ -1219,7 +1240,7 @@ in:
   rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
   expression: 'min(/host/key,5m:now-1h)'
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '5m:now-1h', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
@@ -1230,7 +1251,7 @@ in:
   rules: [ZBX_EVAL_PARSE_CONST_INDEX]
   expression: '1w + 2d + 3h + 4m + 5s '
 out:
-  stack: 
+  stack:
   - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '1w', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '2d', opt: 1}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
@@ -1268,7 +1289,7 @@ in:
   rules: []
   expression: '1G'
 out:
-  stack: 
+  stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
     token: '1G'
     opt: 0
