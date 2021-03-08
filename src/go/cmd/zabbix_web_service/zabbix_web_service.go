@@ -174,5 +174,5 @@ func createTLSServer() (*http.Server, error) {
 
 	tlsConfig.BuildNameToCertificate()
 
-	return &http.Server{Addr: ":" + options.ListenPort, TLSConfig: tlsConfig}, nil
+	return &http.Server{Addr: ":" + options.ListenPort, TLSConfig: tlsConfig, ErrorLog: log.DefaultLogger}, nil
 }
