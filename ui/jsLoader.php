@@ -74,7 +74,6 @@ $availableJScripts = [
 	'multiselect.js' => '',
 	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
-	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
 	'inputsecret.js' => '',

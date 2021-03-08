@@ -53,7 +53,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
 		$initial_load = $this->getInput('initial_load', 1);
-		$script_inline = '';
 
 		$parser = new CNumberParser(['with_suffix' => true]);
 		$lefty_min = $parser->parse($fields['lefty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
@@ -113,14 +112,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'time_from' => $timeline['from_ts'],
 				'time_to' => $timeline['to_ts']
 			];
-
-			// Init script that refreshes widget once timeselector changes.
-			if ($initial_load) {
-				$script_inline .=
-					'jQuery.subscribe("timeselector.rangeupdate", function(e, data) {'.
-						'ZABBIX.Dashboard.refreshWidget("'.$uniqueid.'");'.
-					'});';
-			}
 		}
 		// Otherwise, set graph time period options.
 		else {
@@ -139,42 +130,18 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		}
 
 		if (!$preview) {
-			$graph_options = zbx_array_merge($svg_data['data'], [
+			$svg_data['data'] = zbx_array_merge($svg_data['data'], [
 				'sbox' => ($graph_data['dashboard_time'] && !$edit_mode),
 				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
 				'time_from' => $graph_data['time_period']['time_from'],
 				'hint_max_rows' => ZBX_WIDGET_ROWS
 			]);
-
-			$script_inline .=
-				'var widget = ZABBIX.Dashboard.getWidgetsBy(\'uniqueid\', "'.$uniqueid.'");'.
-				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.json_encode($graph_options).', widget[0]);';
-		}
-
-		if ($initial_load) {
-			// Register widget auto-refresh when resizing widget.
-			$script_inline .=
-				'ZABBIX.Dashboard.addAction("onResizeEnd",'.
-					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
-						'parameters: ["onResizeEnd"],'.
-						'grid: {widget: 1},'.
-						'trigger_name: "svggraph_widget_resize_end_'.$uniqueid.'"'.
-					'});';
-
-			// Disable SBox when switch to edit mode.
-			$script_inline .=
-				'ZABBIX.Dashboard.addAction(DASHBOARD_PAGE_EVENT_EDIT,'.
-					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
-						'parameters: [DASHBOARD_PAGE_EVENT_EDIT],'.
-						'grid: {widget: 1},'.
-						'trigger_name: "svggraph_widget_edit_start_'.$uniqueid.'"'.
-					'});';
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'svg' => $svg_data['svg'].$svg_data['legend'],
-			'script_inline' => $script_inline,
+			'svg_data' => $svg_data,
 			'initial_load' => $initial_load,
 			'preview' => $preview,
 			'info' => $edit_mode ? null : self::makeWidgetInfo($fields),

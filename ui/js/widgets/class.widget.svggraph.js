@@ -20,4 +20,56 @@
 
 class CWidgetSvgGraph extends CWidget {
 
+	_init() {
+		super._init();
+
+		this._is_svg_active = false;
+	}
+
+	_processUpdateResponse(response) {
+		super._processUpdateResponse(response);
+
+		if (response.svg_data !== undefined) {
+			$('svg', this._$content_body).svggraph(response.svg_data, this);
+			this._is_svg_active = true;
+		}
+		else {
+			this._is_svg_active = false;
+		}
+	}
+
+	resize() {
+		super.resize();
+
+		this._update();
+	}
+
+	setEditMode() {
+		super.setEditMode();
+
+		if (this._is_svg_active) {
+			$('svg', this._$content_body).svggraph('disableSBox');
+		}
+	}
+
+	_registerEvents() {
+		super._registerEvents();
+
+		this._events = {
+			...this._events,
+
+			timeselectorRangeUpdate: () => {
+				this._update();
+			}
+		}
+
+		// Refreshes widget once timeselector changes.
+		$.subscribe('timeselector.rangeupdate', this._events.timeselectorRangeUpdate);
+	}
+
+	_unregisterEvents() {
+		super._unregisterEvents();
+
+		$.unsubscribe('timeselector.rangeupdate', this._events.timeselectorRangeUpdate);
+	}
 }

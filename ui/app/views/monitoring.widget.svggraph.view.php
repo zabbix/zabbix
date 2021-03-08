@@ -30,7 +30,7 @@ $output = [
 if (!$data['preview']) {
 	$output += [
 		'header' => $data['name'],
-		'script_inline' => $data['script_inline']
+		'svg_data' => $data['svg_data']
 	];
 
 	if ($data['info'] !== null) {
