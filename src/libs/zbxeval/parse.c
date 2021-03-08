@@ -974,7 +974,7 @@ zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_ui
  ******************************************************************************/
 void	zbx_eval_init(zbx_eval_context_t *ctx)
 {
-	ctx->expression = NULL;
+	memset(ctx, 0, sizeof(zbx_eval_context_t));
 }
 
 /******************************************************************************
