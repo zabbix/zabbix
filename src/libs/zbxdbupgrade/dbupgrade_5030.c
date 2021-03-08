@@ -1344,6 +1344,17 @@ static int	DBpatch_5030026(void)
 	return ret;
 }
 
+static int	DBpatch_5030027(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update trigger_queue set type=4 where type=3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -1377,5 +1388,6 @@ DBPATCH_ADD(5030023, 0, 1)
 DBPATCH_ADD(5030024, 0, 1)
 DBPATCH_ADD(5030025, 0, 1)
 DBPATCH_ADD(5030026, 0, 1)
+DBPATCH_ADD(5030027, 0, 1)
 
 DBPATCH_END()
