@@ -4714,7 +4714,7 @@ void	zbx_db_trigger_queue_unlock(void)
  * Return value: proxyid at the top a queue                                   *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	zbx_hc_proxyqueue_peek()
+static zbx_uint64_t	zbx_hc_proxyqueue_peek(void)
 {
 	zbx_uint64_t	*p_val;
 
