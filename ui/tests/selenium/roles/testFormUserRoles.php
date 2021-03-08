@@ -19,6 +19,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup role
@@ -484,12 +485,46 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => [
 							'user_api_methods'
+						],
+						'api_methods' => [
+							'dashboard.create',
+							'dashboard.*',
+							'*.create'
 						]
 					],
-					'api_methods' => [
-						'dashboard.create',
-						'dashboard.*',
-						'*.create'
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Admin',
+					'fields' => [
+						'Name' => [
+							'admin_api_methods'
+						],
+						'api_methods' => [
+							'dashboard.create',
+							'dashboard.*',
+							'*.create'
+						]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Super admin',
+					'fields' => [
+						'Name' => [
+							'super_admin_api_methods'
+						],
+						'api_methods' => [
+							'dashboard.create',
+							'dashboard.*',
+							'*.create'
+						]
 					],
 					'message_header' => 'User role created'
 				]
@@ -500,36 +535,191 @@ class testFormUserRoles extends CWebTest {
 					'user_type' => 'User',
 					'fields' => [
 						'Name' => [
-							'admin_api_methods'
-						]
-					],
-					'api_methods' => [
-						'dashboard.create',
-						'dashboard.*',
-						'*.create'
+							'user_api_methods_allow'
+						],
+						'API methods' => ['Allow list']
 					],
 					'message_header' => 'User role created'
 				]
 			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Admin',
+					'fields' => [
+						'Name' => [
+							'admin_api_methods_allow'
+						],
+						'API methods' => ['Allow list']
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Super admin',
+					'fields' => [
+						'Name' => [
+							'super_admin_api_methods_allow'
+						],
+						'API methods' => ['Allow list']
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'User',
+					'fields' => [
+						'Name' => [
+							'user_action_access'
+						],
+						'access_to_actions' => [
+							'Create and edit dashboards and screens' => false,
+							'Create and edit maps' => false,
+							'Add problem comments' => false,
+							'Change severity' => false,
+							'Acknowledge problems' => false,
+							'Close problems' => false,
+							'Execute scripts' => false
+						]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Admin',
+					'fields' => [
+						'Name' => [
+							'admin_action_access'
+						],
+						'access_to_actions' => [
+							'Create and edit dashboards and screens' => false,
+							'Create and edit maps' => false,
+							'Create and edit maintenance' => false,
+							'Add problem comments' => false,
+							'Change severity' => false,
+							'Acknowledge problems' => false,
+							'Close problems' => false,
+							'Execute scripts' => false
+						]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_type' => 'Super admin',
+					'fields' => [
+						'Name' => [
+							'super_admin_action_access'
+						],
+						'access_to_actions' => [
+							'Create and edit dashboards and screens' => false,
+							'Create and edit maps' => false,
+							'Create and edit maintenance' => false,
+							'Add problem comments' => false,
+							'Change severity' => false,
+							'Acknowledge problems' => false,
+							'Close problems' => false,
+							'Execute scripts' => false
+						]
+					],
+					'message_header' => 'User role created'
+				]
+			]
 		];
+	}
+
+	public function testFormUserRoles_Layout() {
+		$this->page->login()->open('zabbix.php?action=userrole.edit');
+		$screenshot_area = $this->query('id:user_role_tab')->one();
+		foreach (['User', 'Admin', 'Super admin'] as $role) {
+			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
+			$this->page->removeFocus();
+			$this->assertScreenshotExcept($screenshot_area,
+			['query' => 'xpath://input[@id="name"]'],
+			$role);
+		}
+		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=3');
+		$this->page->removeFocus();
+		$this->assertScreenshotExcept($screenshot_area, [
+			['query' => 'xpath://input[@id="name"]']
+		]);
 	}
 
 	/**
 	 * @dataProvider getCreateData
 	 */
 	public function testFormUserRoles_Create($data) {
-		$this->page->login()->open('zabbix.php?action=userrole.edit');
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$hash_before = CDBHelper::getHash('SELECT * FROM role');
+		}
 
+		$this->page->login()->open('zabbix.php?action=userrole.edit');
+		$role_name = implode($data['fields']['Name']);
 		$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($data['user_type']);
 		$this->fillFluidForm($data['fields']);
 		$this->query('button:Add')->one()->click();
 		switch ($data['expected']) {
 			case TEST_BAD:
 				$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
+				$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role'));
 				break;
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, $data['message_header']);
+				$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM role WHERE name='.zbx_dbstr($role_name)));
 				break;
+		}
+	}
+
+	// fill fluid form.
+	public function fillFluidForm($fields) {
+		// Here is section and value. Example Monitoring-> Dashboard or API methods.
+		foreach ($fields as $section => $elements) {
+
+			// Summon multiselect fill.
+			if ($section === 'api_methods') {
+				$this->fillMultiselect($elements);
+			}
+
+			// Summon actions fill.
+			elseif ($section === 'access_to_actions') {
+				foreach ($elements as $element => $status) {
+					$this->fillActions($element, $status);
+				}
+			}
+
+			// This one needed to checkin or checkout ALL elements at once for checbox elements..
+			elseif ($elements === [true] || $elements === [false]) {
+				$this->fillCheckbox($section, $elements);
+			}
+			else {
+				// Here we find input type, is it - text, checkbox or radio.
+				$found = $this->findAttribute($section);
+				// Here we can choose, what checbox we want to checkout or checkin.
+				if ($found === 'checkbox') {
+					foreach ($elements as $element => $status) {
+						$this->fillCheckbox($section, $element, $status);
+					}
+				}
+				else {
+					// radio or text input left.
+					foreach ($elements as $element) {
+						if ($found === 'text') {
+							$this->fillText($section, $element);
+						}
+						elseif ($found === 'radio') {
+							$this->fillRadio($section, $element);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -578,44 +768,6 @@ class testFormUserRoles extends CWebTest {
 		return $finded_container;
 	}
 
-	// fill fluid form.
-	public function fillFluidForm($fields) {
-		// Here is section and value. Example Monitoring-> Dashboard or API methods.
-		foreach ($fields as $section => $elements) {
-
-			// Summon multiselect fill.
-			if ($section === 'api_methods') {
-				$this->fillMultiselect($elements);
-			}
-
-			// This one needed to checkin or checkout ALL elements at once for checbox elements..
-			elseif ($elements === [true] || $elements === [false]) {
-				$this->fillCheckbox($section, $elements);
-			}
-			else {
-				// Here we find input type, is it - text, checbox or radio.
-				$found = $this->findAttribute($section);
-				// Here we can choose, what checbox we want to checkout or checkin.
-				if ($found === 'checkbox') {
-					foreach ($elements as $element => $status) {
-						$this->fillCheckbox($section, $element, $status);
-					}
-				}
-				else {
-					// radio or text input left.
-					foreach ($elements as $element) {
-						if ($found === 'text') {
-							$this->fillText($section, $element);
-						}
-						elseif ($found === 'radio') {
-							$this->fillRadio($section, $element);
-						}
-					}
-				}
-			}
-		}
-	}
-
 	// Fill multiselect field.
 	public function fillMultiselect($methods) {
 		$api_field = $this->query('class:multiselect-control')->asMultiselect()->one();
@@ -623,7 +775,13 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	// Check/Uncheck Access to actions.
-	public function fillActions($elements) {
-
+	public function fillActions($action, $status = null) {
+		$action_checkbox = $this->query('xpath://label[text()="'.$action.'"]/preceding-sibling::input')->one()->asCheckbox();
+		if ($status !== true) {
+			$action_checkbox->uncheck();
+		}
+		else {
+			$action_checkbox->check();
+		}
 	}
 }
