@@ -52,6 +52,7 @@ class CWidget extends CBaseComponent {
 		cell_height,
 		is_editable,
 		is_edit_mode,
+		web_layout_mode,
 		time_period,
 		dynamic_hostid
 	}) {
@@ -81,6 +82,7 @@ class CWidget extends CBaseComponent {
 		this._cell_height = cell_height;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
+		this._web_layout_mode = web_layout_mode;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
 
@@ -199,6 +201,10 @@ class CWidget extends CBaseComponent {
 		}
 
 		this._$target.removeClass(this._css_classes.focus);
+	}
+
+	getNumHeaderLines() {
+		return (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) ? 1 : 0;
 	}
 
 	resize() {

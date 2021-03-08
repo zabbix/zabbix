@@ -35,6 +35,7 @@ class CDashboard extends CBaseComponent {
 		widget_defaults,
 		is_editable,
 		is_edit_mode,
+		web_layout_mode,
 		time_period,
 		dynamic_hostid
 	}) {
@@ -66,11 +67,12 @@ class CDashboard extends CBaseComponent {
 		this._widget_defaults = widget_defaults;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
+		this._web_layout_mode = web_layout_mode,
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
 
 		this._init();
-		this._registerEvents();
+		this._initEvents();
 	}
 
 	_init() {
@@ -163,6 +165,7 @@ class CDashboard extends CBaseComponent {
 			widget_defaults: this._widget_defaults,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
+			web_layout_mode: this._web_layout_mode,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid
 		});
@@ -195,10 +198,93 @@ class CDashboard extends CBaseComponent {
 	activate() {
 		// this._selectTab(this._tabs.getList().children[0]);
 
-		// return this.getSelectedPage().activate();
+		this._activatePage(this._dashboard_pages[0]);
+	}
 
-		this._dashboard_pages[0].start();
-		this._dashboard_pages[0].activate();
+	_activatePage(dashboard_page) {
+		if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
+			dashboard_page.start();
+		}
+		if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_INACTIVE) {
+			dashboard_page.activate();
+			dashboard_page.on(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.reserveHeaderLines);
+		}
+	}
+
+	_deactivatePage(dashboard_page) {
+		if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_ACTIVE) {
+			dashboard_page.deactivate();
+			dashboard_page.off(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.reserveHeaderLines);
+		}
+	}
+
+	_destroyPage(dashboard_page) {
+		this._deactivatePage(dashboard_page);
+		dashboard_page.destroy();
+	}
+
+
+	_slideKiosk() {
+		// Calculate the dashboard offset (0, 1 or 2 lines) based on focused widget.
+
+		let slide_lines = 0;
+
+		for (const widget of this._widgets) {
+			if (!widget.getView().hasClass(widget.getCssClass('focus'))) {
+				continue;
+			}
+
+			// Focused widget not on the first row of dashboard?
+			if (widget.getView().position().top !== 0) {
+				break;
+			}
+
+			if (widget instanceof CWidgetIterator) {
+				slide_lines = widget.getView().hasClass('iterator-double-header') ? 2 : 1;
+			}
+			else if (widget.getView().hasClass(widget.getCssClass('hidden_header'))) {
+				slide_lines = 1;
+			}
+
+			break;
+		}
+
+		// Apply the calculated dashboard offset (0, 1 or 2 lines) slowly.
+
+		const $wrapper = this._$target.closest('.layout-kioskmode');
+
+		if (!$wrapper.length) {
+			return;
+		}
+
+		if (typeof this._options['kiosk_slide_timeout'] !== 'undefined') {
+			clearTimeout(this._options['kiosk_slide_timeout'])
+			delete this._options['kiosk_slide_timeout'];
+		}
+
+		let slide_lines_current = 0;
+		for (let i = 2; i > 0; i--) {
+			if ($wrapper.hasClass('kiosk-slide-lines-' + i)) {
+				slide_lines_current = i;
+				break;
+			}
+		}
+
+		if (slide_lines > slide_lines_current) {
+			if (slide_lines_current > 0) {
+				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
+			}
+			$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
+		}
+		else if (slide_lines < slide_lines_current) {
+			this._options['kiosk_slide_timeout'] = setTimeout(() => {
+				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
+				if (slide_lines > 0) {
+					$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
+				}
+				delete this._options['kiosk_slide_timeout'];
+			}, 2000);
+		}
 	}
 
 	getSelectedPage() {
@@ -206,8 +292,9 @@ class CDashboard extends CBaseComponent {
 	}
 
 
-	_registerEvents() {
-		let window_resize_timeout_id = null;
+	_initEvents() {
+		let resize_timeout_id = null;
+		let reserve_header_lines_timeout_id = null;
 
 		this._events = {
 			tabsResize: () => {
@@ -255,20 +342,63 @@ class CDashboard extends CBaseComponent {
 				}
 			},
 
-			windowResize: () => {
+			resize: () => {
 				window.addEventListener('resize', () => {
-					if (window_resize_timeout_id != null) {
-						clearTimeout(window_resize_timeout_id);
+					if (resize_timeout_id != null) {
+						clearTimeout(resize_timeout_id);
 					}
 
-					window_resize_timeout_id = setTimeout(() => {
-						window_resize_timeout_id = null;
+					resize_timeout_id = setTimeout(() => {
+						resize_timeout_id = null;
 
 						for (const dashboard_page of this._dashboard_pages) {
 							dashboard_page.resize();
 						}
 					}, 200);
 				});
+			},
+
+			reserveHeaderLines: (e) => {
+				// TODO Slide also in non kiosk mode.
+
+				const wrapper = document.querySelector('.wrapper.layout-kioskmode');
+
+				if (wrapper === null) {
+					return;
+				}
+
+				if (reserve_header_lines_timeout_id !== null) {
+					clearTimeout(reserve_header_lines_timeout_id);
+					reserve_header_lines_timeout_id = null;
+				}
+
+				const new_num_header_lines = e.detail.num_header_lines;
+				let old_num_header_lines = 0;
+
+				for (let i = 2; i > 0; i--) {
+					if (wrapper.classList.contains(`kiosk-slide-lines-${i}`)) {
+						old_num_header_lines = i;
+						break;
+					}
+				}
+
+				if (new_num_header_lines > old_num_header_lines) {
+					if (old_num_header_lines > 0) {
+						wrapper.classList.remove(`kiosk-slide-lines-${old_num_header_lines}`);
+					}
+					wrapper.classList.add(`kiosk-slide-lines-${new_num_header_lines}`);
+				}
+				else if (new_num_header_lines < old_num_header_lines) {
+					reserve_header_lines_timeout_id = setTimeout(() => {
+						reserve_header_lines_timeout_id = null;
+
+						wrapper.classList.remove(`kiosk-slide-lines-${old_num_header_lines}`);
+
+						if (new_num_header_lines > 0) {
+							wrapper.classList.add(`kiosk-slide-lines-${new_num_header_lines}`);
+						}
+					}, 2000);
+				}
 			}
 		};
 
@@ -286,7 +416,7 @@ class CDashboard extends CBaseComponent {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
 		}
 
-		window.addEventListener('resize', this._events.windowResize);
+		window.addEventListener('resize', this._events.resize);
 	}
 
 	// =================================================================================================================

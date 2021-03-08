@@ -25,6 +25,9 @@
 ?>
 
 <script>
+	const ZBX_LAYOUT_NORMAL = <?= ZBX_LAYOUT_NORMAL ?>;
+	const ZBX_LAYOUT_KIOSKMODE = <?= ZBX_LAYOUT_KIOSKMODE ?>;
+
 	const DASHBOARD_EVENT_APPLY_PROPERTIES = 'apply_properties';
 
 	function initializeView(dashboard, widget_defaults, time_period, dynamic, web_layout_mode) {
@@ -59,6 +62,7 @@
 				widget_defaults: widget_defaults,
 				is_editable: dashboard.allowed_edit && dashboard.editable,
 				is_edit_mode: (dashboard.dashboardid === null),
+				web_layout_mode: web_layout_mode,
 				time_period: {
 					from: time_period.from,
 					from_ts: time_period.from_ts,
