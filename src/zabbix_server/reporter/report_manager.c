@@ -949,6 +949,30 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
 
 /******************************************************************************
  *                                                                            *
+ * Function: rm_is_report_active                                              *
+ *                                                                            *
+ * Purpose: check if the report is active based on the specified time         *
+ *                                                                            *
+ * Parameters: report - [IN] the report                                       *
+ *             now    - [IN] the current  time                                *
+ *                                                                            *
+ * Return value: SUCCEED - the report is active                               *
+ *               FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	rm_is_report_active(const zbx_rm_report_t *report, time_t now)
+{
+	if (0 != report->active_since && now < report->active_since)
+		return FAIL;
+
+	if (0 != report->active_till && now >= report->active_till)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: rm_update_cache_reports                                          *
  *                                                                            *
  * Purpose: update reports cache                                              *
@@ -1040,7 +1064,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, time_t now)
 		{
 			if (nextcheck != report->nextcheck)
 			{
-				if (report->active_since <= nextcheck && nextcheck <= report->active_till)
+				if (SUCCEED == rm_is_report_active(report, now))
 				{
 					zbx_binary_heap_elem_t	elem = {report->reportid, (void *)report};
 					time_t			nextcheck_old = report->nextcheck;
@@ -1831,7 +1855,7 @@ static void	rm_schedule_jobs(zbx_rm_t *manager, int now)
 		{
 			if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now)))
 			{
-				if (report->active_since <= nextcheck && nextcheck <= report->active_till)
+				if (SUCCEED == rm_is_report_active(report, now))
 				{
 					zbx_binary_heap_elem_t	elem_new = {report->reportid, report};
 
