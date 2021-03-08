@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "log.h"
-#include "zbxjson.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
@@ -1060,18 +1059,18 @@ static size_t	single_curl_response_write_func(void *ptr, size_t size, size_t nme
  *                                                                                  *
  * Function: elastic_check_version                                                  *
  *                                                                                  *
- * Purpose: queries elastic search version and extract the numeric version from the *
- *          response string                                                         *
+ * Purpose: queries elastic search version and extracts the numeric version from    *
+ *          the response string                                                     *
  *                                                                                  *
  ************************************************************************************/
-void	zbx_elastic_check_version(void)
+int	zbx_elastic_check_version(struct zbx_json *json)
 {
 #define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E		3
 	char	major_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E],
 		minor_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E],
-		increment_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E], version_number[MAX_STRING_LEN],
+		increment_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E], version_unparsed[MAX_STRING_LEN],
 		errbuf[CURL_ERROR_SIZE];
-	int	major_version_num, minor_version_num, increment_version_num, elasticDB_version, local_status,
+	int	flag, major_version_num, minor_version_num, increment_version_num, elasticDB_version, local_status,
 		overall_status = SUCCEED;
 	size_t	version_number_len, next_start_index = 0;
 
@@ -1128,7 +1127,7 @@ void	zbx_elastic_check_version(void)
 	if (SUCCEED != zbx_json_open(s.ptr, &jp) ||
 		SUCCEED != zbx_json_brackets_open(jp.start, &jp_values) ||
 		SUCCEED != zbx_json_brackets_by_name(&jp_values, "version", &jp_sub) ||
-		SUCCEED != zbx_json_value_by_name(&jp_sub, "number", version_number, sizeof(version_number), NULL))
+		SUCCEED != zbx_json_value_by_name(&jp_sub, "number", version_unparsed, sizeof(version_unparsed), NULL))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to retrieve ElasticDB version from the json response");
 		overall_status = FAIL;
@@ -1138,59 +1137,6 @@ clean:
 	curl_easy_cleanup(handle);
 	curl_slist_free_all(curl_headers);
 out:
-#define PROCESS_VERSION_SUBBLOCK(cur_ver)						\
-if (FAIL != overall_status && version_number_len > next_start_index)			\
-{											\
-	local_status = SUCCEED;								\
-	cur_ver[0] = version_number[next_start_index];					\
-											\
-	if (version_number_len > next_start_index + 1 &&				\
-			'.' != version_number[next_start_index + 1])			\
-	{										\
-		if (version_number_len > next_start_index + 1)				\
-		{									\
-			if ('.' == version_number[next_start_index + 2])		\
-			{								\
-				cur_ver[1] = version_number[next_start_index + 1];	\
-				cur_ver[2] = '\0';					\
-				next_start_index = next_start_index + 3;		\
-											\
-				if (0 == isdigit(cur_ver[0]) ||				\
-						0 == isdigit(cur_ver[1]))		\
-				{							\
-					local_status = FAIL;				\
-				}							\
-				else							\
-				{							\
-					cur_ver##_num = atoi(cur_ver);			\
-				}							\
-			}								\
-			else								\
-			{								\
-				local_status = FAIL;					\
-			}								\
-		}									\
-	}										\
-	else										\
-	{										\
-		cur_ver[1] = '\0';							\
-		next_start_index = next_start_index + 2;				\
-											\
-		if (0 == isdigit(cur_ver[0]))						\
-			local_status = FAIL;						\
-		else									\
-			cur_ver##_num  = atoi(cur_ver);					\
-	}										\
-											\
-	if (FAIL == local_status)							\
-	{										\
-		zabbix_log(LOG_LEVEL_CRIT,						\
-			"cannot determine %s in ElasticDB version", #cur_ver);		\
-		cur_ver##_num = 0;							\
-		overall_status = FAIL;							\
-	}										\
-}											\
-
 	if (FAIL == overall_status)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "failed to extract ElasticDB version");
@@ -1198,18 +1144,16 @@ if (FAIL != overall_status && version_number_len > next_start_index)			\
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version retrieved unparsed: %s", version_number);
+		zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version retrieved unparsed: %s", version_unparsed);
 
-		version_number_len = strlen(version_number);
 
-		PROCESS_VERSION_SUBBLOCK(major_version);
-		PROCESS_VERSION_SUBBLOCK(minor_version);
-		PROCESS_VERSION_SUBBLOCK(increment_version);
-
-		if (FAIL == overall_status)
+		if (3 != sscanf(version_unparsed, "%d.%d.%d", &major_version_num, &minor_version_num,
+				&increment_version_num) || major_version_num >= 100 || major_version_num <= 0 ||
+				minor_version_num >= 100 || minor_version_num < 0 || increment_version_num >= 100 ||
+				increment_version_num < 0)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Failed to detect ElasticDB version from the "
-					"following query result: %s", version_number);
+					"following query result: %s", version_unparsed);
 			elasticDB_version = DBVERSION_UNDEFINED;
 		}
 		else
@@ -1219,9 +1163,18 @@ if (FAIL != overall_status && version_number_len > next_start_index)			\
 		}
 	}
 
+#define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION 70000
+#define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION_FRIENDLY "7.X"
+	flag = zbx_check_DBversion("ElasticDB", elasticDB_version, SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION,
+			VERSION_REQUIREMENT_NOT_DEFINED);
+	zbx_json_create_entry_for_DBversion(json, "ElasticDB", version_unparsed,
+			SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION_FRIENDLY,
+			VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY, flag);
 	zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version result: %d", elasticDB_version);
 	ZBX_ELASTIC_SVERSION = elasticDB_version;
 	zbx_free(s.ptr);
+
+	return elasticDB_version;
 }
 
 int	zbx_elastic_get_version(void)
@@ -1239,8 +1192,9 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	return FAIL;
 }
 
-void	zbx_elastic_check_version(void)
+void	zbx_elastic_check_version(struct zbx_json *json)
 {
+	ZBX_UNUSED(json);
 }
 
 int	zbx_elastic_get_version(void)

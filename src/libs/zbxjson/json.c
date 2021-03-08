@@ -1300,3 +1300,18 @@ zbx_json_type_t	zbx_json_valuetype(const char *p)
 {
 	return __zbx_json_type(p);
 }
+
+void	zbx_json_create_entry_for_DBversion(struct zbx_json *json, char *database, char *friendly_current_version,
+		char *friendly_min_version, char *friendly_max_version, int flag)
+{
+	zbx_json_addobject(json, NULL);
+	zbx_json_addstring(json, "database", database, ZBX_JSON_TYPE_STRING);
+
+	if (DB_VERSION_FAILED_TO_RETRIEVE != flag)
+		zbx_json_addstring(json, "current_version", friendly_current_version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "min_version", friendly_min_version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "max_version", friendly_max_version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(json, "flag", flag);
+	zbx_json_close(json);
+}
+

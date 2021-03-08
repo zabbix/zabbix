@@ -2499,6 +2499,30 @@ int	zbx_dbms_mariadb_used(void)
 }
 #endif
 
+#define MAX_FRIENDLY_VERSION_OUTPUT	100
+
+static void	convert_numeric_version_to_user_friendly(int numeric_version, char* friendly_version)
+{
+	size_t	buf_str_len, i = 0, j = 0;
+	char	buf[MAX_FRIENDLY_VERSION_OUTPUT];
+
+	if (VERSION_REQUIREMENT_NOT_DEFINED == numeric_version)
+	{
+		friendly_version[0] = '\0';
+		return;
+	}
+
+	zbx_snprintf(buf, sizeof(buf), "%d", numeric_version);
+	buf_str_len = strlen(buf);
+	friendly_version[buf_str_len + ((buf_str_len - 1) / 2)] = '\0';
+
+	while((friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = buf[buf_str_len - 1 - j++]))
+	{
+		if (0 == j % 2 && j < buf_str_len )
+			friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = '.';
+	}
+}
+
 /***************************************************************************************************************
  *                                                                                                             *
  * Function: zbx_dbms_extract_version                                                                          *
@@ -2529,17 +2553,19 @@ int	zbx_dbms_mariadb_used(void)
  *          For "<anything else>"                                                       => DBVERSION_UNDEFINED *
  *                                                                                                             *
  **************************************************************************************************************/
-void	zbx_dbms_extract_version(void)
+int	zbx_dbms_extract_version(struct zbx_json *json)
 {
 #if defined(HAVE_MYSQL)
-	char	*p, *buffer = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
+	int	flag;
+	char	*p, *buffer = NULL;
+	char	friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ZBX_MYSQL_SVERSION = mysql_get_server_version(conn);
 	zbx_snprintf_alloc(&buffer, &str_alloc, &str_offset, "%s", mysql_get_server_info(conn));
-	p = strstr(buffer,"MariaDB");
+	p = strstr(buffer, "MariaDB");
 
 	if (NULL != p)
 	{
@@ -2549,23 +2575,52 @@ void	zbx_dbms_extract_version(void)
 
 	zbx_free(buffer);
 	zabbix_log(LOG_LEVEL_DEBUG, "MySQL version result: %d", ZBX_MYSQL_SVERSION);
+
+#define MYSQL_MYSQL_MIN_VERSION 50728
+#define MYSQL_MYSQL_MIN_VERSION_FRIENDLY "5.7.28"
+#define MYSQL_MYSQL_MAX_VERSION 80000
+#define MYSQL_MYSQL_MAX_VERSION_FRIENDLY "8.0.x"
+#define MARIA_MYSQL_MIN_VERSION 100037
+#define MARIA_MYSQL_MIN_VERSION_FRIENDLY "10.0.37"
+	convert_numeric_version_to_user_friendly(ZBX_MYSQL_SVERSION, friendly_current_version);
+
+	if (ON == ZBX_MARIADB_SFORK)
+	{
+		flag = zbx_check_DBversion("MariaDB",  ZBX_MYSQL_SVERSION, MARIA_MYSQL_MIN_VERSION,
+				VERSION_REQUIREMENT_NOT_DEFINED);
+		zbx_json_create_entry_for_DBversion(json, "MariaDB", friendly_current_version,
+				MARIA_MYSQL_MIN_VERSION_FRIENDLY, VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY, flag);
+	}
+	else
+	{
+		flag = zbx_check_DBversion("MySQL",  ZBX_MYSQL_SVERSION, MYSQL_MYSQL_MIN_VERSION,
+				MYSQL_MYSQL_MAX_VERSION);
+		zbx_json_create_entry_for_DBversion(json, "MySQL", friendly_current_version,
+				MYSQL_MYSQL_MIN_VERSION_FRIENDLY, MYSQL_MYSQL_MAX_VERSION_FRIENDLY, flag);
+	}
 #elif defined(HAVE_POSTGRESQL)
+	int	flag;
+	char	friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT];
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL version result: %d", ZBX_PG_SVERSION);
+	convert_numeric_version_to_user_friendly(ZBX_PG_SVERSION, friendly_current_version);
+
+#define POSTGRESQL_MIN_VERSION 100900
+#define POSTGRESQL_MIN_VERSION_FRIENDLY "10.9"
+#define POSTGRESQL_MAX_VERSION 130000
+#define POSTGRESQL_MAX_VERSION_FRIENDLY "13.X"
+	flag = zbx_check_DBversion("PostgreSQL", ZBX_PG_SVERSION, POSTGRESQL_MIN_VERSION, POSTGRESQL_MAX_VERSION);
+	zbx_json_create_entry_for_DBversion(json, "PostgreSQL", friendly_current_version, POSTGRESQL_MIN_VERSION_FRIENDLY,
+			POSTGRESQL_MAX_VERSION_FRIENDLY, flag);
 #elif defined(HAVE_ORACLE)
 #define MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT	200
 #define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER		3
 	char	*start, *release_str = "Release ";
-	char	major_release_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER],
-		release_update_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER],
-		release_update_version_revision[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER],
-		increment_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER],
-		reserved_for_future_use[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER],
-		unparsed_version[MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT];
-	int	major_release_version_num, release_update_version_num, release_update_version_revision_num,
-			increment_version_num, reserved_for_future_use_num, local_status, overall_status = SUCCEED;
-	size_t	unparsed_version_len;
+	char	unparsed_version[MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT];
+	int	flag, major_release_version, release_update_version, release_update_version_revision,
+			increment_version, reserved_for_future_use, local_status, overall_status = SUCCEED;
 	sword	err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2580,69 +2635,22 @@ void	zbx_dbms_extract_version(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "OracleDB version retrieved unparsed: %s", unparsed_version);
 
-	unparsed_version_len = strlen(unparsed_version);
-#define PROCESS_VERSION_SUBBLOCK(cur_ver)						\
-if (FAIL != overall_status && unparsed_version_len > (next_start_index + 2))		\
-{											\
-	local_status = SUCCEED;								\
-	cur_ver[0] = unparsed_version[next_start_index];				\
-											\
-	if ('.' != unparsed_version[next_start_index + 1])				\
-	{										\
-		if ('.' == unparsed_version[next_start_index + 2])			\
-		{									\
-			cur_ver[1] = unparsed_version[next_start_index + 1];		\
-			cur_ver[2] = '\0';						\
-			next_start_index = next_start_index + 3;			\
-											\
-			if (0 == isdigit(cur_ver[0]) || 0 == isdigit(cur_ver[1]))	\
-				local_status = FAIL;					\
-			else								\
-				cur_ver##_num = atoi(cur_ver);				\
-		}									\
-		else if (' ' != unparsed_version[next_start_index + 2] &&		\
-				'-' != unparsed_version[next_start_index + 2])		\
-		{									\
-			local_status = FAIL;						\
-		}									\
-	}										\
-	else if ('.' == unparsed_version[next_start_index + 1])				\
-	{										\
-		cur_ver[1] = '\0';							\
-		next_start_index = next_start_index + 2;				\
-											\
-		if (0 == isdigit(cur_ver[0]))						\
-		{									\
-			local_status = FAIL;						\
-		}									\
-		else									\
-			cur_ver##_num  = atoi(cur_ver);					\
-	}										\
-	else										\
-	{										\
-		local_status = FAIL;							\
-	}										\
-											\
-	if (FAIL == local_status)							\
-	{										\
-		zabbix_log(LOG_LEVEL_CRIT,						\
-				"Cannot determine %s in Oracle DB version", #cur_ver);	\
-		cur_ver##_num = 0;							\
-		overall_status = FAIL;							\
-	}										\
-}											\
-
 	if ((start = strstr(unparsed_version, release_str)))
 	{
 		size_t	next_start_index;
 
 		next_start_index = start - unparsed_version + strlen(release_str);
 
-		PROCESS_VERSION_SUBBLOCK(major_release_version);
-		PROCESS_VERSION_SUBBLOCK(release_update_version);
-		PROCESS_VERSION_SUBBLOCK(release_update_version_revision);
-		PROCESS_VERSION_SUBBLOCK(increment_version);
-		PROCESS_VERSION_SUBBLOCK(reserved_for_future_use);
+		if (5 != sscanf(unparsed_version + next_start_index, "%d.%d.%d.%d.%d", &major_release_version,
+				&release_update_version, &release_update_version_revision, &increment_version,
+				&reserved_for_future)) || major_release_version >= 100 || major_release_version <= 0 ||
+				release_update_version >= 100 || release_update_version < 0 ||
+				release_update_version_revision >= 100 || release_update_version_revision < 0 ||
+				increment_version >= 100 || increment_version < 0)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Unexpected Oracle DB version format: %s", unparsed_version);
+			overall_status = FAIL;
+		}
 	}
 	else
 	{
@@ -2652,22 +2660,30 @@ if (FAIL != overall_status && unparsed_version_len > (next_start_index + 2))		\
 out:
 	if (FAIL == overall_status)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Failed to detect OracleDB version from the following query result: %s",
-				unparsed_version);
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to detect OracleDB version");
 		ZBX_ORACLE_SVERSION = DBVERSION_UNDEFINED;
 	}
 	else
 	{
-		ZBX_ORACLE_SVERSION = major_release_version_num * 100000000 + release_update_version_num * 1000000 +
-				release_update_version_revision_num * 10000 + increment_version_num * 100 +
-				reserved_for_future_use_num;
+		ZBX_ORACLE_SVERSION = major_release_version * 100000000 + release_update_version * 1000000 +
+				release_update_version_revision * 10000 + increment_version * 100 +
+				reserved_for_future_use;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "OracleDB version result: %d", ZBX_ORACLE_SVERSION);
+
+	#define ORACLE_MIN_VERSION 1201000200
+	#define ORACLE_MIN_VERSION_FRIENDLY 1201000200
+	flag = zbx_check_DBversion("Oracle", ZBX_ORACLE_SVERSION, ORACLE_MIN_VERSION,
+			VERSION_REQUIREMENT_NOT_DEFINED);
+	zbx_json_create_entry_for_DBversion(json, "Oracle", unparsed_version, ORACLE_MIN_VERSION_FRIENDLY,
+			VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY, flag);
 #else
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return zbx_dbms_get_version();
 }
 
 #if defined(HAVE_POSTGRESQL)

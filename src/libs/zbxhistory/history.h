@@ -20,6 +20,8 @@
 #ifndef ZABBIX_HISTORY_H
 #define ZABBIX_HISTORY_H
 
+#include "zbxjson.h"
+
 #define ZBX_HISTORY_IFACE_SQL		0
 #define ZBX_HISTORY_IFACE_ELASTIC	1
 
@@ -48,7 +50,8 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 
 /* elastic hist */
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
-void	zbx_elastic_check_version(void);
-int	zbx_elastic_get_version(void);
+//void	zbx_history_check_version(struct zbx_json *json);
+//int	zbx_elastic_get_version(void);
+int	zbx_elastic_check_version(struct zbx_json *json);
 
 #endif

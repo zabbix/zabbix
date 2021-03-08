@@ -51,8 +51,8 @@ int	zbx_history_init(char **error)
 
 	const char	*opts[] = {"dbl", "str", "log", "uint", "text"};
 
-	if (NULL != CONFIG_HISTORY_STORAGE_URL)
-		zbx_elastic_check_version();
+	/* if (NULL != CONFIG_HISTORY_STORAGE_URL) */
+	/* 	zbx_elastic_check_version(); */
 
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
 	{
@@ -441,8 +441,13 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
  *               DBVERSION_UNDEFINED otherwise                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_history_get_version(void)
-{
-	return  NULL == CONFIG_HISTORY_STORAGE_URL ? DBVERSION_UNDEFINED : zbx_elastic_get_version();
-}
+/* int	zbx_history_get_version(void) */
+/* { */
+/* 	return  NULL == CONFIG_HISTORY_STORAGE_URL ? DBVERSION_UNDEFINED : zbx_elastic_get_version(); */
+/* } */
 
+void	zbx_history_check_version(struct zbx_json *json)
+{
+	if (NULL != CONFIG_HISTORY_STORAGE_URL)
+		zbx_elastic_check_version(json);
+}

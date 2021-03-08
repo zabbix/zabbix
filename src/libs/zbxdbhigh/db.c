@@ -856,88 +856,28 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-void	DBextract_DBversion(void)
+int	DBextract_DBversion(struct zbx_json *json)
 {
+	int ret;
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	zbx_dbms_extract_version();
+	ret = zbx_dbms_extract_version(json);
 	DBclose();
+
+	return ret;
 }
 
-#define MAX_FRIENDLY_VERSION_OUTPUT	100
-typedef enum
-{
-	DB_VERSION_SUPPORTED,
-	DB_VERSION_LOWER_THAN_MINIMUM,
-	DB_VERSION_HIGHER_THAN_MAXIMUM,
-	DB_VERSION_FAILED_TO_RETRIEVE
-} db_version_status_flags_shared_with_FRONTEND;
+//#define MAX_FRIENDLY_VERSION_OUTPUT	100
+/* typedef enum */
+/* { */
+/* 	DB_VERSION_SUPPORTED, */
+/* 	DB_VERSION_LOWER_THAN_MINIMUM, */
+/* 	DB_VERSION_HIGHER_THAN_MAXIMUM, */
+/* 	DB_VERSION_FAILED_TO_RETRIEVE */
+/* } db_version_status_flags_shared_with_FRONTEND; */
 
-#define VERSION_REQUIREMENT_NOT_DEFINED	-1
+//#define VERSION_REQUIREMENT_NOT_DEFINED	-1
 
-static void	convert_numeric_version_to_user_friendly(int numeric_version, char* friendly_version)
-{
-	size_t	buf_str_len, i = 0, j = 0;
-	char	buf[MAX_FRIENDLY_VERSION_OUTPUT];
-
-	if (VERSION_REQUIREMENT_NOT_DEFINED == numeric_version)
-	{
-		friendly_version[0] = '\0';
-		return;
-	}
-
-	zbx_snprintf(buf, sizeof(buf), "%d", numeric_version);
-	buf_str_len = strlen(buf);
-	friendly_version[buf_str_len + ((buf_str_len - 1) / 2)] = '\0';
-
-	while((friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = buf[buf_str_len - 1 - j++]))
-	{
-		if (0 == j % 2 && j < buf_str_len )
-			friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = '.';
-	}
-}
-
-static void	create_json_entry_for_DBversion(struct zbx_json *json, char *database, int current_version,
-		int min_version, int max_version)
-{
-	int	flag;
-	char	friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT],
-		friendly_min_version[MAX_FRIENDLY_VERSION_OUTPUT],
-		friendly_max_version[MAX_FRIENDLY_VERSION_OUTPUT];
-
-	if (DBVERSION_UNDEFINED == current_version)
-	{
-		flag = DB_VERSION_FAILED_TO_RETRIEVE;
-		zabbix_log(LOG_LEVEL_CRIT, "Failed to retrieve %s version", database);
-	}
-	else if (min_version > current_version && VERSION_REQUIREMENT_NOT_DEFINED != min_version)
-	{
-		flag = DB_VERSION_LOWER_THAN_MINIMUM;
-		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! %s version is %d which is smaller than minimum of %d",
-				database, current_version, min_version);
-	}
-	else if (max_version < current_version && VERSION_REQUIREMENT_NOT_DEFINED != max_version)
-	{
-		flag = DB_VERSION_HIGHER_THAN_MAXIMUM;
-		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! %s version is %d which is higher than maximum of %d",
-				database, current_version, max_version);
-	}
-	else
-		flag = DB_VERSION_SUPPORTED;
-
-	convert_numeric_version_to_user_friendly(current_version, friendly_current_version);
-	convert_numeric_version_to_user_friendly(min_version, friendly_min_version);
-	convert_numeric_version_to_user_friendly(max_version, friendly_max_version);
-
-	zbx_json_addobject(json, NULL);
-	zbx_json_addstring(json, "database", database, ZBX_JSON_TYPE_STRING);
-
-	if (DB_VERSION_FAILED_TO_RETRIEVE != flag)
-		zbx_json_addstring(json, "current_version", friendly_current_version, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "min_version", friendly_min_version, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "max_version", friendly_max_version, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(json, "flag", flag);
-	zbx_json_close(json);
-}
 
 /******************************************************************************
  *                                                                            *
@@ -952,49 +892,23 @@ static void	create_json_entry_for_DBversion(struct zbx_json *json, char *databas
  *                                           elasticDB used                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
+void	DBcheck_version_requirements(struct zbx_json *json)
 {
 	int current_version;
-	struct zbx_json	json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	current_version = zbx_dbms_get_version();
-#if defined(HAVE_MYSQL)
-#define MYSQL_MYSQL_MIN_VERSION 50562
-#define MYSQL_MYSQL_MAX_VERSION 80000
-#define MARIA_MYSQL_MIN_VERSION 100037
-	if (ON == zbx_dbms_mariadb_used())
-		create_json_entry_for_DBversion(&json, "MariaDB", current_version, MARIA_MYSQL_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
-	else
-		create_json_entry_for_DBversion(&json, "MySQL", current_version, MYSQL_MYSQL_MIN_VERSION, MYSQL_MYSQL_MAX_VERSION);
-#elif defined(HAVE_ORACLE)
-#define ORACLE_MIN_VERSION 1102000000
-	create_json_entry_for_DBversion(&json, "Oracle", current_version, ORACLE_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
-#elif defined(HAVE_POSTGRESQL)
-#define POSTGRESQL_MIN_VERSION 90224
-	create_json_entry_for_DBversion(&json, "PostgreSQL", current_version, POSTGRESQL_MIN_VERSION, VERSION_REQUIREMENT_NOT_DEFINED);
-#endif
-#if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
-#define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION 70000
-	if (ON == elastic_is_used)
-	{
-		create_json_entry_for_DBversion(&json, "ElasticDB", elastic_version, SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION,
-				VERSION_REQUIREMENT_NOT_DEFINED);
-	}
-#endif
 	DBbegin();
 
-	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", json.buffer))
+	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", json->buffer))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
 	}
 
 	DBcommit();
 	DBclose();
-	zbx_json_free(&json);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1006,13 +920,13 @@ void	DBcheck_version_requirements(int elastic_is_used, int elastic_version)
  * Purpose: checks DBMS for optional features and exit if is not suitable     *
  *                                                                            *
  ******************************************************************************/
-void	DBcheck_capabilities(void)
+void	DBcheck_capabilities(int db_version)
 {
 #ifdef HAVE_POSTGRESQL
 
 #define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
 #define MIN_TIMESCALEDB_VERSION			10500
-	int		postgresql_version, timescaledb_version;
+	int		timescaledb_version;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -1031,10 +945,10 @@ void	DBcheck_capabilities(void)
 		goto clean;
 
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > (postgresql_version = zbx_dbms_get_version()))
+	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > db_version)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %d is not supported with TimescaleDB, minimum is %d",
-				postgresql_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
+				db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
 		DBfree_result(result);
 		DBclose();
 		exit(EXIT_FAILURE);
