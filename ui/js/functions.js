@@ -905,3 +905,28 @@ function writeTextClipboard(text) {
 	document.execCommand('copy');
 	textarea.remove();
 }
+
+function urlEncodeData(parameters, prefix = '') {
+	const result = [];
+
+	Object.entries(parameters).forEach(([name, value]) => {
+		if (value === undefined) {
+			return;
+		}
+
+		if (value === null) {
+			value = '';
+		}
+
+		const prefixed_name = prefix !== '' ? `${prefix}[${name}]` : name;
+
+		if (Array.isArray(value) || (typeof value === 'object')) {
+			result.push(urlEncodeData(value, prefixed_name));
+		}
+		else {
+			result.push([encodeURIComponent(prefixed_name), encodeURIComponent(value)].join('='));
+		}
+	});
+
+	return result.join('&');
+}

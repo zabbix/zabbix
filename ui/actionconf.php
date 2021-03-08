@@ -88,34 +88,33 @@ CDashboardHelper::updateEditableFlag($dashboards);
 $dashboard = array_shift($dashboards);
 $dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
 
-$widget = $dashboard['pages'][0]['widgets'][0];
-$widget += [
-	'dashboard_data' => [
-		'templateid' => null,
-		'dashboardid' => $dashboardid,
-		'dynamic_hostid' => null,
-	],
-	'defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD)[$widget['type']],
-	'uniqueid' => 'UNIQ123',
-	'cell_width' => 100/24,
-	'cell_height' => 70,
-	'is_editable' => true,
-	'index' => 0
-];
-
-
-
+$widgets = $dashboard['pages'][0]['widgets'];
+foreach ($widgets as &$widget) {
+	$widget += [
+		'dashboard_data' => [
+			'templateid' => null,
+			'dashboardid' => $dashboardid,
+			'dynamic_hostid' => null,
+		],
+		'defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD)[$widget['type']],
+		'uniqueid' => 'UNIQ'.uniqid(),
+		'cell_width' => 100/24,
+		'cell_height' => 70,
+		'is_editable' => true,
+		'index' => 0
+	];
+}
+unset($widget);
 ?>
 
 <main>
 	<div>
-		<button onclick="w.activate();">Activate</button>
-		<button onclick="w.deactivate();">Deactivate</button>
+		<button onclick="_activate();">Activate</button>
+		<button onclick="_deactivate();">Deactivate</button>
 	</div>
 
-	<div id="test_stand" style="position: relative; padding: 50px; height: 500px;"></div>
+	<div id="test_stand" style="position: relative; margin: 20px 0; height: 500px;"></div>
 </main>
-
 
 <script>
 
@@ -150,12 +149,45 @@ ZABBIX.Dashboard.getTimeSelector = () => {
 
 // =====================================================================================================================
 
-//var w = new CWidgetClock(<?= json_encode($widget); ?>);
-var w = new CWidgetGraph(<?= json_encode($widget); ?>);
+var widgets = <?= json_encode($widgets); ?>;
+var type_classes = <?= json_encode(CWidgetConfig::getTypeJSClasses()); ?>;
 
-w.start();
-document.getElementById('test_stand').appendChild(w.getView());
-window.addEventListener('resize', () => w.resize());
+var classes = {};
+
+for (var w of widgets) {
+	classes[w.type] = eval(type_classes[w.type]);
+}
+
+let wi = [];
+
+for (var w_data of widgets) {
+	const w = new classes[w_data.type](w_data);
+	wi.push(w);
+
+	w.start();
+	document.getElementById('test_stand').appendChild(w.getView());
+}
+
+function _activate() {
+	for (var w of wi) {
+		w.activate();
+	}
+}
+function _deactivate() {
+	for (var w of wi) {
+		w.deactivate();
+	}
+}
+
+let resize_timeout;
+window.addEventListener('resize', () => {
+	clearTimeout(resize_timeout);
+	resize_timeout = setTimeout(function() {
+		for (var w of wi) {
+			w.resize();
+		}
+	}, 200);
+});
 
 </script>
 

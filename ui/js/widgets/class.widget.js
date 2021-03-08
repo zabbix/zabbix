@@ -23,6 +23,7 @@ const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
 const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
 const WIDGET_EVENT_ENTER = 'enter';
 const WIDGET_EVENT_LEAVE = 'leave';
+const WIDGET_EVENT_READY = 'ready';
 const WIDGET_EVENT_BEFORE_UPDATE = 'before-update';
 const WIDGET_EVENT_AFTER_UPDATE = 'after-update';
 
@@ -40,43 +41,46 @@ class CWidget extends CBaseComponent {
 		fields,
 		configuration,
 		defaults,
+		parent = null,
+		widgetid = null,
 		uniqueid,
+		pos = null,
+		is_new,
+		rf_rate,
+		dashboard,
 		cell_width,
 		cell_height,
 		is_editable,
 		is_edit_mode,
-		dashboard_data,
-		rf_rate = 0,
-		parent = null,
-		index = null,
-		widgetid = null,
-		is_new = (widgetid === null),
-		pos = null
+		time_period,
+		dynamic_hostid
 	}) {
 		super(document.createElement('div'));
 
 		this._type = type;
 		this._header = header;
 		this._view_mode = view_mode;
-
 		// Patch JSON-decoded empty array to an empty object.
 		this._fields = (typeof fields === 'object') ? fields : {};
-
 		// Patch JSON-decoded empty array to an empty object.
 		this._configuration = (typeof configuration === 'object') ? configuration : {};
-
 		this._defaults = defaults;
+		this._parent = parent;
+		this._widgetid = widgetid;
 		this._uniqueid = uniqueid;
+		this._pos = pos;
+		this._is_new = is_new;
+		this._rf_rate = rf_rate;
+		this._dashboard = {
+			templateid: dashboard.templateid,
+			dashboardid: dashboard.dashboardid
+		};
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
 		this._is_editable = is_editable;
-		this._dashboard_data = dashboard_data;
-		this._rf_rate = rf_rate;
-		this._parent = parent;
-		this._index = index;
-		this._widgetid = widgetid;
-		this._is_new = is_new;
-		this._pos = pos;
+		this._is_edit_mode = is_edit_mode;
+		this._time_period = time_period;
+		this._dynamic_hostid = dynamic_hostid;
 
 		this._init();
 	}
@@ -95,23 +99,21 @@ class CWidget extends CBaseComponent {
 
 		this._state = WIDGET_STATE_INITIAL;
 
+		this._is_ready = false;
 		this._content_size = {};
-
 		this._update_timeout_id = null;
 		this._update_interval_id = null;
 		this._update_abort_controller = null;
 		this._is_updating_paused = false;
 		this._update_retry_sec = 3;
-
 		this._preloader_timeout = null;
 		this._preloader_timeout_sec = 10;
-
 		this._storage = {};
 	}
 
 	start() {
 		if (this._state !== WIDGET_STATE_INITIAL) {
-			throw new Error('Incorrect state change.');
+			throw new Error('Unsupported state change.');
 		}
 		this._state = WIDGET_STATE_INACTIVE;
 
@@ -128,7 +130,7 @@ class CWidget extends CBaseComponent {
 
 	activate() {
 		if (this._state !== WIDGET_STATE_INACTIVE) {
-			throw new Error('Incorrect state change.');
+			throw new Error('Unsupported state change.');
 		}
 		this._state = WIDGET_STATE_ACTIVE;
 
@@ -137,12 +139,15 @@ class CWidget extends CBaseComponent {
 
 	_doActivate() {
 		this._registerEvents();
-		this._startUpdating();
+
+		if (!this._is_edit_mode) {
+			this._startUpdating();
+		}
 	}
 
 	deactivate() {
 		if (this._state !== WIDGET_STATE_ACTIVE) {
-			throw new Error('Incorrect state change.');
+			throw new Error('Unsupported state change.');
 		}
 		this._state = WIDGET_STATE_INACTIVE;
 
@@ -151,7 +156,10 @@ class CWidget extends CBaseComponent {
 
 	_doDeactivate() {
 		this._unregisterEvents();
-		this._stopUpdating();
+
+		if (!this._is_edit_mode) {
+			this._stopUpdating();
+		}
 	}
 
 	destroy() {
@@ -159,7 +167,7 @@ class CWidget extends CBaseComponent {
 			this.deactivate();
 		}
 		if (this._state !== WIDGET_STATE_INACTIVE) {
-			throw new Error('Incorrect state change.');
+			throw new Error('Unsupported state change.');
 		}
 		this._state = WIDGET_STATE_DESTROYED;
 
@@ -169,8 +177,142 @@ class CWidget extends CBaseComponent {
 	_doDestroy() {
 	}
 
+	/**
+	 * Focus specified top-level widget.
+	 */
+	enter() {
+		this._$target.addClass(this._css_classes.focus);
+	}
+
+	/**
+	 * Blur specified top-level widget.
+	 */
+	leave() {
+		if (this._$content_header.has(document.activeElement).length != 0) {
+			document.activeElement.blur();
+		}
+
+		this._$target.removeClass(this._css_classes.focus);
+	}
+
+	resize() {
+	}
+
 	getState() {
 		return this._state;
+	}
+
+	getView() {
+		return this._target;
+	}
+
+	isReady() {
+		return this._is_ready;
+	}
+
+	setViewMode(view_mode) {
+		if (this._view_mode !== view_mode) {
+			this._view_mode = view_mode;
+			this._$target.toggleClass(this._css_classes.hidden_header,
+				this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+			);
+		}
+	}
+
+	getViewMode() {
+		return this._view_mode;
+	}
+
+	isEditMode() {
+		return this._is_edit_mode;
+	}
+
+	setEditMode() {
+		this._is_edit_mode = true;
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._stopUpdating();
+		}
+	}
+
+	supportsDynamicHosts() {
+		return (this._fields.dynamic == 1);
+	}
+
+	setDynamicHost(dynamic_hostid) {
+		if (this._dynamic_hostid !== dynamic_hostid) {
+			this._dynamic_hostid = dynamic_hostid;
+
+			if (this._state !== WIDGET_STATE_INITIAL) {
+				this._updateActionsMenu();
+			}
+
+			if (this._state === WIDGET_STATE_ACTIVE) {
+				this._startUpdating();
+			}
+		}
+	}
+
+	getTimePeriod() {
+		return this._time_period;
+	}
+
+	setTimePeriod(time_period) {
+		this._time_period = time_period;
+	}
+
+	storeValue(key, value) {
+		this._storage[key] = value;
+	}
+
+	getPosition() {
+		return this._pos;
+	}
+
+	setPosition(pos) {
+		this._pos = pos;
+
+		this._$target.css({
+			left: `${this._cell_width * this._pos.x}%`,
+			top: `${this._cell_height * this._pos.y}px`,
+			width: `${this._cell_width * this._pos.width}%`,
+			height: `${this._cell_height * this._pos.height}px`
+		});
+	}
+
+	/**
+	 * Enable user functional interaction with widget.
+	 */
+	enableControls() {
+		this._$content_header
+			.find('button')
+			.prop('disabled', false);
+	}
+
+	/**
+	 * Disable user functional interaction with widget.
+	 */
+	disableControls() {
+		this._$content_header
+			.find('button')
+			.prop('disabled', true);
+	}
+
+	_ready() {
+		if (!this._is_ready) {
+			this._is_ready = true;
+			this._doReady();
+		}
+	}
+
+	_doReady() {
+		if (this._parent === null) {
+			if (this._$button_actions.is('[aria-expanded="true"]')) {
+				this._$button_actions.menuPopup('refresh', this);
+			}
+		}
+
+		this.fire(WIDGET_EVENT_READY);
 	}
 
 	_startUpdating(delay_sec = 0) {
@@ -209,11 +351,11 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	pauseUpdating() {
+	_pauseUpdating() {
 		this._is_updating_paused = true;
 	}
 
-	resumeUpdating() {
+	_resumeUpdating() {
 		this._is_updating_paused = false;
 	}
 
@@ -236,7 +378,10 @@ class CWidget extends CBaseComponent {
 
 		this
 			._promiseUpdate()
-			.then(() => this._hidePreloader())
+			.then(() => {
+				this._hidePreloader();
+				this._ready();
+			})
 			.catch(() => {
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
@@ -259,49 +404,30 @@ class CWidget extends CBaseComponent {
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			body: this._getUpdateFormData(),
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: urlEncodeData(this._getUpdateRequestData()),
 			signal: this._update_abort_controller.signal
 		})
 			.then((response) => response.json())
 			.then((response) => this._processUpdateResponse(response));
 	}
 
-	_getUpdateFormData() {
-		const form_data = new FormData();
-
-		if (this._dashboard_data.templateid !== null) {
-			form_data.append('templateid', this._dashboard_data.templateid);
-		}
-
-		if (this._dashboard_data.dashboardid !== null) {
-			form_data.append('dashboardid', this._dashboard_data.dashboardid);
-		}
-
-		if (this._dashboard_data.dynamic_hostid !== null) {
-			form_data.append('dynamic_hostid', this._dashboard_data.dynamic_hostid);
-		}
-
-		if (this._widgetid !== null) {
-			form_data.append('widgetid', this._widgetid);
-		}
-
-		form_data.append('uniqueid', this._uniqueid);
-
-		if (this._header !== '') {
-			form_data.append('name', this._header);
-		}
-
-		if (Object.keys(this._fields).length > 0) {
-			form_data.append('fields', JSON.stringify(this._fields));
-		}
-
-		form_data.append('view_mode', this._view_mode);
-		form_data.append('edit_mode', this._is_edit_mode ? 1 : 0);
-
-		Object.keys(this._storage).forEach((key) => form_data.append(`storage[${key}]`, this._storage[key]));
-		Object.keys(this._content_size).forEach((key) => form_data.append(key, this._content_size[key]));
-
-		return form_data;
+	_getUpdateRequestData() {
+		return {
+			templateid: this._dashboard.templateid ?? undefined,
+			dashboardid: this._dashboard.dashboardid ?? undefined,
+			dynamic_hostid: this.supportsDynamicHosts() ? (this._dynamic_hostid ?? undefined) : undefined,
+			widgetid: this._widgetid ?? undefined,
+			uniqueid: this._uniqueid,
+			name: this._header !== '' ? this._header : undefined,
+			fields: Object.keys(this._fields).length > 0 ? JSON.stringify(this._fields) : undefined,
+			view_mode: this._view_mode,
+			edit_mode: this._is_edit_mode ? 1 : 0,
+			storage: this._storage,
+			...this._content_size
+		};
 	}
 
 	_processUpdateResponse(response) {
@@ -320,67 +446,6 @@ class CWidget extends CBaseComponent {
 			content_width: Math.floor(this._$content_body.width()),
 			content_height: Math.floor(this._$content_body.height())
 		};
-	}
-
-	resize() {
-	}
-
-	setEditMode() {
-		this._is_edit_mode = true;
-	}
-
-	isEditMode() {
-		return this._is_edit_mode;
-	}
-
-	storeValue(key, value) {
-		if (value !== undefined) {
-			this._storage[key] = value;
-		}
-		else {
-			delete this._storage[key];
-		}
-	}
-
-	/**
-	 * Focus specified top-level widget.
-	 */
-	enter() {
-		this._$target.addClass(this._css_classes.focus);
-	}
-
-	/**
-	 * Blur specified top-level widget.
-	 */
-	leave() {
-		if (this._$content_header.has(document.activeElement).length != 0) {
-			document.activeElement.blur();
-		}
-
-		this._$target.removeClass(this._css_classes.focus);
-	}
-
-	setViewMode(view_mode) {
-		this._view_mode = view_mode;
-		this._$target.toggleClass(this._css_classes.hidden_header, this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
-	}
-
-	/**
-	 * Enable user functional interaction with widget.
-	 */
-	enableControls() {
-		this._$content_header
-			.find('button')
-			.prop('disabled', false);
-	}
-
-	/**
-	 * Disable user functional interaction with widget.
-	 */
-	disableControls() {
-		this._$content_header
-			.find('button')
-			.prop('disabled', true);
 	}
 
 	_setContents({header, aria_label, body, messages, info, debug}) {
@@ -444,15 +509,6 @@ class CWidget extends CBaseComponent {
 		this._$actions.find('.widget-info-button').remove();
 	}
 
-	setPosition(pos) {
-		this._$target.css({
-			left: `${this._cell_width * pos.x}%`,
-			top: `${this._cell_height * pos.y}px`,
-			width: `${this._cell_width * pos.width}%`,
-			height: `${this._cell_height * pos.height}px`
-		});
-	}
-
 	_showPreloader() {
 		if (this._preloader_timeout !== null) {
 			clearTimeout(this._preloader_timeout);
@@ -495,16 +551,18 @@ class CWidget extends CBaseComponent {
 		}, delay_sec * 1000);
 	}
 
-	getIndex() {
-		return this._index;
+	_updateActionsMenu() {
+		this._$button_actions.data('menu-popup').data = this._getActionsMenuRequestData();
 	}
 
-	setIndex(index) {
-		this._index = index;
-	}
-
-	getView() {
-		return this._target;
+	_getActionsMenuRequestData() {
+		return {
+			widgetType: this._type,
+			currentRate: this._rf_rate,
+			widget_uniqueid: this._uniqueid,
+			multiplier: 0,
+			dynamic_hostid: this.supportsDynamicHosts() ? (this._dynamic_hostid ?? undefined) : undefined
+		};
 	}
 
 	_makeView() {
@@ -515,27 +573,6 @@ class CWidget extends CBaseComponent {
 				.append($('<h4>').text((this._header !== '') ? this._header : this._defaults.header));
 
 		if (this._parent === null) {
-			// Do not add action buttons for non-top widgets.
-
-			const widget_actions_data = {
-				widgetType: this._type,
-				currentRate: this._rf_rate,
-				widget_uniqueid: this._uniqueid,
-				multiplier: '0'
-			};
-
-			if (this._fields.graphid !== undefined) {
-				widget_actions_data.graphid = this._fields.graphid;
-			}
-
-			if (this._fields.itemid !== undefined) {
-				widget_actions_data.itemid = this._fields.itemid;
-			}
-
-			if (this._dynamic_hostid !== null) {
-				widget_actions_data.dynamic_hostid = this._dynamic_hostid;
-			}
-
 			this._$actions = $('<ul>', {'class': this._css_classes.actions});
 
 			if (this._is_editable) {
@@ -548,23 +585,21 @@ class CWidget extends CBaseComponent {
 				this._$actions.append($('<li>').append(this._$button_edit));
 			}
 
-			this._$actions.append(
-				$('<li>').append(
-					$('<button>', {
-						'type': 'button',
-						'class': 'btn-widget-action',
-						'title': t('Actions'),
-						'data-menu-popup': JSON.stringify({
-							'type': 'widget_actions',
-							'data': widget_actions_data
-						}),
-						'attr': {
-							'aria-expanded': false,
-							'aria-haspopup': true
-						}
-					})
-				)
-			);
+			this._$button_actions = $('<button>', {
+				'type': 'button',
+				'class': 'btn-widget-action',
+				'title': t('Actions'),
+				'data-menu-popup': JSON.stringify({
+					'type': 'widget_actions',
+					'data': this._getActionsMenuRequestData()
+				}),
+				'attr': {
+					'aria-expanded': false,
+					'aria-haspopup': true
+				}
+			});
+
+			this._$actions.append($('<li>').append(this._$button_actions));
 
 			this._$content_header.append(this._$actions);
 		}
@@ -596,7 +631,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	_registerEvents() {
-		let mousemove_waiting = false;
+		let is_mousemove_required = false;
 
 		this._events = {
 			editClick: () => {
@@ -605,14 +640,14 @@ class CWidget extends CBaseComponent {
 
 			focusin: () => {
 				// Skip mouse events caused by animations which were caused by focus change.
-				mousemove_waiting = true;
+				is_mousemove_required = true;
 
 				this.fire(WIDGET_EVENT_ENTER);
 			},
 
 			focusout: (e) => {
 				// Skip mouse events caused by animations which were caused by focus change.
-				mousemove_waiting = true;
+				is_mousemove_required = true;
 
 				if (!this._$content_header.has(e.relatedTarget).length) {
 					this.fire(WIDGET_EVENT_LEAVE);
@@ -620,13 +655,13 @@ class CWidget extends CBaseComponent {
 			},
 
 			enter: () => {
-				mousemove_waiting = false;
+				is_mousemove_required = false;
 
 				this.fire(WIDGET_EVENT_ENTER);
 			},
 
 			leave: () => {
-				if (!mousemove_waiting) {
+				if (!is_mousemove_required) {
 					this.fire(WIDGET_EVENT_LEAVE);
 				}
 			},

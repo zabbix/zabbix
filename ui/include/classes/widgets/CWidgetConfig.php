@@ -75,6 +75,32 @@ class CWidgetConfig {
 		return $types;
 	}
 
+	public static function getTypeJSClasses() {
+		return [
+			WIDGET_ACTION_LOG			=> 'CWidget',
+			WIDGET_CLOCK				=> 'CWidgetClock',
+			WIDGET_DATA_OVER			=> 'CWidget',
+			WIDGET_DISCOVERY			=> 'CWidget',
+			WIDGET_FAV_GRAPHS			=> 'CWidget',
+			WIDGET_FAV_MAPS				=> 'CWidget',
+			WIDGET_FAV_SCREENS			=> 'CWidget',
+			WIDGET_GRAPH				=> 'CWidgetGraph',
+			WIDGET_GRAPH_PROTOTYPE		=> 'CWidget',
+			WIDGET_HOST_AVAIL			=> 'CWidget',
+			WIDGET_MAP					=> 'CWidget',
+			WIDGET_NAV_TREE				=> 'CWidget',
+			WIDGET_PLAIN_TEXT			=> 'CWidget',
+			WIDGET_PROBLEM_HOSTS		=> 'CWidget',
+			WIDGET_PROBLEMS				=> 'CWidget',
+			WIDGET_PROBLEMS_BY_SV		=> 'CWidget',
+			WIDGET_SVG_GRAPH			=> 'CWidget',
+			WIDGET_SYSTEM_INFO			=> 'CWidget',
+			WIDGET_TRIG_OVER			=> 'CWidget',
+			WIDGET_URL					=> 'CWidget',
+			WIDGET_WEB					=> 'CWidget'
+		];
+	}
+
 	/**
 	 * Get default widget dimensions.
 	 *
@@ -119,12 +145,15 @@ class CWidgetConfig {
 	 */
 	public static function getDefaults(string $context): array {
 		$ret = [];
+
 		$dimensions = self::getDefaultDimensions();
+		$type_js_clases = self::getTypeJSClasses();
 
 		foreach (self::getKnownWidgetTypes($context) as $type => $name) {
 			$ret[$type] = [
 				'header' => $name,
 				'size' => $dimensions[$type],
+				'js_class' => $type_js_clases[$type],
 				'iterator' => self::isIterator($type)
 			];
 		}

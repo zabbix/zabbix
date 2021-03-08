@@ -27,10 +27,9 @@
 <script>
 	const DASHBOARD_EVENT_APPLY_PROPERTIES = 'apply_properties';
 
-	function initializeView(data, widget_defaults, time_selector, dynamic, web_layout_mode) {
+	function initializeView(dashboard, widget_defaults, time_period, dynamic, web_layout_mode) {
 
 		const init = () => {
-			// Prevent page reloading on time selector events.
 			timeControl.refreshPage = false;
 
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBRD ?>'), {
@@ -43,43 +42,46 @@
 					next_page: document.querySelector('.<?= ZBX_STYLE_DASHBRD_NEXT_PAGE ?>'),
 					slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBRD_TOGGLE_SLIDESHOW ?>')
 				},
-				dashboard: {
-					dashboardid: data.dashboardid,
-					display_period: data.display_period,
-					auto_start: data.auto_start,
-					time_selector: time_selector,
-					dynamic_hostid: dynamic.host ? dynamic.host.id : null
+				data: {
+					dashboardid: dashboard.dashboardid,
+					name: dashboard.name,
+					userid: dashboard.owner.id,
+					templateid: null,
+					display_period: dashboard.display_period,
+					auto_start: dashboard.auto_start
 				},
-				options: {
-					'widget-height': 70,
-					'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
-					'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
-					'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-					'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-					'editable': data.allowed_edit && data.editable,
-					'edit_mode': (data.dashboardid === null),
-					'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>),
-					'allowed_edit': data.allowed_edit
-				}
+				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
+				cell_height: 70,
+				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
+				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
+				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
+				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
+				widget_defaults: widget_defaults,
+				is_editable: dashboard.allowed_edit && dashboard.editable,
+				is_edit_mode: (dashboard.dashboardid === null),
+				time_period: time_period,
+				dynamic_hostid: dynamic.host ? dynamic.host.id : null
 			});
 
-			ZABBIX.Dashboard.setWidgetDefaults(widget_defaults);
-			ZABBIX.Dashboard.addPages(data.pages);
+			for (const page of dashboard.pages) {
+				ZABBIX.Dashboard.addDashboardPage(page);
+
+				break;
+			}
+
 			ZABBIX.Dashboard.activate();
 
 			if (dynamic.has_dynamic_widgets) {
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
 				window.addEventListener('popstate', events.popState);
 
-				document
-					.getElementById('dynamic_hostid')
-					.addEventListener('change', events.dynamicHostChange);
+				$('#dynamic_hostid').on('change', events.dynamicHostChange);
 			}
 
 			jqBlink.blink();
 
 			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
-				if (data.dashboardid === null) {
+				if (dashboard.dashboardid === null) {
 					edit();
 					openProperties();
 				}
@@ -150,13 +152,13 @@
 			ZABBIX.Dashboard.saveDashboard();
 
 			const ajax_data = {
-				dashboardid: (data.dashboardid !== null) ? data.dashboardid : undefined,
-				userid: data.owner.id,
-				name: data.name,
-				display_period: data.display_period,
-				auto_start: data.auto_start,
+				dashboardid: (dashboard.dashboardid !== null) ? dashboard.dashboardid : undefined,
+				userid: dashboard.owner.id,
+				name: dashboard.name,
+				display_period: dashboard.display_period,
+				auto_start: dashboard.auto_start,
 				widgets: [],
-				sharing: data.sharing
+				sharing: dashboard.sharing
 			};
 
 			for (const widget of ZABBIX.Dashboard.getWidgets()) {
@@ -218,8 +220,8 @@
 
 			url.setArgument('action', 'dashboard.view');
 
-			if (data.dashboardid !== null) {
-				url.setArgument('dashboardid', data.dashboardid);
+			if (dashboard.dashboardid !== null) {
+				url.setArgument('dashboardid', dashboard.dashboardid);
 			}
 			else {
 				url.setArgument('cancel', '1');
@@ -244,10 +246,10 @@
 
 		const openProperties = () => {
 			const options = {
-				userid: data.owner.id,
-				name: data.name,
-				display_period: data.display_period,
-				auto_start: data.auto_start
+				userid: dashboard.owner.id,
+				name: dashboard.name,
+				display_period: dashboard.display_period,
+				auto_start: dashboard.auto_start
 			};
 
 			PopUp('dashboard.properties.edit', options, 'dashboard_properties', this);
@@ -317,13 +319,13 @@
 
 				url.setArgument('action', 'dashboard.view');
 
-				if (data.dashboardid !== null) {
-					url.setArgument('dashboardid', data.dashboardid);
+				if (dashboard.dashboardid !== null) {
+					url.setArgument('dashboardid', dashboard.dashboardid);
 				}
 
-				if (time_selector) {
-					url.setArgument('from', time_selector.from);
-					url.setArgument('to', time_selector.to);
+				if (time_period) {
+					url.setArgument('from', time_period.from);
+					url.setArgument('to', time_period.to);
 				}
 
 				if (host) {
@@ -387,10 +389,10 @@
 							has_properties_modified =
 								(JSON.stringify(properties) !== JSON.stringify(original_properties));
 
-							data.owner.id = properties.userid;
-							data.name = properties.name;
-							data.display_period = properties.display_period;
-							data.auto_start = properties.auto_start;
+							dashboard.owner.id = properties.userid;
+							dashboard.name = properties.name;
+							dashboard.display_period = properties.display_period;
+							dashboard.auto_start = properties.auto_start;
 
 							document.getElementById('<?= ZBX_STYLE_PAGE_TITLE ?>').textContent = properties.name;
 							document.getElementById('dashboard-direct-link').textContent = properties.name;
@@ -402,10 +404,10 @@
 		};
 
 		const original_properties = {
-			userid: data.owner.id,
-			name: data.name,
-			display_period: data.display_period,
-			auto_start: data.auto_start
+			userid: dashboard.owner.id,
+			name: dashboard.name,
+			display_period: dashboard.display_period,
+			auto_start: dashboard.auto_start
 		};
 
 		let is_busy = false;

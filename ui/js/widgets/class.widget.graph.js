@@ -122,13 +122,13 @@ class CWidgetGraph extends CWidget {
 	}
 
 	_activateGraph() {
-		const time_selector = ZABBIX.Dashboard.getTimeSelector();
+		const time_period = this.getTimePeriod();
 
 		if (this._graph_url !== null) {
 			const curl = new Curl(this._graph_url, false);
 
-			curl.setArgument('from', time_selector.from);
-			curl.setArgument('to', time_selector.to);
+			curl.setArgument('from', time_period.from);
+			curl.setArgument('to', time_period.to);
 
 			this._flickerfreescreen_container.href = curl.getUrl();
 		}
@@ -140,14 +140,14 @@ class CWidgetGraph extends CWidget {
 
 		const curl = new Curl(this._time_control_data.src, false);
 
-		curl.setArgument('from', time_selector.from);
-		curl.setArgument('to', time_selector.to);
+		curl.setArgument('from', time_period.from);
+		curl.setArgument('to', time_period.to);
 
 		this._time_control_data.src = curl.getUrl();
 
-		this._flickerfreescreen_data.timeline = time_selector;
+		this._flickerfreescreen_data.timeline = time_period;
 
-		timeControl.addObject('graph_' + this._uniqueid, time_selector, this._time_control_data);
+		timeControl.addObject('graph_' + this._uniqueid, time_period, this._time_control_data);
 		timeControl.processObjects();
 
 		flickerfreeScreen.add(this._flickerfreescreen_data);
@@ -166,5 +166,19 @@ class CWidgetGraph extends CWidget {
 			width: Math.floor(content.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)),
 			height: Math.floor(content.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
 		};
+	}
+
+	_getActionsMenuRequestData() {
+		let data = super._getActionsMenuRequestData();
+
+		if (!this.isEditMode()) {
+			data = {
+				...data,
+				graphid: this._fields.graphid ?? undefined,
+				itemid: this._fields.itemid ?? undefined
+			};
+		}
+
+		return data;
 	}
 }

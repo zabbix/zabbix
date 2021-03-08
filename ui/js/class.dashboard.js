@@ -25,35 +25,66 @@ class CDashboard extends CBaseComponent {
 	constructor(target, {
 		containers,
 		buttons,
-		dashboard,
-		options
+		data,
+		cell_width,
+		cell_height,
+		max_columns,
+		max_rows,
+		widget_min_rows,
+		widget_max_rows,
+		widget_defaults,
+		is_editable,
+		is_edit_mode,
+		time_period,
+		dynamic_hostid
 	}) {
 		super(target);
 
-		this._containers = containers;
-		this._buttons = buttons;
-		this._dashboard = {
-			templateid: null,
-			dashboardid: null,
-			dynamic_hostid: null,
-			...dashboard
+		this._containers = {
+			grid: containers.grid,
+			navigation_tabs: containers.navigation_tabs
+		}
+		this._buttons = {
+			previous_page: buttons.previous_page,
+			next_page: buttons.next_page,
+			slideshow: buttons.slideshow
 		};
-		this._options = options;
+		this._data = {
+			dashboardid: data.dashboardid,
+			name: data.name,
+			userid: data.userid,
+			templateid: data.templateid,
+			display_period: data.display_period,
+			auto_start: data.auto_start
+		};
+		this._cell_width = cell_width;
+		this._cell_height = cell_height;
+		this._max_columns = max_columns;
+		this._max_rows = max_rows;
+		this._widget_min_rows = widget_min_rows;
+		this._widget_max_rows = widget_max_rows;
+		this._widget_defaults = widget_defaults;
+		this._is_editable = is_editable;
+		this._is_edit_mode = is_edit_mode;
+		this._time_period = time_period;
+		this._dynamic_hostid = dynamic_hostid;
 
 		this._init();
 		this._registerEvents();
 	}
 
 	_init() {
-		const sortable = document.createElement('div');
+//		const sortable = document.createElement('div');
 
-		this._containers.navigation_tabs.appendChild(sortable);
-		this._tabs = new CSortable(sortable, {is_vertical: false});
-		this._selected_tab = null;
+//		this._containers.navigation_tabs.appendChild(sortable);
+//		this._tabs = new CSortable(sortable, {is_vertical: false});
+//		this._selected_tab = null;
 
-		this._tabs_data = new Map();
+//		this._tabs_data = new Map();
 
-		this._widget_defaults = {};
+		this._dashboard_pages = [];
+
+		this._uniqid_index = 0;
 	}
 
 	_addTab(title, data) {
@@ -112,26 +143,54 @@ class CDashboard extends CBaseComponent {
 			|| this._selected_tab.nextSibling === null;
 	}
 
-	addPage(data) {
-		const page = new CDashboardPage($(this._containers.grid), {
-			dashboard: {
-				templateid: this._dashboard.templateid !== undefined ? this._dashboard.templateid : null,
-				dashboardid: this._dashboard.dashboardid !== undefined ? this._dashboard.dashboardid : null,
-				dynamic_hostid: this._dashboard.dynamic_hostid !== undefined ? this._dashboard.dynamic_hostid : null
+	addDashboardPage({dashboard_pageid, name, display_period, widgets}) {
+		const dashboard_page = new CDashboardPage(this._containers.grid, {
+			data: {
+				dashboard_pageid,
+				name,
+				display_period
 			},
-			options: this._options
+			dashboard: {
+				templateid: this._data.templateid,
+				dashboardid: this._data.dashboardid
+			},
+			cell_width: this._cell_width,
+			cell_height: this._cell_height,
+			max_columns: this._max_columns,
+			max_rows: this._max_rows,
+			widget_min_rows: this._widget_min_rows,
+			widget_max_rows: this._widget_max_rows,
+			widget_defaults: this._widget_defaults,
+			is_editable: this._is_editable,
+			is_edit_mode: this._is_edit_mode,
+			time_period: this._time_period,
+			dynamic_hostid: this._dynamic_hostid
 		});
 
-		page.setWidgetDefaults(this._widget_defaults);
-		page.addWidgets(data.widgets);
+		for (const widget_data of widgets) {
+			dashboard_page.addWidget({
+				...widget_data,
+				uniqueid: this._createUniqueId(),
+				is_new: false
+			});
+		}
 
-		this._addTab(data.name, {page: page});
+		this._dashboard_pages.push(dashboard_page);
+
+		// this._addTab(data.name, {page: page});
+	}
+
+	_createUniqueId() {
+		return 'U' + (this._uniqid_index++).toString(36).toUpperCase().padStart(6, '0');
 	}
 
 	activate() {
-		this._selectTab(this._tabs.getList().children[0]);
+		// this._selectTab(this._tabs.getList().children[0]);
 
-		return this.getSelectedPage().activate();
+		// return this.getSelectedPage().activate();
+
+		this._dashboard_pages[0].start();
+		this._dashboard_pages[0].activate();
 	}
 
 	getSelectedPage() {
@@ -140,6 +199,7 @@ class CDashboard extends CBaseComponent {
 
 
 	_registerEvents() {
+		let window_resize_timeout_id = null;
 
 		this._events = {
 			tabsResize: () => {
@@ -176,62 +236,55 @@ class CDashboard extends CBaseComponent {
 				this._selectTab(this._selected_tab.nextSibling);
 			},
 
-			timeSelectorRangeUpdate: (e, data) => {
-				this._dashboard.time_selector = {
-					...this._dashboard.time_selector,
-					from: data.from,
-					to: data.to,
-					from_ts: data.from_ts,
-					to_ts: data.to_ts
-				};
+			timeSelectorRangeUpdate: (e, time_period) => {
+				for (const dashboard_page of this._dashboard_pages) {
+					dashboard_page.setTimePeriod({
+						from: time_period.from,
+						from_ts: time_period.from_ts,
+						to: time_period.to,
+						to_ts: time_period.to_ts
+					});
+				}
 			},
 
 			windowResize: () => {
-				this.getSelectedPage().fire(DASHBOARD_PAGE_EVENT_RESIZE);
+				window.addEventListener('resize', () => {
+					if (window_resize_timeout_id != null) {
+						clearTimeout(window_resize_timeout_id);
+					}
+
+					window_resize_timeout_id = setTimeout(() => {
+						window_resize_timeout_id = null;
+
+						for (const dashboard_page of this._dashboard_pages) {
+							dashboard_page.resize();
+						}
+					}, 200);
+				});
 			}
 		};
 
-		new ResizeObserver(this._events.tabsResize).observe(this._containers.navigation_tabs);
+//		new ResizeObserver(this._events.tabsResize).observe(this._containers.navigation_tabs);
 
-		this._tabs.on(SORTABLE_EVENT_DRAG_END, this._events.tabsDragEnd);
+//		this._tabs.on(SORTABLE_EVENT_DRAG_END, this._events.tabsDragEnd);
 
-		this._containers.navigation_tabs.addEventListener('click', this._events.tabsClick);
-		this._containers.navigation_tabs.addEventListener('keydown', this._events.tabsKeyDown);
+//		this._containers.navigation_tabs.addEventListener('click', this._events.tabsClick);
+//		this._containers.navigation_tabs.addEventListener('keydown', this._events.tabsKeyDown);
 
-		this._buttons.previous_page.addEventListener('click', this._events.previousPageClick);
-		this._buttons.next_page.addEventListener('click', this._events.nextPageClick);
+//		this._buttons.previous_page.addEventListener('click', this._events.previousPageClick);
+//		this._buttons.next_page.addEventListener('click', this._events.nextPageClick);
 
-		if (this._dashboard.time_selector !== null) {
+		if (this._time_selector !== null) {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
 		}
 
 		window.addEventListener('resize', this._events.windowResize);
 	}
 
-
-
-
-
-
-
-	getTimeSelector() {
-		return this._dashboard.time_selector;
-	}
-
 	// =================================================================================================================
 	// =================================================================================================================
 	// =================================================================================================================
 	// TODO: Temporary solution.
-
-	addPages(pages) {
-		for (const page of pages) {
-			this.addPage(page);
-
-			break;
-		}
-
-		return this;
-	}
 
 	getDashboardData() {
 		return this.getSelectedPage().getDashboardData();
@@ -244,7 +297,6 @@ class CDashboard extends CBaseComponent {
 	getOptions() {
 		return this._options;
 	}
-
 
 	deactivate() {
 		return this.getSelectedPage().activate();
