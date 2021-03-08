@@ -513,11 +513,11 @@ static int	process_proxy(void)
 
 				int	more;
 
-				if (FAIL == zbx_hc_check_proxy(proxy.hostid))
-					goto error;
-
 				do
 				{
+					if (FAIL == zbx_hc_check_proxy(proxy.hostid))
+						goto error;
+
 					if (SUCCEED != (ret = proxy_get_data(&proxy, &more)))
 						goto error;
 				}
