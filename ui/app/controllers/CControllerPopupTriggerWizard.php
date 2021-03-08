@@ -129,6 +129,7 @@ class CControllerPopupTriggerWizard extends CController {
 			]);
 
 			$item = reset($item);
+			$host = reset($item['hosts']);
 
 			// Trigger validation.
 			if ($page_options['description'] === '') {
@@ -141,7 +142,7 @@ class CControllerPopupTriggerWizard extends CController {
 				$trigger_valid = false;
 			}
 
-			if ($exprs && ($expression = $constructor->getExpressionFromParts($exprs))) {
+			if ($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
 				if (check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) {
 					if (array_key_exists('triggerid', $page_options)) {
 						$triggerid = $page_options['triggerid'];

@@ -342,18 +342,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>']
 			],
-			'regexp' => [
-				'description' => _('regexp() - Regular expression V matching last value in period T (1 - match, 0 - no match)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
-			'iregexp' => [
-				'description' => _('iregexp() - Regular expression V matching last value in period T (non case-sensitive; 1 - match, 0 - no match)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
 			'logeventid' => [
 				'description' => _('logeventid() - Event ID of last log entry matching regular expression T (1 - match, 0 - no match)'),
 				'params' => $this->param1Str,
@@ -506,22 +494,25 @@ class CControllerPopupTriggerExpr extends CController {
 			$result = $expression_data->parse($expression);
 
 			if ($result) {
-				$function_macro_tokens = $result->getTokensOfTypes([
-					CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO
-				]);
+				$function_tokens = $result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_FUNCTION]);
 
-				if ($function_macro_tokens) {
-					$function_macro_token = $function_macro_tokens[0];
-					$function = $function_macro_token['data']['functionName'];
+				if ($function_tokens) {
+					$function_token = $function_tokens[0];
+					$function = $function_token->function;
 
 					// Determine param type.
-					$params = $function_macro_token['data']['functionParams'];
-					$param_number = in_array($function, ['regexp', 'iregexp', 'str']) ? 1 : 0;
-					if (array_key_exists($param_number, $params) && is_string($params[$param_number])
-							&& $params[$param_number] !== '' && $params[$param_number][0] === '#'
-							&& !in_array($function, ['fuzzytime', 'nodata'])) {
+					$params = $function_token->params_raw['parameters'];
+					if ($params[0]->type == CTriggerExprParserResult::TOKEN_TYPE_QUERY) {
+						array_shift($params);
+					}
+
+					$is_num = (array_key_exists(0, $params) && is_array($params[0])
+						&& substr($params[0]['raw'], 0, 1) === '#'
+					);
+
+					if (!in_array($function, ['fuzzytime', 'nodata']) && $is_num) {
 						$param_type = PARAM_TYPE_COUNTS;
-						$params[$param_number] = substr($params[$param_number], 1);
+						$params[0]['raw'] = substr($params[0]['raw'], 1);
 					}
 					else {
 						$param_type = PARAM_TYPE_TIME;
@@ -529,30 +520,33 @@ class CControllerPopupTriggerExpr extends CController {
 
 					/*
 					 * Try to find an operator and a value.
-					 * The value and operator can be extracted only if they immediately follow the item function macro.
+					 * The value and operator can be extracted only if they immediately follow the function.
 					 */
 					$tokens = $result->getTokens();
 					foreach ($tokens as $key => $token) {
-						if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
-							if (array_key_exists($key + 2, $tokens)
-									&& $tokens[$key + 1]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
-									&& array_key_exists($function, $this->functions)
-									&& in_array($tokens[$key + 1]['value'],
-										$this->functions[$function]['operators'])) {
-								$operator = $tokens[$key + 1]['value'];
+						if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION) {
+							if (!array_key_exists($key + 2, $tokens)) {
+								break;
+							}
 
-								$value = '';
-								$i = 2;
+							if ($tokens[$key + 1]->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
+								$operator_token = $tokens[$key + 1];
+								$value_token = $tokens[$key + 2];
+							}
+							elseif (array_key_exists($key + 3, $tokens)
+									&& $tokens[$key + 2]->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
+								$operator_token = $tokens[$key + 2];
+								$value_token = $tokens[$key + 3];
+							}
+							else {
+								break;
+							}
 
-								if (array_key_exists($key + 3, $tokens)
-										&& $tokens[$key + 2]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
-									$value .= $tokens[$key + 2]['value'];
-									$i++;
-								}
-
-								$value .= ($tokens[$key + $i]['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING)
-									? $tokens[$key + $i]['data']['string']
-									: $tokens[$key + $i]['value'];
+							$fn_name = $token->function;
+							if (array_key_exists($fn_name, $this->functions)
+									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
+								$operator = $operator_token->match;
+								$value = $value_token->match;
 							}
 							else {
 								break;
@@ -566,8 +560,8 @@ class CControllerPopupTriggerExpr extends CController {
 						'selectHosts' => ['name'],
 						'webitems' => true,
 						'filter' => [
-							'host' => $function_macro_token['data']['host'],
-							'key_' => $function_macro_token['data']['item'],
+							'host' => $function_token->getHosts()[0],
+							'key_' => $function_token->getItems()[0],
 							'flags' => null
 						]
 					]);
@@ -619,6 +613,10 @@ class CControllerPopupTriggerExpr extends CController {
 		elseif ($param_type === null) {
 			$param_type = PARAM_TYPE_TIME;
 		}
+
+		$params = array_map(function ($param) {
+			return $param['raw'];
+		}, $params);
 
 		$data = [
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', ''),
