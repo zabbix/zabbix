@@ -50,7 +50,7 @@ jQuery(function ($) {
 
 		if (data) {
 			if (!data.isHintBoxFrozen) {
-				ZABBIX.Dashboard.unpauseWidgetRefresh(graph.data('widget')['uniqueid']);
+				ZABBIX.Dashboard.unpauseWidgetRefresh(graph.data('widget')._uniqueid);
 			}
 
 			$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
@@ -67,8 +67,8 @@ jQuery(function ($) {
 	function dropDocumentListeners(e, graph) {
 		var widgets_boxing = 0; // Number of widgets with active SBox.
 		ZABBIX.Dashboard.getWidgets().forEach(function(w) {
-			if (w !== graph.data('widget') && w['type'] === 'svggraph') {
-				var svg_graph = $('svg', w['content_body']);
+			if (w !== graph.data('widget') && w._type === 'svggraph') {
+				var svg_graph = $('svg', w.getView());
 				if (svg_graph.length && svg_graph.data('options')['boxing']) {
 					widgets_boxing++;
 				}
@@ -118,13 +118,13 @@ jQuery(function ($) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0', graph.parent());
 			data.isHintBoxFrozen = true;
-			ZABBIX.Dashboard.pauseWidgetRefresh(graph.data('widget')['uniqueid']);
+			ZABBIX.Dashboard.pauseWidgetRefresh(graph.data('widget')._uniqueid);
 
 			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
 			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
-				ZABBIX.Dashboard.unpauseWidgetRefresh(graph.data('widget')['uniqueid']);
+				ZABBIX.Dashboard.unpauseWidgetRefresh(graph.data('widget')._uniqueid);
 				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
 				graph.off('mouseup', hintboxSilentMode);
 				destroyHintbox(graph);
@@ -187,7 +187,7 @@ jQuery(function ($) {
 
 		// If mouse movement detected (SBox has dragged), destroy opened hintbox and pause widget refresh.
 		if (data.start != data.end && !data.boxing) {
-			ZABBIX.Dashboard.pauseWidgetRefresh(graph.data('widget')['uniqueid']);
+			ZABBIX.Dashboard.pauseWidgetRefresh(graph.data('widget')._uniqueid);
 			data.isHintBoxFrozen = false;
 			data.boxing = true;
 			destroyHintbox(graph);
