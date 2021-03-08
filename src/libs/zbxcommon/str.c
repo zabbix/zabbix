@@ -4432,6 +4432,18 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_token_parse_nested_macro                                     *
+ *                                                                            *
+ * Purpose: public wrapper for token_parse_nested_macro() function            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token)
+{
+	return token_parse_nested_macro(expression, macro, token);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_no_function                                                  *
  *                                                                            *
  * Purpose: count calculated item (prototype) formula characters that can be  *

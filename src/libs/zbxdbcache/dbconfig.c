@@ -8656,7 +8656,7 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 	}
 	else
 	{
-		if (NULL == dc_trigger)
+		if (NULL == (*dc_trigger))
 			return FAIL;
 
 		if ((*dc_trigger)->revision > timer->revision ||
