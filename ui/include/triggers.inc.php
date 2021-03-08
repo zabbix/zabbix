@@ -610,10 +610,10 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 		error($expressionData->error);
 		return false;
 	}
-	$expressionHosts = $expressionData->getHosts();
+	$expression_hosts = $expressionData->result->getHosts();
 
 	$hosts = API::Host()->get([
-		'filter' => ['host' => $expressionHosts],
+		'filter' => ['host' => $expression_hosts],
 		'editable' => ($permission == PERM_READ_WRITE),
 		'output' => ['hostid', 'host'],
 		'templated_hosts' => true,
@@ -621,7 +621,7 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 	]);
 	$hosts = zbx_toHash($hosts, 'host');
 
-	foreach ($expressionHosts as $host) {
+	foreach ($expression_hosts as $host) {
 		if (!isset($hosts[$host])) {
 			error(_s('Incorrect trigger expression. Host "%1$s" does not exist or you have no access to this host.', $host));
 			return false;

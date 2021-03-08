@@ -160,6 +160,10 @@ class CFunctionParser extends CParser {
 							break;
 
 						case ',':
+							if (array_key_exists($num, $_parameters)) {
+								// Not overwrite previous empty parameter.
+								$num++;
+							}
 							$_parameters[$num] = [
 								'type' => self::PARAM_UNQUOTED,
 								'raw' => '',

@@ -96,8 +96,19 @@
 			$(el).closest('tr').remove();
 		});
 
-		if ($expr_input.val() != '') {
-			expression.push(($iregexp_checkbox.is(':checked') ? 'i' : '') + 'regexp(' + $expr_input.val() + ')');
+		if ($expr_input.val() !== '') {
+			var items = $('#itemid').data('multiSelect').values.selected,
+				query = '';
+			for (var x in items) {
+				query = items[x].name;
+				break;
+			}
+			if (query !== '') {
+				query = '/' + query.replace(': ', '/');
+			}
+
+			var operator = $iregexp_checkbox.is(':checked') ? 'iregexp' : 'regexp';
+			expression.push('find(' + query + ',,' + operator + ',' + $expr_input.val() + ')');
 			$expr_input.val('');
 		}
 
