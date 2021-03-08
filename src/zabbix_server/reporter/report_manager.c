@@ -1040,15 +1040,24 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, time_t now)
 		{
 			if (nextcheck != report->nextcheck)
 			{
-				zbx_binary_heap_elem_t	elem = {report->reportid, (void *)report};
-				time_t			nextcheck_old = report->nextcheck;
+				if (report->active_since <= nextcheck && nextcheck <= report->active_till)
+				{
+					zbx_binary_heap_elem_t	elem = {report->reportid, (void *)report};
+					time_t			nextcheck_old = report->nextcheck;
 
-				report->nextcheck = nextcheck;
+					report->nextcheck = nextcheck;
 
-				if (0 != nextcheck_old)
-					zbx_binary_heap_update_direct(&manager->report_queue, &elem);
+					if (0 != nextcheck_old)
+						zbx_binary_heap_update_direct(&manager->report_queue, &elem);
+					else
+						zbx_binary_heap_insert(&manager->report_queue, &elem);
+				}
 				else
-					zbx_binary_heap_insert(&manager->report_queue, &elem);
+				{
+					if (0 != report->nextcheck)
+						zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
+					report->nextcheck = 0;
+				}
 			}
 		}
 		else
@@ -1822,10 +1831,15 @@ static void	rm_schedule_jobs(zbx_rm_t *manager, int now)
 		{
 			if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now)))
 			{
-				zbx_binary_heap_elem_t	elem_new = {report->reportid, report};
+				if (report->active_since <= nextcheck && nextcheck <= report->active_till)
+				{
+					zbx_binary_heap_elem_t	elem_new = {report->reportid, report};
 
-				report->nextcheck = nextcheck;
-				zbx_binary_heap_insert(&manager->report_queue, &elem_new);
+					report->nextcheck = nextcheck;
+					zbx_binary_heap_insert(&manager->report_queue, &elem_new);
+				}
+				else
+					report->nextcheck = 0;
 			}
 			else
 			{
