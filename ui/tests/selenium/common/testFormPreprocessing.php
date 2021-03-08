@@ -20,7 +20,6 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -43,9 +42,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return ['class' => CMessageBehavior::class];
 	}
 
 	/*
@@ -1745,7 +1742,6 @@ abstract class testFormPreprocessing extends CWebTest {
 	protected function addItemWithPreprocessing($data) {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
-
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
@@ -1764,15 +1760,12 @@ abstract class testFormPreprocessing extends CWebTest {
 		}
 
 		$form = $this->addItemWithPreprocessing($data);
-
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->assertTrue($message->isGood());
-				$this->assertEquals($this->success_message, $message->getTitle());
+				$this->assertMessage(TEST_GOOD, $this->success_message);
 
 				// Check result in frontend form.
 				$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
@@ -1782,9 +1775,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->assertTrue($message->isBad());
-				$this->assertEquals($this->fail_message, $message->getTitle());
-				$this->assertTrue($message->hasLine($data['error']));
+				$this->assertMessage(TEST_BAD, $this->fail_message, $data['error']);
+
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
 				break;
@@ -1856,12 +1848,9 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	protected function checkTrailingSpaces($data) {
 		$form = $this->addItemWithPreprocessing($data);
-
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals($this->success_message, $message->getTitle());
+		$this->assertMessage(TEST_GOOD, $this->success_message);
 
 		// Remove spaces.
 		foreach ($data['preprocessing'] as $i => &$options) {
@@ -2051,11 +2040,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-
-		// Check successful message.
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals($this->success_message, $message->getTitle());
+		$this->assertMessage(TEST_GOOD, $this->success_message);
 
 		// Check saved preprocessing.
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
@@ -2071,7 +2056,8 @@ abstract class testFormPreprocessing extends CWebTest {
 		foreach ($data['preprocessing'] as $i => $options) {
 			// Check "Custom on fail" value in DB.
 			$expected = (!array_key_exists('on_fail', $options) || !$options['on_fail'])
-					? ZBX_PREPROC_FAIL_DEFAULT : $data['value'];
+				? ZBX_PREPROC_FAIL_DEFAULT
+				: $data['value'];
 
 			$this->assertEquals($expected, $rows[$i + 1]);
 
@@ -2349,15 +2335,11 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form = $this->addItemWithPreprocessing($data);
 		$form->submit();
 		$this->page->waitUntilReady();
-
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals($this->success_message, $message->getTitle());
+		$this->assertMessage(TEST_GOOD, $this->success_message);
 
 		// Check preprocessing steps on host.
 		$this->page->open($host_link);
 		$this->query('link', $data['fields']['Name'])->waitUntilPresent()->one()->click();
-
 		$form->selectTab('Preprocessing');
 		$steps = $this->assertPreprocessingSteps($data['preprocessing']);
 
@@ -2438,7 +2420,7 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->selectTab('Preprocessing');
 		$this->assertEquals($original_steps, $this->listPreprocessingSteps());
 
-		// Check preprocessing steps in unsaved form.
+		// Check preprocessing steps in cloned form.
 		foreach (array_keys($this->listPreprocessingSteps()) as $i) {
 			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
 			$this->assertNull($step->getAttribute('readonly'));

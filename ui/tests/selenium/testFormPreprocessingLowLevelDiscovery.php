@@ -230,7 +230,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	}
 
 	/**
-	 * Add preprocessing steps to inherited LLD for copying.
+	 * Add preprocessing steps to inherited LLD for cloning.
 	 */
 	public function preparePreprocessingData() {
 		CDataHelper::call('discoveryrule.update', [
