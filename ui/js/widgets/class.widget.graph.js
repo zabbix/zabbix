@@ -77,6 +77,16 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
+	setDynamicHost(dynamic_hostid) {
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._stopUpdating(true);
+		}
+
+		this._is_graph_mode = false;
+
+		super.setDynamicHost(dynamic_hostid);
+	}
+
 	_promiseUpdate() {
 		if (this._is_graph_mode) {
 			timeControl.refreshObject('graph_' + this._uniqueid);

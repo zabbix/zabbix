@@ -180,6 +180,14 @@ class CDashboard extends CBaseComponent {
 		// this._addTab(data.name, {page: page});
 	}
 
+	setDynamicHost(dynamic_hostid) {
+		this._dynamic_hostid = dynamic_hostid;
+
+		for (const dashboard_page of this._dashboard_pages) {
+			dashboard_page.setDynamicHost(this._dynamic_hostid);
+		}
+	}
+
 	_createUniqueId() {
 		return 'U' + (this._uniqid_index++).toString(36).toUpperCase().padStart(6, '0');
 	}

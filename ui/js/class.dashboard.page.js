@@ -77,25 +77,25 @@ class CDashboardPage extends CBaseComponent {
 	start() {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
 
-		for (const w of this._widgets) {
-			w.start();
-			this._dashboard_target.appendChild(w.getView());
+		for (const widget of this._widgets) {
+			widget.start();
+			this._dashboard_target.appendChild(widget.getView());
 		}
 	}
 
 	activate() {
 		this._state = DASHBOARD_PAGE_STATE_ACTIVE;
 
-		for (const w of this._widgets) {
-			w.activate();
+		for (const widget of this._widgets) {
+			widget.activate();
 		}
 	}
 
 	deactivate() {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
 
-		for (const w of this._widgets) {
-			w.deactivate();
+		for (const widget of this._widgets) {
+			widget.deactivate();
 		}
 	}
 
@@ -108,16 +108,16 @@ class CDashboardPage extends CBaseComponent {
 		}
 		this._state = DASHBOARD_PAGE_STATE_DESTROYED;
 
-		for (const w of this._widgets) {
-			w.destroy();
+		for (const widget of this._widgets) {
+			widget.destroy();
 		}
 
 		delete this._widgets;
 	}
 
 	resize() {
-		for (const w of this._widgets) {
-			w.resize();
+		for (const widget of this._widgets) {
+			widget.resize();
 		}
 	}
 
@@ -132,24 +132,28 @@ class CDashboardPage extends CBaseComponent {
 	setEditMode() {
 		this._is_edit_mode = true;
 
-		for (const w of this._widgets) {
-			w.setEditMode();
+		for (const widget of this._widgets) {
+			widget.setEditMode();
 		}
 	}
 
 	setDynamicHost(dynamic_hostid) {
-		this._dynamic_hostid = dynamic_hostid;
+		if (this._dynamic_hostid != dynamic_hostid) {
+			this._dynamic_hostid = dynamic_hostid;
 
-		for (const w of this._widgets) {
-			w.setDynamicHost(this.dynamic_hostid);
+			for (const widget of this._widgets) {
+				if (widget.supportsDynamicHosts() && this._dynamic_hostid != widget.getDynamicHost()) {
+					widget.setDynamicHost(this._dynamic_hostid);
+				}
+			}
 		}
 	}
 
 	setTimePeriod(time_period) {
 		this._time_period = time_period;
 
-		for (const w of this._widgets) {
-			w.setTimePeriod(this._time_period);
+		for (const widget of this._widgets) {
+			widget.setTimePeriod(this._time_period);
 		}
 	}
 

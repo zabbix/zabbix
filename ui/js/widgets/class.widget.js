@@ -239,17 +239,19 @@ class CWidget extends CBaseComponent {
 		return (this._fields.dynamic == 1);
 	}
 
+	getDynamicHost() {
+		return this._dynamic_hostid;
+	}
+
 	setDynamicHost(dynamic_hostid) {
-		if (this._dynamic_hostid !== dynamic_hostid) {
-			this._dynamic_hostid = dynamic_hostid;
+		this._dynamic_hostid = dynamic_hostid;
 
-			if (this._state !== WIDGET_STATE_INITIAL) {
-				this._updateActionsMenu();
-			}
+		if (this._state !== WIDGET_STATE_INITIAL) {
+			this._updateActionsMenu();
+		}
 
-			if (this._state === WIDGET_STATE_ACTIVE) {
-				this._startUpdating();
-			}
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
 		}
 	}
 

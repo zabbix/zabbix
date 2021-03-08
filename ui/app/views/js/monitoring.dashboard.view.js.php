@@ -59,14 +59,17 @@
 				widget_defaults: widget_defaults,
 				is_editable: dashboard.allowed_edit && dashboard.editable,
 				is_edit_mode: (dashboard.dashboardid === null),
-				time_period: time_period,
+				time_period: {
+					from: time_period.from,
+					from_ts: time_period.from_ts,
+					to: time_period.to,
+					to_ts: time_period.to_ts
+				},
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null
 			});
 
 			for (const page of dashboard.pages) {
 				ZABBIX.Dashboard.addDashboardPage(page);
-
-				break;
 			}
 
 			ZABBIX.Dashboard.activate();
@@ -305,11 +308,10 @@
 
 			popState: (e) => {
 				const host = (e.state && e.state.host) ? e.state.host : null;
-				const hostid = host ? host.id : null;
 
 				$('#dynamic_hostid').multiSelect('addData', host ? [host] : [], false);
 
-				ZABBIX.Dashboard.updateDynamicHost(hostid);
+				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
 			},
 
 			dynamicHostChange: () => {
@@ -323,16 +325,16 @@
 					url.setArgument('dashboardid', dashboard.dashboardid);
 				}
 
-				if (time_period) {
+				if (time_period !== null) {
 					url.setArgument('from', time_period.from);
 					url.setArgument('to', time_period.to);
 				}
 
-				if (host) {
+				if (host !== null) {
 					url.setArgument('hostid', host.id);
 				}
 
-				ZABBIX.Dashboard.updateDynamicHost(host ? host.id : null);
+				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
 
 				history.pushState({host: host}, '', url.getUrl());
 
