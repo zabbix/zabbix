@@ -53,7 +53,7 @@ in:
 out:
   expression: '{123} < {$LIMIT:"c:\\data"}'
 ---
-test case: Replace '"{$U}" -> 123'
+test case: Replace '"{#U}" -> 123'
 in:
   rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_COMPOSE_LLD]
   expression: 'strlen({#U})'
@@ -70,6 +70,15 @@ in:
   - {token: '{123}', value: '456'}
 out:
   expression: '{456} < 0'
+---
+test case: Replace '"{#U}" -> 1m'
+in:
+  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_COMPOSE_LLD]
+  expression: '{#U} = 60'
+  replace: 
+  - {token: '{#U}', value: '1m'}
+out:
+  expression: '1m = 60'
 ...
 
 

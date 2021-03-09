@@ -276,7 +276,7 @@ static int	compare_tokens_by_loc(const void *d1, const void *d2)
 static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, size_t *str_alloc, size_t *str_offset,
 		const zbx_eval_token_t *token)
 {
-	int		quoted = 0, len, check_value = 0;
+	int		quoted = 0, check_value = 0;
 	const char	*src, *value_str;
 	char		*dst;
 	size_t		size;
@@ -322,8 +322,8 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 
 	if (0 != check_value)
 	{
-		if (ZBX_VARIANT_STR == token->value.type && (SUCCEED != zbx_number_parse(token->value.data.str, &len) ||
-				strlen(token->value.data.str) != (size_t)len))
+		if (ZBX_VARIANT_STR == token->value.type &&
+				SUCCEED != eval_suffixed_number_parse(token->value.data.str, NULL))
 		{
 			quoted = 1;
 		}

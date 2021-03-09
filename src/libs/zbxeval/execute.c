@@ -296,6 +296,39 @@ finish:
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_suffixed_number_parse                                       *
+ *                                                                            *
+ * Purpose: check if the value is suffixed number and return the suffix if    *
+ *          exists                                                            *
+ *                                                                            *
+ * Parameters: value  - [IN] the value to check                               *
+ *             suffix - [OUT] the suffix or 0 if number does not have suffix  *
+ *                            (optional)                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the value is suffixed number                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	 eval_suffixed_number_parse(const char *value, char *suffix)
+{
+	int	len, num_len;
+
+	if ('-' == *value)
+		value++;
+
+	len = strlen(value);
+
+	if (SUCCEED != zbx_suffixed_number_parse(value, &num_len) || num_len != len)
+		return FAIL;
+
+	if (NULL != suffix)
+		*suffix = value[len - 1];
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: variant_convert_suffixed_num                                     *
  *                                                                            *
  * Purpose: convert variant string value containing suffixed number to        *
@@ -310,18 +343,15 @@ finish:
  ******************************************************************************/
 static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
 {
-	int	len, num_len, offset;
+	char	suffix;
 
 	if (ZBX_VARIANT_STR != value_num->type)
 		return FAIL;
 
-	len = strlen(value_num->data.str);
-	offset = ('-' == *value_num->data.str ? 1 : 0);
-
-	if (SUCCEED != zbx_suffixed_number_parse(value_num->data.str + offset, &num_len) || num_len != len - offset)
+	if (SUCCEED != eval_suffixed_number_parse(value_num->data.str, &suffix))
 		return FAIL;
 
-	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(value_num->data.str[len - 1]));
+	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(suffix));
 
 	return SUCCEED;
 }
