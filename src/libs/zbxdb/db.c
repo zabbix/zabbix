@@ -2583,7 +2583,7 @@ int	zbx_dbms_extract_version(struct zbx_json *json)
 	if (ON == ZBX_MARIADB_SFORK)
 	{
 		flag = zbx_check_DBversion("MariaDB",  ZBX_MYSQL_SVERSION, MARIA_MYSQL_MIN_VERSION,
-				VERSION_REQUIREMENT_NOT_DEFINED);
+				DBVERSION_UNDEFINED);
 		zbx_json_create_entry_for_DBversion(json, "MariaDB", friendly_current_version,
 				MARIA_MYSQL_MIN_VERSION_FRIENDLY, VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY, flag);
 	}
@@ -2671,8 +2671,7 @@ out:
 
 #define ORACLE_MIN_VERSION 1201000200
 #define ORACLE_MIN_VERSION_FRIENDLY "12.01.00.02.x"
-	flag = zbx_check_DBversion("Oracle", ZBX_ORACLE_SVERSION, ORACLE_MIN_VERSION,
-			VERSION_REQUIREMENT_NOT_DEFINED);
+	flag = zbx_check_DBversion("Oracle", ZBX_ORACLE_SVERSION, ORACLE_MIN_VERSION, DBVERSION_UNDEFINED);
 	zbx_json_create_entry_for_DBversion(json, "Oracle", unparsed_version, ORACLE_MIN_VERSION_FRIENDLY,
 			VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY, flag);
 #else

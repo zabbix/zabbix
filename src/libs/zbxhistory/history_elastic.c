@@ -38,7 +38,7 @@ const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
 
-static int		ZBX_ELASTIC_SVERSION = DBVERSION_UNDEFINED;
+static unsigned long	ZBX_ELASTIC_SVERSION = DBVERSION_UNDEFINED;
 
 typedef struct
 {
@@ -1063,12 +1063,12 @@ static size_t	single_curl_response_write_func(void *ptr, size_t size, size_t nme
  *          the response string                                                     *
  *                                                                                  *
  ************************************************************************************/
-int	zbx_elastic_check_version(struct zbx_json *json)
+void	zbx_elastic_check_version(struct zbx_json *json)
 {
 #define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E		3
-	char	version_unparsed[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE];
-	int	flag, major_version_num, minor_version_num, increment_version_num, elasticDB_version,
-		overall_status = SUCCEED;
+	char		version_unparsed[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE];
+	int		flag, major_version_num, minor_version_num, increment_version_num, overall_status = SUCCEED;
+	unsigned long	elasticDB_version;
 
 	single_curl_response_string	s;
 	struct zbx_json_parse		jp, jp_values, jp_sub;
@@ -1160,18 +1160,16 @@ out:
 #define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION 70000
 #define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION_FRIENDLY "7.x"
 	flag = zbx_check_DBversion("ElasticDB", elasticDB_version, SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION,
-			VERSION_REQUIREMENT_NOT_DEFINED);
+			DBVERSION_UNDEFINED);
 	zbx_json_create_entry_for_DBversion(json, "ElasticDB", version_unparsed,
 			SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION_FRIENDLY,
 			VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY, flag);
-	zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version result: %d", elasticDB_version);
+	zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version result: %lu", elasticDB_version);
 	ZBX_ELASTIC_SVERSION = elasticDB_version;
 	zbx_free(s.ptr);
-
-	return elasticDB_version;
 }
 
-int	zbx_elastic_get_version(void)
+unsigned long	zbx_elastic_get_version(void)
 {
 	return ZBX_ELASTIC_SVERSION;
 }
@@ -1191,7 +1189,7 @@ void	zbx_elastic_check_version(struct zbx_json *json)
 	ZBX_UNUSED(json);
 }
 
-int	zbx_elastic_get_version(void)
+unsigned long	zbx_elastic_get_version(void)
 {
 	return DBVERSION_UNDEFINED;
 }

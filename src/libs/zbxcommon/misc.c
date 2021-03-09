@@ -3902,7 +3902,8 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
 	return SUCCEED;
 }
 
-int	zbx_check_DBversion(char *database, int current_version, int min_version, int max_version)
+int	zbx_check_DBversion(char *database, unsigned long current_version, unsigned long min_version,
+		unsigned long max_version)
 {
 	int	flag;
 
@@ -3911,16 +3912,16 @@ int	zbx_check_DBversion(char *database, int current_version, int min_version, in
 		flag = DB_VERSION_FAILED_TO_RETRIEVE;
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to retrieve %s version", database);
 	}
-	else if (min_version > current_version && VERSION_REQUIREMENT_NOT_DEFINED != min_version)
+	else if (min_version > current_version && DBVERSION_UNDEFINED != min_version)
 	{
 		flag = DB_VERSION_LOWER_THAN_MINIMUM;
-		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! %s version is %d which is smaller than minimum of %d",
+		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! %s version is %lu which is smaller than minimum of %lu",
 				database, current_version, min_version);
 	}
-	else if (max_version < current_version && VERSION_REQUIREMENT_NOT_DEFINED != max_version)
+	else if (max_version < current_version && DBVERSION_UNDEFINED != max_version)
 	{
 		flag = DB_VERSION_HIGHER_THAN_MAXIMUM;
-		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! %s version is %d which is higher than maximum of %d",
+		zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! %s version is %lu which is higher than maximum of %lu",
 				database, current_version, max_version);
 	}
 	else
