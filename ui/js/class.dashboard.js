@@ -223,70 +223,6 @@ class CDashboard extends CBaseComponent {
 		dashboard_page.destroy();
 	}
 
-
-	_slideKiosk() {
-		// Calculate the dashboard offset (0, 1 or 2 lines) based on focused widget.
-
-		let slide_lines = 0;
-
-		for (const widget of this._widgets) {
-			if (!widget.getView().hasClass(widget.getCssClass('focus'))) {
-				continue;
-			}
-
-			// Focused widget not on the first row of dashboard?
-			if (widget.getView().position().top !== 0) {
-				break;
-			}
-
-			if (widget instanceof CWidgetIterator) {
-				slide_lines = widget.getView().hasClass('iterator-double-header') ? 2 : 1;
-			}
-			else if (widget.getView().hasClass(widget.getCssClass('hidden_header'))) {
-				slide_lines = 1;
-			}
-
-			break;
-		}
-
-		// Apply the calculated dashboard offset (0, 1 or 2 lines) slowly.
-
-		const $wrapper = this._$target.closest('.layout-kioskmode');
-
-		if (!$wrapper.length) {
-			return;
-		}
-
-		if (typeof this._options['kiosk_slide_timeout'] !== 'undefined') {
-			clearTimeout(this._options['kiosk_slide_timeout'])
-			delete this._options['kiosk_slide_timeout'];
-		}
-
-		let slide_lines_current = 0;
-		for (let i = 2; i > 0; i--) {
-			if ($wrapper.hasClass('kiosk-slide-lines-' + i)) {
-				slide_lines_current = i;
-				break;
-			}
-		}
-
-		if (slide_lines > slide_lines_current) {
-			if (slide_lines_current > 0) {
-				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
-			}
-			$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
-		}
-		else if (slide_lines < slide_lines_current) {
-			this._options['kiosk_slide_timeout'] = setTimeout(() => {
-				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
-				if (slide_lines > 0) {
-					$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
-				}
-				delete this._options['kiosk_slide_timeout'];
-			}, 2000);
-		}
-	}
-
 	getSelectedPage() {
 		return this._tabs_data.get(this._selected_tab).page;
 	}
@@ -359,14 +295,6 @@ class CDashboard extends CBaseComponent {
 			},
 
 			reserveHeaderLines: (e) => {
-				// TODO Slide also in non kiosk mode.
-
-				const wrapper = document.querySelector('.wrapper.layout-kioskmode');
-
-				if (wrapper === null) {
-					return;
-				}
-
 				if (reserve_header_lines_timeout_id !== null) {
 					clearTimeout(reserve_header_lines_timeout_id);
 					reserve_header_lines_timeout_id = null;
@@ -376,7 +304,7 @@ class CDashboard extends CBaseComponent {
 				let old_num_header_lines = 0;
 
 				for (let i = 2; i > 0; i--) {
-					if (wrapper.classList.contains(`kiosk-slide-lines-${i}`)) {
+					if (this._containers.grid.classList.contains(`reserve-header-lines-${i}`)) {
 						old_num_header_lines = i;
 						break;
 					}
@@ -384,18 +312,18 @@ class CDashboard extends CBaseComponent {
 
 				if (new_num_header_lines > old_num_header_lines) {
 					if (old_num_header_lines > 0) {
-						wrapper.classList.remove(`kiosk-slide-lines-${old_num_header_lines}`);
+						this._containers.grid.classList.remove(`reserve-header-lines-${old_num_header_lines}`);
 					}
-					wrapper.classList.add(`kiosk-slide-lines-${new_num_header_lines}`);
+					this._containers.grid.classList.add(`reserve-header-lines-${new_num_header_lines}`);
 				}
 				else if (new_num_header_lines < old_num_header_lines) {
 					reserve_header_lines_timeout_id = setTimeout(() => {
 						reserve_header_lines_timeout_id = null;
 
-						wrapper.classList.remove(`kiosk-slide-lines-${old_num_header_lines}`);
+						this._containers.grid.classList.remove(`reserve-header-lines-${old_num_header_lines}`);
 
 						if (new_num_header_lines > 0) {
-							wrapper.classList.add(`kiosk-slide-lines-${new_num_header_lines}`);
+							this._containers.grid.classList.add(`reserve-header-lines-${new_num_header_lines}`);
 						}
 					}, 2000);
 				}
