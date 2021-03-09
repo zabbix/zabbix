@@ -1224,10 +1224,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	zbx_json_init(&versions_json, ZBX_JSON_STAT_BUF_LEN);
-	DBcheck_capabilities(DBextract_DBversion(&versions_json));
 
-	if (SUCCEED != DBcheck_version())
+	if (SUCCEED != DBcheck_capabilities(DBextract_DBversion(&versions_json)) || SUCCEED != DBcheck_version())
+	{
+		zbx_json_free(&versions_json);
 		exit(EXIT_FAILURE);
+	}
+
 	DBcheck_character_set();
 
 	if (SUCCEED == DBcheck_double_type())
@@ -1236,10 +1239,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
 
 	if (SUCCEED != zbx_db_check_instanceid())
+	{
+		zbx_json_free(&versions_json);
 		exit(EXIT_FAILURE);
+	}
 
 	zbx_history_check_version(&versions_json);
-	DBcheck_version_requirements(&versions_json);
+	DBflush_version_requirements(&versions_json);
 	zbx_json_free(&versions_json);
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS

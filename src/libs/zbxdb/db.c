@@ -2516,7 +2516,7 @@ static void	convert_numeric_version_to_user_friendly(int numeric_version, char* 
 	buf_str_len = strlen(buf);
 	friendly_version[buf_str_len + ((buf_str_len - 1) / 2)] = '\0';
 
-	while((friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = buf[buf_str_len - 1 - j++]))
+	while ((friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = buf[buf_str_len - 1 - j++]))
 	{
 		if (0 == j % 2 && j < buf_str_len )
 			friendly_version[buf_str_len + ((buf_str_len - 1) / 2) - 1 - i++] = '.';
@@ -2527,7 +2527,8 @@ static void	convert_numeric_version_to_user_friendly(int numeric_version, char* 
  *                                                                                                             *
  * Function: zbx_dbms_extract_version                                                                          *
  *                                                                                                             *
- * Purpose: retrieves the DB version and makes sure it is stored in the numeric format                         *
+ * Purpose: retrieves the DB version and makes sure it is stored in the numeric format, also fills the json    *
+ *          to report to front-end                                                                             *
  *                                                                                                             *
  *          For PostgreSQL:                                                                                    *
  *          numeric version is available from the API                                                          *
@@ -2577,11 +2578,11 @@ int	zbx_dbms_extract_version(struct zbx_json *json)
 	zabbix_log(LOG_LEVEL_DEBUG, "MySQL version result: %d", ZBX_MYSQL_SVERSION);
 
 #define MYSQL_MYSQL_MIN_VERSION 50728
-#define MYSQL_MYSQL_MIN_VERSION_FRIENDLY "5.7.28"
+#define MYSQL_MYSQL_MIN_VERSION_FRIENDLY "5.07.28"
 #define MYSQL_MYSQL_MAX_VERSION 80000
-#define MYSQL_MYSQL_MAX_VERSION_FRIENDLY "8.0.x"
+#define MYSQL_MYSQL_MAX_VERSION_FRIENDLY "8.x.x"
 #define MARIA_MYSQL_MIN_VERSION 100037
-#define MARIA_MYSQL_MIN_VERSION_FRIENDLY "10.0.37"
+#define MARIA_MYSQL_MIN_VERSION_FRIENDLY "10.00.37"
 	convert_numeric_version_to_user_friendly(ZBX_MYSQL_SVERSION, friendly_current_version);
 
 	if (ON == ZBX_MARIADB_SFORK)
@@ -2608,9 +2609,9 @@ int	zbx_dbms_extract_version(struct zbx_json *json)
 	convert_numeric_version_to_user_friendly(ZBX_PG_SVERSION, friendly_current_version);
 
 #define POSTGRESQL_MIN_VERSION 100900
-#define POSTGRESQL_MIN_VERSION_FRIENDLY "10.9"
+#define POSTGRESQL_MIN_VERSION_FRIENDLY "10.09"
 #define POSTGRESQL_MAX_VERSION 130000
-#define POSTGRESQL_MAX_VERSION_FRIENDLY "13.X"
+#define POSTGRESQL_MAX_VERSION_FRIENDLY "13.x"
 	flag = zbx_check_DBversion("PostgreSQL", ZBX_PG_SVERSION, POSTGRESQL_MIN_VERSION, POSTGRESQL_MAX_VERSION);
 	zbx_json_create_entry_for_DBversion(json, "PostgreSQL", friendly_current_version, POSTGRESQL_MIN_VERSION_FRIENDLY,
 			POSTGRESQL_MAX_VERSION_FRIENDLY, flag);

@@ -51,9 +51,6 @@ int	zbx_history_init(char **error)
 
 	const char	*opts[] = {"dbl", "str", "log", "uint", "text"};
 
-	/* if (NULL != CONFIG_HISTORY_STORAGE_URL) */
-	/* 	zbx_elastic_check_version(); */
-
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
 	{
 		if (NULL == CONFIG_HISTORY_STORAGE_URL || NULL == strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))
@@ -431,21 +428,12 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_history_get_version                                          *
+ * Function: zbx_history_check_version                                        *
  *                                                                            *
  * Purpose: relays the version retrieval logic to the history implementation  *
  *          functions                                                         *
  *                                                                            *
- * Return value: XX.YY.ZZ format for the elastic search if it could be        *
- *               retrieved                                                    *
- *               DBVERSION_UNDEFINED otherwise                                *
- *                                                                            *
  ******************************************************************************/
-/* int	zbx_history_get_version(void) */
-/* { */
-/* 	return  NULL == CONFIG_HISTORY_STORAGE_URL ? DBVERSION_UNDEFINED : zbx_elastic_get_version(); */
-/* } */
-
 void	zbx_history_check_version(struct zbx_json *json)
 {
 	if (NULL != CONFIG_HISTORY_STORAGE_URL)

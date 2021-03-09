@@ -1066,13 +1066,9 @@ static size_t	single_curl_response_write_func(void *ptr, size_t size, size_t nme
 int	zbx_elastic_check_version(struct zbx_json *json)
 {
 #define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E		3
-	char	major_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E],
-		minor_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E],
-		increment_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E], version_unparsed[MAX_STRING_LEN],
-		errbuf[CURL_ERROR_SIZE];
-	int	flag, major_version_num, minor_version_num, increment_version_num, elasticDB_version, local_status,
+	char	version_unparsed[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE];
+	int	flag, major_version_num, minor_version_num, increment_version_num, elasticDB_version,
 		overall_status = SUCCEED;
-	size_t	version_number_len, next_start_index = 0;
 
 	single_curl_response_string	s;
 	struct zbx_json_parse		jp, jp_values, jp_sub;
@@ -1146,7 +1142,6 @@ out:
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version retrieved unparsed: %s", version_unparsed);
 
-
 		if (3 != sscanf(version_unparsed, "%d.%d.%d", &major_version_num, &minor_version_num,
 				&increment_version_num) || major_version_num >= 100 || major_version_num <= 0 ||
 				minor_version_num >= 100 || minor_version_num < 0 || increment_version_num >= 100 ||
@@ -1164,7 +1159,7 @@ out:
 	}
 
 #define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION 70000
-#define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION_FRIENDLY "7.X"
+#define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION_FRIENDLY "7.x"
 	flag = zbx_check_DBversion("ElasticDB", elasticDB_version, SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION,
 			VERSION_REQUIREMENT_NOT_DEFINED);
 	zbx_json_create_entry_for_DBversion(json, "ElasticDB", version_unparsed,

@@ -57,8 +57,6 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 		zbx_vector_history_record_t *values);
 
 int	zbx_history_requires_trends(int value_type);
-//int	zbx_history_get_version(void);
-
 void	zbx_history_check_version(struct zbx_json *json);
 
 #endif

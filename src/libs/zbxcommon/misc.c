@@ -3928,4 +3928,3 @@ int	zbx_check_DBversion(char *database, int current_version, int min_version, in
 
 	return flag;
 }
-

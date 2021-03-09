@@ -274,8 +274,6 @@ void		zbx_json_escape(char **string);
 int		zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
 zbx_json_type_t	zbx_json_valuetype(const char *p);
 
-//void	zbx_json_log(const struct zbx_json_parse *jp, int loglevel);
-
 /* jsonpath support */
 
 typedef struct zbx_jsonpath_segment zbx_jsonpath_segment_t;

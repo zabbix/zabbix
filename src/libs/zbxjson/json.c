@@ -1301,6 +1301,23 @@ zbx_json_type_t	zbx_json_valuetype(const char *p)
 	return __zbx_json_type(p);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_create_entry_for_DBversion                              *
+ *                                                                            *
+ * Purpose: preapre json for front-end with the DB current, minimum and       *
+ *          maximum versions and a flag that indicates if the version         *
+ *          satisfies the requirements                                        *
+ *                                                                            *
+ * Parameters:  json                     - [IN/OUT] json data                 *
+ *              database                 - [IN] name of DB (MySQL/ElasticDB)  *
+ *              friendly_current_version - [IN] string current version        *
+ *              friendly_min_version     - [IN] string min version            *
+ *              friendly_max_version     - [IN] string max version            *
+ *              flag                     - [IN] status if DB satisfies the    *
+ *                                         requirements                       *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_json_create_entry_for_DBversion(struct zbx_json *json, char *database, char *friendly_current_version,
 		char *friendly_min_version, char *friendly_max_version, int flag)
 {
@@ -1309,9 +1326,9 @@ void	zbx_json_create_entry_for_DBversion(struct zbx_json *json, char *database, 
 
 	if (DB_VERSION_FAILED_TO_RETRIEVE != flag)
 		zbx_json_addstring(json, "current_version", friendly_current_version, ZBX_JSON_TYPE_STRING);
+
 	zbx_json_addstring(json, "min_version", friendly_min_version, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "max_version", friendly_max_version, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(json, "flag", flag);
 	zbx_json_close(json);
 }
-

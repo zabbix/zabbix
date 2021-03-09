@@ -867,45 +867,24 @@ int	DBextract_DBversion(struct zbx_json *json)
 	return ret;
 }
 
-//#define MAX_FRIENDLY_VERSION_OUTPUT	100
-/* typedef enum */
-/* { */
-/* 	DB_VERSION_SUPPORTED, */
-/* 	DB_VERSION_LOWER_THAN_MINIMUM, */
-/* 	DB_VERSION_HIGHER_THAN_MAXIMUM, */
-/* 	DB_VERSION_FAILED_TO_RETRIEVE */
-/* } db_version_status_flags_shared_with_FRONTEND; */
-
-//#define VERSION_REQUIREMENT_NOT_DEFINED	-1
-
-
 /******************************************************************************
  *                                                                            *
- * Function: DBcheck_version_requirements                                     *
+ * Function: DBflush_version_requirements                                     *
  *                                                                            *
- * Purpose: check if the main DB version (and also ElasticDB if it is used)   *
- *          satisfies the version requirements and 1) logs if it does not     *
- *          2) writes a json entry in DB with the result for the front-end    *
+ * Purpose: writes a json entry in DB with the result for the front-end       *
  *                                                                            *
- * Parameters: elastic_is_used        - [IN] elasticDB is configured          *
- *             elastic_version        - [IN] detected version of the          *
- *                                           elasticDB used                   *
+ * Parameters: json - [IN] json entry                                         *
  *                                                                            *
  ******************************************************************************/
-void	DBcheck_version_requirements(struct zbx_json *json)
+void	DBflush_version_requirements(struct zbx_json *json)
 {
-	int current_version;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	current_version = zbx_dbms_get_version();
 	DBbegin();
 
 	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", json->buffer))
-	{
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
-	}
 
 	DBcommit();
 	DBclose();
@@ -919,9 +898,14 @@ void	DBcheck_version_requirements(struct zbx_json *json)
  *                                                                            *
  * Purpose: checks DBMS for optional features and exit if is not suitable     *
  *                                                                            *
+ * Return value: SUCCEED - if optional feature were checked successfully      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
-void	DBcheck_capabilities(int db_version)
+int	DBcheck_capabilities(int db_version)
 {
+	int	ret = SUCCEED;
+
 #ifdef HAVE_POSTGRESQL
 
 #define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
@@ -950,16 +934,16 @@ void	DBcheck_capabilities(int db_version)
 		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %d is not supported with TimescaleDB, minimum is %d",
 				db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
 		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 
 	if (0 == (timescaledb_version = zbx_tsdb_get_version()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
 		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
@@ -969,14 +953,17 @@ void	DBcheck_capabilities(int db_version)
 		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
 				timescaledb_version, MIN_TIMESCALEDB_VERSION);
 		DBfree_result(result);
-		DBclose();
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 clean:
 	DBfree_result(result);
 out:
 	DBclose();
+#else
+	ZBX_UNUSED(db_version);
 #endif
+	return ret;
 }
 
 #define MAX_EXPRESSIONS	950
