@@ -37,8 +37,8 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	const TEMPL_INHERITANCE_RULEID	= 15011;	//'testInheritanceDiscoveryRule'
 	const HOST_INHERITANCE_RULEID	= 15016;	// 'Template inheritance test host' -> 'testInheritanceDiscoveryRule'
 	const INHERITED_ITEM_PROTOTYPE	= 15096;	// 'testInheritanceDiscoveryRule' -> 'testInheritanceItemPrototypePreprocessing'
-	const CLONE_RULEID				= 99095;	// 'Host for triggers filtering' -> 'Discovery rule for triggers filtering'
-	const CLONE_ITEM_PROTOTYPEID	= 99096;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
+	const CLONE_RULEID				= 33800;	// 'Host for triggers filtering' -> 'Discovery rule for triggers filtering'
+	const CLONE_ITEM_PROTOTYPEID	= 23804;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
 
 	public function getItemPrototypePrometheusData() {
 		return array_merge($this->getPrometheusData(), [
@@ -126,13 +126,13 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	public function testFormPreprocessingItemPrototype_CloneItemPrototype() {
 		$link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::CLONE_RULEID.
 				'&itemid='.self::CLONE_ITEM_PROTOTYPEID;
-		$this->checkCloneTemplatedItem($link, 'Item prototype');
+		$this->checkCloneItem($link, 'Item prototype');
 	}
 
 	public function testFormPreprocessingItemPrototype_CloneTemplatedItemPrototype() {
 		$link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::HOST_INHERITANCE_RULEID.
 				'&itemid='.self::INHERITED_ITEM_PROTOTYPE;
-		$this->checkCloneTemplatedItem($link, 'Item prototype', $templated = true);
+		$this->checkCloneItem($link, 'Item prototype', $templated = true);
 	}
 
 	/**

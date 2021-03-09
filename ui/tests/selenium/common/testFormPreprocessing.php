@@ -2524,7 +2524,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * @param string $link    cloned item, prototype or LLD URL
 	 * @param string $item    what is being cloned: item, prototype or LLD rule
 	 */
-	protected function checkCloneTemplatedItem($link, $item, $templated = false) {
+	protected function checkCloneItem($link, $item, $templated = false) {
 		$cloned_name = 'Cloned_testInheritancePreprocessingSteps'.time();
 		$cloned_key = 'cloned-preprocessing'.time();
 

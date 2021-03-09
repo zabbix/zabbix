@@ -175,12 +175,12 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	 */
 	public function testFormPreprocessingItem_CloneItem() {
 		$link = 'items.php?form=update&hostid='.self::HOSTID.'&itemid='.self::CLONE_ITEMID;
-		$this->checkCloneTemplatedItem($link, 'Item');
+		$this->checkCloneItem($link, 'Item');
 	}
 
 	public function testFormPreprocessingItem_CloneTemplatedItem() {
 		$link = 'items.php?form=update&hostid='.self::INHERITANCE_HOSTID.'&itemid='.self::INHERITED_ITEMID;
-		$this->checkCloneTemplatedItem($link, 'Item', $templated = true);
+		$this->checkCloneItem($link, 'Item', $templated = true);
 	}
 
 	/**
