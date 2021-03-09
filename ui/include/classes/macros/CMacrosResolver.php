@@ -848,7 +848,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Purpose: Translate {10}>10 to something like last(localhost:system.cpu.load)>10
+	 * Purpose: Translate {10}>10 to something like last(/localhost/system.cpu.load)>10
 	 *
 	 * @param array  $triggers
 	 * @param string $triggers[][<sources>]			  See options['source']
