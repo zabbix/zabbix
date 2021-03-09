@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-09T04:39:37Z'
+  date: '2021-03-09T06:34:53Z'
   groups:
     -
       name: Templates/Applications
@@ -896,7 +896,7 @@ zabbix_export:
               retrieve_mode: HEADERS
               trigger_prototypes:
                 -
-                  expression: '{last()}=503'
+                  expression: '{last()}=0'
                   name: 'RabbitMQ: There are active alarms in the cluster'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1583,7 +1583,7 @@ zabbix_export:
               retrieve_mode: HEADERS
               trigger_prototypes:
                 -
-                  expression: '{last()}=503'
+                  expression: '{last()}=0'
                   name: 'RabbitMQ: There are valid TLS certificates expiring in the next month'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1625,7 +1625,7 @@ zabbix_export:
               retrieve_mode: HEADERS
               trigger_prototypes:
                 -
-                  expression: '{last()}=503'
+                  expression: '{last()}=0'
                   name: 'RabbitMQ: There are active alarms in the node'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1667,7 +1667,7 @@ zabbix_export:
               retrieve_mode: HEADERS
               trigger_prototypes:
                 -
-                  expression: '{last()}=503'
+                  expression: '{last()}=0'
                   name: 'RabbitMQ: There are queues that could potentially lose data if the this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1709,7 +1709,7 @@ zabbix_export:
               retrieve_mode: HEADERS
               trigger_prototypes:
                 -
-                  expression: '{last()}=503'
+                  expression: '{last()}=0'
                   name: 'RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1751,7 +1751,7 @@ zabbix_export:
               retrieve_mode: HEADERS
               trigger_prototypes:
                 -
-                  expression: '{last()}=503'
+                  expression: '{last()}=0'
                   name: 'RabbitMQ: There are not running virtual hosts'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
