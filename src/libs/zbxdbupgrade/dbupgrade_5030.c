@@ -1822,7 +1822,7 @@ static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screeni
 
 	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
 
-	result = DBselect("select usrgrpid, permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
+	result = DBselect("select usrgrpid,permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1848,7 +1848,7 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 
 	dashboard_userid = DBget_maxid("dashboard_user");
 
-	result = DBselect("select userid, permission from slideshow_user where slideshowid=" ZBX_FS_UI64, slideshowid);
+	result = DBselect("select userid,permission from slideshow_user where slideshowid=" ZBX_FS_UI64, slideshowid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1864,7 +1864,7 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 
 	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
 
-	result = DBselect("select usrgrpid, permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
+	result = DBselect("select usrgrpid,permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
 			slideshowid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -2076,7 +2076,7 @@ static int	DBpatch_delay_routine(const char *screen_delay, int *dashboard_delay)
 	if (FAIL == is_time_suffix(screen_delay, &tmp, ZBX_LENGTH_UNLIMITED))
 		return FAIL;
 
-	imax = sizeof(delays)/sizeof(delays[0]);;
+	imax = sizeof(delays)/sizeof(delays[0]);
 
 	if (0 >= tmp)
 	{
@@ -2150,8 +2150,9 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 		{
 			if (SUCCEED != (ret = DBpatch_add_dashboard_page(&dashboard_page, dashboard.dashboardid,
 					row2[0], page_delay, step)))
+			{
 				continue;
-
+			}
 		}
 
 		result3 = DBselect(
