@@ -805,7 +805,7 @@ static time_t	rm_report_calc_nextcheck(const zbx_rm_report_t *report, time_t now
 {
 	time_t	nextcheck;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, (int)now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:" ZBX_FS_TIME_T, __func__, now);
 
 	nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays, report->start_time, report->timezone);
 
@@ -2082,6 +2082,7 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 	{
 		/* external test request - forward the response to the requester */
 		zbx_ipc_client_send(writer->job->client, ZBX_IPC_REPORTER_TEST_RESULT, message->data, message->size);
+		rm_job_free(writer->job);
 	}
 	else
 	{
