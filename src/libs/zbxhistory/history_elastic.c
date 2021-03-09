@@ -1125,7 +1125,6 @@ int	zbx_elastic_check_version(struct zbx_json *json)
 		SUCCEED != zbx_json_brackets_by_name(&jp_values, "version", &jp_sub) ||
 		SUCCEED != zbx_json_value_by_name(&jp_sub, "number", version_unparsed, sizeof(version_unparsed), NULL))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "failed to retrieve ElasticDB version from the json response");
 		overall_status = FAIL;
 		goto clean;
 	}
@@ -1135,7 +1134,7 @@ clean:
 out:
 	if (FAIL == overall_status)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "failed to extract ElasticDB version");
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to extract ElasticDB version");
 		elasticDB_version = DBVERSION_UNDEFINED;
 	}
 	else

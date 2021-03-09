@@ -76,7 +76,7 @@ static int	db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
-static int			ZBX_MYSQL_SVERSION = DBVERSION_UNDEFINED;
+static unsigned long		ZBX_MYSQL_SVERSION = DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
@@ -92,7 +92,7 @@ typedef struct
 }
 zbx_oracle_db_handle_t;
 
-static int			ZBX_ORACLE_SVERSION = DBVERSION_UNDEFINED;
+static unsigned long		ZBX_ORACLE_SVERSION = DBVERSION_UNDEFINED;
 
 static zbx_oracle_db_handle_t	oracle;
 
@@ -101,7 +101,8 @@ static ub4	OCI_DBserver_status(void);
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
-static int			ZBX_PG_SVERSION = DBVERSION_UNDEFINED, ZBX_TSDB_VERSION = -1;
+static int			ZBX_TSDB_VERSION = -1;
+static unsigned long		ZBX_PG_SVERSION = DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
@@ -2470,7 +2471,7 @@ int	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
  * Return value: DBMS version or 0 if unknown                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbms_get_version(void)
+unsigned long	zbx_dbms_get_version(void)
 {
 #if defined(HAVE_MYSQL)
 	return ZBX_MYSQL_SVERSION;
@@ -2501,18 +2502,12 @@ int	zbx_dbms_mariadb_used(void)
 
 #define MAX_FRIENDLY_VERSION_OUTPUT	100
 
-static void	convert_numeric_version_to_user_friendly(int numeric_version, char* friendly_version)
+static void	convert_numeric_version_to_user_friendly(unsigned long numeric_version, char* friendly_version)
 {
 	size_t	buf_str_len, i = 0, j = 0;
 	char	buf[MAX_FRIENDLY_VERSION_OUTPUT];
 
-	if (VERSION_REQUIREMENT_NOT_DEFINED == numeric_version)
-	{
-		friendly_version[0] = '\0';
-		return;
-	}
-
-	zbx_snprintf(buf, sizeof(buf), "%d", numeric_version);
+	zbx_snprintf(buf, sizeof(buf), "%lu", numeric_version);
 	buf_str_len = strlen(buf);
 	friendly_version[buf_str_len + ((buf_str_len - 1) / 2)] = '\0';
 
@@ -2559,23 +2554,22 @@ int	zbx_dbms_extract_version(struct zbx_json *json)
 #if defined(HAVE_MYSQL)
 	size_t	str_alloc = 0, str_offset = 0;
 	int	flag;
-	char	*p, *buffer = NULL;
+	char	*buffer = NULL;
 	char	friendly_current_version[MAX_FRIENDLY_VERSION_OUTPUT];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ZBX_MYSQL_SVERSION = mysql_get_server_version(conn);
 	zbx_snprintf_alloc(&buffer, &str_alloc, &str_offset, "%s", mysql_get_server_info(conn));
-	p = strstr(buffer, "MariaDB");
 
-	if (NULL != p)
+	if (NULL != strstr(buffer, "MariaDB"))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "MariaDB fork detected");
 		ZBX_MARIADB_SFORK = ON;
 	}
 
 	zbx_free(buffer);
-	zabbix_log(LOG_LEVEL_DEBUG, "MySQL version result: %d", ZBX_MYSQL_SVERSION);
+	zabbix_log(LOG_LEVEL_DEBUG, "MySQL version result: %lu", ZBX_MYSQL_SVERSION);
 
 #define MYSQL_MYSQL_MIN_VERSION 50728
 #define MYSQL_MYSQL_MIN_VERSION_FRIENDLY "5.07.28"
@@ -2594,7 +2588,7 @@ int	zbx_dbms_extract_version(struct zbx_json *json)
 	}
 	else
 	{
-		flag = zbx_check_DBversion("MySQL",  ZBX_MYSQL_SVERSION, MYSQL_MYSQL_MIN_VERSION,
+		flag = zbx_check_DBversion("MySQL", ZBX_MYSQL_SVERSION, MYSQL_MYSQL_MIN_VERSION,
 				MYSQL_MYSQL_MAX_VERSION);
 		zbx_json_create_entry_for_DBversion(json, "MySQL", friendly_current_version,
 				MYSQL_MYSQL_MIN_VERSION_FRIENDLY, MYSQL_MYSQL_MAX_VERSION_FRIENDLY, flag);
@@ -2605,7 +2599,7 @@ int	zbx_dbms_extract_version(struct zbx_json *json)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
-	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL version result: %d", ZBX_PG_SVERSION);
+	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL version result: %lu", ZBX_PG_SVERSION);
 	convert_numeric_version_to_user_friendly(ZBX_PG_SVERSION, friendly_current_version);
 
 #define POSTGRESQL_MIN_VERSION 100900
@@ -2613,8 +2607,8 @@ int	zbx_dbms_extract_version(struct zbx_json *json)
 #define POSTGRESQL_MAX_VERSION 130000
 #define POSTGRESQL_MAX_VERSION_FRIENDLY "13.x"
 	flag = zbx_check_DBversion("PostgreSQL", ZBX_PG_SVERSION, POSTGRESQL_MIN_VERSION, POSTGRESQL_MAX_VERSION);
-	zbx_json_create_entry_for_DBversion(json, "PostgreSQL", friendly_current_version, POSTGRESQL_MIN_VERSION_FRIENDLY,
-			POSTGRESQL_MAX_VERSION_FRIENDLY, flag);
+	zbx_json_create_entry_for_DBversion(json, "PostgreSQL", friendly_current_version,
+			POSTGRESQL_MIN_VERSION_FRIENDLY, POSTGRESQL_MAX_VERSION_FRIENDLY, flag);
 #elif defined(HAVE_ORACLE)
 #define MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT	200
 #define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER		3
