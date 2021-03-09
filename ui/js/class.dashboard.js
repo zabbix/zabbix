@@ -207,14 +207,18 @@ class CDashboard extends CBaseComponent {
 		}
 		if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_INACTIVE) {
 			dashboard_page.activate();
-			dashboard_page.on(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.reserveHeaderLines);
+			dashboard_page
+				.on(DASHBOARD_PAGE_EVENT_READY, this._events.dashboardPageReady)
+				.on(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.reserveHeaderLines);
 		}
 	}
 
 	_deactivatePage(dashboard_page) {
 		if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_ACTIVE) {
 			dashboard_page.deactivate();
-			dashboard_page.off(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.reserveHeaderLines);
+			dashboard_page
+				.off(DASHBOARD_PAGE_EVENT_READY, this._events.dashboardPageReady)
+				.off(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.reserveHeaderLines);
 		}
 	}
 
@@ -292,6 +296,23 @@ class CDashboard extends CBaseComponent {
 						}
 					}, 200);
 				});
+			},
+
+			dashboardPageReady: (e) => {
+				let is_ready = true;
+
+				for (const dashboard_page of this._dashboard_pages) {
+					if (!dashboard_page.isReady()) {
+						is_ready = false;
+						break;
+					}
+				}
+
+				if (is_ready) {
+					for (const dashboard_page of this._dashboard_pages) {
+						dashboard_page.dashboardReady(this._dashboard_pages);
+					}
+				}
 			},
 
 			reserveHeaderLines: (e) => {

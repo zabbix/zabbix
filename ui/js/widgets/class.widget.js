@@ -23,7 +23,7 @@ const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
 const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
 const WIDGET_EVENT_ENTER = 'enter';
 const WIDGET_EVENT_LEAVE = 'leave';
-const WIDGET_EVENT_READY = 'ready';
+const WIDGET_EVENT_UPDATE = 'update';
 const WIDGET_EVENT_BEFORE_UPDATE = 'before-update';
 const WIDGET_EVENT_AFTER_UPDATE = 'after-update';
 
@@ -222,6 +222,16 @@ class CWidget extends CBaseComponent {
 		return this._is_ready;
 	}
 
+	ready() {
+		this._is_ready = true;
+	}
+
+	dashboardPageReady(widgets) {
+	}
+
+	dashboardReady(widgets) {
+	}
+
 	isInteracting() {
 		return (this._$target.find('[data-expanded="true"], [aria-expanded="true"]').length > 0);
 	}
@@ -249,6 +259,10 @@ class CWidget extends CBaseComponent {
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this._stopUpdating();
 		}
+	}
+
+	getUniqueId() {
+		return this._uniqueid;
 	}
 
 	supportsDynamicHosts() {
@@ -316,23 +330,6 @@ class CWidget extends CBaseComponent {
 			.prop('disabled', true);
 	}
 
-	_ready() {
-		if (!this._is_ready) {
-			this._is_ready = true;
-			this._doReady();
-		}
-	}
-
-	_doReady() {
-		if (this._parent === null) {
-			if (this._$button_actions.is('[aria-expanded="true"]')) {
-				this._$button_actions.menuPopup('refresh', this);
-			}
-		}
-
-		this.fire(WIDGET_EVENT_READY);
-	}
-
 	_startUpdating(delay_sec = 0) {
 		this._stopUpdating(false);
 
@@ -396,7 +393,9 @@ class CWidget extends CBaseComponent {
 			._promiseUpdate()
 			.then(() => {
 				this._hidePreloader();
-				this._ready();
+				this._postUpdate();
+
+				this.fire(WIDGET_EVENT_UPDATE);
 			})
 			.catch(() => {
 				if (this._update_abort_controller.signal.aborted) {
@@ -411,6 +410,14 @@ class CWidget extends CBaseComponent {
 
 				this.fire(WIDGET_EVENT_AFTER_UPDATE);
 			});
+	}
+
+	_postUpdate() {
+		if (this._parent === null) {
+			if (this._$button_actions.is('[aria-expanded="true"]')) {
+				this._$button_actions.menuPopup('refresh', this);
+			}
+		}
 	}
 
 	_promiseUpdate() {
