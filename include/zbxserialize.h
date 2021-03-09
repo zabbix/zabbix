@@ -33,13 +33,14 @@
 #define zbx_serialize_prepare_value(len, value)			\
 	len += sizeof(value)
 
-#define zbx_serialize_uint64(buffer, value) (memcpy(buffer, &value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
+#define zbx_serialize_uint64(buffer, value)			\
+	(memcpy(buffer, (const zbx_uint64_t *)&value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
 
-#define zbx_serialize_int(buffer, value) (memcpy(buffer, (int *)&value, sizeof(int)), sizeof(int))
+#define zbx_serialize_int(buffer, value) (memcpy(buffer, (const int *)&value, sizeof(int)), sizeof(int))
 
-#define zbx_serialize_short(buffer, value) (memcpy(buffer, (short *)&value, sizeof(short)), sizeof(short))
+#define zbx_serialize_short(buffer, value) (memcpy(buffer, (const short *)&value, sizeof(short)), sizeof(short))
 
-#define zbx_serialize_double(buffer, value) (memcpy(buffer, (double *)&value, sizeof(double)), sizeof(double))
+#define zbx_serialize_double(buffer, value) (memcpy(buffer, (const double *)&value, sizeof(double)), sizeof(double))
 
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 

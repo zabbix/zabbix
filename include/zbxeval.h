@@ -147,8 +147,8 @@ typedef struct
 {
 	const char		*expression;
 	zbx_token_type_t	last_token_type;
-	int			const_index;
-	int			functionid_index;
+	zbx_uint32_t		const_index;
+	zbx_uint32_t		functionid_index;
 	zbx_uint64_t		rules;
 	zbx_timespec_t		ts;
 	zbx_vector_eval_token_t	stack;

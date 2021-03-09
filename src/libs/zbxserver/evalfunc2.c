@@ -220,7 +220,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	get_function_parameter_hist_range(time_t from, const char *parameters, int Nparam, int *value,
+static int	get_function_parameter_hist_range(int from, const char *parameters, int Nparam, int *value,
 		zbx_value_type_t *type, int *timeshift)
 {
 	char	*parameter = NULL, *shift;
@@ -257,7 +257,7 @@ static int	get_function_parameter_hist_range(time_t from, const char *parameters
 	{
 		struct tm	tm;
 		char		*error = NULL;
-		time_t		end;
+		int		end;
 
 		if (SUCCEED != zbx_parse_timeshift(from, shift, &tm, &error))
 		{
@@ -529,7 +529,6 @@ out:
 #define OP_REGEXP	7
 #define OP_IREGEXP	8
 #define OP_BAND		9
-#define OP_MAX		10
 
 static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t pattern, zbx_uint64_t mask)
 {
@@ -940,7 +939,6 @@ out:
 #undef OP_REGEXP
 #undef OP_IREGEXP
 #undef OP_BAND
-#undef OP_MAX
 
 /******************************************************************************
  *                                                                            *
@@ -1106,7 +1104,7 @@ static int	evaluate_AVG(zbx_variant_t  *value, DC_ITEM *item, const char *parame
 		else
 		{
 			for (i = 0; i < values.values_num; i++)
-				avg += values.values[i].value.ui64;
+				avg += (double)values.values[i].value.ui64;
 
 			avg = avg / values.values_num;
 		}

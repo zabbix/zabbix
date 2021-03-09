@@ -28,9 +28,9 @@
 
 ZBX_VECTOR_IMPL(eval_token, zbx_eval_token_t)
 
-static int	is_whitespace(unsigned char c)
+static int	is_whitespace(char c)
 {
-	return 0 != isspace(c) ? SUCCEED : FAIL;
+	return 0 != isspace((unsigned char)c) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -670,10 +670,10 @@ static void	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *toke
 	{
 		int	i, params = 0;
 
-		for (i = token->opt; i < ctx->stack.values_num; i++)
+		for (i = (int)token->opt; i < ctx->stack.values_num; i++)
 		{
 			if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_FUNCTION))
-				params -= ctx->stack.values[i].opt - 1;
+				params -= (int)ctx->stack.values[i].opt - 1;
 			else if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_OPERAND))
 				params++;
 			else if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_OPERATOR2))
