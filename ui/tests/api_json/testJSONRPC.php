@@ -278,6 +278,45 @@ class testJSONRPC extends CAPITest {
 						'id' => 3
 					]
 				]
+			],
+			// rpc call with not required auth
+			[
+				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.version", "auth": "token", "id": 5}',
+				'result' => [
+					'jsonrpc' => '2.0',
+					'error' => [
+						'code' => -32602,
+						'message' => 'Invalid params.',
+						'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
+					],
+					'id' => 5
+				]
+			],
+			// rpc call without required auth
+			[
+				'request' => '{"jsonrpc": "2.0", "method": "user.get", "auth": null, "id": 5}',
+				'result' => [
+					'jsonrpc' => '2.0',
+					'error' => [
+						'code' => -32602,
+						'message' => 'Invalid params.',
+						'data' => 'Not authorised.'
+					],
+					'id' => 5
+				]
+			],
+			// rpc call without required auth
+			[
+				'request' => '{"jsonrpc": "2.0", "method": "user.get", "id": 5}',
+				'result' => [
+					'jsonrpc' => '2.0',
+					'error' => [
+						'code' => -32602,
+						'message' => 'Invalid params.',
+						'data' => 'Not authorised.'
+					],
+					'id' => 5
+				]
 			]
 		];
 	}
