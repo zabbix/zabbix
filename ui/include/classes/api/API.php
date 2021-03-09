@@ -340,6 +340,13 @@ class API {
 	}
 
 	/**
+	 * @return CReport
+	 */
+	public static function Report() {
+		return self::getApi('report');
+	}
+
+	/**
 	 * @return CRole
 	 */
 	public static function Role() {
