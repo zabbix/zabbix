@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-03-09T04:34:49Z</date>
+    <date>2021-03-09T06:33:00Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -1126,7 +1126,7 @@ default: 2}</params>
                             <retrieve_mode>HEADERS</retrieve_mode>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()}=503</expression>
+                                    <expression>{last()}=0</expression>
                                     <name>RabbitMQ: There are active alarms in the cluster</name>
                                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                                     <priority>AVERAGE</priority>
@@ -2000,7 +2000,7 @@ default: 2}</params>
                             <retrieve_mode>HEADERS</retrieve_mode>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()}=503</expression>
+                                    <expression>{last()}=0</expression>
                                     <name>RabbitMQ: There are valid TLS certificates expiring in the next month</name>
                                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                                     <priority>AVERAGE</priority>
@@ -2048,7 +2048,7 @@ default: 2}</params>
                             <retrieve_mode>HEADERS</retrieve_mode>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()}=503</expression>
+                                    <expression>{last()}=0</expression>
                                     <name>RabbitMQ: There are active alarms in the node</name>
                                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                                     <priority>AVERAGE</priority>
@@ -2096,7 +2096,7 @@ default: 2}</params>
                             <retrieve_mode>HEADERS</retrieve_mode>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()}=503</expression>
+                                    <expression>{last()}=0</expression>
                                     <name>RabbitMQ: There are queues that could potentially lose data if the this node goes offline.</name>
                                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                                     <priority>AVERAGE</priority>
@@ -2144,7 +2144,7 @@ default: 2}</params>
                             <retrieve_mode>HEADERS</retrieve_mode>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()}=503</expression>
+                                    <expression>{last()}=0</expression>
                                     <name>RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.</name>
                                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                                     <priority>AVERAGE</priority>
@@ -2192,7 +2192,7 @@ default: 2}</params>
                             <retrieve_mode>HEADERS</retrieve_mode>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()}=503</expression>
+                                    <expression>{last()}=0</expression>
                                     <name>RabbitMQ: There are not running virtual hosts</name>
                                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                                     <priority>AVERAGE</priority>
