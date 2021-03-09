@@ -415,7 +415,7 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
-			],
+			]
 		];
 	}
 
