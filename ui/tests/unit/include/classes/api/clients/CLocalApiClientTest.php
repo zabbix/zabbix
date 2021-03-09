@@ -46,11 +46,11 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 		return [
 			// incorrect api
 			['Api', 'method', [], 'token',
-				ZBX_API_ERROR_PARAMETERS, 'Incorrect API "Api".'
+				ZBX_API_ERROR_NO_METHOD, 'Incorrect API "Api".'
 			],
 			// incorrect method
 			['user', 'incorrectMethod', [], 'token',
-				ZBX_API_ERROR_PARAMETERS, 'Incorrect method "user.incorrectMethod".'
+				ZBX_API_ERROR_NO_METHOD, 'Incorrect method "user.incorrectMethod".'
 			],
 			// no auth token
 			['user', 'get', [], null,
