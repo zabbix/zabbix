@@ -45,12 +45,19 @@ class CQueryParserResult extends CParserResult {
 	 */
 	public $type;
 
-	public function __construct() {
-		$this->type = CTriggerExprParserResult::TOKEN_TYPE_QUERY;
-		$this->host = '';
-		$this->item = '';
-		$this->match = '';
-		$this->pos = 0;
-		$this->length = 0;
+	public function __construct(array $data) {
+		$data = array_intersect_key($data, array_flip(['host', 'item', 'match', 'pos', 'length']));
+		$data += [
+			'type' => CTriggerExprParserResult::TOKEN_TYPE_QUERY,
+			'host' => '',
+			'item' => '',
+			'match' => '',
+			'pos' => 0,
+			'length' => 0
+		];
+
+		foreach ($data as $property => $value) {
+			$this->$property = $value;
+		}
 	}
 }

@@ -32,8 +32,8 @@ class CTriggerExprTokenResult extends CParserResult {
 
 	public function __construct(array $data) {
 		$data = array_intersect_key($data, array_flip(['type', 'source', 'match', 'pos', 'length']));
-		foreach ($data as $propery => $value) {
-			$this->$propery = $value;
+		foreach ($data as $property => $value) {
+			$this->$property = $value;
 		}
 	}
 }
