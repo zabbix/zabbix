@@ -111,6 +111,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		req.URL, req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
 
 	var buf []byte
+
 	if err = chromedp.Run(ctx, chromedp.Tasks{
 		network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
 		chromedp.Navigate(req.URL),

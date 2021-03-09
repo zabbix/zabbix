@@ -44,6 +44,7 @@ type handler struct {
 
 func main() {
 	var confFlag string
+
 	var helpFlag bool
 
 	const (
@@ -69,6 +70,7 @@ func main() {
 	}
 
 	var logType, logLevel int
+
 	switch options.LogType {
 	case "system":
 		logType = log.System
@@ -103,14 +105,14 @@ func main() {
 	log.Infof("starting Zabbix web service")
 
 	go func() {
-		if err := run(options.TLSAccept); err != nil {
+		if err := run(); err != nil {
 			fatalExit("failed to start", err)
 		}
 	}()
 
 	<-stop
 
-	farewell := fmt.Sprint("Zabbix web service stopped.")
+	farewell := "Zabbix web service stopped."
 	log.Infof(farewell)
 
 	if options.LogType != "console" {
@@ -118,8 +120,9 @@ func main() {
 	}
 }
 
-func run(tls string) error {
+func run() error {
 	var h handler
+
 	var err error
 
 	if h.allowedPeers, err = zbxnet.GetAllowedPeers(options.AllowedIP); err != nil {
