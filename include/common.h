@@ -1741,7 +1741,7 @@ int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
 
-#define	DBVERSION_UNDEFINED				0
+#define DBVERSION_UNDEFINED				0
 #define VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY	""
 typedef enum
 {

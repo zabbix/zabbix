@@ -1305,7 +1305,7 @@ zbx_json_type_t	zbx_json_valuetype(const char *p)
  *                                                                            *
  * Function: zbx_json_create_entry_for_DBversion                              *
  *                                                                            *
- * Purpose: preapre json for front-end with the DB current, minimum and       *
+ * Purpose: prepare json for front-end with the DB current, minimum and       *
  *          maximum versions and a flag that indicates if the version         *
  *          satisfies the requirements                                        *
  *                                                                            *

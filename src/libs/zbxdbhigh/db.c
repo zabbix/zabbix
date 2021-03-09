@@ -898,7 +898,7 @@ void	DBflush_version_requirements(struct zbx_json *json)
  *                                                                            *
  * Purpose: checks DBMS for optional features and exit if is not suitable     *
  *                                                                            *
- * Return value: SUCCEED - if optional feature were checked successfully      *
+ * Return value: SUCCEED - if optional features were checked successfully     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -963,6 +963,7 @@ out:
 #else
 	ZBX_UNUSED(db_version);
 #endif
+
 	return ret;
 }
 

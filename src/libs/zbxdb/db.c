@@ -2468,7 +2468,7 @@ int	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
  * Example: if the OracleDB version was 18.1.0.0.7 then 1801000007 gets       *
  *          returned                                                          *
  *                                                                            *
- * Return value: DBMS version or 0 if unknown                                 *
+ * Return value: DBMS version or DBVERSION_UNDEFINED if unknown               *
  *                                                                            *
  ******************************************************************************/
 unsigned long	zbx_dbms_get_version(void)

@@ -3902,6 +3902,21 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_DBversion                                              *
+ *                                                                            *
+ * Purpose: determine if a vendor database(MySQL, MariaDB, PostgreSQL,        *
+ *          Oracle, ElasticDB) version satisfies Zabbix requirements          *
+ *                                                                            *
+ * Parameters: database         - [IN] database name                          *
+ *             current_version  - [IN] detected numeric version               *
+ *             min_version      - [IN] minimum required numeric version       *
+ *             max_version      - [IN] maximum required numeric version       *
+ *                                                                            *
+ * Return value: resulting status flag                                        *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_check_DBversion(char *database, unsigned long current_version, unsigned long min_version,
 		unsigned long max_version)
 {
