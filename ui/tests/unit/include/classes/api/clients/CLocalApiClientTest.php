@@ -63,10 +63,6 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			// unnecessary auth token
 			['Apiinfo', 'Version', [], '',
 				ZBX_API_ERROR_PARAMETERS, 'The "Apiinfo.Version" method must be called without the "auth" parameter.'
-			],
-			// no params
-			['Apiinfo', 'Version', null, null,
-				ZBX_API_ERROR_PARAMETERS, 'Cannot call method "Apiinfo.Version" without parameters.'
 			]
 		];
 	}
