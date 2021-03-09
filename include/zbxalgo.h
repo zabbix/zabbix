@@ -346,7 +346,7 @@ void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 unsigned int	zbx_isqrt32(unsigned int value);
 
-char	*zbx_gen_uuid4(const char *str);
+char	*zbx_gen_uuid4(const char *seed);
 
 /* expression evaluation */
 
