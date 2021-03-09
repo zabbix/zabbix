@@ -790,7 +790,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if (SUCCEED == zbx_is_export_enabled())
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_problems_export_init("task-manager", process_num);
 
 	sec1 = zbx_time();

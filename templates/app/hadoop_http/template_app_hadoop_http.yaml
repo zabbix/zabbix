@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-11-19T14:36:53Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -63,7 +63,6 @@ zabbix_export:
                   catch (error) {
                     throw 'Failed to process response received from Hadoop';
                   }
-                  
           url: '{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo'
         -
           name: 'NameNode: Total blocks'
@@ -1032,7 +1031,6 @@ zabbix_export:
                   catch (error) {
                     throw 'Failed to process response received from Hadoop.';
                   }
-                  
         -
           name: 'Node manager discovery'
           type: HTTP_AGENT
@@ -1307,7 +1305,6 @@ zabbix_export:
                   catch (error) {
                     throw 'Failed to process response received from Hadoop.';
                   }
-                  
       macros:
         -
           macro: '{$HADOOP.CAPACITY_REMAINING.MIN.WARN}'
@@ -1337,13 +1334,13 @@ zabbix_export:
           macro: '{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}'
           value: 10s
           description: 'The Hadoop ResourceManager API page maximum response time in seconds for trigger expression.'
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
+      valuemaps:
         -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up

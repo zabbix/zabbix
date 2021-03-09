@@ -180,7 +180,7 @@ switch ($data['method']) {
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				if ($data['object_name'] === 'host_templates') {
@@ -224,7 +224,7 @@ switch ($data['method']) {
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				if ($data['object_name'] === 'item_prototypes') {
@@ -265,7 +265,7 @@ switch ($data['method']) {
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				if ($data['object_name'] === 'graph_prototypes') {
@@ -437,10 +437,10 @@ switch ($data['method']) {
 
 			case 'users':
 				$users = API::User()->get([
-					'output' => ['userid', 'alias', 'name', 'surname'],
+					'output' => ['userid', 'username', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
 						? [
-							'alias' => $data['search'],
+							'username' => $data['search'],
 							'name' => $data['search'],
 							'surname' => $data['search']
 						]
@@ -451,7 +451,7 @@ switch ($data['method']) {
 
 				if ($users) {
 					CArrayHelper::sort($users, [
-						['field' => 'alias', 'order' => ZBX_SORT_UP]
+						['field' => 'username', 'order' => ZBX_SORT_UP]
 					]);
 
 					if (array_key_exists('limit', $data)) {
@@ -545,6 +545,65 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'valuemap_names':
+				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
+					break;
+				}
+
+				$hostids = $data['hostids'];
+
+				if (array_key_exists('with_inherited', $data)) {
+					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $data['context']);
+				}
+
+				$result = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name'],
+					'hostids' => $hostids,
+					'search' => ['name' => $data['search'] ? $data['search'] : null],
+					'limit' => $limit
+				]);
+				$result = array_column($result, null, 'name');
+				$result = CArrayHelper::renameObjectsKeys($result, ['valuemapid' => 'id']);
+				CArrayHelper::sort($result, ['name']);
+				break;
+
+			case 'valuemaps':
+				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
+					break;
+				}
+
+				if ($data['context'] === 'host') {
+					$hosts = API::Host()->get([
+						'output' => ['name'],
+						'hostids' => $data['hostids'],
+						'preservekeys' => true
+					]);
+				}
+				else {
+					$hosts = API::Template()->get([
+						'output' => ['name'],
+						'templateids' => $data['hostids'],
+						'preservekeys' => true
+					]);
+				}
+
+				$valuemaps = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name', 'hostid'],
+					'hostids' => $data['hostids'],
+					'search' => ['name' => $data['search'] ? $data['search'] : null],
+					'limit' => $limit
+				]);
+
+				foreach ($valuemaps as &$valuemap) {
+					$valuemap['prefix'] = $hosts[$valuemap['hostid']]['name'].NAME_DELIMITER;
+					unset($valuemap['hostid']);
+				}
+				unset($valuemap);
+
+				$result = CArrayHelper::renameObjectsKeys($valuemaps, ['valuemapid' => 'id']);
+				CArrayHelper::sort($result, ['name']);
+				break;
+
 			case 'dashboard':
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name'],
@@ -579,7 +638,7 @@ switch ($data['method']) {
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'preservekeys' => true,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				$db_result = API::Host()->get($options);
@@ -596,7 +655,7 @@ switch ($data['method']) {
 					],
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				$db_result = API::Item()->get($options);
@@ -609,7 +668,7 @@ switch ($data['method']) {
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'searchWildcardsEnabled' => $wildcard_enabled,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				$db_result = API::Graph()->get($options);

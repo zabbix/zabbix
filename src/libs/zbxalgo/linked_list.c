@@ -18,8 +18,27 @@
 **/
 
 #include "common.h"
-#include "zbxalgo.h"
 #include "log.h"
+#include "zbxalgo.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_list_create_ext                                              *
+ *                                                                            *
+ * Purpose: create singly linked list (with custom memory functions)          *
+ *                                                                            *
+ * Parameters: queue           - [IN] the list                                *
+ *             mem_malloc_func - [IN] callback for malloc                     *
+ *             mem_free_func   - [IN] callback for free                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func, zbx_mem_free_func_t mem_free_func)
+{
+	memset(queue, 0, sizeof(*queue));
+
+	queue->mem_malloc_func = mem_malloc_func;
+	queue->mem_free_func = mem_free_func;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -32,7 +51,7 @@
  ******************************************************************************/
 void	zbx_list_create(zbx_list_t *queue)
 {
-	memset(queue, 0, sizeof(*queue));
+	zbx_list_create_ext(queue, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
 /******************************************************************************
@@ -67,7 +86,7 @@ static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **cr
 
 	ZBX_UNUSED(list);
 
-	item = (zbx_list_item_t *)zbx_malloc(NULL, sizeof(zbx_list_item_t));
+	item = (zbx_list_item_t *)list->mem_malloc_func(NULL, sizeof(zbx_list_item_t));
 	item->next = NULL;
 	item->data = value;
 
@@ -102,7 +121,9 @@ void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value
 		after->next = item;
 	}
 	else
+	{
 		list->head = item;
+	}
 
 	if (after == list->tail)
 		list->tail = item;
@@ -179,7 +200,7 @@ int	zbx_list_pop(zbx_list_t *list, void **value)
 		*value = head->data;
 
 	list->head = list->head->next;
-	zbx_free(head);
+	list->mem_free_func(head);
 
 	if (NULL == list->head)
 		list->tail = NULL;

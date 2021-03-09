@@ -1299,15 +1299,15 @@ class CHelpItems {
 			],
 			ITEM_TYPE_JMX => [
 				[
-					'key' => 'jmx[object_name,attribute_name]',
+					'key' => 'jmx[object_name,attribute_name,<unique short description>]',
 					'description' => _('Return value of an attribute of MBean object.')
 				],
 				[
-					'key' => 'jmx.discovery[<discovery mode>,<object name>]',
+					'key' => 'jmx.discovery[<discovery mode>,<object name>,<unique short description>]',
 					'description' => _('Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD.')
 				],
 				[
-					'key' => 'jmx.get[<discovery mode>,<object name>]',
+					'key' => 'jmx.get[<discovery mode>,<object name>,<unique short description>]',
 					'description' => _('Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD.')
 				]
 			],

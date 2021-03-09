@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateTemplate extends CController {
+class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstract {
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -36,11 +36,19 @@ class CControllerPopupMassupdateTemplate extends CController {
 			'tags' => 'array',
 			'macros' => 'array',
 			'linked_templates' => 'array',
+			'valuemaps' => 'array',
+			'valuemap_remove' => 'array',
+			'valuemap_remove_except' => 'in 1',
+			'valuemap_remove_all' => 'in 1',
+			'valuemap_rename' => 'array',
+			'valuemap_update_existing' => 'in 1',
+			'valuemap_add_missing' => 'in 1',
 			'mass_action_tpls' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_clear_tpls' => 'in 0,1',
 			'mass_update_groups' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_macros' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+			'valuemap_massupdate' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_RENAME, ZBX_ACTION_REMOVE_ALL]),
 			'description' => 'string',
 			'macros_add' => 'in 0,1',
 			'macros_update' => 'in 0,1',
@@ -368,6 +376,11 @@ class CControllerPopupMassupdateTemplate extends CController {
 					if (!API::UserMacro()->update($template_macros_update)) {
 						throw new Exception();
 					}
+				}
+
+				// Value mapping.
+				if (array_key_exists('valuemaps', $visible)) {
+					$this->updateValueMaps($templateids);
 				}
 			}
 			catch (Exception $e) {

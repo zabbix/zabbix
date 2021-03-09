@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:18Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -1838,6 +1838,25 @@ zabbix_export:
         -
           macro: '{$CLICKHOUSE.USER}'
           value: zabbix
+      valuemaps:
+        -
+          name: 'Replicas state'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'False'
+            -
+              value: '1'
+              newvalue: 'True'
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '{ClickHouse by HTTP:clickhouse.ping.last()}=0 or {ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0'
@@ -2086,22 +2105,3 @@ zabbix_export:
           item:
             host: 'ClickHouse by HTTP'
             key: clickhouse.zookeper.watch
-  value_maps:
-    -
-      name: 'Replicas state'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'False'
-        -
-          value: '1'
-          newvalue: 'True'
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

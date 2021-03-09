@@ -42,6 +42,10 @@ class C52ImportConverter extends CConverter {
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
 
+		if (array_key_exists('value_maps', $data['zabbix_export'])) {
+			$data['zabbix_export'] = self::convertValueMaps($data['zabbix_export']);
+		}
+
 		return $data;
 	}
 
@@ -179,5 +183,58 @@ class C52ImportConverter extends CConverter {
 		}
 
 		return $result;
+	}
+
+	private static function convertValueMaps(array $import): array {
+		$valuemaps = zbx_toHash($import['value_maps'], 'name');
+		unset($import['value_maps']);
+
+		if (array_key_exists('hosts', $import)) {
+			$import['hosts'] = self::moveValueMaps($import['hosts'], $valuemaps);
+		}
+
+		if (array_key_exists('templates', $import)) {
+			$import['templates'] = self::moveValueMaps($import['templates'], $valuemaps);
+		}
+
+		return $import;
+	}
+
+	private static function moveValueMaps(array $hosts, array $valuemaps) {
+		foreach ($hosts as &$host) {
+			$used_valuemaps = [];
+
+			if (array_key_exists('items', $host)) {
+				foreach ($host['items'] as $item) {
+					if (array_key_exists('valuemap', $item) && !in_array($item['valuemap']['name'], $used_valuemaps)) {
+						if (array_key_exists($item['valuemap']['name'], $valuemaps)) {
+							$host['valuemaps'][] = $valuemaps[$item['valuemap']['name']];
+							$used_valuemaps[] = $item['valuemap']['name'];
+						}
+					}
+				}
+			}
+
+			if (array_key_exists('discovery_rules', $host)) {
+				foreach ($host['discovery_rules'] as $drule) {
+					if (!array_key_exists('item_prototypes', $drule)) {
+						continue;
+					}
+
+					foreach ($drule['item_prototypes'] as $item_prototype) {
+						if (array_key_exists('valuemap', $item_prototype)
+								&& !in_array($item_prototype['valuemap']['name'], $used_valuemaps)) {
+							if (array_key_exists($item_prototype['valuemap']['name'], $valuemaps)) {
+								$host['valuemaps'][] = $valuemaps[$item_prototype['valuemap']['name']];
+								$used_valuemaps[] = $item_prototype['valuemap']['name'];
+							}
+						}
+					}
+				}
+			}
+		}
+		unset($host);
+
+		return $hosts;
 	}
 }

@@ -1,6 +1,38 @@
+Changes for 5.4.0beta2
+
+New features:
+.........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
+
+Bug fixes:
+A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+........S. [ZBX-19071] fixed server crash after "Check for not supported value" preprocessing step (akozlovs)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.0beta1
+
+New features:
+.....J.... [ZBXNEXT-735] allowed multiple jmx items on one host (arimdjonoks)
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+.........T [ZBXNEXT-6302] added new metrics to VMWare template (tuskov)
+.........T [ZBXNEXT-6433] added template "Microsoft SharePoint by HTTP" (abakaldin)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
+A.F.I..PS. [ZBXNEXT-1215,ZBXNEXT-6474] changed field "alias" into "username" (talbergs, viktors)
+
+Bug fixes:
+..F....... [ZBX-18906] fixed main menu hidden mode, fixed menu items selection on the actions configuration pages (ashubin)
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB version validation, TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
+..F....... [ZBX-18803] fixed test item form ignoring empty status code input (talbergs)
+A......... [ZBX-18929] fixed tag filtering by multiple negated conditions (miks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 5.4.0alpha2
 
 New features:
+A.F.I...ST [ZBXNEXT-5868] moved global mappings to host / template (afayantsev, rlataria, Sasha, vso)
 .........T [ZBXNEXT-6385] added template "Apache Ignite by JMX" (ychukina)
 .......PS. [ZBXNEXT-6301] extended set of collected VMware metrics for VM and HV (asestakovs)
 A.F.....S. [ZBXNEXT-6427,ZBXNEXT-6458] added support for strong encryption protocols for SNMPv3 (dgoloscapov, talbergs)
@@ -14,6 +46,8 @@ A.F.....S. [ZBXNEXT-6427,ZBXNEXT-6458] added support for strong encryption proto
 .......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
 
 Bug fixes:
+A......... [ZBX-19025] fixed usage of LIMIT in SQL in user.update and user.delete API (vmurzins)
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
 ...G...... [ZBX-17543] fixed error in case if wmi.getall returned no items (dgoloscapov)
 ........S. [ZBX-18917] disabled global script webhook execution on proxy (dgoloscapov)
 .........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
@@ -94,6 +128,38 @@ A.F....... [ZBXNEXT-6324] moved Configuration -> Discovery to MVC (talbergs)
 A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (vmaksimovs)
 .........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.6rc1
+
+New features:
+.........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+.........T [ZBXNEXT-6302] added new metrics to VMWare template (tuskov)
+.........T [ZBXNEXT-6433] added template "Microsoft SharePoint by HTTP" (abakaldin)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
+
+Bug fixes:
+A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+........S. [ZBX-19071] fixed server crash after "Check for not supported value" preprocessing step (akozlovs)
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
+..F....... [ZBX-18803] fixed test item form ignoring empty status code input (talbergs)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.5
+
+5.2.5rc2 was released as 5.2.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.2.5rc2
+
+Bug fixes:
+A......... [ZBX-19025] fixed usage of LIMIT in SQL in user.update and user.delete API (vmurzins)
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.5rc1
@@ -511,6 +577,33 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.10rc1
+
+New features:
+.........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
+
+Bug fixes:
+A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9
+
+5.0.9rc2 was released as 5.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9rc2
+
+Bug fixes:
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.9rc1
@@ -2474,6 +2567,20 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.30rc1
+
+New features:
+
+Bug fixes:
+A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29
+
+4.0.29rc1 was released as 4.0.29 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.29rc1
@@ -5548,9 +5655,12 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 3.0.32rc1
+Changes for 3.0.32
 
-New features:
+3.0.32rc1 was released as 3.0.32 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.32rc1
 
 Bug fixes:
 ...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
