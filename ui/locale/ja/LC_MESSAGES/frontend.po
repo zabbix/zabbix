@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-26 19:56+0200\n"
-"PO-Revision-Date: 2021-02-16 07:13+0300\n"
+"POT-Creation-Date: 2021-03-05 19:56+0200\n"
+"PO-Revision-Date: 2021-03-02 02:35+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1613452439.000000\n"
+"X-POOTLE-MTIME: 1614645316.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -825,7 +825,7 @@ msgstr "子の要素を追加"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "他から追加"
 
 #: include/actions.inc.php:635 include/actions.inc.php:1053
 msgid "Add host"
@@ -2183,7 +2183,7 @@ msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[0] "メンテナンス\"%1$s\"は少なくとも1つのホストかホストグループが必要なのでホストを削除できません。"
 
-#: include/classes/api/services/CHostGroup.php:1542
+#: include/classes/api/services/CHostGroup.php:1543
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2924,7 +2924,7 @@ msgstr "APIトークンを更新できません"
 msgid "Cannot update a discovered graph."
 msgstr "ディスカバリされたグラフを更新できません。"
 
-#: include/classes/api/services/CHostGroup.php:842
+#: include/classes/api/services/CHostGroup.php:843
 msgid "Cannot update a discovered host group."
 msgstr "ディスカバリされたホストグループを更新できません。"
 
@@ -2991,9 +2991,9 @@ msgstr "グラフのプロトタイプを更新できません"
 msgid "Cannot update group"
 msgstr "グループを更新できません"
 
-#: include/classes/api/services/CHostGroup.php:1048
-#: include/classes/api/services/CHostGroup.php:1152
-#: include/classes/api/services/CHostGroup.php:1288
+#: include/classes/api/services/CHostGroup.php:1049
+#: include/classes/api/services/CHostGroup.php:1153
+#: include/classes/api/services/CHostGroup.php:1289
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "ディスカバリされたホスト\"%1$s\"のグループを更新できません。"
@@ -6726,7 +6726,7 @@ msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 #: include/classes/api/services/CDRule.php:325
 #: include/classes/api/services/CDRule.php:528
 #: include/classes/api/services/CDRule.php:538
-#: include/classes/api/services/CHostGroup.php:959
+#: include/classes/api/services/CHostGroup.php:960
 #: include/classes/api/services/CHost.php:917
 #: include/classes/api/services/CTemplate.php:902
 #: include/classes/validators/CNewValidator.php:262
@@ -7395,12 +7395,12 @@ msgstr "グリッド"
 msgid "Group"
 msgstr "グループ"
 
-#: include/classes/api/services/CHostGroup.php:765
+#: include/classes/api/services/CHostGroup.php:766
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "ホストのプロトタイプで使用されているためグループ\"%1$s\"は削除できません。"
 
-#: include/classes/api/services/CHostGroup.php:809
+#: include/classes/api/services/CHostGroup.php:810
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "相関関係の条件で使用されているためグループ\"%1$s\"は削除できません。"
@@ -7742,7 +7742,7 @@ msgstr[0] "ホスト"
 msgid "Host \"%1$s\" already exists."
 msgstr "ホスト\"%1$s\"はすでに存在しています。"
 
-#: include/classes/api/services/CHostGroup.php:1505
+#: include/classes/api/services/CHostGroup.php:1506
 #: include/classes/api/services/CHost.php:983
 #: include/classes/api/services/CHost.php:1921
 #: include/classes/api/services/CHost.php:2116
@@ -7824,17 +7824,17 @@ msgstr[0] "ホストを有効にしました"
 msgid "Host group"
 msgstr "ホストグループ"
 
-#: include/classes/api/services/CHostGroup.php:693
+#: include/classes/api/services/CHostGroup.php:694
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "ホストグループ\"%1$s\"はすでに存在しています。"
 
-#: include/classes/api/services/CHostGroup.php:794
+#: include/classes/api/services/CHostGroup.php:795
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "グローバルスクリプトに使用されているためホストグループ\"%1$s\"を削除できません。"
 
-#: include/classes/api/services/CHostGroup.php:751
+#: include/classes/api/services/CHostGroup.php:752
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "ホストグループ\"%1$s\"は内部的に使用されているため削除できません。"
@@ -8136,7 +8136,7 @@ msgstr "すべてのマクロを削除することを確認"
 
 #: app/partials/massupdate.valuemaps.tab.php:84
 msgid "I confirm to remove all value mappings"
-msgstr ""
+msgstr "すべての値のマッピングを削除することを確認"
 
 #: include/discovery.inc.php:60
 msgid "ICMP ping"
@@ -11424,7 +11424,7 @@ msgstr "マッピング文字列"
 
 #: app/controllers/CControllerPopupGeneric.php:429
 msgid "Mapping"
-msgstr ""
+msgstr "マッピング"
 
 #: app/controllers/CControllerPopupValueMapEdit.php:85
 #: app/views/administration.iconmap.edit.php:124
@@ -12709,13 +12709,13 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 #: include/classes/api/services/CGraphPrototype.php:718
 #: include/classes/api/services/CHostBase.php:56
 #: include/classes/api/services/CHostGeneral.php:66
-#: include/classes/api/services/CHostGroup.php:746
-#: include/classes/api/services/CHostGroup.php:850
-#: include/classes/api/services/CHostGroup.php:1089
-#: include/classes/api/services/CHostGroup.php:1120
-#: include/classes/api/services/CHostGroup.php:1221
-#: include/classes/api/services/CHostGroup.php:1343
-#: include/classes/api/services/CHostGroup.php:1363
+#: include/classes/api/services/CHostGroup.php:747
+#: include/classes/api/services/CHostGroup.php:851
+#: include/classes/api/services/CHostGroup.php:1090
+#: include/classes/api/services/CHostGroup.php:1121
+#: include/classes/api/services/CHostGroup.php:1222
+#: include/classes/api/services/CHostGroup.php:1344
+#: include/classes/api/services/CHostGroup.php:1364
 #: include/classes/api/services/CHostInterface.php:301
 #: include/classes/api/services/CHostInterface.php:321
 #: include/classes/api/services/CHostInterface.php:595
@@ -13317,7 +13317,7 @@ msgstr "一度だけ"
 msgid "One"
 msgstr "1つ"
 
-#: include/classes/api/services/CHostGroup.php:1231
+#: include/classes/api/services/CHostGroup.php:1232
 msgid "One of the objects is left without a host group."
 msgstr "ホストグループが設定されていないオブジェクトが残っています"
 
@@ -13330,7 +13330,7 @@ msgstr "一度限り"
 msgid "One-time downtime"
 msgstr "一時的なダウンタイム"
 
-#: include/classes/api/services/CHostGroup.php:705
+#: include/classes/api/services/CHostGroup.php:706
 msgid "Only Super Admins can create host groups."
 msgstr "特権管理者のみがホストグループを作成できます。"
 
@@ -14153,7 +14153,7 @@ msgstr "すべてのマクロを削除してよいか確認してください。
 
 #: app/views/js/popup.massupdate.js.php:406
 msgid "Please confirm that you want to remove all value mappings."
-msgstr ""
+msgstr "すべての値のマッピングを削除してよいか確認してください。"
 
 #: include/classes/setup/CSetupWizard.php:429
 #, c-format
@@ -15051,7 +15051,7 @@ msgstr "%1$sを削除しました"
 
 #: app/partials/massupdate.valuemaps.tab.php:96
 msgid "Rename"
-msgstr ""
+msgstr "名前変更"
 
 #: app/views/popup.massupdate.host.php:52
 #: app/views/popup.massupdate.host.php:114
@@ -17245,7 +17245,7 @@ msgstr "テンプレート"
 msgid "Template \"%1$s\" already exists."
 msgstr "テンプレート\"%1$s\"はすでに存在します。"
 
-#: include/classes/api/services/CHostGroup.php:1510
+#: include/classes/api/services/CHostGroup.php:1511
 #: include/classes/api/services/CTemplate.php:404
 #: include/classes/api/services/CTemplate.php:1106
 #, c-format
@@ -18999,7 +18999,7 @@ msgstr "ID \"%1$s\"のユーザーは使用できません。"
 #: include/classes/api/services/CUser.php:638
 #, c-format
 msgid "User with username \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\"というユーザー名のユーザーはすでに存在します。"
 
 #: include/actions.inc.php:1832 include/actions.inc.php:1915
 msgid "User/Recipient"
@@ -19439,7 +19439,7 @@ msgstr "値: データなし"
 #: include/classes/api/services/CItemGeneral.php:2784
 #, c-format
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "IDが\"%1$s\"の値のマッピングは\"%2$s\"にはありません。"
 
 #: app/views/monitoring.charts.view.php:57
 #: include/views/monitoring.history.php:78
