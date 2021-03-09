@@ -67,7 +67,7 @@ class CLocalApiClient extends CApiClient {
 
 		// check API
 		if (!$this->isValidApi($api)) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+			$response->errorCode = ZBX_API_ERROR_NO_METHOD;
 			$response->errorMessage = _s('Incorrect API "%1$s".', $requestApi);
 
 			return $response;
@@ -75,7 +75,7 @@ class CLocalApiClient extends CApiClient {
 
 		// check method
 		if (!$this->isValidMethod($api, $method)) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+			$response->errorCode = ZBX_API_ERROR_NO_METHOD;
 			$response->errorMessage = _s('Incorrect method "%1$s.%2$s".', $requestApi, $requestMethod);
 
 			return $response;

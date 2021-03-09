@@ -3164,86 +3164,76 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				''
 			],
 			[
-				['type' => API_MIXED],
+				['type' => API_JSONRPC_PARAMS],
 				[],
-				'/',
+				'/params',
 				[]
 			],
 			[
-				['type' => API_MIXED],
+				['type' => API_JSONRPC_PARAMS],
 				'',
-				'/',
-				''
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
 			],
 			[
-				['type' => API_MIXED],
+				['type' => API_JSONRPC_PARAMS],
 				1,
-				'/',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				true,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'23',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				null,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				[],
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'id',
+				'/id',
+				'id'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				1,
+				'/id',
 				1
 			],
 			[
-				['type' => API_MIXED],
+				['type' => API_JSONRPC_ID],
 				true,
-				'/',
-				true
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
 			],
 			[
-				['type' => API_MIXED],
+				['type' => API_JSONRPC_ID],
 				'23',
-				'/',
+				'/id',
 				'23'
 			],
 			[
-				['type' => API_MIXED],
+				['type' => API_JSONRPC_ID],
 				null,
-				'/',
+				'/id',
 				null
-			],
-			[
-				['type' => API_MIXED, 'flags' => API_REQUIRED],
-				'',
-				'/',
-				''
-			],
-			[
-				['type' => API_OBJECTS, 'fields' => [
-					'mixed' =>	['type' => API_MIXED]
-				]],
-				[
-					[]
-				],
-				'/',
-				[
-					[]
-				],
-			],
-			[
-				['type' => API_OBJECTS, 'fields' => [
-					'mixed' =>	['type' => API_MIXED, 'flags' => API_REQUIRED]
-				]],
-				[
-					['mixed' => ''],
-					['mixed' => []],
-					['mixed' => 1],
-					['mixed' => false]
-				],
-				'/',
-				[
-					['mixed' => ''],
-					['mixed' => []],
-					['mixed' => 1],
-					['mixed' => false]
-				]
-			],
-			[
-				['type' => API_OBJECTS, 'fields' => [
-					'mixed' =>	['type' => API_MIXED, 'flags' => API_REQUIRED]
-				]],
-				[
-					[],
-				],
-				'/',
-				'Invalid parameter "/1": the parameter "mixed" is missing.'
 			]
 		];
 	}
