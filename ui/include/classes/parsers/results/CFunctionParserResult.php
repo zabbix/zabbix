@@ -66,13 +66,21 @@ class CFunctionParserResult extends CParserResult {
 	 */
 	public $type;
 
-	public function __construct() {
-		$this->type = CTriggerExprParserResult::TOKEN_TYPE_FUNCTION;
-		$this->match = '';
-		$this->length = 0;
-		$this->function = '';
-		$this->parameters = '';
-		$this->params_raw = [];
+	public function __construct(array $data = []) {
+		$supported_properties = ['match', 'function', 'parameters', 'params_raw', 'length', 'pos'];
+		$data = array_intersect_key($data, array_flip($supported_properties));
+		$data += [
+			'type' => CTriggerExprParserResult::TOKEN_TYPE_FUNCTION,
+			'function' => '',
+			'parameters' => '',
+			'params_raw' => [],
+			'length' => 0,
+			'pos' => 0
+		];
+
+		foreach ($data as $property => $value) {
+			$this->$property = $value;
+		}
 	}
 
 	/**
