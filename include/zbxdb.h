@@ -98,7 +98,7 @@ int	zbx_db_txn_end_error(void);
 const char	*zbx_db_last_strerr(void);
 
 unsigned long	zbx_dbms_get_version(void);
-int		zbx_dbms_extract_version(struct zbx_json *json);
+unsigned long	zbx_dbms_extract_version(struct zbx_json *json);
 
 #ifdef HAVE_MYSQL
 int	zbx_dbms_mariadb_used(void);

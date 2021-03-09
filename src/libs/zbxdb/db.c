@@ -2550,7 +2550,7 @@ static void	convert_numeric_version_to_user_friendly(unsigned long numeric_versi
  *          For "<anything else>"                                                       => DBVERSION_UNDEFINED *
  *                                                                                                             *
  **************************************************************************************************************/
-int	zbx_dbms_extract_version(struct zbx_json *json)
+unsigned long	zbx_dbms_extract_version(struct zbx_json *json)
 {
 #if defined(HAVE_MYSQL)
 	size_t	str_alloc = 0, str_offset = 0;

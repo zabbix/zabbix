@@ -856,9 +856,9 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-int	DBextract_DBversion(struct zbx_json *json)
+unsigned long	DBextract_DBversion(struct zbx_json *json)
 {
-	int ret;
+	unsigned long ret;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	ret = zbx_dbms_extract_version(json);
@@ -902,7 +902,7 @@ void	DBflush_version_requirements(struct zbx_json *json)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBcheck_capabilities(int db_version)
+int	DBcheck_capabilities(unsigned long db_version)
 {
 	int	ret = SUCCEED;
 
@@ -931,7 +931,7 @@ int	DBcheck_capabilities(int db_version)
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
 	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > db_version)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %d is not supported with TimescaleDB, minimum is %d",
+		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum is %d",
 				db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
 		DBfree_result(result);
 		ret = FAIL;
