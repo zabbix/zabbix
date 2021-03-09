@@ -199,6 +199,8 @@ class CDashboard extends CBaseComponent {
 		// this._selectTab(this._tabs.getList().children[0]);
 
 		this._activatePage(this._dashboard_pages[0]);
+
+		this._announceWidgets();
 	}
 
 	_activatePage(dashboard_page) {
@@ -208,7 +210,7 @@ class CDashboard extends CBaseComponent {
 		if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_INACTIVE) {
 			dashboard_page.activate();
 			dashboard_page
-				.on(DASHBOARD_PAGE_EVENT_READY, this._events.dashboardPageReady)
+				.on(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets)
 				.on(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.reserveHeaderLines);
 		}
 	}
@@ -217,7 +219,7 @@ class CDashboard extends CBaseComponent {
 		if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_ACTIVE) {
 			dashboard_page.deactivate();
 			dashboard_page
-				.off(DASHBOARD_PAGE_EVENT_READY, this._events.dashboardPageReady)
+				.off(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets)
 				.off(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.reserveHeaderLines);
 		}
 	}
@@ -226,6 +228,13 @@ class CDashboard extends CBaseComponent {
 		this._deactivatePage(dashboard_page);
 		dashboard_page.destroy();
 	}
+
+	_announceWidgets() {
+		for (const dashboard_page of this._dashboard_pages) {
+			dashboard_page.announceWidgets(this._dashboard_pages);
+		}
+	}
+
 
 	getSelectedPage() {
 		return this._tabs_data.get(this._selected_tab).page;
@@ -298,21 +307,8 @@ class CDashboard extends CBaseComponent {
 				});
 			},
 
-			dashboardPageReady: (e) => {
-				let is_ready = true;
-
-				for (const dashboard_page of this._dashboard_pages) {
-					if (dashboard_page.getState() !== DASHBOARD_PAGE_STATE_INITIAL && !dashboard_page.isReady()) {
-						is_ready = false;
-						break;
-					}
-				}
-
-				if (is_ready) {
-					for (const dashboard_page of this._dashboard_pages) {
-						dashboard_page.dashboardReady(this._dashboard_pages);
-					}
-				}
+			dashboardPageAnnounceWidgets: () => {
+				this._announceWidgets();
 			},
 
 			reserveHeaderLines: (e) => {

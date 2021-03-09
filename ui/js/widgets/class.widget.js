@@ -103,7 +103,6 @@ class CWidget extends CBaseComponent {
 
 		this._state = WIDGET_STATE_INITIAL;
 
-		this._is_ready = false;
 		this._content_size = {};
 		this._update_timeout_id = null;
 		this._update_interval_id = null;
@@ -218,18 +217,8 @@ class CWidget extends CBaseComponent {
 		return this._target;
 	}
 
-	isReady() {
-		return this._is_ready;
-	}
-
-	ready() {
-		this._is_ready = true;
-	}
-
-	dashboardPageReady(widgets) {
-	}
-
-	dashboardReady(widgets) {
+	announceWidgets(widgets) {
+		console.log('ann', widgets);
 	}
 
 	isInteracting() {
