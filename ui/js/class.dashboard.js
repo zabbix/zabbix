@@ -302,7 +302,7 @@ class CDashboard extends CBaseComponent {
 				let is_ready = true;
 
 				for (const dashboard_page of this._dashboard_pages) {
-					if (!dashboard_page.isReady()) {
+					if (dashboard_page.getState() !== DASHBOARD_PAGE_STATE_INITIAL && !dashboard_page.isReady()) {
 						is_ready = false;
 						break;
 					}
