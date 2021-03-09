@@ -630,7 +630,7 @@ class CTriggerExpression {
 				&& $this->parseUsing($this->functionid_parser, CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO)) {
 			return true;
 		}
-		elseif ($this->parseFunction()) {
+		elseif (!$this->options['collapsed_expression'] && $this->parseFunction()) {
 			return true;
 		}
 
