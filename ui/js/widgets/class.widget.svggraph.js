@@ -23,53 +23,87 @@ class CWidgetSvgGraph extends CWidget {
 	_init() {
 		super._init();
 
-		this._is_svg_active = false;
+		this._is_svg_loaded = false;
+		this._svg_options = {};
 	}
 
-	_processUpdateResponse(response) {
-		super._processUpdateResponse(response);
+	_doActivate() {
+		super._doActivate();
 
-		if (response.svg_data !== undefined) {
-			$('svg', this._$content_body).svggraph(response.svg_data, this);
-			this._is_svg_active = true;
-		}
-		else {
-			this._is_svg_active = false;
-		}
+		this._activateGraph();
+	}
+
+	_doDeactivate() {
+		super._doDeactivate();
+
+		this._deactivateGraph();
 	}
 
 	resize() {
 		super.resize();
 
-		this._update();
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
 	}
 
 	setEditMode() {
 		super.setEditMode();
 
-		if (this._is_svg_active) {
-			$('svg', this._$content_body).svggraph('disableSBox');
+		this._deactivateGraph();
+	}
+
+	setTimePeriod(time_period) {
+		super.setTimePeriod(time_period);
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
 		}
 	}
 
-	_registerEvents() {
-		super._registerEvents();
+	_processUpdateResponse(response) {
+		this._destroyGraph();
+		super._processUpdateResponse(response);
 
-		this._events = {
-			...this._events,
+		if (response.svg_options !== undefined) {
+			this._is_svg_loaded = true;
 
-			timeselectorRangeUpdate: () => {
-				this._update();
-			}
+			this._initGraph({
+				sbox: false,
+				show_problems: true,
+				hint_max_rows: 20,
+				min_period: 60,
+				...response.svg_options.data
+			});
 		}
-
-		// Refreshes widget once timeselector changes.
-		$.subscribe('timeselector.rangeupdate', this._events.timeselectorRangeUpdate);
+		else {
+			this._is_svg_loaded = false;
+		}
 	}
 
-	_unregisterEvents() {
-		super._unregisterEvents();
+	_initGraph(options) {
+		this._svg_options = options;
+		this._$svg = $('svg', this._$content_body);
+		this._$svg.svggraph(this);
+		this._activateGraph();
+	}
 
-		$.unsubscribe('timeselector.rangeupdate', this._events.timeselectorRangeUpdate);
+	_activateGraph() {
+		if (this._is_svg_loaded) {
+			this._$svg.svggraph('activate');
+		}
+	}
+
+	_deactivateGraph() {
+		if (this._is_svg_loaded) {
+			this._$svg.svggraph('deactivate');
+		}
+	}
+
+	_destroyGraph() {
+		if (this._is_svg_loaded) {
+			this._deactivateGraph();
+			this._$svg.remove();
+		}
 	}
 }

@@ -27,7 +27,7 @@ class CWidgetProblemsBySv extends CWidget {
 			...this._events,
 
 			acknowledgeCreated: (e, response, overlay) => {
-				refreshWidgetOnAcknowledgeCreate("problemsbysv", response, overlay);
+				refreshWidgetOnAcknowledgeCreate('problemsbysv', response, overlay);
 			}
 		}
 

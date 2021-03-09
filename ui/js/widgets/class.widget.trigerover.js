@@ -27,7 +27,7 @@ class CWidgetTrigerOver extends CWidget {
 			...this._events,
 
 			acknowledgeCreated: (e, response, overlay) => {
-				refreshWidgetOnAcknowledgeCreate("trigover", response, overlay);
+				refreshWidgetOnAcknowledgeCreate('trigover', response, overlay);
 			}
 		}
 

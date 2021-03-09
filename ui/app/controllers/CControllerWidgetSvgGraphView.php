@@ -124,13 +124,13 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 		}
 
-		$svg_data = CSvgGraphHelper::get($graph_data, $width, $height);
-		if ($svg_data['errors']) {
-			error($svg_data['errors']);
+		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);
+		if ($svg_options['errors']) {
+			error($svg_options['errors']);
 		}
 
 		if (!$preview) {
-			$svg_data['data'] = zbx_array_merge($svg_data['data'], [
+			$svg_options['data'] = zbx_array_merge($svg_options['data'], [
 				'sbox' => ($graph_data['dashboard_time'] && !$edit_mode),
 				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
 				'time_from' => $graph_data['time_period']['time_from'],
@@ -140,8 +140,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'svg' => $svg_data['svg'].$svg_data['legend'],
-			'svg_data' => $svg_data,
+			'svg' => $svg_options['svg'].$svg_options['legend'],
+			'svg_options' => $svg_options,
 			'initial_load' => $initial_load,
 			'preview' => $preview,
 			'info' => $edit_mode ? null : self::makeWidgetInfo($fields),

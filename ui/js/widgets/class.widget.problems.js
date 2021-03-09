@@ -27,7 +27,7 @@ class CWidgetProblems extends CWidget {
 			...this._events,
 
 			acknowledgeCreated: (e, response, overlay) => {
-				refreshWidgetOnAcknowledgeCreate("problems", response, overlay);
+				refreshWidgetOnAcknowledgeCreate('problems', response, overlay);
 			}
 		}
 
