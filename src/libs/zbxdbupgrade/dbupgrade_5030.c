@@ -565,18 +565,18 @@ static void	dbpatch_update_trigger(zbx_dbpatch_trigger_t *trigger, zbx_uint64_t 
 	}
 }
 
-static void	dbpatch_update_func_change(zbx_dbpatch_function_t *function, const char *prefix, char **replace,
-		zbx_vector_ptr_t *functions)
+static void	dbpatch_update_func_change(zbx_dbpatch_function_t *function, const char *prefix, const char **suffix,
+		char **replace, zbx_vector_ptr_t *functions)
 {
 	zbx_uint64_t	functionid2;
 
-	dbpatch_update_function(function, "last", "#1", ZBX_DBPATCH_FUNCTION_UPDATE);
+	dbpatch_update_function(function, "last", "#2", ZBX_DBPATCH_FUNCTION_UPDATE);
 
 	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
-	dbpatch_add_function(function, functionid2, "last", "#2", ZBX_DBPATCH_FUNCTION_CREATE, functions);
+	dbpatch_add_function(function, functionid2, "last", "#1", ZBX_DBPATCH_FUNCTION_CREATE, functions);
 
-	*replace = zbx_dsprintf(NULL, "%s({" ZBX_FS_UI64 "}-{" ZBX_FS_UI64 "})", prefix, function->functionid,
-			functionid2);
+	*replace = zbx_dsprintf(NULL, "%s{" ZBX_FS_UI64 "},{" ZBX_FS_UI64 "}%s", prefix, function->functionid,
+			functionid2, suffix);
 }
 
 static void	dbpatch_update_func_delta(zbx_dbpatch_function_t *function, const char *parameter, char **replace,
@@ -898,7 +898,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	if (0 == strcmp(function->name, "abschange"))
 	{
 		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
-			dbpatch_update_func_change(function, "abs", replace, functions);
+			dbpatch_update_func_change(function, "abs(change(", "))", replace, functions);
 		else
 			dbpatch_update_func_diff(function, replace, functions);
 	}
@@ -913,7 +913,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	else if (0 == strcmp(function->name, "change"))
 	{
 		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
-			dbpatch_update_func_change(function, "", replace, functions);
+			dbpatch_update_func_change(function, "change(", ")", replace, functions);
 		else
 			dbpatch_update_func_diff(function, replace, functions);
 	}

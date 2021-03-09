@@ -253,8 +253,8 @@ void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_u
 
 static int	compare_tokens_by_loc(const void *d1, const void *d2)
 {
-	const zbx_eval_token_t	*t1 = *(const zbx_eval_token_t **)d1;
-	const zbx_eval_token_t	*t2 = *(const zbx_eval_token_t **)d2;
+	const zbx_eval_token_t	*t1 = *(const zbx_eval_token_t * const *)d1;
+	const zbx_eval_token_t	*t2 = *(const zbx_eval_token_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(t1->loc.l, t2->loc.l);
 	return 0;
@@ -760,7 +760,7 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
 				data += sizeof(double);
 				break;
 			case ZBX_VARIANT_STR:
-				data += strlen((char *)data) + 1;
+				data += strlen((const char *)data) + 1;
 				break;
 			case ZBX_VARIANT_NONE:
 				break;

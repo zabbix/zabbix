@@ -894,4 +894,20 @@ in:
 out:
   result: SUCCEED
   value: 1
+---
+test case: Expression 'change(18446744073709551610,18446744073709551615)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'change(18446744073709551610,18446744073709551615)'
+out:
+  result: SUCCEED
+  value: '5'
+---
+test case: Expression 'change(18446744073709551615,18446744073709551610)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'change(18446744073709551615,18446744073709551610)'
+out:
+  result: SUCCEED
+  value: '-5'
 ...

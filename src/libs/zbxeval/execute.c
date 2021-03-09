@@ -350,7 +350,22 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 
 	if (ZBX_VARIANT_NONE == token->value.type)
 	{
-		if (ZBX_EVAL_TOKEN_VAR_NUM == token->type || ZBX_EVAL_TOKEN_VAR_TIME == token->type)
+		if (ZBX_EVAL_TOKEN_VAR_NUM == token->type)
+		{
+			zbx_uint64_t	ui64;
+
+			if (SUCCEED == is_uint64_n(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
+					&ui64))
+			{
+				zbx_variant_set_ui64(&value, ui64);
+			}
+			else
+			{
+				zbx_variant_set_dbl(&value, atof(ctx->expression + token->loc.l) *
+						suffix2factor(ctx->expression[token->loc.r]));
+			}
+		}
+		else if (ZBX_EVAL_TOKEN_VAR_TIME == token->type)
 		{
 			zbx_variant_set_dbl(&value, atof(ctx->expression + token->loc.l) *
 					suffix2factor(ctx->expression[token->loc.r]));
@@ -496,7 +511,7 @@ static int	eval_validate_function_args(const zbx_eval_context_t *ctx, const zbx_
 {
 	int	i;
 
-	if (0 == token->opt)
+	if (output->values_num < (int)token->opt)
 	{
 		*error = zbx_dsprintf(*error, "not enough arguments for function at \"%s\"",
 				ctx->expression + token->loc.l);
@@ -518,6 +533,34 @@ static int	eval_validate_function_args(const zbx_eval_context_t *ctx, const zbx_
 	}
 
 	return UNKNOWN;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_convert_function_arg                                        *
+ *                                                                            *
+ * Purpose: convert function argument to the specified type                   *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             type   - [IN] the required type                                *
+ *             arg    - [IN/OUT] the argument to convert                      *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - argument was converted successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_convert_function_arg(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		unsigned char type, zbx_variant_t *arg, char **error)
+{
+	if (SUCCEED == zbx_variant_convert(arg, type))
+		return SUCCEED;
+
+	*error = zbx_dsprintf(*error, "invalid arg \"%s\" of type \"%s\" for function at \"%s\"",
+			zbx_variant_value_desc(arg), zbx_variant_type_desc(arg), ctx->expression + token->loc.l);
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -559,14 +602,8 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 	{
 		for (; i < output->values_num; i++)
 		{
-			if (SUCCEED != zbx_variant_convert(&output->values[i], ZBX_VARIANT_DBL))
-			{
-				*error = zbx_dsprintf(*error, "invalid value \"%s\" of type \"%s\" for function at"
-						" \"%s\"", zbx_variant_value_desc(&output->values[i]),
-						zbx_variant_type_desc(&output->values[i]),
-						ctx->expression + token->loc.l);
+			if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i], error))
 				return FAIL;
-			}
 		}
 	}
 	else
@@ -1077,6 +1114,74 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_change                                     *
+ *                                                                            *
+ * Purpose: evaluate change() function                                        *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_change(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	value, left, right;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+			ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	zbx_variant_copy(&left, &output->values[output->values_num - 2]);
+	zbx_variant_copy(&right, &output->values[output->values_num - 1]);
+
+	if (ZBX_VARIANT_STR == left.type)
+		zbx_variant_convert(&left, ZBX_VARIANT_UI64);
+	if (ZBX_VARIANT_STR == right.type)
+		zbx_variant_convert(&right, ZBX_VARIANT_UI64);
+
+	if (ZBX_VARIANT_UI64 == left.type && ZBX_VARIANT_UI64 == right.type)
+	{
+		if (left.data.ui64 < right.data.ui64)
+			zbx_variant_set_dbl(&value, right.data.ui64 - left.data.ui64);
+		else
+			zbx_variant_set_dbl(&value, -(double)(left.data.ui64 - right.data.ui64));
+	}
+	else
+	{
+		if (FAIL == eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &left, error) ||
+				FAIL == eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &right, error))
+		{
+			ret = FAIL;
+			goto out;
+		}
+
+		zbx_variant_set_dbl(&value, right.data.dbl - left.data.dbl);
+	}
+
+	eval_function_return(token->opt, &value, output);
+	ret = SUCCEED;
+out:
+	zbx_variant_clear(&left);
+	zbx_variant_clear(&right);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_cb_function                                         *
@@ -1171,6 +1276,8 @@ static int	eval_execute_function(const zbx_eval_context_t *ctx, const zbx_eval_t
 		return eval_execute_function_dayofweek(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "dayofmonth", ZBX_CONST_STRLEN("dayofmonth")))
 		return eval_execute_function_dayofmonth(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "change", ZBX_CONST_STRLEN("change")))
+		return eval_execute_function_change(ctx, token, output, error);
 
 	if (FAIL == eval_execute_cb_function(ctx, token, output, &errmsg))
 	{
