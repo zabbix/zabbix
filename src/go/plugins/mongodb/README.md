@@ -29,9 +29,8 @@ db.createUser({
   "user": "zabbix",
   "pwd": "<PASSWORD>",
   "roles": [
-    { role: "read", db: "admin" },
+    { role: "readAnyDatabase", db: "admin" },
     { role: "clusterMonitor", db: "admin" },
-    { role: "read", db: "local" }
   ]
 })
 ```
