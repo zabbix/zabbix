@@ -3751,7 +3751,6 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	zbx_vector_ptr_t		triggers;
 	zbx_vector_ptr_t		items;
 	zbx_lld_trigger_t		*trigger;
-	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	int				ret = SUCCEED, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3774,16 +3773,6 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_items_get(&trigger_prototypes, &items);
 
 	/* simplifying trigger expressions */
-
-	for (i = 0; i < trigger_prototypes.values_num; i++)
-	{
-		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes.values[i];
-
-		lld_eval_expression_simplify(&trigger_prototype->eval_ctx, &trigger_prototype->expression,
-				&trigger_prototype->functions);
-		lld_eval_expression_simplify(&trigger_prototype->eval_ctx_r,
-				&trigger_prototype->recovery_expression, &trigger_prototype->functions);
-	}
 
 	for (i = 0; i < triggers.values_num; i++)
 	{
