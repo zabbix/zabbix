@@ -1366,7 +1366,10 @@ static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, con
 		value = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
 
 		if (FAIL == substitute_lld_macros(&value, jp_row, lld_macros, ZBX_MACRO_ANY, err, err_len))
+		{
+			zbx_free(value);
 			goto out;
+		}
 
 		zbx_variant_clear(&token->value);
 		zbx_variant_set_str(&token->value, value);
