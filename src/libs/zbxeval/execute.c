@@ -191,7 +191,7 @@ static int	eval_variant_compare(const zbx_variant_t *left, const zbx_variant_t *
 	if (SUCCEED == variant_convert_suffixed_num(&val_r, right))
 		right = &val_r;
 
-	ret = (double)zbx_variant_compare(left, right);
+	ret = zbx_variant_compare(left, right);
 
 	zbx_variant_clear(&val_l);
 	zbx_variant_clear(&val_r);
