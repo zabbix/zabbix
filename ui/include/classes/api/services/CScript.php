@@ -1191,7 +1191,7 @@ class CScript extends CApiService {
 		$result = parent::addRelatedObjects($options, $result);
 
 		// Adding actions.
-		if ($options['selectActions'] !== null && $options['selectActions'] != API_OUTPUT_COUNT) {
+		if ($options['selectActions'] !== null && $options['selectActions'] !== API_OUTPUT_COUNT) {
 			$action_scriptids = [];
 
 			if ($this->outputIsRequested('scope', $options['output'])) {
@@ -1217,8 +1217,8 @@ class CScript extends CApiService {
 			}
 
 			if ($action_scriptids) {
-				if ($options['selectActions'] == API_OUTPUT_EXTEND) {
-					$action_fields = array_map(function($field) { return 'a.'.$field; }, $this->action_fields);
+				if ($options['selectActions'] === API_OUTPUT_EXTEND) {
+					$action_fields = array_map(function ($field) { return 'a.'.$field; }, $this->action_fields);
 					$action_fields = implode(',', $action_fields);
 				}
 				elseif (is_array($options['selectActions'])) {
@@ -1228,7 +1228,7 @@ class CScript extends CApiService {
 						$action_fields[] = 'actionid';
 					}
 
-					$action_fields = array_map(function($field) { return 'a.'.$field; }, $action_fields);
+					$action_fields = array_map(function ($field) { return 'a.'.$field; }, $action_fields);
 					$action_fields = implode(',', $action_fields);
 				}
 

@@ -109,7 +109,7 @@ class CControllerScriptEdit extends CController {
 			'confirmation' => '',
 			'enable_confirmation' => false,
 			'hgstype' => 0,
-			'has_action' => false
+			'actions' => []
 		];
 
 		// Get values from the dabatase.
@@ -119,7 +119,8 @@ class CControllerScriptEdit extends CController {
 					'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username',
 					'password', 'publickey', 'privatekey', 'menu_path', 'parameters'
 				],
-				'scriptids' => $this->getInput('scriptid')
+				'scriptids' => $this->getInput('scriptid'),
+				'selectActions' => []
 			]);
 			if ($scripts) {
 				$script = $scripts[0];
@@ -153,10 +154,7 @@ class CControllerScriptEdit extends CController {
 				$data['port'] = $script['port'];
 				$data['menu_path'] = $script['menu_path'];
 				$data['parameters'] = $script['parameters'];
-				$data['has_action'] = (bool) API::Action()->get([
-					'output' => [],
-					'scriptids' => $script['scriptid']
-				]);
+				$data['actions'] = $script['actions'];
 			}
 		}
 

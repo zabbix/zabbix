@@ -102,7 +102,7 @@ $form_list = (new CFormList())
 			->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
 			->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
 			->setModern(true)
-			->setEnabled(!$data['has_action'])
+			->setEnabled(!$data['actions'])
 	)
 	->addRow(new CLabel(_('Menu path'), 'menu_path'),
 		(new CTextBox('menu_path', $data['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
@@ -154,7 +154,6 @@ $form_list = (new CFormList())
 		(new CTextBox('password', $data['password'], false, DB::getFieldLength('scripts', 'password')))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
-//!!!!!!!!!!!!! password!!!!!!!!!!!!!!!!!!!!!!!!!!!! password!!!!!!!!!!!!!!!!!!!!!! password!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! password!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	->addRow(new CLabel(_('Key passphrase'), 'passphrase'),
 		(new CTextBox('passphrase', $data['passphrase'], false, DB::getFieldLength('scripts', 'password')))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -206,7 +205,7 @@ $form_list = (new CFormList())
 	);
 
 $select_usrgrpid = (new CSelect('usrgrpid'))
-	->setId('user_group')
+	->setId('user-group')
 	->setValue($data['usrgrpid'])
 	->setFocusableElementId('usrgrpid')
 	->addOption(new CSelectOption(0, _('All')))
