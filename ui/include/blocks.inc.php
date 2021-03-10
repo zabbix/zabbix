@@ -605,8 +605,6 @@ function make_status_of_zbx() {
 /**
  * Generate table for dashboard triggers popup.
  *
- * @see makeSystemStatus
- *
  * @param array  $problems
  * @param string $problems[]['objectid']
  * @param int    $problems[]['clock']

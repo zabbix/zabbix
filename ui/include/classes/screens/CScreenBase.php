@@ -22,7 +22,9 @@
 class CScreenBase {
 
 	/**
-	 * @see CScreenBuilder::isFlickerfree
+	 * Switch on/off flicker-free screens auto refresh.
+	 *
+	 * @var boolean
 	 */
 	public $isFlickerfree;
 
@@ -34,12 +36,14 @@ class CScreenBase {
 	public $pageFile;
 
 	/**
-	 * @see CScreenBuilder::mode
+	 * Display mode
+	 *
+	 * @var int
 	 */
 	public $mode;
 
 	/**
-	 * @see CScreenBuilder::timestamp
+	 * @see Request timestamp
 	 */
 	public $timestamp;
 
@@ -92,13 +96,18 @@ class CScreenBase {
 	 */
 	public $timeline;
 
+
 	/**
-	 * @see CScreenBuilder::profileIdx
+	 * Profile table entity name #1
+	 *
+	 * @var string
 	 */
 	public $profileIdx;
 
 	/**
-	 * @see CScreenBuilder::profileIdx2
+	 * Profile table record id belongs to #1
+	 *
+	 * @var int
 	 */
 	public $profileIdx2;
 
@@ -300,12 +309,6 @@ class CScreenBase {
 		// Get screenid.
 		if ($this->required_parameters['screenid'] && $this->screenid === null && $this->screenitem) {
 			$this->screenid = $this->screenitem['screenid'];
-		}
-
-		// Create action URL.
-		if ($this->required_parameters['action'] && $this->action === null && $this->screenitem) {
-			$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.
-				$this->screenitem['screenitemid'];
 		}
 	}
 

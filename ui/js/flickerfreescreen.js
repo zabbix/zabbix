@@ -196,11 +196,6 @@
 					}
 					break;
 
-				// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-				case 19:
-					self.refreshProfile(id, ajax_url);
-					break;
-
 				default:
 					self.refreshHtml(id, ajax_url);
 					break;

@@ -28,7 +28,6 @@ class CControllerExport extends CController {
 			'valuemapids' =>	'not_empty|array_db valuemaps.valuemapid',
 			'hosts' =>			'not_empty|array_db hosts.hostid',
 			'mediatypeids' =>	'not_empty|array_db media_type.mediatypeid',
-			'screens' =>		'not_empty|array_db screens.screenid',
 			'maps' =>			'not_empty|array_db sysmaps.sysmapid',
 			'templates' =>		'not_empty|array_db hosts.hostid',
 			'format' =>			'in '.implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON])
