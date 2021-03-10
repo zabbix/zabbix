@@ -902,7 +902,7 @@ class testItemTest extends CWebTest {
 				else {
 					$details = ($data['fields']['Type'] === 'SNMP agent')
 						? 'Incorrect value for field "SNMP community": cannot be empty.'
-						: ['Incorrect value for field "Host address": cannot be empty.'];
+						: 'Incorrect value for field "Host address": cannot be empty.';
 				}
 
 				// Click Get value button.

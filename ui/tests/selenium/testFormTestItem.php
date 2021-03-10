@@ -41,7 +41,7 @@ class testFormTestItem extends testItemTest{
 	 * Check Test item Button enabled/disabled state depending on item type for Template.
 	 */
 	public function testFormTestItem_CheckButtonStateTemplate() {
-		$this->checkTestButtonState($this->getItemTestButtonStateData(),'Item for Test Button check', 'Item',
+		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item for Test Button check', 'Item',
 				' added', false, false, self::TEMPLATE_ID, 'items');
 	}
 
