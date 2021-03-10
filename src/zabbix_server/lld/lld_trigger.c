@@ -27,8 +27,6 @@ typedef struct
 {
 	zbx_uint64_t		triggerid;
 	char			*description;
-	char			*expression;
-	char			*recovery_expression;
 	char			*comments;
 	char			*url;
 	char			*correlation_tag;
@@ -260,9 +258,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 	zbx_free(trigger_prototype->correlation_tag);
 	zbx_free(trigger_prototype->url);
 	zbx_free(trigger_prototype->comments);
-	zbx_free(trigger_prototype->recovery_expression);
 	zbx_free(trigger_prototype->recovery_expression_orig);
-	zbx_free(trigger_prototype->expression);
 	zbx_free(trigger_prototype->expression_orig);
 	zbx_free(trigger_prototype->description);
 	zbx_free(trigger_prototype);
@@ -347,8 +343,6 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 		trigger_prototype->opdata = zbx_strdup(NULL, row[13]);
 		ZBX_STR2UCHAR(trigger_prototype->discover, row[14]);
 		trigger_prototype->event_name = zbx_strdup(NULL, row[15]);
-		trigger_prototype->expression = NULL;
-		trigger_prototype->recovery_expression = NULL;
 
 		zbx_vector_ptr_create(&trigger_prototype->functions);
 		zbx_vector_ptr_create(&trigger_prototype->dependencies);
@@ -987,12 +981,16 @@ static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **express
 
 	if (SUCCEED == zbx_eval_status(ctx))
 	{
-		char	*new_expression = NULL;
-
 		lld_eval_expression_index_functions(ctx, functions);
-		zbx_eval_compose_expression(ctx, &new_expression);
-		zbx_free(*expression);
-		*expression = new_expression;
+
+		if (NULL != expression)
+		{
+			char	*new_expression = NULL;
+
+			zbx_eval_compose_expression(ctx, &new_expression);
+			zbx_free(*expression);
+			*expression = new_expression;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __func__, *expression);
@@ -3751,6 +3749,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	zbx_vector_ptr_t		triggers;
 	zbx_vector_ptr_t		items;
 	zbx_lld_trigger_t		*trigger;
+	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	int				ret = SUCCEED, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3773,6 +3772,14 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_items_get(&trigger_prototypes, &items);
 
 	/* simplifying trigger expressions */
+
+	for (i = 0; i < trigger_prototypes.values_num; i++)
+	{
+		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes.values[i];
+
+		lld_eval_expression_simplify(&trigger_prototype->eval_ctx, NULL, &trigger_prototype->functions);
+		lld_eval_expression_simplify(&trigger_prototype->eval_ctx_r, NULL, &trigger_prototype->functions);
+	}
 
 	for (i = 0; i < triggers.values_num; i++)
 	{
