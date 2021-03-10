@@ -672,8 +672,8 @@ class CControllerMenuPopup extends CController {
 				foreach ($host_scripts as &$host_script) {
 					if (!array_key_exists($host_script['scriptid'], $scripts)
 							&& $host_script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
-
 						$host_script['menu_path'] = trimPath($host_script['menu_path']);
+						$host_script['sort'] = '';
 
 						if (strlen($host_script['menu_path']) > 0) {
 							// First or only slash from beginning is trimmed.
@@ -681,15 +681,26 @@ class CControllerMenuPopup extends CController {
 								$host_script['menu_path'] = substr($host_script['menu_path'], 1);
 							}
 
+							$host_script['sort'] = $host_script['menu_path'];
+
 							// If there is something more, check if last slash is present.
 							if (strlen($host_script['menu_path']) > 0) {
-								if (substr($host_script['menu_path'], -1) !== '/') {
-									$host_script['menu_path'] .= '/';
+								if (substr($host_script['menu_path'], -1) !== '/'
+										&& substr($host_script['menu_path'], -2) === '\\/') {
+									$host_script['sort'] = $host_script['menu_path'].'/';
+								}
+								else {
+									$host_script['sort'] = $host_script['menu_path'];
+								}
+
+								if (substr($host_script['menu_path'], -1) === '/'
+										&& substr($host_script['menu_path'], -2) !== '\\/') {
+									$host_script['menu_path'] = substr($host_script['menu_path'], 0, -1);
 								}
 							}
 						}
 
-						$host_script['name'] = $host_script['menu_path'].$host_script['name'];
+						$host_script['sort'] = $host_script['sort'].$host_script['name'];
 
 						$scripts[$host_script['scriptid']] = $host_script;
 					}
@@ -698,7 +709,7 @@ class CControllerMenuPopup extends CController {
 			}
 			unset($host_scripts);
 
-			CArrayHelper::sort($scripts, ['name']);
+			CArrayHelper::sort($scripts, ['sort']);
 
 			foreach (array_values($scripts) as $script) {
 				$menu_data['scripts'][] = [
@@ -806,6 +817,7 @@ class CControllerMenuPopup extends CController {
 
 			case 'trigger':
 				$menu_data = self::getMenuDataTrigger($data);
+				sdff($menu_data);
 				break;
 
 			case 'trigger_macro':
