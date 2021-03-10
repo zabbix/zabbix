@@ -2503,8 +2503,7 @@ static int	lld_expression_create(const zbx_lld_trigger_t *trigger, char **expres
 		goto out;
 	}
 
-	if (SUCCEED != zbx_eval_parse_expression(&ctx, *expression, ZBX_EVAL_TRIGGER_EXPRESSION_LLD,
-			&errmsg))
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, *expression, ZBX_EVAL_TRIGGER_EXPRESSION_LLD, &errmsg))
 	{
 		const char	*type;
 
