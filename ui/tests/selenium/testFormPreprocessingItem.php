@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
@@ -36,7 +37,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
 	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
 	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
-	const CLONE_ITEMID			= 99102;	// 'Simple form test host' -> 'testFormItem'
+	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
 
 	use PreprocessingTrait;
 

@@ -114,6 +114,8 @@ require_once dirname(__FILE__).'/testFormMacrosTemplate.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
+require_once dirname(__FILE__).'/testFormPreprocessingCloneHost.php';
+require_once dirname(__FILE__).'/testFormPreprocessingCloneTemplate.php';
 require_once dirname(__FILE__).'/testFormPreprocessingItem.php';
 require_once dirname(__FILE__).'/testFormPreprocessingItemPrototype.php';
 require_once dirname(__FILE__).'/testFormPreprocessingLowLevelDiscovery.php';
@@ -264,6 +266,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormNetworkDiscovery');
+		$suite->addTestSuite('testFormPreprocessingCloneHost');
+		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
 		$suite->addTestSuite('testFormPreprocessingItem');
 		$suite->addTestSuite('testFormPreprocessingItemPrototype');
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
