@@ -220,7 +220,6 @@ $select_hgstype = (new CSelect('hgstype'))
 
 $form_list
 	->addRow(new CLabel(_('Host group'), $select_hgstype->getFocusableElementId()), $select_hgstype)
-	->addRow(new CLabel(_('User group'), $select_usrgrpid->getFocusableElementId()), $select_usrgrpid)
 	->addRow(null,
 		(new CMultiSelect([
 			'name' => 'groupid',
@@ -238,6 +237,7 @@ $form_list
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'hostGroupSelection'
 	)
+	->addRow(new CLabel(_('User group'), $select_usrgrpid->getFocusableElementId()), $select_usrgrpid)
 	->addRow((new CLabel(_('Required host permissions'), 'host_access')),
 		(new CRadioButtonList('host_access', (int) $data['host_access']))
 			->addValue(_('Read'), PERM_READ)
