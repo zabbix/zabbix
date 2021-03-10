@@ -742,14 +742,13 @@ class testFormUserRoles extends CWebTest {
 			$this->fillMultiselect($data['api_methods']);
 		}
 		$form->submit();
-		if ($data['expected'] === TEST_BAD) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
 			if ($action === 'create') {
 				$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role'));
 			}
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, $data['message_header']);
 			if ($action === 'create') {
 				$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM role WHERE name='.zbx_dbstr($data['fields']['Name'])));
 				$this->query('link', $data['fields']['Name'])->one()->click();
