@@ -34,14 +34,14 @@ $form_list = new CFormList();
 /*
  * Operation row.
  */
-$select_operations = (new CSelect('operation[operationtype]'))->setFocusableElementId('operations-select');
+$select_operations = (new CSelect('operation[operationtype]'))->setFocusableElementId('operation-select');
 
 $form_list->addRow(new CLabel(_('Operation'), $select_operations->getFocusableElementId()), [
 		$select_operations,
-		(new CVar('operationtype', 0, 'operation_type')),
-		(new CVar('operation[opcommand][scriptid]', 0))
+		(new CVar('operationtype', 0, 'operation-type')),
+		(new CVar('operation[opcommand][scriptid]', 0, 'operation-opcommand-scriptid'))
 	],
-	'operation-type'
+	'operation-type-select'
 );
 
 /*
