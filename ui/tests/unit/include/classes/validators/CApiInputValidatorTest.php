@@ -2062,9 +2062,9 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_SCRIPT_MENU_PATH],
-				'/',
+				'/folder1/\/'.'/',
 				'/1/menu_path',
-				'/'
+				'/folder1/\/'.'/'
 			],
 			[
 				['type' => API_SCRIPT_MENU_PATH],

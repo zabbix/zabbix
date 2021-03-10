@@ -131,6 +131,7 @@ class CControllerMenuPopup extends CController {
 					}
 
 					$script['menu_path'] = trimPath($script['menu_path']);
+					$script['sort'] = '';
 
 					if (strlen($script['menu_path']) > 0) {
 						// First or only slash from beginning is trimmed.
@@ -142,14 +143,16 @@ class CControllerMenuPopup extends CController {
 
 						// If there is something more, check if last slash is present.
 						if (strlen($script['menu_path']) > 0) {
-							if (substr($script['menu_path'], -1) !== '/') {
+							if (substr($script['menu_path'], -1) !== '/'
+									&& substr($script['menu_path'], -2) === '\\/') {
 								$script['sort'] = $script['menu_path'].'/';
 							}
 							else {
 								$script['sort'] = $script['menu_path'];
 							}
 
-							if (substr($script['menu_path'], -1) === '/') {
+							if (substr($script['menu_path'], -1) === '/'
+									&& substr($script['menu_path'], -2) !== '\\/') {
 								$script['menu_path'] = substr($script['menu_path'], 0, -1);
 							}
 						}
