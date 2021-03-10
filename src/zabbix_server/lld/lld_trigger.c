@@ -3813,6 +3813,5 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-
 	return ret;
 }
