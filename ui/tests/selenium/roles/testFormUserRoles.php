@@ -41,10 +41,17 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	/**
+	 * Id of role that created for future update.
+	 *
+	 * @var integer
+	 */
+	protected static $roleid;
+
+	/**
 	 * Function used to create roles.
 	 */
 	public function prepareRoleData() {
-		CDataHelper::call('role.create', [
+		$response = CDataHelper::call('role.create', [
 			[
 				'name' => 'role_for_update',
 				'type' => 1,
@@ -52,10 +59,15 @@ class testFormUserRoles extends CWebTest {
 					'api' => [
 						'*.create',
 						'host.*',
-						'*.*',
-						]
+						'*.*'
 					]
-				],
+				]
+			]
+		]);
+		$this->assertArrayHasKey('roleids', $response);
+		self::$roleid = $response['roleids'][0];
+
+		CDataHelper::call('role.create', [
 			[
 				'name' => 'role_for_delete',
 				'type' => 1
@@ -749,9 +761,15 @@ class testFormUserRoles extends CWebTest {
 			}
 		}
 		else {
+			$this->assertMessage(TEST_GOOD, $data['message_header']);
 			if ($action === 'create') {
 				$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM role WHERE name='.zbx_dbstr($data['fields']['Name'])));
 				$this->query('link', $data['fields']['Name'])->one()->click();
+				$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+				$form->checkValue($data['fields']);
+			}
+			else {
+				$this->page->login()->open('zabbix.php?action=userrole.edit&roleid='.self::$roleid);
 				$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 				$form->checkValue($data['fields']);
 			}
