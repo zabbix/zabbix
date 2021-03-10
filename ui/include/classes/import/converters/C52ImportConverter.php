@@ -82,7 +82,7 @@ class C52ImportConverter extends CConverter {
 				foreach ($host['items'] as &$item) {
 					if (array_key_exists('triggers', $item)) {
 						foreach ($item['triggers'] as &$trigger) {
-							$trigger = $this->convertTrigger($trigger, $host['host'], $item['name']);
+							$trigger = $this->convertTrigger($trigger, $host['host'], $item['key']);
 						}
 						unset($trigger);
 					}
@@ -108,7 +108,7 @@ class C52ImportConverter extends CConverter {
 				foreach ($template['items'] as &$item) {
 					if (array_key_exists('triggers', $item)) {
 						foreach ($item['triggers'] as &$trigger) {
-							$trigger = $this->convertTrigger($trigger, $template['host'], $item['name']);
+							$trigger = $this->convertTrigger($trigger, $template['host'], $item['key']);
 						}
 						unset($trigger);
 					}
