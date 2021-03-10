@@ -1192,6 +1192,10 @@ class CScript extends CApiService {
 
 		// Adding actions.
 		if ($options['selectActions'] !== null && $options['selectActions'] !== API_OUTPUT_COUNT) {
+			foreach ($result as $scriptid => &$row) {
+				$row['actions'] = [];
+			}
+
 			$action_scriptids = [];
 
 			if ($this->outputIsRequested('scope', $options['output'])) {
@@ -1241,8 +1245,6 @@ class CScript extends CApiService {
 				));
 
 				foreach ($result as $scriptid => &$row) {
-					$row['actions'] = [];
-
 					if ($db_script_actions) {
 						foreach ($db_script_actions as $db_script_action) {
 							if (bccomp($db_script_action['scriptid'], $scriptid) == 0) {

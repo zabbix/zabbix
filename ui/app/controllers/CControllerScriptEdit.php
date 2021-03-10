@@ -122,6 +122,7 @@ class CControllerScriptEdit extends CController {
 				'scriptids' => $this->getInput('scriptid'),
 				'selectActions' => []
 			]);
+
 			if ($scripts) {
 				$script = $scripts[0];
 
