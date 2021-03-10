@@ -565,7 +565,7 @@ static void	dbpatch_update_trigger(zbx_dbpatch_trigger_t *trigger, zbx_uint64_t 
 	}
 }
 
-static void	dbpatch_update_func_change(zbx_dbpatch_function_t *function, const char *prefix, const char **suffix,
+static void	dbpatch_update_func_change(zbx_dbpatch_function_t *function, const char *prefix, const char *suffix,
 		char **replace, zbx_vector_ptr_t *functions)
 {
 	zbx_uint64_t	functionid2;
