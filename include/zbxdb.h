@@ -98,6 +98,8 @@ const char	*zbx_db_last_strerr(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_dbms_get_version(void);
+int	zbx_tsdb_get_version(void);
+#define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 #endif
 
 #ifdef HAVE_ORACLE

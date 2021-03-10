@@ -506,7 +506,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 		$fullnames = [];
 
 		$users = API::User()->get([
-			'output' => ['userid', 'alias', 'name', 'surname'],
+			'output' => ['userid', 'username', 'name', 'surname'],
 			'userids' => $userids
 		]);
 
@@ -1274,7 +1274,6 @@ function getEventsMessages(array $events) {
 
 		foreach ($event['acknowledges'] as $ack) {
 			if (($ack['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
-				// Alias is mandatory for each user, so if alias is not returned, we don't have rights for this user.
 				$event_messages[] = [
 					'message' => $ack['message'],
 					'userid' => $ack['userid'],
@@ -1591,7 +1590,7 @@ function getEventUpdates(array $event) {
  * @param array  $actions['severities']  Severity change icon data.
  * @param array  $actions['actions']     Actions icon data.
  * @param array  $mediatypes             Mediatypes with maxattempts value and name.
- * @param array  $users                  User name, surname and alias.
+ * @param array  $users                  User name, surname and username.
  *
  * @return CCol|string
  */
@@ -1621,7 +1620,7 @@ function makeEventActionsIcons($eventid, $actions, $mediatypes, $users) {
  * @param array  $data['messages']               Array of messages.
  * @param string $data['messages'][]['message']  Message text.
  * @param string $data['messages'][]['clock']    Message creation time.
- * @param array  $users                          User name, surname and alias.
+ * @param array  $users                          User name, surname and username.
  *
  * @return CSpan|null
  */
@@ -1674,7 +1673,7 @@ function makeEventMessagesIcon(array $data, array $users) {
  * @param string $data['original_severity']             Severity before change.
  * @param string $data['current_severity']              Current severity.
  * @param int    $data['count']                         Total number of severity changes.
- * @param array  $users                                 User name, surname and alias.
+ * @param array  $users                                 User name, surname and username.
  *
  * @return CSpan|null
  */
@@ -1748,7 +1747,7 @@ function makeEventSeverityChangesIcon(array $data, array $users) {
  * @param int    $data['count']                     Number of actions.
  * @param bool   $data['has_uncomplete_action']     Does the event have at least one uncompleted alert action.
  * @param bool   $data['has_failed_action']         Does the event have at least one failed alert action.
- * @param array  $users                             User name, surname and alias.
+ * @param array  $users                             User name, surname and username.
  * @param array  $mediatypes                        Mediatypes with maxattempts value and name.
  * @param string $mediatypes[]['name']              Mediatype name.
  *
@@ -1837,7 +1836,7 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes) {
  * @param string $data['actions'][]['subject']        Message alert subject (only for ZBX_EVENT_HISTORY_ALERT).
  * @param string $data['actions'][]['p_eventid']      Problem eventid that was reason for alert (only for ZBX_EVENT_HISTORY_ALERT).
  * @param string $data['actions'][]['acknowledgeid']  Problem update action that was reason for alert (only for ZBX_EVENT_HISTORY_ALERT).
- * @param array  $users                               User name, surname and alias.
+ * @param array  $users                               User name, surname and username.
  * @param array  $mediatypes                          Mediatypes with maxattempts value.
  *
  * @return CTableInfo
@@ -1892,7 +1891,7 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
  * @param array  $actions                   Array with all actions sorted by clock.
  * @param string $actions[]['clock']        Time, when action was performed.
  * @param string $actions[]['message']      Message sent by alert, or written by manual update, or remote command text.
- * @param array  $users                     User name, surname and alias.
+ * @param array  $users                     User name, surname and username.
  *
  * @return CTable
  */
@@ -1923,7 +1922,7 @@ function makeEventHistoryTable(array $actions, array $users) {
  * @param int    $action['action_type']  Type of event table action (ZBX_EVENT_HISTORY_*).
  * @param string $action['alerttype']    Type of alert.
  * @param string $action['userid']       ID of message author, or alert receiver.
- * @param array  $users                  Array with user data - alias, name, surname.
+ * @param array  $users                  Array with user data - username, name, surname.
  *
  * @return string
  */
@@ -1947,7 +1946,7 @@ function makeActionTableUser(array $action, array $users) {
  * @param string $action['alerttype']    Type of alert.
  * @param array  $action['userid']       ID of message author, or alert receiver.
  * @param array  $action['sendto']       Receiver media address for automatic action.
- * @param array  $users                  Array with user data - alias, name, surname.
+ * @param array  $users                  Array with user data - username, name, surname.
  *
  * @return string
  */

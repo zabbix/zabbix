@@ -5991,7 +5991,6 @@ svg {
       background: url("../img/icon-sprite.svg?20200407") no-repeat -604px -503px; }
 
 .checkbox-block {
-  display: none;
   margin: 10px 0; }
 
 #tbl_macros.massupdate-remove th,
@@ -6150,6 +6149,19 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   color: #f2f2f2;
   background-color: #383838 !important;
   border-color: #4f4f4f; }
+
+.valuemap-list-table tbody td {
+  border-bottom: 1px solid #383838; }
+  .valuemap-list-table tbody td.wordwrap {
+    white-space: normal; }
+.valuemap-list-table tbody tr:first-child td {
+  border-top: 1px solid #383838; }
+
+.valuemap-checkbox {
+  margin-top: 10px; }
+
+.overlay-dialogue .valuemap-list-table td {
+  vertical-align: top; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }

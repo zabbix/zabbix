@@ -2006,7 +2006,8 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ACK_MESSAGE		"{ACK.MESSAGE}"			/* deprecated */
 #define MVAR_ACK_TIME			"{ACK.TIME}"			/* deprecated */
 #define MVAR_ACK_DATE			"{ACK.DATE}"			/* deprecated */
-#define MVAR_USER_ALIAS			"{USER.ALIAS}"
+#define MVAR_USER_ALIAS			"{USER.ALIAS}"			/* deprecated */
+#define MVAR_USER_USERNAME		"{USER.USERNAME}"
 #define MVAR_USER_NAME			"{USER.NAME}"
 #define MVAR_USER_SURNAME		"{USER.SURNAME}"
 #define MVAR_USER_FULLNAME		"{USER.FULLNAME}"
@@ -3020,21 +3021,21 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char 
  * Purpose: resolve {USER.*} macros                                           *
  *                                                                            *
  ******************************************************************************/
-static void	resolve_user_macros(zbx_uint64_t userid, const char *m, char **user_alias, char **user_name,
+static void	resolve_user_macros(zbx_uint64_t userid, const char *m, char **user_username, char **user_name,
 		char **user_surname, int *user_names_found, char **replace_to)
 {
-	/* use only one DB request for all occurrences of 4 macros */
+	/* use only one DB request for all occurrences of 5 macros */
 	if (0 == *user_names_found)
 	{
-		if (SUCCEED == DBget_user_names(userid, user_alias, user_name, user_surname))
+		if (SUCCEED == DBget_user_names(userid, user_username, user_name, user_surname))
 			*user_names_found = 1;
 		else
 			return;
 	}
 
-	if (0 == strcmp(m, MVAR_USER_ALIAS))
+	if (0 == strcmp(m, MVAR_USER_USERNAME) || 0 == strcmp(m, MVAR_USER_ALIAS))
 	{
-		*replace_to = zbx_strdup(*replace_to, *user_alias);
+		*replace_to = zbx_strdup(*replace_to, *user_username);
 	}
 	else if (0 == strcmp(m, MVAR_USER_NAME))
 	{
@@ -3047,7 +3048,7 @@ static void	resolve_user_macros(zbx_uint64_t userid, const char *m, char **user_
 	else if (0 == strcmp(m, MVAR_USER_FULLNAME))
 	{
 		zbx_free(*replace_to);
-		*replace_to = format_user_fullname(*user_name, *user_surname, *user_alias);
+		*replace_to = format_user_fullname(*user_name, *user_surname, *user_username);
 	}
 }
 
@@ -3116,7 +3117,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 	zbx_vector_uint64_t	hostids;
 	zbx_token_t		token, inner_token;
 	zbx_token_search_t	token_search = ZBX_TOKEN_SEARCH_BASIC;
-	char			*expression = NULL, *user_alias = NULL, *user_name = NULL, *user_surname = NULL;
+	char			*expression = NULL, *user_username = NULL, *user_name = NULL, *user_surname = NULL;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -3543,11 +3544,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 				else if (0 != (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)) &&
-						NULL != userid && (0 == strcmp(m, MVAR_USER_ALIAS) ||
+						NULL != userid && (0 == strcmp(m, MVAR_USER_USERNAME) ||
 						0 == strcmp(m, MVAR_USER_NAME) || 0 == strcmp(m, MVAR_USER_SURNAME) ||
-						0 == strcmp(m, MVAR_USER_FULLNAME)))
+						0 == strcmp(m, MVAR_USER_FULLNAME) || 0 == strcmp(m, MVAR_USER_ALIAS)))
 				{
-					resolve_user_macros(*userid, m, &user_alias, &user_name, &user_surname,
+					resolve_user_macros(*userid, m, &user_username, &user_name, &user_surname,
 							&user_names_found, &replace_to);
 				}
 				else if (0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
@@ -4644,10 +4645,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 			}
 			else if (NULL != userid)
 			{
-				if (0 == strcmp(m, MVAR_USER_ALIAS) || 0 == strcmp(m, MVAR_USER_NAME) ||
-						0 == strcmp(m, MVAR_USER_SURNAME) || 0 == strcmp(m, MVAR_USER_FULLNAME))
+				if (0 == strcmp(m, MVAR_USER_USERNAME) || 0 == strcmp(m, MVAR_USER_NAME) ||
+						0 == strcmp(m, MVAR_USER_SURNAME) ||
+						0 == strcmp(m, MVAR_USER_FULLNAME) || 0 == strcmp(m, MVAR_USER_ALIAS))
 				{
-					resolve_user_macros(*userid, m, &user_alias, &user_name, &user_surname,
+					resolve_user_macros(*userid, m, &user_username, &user_name, &user_surname,
 							&user_names_found, &replace_to);
 				}
 			}
@@ -4988,7 +4990,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		pos++;
 	}
 
-	zbx_free(user_alias);
+	zbx_free(user_username);
 	zbx_free(user_name);
 	zbx_free(user_surname);
 	zbx_free(expression);

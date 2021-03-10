@@ -31,9 +31,12 @@ $widget = (new CWidget())->setTitle(_('Actions'));
 $actionForm = (new CForm())
 	->setId('action-form')
 	->setName('action.edit')
+	->setAction((new CUrl('actionconf.php'))
+		->setArgument('eventsource', $data['eventsource'])
+		->getUrl()
+	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $data['form'])
-	->addVar('eventsource', $data['eventsource']);
+	->addVar('form', $data['form']);
 
 if ($data['actionid']) {
 	$actionForm->addVar('actionid', $data['actionid']);
@@ -489,14 +492,14 @@ if ($data['actionid']) {
 				_('Delete current action?'),
 				url_param('form').url_param('eventsource').url_param('actionid')
 			),
-			new CButtonCancel(url_param('actiontype'))
+			new CButtonCancel(url_param('actiontype').url_param('eventsource'))
 		]
 	];
 }
 else {
 	$form_buttons = [
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('actiontype'))]
+		[new CButtonCancel(url_param('actiontype').url_param('eventsource'))]
 	];
 }
 

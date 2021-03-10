@@ -1093,7 +1093,18 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 						'poc_2_screen' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_2_notes' =>			['type' => XML_STRING, 'default' => '']
 					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE]
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
+					'valuemaps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'valuemap', 'rules' => [
+						'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
+								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
+									'value' =>					['type' => XML_STRING | XML_REQUIRED],
+									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]]
+						]]
+					]]
 				]]
 			]],
 			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
@@ -1707,7 +1718,18 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							]]
 						]]
 					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE]
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
+					'valuemaps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'valuemap', 'rules' => [
+						'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
+								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
+									'value' =>					['type' => XML_STRING | XML_REQUIRED],
+									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]]
+						]]
+					]]
 				]]
 			]],
 			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
@@ -1981,17 +2003,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'operation_mode' =>			['type' => XML_STRING | XML_REQUIRED, 'in' => $this->OPERATION_MODE],
 							'subject' =>				['type' => XML_STRING, 'default' => ''],
 							'message' =>				['type' => XML_STRING, 'default' => '']
-						]]
-					]]
-				]]
-			]],
-			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
-				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'mappings' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
-						'mapping' =>				['type' => XML_ARRAY, 'rules' => [
-							'value' =>					['type' => XML_STRING, 'default' => ''],
-							'newvalue' =>				['type' => XML_STRING, 'default' => '']
 						]]
 					]]
 				]]

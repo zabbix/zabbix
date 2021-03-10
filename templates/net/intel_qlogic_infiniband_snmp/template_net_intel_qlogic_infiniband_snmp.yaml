@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:33Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -318,64 +318,64 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN_STATUS}'
           value: '2'
-  value_maps:
-    -
-      name: 'ICS-CHASSIS-MIB::icsChassisFanOperStatus'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: online
+          name: 'ICS-CHASSIS-MIB::icsChassisFanOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: online
+            -
+              value: '2'
+              newvalue: operational
+            -
+              value: '3'
+              newvalue: failed
+            -
+              value: '4'
+              newvalue: offline
         -
-          value: '2'
-          newvalue: operational
+          name: 'ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: disabled
+            -
+              value: '3'
+              newvalue: failed
+            -
+              value: '4'
+              newvalue: warning
+            -
+              value: '5'
+              newvalue: standby
+            -
+              value: '6'
+              newvalue: engaged
+            -
+              value: '7'
+              newvalue: redundant
+            -
+              value: '8'
+              newvalue: notPresent
         -
-          value: '3'
-          newvalue: failed
-        -
-          value: '4'
-          newvalue: offline
-    -
-      name: 'ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: unknown
-        -
-          value: '2'
-          newvalue: disabled
-        -
-          value: '3'
-          newvalue: failed
-        -
-          value: '4'
-          newvalue: warning
-        -
-          value: '5'
-          newvalue: standby
-        -
-          value: '6'
-          newvalue: engaged
-        -
-          value: '7'
-          newvalue: redundant
-        -
-          value: '8'
-          newvalue: notPresent
-    -
-      name: 'ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: invalid
-        -
-          value: '2'
-          newvalue: bad
-        -
-          value: '3'
-          newvalue: warning
-        -
-          value: '4'
-          newvalue: good
-        -
-          value: '5'
-          newvalue: disabled
+          name: 'ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: invalid
+            -
+              value: '2'
+              newvalue: bad
+            -
+              value: '3'
+              newvalue: warning
+            -
+              value: '4'
+              newvalue: good
+            -
+              value: '5'
+              newvalue: disabled

@@ -348,7 +348,6 @@ typedef struct
 {
 	char		*extension;
 	unsigned char	history_compression_status;
-	unsigned char	history_compression_availability;
 	int		history_compress_older;
 }
 zbx_config_db_t;
@@ -1005,5 +1004,7 @@ int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);
 
 void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
+
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 
 #endif
