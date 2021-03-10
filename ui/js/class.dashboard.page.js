@@ -499,6 +499,7 @@ class CDashboardPage {
 
 		const dashboard_busy_item = {};
 
+		this._data.new_widget_placeholder.hide();
 		this._setDashboardBusy('pasteWidget', dashboard_busy_item);
 
 		// Remove old widget.
@@ -709,19 +710,15 @@ class CDashboardPage {
 	 *
 	 * @param {object} widget     Data origin widget
 	 * @param {string} data_name  String to identify data shared
+	 * @param {object} data       Shared data
 	 *
 	 * @returns {boolean}  Indicates either there was linked widget that was related to data origin widget
 	 */
-	widgetDataShare(widget, data_name) {
-		const args = Array.prototype.slice.call(arguments, 2);
+	widgetDataShare(widget, data_name, data) {
 		const uniqueid = widget.uniqueid;
 
 		let ret = true;
 		let index = -1;
-
-		if (!args.length) {
-			return false;
-		}
 
 		if (typeof this._data.widget_relations.relations[widget.uniqueid] === 'undefined'
 			|| this._data.widget_relations.relations[widget.uniqueid].length === 0) {
@@ -742,13 +739,13 @@ class CDashboardPage {
 		if (index === -1) {
 			this._data.data_buffer[uniqueid].push({
 				data_name: data_name,
-				args: args,
+				data: data,
 				old: []
 			});
 		}
 		else {
-			if (this._data.data_buffer[uniqueid][index].args !== args) {
-				this._data.data_buffer[uniqueid][index].args = args;
+			if (this._data.data_buffer[uniqueid][index].data !== data) {
+				this._data.data_buffer[uniqueid][index].data = data;
 				this._data.data_buffer[uniqueid][index].old = [];
 			}
 		}
@@ -783,7 +780,7 @@ class CDashboardPage {
 					if (widget.length) {
 						for (const task of this._data.widget_relations.tasks[dest_uid]) {
 							if (task.data_name === buffer_data.data_name) {
-								task.callback.apply(this, [widget[0], buffer_data.args]);
+								task.callback.apply(this, [widget[0], buffer_data.data]);
 							}
 						}
 
@@ -2105,7 +2102,6 @@ class CDashboardPage {
 		return true;
 	}
 
-	// TODO move to widget.iterator
 	_updateIteratorCallback(iterator, response, options) {
 		const has_alt_content = typeof response.messages !== 'undefined' || typeof response.body !== 'undefined';
 
@@ -2140,10 +2136,10 @@ class CDashboardPage {
 
 		iterator.updatePager(response.page, response.page_count);
 
-		const current_children = iterator.children;
+		const current_children = iterator.getChildren();
 		const current_children_by_widgetid = {};
 
-		iterator.children = [];
+		iterator.setChildren([]);
 
 		for (const child of current_children) {
 			if (child.widgetid !== '') {
@@ -2207,7 +2203,7 @@ class CDashboardPage {
 			}
 		}
 
-		iterator._addPlaceholders(iterator.getNumColumns() * iterator.getNumRows() - iterator.children.length);
+		iterator._addPlaceholders(iterator.getNumColumns() * iterator.getNumRows() - iterator.getChildren().length);
 		if (this._options['kioskmode'] && iterator.getView().position().top === 0) {
 			this._slideKiosk();
 		}
@@ -2216,7 +2212,7 @@ class CDashboardPage {
 			this._updateWidgetContent(iterator);
 		}
 
-		for (const child of iterator.children) {
+		for (const child of iterator.getChildren()) {
 			/* Possible update policies for the child widgets:
 				resize: execute 'onResizeEnd' action (widget won't update if there's no trigger or size hasn't changed).
 					- Is used to propagate iterator's resize event.
@@ -2230,7 +2226,7 @@ class CDashboardPage {
 
 			let update_policy = 'refresh';
 
-			if (!reused_widgetids.includes(child.widgetid) && 'update_policy' in options) {
+			if (reused_widgetids.includes(child.widgetid) && 'update_policy' in options) {
 				// Allow to override update_policy only for existing (not new) widgets.
 				update_policy = options['update_policy'];
 			}
@@ -2268,7 +2264,7 @@ class CDashboardPage {
 				return true;
 			}
 
-			search_widgets = widget.parent.children;
+			search_widgets = widget.parent.getChildren();
 		}
 
 		const widgets_found = search_widgets.filter(function(w) {
@@ -3175,7 +3171,7 @@ class CDashboardPage {
 	 */
 	_removeWidget(widget) {
 		if (widget instanceof CDashboardWidgetIterator) {
-			for (const child of widget.children) {
+			for (const child of widget.getChildren()) {
 				this._doAction('onWidgetDelete', child);
 				this._removeWidgetActions(child);
 				child.getView().remove();

@@ -495,12 +495,41 @@ class CDashboardWidget extends CBaseComponent {
 				this.fire(WIDGET_EVENT_EDIT_CLICK);
 			},
 
+			focusin: () => {
+				// Skip mouse events caused by animations which were caused by focus change.
+				this._mousemove_waiting = true;
+
+				this.fire(WIDGET_EVENT_ENTER);
+			},
+
+			focusout: (e) => {
+				// Skip mouse events caused by animations which were caused by focus change.
+				this._mousemove_waiting = true;
+
+				if (!this.content_header.has(e.relatedTarget).length) {
+					this.fire(WIDGET_EVENT_LEAVE);
+				}
+			},
+
 			enter: () => {
+				delete this._mousemove_waiting;
+
 				this.fire(WIDGET_EVENT_ENTER);
 			},
 
 			leave: () => {
-				this.fire(WIDGET_EVENT_LEAVE);
+				if (!this._mousemove_waiting) {
+					this.fire(WIDGET_EVENT_LEAVE);
+				}
+			},
+
+			loadImage: () => {
+				// Call refreshCallback handler for expanded popup menu items.
+				const $menu_popup = this.div.find('[data-expanded="true"][data-menu-popup]');
+
+				if ($menu_popup.length) {
+					$menu_popup.menuPopup('refresh', this);
+				}
 			}
 		};
 
@@ -511,37 +540,13 @@ class CDashboardWidget extends CBaseComponent {
 		}
 
 		this.content_header
-			.on('focusin', this._events.enter)
-			.on('focusout', (e) => {
-				if (!this.content_header.has(e.relatedTarget).length) {
-					this._events.leave();
-				}
-			})
-			.on('focusin focusout', () => {
-				// Skip mouse events caused by animations which were caused by focus change.
-				this._mousemove_waiting = true;
-			});
+			.on('focusin', this._events.focusin)
+			.on('focusout', this._events.focusout);
 
 		this.div
-			// "Mouseenter" is required, since "mousemove" may not always bubble.
-			.on('mouseenter mousemove', () => {
-				this._events.enter();
-
-				delete this._mousemove_waiting;
-			})
-			.on('mouseleave', () => {
-				if (!this._mousemove_waiting) {
-					this._events.leave();
-				}
-			})
-			.on('load.image', () => {
-				// Call refreshCallback handler for expanded popup menu items.
-				const $menu_popup = this.div.find('[data-expanded="true"][data-menu-popup]');
-
-				if ($menu_popup.length) {
-					$menu_popup.menuPopup('refresh', this);
-				}
-			});
+			.on('mouseenter mousemove', this._events.enter)
+			.on('mouseleave', this._events.leave)
+			.on('load.image', this._events.loadImage);
 	}
 
 	_unregisterEvents() {
@@ -551,8 +556,13 @@ class CDashboardWidget extends CBaseComponent {
 			}
 		}
 
-		this.content_header.off('focusin focusout');
+		this.content_header
+			.off('focusin', this._events.focusin)
+			.off('focusout', this._events.focusout);
 
-		this.div.off('mouseenter mousemove mouseleave load.image');
+		this.div
+			.off('mouseenter mousemove', this._events.enter)
+			.off('mouseleave', this._events.leave)
+			.off('load.image', this._events.loadImage);
 	}
 }

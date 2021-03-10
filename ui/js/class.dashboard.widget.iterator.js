@@ -77,6 +77,16 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		return this;
 	}
 
+	getChildren() {
+		return this.children;
+	}
+
+	setChildren(children) {
+		this.children = children;
+
+		return this;
+	}
+
 	addChild(child) {
 		this.children.push(child);
 		this.content_body.append(child.getView());
