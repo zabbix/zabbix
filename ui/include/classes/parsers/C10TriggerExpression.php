@@ -310,7 +310,6 @@ class C10TriggerExpression {
 								$state = self::STATE_AFTER_CONSTANT;
 							}
 							else {
-								exit('fail');
 								break 3;
 							}
 					}
