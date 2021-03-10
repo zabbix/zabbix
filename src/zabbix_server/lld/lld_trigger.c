@@ -1408,7 +1408,9 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 			NULL == (recovery_expression = lld_eval_get_expanded_expression(&trigger_prototype->eval_ctx_r,
 					jp_row, lld_macros, err, sizeof(err))))
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s trigger: %s.\n", operation_msg, err);
+		*error = zbx_strdcatf(*error, "Cannot %s trigger: failed to expand LLD macros in%s expression: %s.\n",
+				operation_msg, (NULL == expression ? "" : " recovery"), err);
+		goto out;
 	}
 
 	discover = trigger_prototype->discover;
