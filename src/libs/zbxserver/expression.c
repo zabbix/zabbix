@@ -4879,8 +4879,8 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 
 		for (f = func_pos->start_index; f < func_pos->start_index + func_pos->count; f++)
 		{
-			if (FAIL != zbx_vector_uint64_bsearch(&itemids_sorted, functions[f].itemid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			if (SUCCEED == errcodes[f] && FAIL != zbx_vector_uint64_bsearch(&itemids_sorted,
+					functions[f].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 				func_pos->trigger->flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
 				break;
