@@ -977,7 +977,7 @@ static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vec
  ******************************************************************************/
 static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **expression, zbx_vector_ptr_t *functions)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, *expression);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, (NULL != expression ? *expression : ""));
 
 	if (SUCCEED == zbx_eval_status(ctx))
 	{
@@ -993,7 +993,7 @@ static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **express
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __func__, *expression);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __func__, (NULL != expression ? *expression : ""));
 }
 
 /******************************************************************************
