@@ -55,14 +55,17 @@ class testFormUserRoles extends CWebTest {
 						'*.*',
 						]
 					]
-				]
+				],
+			[
+				'name' => 'role_for_delete',
+				'type' => 1
 			]
-		);
+		]);
 	}
 
 	public static function getCreateData() {
 		return [
-			//same name for 3 types of roles
+			// same name for 3 types of roles
 			[
 				[
 					'expected' => TEST_BAD,
@@ -516,6 +519,7 @@ class testFormUserRoles extends CWebTest {
 		// Checking buttons for already created role.
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=1');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
 		foreach (['api_mode_0', 'api_mode_1'] as $id) {
@@ -524,13 +528,11 @@ class testFormUserRoles extends CWebTest {
 		$this->assertFalse($this->query('button:Select')->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
 		$this->page->refresh()->waitUntilReady();
-
-		// Enabled buttons
 		foreach (['Update', 'Clone', 'Delete', 'Cancel'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isClickable());
 		}
 
-		// Here is easy way, all checked with screen shots. For new role.
+		// New role check with screenshots.
 		$this->page->login()->open('zabbix.php?action=userrole.edit');
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach (['User', 'Admin', 'Super admin'] as $role) {
@@ -547,11 +549,9 @@ class testFormUserRoles extends CWebTest {
 		$this->assertScreenshotExcept($screenshot_area, [
 			['query' => 'xpath://input[@id="name"]']
 		]);
-		// Enabled buttons
 		foreach (['Clone', 'Cancel'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isClickable());
 		}
-		// Disabled buttons
 		foreach (['Update', 'Delete'] as $button) {
 			$this->assertFalse($this->query('button', $button)->one()->isClickable());
 		}
@@ -559,7 +559,7 @@ class testFormUserRoles extends CWebTest {
 
 	public static function getUpdateData() {
 		return [
-			//empty name
+			// empty name
 			[
 				[
 					'expected' => TEST_BAD,
@@ -687,15 +687,38 @@ class testFormUserRoles extends CWebTest {
 		$this->CreateUpdate($data, 'update');
 	}
 
-	public function testFormUserRoles_Delete() {
-
-	}
-
 	public function testFormUserRoles_Clone() {
-
+		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=2');
+		$this->query('button:Clone')->one()->click();
+		foreach (['Add', 'Cancel'] as $button) {
+			$this->assertTrue($this->query('button', $button)->one()->isClickable());
+		}
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$form->checkValue(['Name' => 'Admin role', 'User type' => 'Admin']);
+		$form->fill(['Name' => 'cloned']);
+		$this->query('button:Add')->one()->click();
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM role WHERE name=\'cloned\''));
 	}
 
-
+	public function testFormUserRoles_Delete() {
+		$hash_before = CDBHelper::getHash('SELECT * FROM role');
+		$this->page->login()->open('zabbix.php?action=userrole.list');
+		foreach (['Admin role', 'role_for_delete'] as $role) {
+			$this->query('link', $role)->one()->click();
+			$this->query('button:Delete')->one()->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			if ($role === 'Admin role') {
+				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'The role "Admin role" is assigned to'.
+						' at least one user and cannot be deleted.');
+				$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role'));
+			}
+			else {
+				$this->assertMessage(TEST_GOOD, 'User role deleted');
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM role WHERE name=\'role_for_delete\''));
+			}
+		}
+	}
 
 	// Fill multiselect field.
 	private function fillMultiselect($methods) {
@@ -703,6 +726,10 @@ class testFormUserRoles extends CWebTest {
 		$api_field->fill($methods);
 	}
 
+	/**
+	 * @param array $data		given data provider
+	 * @param string $action	create or update
+	 */
 	private function CreateUpdate($data, $action) {
 		if ($action === 'create') {
 			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -710,11 +737,11 @@ class testFormUserRoles extends CWebTest {
 			}
 		}
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-        $form->fill($data['fields']);
+		$form->fill($data['fields']);
 		if (array_key_exists('api_methods', $data)) {
 			$this->fillMultiselect($data['api_methods']);
 		}
-        $form->submit();
+		$form->submit();
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
 			if ($action === 'create') {
