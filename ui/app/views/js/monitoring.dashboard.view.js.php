@@ -70,24 +70,24 @@
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
 				window.addEventListener('popstate', events.popState);
 
-				document
-					.getElementById('dynamic_hostid')
-					.addEventListener('change', events.dynamicHostChange);
+				$('#dynamic_hostid').on('change', events.dynamicHostChange);
 			}
 
 			jqBlink.blink();
 
-			if (data.dashboardid === null) {
-				edit();
-				openProperties();
-			}
-			else {
-				document
-					.getElementById('dashbrd-edit')
-					.addEventListener('click', () => ZABBIX.Dashboard.editDashboard());
-			}
+			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
+				if (data.dashboardid === null) {
+					edit();
+					openProperties();
+				}
+				else {
+					document
+						.getElementById('dashbrd-edit')
+						.addEventListener('click', () => ZABBIX.Dashboard.editDashboard());
+				}
 
-			$.subscribe('dashboard.grid.editDashboard', () => edit());
+				$.subscribe('dashboard.grid.editDashboard', () => edit());
+			}
 		};
 
 		const edit = () => {

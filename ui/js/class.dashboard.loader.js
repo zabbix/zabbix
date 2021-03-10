@@ -20,4 +20,13 @@
 
 class CDashboardLoader {
 
+	constructor() {
+		this._cache = {};
+	}
+
+	getContent(key) {
+		if (this._cache[key] !== undefined) {
+
+		}
+	}
 }

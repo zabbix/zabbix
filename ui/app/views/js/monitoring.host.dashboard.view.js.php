@@ -65,7 +65,9 @@
 
 			jqBlink.blink();
 
-			document.getElementById('dashboardid').addEventListener('change', events.dashboardChange);
+			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
+				document.getElementById('dashboardid').addEventListener('change', events.dashboardChange);
+			}
 		};
 
 		const events = {

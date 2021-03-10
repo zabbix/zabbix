@@ -269,8 +269,8 @@ class CDashboard extends CBaseComponent {
 		return this._selected_page.registerDataExchange(obj);
 	}
 
-	widgetDataShare(widget, data_name) {
-		return this._selected_page.widgetDataShare(widget, data_name);
+	widgetDataShare(widget, data_name, data) {
+		return this._selected_page.widgetDataShare(widget, data_name, data);
 	}
 
 	callWidgetDataShare() {

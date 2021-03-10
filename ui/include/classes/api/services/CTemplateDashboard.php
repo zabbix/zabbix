@@ -250,7 +250,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'display_period' =>	['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
 			'auto_start' =>		['type' => API_INT32, 'in' => '0,1'],
-			'pages' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+			'pages' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DASHBOARD_MAX_PAGES, 'fields' => [
 				'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('dashboard_page', 'name')],
 				'display_period' =>	['type' => API_INT32, 'in' => implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))],
 				'widgets' =>		['type' => API_OBJECTS, 'fields' => [
@@ -290,7 +290,6 @@ class CTemplateDashboard extends CDashboardGeneral {
 		}
 
 		$this->checkDuplicates($dashboards);
-		$this->checkPages($dashboards);
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards);
 	}
@@ -307,7 +306,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'display_period' =>		['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
 			'auto_start' =>			['type' => API_INT32, 'in' => '0,1'],
-			'pages' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['dashboard_pageid']], 'fields' => [
+			'pages' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['dashboard_pageid']], 'length' => DASHBOARD_MAX_PAGES, 'fields' => [
 				'dashboard_pageid' =>	['type' => API_ID],
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('dashboard_page', 'name')],
 				'display_period' =>		['type' => API_INT32, 'in' => implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))],
@@ -363,7 +362,6 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$this->checkReferences($dashboards, $db_dashboards);
 
 		$this->checkDuplicates($dashboards, $db_dashboards);
-		$this->checkPages($dashboards);
 		$this->checkWidgets($dashboards, $db_dashboards);
 		$this->checkWidgetFields($dashboards, $db_dashboards);
 	}
@@ -377,24 +375,24 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 * @throws APIException if dashboard names are not unique.
 	 */
 	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
-		$names_by_template = [];
+		$names_by_templateid = [];
 
 		foreach ($dashboards as $dashboard) {
 			if ($db_dashboards === null || $dashboard['name'] !== $db_dashboards[$dashboard['dashboardid']]['name']) {
-				$names_by_template[$dashboard['templateid']][] = $dashboard['name'];
+				$names_by_templateid[$dashboard['templateid']][] = $dashboard['name'];
 			}
 		}
 
-		if (!$names_by_template) {
+		if (!$names_by_templateid) {
 			return;
 		}
 
 		$where = [];
-		foreach ($names_by_template as $templateid => $names) {
-			$where[] = '('.dbConditionId('templateid', [$templateid]).' AND '.dbConditionString('name', $names).')';
+		foreach ($names_by_templateid as $templateid => $names) {
+			$where[] = '('.dbConditionId('d.templateid', [$templateid]).' AND '.dbConditionString('d.name', $names).')';
 		}
 
-		$duplicate = DBfetch(DBselect('SELECT name FROM dashboard WHERE '.implode(' OR ', $where), 1));
+		$duplicate = DBfetch(DBselect('SELECT d.name FROM dashboard d WHERE '.implode(' OR ', $where), 1));
 
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Dashboard "%1$s" already exists.', $duplicate['name']));

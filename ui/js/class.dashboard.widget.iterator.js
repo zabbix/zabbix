@@ -47,6 +47,18 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		this._min_rows = config.min_rows;
 	}
 
+	activate() {
+		super.activate();
+
+		for (const child of this.children) {
+			child.activate();
+		}
+	}
+
+	getViewMode() {
+		return this.view_mode;
+	}
+
 	setViewMode(view_mode) {
 		if (this.view_mode !== view_mode) {
 			this.view_mode = view_mode;
@@ -65,22 +77,21 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		return this;
 	}
 
-	addWidget(child) {
-		child = new CDashboardWidget({
-			view_mode: this.view_mode,
-			...child,
-			cell_height: this._cell_height,
-			cell_width: this._cell_width,
-			parent: this,
-			is_editable: this._is_editable,
-			is_iterator: false,
-			is_new: false
-		});
+	getChildren() {
+		return this.children;
+	}
 
-		this.content_body.append(child.div);
+	setChildren(children) {
+		this.children = children;
+
+		return this;
+	}
+
+	addChild(child) {
 		this.children.push(child);
+		this.content_body.append(child.getView());
 
-		child.showPreloader();
+		return this;
 	}
 
 	/**
@@ -186,33 +197,121 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		return this;
 	}
 
+	_makeView() {
+		super._makeView();
+
+		this._addPlaceholders(this.getNumColumns() * this.getNumRows());
+		this.alignContents(this.pos);
+	}
+
+	_addPlaceholders(count) {
+		$('.dashbrd-grid-iterator-placeholder', this.content_body).remove();
+
+		for (let index = 0; index < count; index++) {
+			this.content_body.append(
+				$('<div>', {'class': 'dashbrd-grid-iterator-placeholder'})
+					.append('<div>').on('mouseenter', () => {
+						// Set single-line header for the iterator.
+						this.div.removeClass('iterator-double-header');
+					})
+			);
+		}
+	}
+
+	/**
+	 * @returns {boolean}  Returns true, if to small state.
+	 */
+	alignContents(pos) {
+		if (this.isTooSmall(pos)) {
+			this.setTooSmallState(true);
+
+			return false;
+		}
+
+		if (this.getTooSmallState() && this.update_pending) {
+			this.setTooSmallState(false);
+			this.showPreloader();
+
+			return true;
+		}
+
+		this.setTooSmallState(false);
+
+		const $placeholders = this.content_body.find('.dashbrd-grid-iterator-placeholder');
+		const num_columns = this.getNumColumns();
+		const num_rows = this.getNumRows();
+
+		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
+			const cell_column = index % num_columns;
+			const cell_row = Math.floor(index / num_columns);
+			const cell_width_min = Math.floor(pos.width / num_columns);
+			const cell_height_min = Math.floor(pos.height / num_rows);
+
+			const num_enlarged_columns = pos.width - cell_width_min * num_columns;
+			const num_enlarged_rows = pos.height - cell_height_min * num_rows;
+
+			const x = cell_column * cell_width_min + Math.min(cell_column, num_enlarged_columns);
+			const y = cell_row * cell_height_min + Math.min(cell_row, num_enlarged_rows);
+			const width = cell_width_min + (cell_column < num_enlarged_columns ? 1 : 0);
+			const height = cell_height_min + (cell_row < num_enlarged_rows ? 1 : 0);
+
+			let css = {
+				left: `${x / pos.width * 100}%`,
+				top: `${y * this._cell_height}px`,
+				width: `${width / pos.width * 100}%`,
+				height: `${height * this._cell_height}px`
+			};
+
+			if (cell_column === (num_columns - 1)) {
+				// Setting right side for last column of widgets (fixes IE11 and Opera issues).
+				css = {
+					...css,
+					'width': 'auto',
+					'right': '0px'
+				};
+			}
+			else {
+				css = {
+					...css,
+					'width': `${Math.round(width / pos.width * 100 * 100) / 100}%`,
+					'right': 'auto'
+				};
+			}
+
+			if (index < this.children.length) {
+				this.children[index].div.css(css);
+			}
+			else {
+				$placeholders.eq(index - this.children.length).css(css);
+			}
+		}
+
+		return false;
+	}
+
 	_registerEvents() {
 		super._registerEvents();
 
 		this._events = {
 			...this._events,
 
-			iteratorPreviousPage: () => {
+			previousPage: () => {
 				this.fire(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK);
 			},
 
-			iteratorNextPage: () => {
+			nextPage: () => {
 				this.fire(WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK);
 			}
 		}
 
-		if (!this.parent) {
-			this.$button_iterator_previous_page.on('click', this._events.iteratorPreviousPage);
-			this.$button_iterator_next_page.on('click', this._events.iteratorNextPage);
-		}
+		this.$button_previous_page.on('click', this._events.previousPage);
+		this.$button_next_page.on('click', this._events.nextPage);
 	}
 
 	_unregisterEvents() {
 		super._unregisterEvents();
 
-		if (!this.parent) {
-			this.$button_iterator_previous_page.off('click', this._events.iteratorPreviousPage);
-			this.$button_iterator_next_page.off('click', this._events.iteratorNextPage);
-		}
+		this.$button_previous_page.off('click', this._events.previousPage);
+		this.$button_next_page.off('click', this._events.nextPage);
 	}
 }
