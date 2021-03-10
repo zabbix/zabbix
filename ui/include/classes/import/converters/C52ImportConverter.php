@@ -27,12 +27,12 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Converter used to convert trigger expressions from 5.2 to 5.4 syntax.
 	 *
-	 * @var C30TriggerConverter
+	 * @var C52TriggerConverter
 	 */
 	protected $trigger_expression_converter;
 
 	public function __construct() {
-		$this->trigger_expression_converter = new C30TriggerConverter();
+		$this->trigger_expression_converter = new C52TriggerConverter();
 	}
 
 	/**

@@ -22,7 +22,7 @@
 /**
  * A converter to convert trigger expression syntax from 5.2 to 5.4.
  */
-class C30TriggerConverter extends CConverter {
+class C52TriggerConverter extends CConverter {
 
 	protected $parser;
 
