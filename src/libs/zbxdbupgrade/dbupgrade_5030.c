@@ -976,15 +976,19 @@ static void	DBpatch_get_min_widget_size(zbx_db_screen_item_t *item, int *w, int 
 			break;
 		case SCREEN_RESOURCE_PLAIN_TEXT:
 		case SCREEN_RESOURCE_URL:
-		case SCREEN_RESOURCE_HOST_INFO:
 		case SCREEN_RESOURCE_TRIGGER_INFO:
-		case SCREEN_RESOURCE_SERVER_INFO:
 		case SCREEN_RESOURCE_ACTIONS:
 		case SCREEN_RESOURCE_EVENTS:
 		case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-		case SCREEN_RESOURCE_SYSTEM_STATUS:
 		case SCREEN_RESOURCE_HOST_TRIGGERS:
 			*w = 4; *h = 2;
+			break;
+		case SCREEN_RESOURCE_HOST_INFO:
+			*w = 4; *h = 3;
+			break;
+		case SCREEN_RESOURCE_SERVER_INFO:
+		case SCREEN_RESOURCE_SYSTEM_STATUS:
+			*w = 4; *h = 4;
 			break;
 		case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
 			*w = 4; *h = 7;
@@ -2107,15 +2111,19 @@ static int	DBpatch_delay_routine(const char *screen_delay, int *dashboard_delay)
 static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay, uint64_t userid, int private)
 {
 	int			ret;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_db_dashboard_t	dashboard;
 	DB_RESULT		result;
 	DB_ROW			row;
 
-	result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select slideid,screenid,step,delay"
-				" from slides"
-				" where slideshowid=" ZBX_FS_UI64
-				" order by step asc limit 50", slideshowid);
+			" from slides"
+			" where slideshowid=" ZBX_FS_UI64
+			" order by step asc", slideshowid);
+
+	result = DBselectN(sql, 50);
 
 	if (NULL == result)
 		return FAIL;
