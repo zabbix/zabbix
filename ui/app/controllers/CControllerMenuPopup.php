@@ -714,6 +714,7 @@ class CControllerMenuPopup extends CController {
 			foreach (array_values($scripts) as $script) {
 				$menu_data['scripts'][] = [
 					'name' => $script['name'],
+					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				];
