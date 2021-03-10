@@ -94,6 +94,19 @@ class testJSONRPC extends CAPITest {
 					'id' => null
 				]
 			],
+			// rpc call with invalid version "jsonrpc"
+			[
+				'request' => '{"jsonrpc": "1.0"}',
+				'result' => [
+					'jsonrpc' => '2.0',
+					'error' => [
+						'code' => -32600,
+						'message' => 'Invalid Request.',
+						'data' => 'Invalid parameter "/jsonrpc": value must be one of 2.0.'
+					],
+					'id' => null
+				]
+			],
 			// rpc call with invalid "method"
 			[
 				'request' => '{"jsonrpc": "2.0", "method": 1}',
@@ -192,6 +205,19 @@ class testJSONRPC extends CAPITest {
 						],
 						'id' => null
 					]
+				]
+			],
+			// rpc call with empty "method"
+			[
+				'request' => '{"jsonrpc": "2.0", "method": "", "id": null}',
+				'result' => [
+					'jsonrpc' => '2.0',
+					'error' => [
+						'code' => -32601,
+						'message' => 'Method not found.',
+						'data' => 'Incorrect API "".'
+					],
+					'id' => null
 				]
 			],
 			// rpc call of non-existent API class
