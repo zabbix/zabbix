@@ -129,20 +129,20 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				'forecast(/Trapper/trap[2],10,100s) > 0 and  forecast(/Trapper/trap[2],3600s:now-7200s,600s,"linear","avg") > 0 and  forecast(/Trapper/trap[2],30m:now-1d,600s,,"avg") > 0'
 			],
 			[
-				'{Trapper:trap[2].timeleft(#10,,100)} > 0 and  {Trapper:trap[2].timeleft(3600,7200,600,linear)} > 0 and  {Trapper:trap[2].timeleft(30m,1d,600)} > 0',
-				'timeleft(/Trapper/trap[2],10,100) > 0 and  timeleft(/Trapper/trap[2],3600s:now-7200s,600,"linear") > 0 and  timeleft(/Trapper/trap[2],30m:now-1d,600) > 0'
+				'{Trapper:trap[2].timeleft(#10,,100)} > 0 and  {Trapper:trap[2].timeleft(3600,7200,600,linear)} > 0 and {Trapper:trap[2].timeleft(30m,1d,600)} > 0',
+				'timeleft(/Trapper/trap[2],10,100) > 0 and  timeleft(/Trapper/trap[2],3600s:now-7200s,600,"linear") > 0 and timeleft(/Trapper/trap[2],30m:now-1d,600) > 0'
 			],
 			[
 				'{Trapper:trap[3].count(#1, 0, eq)} > 0 and {Trapper:trap[3].count(5m, "xyz", regexp, 2h)} > 0 and {Trapper:trap[2].count(5m, 10, iregexp, 1h)} > 0 and {Trapper:trap[1].count(5m, 100, gt, 2d)} > 0 and {Trapper:trap[1].count(1m, 32, band)} > 0 and {Trapper:trap[1].count(1m, 32/8, band)} > 0 and {Trapper:trap[1].count(1m)} > 0',
 				'count(/Trapper/trap[3],1,"eq","0") > 0 and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0 and count(/Trapper/trap[2],5m:now-1h,"iregexp","10") > 0 and count(/Trapper/trap[1],5m:now-2d,"gt",100) > 0 and count(/Trapper/trap[1],1m,"band",32) > 0 and count(/Trapper/trap[1],1m,"band","32/8") > 0 and count(/Trapper/trap[1],1m) > 0'
 			],
 			[
-				'{Trapper:trap[3].iregexp("^error", #10)} > 0 and {Trapper:trap[3].iregexp("^critical", 60)} > 0 and  {Trapper:trap[3].iregexp("^warning", 5m)} > 0',
-				'find(/Trapper/trap[3],10,"iregexp","^error") > 0 and find(/Trapper/trap[3],60s,"iregexp","^critical") > 0 and  find(/Trapper/trap[3],5m,"iregexp","^warning") > 0'
+				'{Trapper:trap[3].iregexp("^error", #10)} > 0 and {Trapper:trap[3].iregexp("^critical", 60)} > 0 and {Trapper:trap[3].iregexp("^warning", 5m)} > 0',
+				'find(/Trapper/trap[3],10,"iregexp","^error") > 0 and find(/Trapper/trap[3],60s,"iregexp","^critical") > 0 and find(/Trapper/trap[3],5m,"iregexp","^warning") > 0'
 			],
 			[
-				'{Trapper:trap[3].last()} > 0 and {Trapper:trap[3].last(#5)} > 0 and  {Trapper:trap[3].last(#10,3600)} > 0 and  {Trapper:trap[3].last(#1,1d)} > 0',
-				'last(/Trapper/trap[3]) > 0 and last(/Trapper/trap[3],5) > 0 and  last(/Trapper/trap[3],10:now-3600s) > 0 and  last(/Trapper/trap[3],1:now-1d) > 0'
+				'{Trapper:trap[3].last()} > 0 and {Trapper:trap[3].last(#5)} > 0 and  {Trapper:trap[3].last(#10,3600)} > 0 and {Trapper:trap[3].last(#1,1d)} > 0',
+				'last(/Trapper/trap[3]) > 0 and last(/Trapper/trap[3],5) > 0 and  last(/Trapper/trap[3],10:now-3600s) > 0 and last(/Trapper/trap[3],1:now-1d) > 0'
 			],
 			[
 				'{Trapper:trap[3].prev()} > 0',
@@ -153,7 +153,7 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				'find(/Trapper/trap[3],10,"regexp","^error") > 0 and find(/Trapper/trap[3],60s,"regexp","^critical") > 0 and  find(/Trapper/trap[3],5m,"regexp","^warning") > 0'
 			],
 			[
-				'{Trapper:trap[3].count(   #1,  0, eq)} > 0 and {Trapper:trap[3].count( 5m,  "xyz"   ,    regexp,     2h)} > 0',
+				'{Trapper:trap[3].count( #1,0, eq)} > 0 and {Trapper:trap[3].count(5m, "xyz" , regexp, 2h)} > 0',
 				'count(/Trapper/trap[3],1,"0","eq") > 0 and count(/Trapper/trap[3],5m:now-2h,"xyz","regexp") > 0'
 			],
 			[
