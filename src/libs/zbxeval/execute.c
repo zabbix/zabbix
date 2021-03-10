@@ -28,6 +28,35 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: variant_convert_suffixed_num                                     *
+ *                                                                            *
+ * Purpose: convert variant string value containing suffixed number to        *
+ *          floating point variant value                                      *
+ *                                                                            *
+ * Parameters: value     - [OUT] the output value                             *
+ *             value_num - [IN] the value to convert                          *
+ *                                                                            *
+ * Return value: SUCCEED - the value was converted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
+{
+	char	suffix;
+
+	if (ZBX_VARIANT_STR != value_num->type)
+		return FAIL;
+
+	if (SUCCEED != eval_suffixed_number_parse(value_num->data.str, &suffix))
+		return FAIL;
+
+	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(suffix));
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_execute_op_unary                                            *
  *                                                                            *
  * Purpose: evaluate unary operator                                           *
@@ -139,6 +168,39 @@ static int	eval_execute_op_logic_err(const zbx_eval_token_t *token, const zbx_va
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_variant_compare                                             *
+ *                                                                            *
+ * Purpose: compare two variant values supporting suffixed numbers            *
+ *                                                                            *
+ * Return value: <0 - the first value is less than the second                 *
+ *               >0 - the first value is greater than the second              *
+ *               0  - the values are equal                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_variant_compare(const zbx_variant_t *left, const zbx_variant_t *right)
+{
+	zbx_variant_t	val_l, val_r;
+	int		ret;
+
+	zbx_variant_set_none(&val_l);
+	zbx_variant_set_none(&val_r);
+
+	if (SUCCEED == variant_convert_suffixed_num(&val_l, left))
+		left = &val_l;
+
+	if (SUCCEED == variant_convert_suffixed_num(&val_r, right))
+		right = &val_r;
+
+	ret = (double)zbx_variant_compare(left, right);
+
+	zbx_variant_clear(&val_l);
+	zbx_variant_clear(&val_r);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_execute_op_binary                                           *
  *                                                                            *
  * Purpose: evaluate binary operator                                          *
@@ -203,10 +265,10 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 	switch (token->type)
 	{
 		case ZBX_EVAL_TOKEN_OP_EQ:
-			value = (0 == zbx_variant_compare(left, right) ? 1 : 0);
+			value = (0 == eval_variant_compare(left, right) ? 1 : 0);
 			goto finish;
 		case ZBX_EVAL_TOKEN_OP_NE:
-			value = (0 == zbx_variant_compare(left, right) ? 0 : 1);
+			value = (0 == eval_variant_compare(left, right) ? 0 : 1);
 			goto finish;
 	}
 
@@ -323,35 +385,6 @@ int	 eval_suffixed_number_parse(const char *value, char *suffix)
 
 	if (NULL != suffix)
 		*suffix = value[len - 1];
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: variant_convert_suffixed_num                                     *
- *                                                                            *
- * Purpose: convert variant string value containing suffixed number to        *
- *          floating point variant value                                      *
- *                                                                            *
- * Parameters: value     - [OUT] the output value                             *
- *             value_num - [IN] the value to convert                          *
- *                                                                            *
- * Return value: SUCCEED - the value was converted successfully               *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
-{
-	char	suffix;
-
-	if (ZBX_VARIANT_STR != value_num->type)
-		return FAIL;
-
-	if (SUCCEED != eval_suffixed_number_parse(value_num->data.str, &suffix))
-		return FAIL;
-
-	zbx_variant_set_dbl(value, atof(value_num->data.str) * suffix2factor(suffix));
 
 	return SUCCEED;
 }
@@ -584,6 +617,15 @@ static int	eval_validate_function_args(const zbx_eval_context_t *ctx, const zbx_
 static int	eval_convert_function_arg(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		unsigned char type, zbx_variant_t *arg, char **error)
 {
+	zbx_variant_t	value;
+
+	if (ZBX_VARIANT_DBL == type && SUCCEED == variant_convert_suffixed_num(&value, arg))
+	{
+		zbx_variant_clear(arg);
+		*arg = value;
+		return SUCCEED;
+	}
+
 	if (SUCCEED == zbx_variant_convert(arg, type))
 		return SUCCEED;
 
