@@ -38,6 +38,10 @@ class C44ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = $this->convertSnmpFieldsToInterfaces($data['zabbix_export']['hosts']);
 		}
 
+		if (array_key_exists('screens', $data['zabbix_export'])) {
+			unset($data['zabbix_export']['screens']);
+		}
+
 		$data['zabbix_export'] = $this->sanitizeSnmpFields($data['zabbix_export']);
 
 		return $data;
