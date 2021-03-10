@@ -33,10 +33,14 @@ import (
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxnet"
 )
 
-var confDefault string
+var (
+	confDefault     string
+	applicationName string
+)
 
 type handler struct {
 	allowedPeers *zbxnet.AllowedPeers
@@ -44,24 +48,35 @@ type handler struct {
 
 func main() {
 	var confFlag string
-
 	var helpFlag bool
+	var versionFlag bool
+
+	version.Init(applicationName)
 
 	const (
-		confDescription = "Path to the configuration file"
-		helpDefault     = false
-		helpDescription = "Display this help message"
+		confDescription    = "Path to the configuration file"
+		helpDefault        = false
+		helpDescription    = "Display this help message"
+		versionDefault     = false
+		versionDescription = "Print program version and exit"
 	)
 
 	flag.StringVar(&confFlag, "config", confDefault, confDescription)
 	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorthand)")
 	flag.BoolVar(&helpFlag, "help", helpDefault, helpDescription)
 	flag.BoolVar(&helpFlag, "h", helpDefault, helpDescription+" (shorthand)")
+	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
+	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
 
 	flag.Parse()
 
 	if helpFlag {
 		flag.Usage()
+		os.Exit(0)
+	}
+
+	if versionFlag {
+		version.Display()
 		os.Exit(0)
 	}
 

@@ -77,10 +77,10 @@ CGO_LDFLAGS += $(LDFLAGS)
 
 PKG=zabbix.com/pkg/version
 
-GOLDFLAGS = -X $(PKG).titleMessage=zabbix_agent2
-GOLDFLAGS += -X $(PKG).compileOs=windows
+GOLDFLAGS = -X $(PKG).compileOs=windows
 GOLDFLAGS += -X $(PKG).compileArch=$(GOARCH)
 GOLDFLAGS += -X main.confDefault=zabbix_agent2.win.conf
+GOLDFLAGS += -X main.applicationName=zabbix_agent2
 
 all: $(TARGETBIN)
 

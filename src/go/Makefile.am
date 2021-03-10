@@ -1,20 +1,24 @@
 ## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = .	
-	
+EXTRA_DIST = .
+
 BUILD_TIME=`date +%H:%M:%S`
 BUILD_DATE=`date +"%b %_d %Y"`
 GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
 PKG=zabbix.com/pkg/version
 
-GOLDFLAGS = -X ${PKG}.titleMessage=zabbix_agent2
-GOLDFLAGS += -X '${PKG}.compileDate=${BUILD_DATE}'
+GOLDFLAGS = -X '${PKG}.compileDate=${BUILD_DATE}'
 GOLDFLAGS += -X ${PKG}.compileTime=${BUILD_TIME}
 GOLDFLAGS += -X ${PKG}.compileOs=${GOOS}
 GOLDFLAGS += -X ${PKG}.compileArch=${GOARCH}
-# GOLDFLAGS += -X ${PKG}.compileMode=daemon
-GOLDFLAGS += -X main.confDefault=${AGENT2_CONFIG_FILE}
+
+AGENT_GOLDFLAGS = ${GOLDFLAGS}
+AGENT_GOLDFLAGS += -X main.confDefault=${AGENT2_CONFIG_FILE}
+AGENT_GOLDFLAGS += -X main.applicationName=zabbix_agent2
+
+WEBSERVICE_GOLDFLAGS = ${GOLDFLAGS}
+WEBSERVICE_GOLDFLAGS += -X main.applicationName=zabbix_web_service
 
 dist_sysconf_DATA =
 TARGETS =
@@ -36,10 +40,10 @@ endif
 all: build
 
 zabbix.com/cmd/zabbix_agent2:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}" -o bin zabbix.com/cmd/zabbix_agent2
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${AGENT_GOLDFLAGS}" -o bin zabbix.com/cmd/zabbix_agent2
 
 zabbix.com/cmd/zabbix_web_service:
-	go build -o bin zabbix.com/cmd/zabbix_web_service
+	go build -ldflags="${WEBSERVICE_GOLDFLAGS}" -o bin zabbix.com/cmd/zabbix_web_service
 
 build: ${TARGETS}
 
@@ -49,7 +53,7 @@ clean:
 
 install-zabbix.com/cmd/zabbix_agent2:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
-		go install -ldflags="${GOLDFLAGS}" ${TARGETS}
+		go install -ldflags="${AGENT_GOLDFLAGS}" ${TARGETS}
 
 install-zabbix.com/cmd/zabbix_web_service:
 	GOBIN=${GOBIN} 	go install zabbix.com/cmd/zabbix_web_service
