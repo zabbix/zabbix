@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:15Z</date>
+   <date>2021-03-10T09:31:15Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -18,7 +18,7 @@ ENTITY-SENSORS-MIB&#13;
 ENTITY-STATE-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -121,6 +121,7 @@ Template tooling version used: 0.36</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Fan Discovery</name>
@@ -176,7 +177,7 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </valuemap>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{count(#1,{$FAN.STATUS.CRIT},eq)}=1</expression>
                            <name>{#SENSOR_INFO}: Fan is in critical state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
@@ -185,6 +186,17 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value).filter(function (item) {
+  return (typeof item['{#SNMPVALUE}'] !== 'undefined');
+});
+
+return JSON.stringify(data);</params>
+                  </step>
+               </preprocessing>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -222,7 +234,7 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </valuemap>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{count(#1,{$PSU.STATUS.CRIT},eq)}=1</expression>
                            <name>{#ENT_NAME}: Power supply is in critical state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
@@ -231,6 +243,7 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -264,7 +277,10 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      <history>2w</history>
                      <trends>0d</trends>
                      <description>MIB: ENTITY-SENSORS-MIB&#13;
-The operational status of the sensor {#SENSOR_INFO}</description>
+The operational status of the sensor {#SENSOR_INFO}. Possible value:&#13;
+- ok(1) indicates that the agent can obtain the sensor value.&#13;
+- unavailable(2) indicates that the agent presently cannot obtain the sensor value.&#13;
+- nonoperational(3) indicates that the agent believes the sensor is broken. The sensor could have a hard failure (disconnected wire), or a soft failure such as out-of-range, jittery, or wildly fluctuating readings.</description>
                      <applications>
                         <application>
                            <name>Temperature</name>
@@ -299,71 +315,78 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                           <expression>{avg(5m)}&lt;{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
-                           <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
+                           <recovery_expression>{min(5m)}&gt;{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}+3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+                     <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"{#SENSOR_INFO}"}&#13;
 or&#13;
-{Template Net Mellanox SNMP:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
+{Template Net Mellanox SNMP:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last()}={$TEMP.STATUS.WARN}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
-                     <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
+                     <recovery_expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"{#SENSOR_INFO}"}-3</recovery_expression>
+                     <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"{#SENSOR_INFO}"}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <dependencies>
                         <dependency>
-                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}</name>
+                           <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}</expression>
+                           <recovery_expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                </trigger_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value).filter(function (item) {
+  return (typeof item['{#SENSOR_PRECISION}'] !== 'undefined');
+});
+
+return JSON.stringify(data);</params>
+                  </step>
+               </preprocessing>
             </discovery_rule>
          </discovery_rules>
          <macros>
             <macro>
-               <macro>{$FAN_CRIT_STATUS}</macro>
+               <macro>{$FAN.STATUS.CRIT}</macro>
                <value>3</value>
             </macro>
             <macro>
-               <macro>{$PSU_CRIT_STATUS}</macro>
+               <macro>{$PSU.STATUS.CRIT}</macro>
                <value>2</value>
             </macro>
             <macro>
-               <macro>{$TEMP_CRIT_LOW}</macro>
-               <value>5</value>
-            </macro>
-            <macro>
-               <macro>{$TEMP_CRIT}</macro>
+               <macro>{$TEMP.MAX.CRIT}</macro>
                <value>60</value>
             </macro>
             <macro>
-               <macro>{$TEMP_WARN_STATUS}</macro>
-               <value>3</value>
+               <macro>{$TEMP.MIN.CRIT}</macro>
+               <value>5</value>
             </macro>
             <macro>
-               <macro>{$TEMP_WARN}</macro>
-               <value>50</value>
+               <macro>{$TEMP.STATUS.WARN}</macro>
+               <value>3</value>
             </macro>
          </macros>
       </template>
