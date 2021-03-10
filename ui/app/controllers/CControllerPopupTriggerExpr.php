@@ -518,6 +518,10 @@ class CControllerPopupTriggerExpr extends CController {
 						$param_type = PARAM_TYPE_TIME;
 					}
 
+					$params = array_map(function ($param) {
+						return $param['raw'];
+					}, $params);
+
 					/*
 					 * Try to find an operator and a value.
 					 * The value and operator can be extracted only if they immediately follow the function.
@@ -613,10 +617,6 @@ class CControllerPopupTriggerExpr extends CController {
 		elseif ($param_type === null) {
 			$param_type = PARAM_TYPE_TIME;
 		}
-
-		$params = array_map(function ($param) {
-			return $param['raw'];
-		}, $params);
 
 		$data = [
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', ''),
