@@ -841,6 +841,7 @@ static int	DBpatch_init_dashboard(zbx_db_dashboard_t *dashboard, char *name, uin
 
 	dashboard->userid = userid;
 	dashboard->private = private;
+	dashboard->display_period = 30;
 	ret = DBpatch_dashboard_name(name, &dashboard->name);
 
 	return ret;
@@ -2080,7 +2081,7 @@ static int	DBpatch_delay_routine(const char *screen_delay, int *dashboard_delay)
 	if (FAIL == is_time_suffix(screen_delay, &tmp, ZBX_LENGTH_UNLIMITED))
 		return FAIL;
 
-	imax = sizeof(delays)/sizeof(delays[0]);
+	imax = (int)ARRSIZE(delays);
 
 	if (0 >= tmp)
 	{
