@@ -30,9 +30,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 class testItemTest extends CWebTest {
 
 	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
-	const TEMPLATE_ID = 99137;	//'Test Item Template'
+	const TEMPLATE_ID = 99137;	// 'Test Item Template'
 
-	use MacrosTrait;
 	use PreprocessingTrait;
 
 	/**
@@ -98,7 +97,7 @@ class testItemTest extends CWebTest {
 			: $items.'.php?form=update&context=host&hostid='.$id.'&itemid=';
 
 		$this->page->login()->open($create_link);
-		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
 
 		// Create item.
 		$item_form->fill([
@@ -122,14 +121,12 @@ class testItemTest extends CWebTest {
 					$enabled = false;
 				}
 				else {
-					$enabled = (!in_array($type, ['Zabbix agent (active)', 'SNMP trap', 'Zabbix trapper','Dependent item']));
+					$enabled = (!in_array($type, ['Zabbix agent (active)', 'SNMP trap', 'Zabbix trapper', 'Dependent item']));
 				}
 
 				$this->checkTestButtonInPreprocessing($item_type, $enabled, $i);
-				/*
-				 * Check "Execute now" button only in host case item saved form
-				 * and then change type.
-				 */
+
+				// Check "Execute now" button only in host case item saved form and then change type.
 				if ($i === 0) {
 					if ($check_now) {
 						$execute_button = $this->query('id:check_now')->waitUntilVisible()->one();
@@ -677,7 +674,7 @@ class testItemTest extends CWebTest {
 		}
 
 		$this->page->login()->open($create_link);
-		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
 		$item_form->fill($data['fields']);
 
 		if ($is_host) {
@@ -753,6 +750,7 @@ class testItemTest extends CWebTest {
 				}
 				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN ".
 						"(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
+
 				// Check test item form fields depending on item type.
 				switch ($data['fields']['Type']) {
 					case 'Zabbix agent':
@@ -906,7 +904,7 @@ class testItemTest extends CWebTest {
 				else {
 					$details = ($data['fields']['Type'] === 'SNMP agent')
 						? 'Incorrect value for field "SNMP community": cannot be empty.'
-						: ['Incorrect value for field "Host address": cannot be empty.'];
+						: 'Incorrect value for field "Host address": cannot be empty.';
 				}
 
 				// Click Get value button.
@@ -964,6 +962,7 @@ class testItemTest extends CWebTest {
 				// Uncheck "Get value from host" checkbox.
 				if (CTestArrayHelper::get($data, 'host_value', true) === false) {
 					$get_host_value->uncheck();
+
 					// Check that interface and proxy fields disappeared.
 					foreach (['address', 'port', 'proxy'] as $field) {
 						$elements[$field]->waitUntilNotVisible();
@@ -978,10 +977,7 @@ class testItemTest extends CWebTest {
 						$this->assertFalse($not_supported->isChecked());
 					}
 
-					/*
-					 * Check that value fields still present after "Get value
-					 * from host" checkbox is unset.
-					 */
+					// Check that value fields still present after "Get value from host" checkbox is unset.
 					$this->checkValueFields($data, $not_supported, $lld);
 				}
 
@@ -1048,7 +1044,7 @@ class testItemTest extends CWebTest {
 	 * @param boolean			$lld			true if lld, false if item or prototype
 	 */
 	private function checkValueFields($data, $not_supported, $lld = false) {
-		$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->one()->waitUntilReady();
+		$test_form = $this->query('id:preprocessing-test-form')->waitUntilReady()->one();
 		$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
 		$checked = $get_host_value->isChecked();
 		$prev_enabled = false;
