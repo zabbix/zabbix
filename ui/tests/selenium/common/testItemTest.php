@@ -32,7 +32,6 @@ class testItemTest extends CWebTest {
 	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
 	const TEMPLATE_ID = 99137;	//'Test Item Template'
 
-	use MacrosTrait;
 	use PreprocessingTrait;
 
 	/**
