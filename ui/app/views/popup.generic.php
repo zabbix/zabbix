@@ -553,35 +553,6 @@ switch ($data['popup_type']) {
 		unset($graph);
 		break;
 
-	case 'screens':
-		foreach ($data['table_records'] as $screen) {
-			$checkbox_key = is_numeric($screen[$options['srcfld1']])
-				? $screen[$options['srcfld1']]
-				: zbx_jsValue($screen[$options['srcfld1']]);
-
-			$check_box = $data['multiselect']
-				? new CCheckBox('item['.$checkbox_key.']', $screen['screenid'])
-				: null;
-
-			$name = new CLink($screen['name'], 'javascript:void(0);');
-
-			if ($data['multiselect']) {
-				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-					zbx_jsvalue($screen['screenid']).');';
-			}
-			else {
-				$values = [
-					$options['dstfld1'] => $screen[$options['srcfld1']],
-					$options['dstfld2'] => $screen[$options['srcfld2']]
-				];
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.zbx_jsvalue($values).');';
-			}
-			$name->onClick($js_action.$js_action_onclick);
-
-			$table->addRow([$check_box, $name]);
-		}
-		break;
-
 	case 'scripts':
 		foreach ($data['table_records'] as $script) {
 			$description = new CLink($script['name'], 'javascript:void(0);');

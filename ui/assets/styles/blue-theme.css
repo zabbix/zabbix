@@ -3219,9 +3219,6 @@ button {
     .btn-link[disabled]:hover, .interface-container .interface-row .interface-cell [disabled].interface-btn-toggle:hover {
       background-color: transparent; }
 
-.btn-conf {
-  background: #0275b8 url("../img/icon-sprite.svg?20200407") no-repeat -7px -187px; }
-
 .btn-kiosk {
   background: #0275b8 url("../img/icon-sprite.svg?20200407") no-repeat -79px -259px; }
 
@@ -3525,7 +3522,7 @@ button {
     background-color: transparent;
     opacity: .25; }
 
-.btn-conf, .btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-cal, .icon-wzrd-action, .drag-icon {
+.btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
   height: auto;
   padding: 0; }

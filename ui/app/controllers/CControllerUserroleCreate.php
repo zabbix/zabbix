@@ -37,7 +37,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'ui_monitoring_hosts' => 'in 0,1',
 			'ui_monitoring_overview' => 'in 0,1',
 			'ui_monitoring_latest_data' => 'in 0,1',
-			'ui_monitoring_screens' => 'in 0,1',
 			'ui_monitoring_maps' => 'in 0,1',
 			'ui_monitoring_discovery' => 'in 0,1',
 			'ui_monitoring_services' => 'in 0,1',

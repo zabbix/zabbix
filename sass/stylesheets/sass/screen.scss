@@ -2058,7 +2058,6 @@ button {
 }
 
 $icon-btn: (
-	conf: $btn-bg-color url($sprite-path) no-repeat -7px -187px,
 	kiosk: $btn-bg-color url($sprite-path) no-repeat -79px -259px,
 	min: $btn-bg-color url($sprite-path) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url($sprite-path) no-repeat -7px -295px,
@@ -2068,7 +2067,6 @@ $icon-btn: (
 );
 
 // Dynamically generated classes:
-//  .btn-conf
 //  .btn-kiosk
 //  .btn-min
 //  .btn-add-fav

@@ -487,18 +487,6 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 
 				// it is a quick solution for slide refresh multiplier, should be replaced with slide.refresh or similar
 				if (options.multiplier) {
-					sendAjaxData('slides.php', {
-						data: jQuery.extend({}, params, {
-							widgetName: options.widgetName,
-							widgetRefreshRate: currentRate
-						}),
-						dataType: 'script',
-						success: function() {
-							// Set new refresh rate as current in slideshow controls.
-							trigger_elmnt.data('menu-popup').data.currentRate = currentRate;
-						}
-					});
-
 					jQuery('a', $obj.closest('.menu-popup')).each(function() {
 						var link = jQuery(this);
 
