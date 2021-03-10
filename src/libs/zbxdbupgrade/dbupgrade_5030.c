@@ -2124,6 +2124,7 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 			" order by step asc", slideshowid);
 
 	result = DBselectN(sql, 50);
+	zbx_free(sql);
 
 	if (NULL == result)
 		return FAIL;
