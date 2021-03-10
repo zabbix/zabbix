@@ -150,7 +150,7 @@ zabbix_export:
                 )
             ));
         
-            if (req.Status != 200 && !resp.ok) {
+            if (req.Status() != 200 && !resp.ok) {
                 throw 'message was created, but getting message link was failed with reason "' + resp.error + '"';
             }
         
@@ -192,7 +192,7 @@ zabbix_export:
         
                 var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status != 200 && !resp.ok) {
+                if (req.Status() != 200 && !resp.ok) {
                     throw resp.error;
                 }
         
@@ -214,7 +214,7 @@ zabbix_export:
                 ];
         
                 resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
-                if (req.Status != 200 && !resp.ok) {
+                if (req.Status() != 200 && !resp.ok) {
                     throw resp.error;
                 }
         
@@ -233,7 +233,7 @@ zabbix_export:
                 ];
         
                 resp = JSON.parse(req.Post(Slack.chatUpdate, JSON.stringify(fields)));
-                if (req.Status != 200 && !resp.ok) {
+                if (req.Status() != 200 && !resp.ok) {
                     throw resp.error;
                 }
             }
@@ -257,7 +257,7 @@ zabbix_export:
         
                 var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status != 200 && !resp.ok) {
+                if (req.Status() != 200 && !resp.ok) {
                     throw resp.error;
                 }
         
@@ -278,7 +278,7 @@ zabbix_export:
         
                 resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status != 200 && !resp.ok) {
+                if (req.Status() != 200 && !resp.ok) {
                     throw resp.error;
                 }
         
@@ -295,7 +295,7 @@ zabbix_export:
         
                 resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status != 200 && !resp.ok) {
+                if (req.Status() != 200 && !resp.ok) {
                     throw resp.error;
                 }
             }
