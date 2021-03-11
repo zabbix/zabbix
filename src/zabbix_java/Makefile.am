@@ -9,7 +9,7 @@ EXTRA_DIST = \
 	startup.sh
 
 ZJG = bin/zabbix-java-gateway-$(VERSION).jar
-LIB = lib/android-json-4.3_r3.1.jar:lib/logback-core-0.9.27.jar:lib/logback-classic-0.9.27.jar:lib/slf4j-api-1.6.1.jar
+LIB = lib/android-json-4.3_r3.1.jar:lib/logback-core-1.2.3.jar:lib/logback-classic-1.2.3.jar:lib/slf4j-api-1.7.30.jar
 JUNIT = tests/junit-4.8.2.jar
 
 ZJG_DEST = $(DESTDIR)$(sbindir)/zabbix_java
@@ -42,6 +42,8 @@ install: all
 	if test ! -f "$(ZJG_DEST)/lib/logback-console.xml"; then cp lib/logback-console.xml "$(ZJG_DEST)/lib"; fi
 
 clean:
+	rm -f tests/com/zabbix/gateway/jmx_test_beans/*.class
+	rm -f bin/*
 	rm -f $(ZJG)
 	rm -f tests/com/zabbix/gateway/jmx_test_beans/*.class
 	rm -f bin/*

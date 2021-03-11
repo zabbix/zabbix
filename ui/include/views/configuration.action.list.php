@@ -39,6 +39,8 @@ foreach ($submenu_source as $value => $label) {
 	$submenu[$url] = $label;
 }
 
+$current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['eventsource']);
+
 $widget = (new CWidget())
 	->setTitle(array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null)
 	->setTitleSubmenu([
@@ -56,7 +58,7 @@ $widget = (new CWidget())
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter((new CUrl('actionconf.php'))->setArgument('eventsource', $data['eventsource'])))
+	->addItem((new CFilter($current_url))
 		->addVar('eventsource', $data['eventsource'])
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
@@ -76,8 +78,12 @@ $widget = (new CWidget())
 		])
 	);
 
+$current_url->removeArgument('filter_rst');
+
 // create form
-$actionForm = (new CForm())->setName('actionForm');
+$actionForm = (new CForm())
+	->setName('actionForm')
+	->setAction($current_url->getUrl());
 
 // create table
 $actionTable = (new CTableInfo())
@@ -86,10 +92,10 @@ $actionTable = (new CTableInfo())
 			(new CCheckBox('all_items'))
 				->onClick("checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'actionconf.php'),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $current_url->getUrl()),
 		_('Conditions'),
 		_('Operations'),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], 'actionconf.php')
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $current_url->getUrl())
 	]);
 
 if ($this->data['actions']) {
@@ -134,7 +140,10 @@ if ($this->data['actions']) {
 
 		$actionTable->addRow([
 			new CCheckBox('g_actionid['.$action['actionid'].']', $action['actionid']),
-			new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
+			(new CLink($action['name'], $current_url
+				->setArgument('form', 'update')
+				->setArgument('actionid', $action['actionid'])
+			)),
 			$conditions,
 			$operations,
 			$status

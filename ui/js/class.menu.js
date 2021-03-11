@@ -80,9 +80,9 @@ class CMenu extends CBaseComponent {
 
 	focusSelected(till_level) {
 		if (this._selected_item !== null) {
-			if (this._selected_item.hasSubmenu()) {
+			if (this._selected_item.hasSubmenu() && this._level < till_level) {
 				this.expandSelected(till_level);
-				this._selected_item.getSubmenu().focusSelected();
+				this._selected_item.getSubmenu().focusSelected(till_level);
 			}
 			else {
 				this._selected_item.focus();
