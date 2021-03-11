@@ -22,12 +22,12 @@
 class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 
 	/**
-	 * @var C52TriggerConverter
+	 * @var C52TriggerExpressionConverter
 	 */
 	private $converter;
 
 	protected function setUp() {
-		$this->converter = new C52TriggerConverter();
+		$this->converter = new C52TriggerExpressionConverter();
 	}
 
 	protected function tearDown() {
@@ -191,7 +191,7 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' and {Trapper:trap[2].forecast(3600,7200,600,linear,avg)} > 0'.
 				' and {Trapper:trap[2].forecast(30m,1d,600,,avg)} > 0',
 
-				'forecast(/Trapper/trap[2],10,100s) > 0'.
+				'forecast(/Trapper/trap[2],#10,100s) > 0'.
 				' and forecast(/Trapper/trap[2],3600s:now-7200s,600s,"linear","avg") > 0'.
 				' and forecast(/Trapper/trap[2],30m:now-1d,600s,,"avg") > 0'
 			],
@@ -201,7 +201,7 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' and {Trapper:trap[2].timeleft(3600,7200,600,linear)} > 0'.
 				' and {Trapper:trap[2].timeleft(30m,1d,600)} > 0',
 
-				'timeleft(/Trapper/trap[2],10,100) > 0'.
+				'timeleft(/Trapper/trap[2],#10,100) > 0'.
 				' and timeleft(/Trapper/trap[2],3600s:now-7200s,600,"linear") > 0'.
 				' and timeleft(/Trapper/trap[2],30m:now-1d,600) > 0'
 			],
@@ -214,11 +214,11 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' and {Trapper:trap[1].count(1m, 32/8, band)} > 0'.
 				' and {Trapper:trap[1].count(1m)} > 0',
 
-				'count(/Trapper/trap[3],1,"eq","0") > 0'.
+				'count(/Trapper/trap[3],#1,"eq","0") > 0'.
 				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'.
 				' and count(/Trapper/trap[2],5m:now-1h,"iregexp","10") > 0'.
-				' and count(/Trapper/trap[1],5m:now-2d,"gt",100) > 0'.
-				' and count(/Trapper/trap[1],1m,"band",32) > 0'.
+				' and count(/Trapper/trap[1],5m:now-2d,"gt","100") > 0'.
+				' and count(/Trapper/trap[1],1m,"band","32") > 0'.
 				' and count(/Trapper/trap[1],1m,"band","32/8") > 0'.
 				' and count(/Trapper/trap[1],1m) > 0'
 			],
@@ -251,7 +251,7 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' and {Trapper:trap[3].regexp("^critical", 60)} > 0'.
 				' and {Trapper:trap[3].regexp("^warning", 5m)} > 0',
 
-				'find(/Trapper/trap[3],1#0,"regexp","^error") > 0'.
+				'find(/Trapper/trap[3],#10,"regexp","^error") > 0'.
 				' and find(/Trapper/trap[3],60s,"regexp","^critical") > 0'.
 				' and find(/Trapper/trap[3],5m,"regexp","^warning") > 0'
 			],
@@ -259,8 +259,8 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				'{Trapper:trap[3].count(#1,0,eq)} > 0'.
 				' and {Trapper:trap[3].count(5m,"xyz",regexp,2h)} > 0',
 
-				'count(/Trapper/trap[3],#1,"0","eq") > 0'.
-				' and count(/Trapper/trap[3],5m:now-2h,"xyz","regexp") > 0'
+				'count(/Trapper/trap[3],#1,"eq","0") > 0'.
+				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'
 			],
 			[
 				'{Trapper:trap[3].str("^error", #10)} > 0'.
@@ -309,15 +309,15 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				'{Trapper:trap[1].dayofweek()} > 0'.
 				' or {Trapper:trap[2].last()} > 0',
 
-				'(dayofweek() > 0)'.
-				' or last(/Trapper/trap[2])'
+				'dayofweek() > 0'.
+				' or last(/Trapper/trap[2]) > 0'
 			],
 			[
 				'{Trapper:trap[1].dayofweek()} > 0',
 				'(dayofweek() > 0) or (last(/Trapper/trap[1])<>last(/Trapper/trap[1]))'
 			],
 			[
-				'Trapper:trap[1].dayofweek()} > 0'.
+				'{Trapper:trap[1].dayofweek()} > 0'.
 				' and {Host:trap[1].last()} > 0',
 
 				'(dayofweek() > 0 and last(/Host/trap[1]) > 0)'.

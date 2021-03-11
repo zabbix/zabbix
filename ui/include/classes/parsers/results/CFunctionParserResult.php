@@ -165,6 +165,10 @@ class CFunctionParserResult extends CParserResult {
 	 * @return CQueryParserResult|null
 	 */
 	public function getFunctionTriggerQuery(): ?CQueryParserResult {
+		if (!$this->params_raw['parameters']) {
+			return null;
+		}
+
 		return ($this->params_raw['parameters'][0] instanceof CQueryParserResult)
 			? $this->params_raw['parameters'][0]
 			: null;
