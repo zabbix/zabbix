@@ -3920,38 +3920,51 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
  *               error occurred.                                              *
  *                                                                            *
  ******************************************************************************/
-time_t	zbx_get_report_nextcheck(time_t now, unsigned char cycle, unsigned char weekdays, int start_time,
+int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
 		const char *timezone)
 {
-	struct tm	tm;
+	struct tm	*tm;
+	time_t		yesterday = now - SEC_PER_DAY;
+	int		nextcheck, tm_hour, tm_min, tm_sec;
 
-	tm = *zbx_localtime(&now, timezone);
+	if (NULL == (tm = zbx_localtime(&yesterday, timezone)))
+		return -1;
 
-	switch (cycle)
+	tm_sec = start_time % 60;
+	start_time /= 60;
+	tm_min = start_time % 60;
+	start_time /= 60;
+	tm_hour = start_time;
+
+	do
 	{
-		case ZBX_REPORT_CYCLE_YEARLY:
-			zbx_tm_round_up(&tm, ZBX_TIME_UNIT_YEAR);
-			break;
-		case ZBX_REPORT_CYCLE_MONTHLY:
-			zbx_tm_round_up(&tm, ZBX_TIME_UNIT_MONTH);
-			break;
-		case ZBX_REPORT_CYCLE_WEEKLY:
-		case ZBX_REPORT_CYCLE_DAILY:
-			if (0 == weekdays)
-				return -1;
-			zbx_tm_round_up(&tm, ZBX_TIME_UNIT_DAY);
+		switch (cycle)
+		{
+			case ZBX_REPORT_CYCLE_YEARLY:
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR);
+				break;
+			case ZBX_REPORT_CYCLE_MONTHLY:
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH);
+				break;
+			case ZBX_REPORT_CYCLE_WEEKLY:
+			case ZBX_REPORT_CYCLE_DAILY:
+				if (0 == weekdays)
+					return -1;
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
 
-			while (0 == (weekdays & (1 << (tm.tm_wday + 6) % 7)))
-				zbx_tm_add(&tm, 1, ZBX_TIME_UNIT_DAY);
+				while (0 == (weekdays & (1 << (tm->tm_wday + 6) % 7)))
+					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
 
-			break;
+				break;
+		}
+
+		tm->tm_sec = tm_sec;
+		tm->tm_min = tm_min;
+		tm->tm_hour = tm_hour;
+
+		nextcheck = mktime(tm);
 	}
+	while (-1 != nextcheck && nextcheck <= now);
 
-	tm.tm_sec = start_time % 60;
-	start_time /= 60;
-	tm.tm_min = start_time % 60;
-	start_time /= 60;
-	tm.tm_hour = start_time;
-
-	return mktime(&tm);
+	return nextcheck;
 }
