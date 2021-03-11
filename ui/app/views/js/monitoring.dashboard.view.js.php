@@ -64,12 +64,7 @@
 				is_edit_mode: (dashboard.dashboardid === null),
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				web_layout_mode: web_layout_mode,
-				time_period: {
-					from: time_period.from,
-					from_ts: time_period.from_ts,
-					to: time_period.to,
-					to_ts: time_period.to_ts
-				},
+				time_period: time_period,
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null
 			});
 
