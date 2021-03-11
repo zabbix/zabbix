@@ -20,6 +20,7 @@ No specific Zabbix configuration is required.
 |{$FAN.STATUS.CRIT} |<p>-</p> |`3` |
 |{$PSU.STATUS.CRIT} |<p>-</p> |`2` |
 |{$TEMP.MAX.CRIT} |<p>-</p> |`60` |
+|{$TEMP.MAX.WARN} |<p>-</p> |`50` |
 |{$TEMP.MIN.CRIT} |<p>-</p> |`5` |
 |{$TEMP.STATUS.WARN} |<p>-</p> |`3` |
 
@@ -59,7 +60,7 @@ No specific Zabbix configuration is required.
 |{#SENSOR_INFO}: Fan is in critical state |<p>Please check the fan unit</p> |`{TEMPLATE_NAME:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN.STATUS.CRIT},eq)}=1` |AVERAGE | |
 |{#ENT_NAME}: Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {TEMPLATE_NAME:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#ENT_NAME}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[entStateOper.{#SNMPINDEX}].count(#1,{$PSU.STATUS.CRIT},eq)}=1` |AVERAGE | |
-|{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SENSOR_INFO}"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"{#SENSOR_INFO}"} or {Mellanox SNMP:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last()}={$TEMP.STATUS.WARN}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"{#SENSOR_INFO}"}-3` |WARNING |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}</p> |
+|{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"{#SENSOR_INFO}"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}>{$TEMP.MAX.WARN:"{#SENSOR_INFO}"} or {Mellanox SNMP:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last()}={$TEMP.STATUS.WARN}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}<{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}-3` |WARNING |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}</p> |
 |{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}<{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3` |HIGH | |
 |{#SENSOR_INFO}: Temperature is too low: <{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"} |<p>-</p> |`{TEMPLATE_NAME:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}<{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)}>{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}+3` |AVERAGE | |
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-10T09:31:15Z</date>
+   <date>2021-03-11T08:22:29Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -337,12 +337,12 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"{#SENSOR_INFO}"}&#13;
+                     <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}&#13;
 or&#13;
 {Template Net Mellanox SNMP:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last()}={$TEMP.STATUS.WARN}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"{#SENSOR_INFO}"}-3</recovery_expression>
-                     <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"{#SENSOR_INFO}"}</name>
+                     <recovery_expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}-3</recovery_expression>
+                     <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
@@ -379,6 +379,10 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$TEMP.MAX.CRIT}</macro>
                <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP.MAX.WARN}</macro>
+               <value>50</value>
             </macro>
             <macro>
                <macro>{$TEMP.MIN.CRIT}</macro>
