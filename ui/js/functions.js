@@ -909,9 +909,9 @@ function writeTextClipboard(text) {
 function urlEncodeData(parameters, prefix = '') {
 	const result = [];
 
-	Object.entries(parameters).forEach(([name, value]) => {
+	for (const [name, value] of Object.entries(parameters)) {
 		if (value === undefined) {
-			return;
+			continue;
 		}
 
 		if (value === null) {
@@ -926,7 +926,7 @@ function urlEncodeData(parameters, prefix = '') {
 		else {
 			result.push([encodeURIComponent(prefixed_name), encodeURIComponent(value)].join('='));
 		}
-	});
+	};
 
 	return result.join('&');
 }

@@ -667,11 +667,6 @@ footer {
     .dashbrd-edit ul li .btn-dashbrd-conf {
       vertical-align: middle; }
 
-.dashbrd-navigation {
-  display: flex;
-  margin-top: 10px;
-  padding-bottom: 4px; }
-
 .dashbrd-navigation-tabs {
   margin: -2px 10px -2px 0;
   overflow: hidden; }
@@ -726,14 +721,27 @@ footer {
       display: none;
       margin: 0; }
 
+.dashbrd-navigation {
+  display: flex;
+  margin-top: 10px;
+  padding-bottom: 4px; }
+  .dashbrd-navigation.is-scrollable .dashbrd-navigation-controls button.dashbrd-previous-page, .dashbrd-navigation.is-scrollable .dashbrd-navigation-controls button.dashbrd-next-page {
+    display: inline-block; }
+
 .dashbrd-grid-container {
   position: relative;
   margin: 0 -4px -4px -4px;
-  z-index: 3;
+  z-index: 3; }
+
+.dashbrd:not(.dashbrd-is-multipage):not(.dashbrd-is-edit-mode) .dashbrd-navigation {
+  display: none; }
+.dashbrd.dashbrd-is-edit-mode .dashbrd-toggle-slideshow, .dashbrd:not(.dashbrd-is-multipage) .dashbrd-toggle-slideshow {
+  display: none; }
+.dashbrd.dashbrd-is-multipage .dashbrd-grid-container {
   transition: margin-top .3s; }
-  .dashbrd-grid-container.reserve-header-lines-1 {
+  .dashbrd.dashbrd-is-multipage .dashbrd-grid-container.reserve-header-lines-1 {
     margin-top: 2rem; }
-  .dashbrd-grid-container.reserve-header-lines-2 {
+  .dashbrd.dashbrd-is-multipage .dashbrd-grid-container.reserve-header-lines-2 {
     margin-top: 4rem; }
 
 .dashbrd-grid-new-widget-placeholder {

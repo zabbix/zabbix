@@ -177,18 +177,4 @@ class CWidgetGraph extends CWidget {
 			height: Math.floor(content.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
 		};
 	}
-
-	_getActionsMenuRequestData() {
-		let data = super._getActionsMenuRequestData();
-
-		if (!this.isEditMode()) {
-			data = {
-				...data,
-				graphid: this._fields.graphid ?? undefined,
-				itemid: this._fields.itemid ?? undefined
-			};
-		}
-
-		return data;
-	}
 }

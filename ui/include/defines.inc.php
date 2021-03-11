@@ -1683,6 +1683,8 @@ define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
 define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBRD', 'dashbrd');
+define('ZBX_STYLE_DASHBRD_IS_MULTIPAGE', 'dashbrd-is-multipage');
+define('ZBX_STYLE_DASHBRD_IS_EDIT_MODE', 'dashbrd-is-edit-mode');
 define('ZBX_STYLE_DASHBRD_GRID', 'dashbrd-grid-container');
 define('ZBX_STYLE_DASHBRD_NAVIGATION', 'dashbrd-navigation');
 define('ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS', 'dashbrd-navigation-controls');

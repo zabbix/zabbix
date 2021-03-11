@@ -25,6 +25,7 @@ const DASHBOARD_PAGE_STATE_DESTROYED = 'destroyed';
 
 const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'announce-widgets';
 const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'reserve-header-lines';
+const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'widget-copy';
 
 class CDashboardPage extends CBaseComponent {
 
@@ -40,9 +41,11 @@ class CDashboardPage extends CBaseComponent {
 		widget_defaults,
 		is_editable,
 		is_edit_mode,
+		can_edit_dashboards,
 		web_layout_mode,
 		time_period,
-		dynamic_hostid
+		dynamic_hostid,
+		unique_id
 	}) {
 		super(document.createElement('div'));
 
@@ -54,8 +57,8 @@ class CDashboardPage extends CBaseComponent {
 			display_period: data.display_period
 		};
 		this._dashboard = {
-			templateid: data.templateid,
-			dashboardid: data.dashboardid
+			templateid: dashboard.templateid,
+			dashboardid: dashboard.dashboardid
 		};
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
@@ -66,9 +69,11 @@ class CDashboardPage extends CBaseComponent {
 		this._widget_defaults = widget_defaults;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
+		this._can_edit_dashboards = can_edit_dashboards;
 		this._web_layout_mode = web_layout_mode;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
+		this._unique_id = unique_id;
 
 		this._init();
 		this._initEvents();
@@ -103,11 +108,71 @@ class CDashboardPage extends CBaseComponent {
 
 				widget.leave();
 				this._reserveHeaderLines();
+			},
+
+			widgetCopy: (e) => {
+				const widget = e.detail.target;
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_COPY, {data: widget.getDataCopy()});
+			},
+
+			widgetPaste: (e) => {
+				const widget = e.detail.target;
+
+//				if (!widget.isEntered() || this._isInteracting()) {
+//					return;
+//				}
+
+//				widget.leave();
+//				this._reserveHeaderLines();
+			},
+
+			widgetDelete: (e) => {
+				const widget = e.detail.target;
+
+
+
+//				if (!widget.isEntered() || this._isInteracting()) {
+//					return;
+//				}
+
+//				widget.leave();
+//				this._reserveHeaderLines();
 			}
 		};
 
 		this._registerEvents = () => {};
 		this._unregisterEvents = () => {};
+	}
+
+	getData() {
+		return this._data;
+	}
+
+	getWidget(unique_id) {
+		for (const widget of this._widgets) {
+			if (widget.getUniqueId() === unique_id) {
+				return widget;
+			}
+		}
+
+		return null;
+	}
+
+	getUniqueId() {
+		return this._unique_id;
+	}
+
+	isUpdated() {
+
+	}
+
+	editProperties() {
+
+	}
+
+	applyProperties() {
+
 	}
 
 	_reserveHeaderLines() {
@@ -154,19 +219,15 @@ class CDashboardPage extends CBaseComponent {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
 
 		for (const widget of this._widgets) {
-			this._startWidget(widget);
+			widget.start();
 		}
-	}
-
-	_startWidget(widget) {
-		widget.start();
-		this._dashboard_target.appendChild(widget.getView());
 	}
 
 	activate() {
 		this._state = DASHBOARD_PAGE_STATE_ACTIVE;
 
 		for (const widget of this._widgets) {
+			this._dashboard_target.appendChild(widget.getView());
 			this._activateWidget(widget);
 		}
 	}
@@ -176,13 +237,16 @@ class CDashboardPage extends CBaseComponent {
 		widget
 			.on(WIDGET_EVENT_ENTER, this._events.widgetEnter)
 			.on(WIDGET_EVENT_LEAVE, this._events.widgetLeave)
-			.on(WIDGET_EVENT_UPDATE, this._events.widgetUpdate);
+			.on(WIDGET_EVENT_COPY, this._events.widgetCopy)
+			.on(WIDGET_EVENT_PASTE, this._events.widgetPaste)
+			.on(WIDGET_EVENT_DELETE, this._events.widgetDelete);
 	}
 
 	deactivate() {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
 
 		for (const widget of this._widgets) {
+			this._dashboard_target.removeChild(widget.getView());
 			this._deactivateWidget(widget);
 		}
 	}
@@ -192,7 +256,9 @@ class CDashboardPage extends CBaseComponent {
 		widget
 			.off(WIDGET_EVENT_ENTER, this._events.widgetEnter)
 			.off(WIDGET_EVENT_LEAVE, this._events.widgetLeave)
-			.off(WIDGET_EVENT_UPDATE, this._events.widgetUpdate);
+			.off(WIDGET_EVENT_COPY, this._events.widgetCopy)
+			.off(WIDGET_EVENT_PASTE, this._events.widgetPaste)
+			.off(WIDGET_EVENT_DELETE, this._events.widgetDelete);
 	}
 
 	destroy() {
@@ -260,10 +326,10 @@ class CDashboardPage extends CBaseComponent {
 		fields,
 		configuration,
 		widgetid = null,
-		uniqueid,
 		pos,
 		is_new,
-		rf_rate
+		rf_rate,
+		unique_id
 	}) {
 		const widget = new (eval(this._widget_defaults[type].js_class))({
 			type: type,
@@ -274,7 +340,6 @@ class CDashboardPage extends CBaseComponent {
 			defaults: this._widget_defaults[type],
 			parent: null,
 			widgetid: widgetid,
-			uniqueid: uniqueid,
 			pos: pos,
 			is_new: is_new,
 			rf_rate: rf_rate,
@@ -282,13 +347,18 @@ class CDashboardPage extends CBaseComponent {
 				templateid: this._dashboard.templateid,
 				dashboardid: this._dashboard.dashboardid
 			},
+			dashboard_page: {
+				unique_id: this._unique_id
+			},
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
+			can_edit_dashboards: this._can_edit_dashboards,
 			web_layout_mode: this._web_layout_mode,
 			time_period: this._time_period,
-			dynamic_hostid: this._dynamic_hostid
+			dynamic_hostid: this._dynamic_hostid,
+			unique_id: unique_id
 		});
 
 		this._widgets.push(widget);

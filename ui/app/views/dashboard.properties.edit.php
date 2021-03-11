@@ -89,9 +89,7 @@ $output = [
 			'title' => _('Apply'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'document.dispatchEvent('.
-				'new CustomEvent(DASHBOARD_EVENT_APPLY_PROPERTIES, {detail: {overlay: overlay}})'.
-			');'
+			'action' => 'applyDashboardProperties(overlay);'
 		]
 	]
 ];

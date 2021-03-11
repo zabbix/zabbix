@@ -43,7 +43,7 @@ class CSortable extends CBaseComponent {
 		drag_scroll_delay_long = 400,
 		wheel_step = 100,
 		do_activate = true
-	} = {}) {
+	}) {
 		super(target);
 
 		this._is_vertical = is_vertical;
