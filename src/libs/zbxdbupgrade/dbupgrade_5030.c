@@ -2235,7 +2235,7 @@ static int	DBpatch_5030052(void)
 		if (FAIL == (ret = DBpatch_delay_routine(row[2], &delay)))
 			break;
 
-		ret = 	DBpatch_convert_slideshow(slideshowid, row[1], delay, userid, private);
+		ret = DBpatch_convert_slideshow(slideshowid, row[1], delay, userid, private);
 	}
 
 	DBfree_result(result);
