@@ -35,8 +35,8 @@ class CWidgetProblemsBySv extends CWidget {
 	}
 
 	_unregisterEvents() {
-		super._unregisterEvents();
-
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
+
+		super._unregisterEvents();
 	}
 }

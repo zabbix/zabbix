@@ -464,9 +464,7 @@ class CDashboard extends CBaseComponent {
 		const wrapper_scroll_top_min = Math.max(0, widget_top + Math.min(0, widget_height - wrapper_height));
 		const wrapper_scroll_top_max = widget_top;
 
-//		if (pos.y + pos.height > this._options['rows']) {
-//			this._resizeDashboardGrid(pos.y + pos.height);
-//		}
+		this._resizeGrid(pos.y + pos.height);
 
 		return new Promise((resolve) => {
 			if (wrapper_scroll_top < wrapper_scroll_top_min) {
@@ -493,7 +491,6 @@ class CDashboard extends CBaseComponent {
 	 * @param {int|null}  min_rows  Minimal desired rows count.
 	 */
 	_resizeGrid(min_rows = 0) {
-		console.log('RESIZE');
 		const $grid = $(this._containers.grid);
 
 		let num_rows = this._selected_dashboard_page.getNumRows();

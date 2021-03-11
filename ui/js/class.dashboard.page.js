@@ -85,7 +85,7 @@ class CDashboardPage extends CBaseComponent {
 	_init() {
 		this._state = DASHBOARD_PAGE_STATE_INITIAL;
 
-		this._widgets = [];
+		this._widgets = new Map();
 	}
 
 	_initEvents() {
@@ -190,7 +190,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_isPosFree(pos) {
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			if (this._posOverlap(pos, widget.getPosition())) {
 				return false;
 			}
@@ -202,7 +202,7 @@ class CDashboardPage extends CBaseComponent {
 	_accommodatePos(pos) {
 		pos = {...pos};
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			if (this._posOverlap(pos, widget.getPosition())) {
 				if (pos.x < widget.pos.x && pos.x + pos.width > widget.pos.x ) {
 					pos.width = widget.pos.x - pos.x;
@@ -241,7 +241,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	getWidget(unique_id) {
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			if (widget.getUniqueId() === unique_id) {
 				return widget;
 			}
@@ -269,7 +269,7 @@ class CDashboardPage extends CBaseComponent {
 	_reserveHeaderLines() {
 		let num_header_lines = 0;
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			if (!widget.isEntered()) {
 				continue;
 			}
@@ -285,7 +285,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	leaveWidgetsExcept(except_widget = null) {
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			if (widget !== except_widget) {
 				widget.leave();
 			}
@@ -293,7 +293,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_isInteracting() {
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			const widget_view = widget.getView();
 
 			if (widget.isInteracting()
@@ -309,7 +309,7 @@ class CDashboardPage extends CBaseComponent {
 	start() {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			widget.start();
 		}
 	}
@@ -317,7 +317,7 @@ class CDashboardPage extends CBaseComponent {
 	activate() {
 		this._state = DASHBOARD_PAGE_STATE_ACTIVE;
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			this._dashboard_target.appendChild(widget.getView());
 			this._activateWidget(widget);
 		}
@@ -337,7 +337,7 @@ class CDashboardPage extends CBaseComponent {
 	deactivate() {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			this._dashboard_target.removeChild(widget.getView());
 			this._deactivateWidget(widget);
 		}
@@ -363,15 +363,15 @@ class CDashboardPage extends CBaseComponent {
 		}
 		this._state = DASHBOARD_PAGE_STATE_DESTROYED;
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			widget.destroy();
 		}
 
-		delete this._widgets;
+		this._widgets.clear();
 	}
 
 	resize() {
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			widget.resize();
 		}
 	}
@@ -387,7 +387,7 @@ class CDashboardPage extends CBaseComponent {
 	setEditMode() {
 		this._is_edit_mode = true;
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			widget.setEditMode();
 		}
 	}
@@ -396,7 +396,7 @@ class CDashboardPage extends CBaseComponent {
 		if (this._dynamic_hostid != dynamic_hostid) {
 			this._dynamic_hostid = dynamic_hostid;
 
-			for (const widget of this._widgets) {
+			for (const widget of this._widgets.keys()) {
 				if (widget.supportsDynamicHosts() && this._dynamic_hostid != widget.getDynamicHost()) {
 					widget.setDynamicHost(this._dynamic_hostid);
 				}
@@ -407,7 +407,7 @@ class CDashboardPage extends CBaseComponent {
 	setTimePeriod(time_period) {
 		this._time_period = time_period;
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			widget.setTimePeriod(this._time_period);
 		}
 	}
@@ -415,7 +415,7 @@ class CDashboardPage extends CBaseComponent {
 	getNumRows() {
 		let num_rows = 0;
 
-		for (const widget of this._widgets) {
+		for (const widget of this._widgets.keys()) {
 			const pos = widget.getPosition();
 
 			num_rows = Math.max(num_rows, pos.y + pos.height);
@@ -466,7 +466,7 @@ class CDashboardPage extends CBaseComponent {
 			unique_id: unique_id
 		});
 
-		this._widgets.push(widget);
+		this._widgets.set(widget, {});
 
 		if (do_announce_widgets) {
 			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
@@ -493,6 +493,8 @@ class CDashboardPage extends CBaseComponent {
 		if (widget.getState() !== WIDGET_STATE_INITIAL) {
 			widget.destroy();
 		}
+
+		this._widgets.delete(widget);
 
 		this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DELETE);
 
