@@ -1818,9 +1818,13 @@ static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screeni
 		ZBX_STR2UINT64(userid, row[0]);
 		permission = atoi(row[1]);
 
-		DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
 			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_userid++, dashboardid, userid, permission);
+			dashboard_userid++, dashboardid, userid, permission))
+		{
+			ret = FAIL;
+			goto out;
+		}
 	}
 
 	DBfree_result(result);
@@ -1834,11 +1838,15 @@ static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screeni
 		ZBX_STR2UINT64(usrgrpid, row[0]);
 		permission = atoi(row[1]);
 
-		DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
 			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_usrgrpid++, dashboardid, usrgrpid, permission);
+			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		{
+			ret = FAIL;
+			goto out;
+		}
 	}
-
+out:
 	DBfree_result(result);
 
 	return ret;
@@ -1860,9 +1868,13 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 		ZBX_STR2UINT64(userid, row[0]);
 		permission = atoi(row[1]);
 
-		DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
 			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_userid++, dashboardid, userid, permission);
+			dashboard_userid++, dashboardid, userid, permission))
+		{
+			ret = FAIL;
+			goto out;
+		}
 	}
 
 	DBfree_result(result);
@@ -1877,11 +1889,15 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 		ZBX_STR2UINT64(usrgrpid, row[0]);
 		permission = atoi(row[1]);
 
-		DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
 			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
-			dashboard_usrgrpid++, dashboardid, usrgrpid, permission);
+			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		{
+			ret = FAIL;
+			goto out;
+		}
 	}
-
+out:
 	DBfree_result(result);
 
 	return ret;
