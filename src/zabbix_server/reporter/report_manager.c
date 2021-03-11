@@ -1956,6 +1956,26 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
 
 /******************************************************************************
  *                                                                            *
+ * Function: rm_send_test_error_result                                        *
+ *                                                                            *
+ * Purpose: send error result in reponse to test request                      *
+ *                                                                            *
+ * Parameters: client - [IN] the connected trapper                            *
+ *             error  - [IN] the error message                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_send_test_error_result(zbx_ipc_client_t *client, const char *error)
+{
+	unsigned char	*data;
+	zbx_uint32_t	size;
+
+	size = report_serialize_response(&data, FAIL, error);
+	zbx_ipc_client_send(client, ZBX_IPC_REPORTER_TEST_RESULT, data, size);
+	zbx_free(data);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: rm_process_jobs                                                  *
  *                                                                            *
  * Purpose: process queue                                                     *
@@ -1981,7 +2001,13 @@ static void	rm_process_jobs(zbx_rm_t *manager)
 
 		if (SUCCEED != rm_writer_process_job(writer, job, &error))
 		{
-			rm_finish_job(manager, job, FAIL, error);
+			if (NULL != job->client)
+			{
+				rm_send_test_error_result(job->client, error);
+				rm_job_free(job);
+			}
+			else
+				rm_finish_job(manager, job, FAIL, error);
 			zbx_queue_ptr_push(&manager->free_writers, writer);
 			zbx_free(error);
 		}
@@ -2033,26 +2059,6 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 	report_destroy_params(&params);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: rm_send_test_error_result                                        *
- *                                                                            *
- * Purpose: send error result in reponse to test request                      *
- *                                                                            *
- * Parameters: client - [IN] the connected trapper                            *
- *             error  - [IN] the error message                                *
- *                                                                            *
- ******************************************************************************/
-static void	rm_send_test_error_result(zbx_ipc_client_t *client, const char *error)
-{
-	unsigned char	*data;
-	zbx_uint32_t	size;
-
-	size = report_serialize_response(&data, FAIL, error);
-	zbx_ipc_client_send(client, ZBX_IPC_REPORTER_TEST_RESULT, data, size);
-	zbx_free(data);
 }
 
 /******************************************************************************

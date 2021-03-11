@@ -33,6 +33,10 @@ extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
+extern char	*CONFIG_TLS_CA_FILE;
+extern char	*CONFIG_TLS_CERT_FILE;
+extern char	*CONFIG_TLS_KEY_FILE;
+
 
 typedef struct
 {
@@ -143,6 +147,19 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 		*error = zbx_dsprintf(*error, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
+
+	if (NULL != CONFIG_TLS_CA_FILE && '\0' != *CONFIG_TLS_CA_FILE)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, CONFIG_TLS_CA_FILE)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, CONFIG_TLS_CERT_FILE)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, CONFIG_TLS_KEY_FILE)))
+		{
+			*error = zbx_dsprintf(*error, "cannot set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			goto out;
+		}
+	}
+
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
