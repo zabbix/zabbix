@@ -36,7 +36,6 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 		$navtree.zbx_navtree(action);
 	}
 }
-
 (function($) {
 	$.widget('zbx.sortable_tree', $.extend({}, $.ui.sortable.prototype, {
 		options: {
@@ -543,8 +542,7 @@ jQuery(function($) {
 					ul.setAttribute('id', prefix + 'children-of-' + parentId);
 				}
 
-				className += ' tree-list';
-				ul.setAttribute('class', className);
+				ul.setAttribute('class', className + ' tree-list');
 
 				return ul;
 			};
@@ -1106,7 +1104,8 @@ jQuery(function($) {
 				var widget_data = $obj.data('widgetData'),
 					tree = [];
 
-				$.each(widget_data['navtree'], function(index, item) {
+				$.each(widget_data.navtree, (index, item) => {
+
 					var tree_item = {
 						id: index,
 						name: item.name,
@@ -1190,6 +1189,7 @@ jQuery(function($) {
 				});
 			};
 
+			// TODO check usage
 			var openBranch = function($obj, id) {
 				if (!$('.tree-item[data-id=' + id + ']').is(':visible')) {
 					var selector = '> .tree-row > .content > .arrow > .treeview > span',
@@ -1211,7 +1211,7 @@ jQuery(function($) {
 			};
 
 			var switchToNavigationMode = function($obj) {
-				drawTree($obj, isEditMode());
+				drawTree($obj, $obj.data('widget').isEditMode());
 				parseProblems($obj);
 			};
 
@@ -1300,8 +1300,8 @@ jQuery(function($) {
 				},
 
 				// initialization of widget
-				init: function(options) {
-					options = $.extend({}, options);
+				init: function(options, widget) {
+					options = {...options};
 
 					return this.each(function() {
 						var $this = $(this);
@@ -1319,94 +1319,97 @@ jQuery(function($) {
 							lastId: 0
 						});
 
-						var	triggers = [DASHBOARD_PAGE_EVENT_EDIT, 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad',
+						$this.data('widget', widget);
+
+						// var	triggers = [DASHBOARD_PAGE_EVENT_EDIT, 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad',
+						var	triggers = ['dashboard-page-edit', 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad',
 							'onDashboardReady'
 						];
 
-						$.each(triggers, function(index, trigger) {
-							ZABBIX.Dashboard.addAction(trigger, 'zbx_widget_navtree_trigger', options.uniqueid, {
-								'parameters': [trigger],
-								'grid': {'widget': 1},
-								'priority': 5,
-								'trigger_name': 'maptree_' + options.uniqueid
-							});
-						});
+						// $.each(triggers, function(index, trigger) {
+						// 	ZABBIX.Dashboard.addAction(trigger, 'zbx_widget_navtree_trigger', options.uniqueid, {
+						// 		'parameters': [trigger],
+						// 		'grid': {'widget': 1},
+						// 		'priority': 5,
+						// 		'trigger_name': 'maptree_' + options.uniqueid
+						// 	});
+						// });
 
-						if (isEditMode()) {
+						if (widget.isEditMode()) {
 							switchToEditMode($this);
 						}
 						else {
-							ZABBIX.Dashboard.registerDataExchange({
-								uniqueid: options.uniqueid,
-								data_name: 'current_sysmapid',
-								callback: function(widget, data) {
-									var item,
-										selector = '',
-										mapid_selector = '',
-										prev_map_selector = '';
-
-									mapid_selector = '.tree-item[data-sysmapid=' + data['submapid'] + ']';
-
-									if (data['previous_maps'].length) {
-										var prev_maps = data['previous_maps'].split(','),
-											prev_maps = prev_maps.length
-												? prev_maps[prev_maps.length-1]
-												: null;
-
-										if (prev_maps) {
-											var sc = '.selected',
-												sysmapid = '[data-sysmapid=' + prev_maps + ']',
-												prev_map_selectors = [
-													Array(4).join(sc + ' ') + '.tree-item' + sc + sysmapid,
-													Array(3).join(sc + ' ') + '.tree-item' + sc + sysmapid,
-													Array(2).join(sc + ' ') + '.tree-item' + sc + sysmapid,
-													sc + ' .tree-item' + sc + sysmapid,
-													'.tree-item' + sc + sysmapid,
-													'.tree-item' + sysmapid
-												],
-												indx = 0;
-
-											while (!prev_map_selector.length
-													&& typeof prev_map_selectors[indx] !== 'undefined') {
-												if ($(prev_map_selectors[indx], $this).length) {
-													prev_map_selector = prev_map_selectors[indx] + ' ';
-												}
-												indx++;
-											}
-										}
-									}
-
-									if (prev_map_selector.length && mapid_selector.length) {
-										selector = prev_map_selector + ' > .tree-list > ' + mapid_selector;
-										if (!data['moving_upward']) {
-											selector = selector + ':first';
-										}
-										item = $(selector.trim(selector), $this);
-									}
-									else {
-										item = $('.selected', $this).closest(mapid_selector);
-									}
-
-									if (item.length) {
-										item = item.first();
-
-										var step_in_path = $(item).closest('.tree-item');
-
-										$('.selected', $this).removeClass('selected');
-										$(item).addClass('selected');
-
-										while ($(step_in_path).length) {
-											$(step_in_path).addClass('selected');
-											step_in_path = $(step_in_path).parent().closest('.tree-item');
-										}
-
-										openBranch($this, $(item).data('id'));
-										updateUserProfile('web.dashbrd.navtree.item.selected', $(item).data('id'),
-											[widget['widgetid']]
-										);
-									}
-								}
-							});
+							// ZABBIX.Dashboard.registerDataExchange({
+							// 	uniqueid: options.uniqueid,
+							// 	data_name: 'current_sysmapid',
+							// 	callback: function(widget, data) {
+							// 		var item,
+							// 			selector = '',
+							// 			mapid_selector = '',
+							// 			prev_map_selector = '';
+							//
+							// 		mapid_selector = '.tree-item[data-sysmapid=' + data['submapid'] + ']';
+							//
+							// 		if (data['previous_maps'].length) {
+							// 			var prev_maps = data['previous_maps'].split(','),
+							// 				prev_maps = prev_maps.length
+							// 					? prev_maps[prev_maps.length-1]
+							// 					: null;
+							//
+							// 			if (prev_maps) {
+							// 				var sc = '.selected',
+							// 					sysmapid = '[data-sysmapid=' + prev_maps + ']',
+							// 					prev_map_selectors = [
+							// 						Array(4).join(sc + ' ') + '.tree-item' + sc + sysmapid,
+							// 						Array(3).join(sc + ' ') + '.tree-item' + sc + sysmapid,
+							// 						Array(2).join(sc + ' ') + '.tree-item' + sc + sysmapid,
+							// 						sc + ' .tree-item' + sc + sysmapid,
+							// 						'.tree-item' + sc + sysmapid,
+							// 						'.tree-item' + sysmapid
+							// 					],
+							// 					indx = 0;
+							//
+							// 				while (!prev_map_selector.length
+							// 						&& typeof prev_map_selectors[indx] !== 'undefined') {
+							// 					if ($(prev_map_selectors[indx], $this).length) {
+							// 						prev_map_selector = prev_map_selectors[indx] + ' ';
+							// 					}
+							// 					indx++;
+							// 				}
+							// 			}
+							// 		}
+							//
+							// 		if (prev_map_selector.length && mapid_selector.length) {
+							// 			selector = prev_map_selector + ' > .tree-list > ' + mapid_selector;
+							// 			if (!data['moving_upward']) {
+							// 				selector = selector + ':first';
+							// 			}
+							// 			item = $(selector.trim(selector), $this);
+							// 		}
+							// 		else {
+							// 			item = $('.selected', $this).closest(mapid_selector);
+							// 		}
+							//
+							// 		if (item.length) {
+							// 			item = item.first();
+							//
+							// 			var step_in_path = $(item).closest('.tree-item');
+							//
+							// 			$('.selected', $this).removeClass('selected');
+							// 			$(item).addClass('selected');
+							//
+							// 			while ($(step_in_path).length) {
+							// 				$(step_in_path).addClass('selected');
+							// 				step_in_path = $(step_in_path).parent().closest('.tree-item');
+							// 			}
+							//
+							// 			openBranch($this, $(item).data('id'));
+							// 			updateUserProfile('web.dashbrd.navtree.item.selected', $(item).data('id'),
+							// 				[widget['widgetid']]
+							// 			);
+							// 		}
+							// 	}
+							// });
 
 							switchToNavigationMode($this);
 

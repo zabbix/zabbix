@@ -30,13 +30,13 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 
 		switch (hook_name) {
 			case 'onWidgetRefresh':
-				var div_id = jQuery('[data-uniqueid="' + grid['widget']['uniqueid'] + '"]').attr('id');
-				jQuery('#' + div_id).zbx_mapwidget('update', grid['widget']);
+				// var div_id = jQuery('[data-uniqueid="' + grid['widget']['uniqueid'] + '"]').attr('id');
+				// jQuery('#' + div_id).zbx_mapwidget('update', grid['widget']);
 				break;
 			case 'afterUpdateWidgetConfig':
-				ZABBIX.Dashboard.setWidgetStorageValue(grid['widget']['uniqueid'], 'current_sysmapid',
-					grid['widget']['fields']['sysmapid']
-				);
+				// ZABBIX.Dashboard.setWidgetStorageValue(grid['widget']['uniqueid'], 'current_sysmapid',
+				// 	grid['widget']['fields']['sysmapid']
+				// );
 				break;
 			case 'onDashboardReady':
 				if (typeof grid['widget']['storage']['current_sysmapid'] === 'undefined') {

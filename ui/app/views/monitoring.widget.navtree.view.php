@@ -42,8 +42,11 @@ if ($data['error'] !== null) {
 $output = [
 	'header' => $data['name'],
 	'body' => $item->toString(),
-	'script_inline' => $item->getScriptRun()
+//	'script_inline' => $item->getScriptRun(),
+	'navtree_data' => $item->getScriptData()
 ];
+
+//var_dump($output);
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

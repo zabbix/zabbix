@@ -115,85 +115,34 @@ class CDashboardWidgetMap extends CDiv {
 	 *
 	 * @return string
 	 */
-	public function getScriptRun() {
-		$script_run = '';
+	public function getScriptData() {
+		$map_data = [
+			'current_sysmapid' => null,
+			'filter_widget_reference' => null,
+			'map_options' => null
+		];
 
 		if ($this->current_sysmapid !== null && $this->initial_load) {
-			// This should be before other scripts.
-			$script_run .=
-				'ZABBIX.Dashboard.setWidgetStorageValue("'.$this->uniqueid.'", \'current_sysmapid\', '.
-					$this->current_sysmapid.');';
+			$map_data['current_sysmapid'] = $this->current_sysmapid;
 		}
 
-		if ($this->initial_load) {
-			$script_run .=
-				'ZABBIX.Dashboard.addAction(WIDGET_EVENT_REFRESH, '.
-					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
-						'parameters: ["onWidgetRefresh"],'.
-						'grid: {widget: 1},'.
-						'trigger_name: "map_widget_timer_refresh_'.$this->uniqueid.'"'.
-					'}'.
-				');';
-
-			$script_run .=
-				'ZABBIX.Dashboard.addAction("afterUpdateWidgetConfig", '.
-					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
-						'parameters: ["afterUpdateWidgetConfig"],'.
-						'grid: {widget: 1},'.
-						'trigger_name: "after_map_widget_config_update_'.$this->uniqueid.'"'.
-					'}'.
-				');';
-		}
-
-		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && $this->filter_widget_reference
+		if ($this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER
+				&& $this->filter_widget_reference
 				&& $this->initial_load) {
-			$script_run .=
-				'ZABBIX.Dashboard.registerDataExchange({'.
-					'uniqueid: "'.$this->uniqueid.'",'.
-					'linkedto: "'.$this->filter_widget_reference.'",'.
-					'data_name: "selected_mapid",'.
-					'callback: function(widget, data) {'.
-						'ZABBIX.Dashboard.setWidgetStorageValue('.
-							'widget.uniqueid, \'current_sysmapid\', data.mapid'.
-						');'.
-						'ZABBIX.Dashboard.setWidgetStorageValue(widget.uniqueid, \'previous_maps\', "");'.
-						'ZABBIX.Dashboard.refreshWidget(widget.widgetid);'.
-					'}'.
-				'});'.
-
-				'ZABBIX.Dashboard.callWidgetDataShare();'.
-
-				'ZABBIX.Dashboard.addAction(DASHBOARD_PAGE_EVENT_EDIT, '.
-					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
-						'parameters: [DASHBOARD_PAGE_EVENT_EDIT],'.
-						'grid: {widget: 1},'.
-					'trigger_name: "map_widget_on_edit_start_'.$this->uniqueid.'"'.
-				'});';
+			$map_data['filter_widget_reference'] = $this->filter_widget_reference;
 		}
 
 		if ($this->sysmap_data && $this->error === null) {
 			$this->sysmap_data['container'] = '#map_'.$this->uniqueid;
 
-			$script_run .= 'jQuery(function($) {'.
-				'$("#'.$this->getId().'").zbx_mapwidget({'.
-					'uniqueid: "'.$this->uniqueid.'",'.
-					'map_options: '.zbx_jsvalue($this->sysmap_data).
-				'});'.
-			'});';
+			$map_data['map_options'] = $this->sysmap_data;
 		}
 		elseif ($this->error !== null && $this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			$error_msg_html = (new CTableInfo())->setNoDataMessage($this->error);
-			$script_run .=
-				'ZABBIX.Dashboard.addAction("onDashboardReady", '.
-					'"zbx_sysmap_widget_trigger", "'.$this->uniqueid.'", {'.
-						'parameters: ["onDashboardReady", {html: "'. addslashes($error_msg_html).'"}],'.
-						'grid: {widget: 1},'.
-						'trigger_name: "on_dashboard_ready_'.$this->uniqueid.'"'.
-					'}'.
-				');';
+			$map_data['error_msg'] = addslashes($error_msg_html);
 		}
 
-		return $script_run;
+		return $map_data;
 	}
 
 	/**

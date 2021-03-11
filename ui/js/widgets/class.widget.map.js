@@ -20,4 +20,85 @@
 
 class CWidgetMap extends CWidget {
 
+	_init() {
+		super._init();
+
+		this._filter_widget_reference = null;
+		this._map_options = null;
+	}
+
+	_processUpdateResponse(response) {
+		super._processUpdateResponse(response);
+
+		if (response.sysmap_data !== undefined) {
+			this._filter_widget_reference = response.sysmap_data.filter_widget_reference;
+			this._map_options = response.sysmap_data.sysmap_data;
+
+			if (response.sysmap_data._current_sysmapid !== null) {
+				this.storeValue('current_sysmapid', response.sysmap_data._current_sysmapid);
+			}
+
+			if (this._filter_widget_reference !== null) {
+				this._registerDataExchange();
+			}
+
+			if (this._map_options !== null) {
+				this._$target.zbx_mapwidget(this._uniqueid, this._map_options);
+			}
+
+			if (response.sysmap_data.error_msg !== null) {
+				this._$content_body.append(response.sysmap_data.error_msg);
+			}
+		}
+	}
+
+	_registerDataExchange() {
+		// ZABBIX.Dashboard.registerDataExchange({
+		// 	uniqueid: this._uniqueid,
+		// 	linkedto: this._filter_widget_reference,
+		// 	data_name: 'selected_mapid',
+		// 	callback: (widget, data) => {
+		// 		widget.storeValue('current_sysmapid', data.mapid);
+		// 		ZABBIX.Dashboard.setWidgetStorageValue(widget._uniqueid, 'previous_maps', '');
+		// 		ZABBIX.Dashboard.refreshWidget(widget._widgetid);
+		// 	}
+		// });
+
+		// ZABBIX.Dashboard.callWidgetDataShare();
+
+		// ZABBIX.Dashboard.addAction(DASHBOARD_PAGE_EVENT_EDIT,
+		// 	'zbx_sysmap_widget_trigger', this._uniqueid, {
+		// 		parameters: [DASHBOARD_PAGE_EVENT_EDIT],
+		// 		grid: {widget: 1},
+		// 		trigger_name: `map_widget_on_edit_start_${this._uniqueid}`
+		// 	});
+	}
+
+	_registerEvents() {
+		super._registerEvents();
+
+		this._events = {
+			...this._events,
+
+			refresh: () => {
+				this._$target.zbx_mapwidget('update', this);
+			},
+
+			afterUpdateConfig: () => {
+				this.storeValue('current_sysmapid', this._fields.sysmapid);
+			}
+		}
+
+		this
+			.on(WIDGET_EVENT_REFRESH, this._events.refresh);
+			// .on(WIDGET_EVENT_CONFIG_AFTER_UPDATE, this._events.afterUpdateConfig);
+	}
+
+	_unregisterEvents() {
+		super._unregisterEvents();
+
+		this
+			.on(WIDGET_EVENT_REFRESH, this._events.refresh);
+			// .off(WIDGET_EVENT_CONFIG_AFTER_UPDATE, this._events.afterUpdateConfig);
+	}
 }

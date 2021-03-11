@@ -28,7 +28,7 @@ $item = new CDashboardWidgetMap($data['sysmap_data'], $data['widget_settings']);
 $output = [
 	'header' => $data['name'],
 	'body' => $item->toString(),
-	'script_inline' => $item->getScriptRun()
+	'sysmap_data' => $item->getScriptData()
 ];
 
 if (($messages = getMessages()) !== null) {
