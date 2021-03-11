@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:26Z'
+  date: '2021-02-16T06:34:58Z'
   groups:
     -
       name: Templates/Modules
@@ -334,7 +334,7 @@ zabbix_export:
               recovery_expression: |
                 {Interfaces SNMP:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} and
                 {Interfaces SNMP:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -352,7 +352,7 @@ zabbix_export:
               recovery_expression: |
                 {Interfaces SNMP:net.if.in.errors[ifInErrors.{#SNMPINDEX}].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and {Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -464,7 +464,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -473,11 +473,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid

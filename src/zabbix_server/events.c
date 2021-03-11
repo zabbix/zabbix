@@ -2827,7 +2827,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		DCconfig_triggers_apply_changes(&trigger_diff);
 		DBupdate_itservices(&trigger_diff);
 
-		if (SUCCEED == zbx_is_export_enabled())
+		if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 			zbx_export_events();
 
 		zbx_clean_events();

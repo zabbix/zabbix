@@ -240,7 +240,7 @@ class testFormAdministrationScripts extends CWebTest {
 		]);
 		$form->query('button:Cancel')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertPageHeader('Scripts');
+		$this->page->assertHeader('Scripts');
 		$this->assertTrue($this->query('button:Create script')->waitUntilVisible()->one()->isReady());
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}

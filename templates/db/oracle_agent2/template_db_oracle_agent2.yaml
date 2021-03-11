@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-01-13T10:36:32Z'
+  date: '2021-02-10T15:01:09Z'
   groups:
     -
       name: Templates/Databases
@@ -398,7 +398,7 @@ zabbix_export:
           master_item:
             key: 'oracle.fra.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
         -
-          name: 'Oracle: FRA, Used space in %'
+          name: 'Oracle: FRA, Usable space in %'
           type: DEPENDENT
           key: oracle.fra_usable_pct
           delay: '0'
@@ -1421,7 +1421,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DEST_NAME}''].log_sequence.first()'
+                    - '$..[''{#DEST_NAME}''].error.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1457,7 +1461,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DEST_NAME}''].log_sequence.first()'
+                    - '$..[''{#DEST_NAME}''].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               trigger_prototypes:
@@ -1782,7 +1790,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.file_bytes.first()'
+                    - '$..[''{#TABLESPACE}''].file_bytes.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1800,7 +1808,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.free_bytes.first()'
+                    - '$..[''{#TABLESPACE}''].free_bytes.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1818,7 +1826,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.max_bytes.first()'
+                    - '$..[''{#TABLESPACE}''].max_bytes.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1837,7 +1845,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.status.first()'
+                    - '$..[''{#TABLESPACE}''].status.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               trigger_prototypes:
@@ -1871,7 +1879,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.used_bytes.first()'
+                    - '$..[''{#TABLESPACE}''].used_bytes.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1890,7 +1898,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.used_file_pct.first()'
+                    - '$..[''{#TABLESPACE}''].used_file_pct.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               trigger_prototypes:
@@ -1922,7 +1930,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.used_pct_max.first()'
+                    - '$..[''{#TABLESPACE}''].used_pct_max.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               trigger_prototypes:

@@ -21,7 +21,12 @@
 #include "log.h"
 #include "export.h"
 
+#define ZBX_OPTION_EXPTYPE_EVENTS	"events"
+#define ZBX_OPTION_EXPTYPE_HISTORY	"history"
+#define ZBX_OPTION_EXPTYPE_TRENDS	"trends"
+
 extern char		*CONFIG_EXPORT_DIR;
+extern char		*CONFIG_EXPORT_TYPE;
 extern zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
 
 typedef struct
@@ -38,20 +43,131 @@ static zbx_export_file_t	*problems_file;
 
 static char	*export_dir;
 
-int	zbx_is_export_enabled(void)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_validate_export_type                                         *
+ *                                                                            *
+ * Purpose: validate export type                                              *
+ *                                                                            *
+ * Parameters:  export_type - [in] list of export types                       *
+ *              export_mask - [out] export types mask (if SUCCEED)            *
+ *                                                                            *
+ * Return value: SUCCEED - valid configuration                                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 {
-	if (NULL == CONFIG_EXPORT_DIR)
-		return FAIL;
+	int		ret = SUCCEED;
+	char		*start = export_type;
+	uint32_t	mask;
+	char		*types[] = {
+				ZBX_OPTION_EXPTYPE_EVENTS,
+				ZBX_OPTION_EXPTYPE_HISTORY,
+				ZBX_OPTION_EXPTYPE_TRENDS,
+				NULL};
+	size_t		lengths[] = {
+				ZBX_CONST_STRLEN(ZBX_OPTION_EXPTYPE_EVENTS),
+				ZBX_CONST_STRLEN(ZBX_OPTION_EXPTYPE_HISTORY),
+				ZBX_CONST_STRLEN(ZBX_OPTION_EXPTYPE_TRENDS),
+				0};
 
-	return SUCCEED;
+	if (NULL != start)
+	{
+		mask = 0;
+
+		do
+		{
+			int	i;
+			char	*end;
+
+			end = strchr(start, ',');
+
+			for (i = 0; NULL != types[i]; i++)
+			{
+				if ((NULL != end && lengths[i] == (size_t)(end - start) &&
+						0 == strncmp(start, types[i], lengths[i])) ||
+						(NULL == end && 0 == strcmp(start, types[i])))
+				{
+					mask |= (uint32_t)(1 << i);
+					break;
+				}
+			}
+
+			if (NULL == types[i])
+			{
+				ret = FAIL;
+				break;
+			}
+
+			start = end;
+		} while (NULL != start++);
+	}
+	else
+		mask = ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_HISTORY | ZBX_FLAG_EXPTYPE_TRENDS;
+
+	if (NULL != export_mask)
+		*export_mask = mask;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_is_export_enabled                                            *
+ *                                                                            *
+ * Purpose: checks if export is enabled for given type(s)                     *
+ *                                                                            *
+ * Parameters: flag - ZBX_FLAG_EXPTYPE_EVENTS events are enabled              *
+ *                    ZBX_FLAG_EXPTYPE_HISTORY history is enabled             *
+ *                    ZBX_FLAG_EXPTYPE_TRENDS trends are enabled              *
+ *                                                                            *
+ * Return value: SUCCEED - export enabled                                     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_export_enabled(uint32_t flags)
+{
+	int			ret = FAIL;
+	static uint32_t		export_types;
+
+	if (NULL == CONFIG_EXPORT_DIR)
+		return ret;
+
+	if (NULL != CONFIG_EXPORT_TYPE)
+	{
+		if (0 == export_types)
+			zbx_validate_export_type(CONFIG_EXPORT_TYPE, &export_types);
+
+		if (0 != (export_types & flags))
+			ret = SUCCEED;
+	}
+	else
+		ret = SUCCEED;
+
+	return ret;
 }
 
 int	zbx_export_init(char **error)
 {
 	struct stat	fs;
 
-	if (FAIL == zbx_is_export_enabled())
+	if (FAIL == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_TRENDS | ZBX_FLAG_EXPTYPE_HISTORY))
+	{
+		if (NULL != CONFIG_EXPORT_TYPE)
+		{
+			*error = zbx_dsprintf(*error, "Misconfiguration: \"ExportType\" is set to '%s' "
+					"while \"ExportDir\" is unset.", CONFIG_EXPORT_TYPE);
+			return FAIL;
+		}
 		return SUCCEED;
+	}
+
+	if (NULL == CONFIG_EXPORT_TYPE)
+	{
+		CONFIG_EXPORT_TYPE = zbx_dsprintf(CONFIG_EXPORT_TYPE, "%s,%s,%s", ZBX_OPTION_EXPTYPE_EVENTS,
+				ZBX_OPTION_EXPTYPE_HISTORY, ZBX_OPTION_EXPTYPE_TRENDS);
+	}
 
 	if (0 != stat(CONFIG_EXPORT_DIR, &fs))
 	{
@@ -115,6 +231,10 @@ static zbx_export_file_t	*export_init(zbx_export_file_t *file, const char *proce
 void	zbx_history_export_init(const char *process_name, int process_num)
 {
 	history_file = export_init(history_file, "history", process_name, process_num);
+}
+
+void	zbx_trends_export_init(const char *process_name, int process_num)
+{
 	trends_file = export_init(trends_file, "trends", process_name, process_num);
 }
 

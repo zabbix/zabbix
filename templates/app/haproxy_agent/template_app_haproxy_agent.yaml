@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:02Z'
+  date: '2021-02-16T06:23:09Z'
   groups:
     -
       name: Templates/Applications
@@ -427,14 +427,14 @@ zabbix_export:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
         -
           name: 'TCP BACKEND discovery'
           type: DEPENDENT
@@ -696,14 +696,14 @@ zabbix_export:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
         -
           name: 'FRONTEND discovery'
           type: DEPENDENT
@@ -1106,14 +1106,14 @@ zabbix_export:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
         -
           name: 'TCP FRONTEND discovery'
           type: DEPENDENT
@@ -1378,14 +1378,14 @@ zabbix_export:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
         -
           name: 'Servers discovery'
           type: DEPENDENT
@@ -1690,14 +1690,14 @@ zabbix_export:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
         -
           name: 'TCP Servers discovery'
           type: DEPENDENT
@@ -1960,14 +1960,14 @@ zabbix_export:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           lld_macro_paths:
             -
-              lld_macro: '{#MODE}'
-              path: $.mode
-            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
+            -
+              lld_macro: '{#MODE}'
+              path: $.mode
       macros:
         -
           macro: '{$HAPROXY.BACK_ERESP.MAX.WARN}'
@@ -2036,7 +2036,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2045,11 +2045,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2062,7 +2058,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '12'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2071,11 +2067,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2086,7 +2078,7 @@ zabbix_export:
               type: GRAPH_PROTOTYPE
               x: '12'
               width: '12'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2095,11 +2087,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2108,9 +2096,9 @@ zabbix_export:
                     host: 'HAProxy by Zabbix agent'
             -
               type: GRAPH_PROTOTYPE
-              'y': '5'
+              'y': '12'
               width: '12'
-              height: '5'
+              height: '13'
               fields:
                 -
                   type: INTEGER
@@ -2119,11 +2107,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2133,9 +2117,9 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               x: '12'
-              'y': '5'
+              'y': '12'
               width: '12'
-              height: '5'
+              height: '13'
               fields:
                 -
                   type: INTEGER
@@ -2144,11 +2128,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2161,7 +2141,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2170,11 +2150,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid

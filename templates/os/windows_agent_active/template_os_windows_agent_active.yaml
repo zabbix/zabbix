@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-23T21:21:14Z'
+  date: '2021-02-16T06:45:02Z'
   groups:
     -
       name: Templates/Modules
@@ -714,7 +714,7 @@ zabbix_export:
               description: 'The Memory Free System Page Table Entries is less than {$MEM.PAGE_TABLE_CRIT.MIN} for 5 minutes. If the number is less than 5,000, there may well be a memory leak.'
               dependencies:
                 -
-                  name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   expression: '{Windows memory by Zabbix agent active:vm.memory.util.min(5m)}>{$MEMORY.UTIL.MAX}'
         -
           name: 'Memory page faults per second'
@@ -752,7 +752,7 @@ zabbix_export:
               description: 'The Memory Pages/sec in the last 5 minutes exceeds {$MEM.PAGE_SEC.CRIT.MAX}. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.'
               dependencies:
                 -
-                  name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   expression: '{Windows memory by Zabbix agent active:vm.memory.util.min(5m)}>{$MEMORY.UTIL.MAX}'
         -
           name: 'Memory pool non-paged'
@@ -854,7 +854,7 @@ zabbix_export:
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       macros:
@@ -1058,9 +1058,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      return (value=='9223372036854775807' ? 0 : value)
-                      
+                    - 'return (value==''9223372036854775807'' ? 0 : value)'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1157,7 +1155,7 @@ zabbix_export:
               recovery_expression: |
                 {Windows network by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} and
                 {Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1175,7 +1173,7 @@ zabbix_export:
               recovery_expression: |
                 {Windows network by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and {Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -1627,13 +1625,13 @@ zabbix_export:
           expression: '{Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}>{$CPU.UTIL.CRIT}'
     -
       expression: '{Windows memory by Zabbix agent active:system.swap.pfree.min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Windows memory by Zabbix agent active:system.swap.size[,total].last()}>0'
-      name: 'High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'This trigger is ignored, if there is no swap configured'
       dependencies:
         -
-          name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+          name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
           expression: '{Windows memory by Zabbix agent active:vm.memory.util.min(5m)}>{$MEMORY.UTIL.MAX}'
   graphs:
     -

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:25Z'
+  date: '2021-02-16T06:32:46Z'
   groups:
     -
       name: Templates/Modules
@@ -150,7 +150,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-                  name: '{#MEMNAME}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
@@ -213,10 +213,6 @@ zabbix_export:
               height: '5'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -226,7 +222,7 @@ zabbix_export:
               type: GRAPH_PROTOTYPE
               'y': '5'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -235,11 +231,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -248,9 +240,9 @@ zabbix_export:
                     host: 'HOST-RESOURCES-MIB SNMP'
             -
               type: GRAPH_PROTOTYPE
-              'y': '10'
+              'y': '17'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -259,11 +251,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
