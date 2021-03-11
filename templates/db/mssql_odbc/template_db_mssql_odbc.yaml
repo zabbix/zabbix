@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:18Z'
+  date: '2021-03-11T11:50:30Z'
   groups:
     -
       name: Templates/Databases
@@ -2561,9 +2561,9 @@ zabbix_export:
           description: 'Discovery of the non-local (not local to the SQL Server instance) availability databases.'
           item_prototypes:
             -
-              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Get non-local DB states'
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Get non-local DB states'
               type: ODBC
-              key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
+              key: 'db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
               history: 0h
               trends: '0'
               value_type: TEXT
@@ -2584,9 +2584,9 @@ zabbix_export:
                 -
                   name: 'Zabbix raw items'
             -
-              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Log queue size'
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Log queue size'
               type: DEPENDENT
-              key: 'mssql.non-local_db.log_send_queue_size["{#DBNAME}"]'
+              key: 'mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2608,17 +2608,17 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
               trigger_prototypes:
                 -
                   expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
-                  name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Log queue size is growing'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Log queue size is growing'
                   priority: HIGH
                   description: 'The log records of the primary database do not send to the secondary databases.'
             -
-              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Redo log queue size'
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Redo log queue size'
               type: DEPENDENT
-              key: 'mssql.non-local_db.redo_queue_size["{#DBNAME}"]'
+              key: 'mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2640,11 +2640,11 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
               trigger_prototypes:
                 -
                   expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
-                  name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Redo log queue size is growing'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Redo log queue size is growing'
                   priority: HIGH
                   description: 'The log records in the log files of the secondary replica have not yet been redone.'
           preprocessing:
