@@ -63,6 +63,7 @@ class CReport extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'reportids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'expired' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'reportid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -105,6 +106,13 @@ class CReport extends CApiService {
 		// reportids
 		if ($options['reportids'] !== null) {
 			$sql_parts['where'][] = dbConditionInt('r.reportid', $options['reportids']);
+		}
+
+		// expired
+		if ($options['expired'] !== null) {
+			$sql_parts['where'][] = $options['expired']
+				? '(r.active_till>0 AND r.active_till<'.strtotime('tomorrow UTC').')'
+				: '(r.active_till=0 OR r.active_till>='.strtotime('tomorrow UTC').')';
 		}
 
 		// filter
