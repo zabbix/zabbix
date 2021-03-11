@@ -818,7 +818,6 @@ class CControllerMenuPopup extends CController {
 
 			case 'trigger':
 				$menu_data = self::getMenuDataTrigger($data);
-				sdff($menu_data);
 				break;
 
 			case 'trigger_macro':
