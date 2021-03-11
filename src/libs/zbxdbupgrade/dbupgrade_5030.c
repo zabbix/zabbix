@@ -2159,7 +2159,7 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 	if (SUCCEED != (ret = DBpatch_add_dashboard(&dashboard)))
 		goto out;
 
-	while (NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
 		int			step, page_delay;
 		zbx_db_dashboard_page_t	dashboard_page;
@@ -2174,11 +2174,17 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 		result2 = DBselect("select name from screens where screenid=" ZBX_FS_UI64, screenid);
 
 		if (NULL == result2 || NULL == (row2 = DBfetch(result2)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen " ZBX_FS_UI64, screenid);
+			DBfree_result(result2);
 			continue;
+		}
 
 		if (SUCCEED != (ret = DBpatch_add_dashboard_page(&dashboard_page, dashboard.dashboardid,
 				row2[0], page_delay, step)))
 		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen " ZBX_FS_UI64, screenid);
+			DBfree_result(result2);
 			continue;
 		}
 
