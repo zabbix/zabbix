@@ -1884,14 +1884,15 @@ out:
  * Parameters: manager - [IN] the manager                                     *
  *             now     - [IN] the current time                                *
  *                                                                            *
+ * Return value: The number of scheduled jobs.                                *
+ *                                                                            *
  ******************************************************************************/
-static void	rm_schedule_jobs(zbx_rm_t *manager, int now)
+static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 {
 	zbx_rm_report_t		*report;
 	zbx_binary_heap_elem_t	*elem;
-	int			nextcheck;
+	int			nextcheck, ret, jobs_num = 0;
 	char			*error = NULL;
-	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queue:%d", __func__, manager->report_queue.elems_num);
 
@@ -1914,6 +1915,8 @@ static void	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 					report->nextcheck = nextcheck;
 					zbx_binary_heap_insert(&manager->report_queue, &elem_new);
+
+					jobs_num++;
 				}
 				else
 					report->nextcheck = 0;
@@ -1937,7 +1940,9 @@ static void	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() jobs:%d", __func__, jobs_num);
+
+	return jobs_num;
 }
 
 /******************************************************************************
@@ -2036,12 +2041,15 @@ static void	rm_send_test_error_result(zbx_ipc_client_t *client, const char *erro
  * Parameters: manager - [IN] the manager                                     *
  *             now     - [IN] current time                                    *
  *                                                                            *
+ * Return value: The number of started jobs.                                  *
+ *                                                                            *
  ******************************************************************************/
-static void	rm_process_jobs(zbx_rm_t *manager)
+static int	rm_process_jobs(zbx_rm_t *manager)
 {
-	zbx_rm_writer_t		*writer;
-	zbx_rm_job_t		*job;
-	char			*error = NULL;
+	zbx_rm_writer_t	*writer;
+	zbx_rm_job_t	*job;
+	char		*error = NULL;
+	int		jobs_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2061,14 +2069,19 @@ static void	rm_process_jobs(zbx_rm_t *manager)
 			}
 			else
 				rm_finish_job(manager, job, FAIL, error);
+
 			zbx_queue_ptr_push(&manager->free_writers, writer);
 			zbx_free(error);
 		}
 		else
 			writer->job = job;
+
+		jobs_num++;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() jobs:%d", __func__, jobs_num);
+
+	return jobs_num;
 }
 
 /******************************************************************************
@@ -2167,7 +2180,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	double			time_stat, time_idle = 0, time_now, sec, time_sync, time_flush_sessions, time_flush;
-	int			ret, sent_num = 0, failed_num = 0, delay;
+	int			ret, delay, processed_num = 0, created_num = 0;
 	zbx_rm_t		manager;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -2204,14 +2217,14 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 
 		if (ZBX_STAT_INTERVAL < time_now - time_stat)
 		{
-			zbx_setproctitle("%s #%d [sent %d, failed %d reports, idle " ZBX_FS_DBL " sec during "
+			zbx_setproctitle("%s #%d [jobs created %d, processed %d, idle " ZBX_FS_DBL " sec during "
 					ZBX_FS_DBL " sec]", get_process_type_string(process_type), process_num,
-					sent_num, failed_num, time_idle, time_now - time_stat);
+					created_num, processed_num, time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
-			sent_num = 0;
-			failed_num = 0;
+			created_num = 0;
+			processed_num = 0;
 		}
 
 		if (SEC_PER_HOUR < time_now - time_flush_sessions)
@@ -2232,8 +2245,8 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 			time_sync = time_now;
 		}
 
-		rm_schedule_jobs(&manager, time(NULL));
-		rm_process_jobs(&manager);
+		created_num += rm_schedule_jobs(&manager, time(NULL));
+		processed_num += rm_process_jobs(&manager);
 
 		sec = zbx_time();
 		delay = (sec - time_now > 0.5 ? 0 : 1);

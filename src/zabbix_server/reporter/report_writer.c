@@ -390,12 +390,16 @@ static void	rw_send_result(zbx_ipc_socket_t *socket, int status, char *error)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(report_writer_thread, args)
 {
+#define	ZBX_STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+					/* once in STAT_INTERVAL seconds */
+
 	pid_t			ppid;
 	char			*error = NULL;
 	zbx_ipc_socket_t	socket;
 	zbx_ipc_message_t	message;
 	zbx_alerter_dispatch_t	dispatch = {0};
-	int			report_status = FAIL;
+	int			report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
+	double			time_now, time_stat, time_idle = 0, time_wake;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -422,8 +426,26 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
+	time_stat = zbx_time();
+
 	while (ZBX_IS_RUNNING())
 	{
+		time_now = zbx_time();
+
+		if (ZBX_STAT_INTERVAL < time_now - time_stat)
+		{
+			zbx_setproctitle("%s #%d [reprots started %d, sent %d, finished %d, idle " ZBX_FS_DBL
+					" sec during " ZBX_FS_DBL " sec]", get_process_type_string(process_type),
+					process_num, started_num, sent_num, finished_num, time_idle,
+					time_now - time_stat);
+
+			time_stat = time_now;
+			time_idle = 0;
+			started_num = 0;
+			sent_num = 0;
+			finished_num = 0;
+		}
+
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
@@ -433,19 +455,26 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		zbx_update_env(zbx_time());
+
+		time_wake = zbx_time();
+		zbx_update_env(time_wake);
+		time_idle += time_wake = time_now;
 
 		switch (message.code)
 		{
 			case ZBX_IPC_REPORTER_BEGIN_REPORT:
 				if (SUCCEED != (report_status = rw_begin_report(&message, &dispatch, &error)))
 					zabbix_log(LOG_LEVEL_DEBUG, "failed to begin report dispatch: %s", error);
+				else
+					started_num++;
 				break;
 			case ZBX_IPC_REPORTER_SEND_REPORT:
 				if (SUCCEED == report_status)
 				{
 					if (SUCCEED != (report_status = rw_send_report(&message, &dispatch, &error)))
 						zabbix_log(LOG_LEVEL_DEBUG, "failed to send report: %s", error);
+					else
+						sent_num++;
 				}
 				break;
 			case ZBX_IPC_REPORTER_END_REPORT:
@@ -453,6 +482,8 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 				{
 					if (SUCCEED != (report_status = rw_end_report(&dispatch, &error)))
 						zabbix_log(LOG_LEVEL_DEBUG, "failed to end report dispatch: %s", error);
+					else
+						finished_num++;
 				}
 
 				rw_send_result(&socket, report_status, error);
