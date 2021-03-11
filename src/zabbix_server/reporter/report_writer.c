@@ -236,14 +236,14 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 	zbx_vector_ptr_pair_t	params;
 	int			i, ret;
 	char			*url, *cookie, *subject = "", *width = "1920", *height = "1080", *message = "",
-				*report = NULL;
+				*report = NULL, *name;
 	size_t			report_size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_begin_report(msg->data, &url, &cookie, &params);
+	report_deserialize_begin_report(msg->data, &name, &url, &cookie, &params);
 
 	for (i = 0; i < params.values_num; i++)
 	{
@@ -272,11 +272,12 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 
 	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, error)))
 	{
-		ret = zbx_alerter_begin_dispatch(dispatch, subject, message, "zabbix-report.pdf", "application/pdf",
-				report, report_size, error);
+		ret = zbx_alerter_begin_dispatch(dispatch, subject, message, name, "application/pdf", report,
+				report_size, error);
 	}
 
 	zbx_free(report);
+	zbx_free(name);
 	zbx_free(url);
 	zbx_free(cookie);
 

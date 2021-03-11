@@ -121,6 +121,7 @@ typedef struct
 	zbx_uint64_t		batchid;
 	char			*url;
 	char			*cookie;
+	char			*report_name;
 	zbx_vector_uint64_t	userids;
 	zbx_vector_ptr_pair_t	params;
 
@@ -231,6 +232,7 @@ static void	rm_report_clean(zbx_rm_report_t *report)
  ******************************************************************************/
 static void	rm_job_free(zbx_rm_job_t *job)
 {
+	zbx_free(job->report_name);
 	zbx_free(job->url);
 	zbx_free(job->cookie);
 
@@ -686,11 +688,59 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 
 /******************************************************************************
  *                                                                            *
+ * Function: rm_get_report_name                                               *
+ *                                                                            *
+ * Purpose: make report attachment name based on report name and timestamp    *
+ *                                                                            *
+ * Parameters: name        - [IN] the report name                             *
+ *             report_time - [IN] the report time                             *
+ *                                                                            *
+ * Return value: The report attachment name                                   *
+ *                                                                            *
+ ******************************************************************************/
+static char	*rm_get_report_name(const char *name, int report_time)
+{
+	time_t		rtime = report_time;
+	struct tm	*tm;
+	char		*name_esc, *ptr, *name_full;
+
+	name_esc = zbx_strdup(NULL, name);
+	for (ptr = name_esc; '\0' != *name; ptr++, name++)
+	{
+		switch (*name)
+		{
+			case ' ':
+			case '\t':
+			case ':':
+			case '/':
+			case '\\':
+				*ptr = '_';
+				break;
+			default:
+				*ptr = *name;
+				break;
+		}
+	}
+
+	if (NULL == (tm = localtime(&rtime)))
+		name_full = zbx_dsprintf(NULL, "%s.pdf", name_esc);
+	else
+		name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1970,
+				tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+
+	zbx_free(name_esc);
+
+	return name_full;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: rm_create_job                                                    *
  *                                                                            *
  * Purpose: create new job to be processed by report writers                  *
  *                                                                            *
  * Parameters: manager       - [IN] the manager                               *
+ *             report_name   - [IN] the report name                           *
  *             dashboardid   - [IN] the dashboard to view                     *
  *             access_userid - [IN] the user accessing the dashboard          *
  *             report_time   - [IN] the report time                           *
@@ -700,9 +750,9 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
  *             params        - [IN] the viewing and processing parameters     *
  *                                                                            *
  ******************************************************************************/
-static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, zbx_uint64_t dashboardid, zbx_uint64_t access_userid,
-		int report_time, unsigned char period, zbx_uint64_t *userids, int userids_num,
-		zbx_vector_ptr_pair_t *params, char **error)
+static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, zbx_uint64_t dashboardid,
+		zbx_uint64_t access_userid, int report_time, unsigned char period, zbx_uint64_t *userids,
+		int userids_num, zbx_vector_ptr_pair_t *params, char **error)
 {
 	zbx_rm_job_t		*job;
 	size_t			url_alloc = 0, url_offset = 0;
@@ -717,6 +767,8 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, zbx_uint64_t dashboardid, 
 
 	job = (zbx_rm_job_t *)zbx_malloc(NULL, sizeof(zbx_rm_job_t));
 	memset(job, 0, sizeof(zbx_rm_job_t));
+
+	job->report_name = rm_get_report_name(report_name, report_time);
 
 	zbx_vector_ptr_pair_create(&job->params);
 	/* move key-value pairs from params to job */
@@ -1504,7 +1556,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 		goto out;
 	}
 
-	size = report_serialize_begin_report(&data, job->url, job->cookie, &job->params);
+	size = report_serialize_begin_report(&data, job->report_name, job->url, job->cookie, &job->params);
 	if (SUCCEED != zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_BEGIN_REPORT, data, size))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -1647,8 +1699,8 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
 
 	if (i == jobs->values_num)
 	{
-		if (NULL == (job = rm_create_job(manager, report->dashboardid, access_userid, now, report->period,
-				&userid, 1, &report->params, error)))
+		if (NULL == (job = rm_create_job(manager, report->name, report->dashboardid, access_userid, now,
+				report->period, &userid, 1, &report->params, error)))
 		{
 			return FAIL;
 		}
@@ -2041,13 +2093,14 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 	int			report_time, ret;
 	unsigned char		period;
 	zbx_rm_job_t		*job;
+	char			*name;
 
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_test_report(message->data, &dashboardid, &userid, &access_userid, &report_time, &period,
-			&params);
+	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &access_userid, &report_time,
+			&period, &params);
 
-	if (NULL != (job = rm_create_job(manager, dashboardid, access_userid, report_time, period, &userid, 1, &params,
+	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1, &params,
 			error)))
 	{
 		job->client = client;
@@ -2057,6 +2110,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 	else
 		ret = FAIL;
 
+	zbx_free(name);
 	report_destroy_params(&params);
 
 	return ret;

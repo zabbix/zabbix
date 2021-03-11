@@ -50,14 +50,15 @@ static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zb
  *                                                                            *
  ******************************************************************************/
 
-static zbx_uint32_t	report_serialize_test_report(unsigned char **data, zbx_uint64_t dashboardid,
+static zbx_uint32_t	report_serialize_test_report(unsigned char **data, const char *name, zbx_uint64_t dashboardid,
 		zbx_uint64_t userid, zbx_uint64_t viewer_userid, int report_time, unsigned char period,
 		const zbx_vector_ptr_pair_t *params)
 {
-	zbx_uint32_t	data_len = 0, *len;
+	zbx_uint32_t	data_len = 0, *len, name_len;
 	int		i;
 	unsigned char	*ptr;
 
+	zbx_serialize_prepare_str(data_len, name);
 	zbx_serialize_prepare_value(data_len, dashboardid);
 	zbx_serialize_prepare_value(data_len, userid);
 	zbx_serialize_prepare_value(data_len, viewer_userid);
@@ -76,6 +77,7 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, zbx_uint6
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr = *data;
 
+	ptr += zbx_serialize_str(ptr, name, name_len);
 	ptr += zbx_serialize_value(ptr, dashboardid);
 	ptr += zbx_serialize_value(ptr, userid);
 	ptr += zbx_serialize_value(ptr, viewer_userid);
@@ -94,11 +96,14 @@ static zbx_uint32_t	report_serialize_test_report(unsigned char **data, zbx_uint6
 	return data_len;
 }
 
-void	report_deserialize_test_report(const unsigned char *data, zbx_uint64_t *dashboardid, zbx_uint64_t *userid,
-		zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period, zbx_vector_ptr_pair_t *params)
+void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_uint64_t *dashboardid,
+		zbx_uint64_t *userid, zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period,
+		zbx_vector_ptr_pair_t *params)
 {
-	int	params_num, i;
+	int		params_num, i;
+	zbx_uint32_t	len;
 
+	data += zbx_deserialize_str(data, name, len);
 	data += zbx_deserialize_value(data, dashboardid);
 	data += zbx_deserialize_value(data, userid);
 	data += zbx_deserialize_value(data, viewer_userid);
@@ -156,13 +161,14 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
  *                                                                            *
  ******************************************************************************/
 
-zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *url, const char *cookie,
-		const zbx_vector_ptr_pair_t *params)
+zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *name, const char *url,
+		const char *cookie, const zbx_vector_ptr_pair_t *params)
 {
-	zbx_uint32_t	data_len = 0, *params_len, url_len, cookie_len;
+	zbx_uint32_t	data_len = 0, *params_len, url_len, cookie_len, name_len;
 	unsigned char	*ptr;
 	int		i;
 
+	zbx_serialize_prepare_str(data_len, name);
 	zbx_serialize_prepare_str(data_len, url);
 	zbx_serialize_prepare_str(data_len, cookie);
 	zbx_serialize_prepare_value(data_len, params->values_num);
@@ -177,6 +183,7 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *url
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr = *data;
 
+	ptr += zbx_serialize_str(ptr, name, name_len);
 	ptr += zbx_serialize_str(ptr, url, url_len);
 	ptr += zbx_serialize_str(ptr, cookie, cookie_len);
 
@@ -193,12 +200,13 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *url
 	return data_len;
 }
 
-void	report_deserialize_begin_report(const unsigned char *data, char **url, char **cookie,
+void	report_deserialize_begin_report(const unsigned char *data, char **name, char **url, char **cookie,
 		zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	len;
 	int		i, params_num;
 
+	data += zbx_deserialize_str(data, name, len);
 	data += zbx_deserialize_str(data, url, len);
 	data += zbx_deserialize_str(data, cookie, len);
 
@@ -304,8 +312,16 @@ int	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, char *
 	zbx_vector_ptr_pair_t	params;
 	zbx_uint32_t		size;
 	unsigned char		*data = NULL, *response = NULL;
+	char			*name = NULL;
+	size_t			name_alloc = 0;
 
 	zbx_vector_ptr_pair_create(&params);
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_NAME, &name, &name_alloc, NULL))
+	{
+		*error = zbx_dsprintf(*error, "cannot find tag: %s", ZBX_PROTO_TAG_NAME);
+		goto out;
+	}
 
 	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_DASHBOARDID, &dashboardid, error))
 		goto out;
@@ -339,7 +355,8 @@ int	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, char *
 		}
 	}
 
-	size = report_serialize_test_report(&data, dashboardid, userid, viewer_userid, report_time, period, &params);
+	size = report_serialize_test_report(&data, name, dashboardid, userid, viewer_userid, report_time, period,
+			&params);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_REPORTER, ZBX_IPC_REPORTER_TEST,
 			SEC_PER_MIN, data, size, &response, error))
@@ -351,6 +368,7 @@ int	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, char *
 out:
 	zbx_free(response);
 	zbx_free(data);
+	zbx_free(name);
 
 	report_destroy_params(&params);
 

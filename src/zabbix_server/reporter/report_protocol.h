@@ -44,15 +44,16 @@
 void	report_clear_params(zbx_vector_ptr_pair_t *params);
 void	report_destroy_params(zbx_vector_ptr_pair_t *params);
 
-void	report_deserialize_test_report(const unsigned char *data, zbx_uint64_t *dashboardid, zbx_uint64_t *userid,
-		zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period, zbx_vector_ptr_pair_t *params);
+void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_uint64_t *dashboardid,
+		zbx_uint64_t *userid, zbx_uint64_t *viewer_userid, int *report_time, unsigned char *period,
+		zbx_vector_ptr_pair_t *params);
 
 zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const char *error);
 void	report_deserialize_response(const unsigned char *data, int *status, char **error);
 
-zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *url, const char *cookie,
-		const zbx_vector_ptr_pair_t *params);
-void	report_deserialize_begin_report(const unsigned char *data, char **url, char **cookie,
+zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *name, const char *url,
+		const char *cookie, const zbx_vector_ptr_pair_t *params);
+void	report_deserialize_begin_report(const unsigned char *data, char **name, char **url, char **cookie,
 		zbx_vector_ptr_pair_t *params);
 
 zbx_uint32_t	report_serialize_send_report(unsigned char **data, const DB_MEDIATYPE *mt,
