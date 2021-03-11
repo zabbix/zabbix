@@ -138,6 +138,9 @@ jQuery(function($) {
 
 				// initialization of widget
 				init: function(options) {
+
+					console.log(options);
+
 					var widget_data = $.extend({}, options);
 
 					return this.each(function() {

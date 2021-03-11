@@ -27,6 +27,12 @@ class CWidgetMap extends CWidget {
 		this._map_options = null;
 	}
 
+	_startUpdating(delay_sec = 0) {
+		super._startUpdating(delay_sec);
+
+		// this._$target.zbx_mapwidget('update', this);
+	}
+
 	_processUpdateResponse(response) {
 		super._processUpdateResponse(response);
 
@@ -43,7 +49,7 @@ class CWidgetMap extends CWidget {
 			}
 
 			if (this._map_options !== null) {
-				this._$target.zbx_mapwidget(this._uniqueid, this._map_options);
+				this._$target.zbx_mapwidget(this._map_options);
 			}
 
 			if (response.sysmap_data.error_msg !== null) {
@@ -80,25 +86,19 @@ class CWidgetMap extends CWidget {
 		this._events = {
 			...this._events,
 
-			refresh: () => {
-				this._$target.zbx_mapwidget('update', this);
-			},
-
 			afterUpdateConfig: () => {
 				this.storeValue('current_sysmapid', this._fields.sysmapid);
 			}
 		}
 
-		this
-			.on(WIDGET_EVENT_REFRESH, this._events.refresh);
+		// this
 			// .on(WIDGET_EVENT_CONFIG_AFTER_UPDATE, this._events.afterUpdateConfig);
 	}
 
 	_unregisterEvents() {
 		super._unregisterEvents();
 
-		this
-			.on(WIDGET_EVENT_REFRESH, this._events.refresh);
+		// this
 			// .off(WIDGET_EVENT_CONFIG_AFTER_UPDATE, this._events.afterUpdateConfig);
 	}
 }

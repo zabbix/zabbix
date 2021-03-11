@@ -28,7 +28,6 @@ class CControllerWidgetMapView extends CControllerWidget {
 		$this->setType(WIDGET_MAP);
 		$this->setValidationRules([
 			'name' => 'string',
-			'uniqueid' => 'required|string',
 			'initial_load' => 'in 0,1',
 			'fields' => 'json',
 			'storage' => 'array'
@@ -38,7 +37,6 @@ class CControllerWidgetMapView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 		$storage = $this->getInput('storage', []);
-		$uniqueid = $this->getInput('uniqueid');
 		$sysmap_data = null;
 		$previous_map = null;
 		$sysmapid = null;
@@ -71,7 +69,6 @@ class CControllerWidgetMapView extends CControllerWidget {
 		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
 		foreach ($sysmap_data['elements'] as &$element) {
 			$actions = json_decode($element['actions'], true);
-			$actions['data']['widget_uniqueid'] = $uniqueid;
 			$element['actions'] = json_encode($actions);
 		}
 		unset($element);
@@ -88,7 +85,6 @@ class CControllerWidgetMapView extends CControllerWidget {
 				'source_type' => $fields['source_type'],
 				'previous_map' => $previous_map,
 				'initial_load' => $this->getInput('initial_load', 1),
-				'uniqueid' => $uniqueid,
 				'error' => $error
 			],
 			'user' => [

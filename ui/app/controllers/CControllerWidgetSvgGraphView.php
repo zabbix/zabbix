@@ -34,7 +34,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$this->setType(WIDGET_SVG_GRAPH);
 		$this->setValidationRules([
 			'name' => 'string',
-			'uniqueid' => 'required|string',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'initial_load' => 'in 0,1',
 			'edit_mode' => 'in 0,1',
@@ -47,7 +46,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
-		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);

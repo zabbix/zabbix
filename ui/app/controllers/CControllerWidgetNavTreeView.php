@@ -31,7 +31,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$this->setType(WIDGET_NAV_TREE);
 		$this->setValidationRules([
 			'name' => 'string',
-			'uniqueid' => 'required|string',
 			'widgetid' => 'db widget.widgetid',
 			'initial_load' => 'in 0,1',
 			'fields' => 'json'
@@ -471,7 +470,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'uniqueid' => $this->getInput('uniqueid'),
 			'navtree' => $fields['navtree'],
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,
