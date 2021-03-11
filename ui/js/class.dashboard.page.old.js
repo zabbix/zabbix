@@ -574,128 +574,6 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	/**
-	 * Add or update form on widget configuration dialogue (when opened, as well as when requested by 'onchange'
-	 * attributes in form itself).
-	 */
-	updateWidgetConfigDialogue() {
-		const $body = this._data.dialogue.body;
-		const $footer = $('.overlay-dialogue-footer', this._data.dialogue.div);
-		const $header = $('.dashbrd-widget-head', this._data.dialogue.div);
-		const $form = $('form', $body);
-		const widget = this._data.dialogue.widget; // Widget currently being edited.
-		const url = new Curl('zabbix.php');
-		const ajax_data = {};
-
-		let fields;
-
-		url.setArgument('action', 'dashboard.widget.edit');
-
-		if (this._data.dashboard.templateid !== null) {
-			ajax_data.templateid = this._data.dashboard.templateid;
-		}
-
-		if ($form.length) {
-			// Take values from form.
-			fields = $form.serializeJSON();
-			ajax_data.type = fields['type'];
-			ajax_data.prev_type = this._data.dialogue.widget_type;
-			delete fields['type'];
-
-			if (ajax_data.prev_type === ajax_data.type) {
-				ajax_data.name = fields['name'];
-				ajax_data.view_mode = (fields['show_header'] == 1)
-					? ZBX_WIDGET_VIEW_MODE_NORMAL
-					: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
-
-				delete fields['name'];
-				delete fields['show_header'];
-			}
-			else {
-				// Get default config if widget type changed.
-				fields = {};
-			}
-		}
-		else if (widget !== null) {
-			// Open form with current config.
-			ajax_data.type = widget.type;
-			ajax_data.name = widget.header;
-			ajax_data.view_mode = widget.view_mode;
-			fields = widget.fields;
-		}
-		else {
-			// Get default config for new widget.
-			fields = {};
-		}
-
-		if (fields && Object.keys(fields).length !== 0) {
-			ajax_data.fields = JSON.stringify(fields);
-		}
-
-		const overlay = overlays_stack.getById('widgetConfg');
-
-		overlay.setLoading();
-
-		if (overlay.xhr) {
-			overlay.xhr.abort();
-		}
-
-		overlay.xhr = jQuery.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			data: ajax_data,
-			dataType: 'json'
-		});
-
-		overlay.xhr.done((response) => {
-			this._data.dialogue.widget_type = response.type;
-
-			$body.empty();
-			$body.append(response.body);
-
-			if (typeof response.debug !== 'undefined') {
-				$body.append(response.debug);
-			}
-
-			if (typeof response.messages !== 'undefined') {
-				$body.append(response.messages);
-			}
-
-			$body.find('form').attr('aria-labeledby', $header.find('h4').attr('id'));
-
-			// Change submit function for returned form.
-			$('#widget-dialogue-form', $body).on('submit', (e) => {
-				e.preventDefault();
-				this._updateWidgetConfig(widget);
-			});
-
-			const $overlay = jQuery('[data-dialogueid="widgetConfg"]');
-
-			// TODO move to CWidgetConfig.
-			$overlay.toggleClass('sticked-to-top', this._data.dialogue.widget_type === 'svggraph');
-
-			Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
-			Overlay.prototype.containFocus.call({'$dialogue': $overlay});
-
-			overlay.unsetLoading();
-
-			const area_size = {
-				'width': this._data.widget_defaults[this._data.dialogue.widget_type].size.width,
-				'height': this._data.widget_defaults[this._data.dialogue.widget_type].size.height
-			};
-
-			if (widget === null && !this._findEmptyPosition(area_size)) {
-				this._showDialogMessageExhausted();
-				$('.dialogue-widget-save', $footer).prop('disabled', true);
-			}
-
-			// Activate tab indicator for graph widget form.
-			if (this._data.dialogue.widget_type === 'svggraph') {
-				new TabIndicators();
-			}
-		});
-	}
-
-	/**
 	 * Returns list of widgets filter by key=>value pair.
 	 */
 	getWidgetsBy(key, value) {
@@ -2688,6 +2566,8 @@ class CDashboardPage extends CBaseComponent {
 					if (widget && 'pos' in widget) {
 						pos = {...this._data.widget_defaults[type].size, ...widget.pos};
 
+
+
 						this._widgets
 							.filter((w) => {
 								return this._rectOverlap(w.pos, pos);
@@ -2878,6 +2758,130 @@ class CDashboardPage extends CBaseComponent {
 
 		this.updateWidgetConfigDialogue();
 	}
+
+	/**
+	 * Add or update form on widget configuration dialogue (when opened, as well as when requested by 'onchange'
+	 * attributes in form itself).
+	 */
+	updateWidgetConfigDialogue() {
+		const $body = this._data.dialogue.body;
+		const $footer = $('.overlay-dialogue-footer', this._data.dialogue.div);
+		const $header = $('.dashbrd-widget-head', this._data.dialogue.div);
+		const $form = $('form', $body);
+		const widget = this._data.dialogue.widget; // Widget currently being edited.
+		const url = new Curl('zabbix.php');
+		const ajax_data = {};
+
+		let fields;
+
+		url.setArgument('action', 'dashboard.widget.edit');
+
+		if (this._data.dashboard.templateid !== null) {
+			ajax_data.templateid = this._data.dashboard.templateid;
+		}
+
+		if ($form.length) {
+			// Take values from form.
+			fields = $form.serializeJSON();
+			ajax_data.type = fields['type'];
+			ajax_data.prev_type = this._data.dialogue.widget_type;
+			delete fields['type'];
+
+			if (ajax_data.prev_type === ajax_data.type) {
+				ajax_data.name = fields['name'];
+				ajax_data.view_mode = (fields['show_header'] == 1)
+					? ZBX_WIDGET_VIEW_MODE_NORMAL
+					: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
+
+				delete fields['name'];
+				delete fields['show_header'];
+			}
+			else {
+				// Get default config if widget type changed.
+				fields = {};
+			}
+		}
+		else if (widget !== null) {
+			// Open form with current config.
+			ajax_data.type = widget.type;
+			ajax_data.name = widget.header;
+			ajax_data.view_mode = widget.view_mode;
+			fields = widget.fields;
+		}
+		else {
+			// Get default config for new widget.
+			fields = {};
+		}
+
+		if (fields && Object.keys(fields).length !== 0) {
+			ajax_data.fields = JSON.stringify(fields);
+		}
+
+		const overlay = overlays_stack.getById('widgetConfg');
+
+		overlay.setLoading();
+
+		if (overlay.xhr) {
+			overlay.xhr.abort();
+		}
+
+		overlay.xhr = jQuery.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			data: ajax_data,
+			dataType: 'json'
+		});
+
+		overlay.xhr.done((response) => {
+			this._data.dialogue.widget_type = response.type;
+
+			$body.empty();
+			$body.append(response.body);
+
+			if (typeof response.debug !== 'undefined') {
+				$body.append(response.debug);
+			}
+
+			if (typeof response.messages !== 'undefined') {
+				$body.append(response.messages);
+			}
+
+			$body.find('form').attr('aria-labeledby', $header.find('h4').attr('id'));
+
+			// Change submit function for returned form.
+			$('#widget-dialogue-form', $body).on('submit', (e) => {
+				e.preventDefault();
+				this._updateWidgetConfig(widget);
+			});
+
+			const $overlay = jQuery('[data-dialogueid="widgetConfg"]');
+
+			// TODO move to CWidgetConfig.
+			$overlay.toggleClass('sticked-to-top', this._data.dialogue.widget_type === 'svggraph');
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
+			Overlay.prototype.containFocus.call({'$dialogue': $overlay});
+
+			overlay.unsetLoading();
+
+			const area_size = {
+				'width': this._data.widget_defaults[this._data.dialogue.widget_type].size.width,
+				'height': this._data.widget_defaults[this._data.dialogue.widget_type].size.height
+			};
+
+			if (widget === null && !this._findEmptyPosition(area_size)) {
+				this._showDialogMessageExhausted();
+				$('.dialogue-widget-save', $footer).prop('disabled', true);
+			}
+
+			// Activate tab indicator for graph widget form.
+			if (this._data.dialogue.widget_type === 'svggraph') {
+				new TabIndicators();
+			}
+		});
+	}
+
+
 
 	_editDashboard() {
 		this._$target.addClass('dashbrd-mode-edit');

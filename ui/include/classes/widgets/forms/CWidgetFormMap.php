@@ -42,7 +42,7 @@ class CWidgetFormMap extends CWidgetForm {
 			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree')
 		]))
 			->setDefault(WIDGET_SYSMAP_SOURCETYPE_MAP)
-			->setAction('updateWidgetConfigDialogue()')
+			->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
 			->setModern(true);
 
 		if (array_key_exists('source_type', $this->data)) {

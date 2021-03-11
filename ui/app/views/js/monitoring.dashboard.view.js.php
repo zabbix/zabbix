@@ -60,8 +60,8 @@
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
 				widget_defaults: widget_defaults,
-				is_editable: dashboard.allowed_edit && dashboard.editable,
-				is_edit_mode: (dashboard.dashboardid === null),
+				is_editable: dashboard.can_edit_dashboards && dashboard.editable,
+				is_edit_mode: dashboard.dashboardid === null,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				web_layout_mode: web_layout_mode,
 				time_period: time_period,
@@ -69,6 +69,12 @@
 			});
 
 			for (const page of dashboard.pages) {
+				// Patch JSON-decoded empty arrays to empty objects.
+				for (const widget of page.widgets) {
+					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.configuration = (typeof widget.configuration === 'object') ? widget.configuration : {};
+				}
+
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
 
@@ -85,24 +91,27 @@
 
 			if (web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 				if (dashboard.dashboardid === null) {
+					ZABBIX.Dashboard.setEditMode();
 					edit();
-					ZABBIX.Dashboard.editProperties();
+
+					PopUp('dashboard.properties.edit', ZABBIX.Dashboard.getProperties(), 'dashboard_properties',
+						document.activeElement
+					);
 				}
 				else {
 					document
 						.getElementById('dashbrd-edit')
-						.addEventListener('click', () => edit());
+						.addEventListener('click', () => {
+							ZABBIX.Dashboard.setEditMode();
+							edit();
+						});
 				}
 
-				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT_MODE, () => edit());
+				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => edit());
 			}
 		};
 
 		const edit = () => {
-			if (!ZABBIX.Dashboard.isEditMode()) {
-				ZABBIX.Dashboard.setEditMode();
-			}
-
 			timeControl.disableAllSBox();
 
 			if (dynamic.has_dynamic_widgets) {
@@ -125,11 +134,15 @@
 
 			document
 				.getElementById('dashbrd-config')
-				.addEventListener('click', () => ZABBIX.Dashboard.editProperties());
+				.addEventListener('click', () => {
+					PopUp('dashboard.properties.edit', ZABBIX.Dashboard.getProperties(), 'dashboard_properties',
+						document.activeElement
+					);
+				});
 
-//			document
-//				.getElementById('dashbrd-add-widget')
-//				.addEventListener('click', (e) => ZABBIX.Dashboard.addNewWidget(e.target));
+			document
+				.getElementById('dashbrd-add-widget')
+				.addEventListener('click', () => ZABBIX.Dashboard.addNewWidget());
 
 			document
 				.getElementById('dashbrd-add')
@@ -179,7 +192,7 @@
 				}
 				ajax_widget.pos = widget.pos;
 				ajax_widget.type = widget.type;
-				ajax_widget.name = widget.header;
+				ajax_widget.name = widget.name;
 				ajax_widget.view_mode = widget.view_mode;
 				if (Object.keys(widget.fields).length != 0) {
 					ajax_widget.fields = JSON.stringify(widget.fields);
@@ -255,12 +268,11 @@
 						items: [
 							{
 								label: t('Add widget'),
-								clickCallback: () => ZABBIX.Dashboard.addNewWidget(e.target)
+								clickCallback: () => ZABBIX.Dashboard.addNewWidget()
 							},
 							{
 								label: t('Add page'),
-								clickCallback: () => ZABBIX.Dashboard.addNewPage(e.target),
-								disabled: true
+								clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
 							}
 						]
 					},
@@ -269,7 +281,7 @@
 							{
 								label: t('Paste widget'),
 								clickCallback: () => ZABBIX.Dashboard.pasteWidget(null, null),
-								disabled: (ZABBIX.Dashboard.getCopiedWidget() === null)
+								disabled: (ZABBIX.Dashboard.getStoredWidgetCopy() === null)
 							},
 							{
 								label: t('Paste page'),
@@ -340,20 +352,12 @@
 	}
 
 	function applyDashboardProperties(overlay) {
-		const form = overlay.$dialogue[0].querySelector('form');
-		const form_data = {};
-
-		new FormData(form).forEach((value, key) => form_data[key] = value);
-
-		for (const el of form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad')) {
-				el.parentNode.removeChild(el);
-			}
-		}
+		const form = overlay.$dialogue.$body[0].querySelector('form');
+		const fields = getFormFields(form);
 
 		overlay.setLoading();
 
-		new Promise((resolve) => resolve(ZABBIX.Dashboard.promiseApplyProperties(form_data)))
+		new Promise((resolve) => resolve(ZABBIX.Dashboard.promiseApplyProperties(fields)))
 			.then(() => {
 				const dashboard_data = ZABBIX.Dashboard.getData();
 
@@ -363,6 +367,12 @@
 				overlayDialogueDestroy(overlay.dialogueid);
 			})
 			.catch((error) => {
+				for (const el of form.parentNode.children) {
+					if (el.matches('.msg-good, .msg-bad')) {
+						el.parentNode.removeChild(el);
+					}
+				}
+
 				const message_box = (typeof error === 'object' && 'html_string' in error)
 					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
 					: makeMessageBox('bad', [], t('Cannot update dashboard properties.'), true, false)[0];
@@ -382,13 +392,6 @@
 		window.addPopupValues = function(list) {
 			dashboard_share.addPopupValues(list);
 		}
-	}
-
-	/**
-	 * Reload widget configuration dialogue. Used as callback in widget forms.
-	 */
-	function updateWidgetConfigDialogue() {
-		ZABBIX.Dashboard.updateWidgetConfigDialogue();
 	}
 
 	/**

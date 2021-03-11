@@ -930,3 +930,22 @@ function urlEncodeData(parameters, prefix = '') {
 
 	return result.join('&');
 }
+
+function getFormFields(form) {
+	const fields = {};
+
+	for (let [key, value] of new FormData(form)) {
+		if (key.substr(-2) === '[]') {
+			key = key.substr(0, key.length - 2);
+			if (!(key in fields)) {
+				fields[key] = [];
+			}
+			fields[key].push(value);
+		}
+		else {
+			fields[key] = value;
+		}
+	}
+
+	return fields;
+}

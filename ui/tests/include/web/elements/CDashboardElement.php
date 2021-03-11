@@ -122,7 +122,7 @@ class CDashboardElement extends CElement {
 		$this->checkIfEditable();
 		$this->getControls()->query('id:dashbrd-add-widget')->one()->click();
 
-		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
+		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
 				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
 	}
 

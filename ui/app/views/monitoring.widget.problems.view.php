@@ -300,7 +300,6 @@ if ($data['info'] !== '') {
 }
 
 $output = [
-	'aria_label' => _xs('%1$s widget', 'screen reader', $data['name']).', '.$data['info'],
 	'header' => $data['name'],
 	'body' => $table->toString()
 ];

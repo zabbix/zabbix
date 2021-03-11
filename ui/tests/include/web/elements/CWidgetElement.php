@@ -75,7 +75,7 @@ class CWidgetElement extends CElement {
 	 */
 	public function edit() {
 		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->waitUntilPresent()->click(true);
-		return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
+		return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()->asForm()->one();
 	}
 
 	/**

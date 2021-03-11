@@ -20,7 +20,7 @@
 const ZBX_WIDGET_VIEW_MODE_NORMAL = 0;
 const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
 
-const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
+const WIDGET_EVENT_EDIT = 'edit';
 const WIDGET_EVENT_ENTER = 'enter';
 const WIDGET_EVENT_LEAVE = 'leave';
 const WIDGET_EVENT_BEFORE_UPDATE = 'before-update';
@@ -38,7 +38,7 @@ class CWidget extends CBaseComponent {
 
 	constructor({
 		type,
-		header,
+		name,
 		view_mode,
 		fields,
 		configuration,
@@ -65,12 +65,10 @@ class CWidget extends CBaseComponent {
 		this._$target = $(this._target);
 
 		this._type = type;
-		this._header = header;
+		this._name = name;
 		this._view_mode = view_mode;
-		// Patch JSON-decoded empty array to an empty object.
-		this._fields = (typeof fields === 'object') ? fields : {};
-		// Patch JSON-decoded empty array to an empty object.
-		this._configuration = (typeof configuration === 'object') ? configuration : {};
+		this._fields = fields;
+		this._configuration = configuration;
 		this._defaults = defaults;
 		this._parent = parent;
 		this._widgetid = widgetid;
@@ -119,6 +117,7 @@ class CWidget extends CBaseComponent {
 		this._update_retry_sec = 3;
 		this._preloader_timeout = null;
 		this._preloader_timeout_sec = 10;
+		this._show_preloader_asap = true;
 		this._storage = {};
 	}
 
@@ -150,10 +149,7 @@ class CWidget extends CBaseComponent {
 
 	_doActivate() {
 		this._registerEvents();
-
-		if (!this._is_edit_mode) {
-			this._startUpdating();
-		}
+		this._startUpdating(0, {do_update_once: this._is_edit_mode});
 	}
 
 	deactivate() {
@@ -167,10 +163,7 @@ class CWidget extends CBaseComponent {
 
 	_doDeactivate() {
 		this._unregisterEvents();
-
-		if (!this._is_edit_mode) {
-			this._stopUpdating();
-		}
+		this._stopUpdating();
 	}
 
 	destroy() {
@@ -217,8 +210,44 @@ class CWidget extends CBaseComponent {
 	resize() {
 	}
 
+	setName(name) {
+		this._name = name;
+
+		if (this._state !== WIDGET_STATE_INITIAL) {
+			this._$content_header.find('h4').text(name);
+		}
+	}
+
+	setFields(fields) {
+		this._fields = fields;
+
+		this._show_preloader_asap = true;
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating(0, {do_update_once: this._is_edit_mode});
+		}
+	}
+
+	setConfiguration(configuration) {
+		this._configuration = configuration;
+
+		this._show_preloader_asap = true;
+
+		if (this._state !== WIDGET_STATE_INITIAL) {
+			this._$content_body.toggleClass('no-padding', !this._configuration.padding);
+		}
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating(0, {do_update_once: this._is_edit_mode});
+		}
+	}
+
 	getState() {
 		return this._state;
+	}
+
+	getType() {
+		return this._type;
 	}
 
 	getView() {
@@ -273,7 +302,7 @@ class CWidget extends CBaseComponent {
 		this._dynamic_hostid = dynamic_hostid;
 
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
+			this._startUpdating(0, {do_update_once: this._is_edit_mode});
 		}
 	}
 
@@ -322,6 +351,16 @@ class CWidget extends CBaseComponent {
 			.prop('disabled', true);
 	}
 
+	getProperties() {
+		return {
+			type: this._type,
+			name: this._name,
+			view_mode: this._view_mode,
+			fields: JSON.stringify(this._fields),
+			unique_id: this._unique_id
+		};
+	}
+
 	_setRfRate(rf_rate) {
 		let update_promise;
 
@@ -347,7 +386,7 @@ class CWidget extends CBaseComponent {
 
 			if (this._state === WIDGET_STATE_ACTIVE) {
 				if (this._rf_rate > 0) {
-					this._startUpdating();
+					this._startUpdating(0, {do_update_once: this._is_edit_mode});
 				}
 				else {
 					this._stopUpdating();
@@ -359,7 +398,7 @@ class CWidget extends CBaseComponent {
 	getDataCopy() {
 		return {
 			type: this._type,
-			header: this._header,
+			name: this._name,
 			view_mode: this._view_mode,
 			fields: this._fields,
 			configuration: this._configuration,
@@ -435,23 +474,27 @@ class CWidget extends CBaseComponent {
 		return menu;
 	}
 
-	_startUpdating(delay_sec = 0) {
+	updateOnce() {
+		this._startUpdating(0, true);
+	}
+
+	_startUpdating(delay_sec = 0, {do_update_once = false} = {}) {
 		this._stopUpdating(false);
 
 		if (delay_sec > 0) {
 			this._update_timeout_id = setTimeout(() => {
 				this._update_timeout_id = null;
-				this._startUpdating();
+				this._startUpdating(0, {do_update_once: do_update_once});
 			}, delay_sec * 1000);
 		}
 		else {
-			if (this._rf_rate > 0) {
+			if (!do_update_once && this._rf_rate > 0) {
 				this._update_interval_id = setInterval(() => {
-					this._update();
+					this._update(do_update_once);
 				}, this._rf_rate * 1000);
 			}
 
-			this._update();
+			this._update(do_update_once);
 		}
 	}
 
@@ -479,9 +522,9 @@ class CWidget extends CBaseComponent {
 		this._is_updating_paused = false;
 	}
 
-	_update() {
+	_update(do_update_once) {
 		if (this._update_abort_controller !== null || this._is_updating_paused || this.isInteracting()) {
-			this._startUpdating(1);
+			this._startUpdating(1, {do_update_once: do_update_once});
 
 			return;
 		}
@@ -492,7 +535,14 @@ class CWidget extends CBaseComponent {
 		this._content_size = this._getContentSize();
 
 		this._update_abort_controller = new AbortController();
-		this._schedulePreloader();
+
+		if (this._show_preloader_asap) {
+			this._show_preloader_asap = false;
+			this._showPreloader();
+		}
+		else {
+			this._schedulePreloader();
+		}
 
 		new Promise((resolve) => resolve(this._promiseUpdate()))
 			.then(() => this._hidePreloader())
@@ -501,7 +551,7 @@ class CWidget extends CBaseComponent {
 					this._hidePreloader();
 				}
 				else {
-					this._startUpdating(this._update_retry_sec);
+					this._startUpdating(this._update_retry_sec, {do_update_once: do_update_once});
 				}
 			})
 			.finally(() => {
@@ -533,7 +583,7 @@ class CWidget extends CBaseComponent {
 			templateid: this._dashboard.templateid ?? undefined,
 			dashboardid: this._dashboard.dashboardid ?? undefined,
 			widgetid: this._widgetid ?? undefined,
-			name: this._header !== '' ? this._header : undefined,
+			name: this._name !== '' ? this._name : undefined,
 			fields: Object.keys(this._fields).length > 0 ? JSON.stringify(this._fields) : undefined,
 			view_mode: this._view_mode,
 			edit_mode: this._is_edit_mode ? 1 : 0,
@@ -545,8 +595,7 @@ class CWidget extends CBaseComponent {
 
 	_processUpdateResponse(response) {
 		this._setContents({
-			header: response.header,
-			aria_label: response.aria_label,
+			name: response.header,
 			body: response.body,
 			messages: response.messages,
 			info: response.info,
@@ -561,17 +610,8 @@ class CWidget extends CBaseComponent {
 		};
 	}
 
-	_setContents({header, aria_label, body, messages, info, debug}) {
-		const $content_header_h4 = this._$content_header.find('h4');
-
-		$content_header_h4.text(header);
-
-		if (aria_label !== undefined && aria_label !== '') {
-			$content_header_h4.attr('aria-label', aria_label);
-		}
-		else {
-			$content_header_h4.removeAttr('aria-label');
-		}
+	_setContents({name, body, messages, info, debug}) {
+		this.setName(name);
 
 		this._$content_body.empty();
 
@@ -667,7 +707,7 @@ class CWidget extends CBaseComponent {
 	_makeView() {
 		this._$content_header =
 			$('<div>', {'class': this._css_classes.head})
-				.append($('<h4>').text((this._header !== '') ? this._header : this._defaults.header));
+				.append($('<h4>').text((this._name !== '') ? this._name : this._defaults.name));
 
 		if (this._parent === null) {
 			this._$actions = $('<ul>', {'class': this._css_classes.actions});
@@ -734,8 +774,8 @@ class CWidget extends CBaseComponent {
 		let is_mousemove_required = false;
 
 		this._events = {
-			editClick: () => {
-				this.fire(WIDGET_EVENT_EDIT_CLICK);
+			edit: () => {
+				this.fire(WIDGET_EVENT_EDIT);
 			},
 
 			focusin: () => {
@@ -778,7 +818,7 @@ class CWidget extends CBaseComponent {
 
 		if (this._parent === null) {
 			if (this._is_editable) {
-				this._$button_edit.on('click', this._events.editClick);
+				this._$button_edit.on('click', this._events.edit);
 			}
 		}
 
@@ -798,7 +838,7 @@ class CWidget extends CBaseComponent {
 	_unregisterEvents() {
 		if (this._parent === null) {
 			if (this._is_editable) {
-				this._$button_edit.off('click', this._events.editClick);
+				this._$button_edit.off('click', this._events.edit);
 			}
 		}
 

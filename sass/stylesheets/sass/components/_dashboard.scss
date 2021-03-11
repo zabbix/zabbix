@@ -32,12 +32,6 @@
 	}
 }
 
-.dashbrd-navigation {
-	display: flex;
-	margin-top: 10px;
-	padding-bottom: 4px;
-}
-
 .dashbrd-navigation-tabs {
 	// Compensate 2px padding of tabs.
 	margin: -2px 10px -2px 0;
@@ -129,6 +123,23 @@
 	}
 }
 
+.dashbrd-navigation {
+	display: flex;
+	margin-top: 10px;
+	padding-bottom: 4px;
+
+	&.is-scrollable {
+		.dashbrd-navigation-controls {
+			button {
+				&.dashbrd-previous-page,
+				&.dashbrd-next-page {
+					display: inline-block;
+				}
+			}
+		}
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
@@ -139,17 +150,36 @@
 
 	// For widget sliding headers to appear over the breadcrumbs.
 	z-index: 3;
+}
 
-	&.reserve-header-lines-1 {
-		margin-top: 2rem;
+.dashbrd {
+	&:not(.dashbrd-is-multipage):not(.dashbrd-is-edit-mode) {
+		.dashbrd-navigation {
+			display: none;
+		}
 	}
 
-	&.reserve-header-lines-2 {
-		margin-top: 4rem;
+	&.dashbrd-is-edit-mode,
+	&:not(.dashbrd-is-multipage) {
+		.dashbrd-toggle-slideshow {
+			display: none;
+		}
 	}
 
-	@if $ui-transitions {
-		transition: margin-top .3s;
+	&.dashbrd-is-multipage {
+		.dashbrd-grid-container {
+			&.reserve-header-lines-1 {
+				margin-top: 2rem;
+			}
+
+			&.reserve-header-lines-2 {
+				margin-top: 4rem;
+			}
+
+			@if $ui-transitions {
+				transition: margin-top .3s;
+			}
+		}
 	}
 }
 

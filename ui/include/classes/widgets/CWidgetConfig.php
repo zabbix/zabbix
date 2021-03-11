@@ -154,7 +154,8 @@ class CWidgetConfig {
 				'header' => $name,
 				'size' => $dimensions[$type],
 				'js_class' => $type_js_clases[$type],
-				'iterator' => self::isIterator($type)
+				'iterator' => self::isIterator($type),
+				'dialogue_stick_to_top' => self::getDialogueStickToTop($type)
 			];
 		}
 

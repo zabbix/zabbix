@@ -46,7 +46,7 @@ class CWidgetGraph extends CWidget {
 		super.resize();
 
 		if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
-			const image = document.getElementById('graph_' + this._uniqueid);
+			const image = document.getElementById('graph_' + this._unique_id);
 
 			if (image.src === '') {
 				image.addEventListener('load', () => this.resize(), {once: true});
@@ -56,8 +56,8 @@ class CWidgetGraph extends CWidget {
 
 			const graph_size = this._getGraphSize();
 
-			timeControl.objectList['graph_' + this._uniqueid].objDims.width = graph_size.width;
-			timeControl.objectList['graph_' + this._uniqueid].objDims.graphHeight = graph_size.height;
+			timeControl.objectList['graph_' + this._unique_id].objDims.width = graph_size.width;
+			timeControl.objectList['graph_' + this._unique_id].objDims.graphHeight = graph_size.height;
 
 			const image_curl = new Curl(image.src, false);
 
@@ -66,6 +66,16 @@ class CWidgetGraph extends CWidget {
 			image_curl.setArgument('_', (new Date).getTime().toString(34));
 			image.src = image_curl.getUrl();
 		}
+	}
+
+	setFields(fields) {
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._stopUpdating(true);
+		}
+
+		this._is_graph_mode = false;
+
+		super.setFields(fields);
 	}
 
 	setEditMode() {
@@ -89,7 +99,7 @@ class CWidgetGraph extends CWidget {
 
 	_promiseUpdate() {
 		if (this._is_graph_mode) {
-			timeControl.refreshObject('graph_' + this._uniqueid);
+			timeControl.refreshObject('graph_' + this._unique_id);
 
 			return Promise.resolve();
 		}
@@ -106,10 +116,10 @@ class CWidgetGraph extends CWidget {
 			this._graph_url = response.async_data.graph_url;
 
 			this._flickerfreescreen = this._$content_body[0].querySelector('.flickerfreescreen');
-			this._flickerfreescreen.id = 'flickerfreescreen_graph_' + this._uniqueid;
+			this._flickerfreescreen.id = 'flickerfreescreen_graph_' + this._unique_id;
 
 			this._flickerfreescreen_container = this._flickerfreescreen.querySelector('.dashbrd-widget-graph-link');
-			this._flickerfreescreen_container.id = 'graph_container_' + this._uniqueid;
+			this._flickerfreescreen_container.id = 'graph_container_' + this._unique_id;
 
 			if (this._graph_url !== null && this.isEditMode()) {
 				this._flickerfreescreen_container.href = 'javascript:void(0)';
@@ -118,13 +128,13 @@ class CWidgetGraph extends CWidget {
 
 			this._time_control_data = {
 				...response.async_data.time_control_data,
-				id: 'graph_' + this._uniqueid,
-				containerid: 'graph_container_' + this._uniqueid
+				id: 'graph_' + this._unique_id,
+				containerid: 'graph_container_' + this._unique_id
 			};
 
 			this._flickerfreescreen_data = {
 				...response.async_data.flickerfreescreen_data,
-				id: 'graph_' + this._uniqueid
+				id: 'graph_' + this._unique_id
 			};
 
 			this._activateGraph();
@@ -157,14 +167,14 @@ class CWidgetGraph extends CWidget {
 
 		this._flickerfreescreen_data.timeline = time_period;
 
-		timeControl.addObject('graph_' + this._uniqueid, time_period, this._time_control_data);
+		timeControl.addObject('graph_' + this._unique_id, time_period, this._time_control_data);
 		timeControl.processObjects();
 
 		flickerfreeScreen.add(this._flickerfreescreen_data);
 	}
 
 	_deactivateGraph() {
-		timeControl.removeObject('graph_' + this._uniqueid);
+		timeControl.removeObject('graph_' + this._unique_id);
 		flickerfreeScreen.remove(this._flickerfreescreen_data);
 	}
 

@@ -23,9 +23,12 @@ const DASHBOARD_PAGE_STATE_ACTIVE = 'active';
 const DASHBOARD_PAGE_STATE_INACTIVE = 'inactive';
 const DASHBOARD_PAGE_STATE_DESTROYED = 'destroyed';
 
+const DASHBOARD_PAGE_EVENT_EDIT = 'edit';
+const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'widget-edit';
+const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'widget-copy';
+const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'widget-delete';
 const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'announce-widgets';
 const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'reserve-header-lines';
-const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'widget-copy';
 
 class CDashboardPage extends CBaseComponent {
 
@@ -87,6 +90,22 @@ class CDashboardPage extends CBaseComponent {
 
 	_initEvents() {
 		this._events = {
+			widgetEdit: (e) => {
+				const widget = e.detail.target;
+
+				if (!this._is_edit_mode) {
+					this.setEditMode();
+					this.fire(DASHBOARD_PAGE_EVENT_EDIT);
+				}
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, {
+					properties: {
+						...widget.getProperties(),
+						dashboard_page_unique_id: this._unique_id
+					}
+				});
+			},
+
 			widgetEnter: (e) => {
 				const widget = e.detail.target;
 
@@ -95,7 +114,7 @@ class CDashboardPage extends CBaseComponent {
 				}
 
 				widget.enter();
-				this._leaveWidgetsExcept(widget);
+				this.leaveWidgetsExcept(widget);
 				this._reserveHeaderLines();
 			},
 
@@ -130,19 +149,91 @@ class CDashboardPage extends CBaseComponent {
 			widgetDelete: (e) => {
 				const widget = e.detail.target;
 
-
-
-//				if (!widget.isEntered() || this._isInteracting()) {
-//					return;
-//				}
-
-//				widget.leave();
-//				this._reserveHeaderLines();
+				this.deleteWidget(widget);
 			}
 		};
 
 		this._registerEvents = () => {};
 		this._unregisterEvents = () => {};
+	}
+
+	/**
+	 * Find free position of the given width and height.
+	 *
+	 * @param {int} width
+	 * @param {int} height
+	 *
+	 * @returns {object|null}
+	 */
+	findFreePos({width, height}) {
+		const pos = {x: 0, y: 0, width: width, height: height};
+
+		// Go y by row and try to position widget in each space.
+		const max_column = this._max_columns - pos.width;
+		const max_row = this._max_rows - pos.height;
+
+		let found = false;
+		let x, y;
+
+		for (y = 0; !found; y++) {
+			if (y > max_row) {
+				return null;
+			}
+			for (x = 0; x <= max_column && !found; x++) {
+				pos.x = x;
+				pos.y = y;
+				found = this._isPosFree(pos);
+			}
+		}
+
+		return pos;
+	}
+
+	_isPosFree(pos) {
+		for (const widget of this._widgets) {
+			if (this._posOverlap(pos, widget.getPosition())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	_accommodatePos(pos) {
+		pos = {...pos};
+
+		for (const widget of this._widgets) {
+			if (this._posOverlap(pos, widget.getPosition())) {
+				if (pos.x < widget.pos.x && pos.x + pos.width > widget.pos.x ) {
+					pos.width = widget.pos.x - pos.x;
+				}
+				else if (pos.y < widget.pos.y && pos.y + pos.height > widget.pos.y) {
+					pos.height = widget.pos.y - pos.y;
+				}
+			}
+		}
+
+		pos.width = Math.min(this._max_columns - pos.x, pos.width);
+		pos.height = Math.min(this._max_rows - pos.y, pos.height);
+
+		return pos;
+	}
+
+	/**
+	 * Check if positions overlap.
+	 *
+	 * @param {object} pos_1
+	 * @param {object} pos_2
+	 *
+	 * @returns {boolean}
+	 */
+	_posOverlap(pos_1, pos_2) {
+		return (
+			pos_1.x < (pos_2.x + pos_2.width)
+				&& (pos_1.x + pos_1.width) > pos_2.x
+				&& pos_1.y < (pos_2.y + pos_2.height)
+				&& (pos_1.y + pos_1.height) > pos_2.y
+		);
 	}
 
 	getData() {
@@ -193,7 +284,7 @@ class CDashboardPage extends CBaseComponent {
 		this.fire(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, {num_header_lines: num_header_lines});
 	}
 
-	_leaveWidgetsExcept(except_widget = null) {
+	leaveWidgetsExcept(except_widget = null) {
 		for (const widget of this._widgets) {
 			if (widget !== except_widget) {
 				widget.leave();
@@ -235,6 +326,7 @@ class CDashboardPage extends CBaseComponent {
 	_activateWidget(widget) {
 		widget.activate();
 		widget
+			.on(WIDGET_EVENT_EDIT, this._events.widgetEdit)
 			.on(WIDGET_EVENT_ENTER, this._events.widgetEnter)
 			.on(WIDGET_EVENT_LEAVE, this._events.widgetLeave)
 			.on(WIDGET_EVENT_COPY, this._events.widgetCopy)
@@ -254,6 +346,7 @@ class CDashboardPage extends CBaseComponent {
 	_deactivateWidget(widget) {
 		widget.deactivate();
 		widget
+			.off(WIDGET_EVENT_EDIT, this._events.widgetEdit)
 			.off(WIDGET_EVENT_ENTER, this._events.widgetEnter)
 			.off(WIDGET_EVENT_LEAVE, this._events.widgetLeave)
 			.off(WIDGET_EVENT_COPY, this._events.widgetCopy)
@@ -319,21 +412,33 @@ class CDashboardPage extends CBaseComponent {
 		}
 	}
 
+	getNumRows() {
+		let num_rows = 0;
+
+		for (const widget of this._widgets) {
+			const pos = widget.getPosition();
+
+			num_rows = Math.max(num_rows, pos.y + pos.height);
+		}
+
+		return num_rows;
+	}
+
 	addWidget({
 		type,
-		header,
+		name,
 		view_mode,
 		fields,
 		configuration,
-		widgetid = null,
+		widgetid,
 		pos,
 		is_new,
 		rf_rate,
 		unique_id
-	}) {
+	}, do_announce_widgets = true) {
 		const widget = new (eval(this._widget_defaults[type].js_class))({
 			type: type,
-			header: header,
+			name: name,
 			view_mode: view_mode,
 			fields: fields,
 			configuration: configuration,
@@ -363,21 +468,37 @@ class CDashboardPage extends CBaseComponent {
 
 		this._widgets.push(widget);
 
-		this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+		if (do_announce_widgets) {
+			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+		}
 
 		if (this._state !== DASHBOARD_PAGE_STATE_INITIAL) {
-			this._startWidget(widget);
+			widget.start();
 		}
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
+			this._dashboard_target.appendChild(widget.getView());
 			this._activateWidget(widget);
 		}
+
+		return widget;
 	}
 
-	deleteWidget(widget) {
-		// TODO ...
+	deleteWidget(widget, do_announce_widgets = true) {
+		if (widget.getState() === WIDGET_STATE_ACTIVE) {
+			this._dashboard_target.removeChild(widget.getView());
+			this._deactivateWidget(widget);
+		}
 
-		this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+		if (widget.getState() !== WIDGET_STATE_INITIAL) {
+			widget.destroy();
+		}
+
+		this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DELETE);
+
+		if (do_announce_widgets) {
+			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+		}
 	}
 
 	announceWidgets(dashboard_pages) {

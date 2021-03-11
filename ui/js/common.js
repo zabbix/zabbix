@@ -336,8 +336,8 @@ function getPosition(obj) {
 function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
 	if (!overlay) {
-		var wide_popup_actions = ['popup.generic', 'dashboard.share.edit',
-				'dashboard.properties.edit', 'popup.services', 'popup.media', 'popup.lldoperation', 'popup.lldoverride',
+		var wide_popup_actions = ['popup.generic', 'dashboard.share.edit', 'dashboard.properties.edit',
+				'dashboard.widget.edit', 'popup.services', 'popup.media', 'popup.lldoperation', 'popup.lldoverride',
 				'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr',
 				'popup.triggerwizard'
 			],

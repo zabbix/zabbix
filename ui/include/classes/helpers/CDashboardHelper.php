@@ -125,7 +125,7 @@ class CDashboardHelper {
 				$grid_page_widgets[] = [
 					'widgetid' => $widgetid,
 					'type' => $widget['type'],
-					'header' => $widget['name'],
+					'name' => $widget['name'],
 					'view_mode' => $widget['view_mode'],
 					'pos' => [
 						'x' => (int) $widget['x'],
