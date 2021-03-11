@@ -446,7 +446,6 @@ void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_ui
 	if (NULL != (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R)))
 		zbx_eval_get_functionids(&cache->eval_ctx_r, functionids);
 
-	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
