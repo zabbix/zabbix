@@ -1587,6 +1587,7 @@ do {							\
 			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_MAP, "sysmapid", (void *)&si->resourceid);
 			if (SUCCEED == DBpatch_reference_name(&reference))
 				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_STR, "reference", (void *)reference);
+			zbx_free(reference);
 			break;
 		case SCREEN_RESOURCE_SYSTEM_STATUS:
 			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_SYSTEM_STATUS);
