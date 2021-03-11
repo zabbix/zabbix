@@ -103,10 +103,10 @@ typedef struct
 	int			start_time;
 	int			state;
 	zbx_uint32_t		flags;
-	time_t			nextcheck;
-	time_t			active_since;
-	time_t			active_till;
-	time_t			lastsent;
+	int			nextcheck;
+	int			active_since;
+	int			active_till;
+	int			lastsent;
 
 	zbx_vector_ptr_pair_t	params;
 	zbx_vector_recipient_t	usergroups;
@@ -666,12 +666,13 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rm_get_report_range(time_t report_time, unsigned char period, struct tm *from, struct tm *to)
+static int	rm_get_report_range(int report_time, unsigned char period, struct tm *from, struct tm *to)
 {
 	struct tm	*tm;
+	time_t		from_time = report_time;
 	zbx_time_unit_t	period2unit[] = {ZBX_TIME_UNIT_DAY, ZBX_TIME_UNIT_WEEK, ZBX_TIME_UNIT_MONTH, ZBX_TIME_UNIT_YEAR};
 
-	if (ARRSIZE(period2unit) <= period || NULL == (tm = localtime(&report_time)))
+	if (ARRSIZE(period2unit) <= period || NULL == (tm = localtime(&from_time)))
 		return FAIL;
 
 	*to = *tm;
@@ -801,11 +802,11 @@ static void	rm_update_report(zbx_rm_t *manager, zbx_rm_report_t *report, int sta
  *             now    - [IN] the current time                                 *
  *                                                                            *
  ******************************************************************************/
-static time_t	rm_report_calc_nextcheck(const zbx_rm_report_t *report, time_t now)
+static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now)
 {
-	time_t	nextcheck;
+	int	nextcheck;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:" ZBX_FS_TIME_T, __func__, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays, report->start_time, report->timezone);
 
@@ -960,7 +961,7 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
  *               FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	rm_is_report_active(const zbx_rm_report_t *report, time_t now)
+static int	rm_is_report_active(const zbx_rm_report_t *report, int now)
 {
 	if (0 != report->active_since && now < report->active_since)
 		return FAIL;
@@ -981,7 +982,7 @@ static int	rm_is_report_active(const zbx_rm_report_t *report, time_t now)
  *             now     - [IN] the current time                                *
  *                                                                            *
  ******************************************************************************/
-static void	rm_update_cache_reports(zbx_rm_t *manager, time_t now)
+static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1005,7 +1006,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, time_t now)
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	reportid;
-		time_t		nextcheck;
+		int		nextcheck;
 
 		ZBX_STR2UINT64(reportid, row[0]);
 		zbx_vector_uint64_append(&reportids, reportid);
@@ -1067,7 +1068,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, time_t now)
 				if (SUCCEED == rm_is_report_active(report, now))
 				{
 					zbx_binary_heap_elem_t	elem = {report->reportid, (void *)report};
-					time_t			nextcheck_old = report->nextcheck;
+					int			nextcheck_old = report->nextcheck;
 
 					report->nextcheck = nextcheck;
 
@@ -1417,7 +1418,7 @@ static void	rm_dump_cache(zbx_rm_t *manager)
  ******************************************************************************/
 static void	rm_update_cache(zbx_rm_t *manager)
 {
-	time_t	now;
+	int	now;
 
 	now = time(NULL);
 
@@ -1629,7 +1630,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint64_t userid,
-		zbx_uint64_t access_userid, time_t now, zbx_vector_ptr_t *jobs, char **error)
+		zbx_uint64_t access_userid, int now, zbx_vector_ptr_t *jobs, char **error)
 {
 	int		i;
 	zbx_rm_job_t	*job;
@@ -1675,7 +1676,7 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, time_t now,
+static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int now,
 		zbx_vector_ptr_t *jobs, char **error)
 {
 	DB_ROW			row;
@@ -1748,7 +1749,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, time_t now, char **error)
+static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int now, char **error)
 {
 	zbx_vector_ptr_t	jobs;
 	int			i, ret = FAIL, jobs_num;
@@ -1836,7 +1837,7 @@ static void	rm_schedule_jobs(zbx_rm_t *manager, int now)
 {
 	zbx_rm_report_t		*report;
 	zbx_binary_heap_elem_t	*elem;
-	time_t			nextcheck;
+	int			nextcheck;
 	char			*error = NULL;
 	int			ret;
 
