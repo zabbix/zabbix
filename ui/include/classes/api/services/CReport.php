@@ -307,7 +307,7 @@ class CReport extends CApiService {
 	 */
 	protected function validateUpdate(array &$reports, ?array &$db_reports = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'reportid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'reportid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'userid' =>				['type' => API_ID],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('report', 'name')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('report', 'description')],
@@ -622,7 +622,7 @@ class CReport extends CApiService {
 			}
 		}
 
-		DB::delete('report', ['reportids' => $reportids]);
+		DB::delete('report', ['reportid' => $reportids]);
 
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCHEDULED_REPORT, $db_reports);
 
