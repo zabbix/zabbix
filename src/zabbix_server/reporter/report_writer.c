@@ -434,7 +434,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 		if (ZBX_STAT_INTERVAL < time_now - time_stat)
 		{
-			zbx_setproctitle("%s #%d [reprots started %d, sent %d, finished %d, idle " ZBX_FS_DBL
+			zbx_setproctitle("%s #%d [reports started %d, sent %d, finished %d, idle " ZBX_FS_DBL
 					" sec during " ZBX_FS_DBL " sec]", get_process_type_string(process_type),
 					process_num, started_num, sent_num, finished_num, time_idle,
 					time_now - time_stat);

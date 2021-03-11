@@ -49,7 +49,7 @@ extern int		server_num, process_num, CONFIG_REPORTWRITER_FORKS;
 /* report manager data */
 typedef struct
 {
-	/* config.url, config.session_key fields synced from database together with reprots */
+	/* config.url, config.session_key fields synced from database together with reports */
 	char			*zabbix_url;
 	char			*session_key;
 

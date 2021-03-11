@@ -40,7 +40,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 
 	if (0 == CONFIG_REPORTMANAGER_FORKS)
 	{
-		zbx_send_response(sock, FAIL, "Reprot manager is disabled.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, "Report manager is disabled.", CONFIG_TIMEOUT);
 		return;
 	}
 
