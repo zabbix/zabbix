@@ -367,19 +367,6 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'scripts' => [
-				'title' => _('Global scripts'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'scriptid,name',
-				'form' => [
-					'name' => 'scriptform',
-					'id' => 'scripts'
-				],
-				'table_columns' => [
-					_('Name'),
-					_('Execute on')
-				]
-			],
 			'roles' => [
 				'title' => _('User roles'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
