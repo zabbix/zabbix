@@ -2064,7 +2064,8 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t userid
 	if (SUCCEED == ret)
 		ret = DBpatch_convert_screen_items(result, dashboard_page.dashboard_pageid);
 
-	ret = DBpatch_set_permissions_screen(dashboard.dashboardid, screenid);
+	if (SUCCEED == ret)
+		ret = DBpatch_set_permissions_screen(dashboard.dashboardid, screenid);
 
 	zbx_free(dashboard.name);
 out:
@@ -2156,13 +2157,13 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 
 		result2 = DBselect("select name from screens where screenid=" ZBX_FS_UI64, screenid);
 
-		if (NULL != result2 && NULL != (row2 = DBfetch(result2)))
+		if (NULL == result2 || NULL == (row2 = DBfetch(result2)))
+			continue;
+
+		if (SUCCEED != (ret = DBpatch_add_dashboard_page(&dashboard_page, dashboard.dashboardid,
+				row2[0], page_delay, step)))
 		{
-			if (SUCCEED != (ret = DBpatch_add_dashboard_page(&dashboard_page, dashboard.dashboardid,
-					row2[0], page_delay, step)))
-			{
-				continue;
-			}
+			continue;
 		}
 
 		result3 = DBselect(
