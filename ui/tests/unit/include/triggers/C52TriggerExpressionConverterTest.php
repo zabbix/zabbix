@@ -188,21 +188,21 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{Trapper:trap[2].forecast(#10,,100)} > 0'.
-				' and  {Trapper:trap[2].forecast(3600,7200,600,linear,avg)} > 0'.
-				' and  {Trapper:trap[2].forecast(30m,1d,600,,avg)} > 0',
+				' and {Trapper:trap[2].forecast(3600,7200,600,linear,avg)} > 0'.
+				' and {Trapper:trap[2].forecast(30m,1d,600,,avg)} > 0',
 
 				'forecast(/Trapper/trap[2],10,100s) > 0'.
-				' and  forecast(/Trapper/trap[2],3600s:now-7200s,600s,"linear","avg") > 0'.
-				' and  forecast(/Trapper/trap[2],30m:now-1d,600s,,"avg") > 0'
+				' and forecast(/Trapper/trap[2],3600s:now-7200s,600s,"linear","avg") > 0'.
+				' and forecast(/Trapper/trap[2],30m:now-1d,600s,,"avg") > 0'
 			],
 
 			[
 				'{Trapper:trap[2].timeleft(#10,,100)} > 0'.
-				' and  {Trapper:trap[2].timeleft(3600,7200,600,linear)} > 0'.
+				' and {Trapper:trap[2].timeleft(3600,7200,600,linear)} > 0'.
 				' and {Trapper:trap[2].timeleft(30m,1d,600)} > 0',
 
 				'timeleft(/Trapper/trap[2],10,100) > 0'.
-				' and  timeleft(/Trapper/trap[2],3600s:now-7200s,600,"linear") > 0'.
+				' and timeleft(/Trapper/trap[2],3600s:now-7200s,600,"linear") > 0'.
 				' and timeleft(/Trapper/trap[2],30m:now-1d,600) > 0'
 			],
 			[
@@ -234,12 +234,12 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 			[
 				'{Trapper:trap[3].last()} > 0'.
 				' and {Trapper:trap[3].last(#5)} > 0'.
-				' and  {Trapper:trap[3].last(#10,3600)} > 0'.
+				' and {Trapper:trap[3].last(#10,3600)} > 0'.
 				' and {Trapper:trap[3].last(#1,1d)} > 0',
 
 				'last(/Trapper/trap[3]) > 0'.
 				' and last(/Trapper/trap[3],#5) > 0'.
-				' and  last(/Trapper/trap[3],#10:now-3600s) > 0'.
+				' and last(/Trapper/trap[3],#10:now-3600s) > 0'.
 				' and last(/Trapper/trap[3],#1:now-1d) > 0'
 			],
 			[
@@ -249,11 +249,11 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 			[
 				'{Trapper:trap[3].regexp("^error", #10)} > 0'.
 				' and {Trapper:trap[3].regexp("^critical", 60)} > 0'.
-				' and  {Trapper:trap[3].regexp("^warning", 5m)} > 0',
+				' and {Trapper:trap[3].regexp("^warning", 5m)} > 0',
 
 				'find(/Trapper/trap[3],1#0,"regexp","^error") > 0'.
 				' and find(/Trapper/trap[3],60s,"regexp","^critical") > 0'.
-				' and  find(/Trapper/trap[3],5m,"regexp","^warning") > 0'
+				' and find(/Trapper/trap[3],5m,"regexp","^warning") > 0'
 			],
 			[
 				'{Trapper:trap[3].count(#1,0,eq)} > 0'.
@@ -265,11 +265,11 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 			[
 				'{Trapper:trap[3].str("^error", #10)} > 0'.
 				' and {Trapper:trap[3].str("^critical", 60)} > 0'.
-				' and  {Trapper:trap[3].str("^warning", 5m)} > 0',
+				' and {Trapper:trap[3].str("^warning", 5m)} > 0',
 
 				'find(/Trapper/trap[3],#10,"like","^error") > 0'.
 				' and find(/Trapper/trap[3],60s,"like","^critical") > 0'.
-				' and  find(/Trapper/trap[3],5m,"like","^warning") > 0'
+				' and find(/Trapper/trap[3],5m,"like","^warning") > 0'
 			],
 			[
 				'{Trapper:trap[3].strlen(30m)} > 0'.
