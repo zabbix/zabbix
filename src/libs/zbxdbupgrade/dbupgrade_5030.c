@@ -757,13 +757,15 @@ static int DBpatch_dashboard_name(char *name, char **new_name)
 {
 	int		affix = 0, ret = FAIL, trim;
 	char		*affix_string = NULL;
-	DB_RESULT	result;
+	DB_RESULT	result = NULL;
 	DB_ROW		row;
 
 	*new_name = zbx_strdup(*new_name, name);
 
 	do
 	{
+		DBfree_result(result);
+
 		result = DBselect("select count(*)"
 				" from dashboard"
 				" where name='%s' and templateid is null",
@@ -784,7 +786,7 @@ static int DBpatch_dashboard_name(char *name, char **new_name)
 		affix_string = zbx_dsprintf(affix_string, " (%d)", affix + 1);
 		trim = (int)strlen(name) + (int)strlen(affix_string) - DASHBOARD_NAME_LEN;
 		if (0 < trim )
-			name[strlen(name) - trim] = '\0';
+			name[(int)strlen(name) - trim] = '\0';
 
 		*new_name = zbx_dsprintf(*new_name, "%s%s", name, affix_string);
 	} while (COLLISIONS_MAX_NUMBER > affix++);
