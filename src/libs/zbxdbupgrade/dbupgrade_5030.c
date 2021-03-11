@@ -1026,7 +1026,7 @@ static char *update_template_name(char *old)
 	ptr = old;
 
 	if (NULL != zbx_regexp_match(old, "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) ", NULL) &&
-			1 == sscanf(old, "Template %*[^ ] %s", new) &&
+			1 == sscanf(old, "Template %*[^ ] %" ZBX_STR(MAX_STRING_LEN) "s", new) &&
 			strlen(new) > MIN_TEMPLATE_NAME_LEN)
 	{
 		ptr = zbx_strdup(ptr, new);
@@ -1090,7 +1090,7 @@ static int	DBpatch_5030066(void)
 				"select i.itemid,i.key_,h.name"
 				" from items i"
 				" join hosts h on h.hostid=i.hostid"
-				" where h.status=%d and i.flags in (%d,%d)",
+				" where h.status=%d and i.flags in (%d,%d) and i.templateid is null",
 				HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1141,9 +1141,8 @@ static int	DBpatch_5030067(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		const char	*pexpr, *pexpr_f;
-		char		*expr, *pexpr_s;
-		char		*expression = NULL;
+		const char	*pexpr, *pexpr_f, *pexpr_s;
+		char		*trigger_expr, *expression = NULL;
 		int		i;
 		size_t		expression_alloc = 0, expression_offset = 0;
 		zbx_uint64_t	functionid;
@@ -1154,12 +1153,12 @@ static int	DBpatch_5030067(void)
 
 		for (i = 0; i < 2; i++)
 		{
-			expr = zbx_strdup(NULL, row[i + 2]);
-			pexpr = pexpr_f = (const char *)expr;
+			trigger_expr = zbx_strdup(NULL, row[i + 2]);
+			pexpr = pexpr_f = (const char *)trigger_expr;
 
 			while (SUCCEED == get_N_functionid(pexpr, 1, &functionid, (const char **)&pexpr_s, &pexpr_f))
 			{
-				*pexpr_s = '\0';
+				trigger_expr[pexpr_s - trigger_expr] = '\0';
 
 				result2 = DBselect(
 						"select h.name,i.key_,f.name,f.parameter"
@@ -1179,10 +1178,10 @@ static int	DBpatch_5030067(void)
 				DBfree_result(result2);
 			}
 
-			if (pexpr != expr)
+			if (pexpr != trigger_expr)
 				zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset, "%s", pexpr);
 
-			zbx_free(expr);
+			zbx_free(trigger_expr);
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset,"%s", name);
@@ -1473,7 +1472,7 @@ static int	DBpatch_5030073(void)
 			" join hosts h on h.hostid=i.hostid"
 			" join item_discovery id on id.itemid=i.itemid"
 			" join items i2 on id.parent_itemid=i2.itemid"
-			" where h.status=%d and i.flags=%d",
+			" where h.status=%d and i.flags=%d and i.templateid is null",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1528,8 +1527,8 @@ static int	DBpatch_5030074(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		const char	*pexpr, *pexpr_f;
-		char		*trigger_expr, *pexpr_s, *total_expr = NULL;
+		const char	*pexpr, *pexpr_f, *pexpr_s;
+		char		*trigger_expr, *total_expr = NULL;
 		int		i;
 		size_t		total_expr_alloc = 0, total_expr_offset = 0;
 		zbx_uint64_t 	functionid;
@@ -1563,7 +1562,7 @@ static int	DBpatch_5030074(void)
 
 			while (SUCCEED == get_N_functionid(pexpr, 1, &functionid, (const char **)&pexpr_s, &pexpr_f))
 			{
-				*pexpr_s = '\0';
+				trigger_expr[pexpr_s - trigger_expr] = '\0';
 
 				result2 = DBselect(
 						"select h.name,i.key_,f.name,f.parameter"
