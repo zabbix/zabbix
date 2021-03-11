@@ -36,9 +36,6 @@ class C32ImportConverter extends CConverter {
 		if (array_key_exists('maps', $data['zabbix_export'])) {
 			$data['zabbix_export']['maps'] = $this->convertMaps($data['zabbix_export']['maps']);
 		}
-		if (array_key_exists('screens', $data['zabbix_export'])) {
-			unset($data['zabbix_export']['screens']);
-		}
 
 		return $data;
 	}

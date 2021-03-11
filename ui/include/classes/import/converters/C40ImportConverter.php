@@ -35,10 +35,6 @@ class C40ImportConverter extends CConverter {
 			$data['zabbix_export']['templates'] = $this->convertHosts($data['zabbix_export']['templates']);
 		}
 
-		if (array_key_exists('screens', $data['zabbix_export'])) {
-			unset($data['zabbix_export']['screens']);
-		}
-
 		return $data;
 	}
 

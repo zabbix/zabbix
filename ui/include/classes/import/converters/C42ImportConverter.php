@@ -32,10 +32,6 @@ class C42ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = $this->convertTlsAccept($data['zabbix_export']['hosts']);
 		}
 
-		if (array_key_exists('screens', $data['zabbix_export'])) {
-			unset($data['zabbix_export']['screens']);
-		}
-
 		$data['zabbix_export'] = $this->convertFormat($data['zabbix_export']);
 
 		return $data;

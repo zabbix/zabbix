@@ -56,10 +56,6 @@ class C10ImportConverter extends CConverter {
 
 		$content = $this->convertSysmaps($content);
 
-		if (array_key_exists('screens', $content)) {
-			unset($content['screens']);
-		}
-
 		$content = $this->filterDuplicateGroups($content);
 		$content = $this->filterDuplicateTriggers($content);
 		$content = $this->filterDuplicateGraphs($content);
