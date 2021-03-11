@@ -26,10 +26,10 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		let $menu_path = $('#menu_path'),
-			$user_group = $('#user_group'),
-			$host_access = $('#host_access'),
-			$enable_confirmation = $('#enable_confirmation'),
+		let $menu_path = $('#menu-path'),
+			$user_group = $('#user-group'),
+			$host_access = $('#host-access'),
+			$enable_confirmation = $('#enable-confirmation'),
 			$confirmation = $('#confirmation'),
 			$publickey = $('#publickey'),
 			$privatekey = $('#privatekey'),
@@ -66,13 +66,13 @@
 		$('#type')
 			.change(function() {
 				let type = $('input[name=type]:checked').val(),
-					$execute_on = $('#execute_on'),
+					$execute_on = $('#execute-on'),
 					$authtype = $('#authtype'),
 					$username = $('#username'),
 					$port = $('#port'),
 					$command_ipmi = $('#commandipmi'),
 					$command = $('#command'),
-					$parameters = $('#row_webhook_parameters'),
+					$parameters = $('#row-webhook-parameters'),
 					$script = $('#script'),
 					$timeout = $('#timeout');
 
@@ -271,12 +271,12 @@
 		// confirmation text input
 		$('#confirmation')
 			.keyup(function() {
-				$('#testConfirmation').prop('disabled', (this.value == ''));
+				$('#test-confirmation').prop('disabled', (this.value == ''));
 			})
 			.keyup();
 
 		// enable confirmation checkbox
-		$('#enable_confirmation')
+		$('#enable-confirmation')
 			.change(function() {
 				if (this.checked) {
 					$('#confirmation')
@@ -284,13 +284,13 @@
 						.keyup();
 				}
 				else {
-					$('#confirmation, #testConfirmation').prop('disabled', true);
+					$('#confirmation, #test-confirmation').prop('disabled', true);
 				}
 			})
 			.change();
 
 		// test confirmation button
-		$('#testConfirmation').click(function() {
+		$('#test-confirmation').click(function() {
 			executeScript(null, $('#confirmation').val(), this);
 		});
 
@@ -298,21 +298,21 @@
 		$('#hgstype-select')
 			.change(function() {
 				if ($('#hgstype-select').val() == 1) {
-					$('#hostGroupSelection').show();
+					$('#host-group-selection').show();
 				}
 				else {
-					$('#hostGroupSelection').hide();
+					$('#host-group-selection').hide();
 				}
 			})
 			.change();
 
 		// Trim spaces on sumbit.
-		$('#scriptForm').submit(function() {
+		$('#script-form').submit(function() {
 			$(this).trimValues(['#name', '#command', '#commandipmi', '#description', 'input[name^="parameters"]',
-				'input[name="script"]', '#username', '#publickey', '#privatekey', '#menu_path', '#port'
+				'input[name="script"]', '#username', '#publickey', '#privatekey', '#menu-path', '#port'
 			]);
 		});
 
-		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
+		$('#parameters-table').dynamicRows({ template: '#parameters-row' });
 	});
 </script>

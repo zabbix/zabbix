@@ -725,7 +725,7 @@ class testFormAdministrationScripts extends CWebTest {
 		}
 
 		$this->page->login()->open($link);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Parameters')) {
@@ -738,7 +738,7 @@ class testFormAdministrationScripts extends CWebTest {
 				unset($parameter);
 			}
 
-			$this->query('id:parameters_table')->asMultifieldTable()->one()->fill($data['Parameters']);
+			$this->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['Parameters']);
 		}
 
 		// Check testing confirmation while configuring.
@@ -793,7 +793,7 @@ class testFormAdministrationScripts extends CWebTest {
 					unset($parameter);
 				}
 
-				$this->query('id:parameters_table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
+				$this->query('id:parameters-table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
 			}
 		}
 	}
@@ -807,7 +807,7 @@ class testFormAdministrationScripts extends CWebTest {
 	private function checkConfirmation($data, $form) {
 		if (CTestArrayHelper::get($data['fields'], 'Enable confirmation') === false) {
 			$this->assertFalse($form->query('id:confirmation')->one()->isEnabled());
-			$this->assertFalse($form->query('id:testConfirmation')->one()->isEnabled());
+			$this->assertFalse($form->query('id:test-confirmation')->one()->isEnabled());
 		}
 
 		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
@@ -828,7 +828,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 		$form->fill([
 			'Name' => 'Cancelled cript',
 			'Type' => 'Script',
@@ -855,7 +855,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$this->query('id:scriptForm')->waitUntilReady()->asForm()->one()->submit();
+		$this->query('id:script-form')->waitUntilReady()->asForm()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -866,7 +866,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 */
 	public function testFormAdministrationScripts_Clone() {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_CLONE);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 		$values = $form->getFields()->asValues();
 		$values['Name'] = self::NAME_CLONE;
 		$this->query('button:Clone')->waitUntilReady()->one()->click();

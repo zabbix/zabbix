@@ -31,7 +31,7 @@ $this->includeJsFile('administration.script.edit.js.php');
 $widget = (new CWidget())->setTitle(_('Scripts'));
 
 $row_template = (new CTag('script', true))
-	->setId('parameters_row')
+	->setId('parameters-row')
 	->setAttribute('type', 'text/x-jquery-tmpl')
 	->addItem(
 		(new CRow([
@@ -52,14 +52,14 @@ $row_template = (new CTag('script', true))
 $widget->addItem($row_template);
 
 $form = (new CForm())
-	->setId('scriptForm')
+	->setId('script-form')
 	->setName('scripts')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
 $parameters_table = (new CTable())
-	->setId('parameters_table')
+	->setId('parameters-table')
 	->setHeader([
 		(new CColHeader(_('Name')))->setWidth('50%'),
 		(new CColHeader(_('Value')))->setWidth('50%'),
@@ -108,6 +108,7 @@ $form_list = (new CFormList())
 		(new CTextBox('menu_path', $data['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('placeholder', _('<sub-menu/sub-menu/...>'))
+			->setId('menu-path')
 	)
 	->addRow((new CLabel(_('Type'), 'type')),
 		(new CRadioButtonList('type', (int) $data['type']))
@@ -124,6 +125,7 @@ $form_list = (new CFormList())
 			->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
 			->setModern(true)
+			->setId('execute-on')
 	)
 	->addRow(new CLabel(_('Authentication method'), 'authtype'),
 		(new CSelect('authtype'))
@@ -179,7 +181,7 @@ $form_list = (new CFormList())
 		(new CDiv($parameters_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-		'row_webhook_parameters'
+		'row-webhook-parameters'
 	)
 	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
 		(new CMultilineInput('script', $data['script'], [
@@ -235,7 +237,7 @@ $form_list
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'hostGroupSelection'
+		'host-group-selection'
 	)
 	->addRow(new CLabel(_('User group'), $select_usrgrpid->getFocusableElementId()), $select_usrgrpid)
 	->addRow((new CLabel(_('Required host permissions'), 'host_access')),
@@ -243,15 +245,20 @@ $form_list
 			->addValue(_('Read'), PERM_READ)
 			->addValue(_('Write'), PERM_READ_WRITE)
 			->setModern(true)
+			->setId('host-access')
 	)
 	->addRow(_('Enable confirmation'),
-		(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'])
+		(new CCheckBox('enable_confirmation'))
+			->setChecked($data['enable_confirmation'])
+			->setId('enable-confirmation')
 	)
 	->addRow(new CLabel(_('Confirmation text'), 'confirmation'), [
 		(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		SPACE,
-		(new CButton('testConfirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
+		(new CButton('testConfirmation', _('Test confirmation')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setId('test-confirmation')
 	]
 );
 
