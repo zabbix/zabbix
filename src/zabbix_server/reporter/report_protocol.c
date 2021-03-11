@@ -162,7 +162,7 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
  ******************************************************************************/
 
 zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *name, const char *url,
-		const char *cookie, const zbx_vector_ptr_pair_t *params)
+		const char *cookie, int width, int height, const zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	data_len = 0, *params_len, url_len, cookie_len, name_len;
 	unsigned char	*ptr;
@@ -171,6 +171,8 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 	zbx_serialize_prepare_str(data_len, name);
 	zbx_serialize_prepare_str(data_len, url);
 	zbx_serialize_prepare_str(data_len, cookie);
+	zbx_serialize_prepare_value(data_len, width);
+	zbx_serialize_prepare_value(data_len, height);
 	zbx_serialize_prepare_value(data_len, params->values_num);
 
 	params_len = (zbx_uint32_t *)zbx_malloc(NULL, params->values_num * 2 * sizeof(zbx_uint32_t));
@@ -186,6 +188,8 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 	ptr += zbx_serialize_str(ptr, name, name_len);
 	ptr += zbx_serialize_str(ptr, url, url_len);
 	ptr += zbx_serialize_str(ptr, cookie, cookie_len);
+	ptr += zbx_serialize_value(ptr, width);
+	ptr += zbx_serialize_value(ptr, height);
 
 	ptr += zbx_serialize_value(ptr, params->values_num);
 
@@ -201,7 +205,7 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 }
 
 void	report_deserialize_begin_report(const unsigned char *data, char **name, char **url, char **cookie,
-		zbx_vector_ptr_pair_t *params)
+		int *width, int *height, zbx_vector_ptr_pair_t *params)
 {
 	zbx_uint32_t	len;
 	int		i, params_num;
@@ -209,6 +213,8 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
 	data += zbx_deserialize_str(data, name, len);
 	data += zbx_deserialize_str(data, url, len);
 	data += zbx_deserialize_str(data, cookie, len);
+	data += zbx_deserialize_value(data, width);
+	data += zbx_deserialize_value(data, height);
 
 	data += zbx_deserialize_value(data, &params_num);
 	zbx_vector_ptr_pair_reserve(params, params_num);

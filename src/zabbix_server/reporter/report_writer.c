@@ -84,7 +84,7 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rw_get_report(const char *url, const char *cookie, const char *width, const char *height, char **report,
+static int	rw_get_report(const char *url, const char *cookie, int width, int height, char **report,
 		size_t *report_size, char **error)
 {
 #if !defined(HAVE_LIBCURL)
@@ -100,7 +100,7 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 
 #else
 	struct zbx_json		j;
-	char			*cookie_value;
+	char			*cookie_value, buffer[MAX_ID_LEN + 1];
 	int			ret = FAIL;
 	long			httpret;
 	zbx_buffer_t		response = {NULL, 0, 0};
@@ -109,8 +109,7 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 	CURLoption		opt;
 	struct curl_slist	*headers = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:%s width:%s height:%s", __func__, url, ZBX_NULL2EMPTY_STR(width),
-			ZBX_NULL2EMPTY_STR(height));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:%s width:%d height:%d", __func__, url, width, height);
 
 	cookie_value = zbx_dsprintf(NULL, "zbx_session=%s", cookie);
 
@@ -122,8 +121,10 @@ static int	rw_get_report(const char *url, const char *cookie, const char *width,
 	zbx_json_close(&j);
 
 	zbx_json_addobject(&j, ZBX_PROTO_TAG_PARAMETERS);
-	zbx_json_addstring(&j, "width", width, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&j, "height", height, ZBX_JSON_TYPE_STRING);
+	zbx_snprintf(buffer, sizeof(buffer), "%d", width);
+	zbx_json_addstring(&j, "width", buffer, ZBX_JSON_TYPE_STRING);
+	zbx_snprintf(buffer, sizeof(buffer), "%d", height);
+	zbx_json_addstring(&j, "height", buffer, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&j);
 
 	if (NULL == (curl = curl_easy_init()))
@@ -234,16 +235,15 @@ out:
 static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error)
 {
 	zbx_vector_ptr_pair_t	params;
-	int			i, ret;
-	char			*url, *cookie, *subject = "", *width = "1920", *height = "1080", *message = "",
-				*report = NULL, *name;
+	int			i, ret, width, height;
+	char			*url, *cookie, *subject = "", *message = "", *report = NULL, *name;
 	size_t			report_size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_begin_report(msg->data, &name, &url, &cookie, &params);
+	report_deserialize_begin_report(msg->data, &name, &url, &cookie, &width, &height, &params);
 
 	for (i = 0; i < params.values_num; i++)
 	{
@@ -254,14 +254,6 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 		else if (0 == strcmp(params.values[i].first, "body"))
 		{
 			message = (char *)params.values[i].second;
-		}
-		else if (0 == strcmp(params.values[i].first, "width"))
-		{
-			width = (char *)params.values[i].second;
-		}
-		else if (0 == strcmp(params.values[i].first, "height"))
-		{
-			height = (char *)params.values[i].second;
 		}
 		else
 		{
