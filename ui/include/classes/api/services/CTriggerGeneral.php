@@ -1679,8 +1679,10 @@ abstract class CTriggerGeneral extends CApiService {
 		$functions_num = array_sum(array_map(function ($funcs) {return count($funcs);}, $triggers_functions));
 		$functionid = DB::reserveIds('functions', $functions_num);
 
-		$expression_max_length = DB::getFieldLength('triggers', 'expression');
-		$recovery_expression_max_length = DB::getFieldLength('triggers', 'recovery_expression');
+		$max_length = [
+			'expression' => DB::getFieldLength('triggers', 'expression'),
+			'recovery_expression' => DB::getFieldLength('triggers', 'recovery_expression')
+		];
 
 		// Replace func(/host/item) macros with {<functionid>}.
 		foreach ($triggers as $tnum => &$trigger) {
@@ -1702,26 +1704,22 @@ abstract class CTriggerGeneral extends CApiService {
 				? ['expression', 'recovery_expression']
 				: ['expression'];
 
-			if (mb_strlen($trigger['expression']) > $expression_max_length) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Invalid parameter "%1$s": %2$s.', '/'.($tnum + 1).'/expression', _('value is too long')
-				));
-			}
+			foreach ($expression_fields as $expr_field) {
+				usort($triggers_function_occurances[$tnum][$expr_field], function ($a, $b) {
+					return $a['pos'] <=> $b['pos'];
+				});
 
-			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-				$expressionData->parse($trigger['recovery_expression']);
-				$exprPart = end($expressionData->expressions);
-				do {
-					$trigger['recovery_expression'] = substr_replace($trigger['recovery_expression'],
-						'{'.$triggers_functions[$tnum][$exprPart['expression']]['functionid'].'}',
-						$exprPart['pos'], strlen($exprPart['expression'])
+				for ($i = count($triggers_function_occurances[$tnum][$expr_field])-1; $i>=0; $i--) {
+					$occurance = $triggers_function_occurances[$tnum][$expr_field][$i];
+					$trigger[$expr_field] = substr_replace($trigger[$expr_field],
+						'{'.$triggers_functions[$tnum][$occurance['match']]['functionid'].'}', $occurance['pos'],
+						$occurance['length']
 					);
 				}
-				while ($exprPart = prev($expressionData->expressions));
 
-				if (mb_strlen($trigger['recovery_expression']) > $recovery_expression_max_length) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($tnum + 1).'/recovery_expression', _('value is too long')
+				if (mb_strlen($trigger[$expr_field]) > $max_length[$expr_field]) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Invalid parameter "%1$s": %2$s.', '/'.($tnum + 1).'/'.$expr_field, _('value is too long')
 					));
 				}
 			}
