@@ -1347,15 +1347,15 @@ jQuery(function($) {
 							// 			selector = '',
 							// 			mapid_selector = '',
 							// 			prev_map_selector = '';
-							//
+
 							// 		mapid_selector = '.tree-item[data-sysmapid=' + data['submapid'] + ']';
-							//
+
 							// 		if (data['previous_maps'].length) {
 							// 			var prev_maps = data['previous_maps'].split(','),
 							// 				prev_maps = prev_maps.length
 							// 					? prev_maps[prev_maps.length-1]
 							// 					: null;
-							//
+
 							// 			if (prev_maps) {
 							// 				var sc = '.selected',
 							// 					sysmapid = '[data-sysmapid=' + prev_maps + ']',
@@ -1368,7 +1368,7 @@ jQuery(function($) {
 							// 						'.tree-item' + sysmapid
 							// 					],
 							// 					indx = 0;
-							//
+
 							// 				while (!prev_map_selector.length
 							// 						&& typeof prev_map_selectors[indx] !== 'undefined') {
 							// 					if ($(prev_map_selectors[indx], $this).length) {
@@ -1378,7 +1378,7 @@ jQuery(function($) {
 							// 				}
 							// 			}
 							// 		}
-							//
+
 							// 		if (prev_map_selector.length && mapid_selector.length) {
 							// 			selector = prev_map_selector + ' > .tree-list > ' + mapid_selector;
 							// 			if (!data['moving_upward']) {
@@ -1389,20 +1389,20 @@ jQuery(function($) {
 							// 		else {
 							// 			item = $('.selected', $this).closest(mapid_selector);
 							// 		}
-							//
+
 							// 		if (item.length) {
 							// 			item = item.first();
-							//
+
 							// 			var step_in_path = $(item).closest('.tree-item');
-							//
+
 							// 			$('.selected', $this).removeClass('selected');
 							// 			$(item).addClass('selected');
-							//
+
 							// 			while ($(step_in_path).length) {
 							// 				$(step_in_path).addClass('selected');
 							// 				step_in_path = $(step_in_path).parent().closest('.tree-item');
 							// 			}
-							//
+
 							// 			openBranch($this, $(item).data('id'));
 							// 			updateUserProfile('web.dashbrd.navtree.item.selected', $(item).data('id'),
 							// 				[widget['widgetid']]

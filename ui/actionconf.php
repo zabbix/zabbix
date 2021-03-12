@@ -25,7 +25,6 @@ $page['scripts'] = [
 	'flickerfreescreen.js',
 	'gtlc.js',
 	'class.dashboard.js',
-	'class.dashboard.loader.js',
 	'class.dashboard.page.js',
 //	'class.dashboard.widget.iterator.js',
 	'class.dashboard.widget.placeholder.js',
