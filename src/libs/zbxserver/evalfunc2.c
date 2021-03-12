@@ -2184,8 +2184,8 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 {
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)' ts:'%s\'", __func__,
-			item->host.host, item->key_orig, function, parameter, zbx_timespec_str(ts));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s(/%s/%s,%s)' ts:'%s\'", __func__,
+			function, item->host.host, item->key_orig, parameter, zbx_timespec_str(ts));
 
 	if (0 == strcmp(function, "last"))
 	{

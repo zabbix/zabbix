@@ -964,3 +964,75 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 
 	return msg;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_serialized_expression_function                         *
+ *                                                                            *
+ * Purpose: check if a function is used in the expression                     *
+ *                                                                            *
+ * Parameters: expression - [IN] the original expression                      *
+ *             data       - [IN] the serialized expression                    *
+ *             functions  - [IN] an array of function names to check          *
+ *                                                                            *
+ * Return value: SUCCEED - one of the functions is used in the expression     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_serialized_expression_function(const char *expression, const unsigned char *data,
+	const char **functions)
+{
+	zbx_uint32_t		i, tokens_num, len, loc_l, loc_r, opt;
+	zbx_token_type_t	type;
+	unsigned char		var_type;
+
+	data += zbx_deserialize_uint31_compact(data, &len);
+	data += zbx_deserialize_uint31_compact(data, &tokens_num);
+
+	for (i = 0; i < tokens_num; i++)
+	{
+		data += zbx_deserialize_value(data, &type);
+		data += zbx_deserialize_uint31_compact(data, &opt);
+		data += zbx_deserialize_uint31_compact(data, &loc_l);
+		data += zbx_deserialize_uint31_compact(data, &loc_r);
+
+		data += zbx_deserialize_char(data, &var_type);
+
+		switch (var_type)
+		{
+			case ZBX_VARIANT_UI64:
+				data += sizeof(zbx_uint64_t);
+				break;
+			case ZBX_VARIANT_DBL:
+				data += sizeof(double);
+				break;
+			case ZBX_VARIANT_STR:
+				data += strlen((const char *)data) + 1;
+				break;
+			case ZBX_VARIANT_NONE:
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+		}
+
+		if (ZBX_EVAL_TOKEN_FUNCTION == type)
+		{
+			const char	**function;
+
+			for (function = functions; NULL != *function; function++)
+			{
+				size_t	len;
+
+				if (loc_r - loc_l + 1 == (len = strlen(*function)) &&
+						0 == memcmp(expression + loc_l, *function, len))
+				{
+					return SUCCEED;
+				}
+			}
+		}
+	}
+
+	return FAIL;
+}
+
