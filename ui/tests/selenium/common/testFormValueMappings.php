@@ -87,9 +87,7 @@ class testFormValueMappings extends CWebTest {
 
 		$labels = $mapping_form->query('xpath:.//label')->all()->asText();
 		$this->assertEquals(['Name', 'Mappings'], $labels);
-
-		$name_field = $mapping_form->query('id:name')->one();
-		$this->assertEquals('64', $name_field->getAttribute('maxlength'));
+		$this->assertEquals('64', $mapping_form->query('id:name')->one()->getAttribute('maxlength'));
 
 		// Check mappings table layout.
 		$mappings_table = $mapping_form->query('id:mappings_table')->one()->asTable();
@@ -124,7 +122,6 @@ class testFormValueMappings extends CWebTest {
 
 			// Get the id of the created host/template clone.
 			$hostids[] = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($action.' Valuemap Test'));
-
 		}
 
 		// Check value mappings were copied correctly.
@@ -159,8 +156,8 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'один + один'
 						],
 						[
-							'value' => '1_WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
-							'newvalue' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW'
+							'value' => '1_'.str_repeat('W', 62),
+							'newvalue' => str_repeat('W', 64)
 						],
 						[
 							'value' => 'mapping not shown',
@@ -444,6 +441,7 @@ class testFormValueMappings extends CWebTest {
 	}
 
 	/**
+	 * Function that checks that no changes in the database are made in case if Value mapping update is cancelled.
 	 *
 	 * @param string $source		Entity (host or template) for which the scenario is executed.
 	 */
@@ -496,7 +494,7 @@ class testFormValueMappings extends CWebTest {
 		// Get the Database records that correspond to the value mapping to be deleted and its mappings.
 		$valuemap_sql = 'SELECT valuemapid FROM valuemap WHERE name='.zbx_dbstr(self::DELETE_VALUEMAP);
 		$valuemap_id = CDBHelper::getValue($valuemap_sql);
-		$mappings_sql = 'SELECT valuemap_mappingid FROM valuemap_mapping WHERE valuemapid='.zbx_dbstr($valuemap_id);
+		$mappings_sql = 'SELECT valuemap_mappingid FROM valuemap_mapping WHERE valuemapid='.$valuemap_id;
 
 		// Delete the value mapping.
 		$this->openValueMappingTab($source);

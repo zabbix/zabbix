@@ -21,8 +21,7 @@
 require_once dirname(__FILE__).'/common/testFormValueMappings.php';
 
 /**
- * @backup valuemap
- * @backup hosts
+ * @backup valuemap, hosts
  *
  * @on-before prepareHostValueMappings
  */
@@ -34,7 +33,7 @@ class testFormValueMappingsHost extends testFormValueMappings {
 	public static function prepareHostValueMappings() {
 		CDataHelper::setSessionId(null);
 
-		$response = CDataHelper::call('valuemap.create', [
+		CDataHelper::call('valuemap.create', [
 			[
 				'name' => self::UPDATE_VALUEMAP1,
 				'hostid' => self::HOSTID,
