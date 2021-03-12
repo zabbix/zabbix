@@ -513,7 +513,7 @@ abstract class CTriggerGeneral extends CApiService {
 		foreach ($descriptions as $description => $triggers) {
 			foreach ($triggers as $index => $trigger) {
 				$expression_data->parse($trigger['expression']);
-				$hosts[$expression_data->getHosts()[0]][$description][] = $index;
+				$hosts[$expression_data->result->getHosts()[0]][$description][] = $index;
 			}
 		}
 
@@ -714,27 +714,6 @@ abstract class CTriggerGeneral extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('should be empty'))
 			);
-		}
-	}
-
-	/**
-	 * Validate integrity of trigger recovery properties.
-	 *
-	 * @static
-	 *
-	 * @param array  $trigger
-	 * @param int    $trigger['recovery_mode']
-	 * @param string $trigger['recovery_expression']
-	 *
-	 * @throws APIException if validation failed.
-	 */
-	private static function checkTriggerRecoveryMode(array $trigger) {
-		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-			if ($trigger['recovery_expression'] === '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('cannot be empty'))
-				);
-			}
 		}
 	}
 
@@ -1699,6 +1678,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$functions_num = array_sum(array_map(function ($funcs) {return count($funcs);}, $triggers_functions));
 		$functionid = DB::reserveIds('functions', $functions_num);
+
+		$expression_max_length = DB::getFieldLength('triggers', 'expression');
+		$recovery_expression_max_length = DB::getFieldLength('triggers', 'recovery_expression');
 
 		// Replace func(/host/item) macros with {<functionid>}.
 		foreach ($triggers as $tnum => &$trigger) {
