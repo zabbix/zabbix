@@ -199,43 +199,27 @@
 	 *                                          component hierarchy. These are kept in props object. Default props must
 	 *                                          be provided here.
 	 * @param {object} props['eventsource']
-	 * @param {object} props['operation_type']
-	 * @param {object} props['command_type']
+	 * @param {object} props['cmd']
+	 * @param {object} props['scriptid']
 	 */
 	function OperationView(props) {
 		this.props = props;
-
 		this.$obj = $($('#operation-popup-tmpl').html());
 		this.$wrapper = this.$obj.find('>ul');
-		this.operation_type_select = new OperationViewType(this.$obj.find('>ul>li[id^="operation-type-select"]'));
-		this.$operation_type = this.$obj.find('[id^="operation-type"]');
-		this.$operation_opcommand_scriptid = this.$obj.find('[id^="operation-opcommand-scriptid"]');
+		this.operation_type = new OperationViewType(this.$obj.find('>ul>li[id^="operation-type"]'));
+		this.$current_focus = this.operation_type.$select;
 
-		this.operation_type_select.onchange = (operations) => {
-			var script_pattern = /^scriptid\[([\d]+)\]|cmd\[([\d]+)\]$/,
-				command_pattern = /^cmd\[([\d]+)\]$/,
-				script_match = script_pattern.exec(operations),
-				command_match = command_pattern.exec(operations);
-
-			if (command_match != null) {
-				this.$operation_type.val(command_match[1]);
-				this.$operation_opcommand_scriptid.val(0);
-			}
-			else if (script_match != null) {
-				this.$operation_opcommand_scriptid.val(script_match[1]);
-				this.$operation_type.val(operation_details.OPERATION_TYPE_COMMAND);
-			}
-
-			this.props.operation_type = this.$operation_type.val();
-
+		this.operation_type.onchange = ({cmd, scriptid}) => {
+			this.props.cmd = cmd;
+			this.props.scriptid = scriptid;
 			this.render();
 			this.onupdate();
-			this.operation_type_select.$select.focus();
+			this.operation_type.$select.focus();
 		};
 
 		this.operation_steps = new OperationViewSteps(this.$obj.find('>ul>li[id^="operation-step"]'));
 		this.operation_message = new OperationViewMessage(this.$obj.find('>ul>li[id^="operation-message"]'));
-		this.operation_command = new OperationViewCommand(this.$obj.find('>ul>li[id^="operation-command-targets"]'));
+		this.operation_command = new OperationViewCommand(this.$obj.find('>ul>li[id^="operation-command"]'));
 		this.operation_attr = new OperationViewAttr(this.$obj.find('>ul>li[id^="operation-attr"]'));
 		this.operation_condition = new OperationViewCondition(this.$obj.find('>ul>li[id^="operation-condition"]'));
 	}
@@ -261,17 +245,16 @@
 	 */
 	OperationView.prototype.render = function() {
 		this.detach();
-
-		this.operation_type_select.attach(this.$wrapper);
+		this.operation_type.attach(this.$wrapper);
 		this.operation_steps.attach(this.$wrapper);
 
-		if (this.props.operation_type == operation_details.OPERATION_TYPE_MESSAGE
-				|| this.props.operation_type == operation_details.OPERATION_TYPE_ACK_MESSAGE
-				|| this.props.operation_type == operation_details.OPERATION_TYPE_RECOVERY_MESSAGE) {
+		if (this.props.cmd !== null && (this.props.cmd == operation_details.OPERATION_TYPE_MESSAGE
+				|| this.props.cmd == operation_details.OPERATION_TYPE_ACK_MESSAGE
+				|| this.props.cmd == operation_details.OPERATION_TYPE_RECOVERY_MESSAGE)) {
 			this.operation_message.attach(this.$wrapper, this.props);
 		}
-		else if (this.props.operation_type == operation_details.OPERATION_TYPE_COMMAND) {
-			this.operation_command.attach(this.$wrapper, this.props);
+		else if (this.props.scriptid != null) {
+			this.operation_command.attach(this.$wrapper);
 		}
 
 		this.operation_attr.attach(this.$wrapper, this.props);
@@ -283,7 +266,7 @@
 	 * Each of config fields must contain default values as they will be set into view.
 	 *
 	 * @param {object}      conf
-	 * @param {object|null} conf['operation_types']      See OperationViewType.setConfig doc-block.
+	 * @param {object|null} conf['operation_type']       See OperationViewType.setConfig doc-block.
 	 * @param {object|null} conf['operation_steps']      See OperationViewSteps.setConfig doc-block.
 	 * @param {object|null} conf['operation_message']    See OperationViewMessage.setConfig doc-block.
 	 * @param {object|null} conf['operation_command']    See OperationViewCommand.setConfig doc-block.
@@ -327,10 +310,10 @@
 		}
 
 		if (conf.operation_types === null) {
-			this.$operation_type.attach = this.$operation_type.detach;
+			this.operation_type.attach = this.operation_type.detach;
 		}
 		else {
-			this.operation_type_select.setConfig(conf.operation_types);
+			this.operation_type.setConfig(conf.operation_types);
 		}
 	};
 
@@ -483,19 +466,19 @@
 	 *
 	 * @param {jQuery} $wrapper
 	 * @param {object} props
-	 * @param {string} props['operation_type']
+	 * @param {string} props['cmd']
 	 * @param {string} props['recovery_phase']
 	 */
 	OperationViewMessage.prototype.attach = function($wrapper, props) {
 		this.detach();
 
-		if (props.operation_type == operation_details.OPERATION_TYPE_MESSAGE) {
+		if (props.cmd !== null && props.cmd == operation_details.OPERATION_TYPE_MESSAGE) {
 			this.$notice.appendTo($wrapper);
 			this.$usergroups.appendTo($wrapper);
 			this.$users.appendTo($wrapper);
 			this.$mediatype_only.appendTo($wrapper);
 		}
-		else if (props.operation_type == operation_details.OPERATION_TYPE_ACK_MESSAGE) {
+		else if (props.cmd !== null && props.cmd == operation_details.OPERATION_TYPE_ACK_MESSAGE) {
 			this.$mediatype_default.appendTo($wrapper);
 		}
 		else if (props.recovery_phase == operation_details.ACTION_OPERATION
@@ -595,12 +578,8 @@
 	 * Attaches nodes for chosen command type.
 	 *
 	 * @param {jQuery} $wrapper
-	 * @param {object} props
-	 * @param {object} props['command_type']
 	 */
-	OperationViewCommand.prototype.attach = function($wrapper, {command_type}) {
-		this.detach();
-
+	OperationViewCommand.prototype.attach = function($wrapper) {
 		this.$targets.appendTo($wrapper);
 	};
 
@@ -617,12 +596,22 @@
 	function OperationViewType($obj) {
 		this.$obj = $obj;
 		this.$select = this.$obj.find('z-select');
-		this.$select.on('change', ({target}) => this.onchange(target.value));
+		this.$select.on('change', ({target}) => {
+
+			var script_pattern = /^scriptid\[([\d]+)\]|cmd\[([\d]+)\]$/,
+				command_pattern = /^cmd\[([\d]+)\]$/,
+				script_match = script_pattern.exec(target.value),
+				command_match = command_pattern.exec(target.value);
+
+			if (command_match != null) {
+				this.onchange({cmd: command_match[1], scriptid: null});
+			}
+			else if (script_match != null) {
+				this.onchange({cmd: null, scriptid: script_match[1]});
+			}
+		});
 	}
 
-	/**
-	 * @param {string} value
-	 */
 	OperationViewType.prototype.onchange = function(value) {};
 
 	/**
@@ -738,18 +727,18 @@
 	/**
 	 * @param {jQuery} $wrapper
 	 * @param {object} props
-	 * @param {string} props['operation_type']
+	 * @param {string} props['cmd']
 	 */
 	OperationViewAttr.prototype.attach = function($wrapper, props) {
-		if (props.operation_type == operation_details.OPERATION_TYPE_TEMPLATE_REMOVE
-				|| props.operation_type == operation_details.OPERATION_TYPE_TEMPLATE_ADD) {
+		if (props.cmd == operation_details.OPERATION_TYPE_TEMPLATE_REMOVE
+				|| props.cmd == operation_details.OPERATION_TYPE_TEMPLATE_ADD) {
 			this.$templates.appendTo($wrapper);
 		}
-		else if (props.operation_type == operation_details.OPERATION_TYPE_GROUP_REMOVE
-				|| props.operation_type == operation_details.OPERATION_TYPE_GROUP_ADD) {
+		else if (props.cmd == operation_details.OPERATION_TYPE_GROUP_REMOVE
+				|| props.cmd == operation_details.OPERATION_TYPE_GROUP_ADD) {
 			this.$hostgroups.appendTo($wrapper);
 		}
-		else if (props.operation_type == operation_details.OPERATION_TYPE_HOST_INVENTORY) {
+		else if (props.cmd == operation_details.OPERATION_TYPE_HOST_INVENTORY) {
 			this.$inventory.appendTo($wrapper);
 		}
 	};
@@ -987,8 +976,8 @@
 
 		const props = {
 			recovery_phase,
-			operation_type: operation_details.OPERATION_TYPE_MESSAGE,
-			command_type: operation_details.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+			cmd: operation_details.OPERATION_TYPE_MESSAGE,
+			scriptid: null
 		};
 
 		this.view = new OperationView(props);
@@ -1029,8 +1018,15 @@
 
 		form_data.append('operation[eventsource]', this.eventsource);
 		form_data.append('operation[recovery]', this.recovery_phase);
+		form_data.append('operation[operationtype]', (this.view.props.scriptid !== null)
+			? window.operation_details.OPERATION_TYPE_COMMAND
+			: this.view.props.cmd
+		);
 
-		form_data.append('operation[operationtype]', form_data.get('operationtype'));
+		if (this.view.props.scriptid !== null) {
+			form_data.append('operation[opcommand][scriptid]', this.view.props.scriptid);
+		}
+
 		form_data.delete('operationtype');
 
 		return form_data;
