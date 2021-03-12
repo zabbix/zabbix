@@ -869,7 +869,7 @@ static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now)
 {
 	int	nextcheck;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%s %s", __func__, zbx_date2str(now, NULL), zbx_time2str(now, NULL));
 
 	nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays, report->start_time, report->timezone);
 
@@ -1069,7 +1069,9 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	reportid;
-		int		nextcheck;
+		int		nextcheck, start_time, active_since, active_till, reschedule = 0;
+		unsigned char	period, cycle, weekdays;
+
 
 		ZBX_STR2UINT64(reportid, row[0]);
 		zbx_vector_uint64_append(&reportids, reportid);
@@ -1077,6 +1079,13 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		timezone = row[10];
 		if (0 == strcmp(timezone, ZBX_TIMEZONE_DEFAULT_VALUE))
 			timezone = cfg.default_timezone;
+
+		ZBX_STR2UCHAR(period, row[4]);
+		ZBX_STR2UCHAR(cycle, row[5]);
+		ZBX_STR2UCHAR(weekdays, row[6]);
+		start_time = atoi(row[7]);
+		active_since = atoi(row[8]);
+		active_till = atoi(row[9]);
 
 		if (NULL == (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &reportid)))
 		{
@@ -1095,13 +1104,26 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 			report->error = zbx_strdup(NULL, row[12]);
 			report->lastsent = atoi(row[13]);
 			report->flags = 0;
+
+			reschedule = 1;
 		}
 		else
 		{
+			if (report->period != period || report->cycle != cycle || report->weekdays != weekdays ||
+					report->start_time != start_time || report->active_since != active_since ||
+					report->active_till != active_till)
+			{
+				reschedule = 1;
+			}
+
 			if (0 != strcmp(report->name, row[2]))
 				report->name = zbx_strdup(report->name, row[2]);
+
 			if (0 != strcmp(report->timezone, timezone))
-				report->name = zbx_strdup(report->name, timezone);
+			{
+				report->timezone = zbx_strdup(report->timezone, timezone);
+				reschedule = 1;
+			}
 		}
 
 		ZBX_STR2UINT64(report->userid, row[1]);
@@ -1123,6 +1145,9 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 			}
 			continue;
 		}
+
+		if (0 == reschedule)
+			continue;
 
 		if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now)))
 		{
