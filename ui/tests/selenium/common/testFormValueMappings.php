@@ -156,11 +156,11 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'один + один'
 						],
 						[
-							'value' => str_repeat('W', 64),
-							'newvalue' => str_repeat('W', 64)
+							'value' => '1_WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
+							'newvalue' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW'
 						],
 						[
-							'value' => 'Z mapping not shown',
+							'value' => 'mapping not shown',
 							'newvalue' => '  not shown on screenshot   '
 						]
 
