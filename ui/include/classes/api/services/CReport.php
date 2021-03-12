@@ -373,21 +373,26 @@ class CReport extends CApiService {
 	 * @param string $method
 	 */
 	protected function updateParams(array $reports, string $method): void {
-		$fields_by_name = [
+		$params_by_name = [
 			'subject' => 'subject',
 			'body' => 'message'
 		];
 		$report_params = [];
 
 		foreach ($reports as $report) {
-			foreach ($fields_by_name as $name => $field) {
-				if (array_key_exists($field, $report)) {
-					$report_params[$report['reportid']][$name] = $report[$field];
+			$report_params[$report['reportid']] = [];
+
+			foreach ($params_by_name as $name => $param) {
+				if (array_key_exists($param, $report) && $report[$param] !== '') {
+					$report_params[$report['reportid']][] = [
+						'name' => $name,
+						'value' => $report[$param]
+					];
 				}
 			}
 		}
 
-		if ($report_params) {
+		if (!$report_params) {
 			return;
 		}
 
@@ -403,18 +408,15 @@ class CReport extends CApiService {
 		$del_reportparamids = [];
 
 		foreach ($db_report_params as $db_report_param) {
-			if (!array_key_exists($db_report_param['name'], $report_params[$db_report_param['reportid']])) {
-				continue;
-			}
+			if ($report_params[$db_report_param['reportid']]) {
+				$report_param = array_shift($report_params[$db_report_param['reportid']]);
 
-			$report_param = array_shift($report_params[$db_report_param['reportid']][$db_report_param['name']]);
-
-			if ($report_param !== null) {
 				$upd_report_param = [];
 
 				foreach (['name', 'value'] as $field_name) {
-					if ($report_param !== $db_report_param[$field_name]) {
-						$upd_report_param[$field_name] = $report_param;
+					if (array_key_exists($field_name, $report_param)
+							&& $report_param[$field_name] !== $db_report_param[$field_name]) {
+						$upd_report_param[$field_name] = $report_param[$field_name];
 					}
 				}
 
@@ -430,12 +432,12 @@ class CReport extends CApiService {
 			}
 		}
 
-		foreach ($report_params as $reportid => $report_params_by_name) {
-			foreach ($report_params_by_name as $name => $value) {
+		foreach ($report_params as $reportid => $report_param) {
+			foreach ($report_param as $param) {
 				$ins_report_params[] = [
 					'reportid' => $reportid,
-					'name' => $name,
-					'value' => $value
+					'name' => $param['name'],
+					'value' => $param['value']
 				];
 			}
 		}
