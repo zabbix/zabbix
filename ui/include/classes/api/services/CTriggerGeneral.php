@@ -512,8 +512,18 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($descriptions as $description => $triggers) {
 			foreach ($triggers as $index => $trigger) {
-				$expression_data->parse($trigger['expression']);
-				$hosts[$expression_data->result->getHosts()[0]][$description][] = $index;
+				if ($expression_data->parse($trigger['expression'])) {
+					$expression_hosts = $expression_data->result->getHosts();
+					if ($expression_hosts) {
+						$hosts[$expression_hosts[0]][$description][] = $index;
+					}
+					else {
+						$path = '/'.($index+1).'/expression';
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+							_('trigger expression must contain at least one /host/key reference')
+						));
+					}
+				}
 			}
 		}
 
@@ -1547,9 +1557,20 @@ abstract class CTriggerGeneral extends CApiService {
 
 				// Validate functions of trigger expression. Colect trigger functions in $triggers_functions.
 				foreach ($expressionData->result->getFunctions() as $fn) {
-					$query = $fn->getFunctionTriggerQuery();
+					foreach ([$trigger_function_validator, $math_function_validator] as $validator) {
+						if ($validator->validate($fn)) {
+							$error_msg = '';
+							break;
+						}
+						else {
+							$error_msg = $validator->getError();
+						}
+					}
+					if ($error_msg !== '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error_msg);
+					}
 
-					if ($query) {
+					if (($query = $fn->getFunctionTriggerQuery()) !== null) {
 						$host_keys = $hosts_keys[$query->host];
 						$key = $host_keys['keys'][$query->item];
 
@@ -1564,11 +1585,7 @@ abstract class CTriggerGeneral extends CApiService {
 							));
 						}
 
-						if (!$trigger_function_validator->validate([
-								'function' => $fn->match,
-								'functionName' => $fn->function,
-								'functionParamList' => $fn->params_raw['parameters'],
-								'valueType' => $key['value_type']])) {
+						if (!$trigger_function_validator->validateValueType($key['value_type'], $fn)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, $trigger_function_validator->getError());
 						}
 
@@ -1600,9 +1617,6 @@ abstract class CTriggerGeneral extends CApiService {
 						$status_mask |= ($host_keys['status'] == HOST_STATUS_TEMPLATE ? 0x01 : 0x02);
 						$hostids[$host_keys['hostid']] = true;
 						$hosts[$host_keys['host']] = true;
-					}
-					elseif (!$math_function_validator->validate($fn)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, $math_function_validator->getError());
 					}
 				}
 			}

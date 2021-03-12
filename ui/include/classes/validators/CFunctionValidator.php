@@ -305,38 +305,22 @@ class CFunctionValidator extends CValidator {
 
 	/**
 	 * Validate trigger function like last(0), time(), etc.
-	 * Examples:
-	 *	array(
-	 *		'function' => last("#15"),
-	 *		'functionName' => 'last',
-	 *		'functionParamList' => array(0 => '#15'),
-	 *		'valueType' => 3
-	 *	)
 	 *
-	 * @param string $value['function']
-	 * @param string $value['functionName']
-	 * @param array  $value['functionParamList']
-	 * @param int    $value['valueType']
+	 * @param CFunctionParserResult  $fn
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($fn) {
 		$this->setError('');
 
-		if (!array_key_exists($value['functionName'], $this->allowed)) {
-			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.
+		if (!array_key_exists($fn->function, $this->allowed)) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Unknown function.'));
 			return false;
 		}
 
-		if (!array_key_exists($value['valueType'], $this->allowed[$value['functionName']]['value_types'])) {
-			$this->setError(_s('Incorrect item value type "%1$s" provided for trigger function "%2$s".',
-				itemValueTypeString($value['valueType']), $value['function']));
-			return false;
-		}
-
-		if (count($this->allowed[$value['functionName']]['args']) < count($value['functionParamList'])) {
-			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.
+		if (count($this->allowed[$fn->function]['args']) < count($fn->params_raw['parameters'])) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid number of parameters.'));
 			return false;
 		}
@@ -349,32 +333,51 @@ class CFunctionValidator extends CValidator {
 			_('Invalid fifth parameter.')
 		];
 
-		foreach ($this->allowed[$value['functionName']]['args'] as $num => $arg) {
+		foreach ($this->allowed[$fn->function]['args'] as $num => $arg) {
 			// Mandatory check.
-			if ($arg['mandat'] && !array_key_exists($num, $value['functionParamList'])) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.
+			if ($arg['mandat'] && !array_key_exists($num, $fn->params_raw['parameters'])) {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					_('Mandatory parameter is missing.'));
 				return false;
 			}
-			elseif (!array_key_exists($num, $value['functionParamList'])) {
+			elseif (!array_key_exists($num, $fn->params_raw['parameters'])) {
 				continue;
 			}
 
-			$param = ($value['functionParamList'][$num] instanceof CParserResult)
-					? $value['functionParamList'][$num]->match
-					: $value['functionParamList'][$num]['raw'];
+			$param = ($fn->params_raw['parameters'][$num] instanceof CParserResult)
+					? $fn->params_raw['parameters'][$num]->match
+					: $fn->params_raw['parameters'][$num]['raw'];
 
 			if (($arg['mandat'] & 0x02) && strstr($param, ':') === false) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['function']).' '.
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					_('Mandatory parameter is missing.'));
 				return false;
 			}
 
 			if (!$this->validateParameter($param, $arg)) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.',
-					$value['function']).' '.$param_labels[$num]);
+				$this->setError(
+					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
+				);
 				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate value type.
+	 *
+	 * @param int                   $value_type
+	 * @param CFunctionParserResult $fn
+	 *
+	 * @return bool
+	 */
+	public function validateValueType(int $value_type, CFunctionParserResult $fn): bool {
+		if (!array_key_exists($value_type, $this->allowed[$fn->function]['value_types'])) {
+			$this->setError(_s('Incorrect item value type "%1$s" provided for trigger function "%2$s".',
+				itemValueTypeString($value_type), $fn->match));
+			return false;
 		}
 
 		return true;
