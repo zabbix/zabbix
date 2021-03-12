@@ -29,9 +29,7 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CForm())
-				->cleanItems()
 				->addVar('action', 'module.scan')
-				->addVar('sid', substr($_COOKIE[ZBX_SESSION_NAME], 16, 16))
 				->addItem((new CList())
 					->addItem(new CSubmit('form', _('Scan directory')))
 				)
