@@ -1048,7 +1048,7 @@ static zbx_dbpatch_function_t	*dbpatch_new_function(zbx_uint64_t functionid, zbx
 	return func;
 }
 
-static void	dbpatch_add_function(zbx_dbpatch_function_t *template, zbx_uint64_t functionid, const char *name,
+static void	dbpatch_add_function(const zbx_dbpatch_function_t *template, zbx_uint64_t functionid, const char *name,
 		const char *parameter, unsigned char flags, zbx_vector_ptr_t *functions)
 {
 	zbx_dbpatch_function_t	*func;
