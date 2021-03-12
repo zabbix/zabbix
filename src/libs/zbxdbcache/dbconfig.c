@@ -8512,7 +8512,6 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 static int	DCconfig_find_active_time_function(const char *expression, const unsigned char *data,
 		unsigned char trigger_timer)
 {
-	const char		*time_functions[] = {"date", "dayofmonth", "dayofweek", "now", "time", NULL};
 	int			i, ret = SUCCEED;
 	const ZBX_DC_FUNCTION	*dc_function;
 	const ZBX_DC_HOST	*dc_host;
@@ -8544,7 +8543,7 @@ static int	DCconfig_find_active_time_function(const char *expression, const unsi
 		}
 	}
 
-	ret = zbx_check_serialized_expression_function(expression, data, time_functions);
+	ret = (ZBX_TRIGGER_TIMER_DEFAULT != trigger_timer ? SUCCEED : FAIL);
 out:
 	zbx_vector_uint64_destroy(&functionids);
 
