@@ -31,6 +31,9 @@ type handlerFunc func(s Session, params map[string]string) (res interface{}, err
 // getHandlerFunc returns a handlerFunc related to a given key.
 func getHandlerFunc(key string) handlerFunc {
 	switch key {
+	case keyConfigDiscovery:
+		return configDiscoveryHandler
+
 	case keyCollectionStats:
 		return collectionStatsHandler
 
@@ -76,6 +79,7 @@ func getHandlerFunc(key string) handlerFunc {
 }
 
 const (
+	keyConfigDiscovery      = "mongodb.cfg.discovery"
 	keyCollectionStats      = "mongodb.collection.stats"
 	keyCollectionsDiscovery = "mongodb.collections.discovery"
 	keyCollectionsUsage     = "mongodb.collections.usage"
@@ -105,6 +109,9 @@ var (
 )
 
 var metrics = metric.MetricSet{
+	keyConfigDiscovery: metric.New("Returns a list of discovered config servers.",
+		[]*metric.Param{paramURI, paramUser, paramPassword}, false),
+
 	keyCollectionStats: metric.New("Returns a variety of storage statistics for a given collection.",
 		[]*metric.Param{paramURI, paramUser, paramPassword, paramDatabase, paramCollection}, false),
 

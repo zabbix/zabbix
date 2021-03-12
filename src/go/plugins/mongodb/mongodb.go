@@ -108,6 +108,7 @@ func (l MongoLogger) Output(_ int, msg string) error {
 
 func init() {
 	logger := MongoLogger{Debugf: impl.Tracef}
+
 	mgo.SetDebug(true)
 	mgo.SetLogger(logger)
 }

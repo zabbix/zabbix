@@ -104,6 +104,8 @@ given collection.
 database — database name (default: admin).  
 collection (required) — collection name.
 
+**mongodb.cfg.discovery[\<commonParams\>]** — Returns a list of discovered config servers.  
+
 **mongodb.collections.discovery[\<commonParams\>]** — Returns a list of discovered collections.  
 
 **mongodb.collections.usage[\<commonParams\>]** — Returns usage statistics for collections.  
