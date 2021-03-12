@@ -209,7 +209,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call with empty "method"
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "", "id": null}',
+				'request' => '{"jsonrpc": "2.0", "method": "", "params": {}, "id": null}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -222,7 +222,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call of non-existent API class
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "foo", "id": 5}',
+				'request' => '{"jsonrpc": "2.0", "method": "foo", "params": {}, "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -235,7 +235,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call of non-existent method
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.get", "id": 5}',
+				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.get", "params": {}, "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -253,13 +253,13 @@ class testJSONRPC extends CAPITest {
 			],
 			// a notification with non-existent method
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "foobar"}',
+				'request' => '{"jsonrpc": "2.0", "method": "foobar", "params": {}}',
 				'result' => ''
 			],
 			// rpc call batch (all notifications)
 			[
 				'request' => '['.
-					'{"jsonrpc": "2.0", "method": "apiinfo.version"},'.
+					'{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}},'.
 					'{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}}'.
 				']',
 				'result' => ''
@@ -267,12 +267,13 @@ class testJSONRPC extends CAPITest {
 			// rpc call batch
 			[
 				'request' => '['.
-					'{"jsonrpc": "2.0", "method": "apiinfo.version", "id": 1},'.
-					'{"jsonrpc": "2.0", "method": "apiinfo.version"},'.
-					'{"jsonrpc": "2.0", "method": "foo"},'.
-					'{"method": "foo", "id": 2},'.
+					'{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}, "id": 1},'.
+					'{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}},'.
+					'{"jsonrpc": "2.0", "method": "foo", "params": {}},'.
+					'{"method": "foo", "params": {}, "id": 2},'.
+					'{"jsonrpc": "2.0", "method": "foo", "id": 3},'.
 					'"abc",'.
-					'{"jsonrpc": "2.0", "method": "apiinfo.version", "id": 3}'.
+					'{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}, "id": 4}'.
 				']',
 				'result' => [
 					[
@@ -294,6 +295,15 @@ class testJSONRPC extends CAPITest {
 						'error' => [
 							'code' => -32600,
 							'message' => 'Invalid Request.',
+							'data' => 'Invalid parameter "/": the parameter "params" is missing.'
+						],
+						'id' => 3
+					],
+					[
+						'jsonrpc' => '2.0',
+						'error' => [
+							'code' => -32600,
+							'message' => 'Invalid Request.',
 							'data' => 'Invalid parameter "/": an array is expected.'
 						],
 						'id' => null
@@ -301,13 +311,13 @@ class testJSONRPC extends CAPITest {
 					[
 						'jsonrpc' => '2.0',
 						'result' => ZABBIX_API_VERSION,
-						'id' => 3
+						'id' => 4
 					]
 				]
 			],
 			// rpc call with not required auth
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.version", "auth": "token", "id": 5}',
+				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}, "auth": "token", "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -320,7 +330,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call without required auth
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "user.get", "auth": null, "id": 5}',
+				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {}, "auth": null, "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -333,7 +343,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call without required auth
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "user.get", "id": 5}',
+				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {}, "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [

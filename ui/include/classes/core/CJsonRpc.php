@@ -94,7 +94,7 @@ class CJsonRpc {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'jsonrpc' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => self::VERSION],
 			'method' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'params' =>		['type' => API_JSONRPC_PARAMS, 'default' => []],
+			'params' =>		['type' => API_JSONRPC_PARAMS, 'flags' => API_REQUIRED],
 			'auth' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null],
 			'id' =>			['type' => API_JSONRPC_ID]
 		]];
