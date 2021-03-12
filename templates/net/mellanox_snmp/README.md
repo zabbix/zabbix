@@ -48,7 +48,7 @@ No specific Zabbix configuration is required.
 |{$TEMP.MIN.CRIT} |<p>-</p> |`5` |
 |{$TEMP.STATUS.WARN} |<p>-</p> |`3` |
 |{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.+` |
-|{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
+|{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^(/dev|/sys|/$|/run|/proc|.+/shm$)` |
 |{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$` |
 |{$VFS.FS.FSTYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>-</p> |`90` |

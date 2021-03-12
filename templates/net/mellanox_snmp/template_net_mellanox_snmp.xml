@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-12T14:41:30Z</date>
+   <date>2021-03-12T18:00:45Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -1608,7 +1608,7 @@ The amount of the storage represented by this entry that is allocated, in units 
             </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.NOT_MATCHES}</macro>
-               <value>^(/dev|/sys|/run|/proc|.+/shm$)</value>
+               <value>^(/dev|/sys|/$|/run|/proc|.+/shm$)</value>
                <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
