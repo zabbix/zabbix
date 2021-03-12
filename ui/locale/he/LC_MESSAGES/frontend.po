@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-05 19:56+0200\n"
-"PO-Revision-Date: 2021-03-01 07:25+0300\n"
+"PO-Revision-Date: 2021-03-08 17:12+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1614576329.000000\n"
+"X-POOTLE-MTIME: 1615216368.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -19120,7 +19120,7 @@ msgstr "המשתמש עם המזהה „%1$s” לא זמין."
 #: include/classes/api/services/CUser.php:638
 #, c-format
 msgid "User with username \"%1$s\" already exists."
-msgstr ""
+msgstr "כבר קיים משתמש עם השם „%1$s”."
 
 #: include/actions.inc.php:1832 include/actions.inc.php:1915
 msgid "User/Recipient"
