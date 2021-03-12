@@ -56,7 +56,7 @@ install-zabbix.com/cmd/zabbix_agent2:
 		go install -ldflags="${AGENT_GOLDFLAGS}" ${TARGETS}
 
 install-zabbix.com/cmd/zabbix_web_service:
-	GOBIN=${GOBIN} 	go install zabbix.com/cmd/zabbix_web_service
+	GOBIN=${GOBIN} go install -ldflags="${WEBSERVICE_GOLDFLAGS}" zabbix.com/cmd/zabbix_web_service
 
 install-exec-local: ${INSTALL_TARGETS}
 
