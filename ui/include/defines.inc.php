@@ -403,8 +403,12 @@ define('REPORT_PERIOD_LAST_MONTH',		6);
 define('REPORT_PERIOD_LAST_YEAR',		7);
 
 // scheduled reports
+define('ZBX_REPORT_FILTER_SHOW_ALL',	0);
+define('ZBX_REPORT_FILTER_SHOW_MY',		1);
+
 define('ZBX_REPORT_STATUS_ENABLED',		0);
 define('ZBX_REPORT_STATUS_DISABLED',	1);
+define('ZBX_REPORT_STATUS_EXPIRED',		2);
 
 define('ZBX_REPORT_PERIOD_DAY',		0);
 define('ZBX_REPORT_PERIOD_WEEK',	1);
