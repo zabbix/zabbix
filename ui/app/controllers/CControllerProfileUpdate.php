@@ -79,10 +79,12 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.httpconf.filter.active':
 				case 'web.templates.items.filter.active':
 				case 'web.templates.triggers.filter.active':
+				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
 				case 'web.user.filter.active':
+				case 'web.user.token.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
 					$ret = true;

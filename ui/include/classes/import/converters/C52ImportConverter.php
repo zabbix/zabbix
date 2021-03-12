@@ -60,6 +60,10 @@ class C52ImportConverter extends CConverter {
 			unset($trigger);
 		}
 
+		if (array_key_exists('value_maps', $data['zabbix_export'])) {
+			$data['zabbix_export'] = self::convertValueMaps($data['zabbix_export']);
+		}
+
 		return $data;
 	}
 
@@ -89,6 +93,14 @@ class C52ImportConverter extends CConverter {
 				}
 				unset($item);
 			}
+
+			if (array_key_exists('interfaces', $host)) {
+				$host['interfaces'] = self::convertIntefaces($host['interfaces']);
+			}
+
+			if (array_key_exists('discovery_rules', $host)) {
+				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
+			}
 		}
 		unset($host);
 
@@ -115,10 +127,150 @@ class C52ImportConverter extends CConverter {
 				}
 				unset($item);
 			}
+
+			if (array_key_exists('discovery_rules', $template)) {
+				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
+			}
 		}
 		unset($template);
 
 		return $templates;
+	}
+
+	/**
+	 * Convert interfaces.
+	 *
+	 * @static
+	 *
+	 * @param array $interfaces
+	 *
+	 * @return array
+	 */
+	private static function convertIntefaces(array $interfaces): array {
+		$result = [];
+
+		foreach ($interfaces as $interface) {
+			$snmp_v3_convert = array_key_exists('type', $interface)
+				&& $interface['type'] === CXmlConstantName::SNMP
+				&& array_key_exists('details', $interface)
+				&& array_key_exists('version', $interface['details'])
+				&& $interface['details']['version'] === CXmlConstantName::SNMPV3;
+
+			if ($snmp_v3_convert) {
+				if (array_key_exists('authprotocol', $interface['details'])
+						&& $interface['details']['authprotocol'] === CXmlConstantName::SHA) {
+					$interface['details']['authprotocol'] = CXmlConstantName::SHA1;
+				}
+
+				if (array_key_exists('privprotocol', $interface['details'])
+						&& $interface['details']['privprotocol'] === CXmlConstantName::AES) {
+					$interface['details']['privprotocol'] = CXmlConstantName::AES128;
+				}
+			}
+
+			$result[] = $interface;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert discover rules.
+	 *
+	 * @static
+	 *
+	 * @param array $discovery_rules
+	 *
+	 * @return array
+	 */
+	private static function convertDiscoveryRules(array $discovery_rules): array {
+		$result = [];
+
+		foreach ($discovery_rules as $discovery_rule) {
+			if (array_key_exists('host_prototypes', $discovery_rule)) {
+				$discovery_rule['host_prototypes'] = self::convertHostPrototypes($discovery_rule['host_prototypes']);
+			}
+
+			$result[] = $discovery_rule;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert host prototypes.
+	 *
+	 * @static
+	 *
+	 * @param array $host_prototypes
+	 *
+	 * @return array
+	 */
+	private static function convertHostPrototypes(array $host_prototypes): array {
+		$result = [];
+
+		foreach ($host_prototypes as $host_prototype) {
+			if (array_key_exists('interfaces', $host_prototype)) {
+				$host_prototype['interfaces'] = self::convertIntefaces($host_prototype['interfaces']);
+			}
+
+			$result[] = $host_prototype;
+		}
+
+		return $result;
+	}
+
+	private static function convertValueMaps(array $import): array {
+		$valuemaps = zbx_toHash($import['value_maps'], 'name');
+		unset($import['value_maps']);
+
+		if (array_key_exists('hosts', $import)) {
+			$import['hosts'] = self::moveValueMaps($import['hosts'], $valuemaps);
+		}
+
+		if (array_key_exists('templates', $import)) {
+			$import['templates'] = self::moveValueMaps($import['templates'], $valuemaps);
+		}
+
+		return $import;
+	}
+
+	private static function moveValueMaps(array $hosts, array $valuemaps) {
+		foreach ($hosts as &$host) {
+			$used_valuemaps = [];
+
+			if (array_key_exists('items', $host)) {
+				foreach ($host['items'] as $item) {
+					if (array_key_exists('valuemap', $item) && !in_array($item['valuemap']['name'], $used_valuemaps)) {
+						if (array_key_exists($item['valuemap']['name'], $valuemaps)) {
+							$host['valuemaps'][] = $valuemaps[$item['valuemap']['name']];
+							$used_valuemaps[] = $item['valuemap']['name'];
+						}
+					}
+				}
+			}
+
+			if (array_key_exists('discovery_rules', $host)) {
+				foreach ($host['discovery_rules'] as $drule) {
+					if (!array_key_exists('item_prototypes', $drule)) {
+						continue;
+					}
+
+					foreach ($drule['item_prototypes'] as $item_prototype) {
+						if (array_key_exists('valuemap', $item_prototype)
+								&& !in_array($item_prototype['valuemap']['name'], $used_valuemaps)) {
+							if (array_key_exists($item_prototype['valuemap']['name'], $valuemaps)) {
+								$host['valuemaps'][] = $valuemaps[$item_prototype['valuemap']['name']];
+								$used_valuemaps[] = $item_prototype['valuemap']['name'];
+							}
+						}
+					}
+				}
+			}
+		}
+		unset($host);
+
+		return $hosts;
 	}
 
 	/**

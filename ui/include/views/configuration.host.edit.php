@@ -154,8 +154,6 @@ else {
 	zbx_add_post_js('hostInterfaceManager.render();');
 	zbx_add_post_js('HostInterfaceManager.makeReadonly();');
 
-	$hostList->addVar('interfaces', $data['interfaces']);
-
 	$interface_header = renderInterfaceHeaders();
 
 	$agent_interfaces = (new CDiv())
@@ -514,6 +512,19 @@ $encryption_form_list
 	);
 
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_INDICATOR_ENCRYPTION);
+
+if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	// Value mapping.
+	$divTabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
+		new CPartial('configuration.valuemap', [
+			'source' => 'host',
+			'valuemaps' => $data['valuemaps'],
+			'readonly' => $data['readonly'],
+			'form' => 'host'
+		])),
+		TAB_INDICATOR_VALUEMAPS
+	);
+}
 
 /*
  * footer

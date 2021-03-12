@@ -67,7 +67,7 @@ class CImportDataAdapter {
 				$template = CArrayHelper::renameKeys($template, ['template' => 'host']);
 
 				$templates[] = CArrayHelper::getByKeys($template, [
-					'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags'
+					'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags', 'valuemaps'
 				]);
 			}
 		}
@@ -96,7 +96,7 @@ class CImportDataAdapter {
 				$hosts[] = CArrayHelper::getByKeys($host, [
 					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
 					'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
-					'inventory_mode', 'tags'
+					'inventory_mode', 'tags', 'valuemaps'
 				]);
 			}
 		}
@@ -133,15 +133,6 @@ class CImportDataAdapter {
 		}
 
 		return $applications;
-	}
-
-	/**
-	 * Get value maps from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getValueMaps() {
-		return array_key_exists('value_maps', $this->data) ? $this->data['value_maps'] : [];
 	}
 
 	/**

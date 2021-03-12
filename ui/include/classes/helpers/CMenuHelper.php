@@ -232,7 +232,7 @@ class CMenuHelper {
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
-					->setSubMenu(new CMenu([
+					->setSubMenu(new CMenu(array_filter([
 						(new CMenuItem(_('GUI')))
 							->setAction('gui.edit'),
 						(new CMenuItem(_('Autoregistration')))
@@ -250,17 +250,19 @@ class CMenuHelper {
 							->setAliases(['regex.edit']),
 						(new CMenuItem(_('Macros')))
 							->setAction('macros.edit'),
-						(new CMenuItem(_('Value mapping')))
-							->setAction('valuemap.list')
-							->setAliases(['valuemap.edit']),
 						(new CMenuItem(_('Trigger displaying options')))
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),
+						(!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS))
+							? (new CMenuItem(_('API tokens')))
+								->setAction('token.list')
+								->setAliases(['token.edit', 'token.view'])
+							: null,
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
-					]))
+					])))
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 				? (new CMenuItem(_('Proxies')))
@@ -356,7 +358,7 @@ class CMenuHelper {
 				->setTarget('_blank')
 		);
 
-		$user = array_intersect_key(CWebUser::$data, array_flip(['alias', 'name', 'surname'])) + [
+		$user = array_intersect_key(CWebUser::$data, array_flip(['username', 'name', 'surname'])) + [
 			'name' => null,
 			'surname' => null
 		];
@@ -366,6 +368,20 @@ class CMenuHelper {
 				(new CMenuItem(_('Guest user')))
 					->setIcon('icon-guest')
 					->setTitle(getUserFullname($user))
+			);
+		}
+		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+			$menu->add(
+				(new CMenuItem(_('User settings')))
+					->setIcon('icon-profile')
+					->setTitle(getUserFullname($user))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Profile')))
+							->setAction('userprofile.edit'),
+						(new CMenuItem(_('API tokens')))
+							->setAction('user.token.list')
+							->setAliases(['user.token.view', 'user.token.edit'])
+					]))
 			);
 		}
 		else {

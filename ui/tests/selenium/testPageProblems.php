@@ -19,6 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/traits/FilterTrait.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -26,6 +28,9 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup profiles
  */
 class testPageProblems extends CLegacyWebTest {
+
+	use FilterTrait;
+	use TableTrait;
 
 	public function testPageProblems_CheckLayout() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
@@ -68,7 +73,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->assertTrue($this->zbxTestCheckboxSelected('evaltype_00'));
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
-		$this->assertTrue($this->zbxTestCheckboxSelected('tags_000'));
+		$this->zbxTestDropdownAssertSelected('tags_00_operator', 'Contains');
 
 		// Select "AND" option and two tag names with partial "Contains" value match
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
@@ -105,7 +110,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Test trigger with tag');
 
 		// Change tag value filter to "Equals"
-		$this->zbxTestClickXpath('//label[@for="tags_100"]');
+		$this->zbxTestDropdownSelect('tags_00_operator', 'Equals');
 		$this->query('name:filter_apply')->one()->click();
 		$this->zbxTestAssertElementText('//tbody/tr[@class="nothing-to-show"]/td', 'No data found.');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
@@ -122,7 +127,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Select tag option "OR" and exact "Equals" tag value match
 		$this->zbxTestClickXpath('//label[@for="evaltype_20"]');
-		$this->zbxTestClickXpath('//label[@for="tags_100"]');
+		$this->zbxTestDropdownSelect('tags_00_operator', 'Equals');
 
 		// Filter by two tags
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
@@ -144,6 +149,246 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
+	}
+
+	public static function getFilterByTagsExceptContainsEqualsData() {
+		return [
+			// "And" and "And/Or" checks.
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Exists']
+					],
+					'expected_problems' => [
+						'Test trigger to check tag filter on problem page',
+						'Test trigger with tag',
+						'Trigger for tag permissions MySQL',
+						'Trigger for tag permissions Oracle'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Exists']
+					],
+					'expected_problems' => [
+						'Test trigger to check tag filter on problem page',
+						'Test trigger with tag',
+						'Trigger for tag permissions MySQL',
+						'Trigger for tag permissions Oracle'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Exists'],
+						['name' => 'Database', 'operator' => 'Exists']
+					],
+					'expected_problems' => [
+						'Test trigger to check tag filter on problem page'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Exists'],
+						['name' => 'Database', 'operator' => 'Exists']
+					],
+					'expected_problems' => [
+						'Test trigger to check tag filter on problem page',
+						'Test trigger with tag',
+						'Trigger for tag permissions MySQL',
+						'Trigger for tag permissions Oracle'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'Alpha', 'operator' => 'Does not exist']
+					],
+					'absent_problems' => [
+						'Third test trigger with tag priority',
+						'First test trigger with tag priority'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'Alpha', 'operator' => 'Does not exist']
+					],
+					'absent_problems' => [
+						'Third test trigger with tag priority',
+						'First test trigger with tag priority'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Does not exist'],
+						['name' => 'Database', 'operator' => 'Does not exist']
+					],
+					'absent_problems' => [
+						'Test trigger to check tag filter on problem page'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Does not exist'],
+						['name' => 'Database', 'operator' => 'Does not exist']
+					],
+					'absent_problems' => [
+						'Trigger for tag permissions Oracle',
+						'Test trigger with tag',
+						'Trigger for tag permissions MySQL',
+						'Test trigger to check tag filter on problem page'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
+					],
+					'absent_problems' => [
+						'Inheritance trigger with tags'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
+					],
+					'absent_problems' => [
+						'Inheritance trigger with tags'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium'],
+						['name' => 'Beta', 'operator' => 'Does not equal', 'value' => 'b']
+					],
+					'absent_problems' => [
+						'Inheritance trigger with tags',
+						'Second test trigger with tag priority',
+						'First test trigger with tag priority'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'Service', 'operator' => 'Does not equal', 'value' => 'abc'],
+						['name' => 'Database', 'operator' => 'Does not equal']
+					],
+					'absent_problems' => [
+						'Test trigger to check tag filter on problem page'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
+					],
+					'absent_problems' => [
+						'Third test trigger with tag priority',
+						'First test trigger with tag priority'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
+					],
+					'absent_problems' => [
+						'Third test trigger with tag priority',
+						'First test trigger with tag priority'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'],
+						['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
+					],
+					'absent_problems' => [
+						'Third test trigger with tag priority',
+						'First test trigger with tag priority'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'],
+						['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
+					],
+					'absent_problems' => [
+						'First test trigger with tag priority'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getFilterByTagsExceptContainsEqualsData
+	 */
+	public function testPageProblems_FilterByTagsExceptContainsEquals($data) {
+		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&sort=name&sortorder=ASC');
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
+		$this->setFilterSelector('id:filter-tags_0');
+		$this->setTags($data['tags']);
+		$this->query('name:filter_apply')->one()->click();
+		$this->page->waitUntilReady();
+
+		// We remove from the result list templates that is not displayed there.
+		if (array_key_exists('absent_problems', $data)) {
+			$filtering = $this->getTableResult('Problem');
+			foreach ($data['absent_problems'] as $absence) {
+				if (($key = array_search($absence, $filtering))) {
+					unset($filtering[$key]);
+				}
+			}
+			$filtering = array_values($filtering);
+			$this->assertTableDataColumn($filtering, 'Problem');
+		}
+		else {
+			$this->assertTableDataColumn($data['expected_problems'], 'Problem');
+		}
+
+		// Reset filter due to not influence further tests.
+		$this->query('name:filter_reset')->one()->click();
 	}
 
 	/**

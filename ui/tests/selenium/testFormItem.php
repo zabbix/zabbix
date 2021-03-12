@@ -172,19 +172,19 @@ class testFormItem extends CLegacyWebTest {
 				['type' => 'Calculated', 'host' => 'Simple form test host']
 			],
 			[
-				['type' => 'Zabbix agent', 'host' => 'Inheritance test template']
+				['type' => 'Zabbix agent', 'template' => 'Inheritance test template']
 			],
 			[
 				[
 					'type' => 'Zabbix agent',
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'key' => 'test-inheritance-item1'
 				]
 			],
 			[
 				[
 					'type' => 'Zabbix agent',
-					'host' => 'Template inheritance test host',
+					'template' => 'Template inheritance test host',
 					'key' => 'test-inheritance-item1'
 				]
 			],
@@ -192,110 +192,110 @@ class testFormItem extends CLegacyWebTest {
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'host' => 'Inheritance test template'
+					'template' => 'Inheritance test template'
 				]
 			],
 			[
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'host' => 'Inheritance test template'
+					'template' => 'Inheritance test template'
 				]
 			],
 			[
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
-					'host' => 'Inheritance test template'
+					'template' => 'Inheritance test template'
 				]
 			],
 			[
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (float)',
-					'host' => 'Inheritance test template'
+					'template' => 'Inheritance test template'
 					]
 			],
 			[
 				[
 					'type' => 'Zabbix agent',
 					'value_type' => 'Character',
-					'host' => 'Inheritance test template'
+					'template' => 'Inheritance test template'
 				]
 			],
 			[
-				['type' => 'Zabbix agent', 'value_type' => 'Log', 'host' => 'Inheritance test template']
+				['type' => 'Zabbix agent', 'value_type' => 'Log', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'Zabbix agent', 'value_type' => 'Text', 'host' => 'Inheritance test template']
+				['type' => 'Zabbix agent', 'value_type' => 'Text', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'Zabbix agent (active)', 'host' => 'Inheritance test template']
+				['type' => 'Zabbix agent (active)', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'Simple check', 'host' => 'Inheritance test template']
+				['type' => 'Simple check', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SNMP agent', 'host' => 'Inheritance test template']
+				['type' => 'SNMP agent', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SNMP agent', 'value_type' => 'Numeric (float)', 'host' => 'Inheritance test template']
+				['type' => 'SNMP agent', 'value_type' => 'Numeric (float)', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SNMP agent', 'value_type' => 'Character', 'host' => 'Inheritance test template']
+				['type' => 'SNMP agent', 'value_type' => 'Character', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SNMP agent', 'value_type' => 'Text', 'host' => 'Inheritance test template']
+				['type' => 'SNMP agent', 'value_type' => 'Text', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SNMP trap', 'host' => 'Inheritance test template']
+				['type' => 'SNMP trap', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'Zabbix internal', 'host' => 'Inheritance test template']
+				['type' => 'Zabbix internal', 'template' => 'Inheritance test template']
 			],
 			[
 				[
 					'type' => 'Zabbix internal',
 					'value_type' => 'Numeric (unsigned)',
-					'host' => 'Inheritance test template'
+					'template' => 'Inheritance test template'
 				]
 			],
 			[
 				[
 					'type' => 'Zabbix internal',
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'key' => 'test-inheritance-item1'
 				]
 			],
 			[
-				['type' => 'Zabbix trapper', 'host' => 'Inheritance test template']
+				['type' => 'Zabbix trapper', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'Zabbix aggregate', 'host' => 'Inheritance test template']
+				['type' => 'Zabbix aggregate', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'External check', 'host' => 'Inheritance test template']
+				['type' => 'External check', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'Database monitor', 'host' => 'Inheritance test template']
+				['type' => 'Database monitor', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'IPMI agent', 'host' => 'Inheritance test template']
+				['type' => 'IPMI agent', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SSH agent', 'host' => 'Inheritance test template']
+				['type' => 'SSH agent', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SSH agent', 'authtype' => 'Public key', 'host' => 'Inheritance test template']
+				['type' => 'SSH agent', 'authtype' => 'Public key', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'SSH agent', 'authtype' => 'Password', 'host' => 'Inheritance test template']
+				['type' => 'SSH agent', 'authtype' => 'Password', 'template' => 'Inheritance test template']
 			],
 			[
 				[
 					'type' => 'SSH agent',
 					'value_type' => 'Numeric (unsigned)',
-					'host' => 'Inheritance test template'
+					'template' => 'Inheritance test template'
 				]
 			],
 			[
@@ -303,17 +303,17 @@ class testFormItem extends CLegacyWebTest {
 					'type' => 'SSH agent',
 					'authtype' => 'Password',
 					'value_type' => 'Character',
-					'host' => 'Inheritance test template'
+					'template' => 'Inheritance test template'
 				]
 			],
 			[
-				['type' => 'TELNET agent', 'host' => 'Inheritance test template']
+				['type' => 'TELNET agent', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'JMX agent', 'host' => 'Inheritance test template']
+				['type' => 'JMX agent', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'Calculated', 'host' => 'Inheritance test template']
+				['type' => 'Calculated', 'template' => 'Inheritance test template']
 			],
 			[
 				[
@@ -330,13 +330,16 @@ class testFormItem extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormItem_CheckLayout($data) {
-		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($data['host']));
-		$dbRow = DBfetch($dbResult);
+		$context = array_key_exists('host', $data) ? 'host' : 'template';
+		$host_name = array_key_exists('host', $data) ? $data['host'] : $data['template'];
 
-		$this->assertNotEquals($dbRow, null);
+		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($host_name));
+		$host_info = DBfetch($dbResult);
 
-		$hostid = $dbRow['hostid'];
-		$status = $dbRow['status'];
+		$this->assertNotEquals($host_info, null);
+
+		$hostid = $host_info['hostid'];
+		$status = $host_info['status'];
 
 		if (isset($data['key'])) {
 			$dbResult = DBselect(
@@ -345,18 +348,18 @@ class testFormItem extends CLegacyWebTest {
 				' WHERE hostid='.$hostid.
 					' AND key_='.zbx_dbstr($data['key'])
 			);
-			$dbRow = DBfetch($dbResult);
+			$template_info = DBfetch($dbResult);
 
-			$this->assertNotEquals($dbRow, null);
+			$this->assertNotEquals($template_info, null);
 
-			$itemid = $dbRow['itemid'];
-			if (0 != $dbRow['templateid'])
-				$templateid = $dbRow['templateid'];
+			$itemid = $template_info['itemid'];
+			if (0 != $template_info['templateid'])
+				$templateid = $template_info['templateid'];
 		}
 
 		$this->zbxTestLogin(
 			'items.php?form='.(isset($itemid) ? 'update' : 'create').
-			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '').'&context=host'
+			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '').'&context='.$context
 		);
 
 		$this->zbxTestCheckTitle('Configuration of items');
@@ -726,25 +729,66 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
-			$this->zbxTestTextPresent(['Show value', 'show value mappings']);
+			$this->zbxTestTextPresent('Value mapping');
+			$valuemap_field = $this->query('name:itemForm')->asForm()->one()->getField('Value mapping');
 			if (!isset($templateid)) {
-				$this->zbxTestDropdownAssertSelected('valuemapid', 'As is');
+				$this->assertEquals([], $valuemap_field->getValue());
 
-				$options = ['As is'];
-				$result = DBselect('SELECT name FROM valuemaps');
-				while ($row = DBfetch($result)) {
-					$options[] = $row['name'];
+				$db_valuemap = [];
+				$valuemap_result = DBselect('SELECT name FROM valuemap WHERE hostid='.$host_info['hostid']);
+				while ($row = DBfetch($valuemap_result)) {
+					$db_valuemap[] = $row['name'];
 				}
-				$this->zbxTestDropdownHasOptions('valuemapid', $options);
+				$db_mappings = CDBHelper::getAll('SELECT vm.name, m.value, m.newvalue FROM valuemap vm INNER JOIN'.
+						' valuemap_mapping m ON m.valuemapid = vm.valuemapid WHERE vm.hostid='.$host_info['hostid']);
+
+				$valuemap_field->edit();
+				$valuemap_overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				if ($db_valuemap !== []) {
+					$this->assertEquals('Value mapping', $valuemap_overlay->getTitle());
+					$valuemap_table = $valuemap_overlay->query('class:list-table')->one()->asTable();
+					$this->assertEquals(['Name', 'Mapping'], $valuemap_table->getHeadersText());
+
+					$expected_count = (count($db_valuemap) > 3) ? 3 : count($db_valuemap);
+					$table_rows = $valuemap_table->getRows();
+					$this->assertEquals($expected_count, $table_rows->count());
+					foreach($table_rows as $value_mapping) {
+						$valuemap_name = ltrim($value_mapping->getColumn('Name')->getText(), $host_name.': ');
+						$this->assertTrue(in_array($valuemap_name, $db_valuemap));
+
+						$mappings = [];
+						$i = 0;
+						foreach ($db_mappings as $db_mapping) {
+							$mappings_text = $value_mapping->getColumn('Mapping')->getText();
+
+							if ($db_mapping['name'] === $valuemap_name) {
+								$mappings_text = $value_mapping->getColumn('Mapping')->getText();
+								$i++;
+								// Only the first three mappings are displayed in the form for each value mapping
+								if ($i < 4) {
+									$this->assertTrue(str_contains($mappings_text, $db_mapping['value'].' ⇒ '.$db_mapping['newvalue']));
+								}
+								else {
+									$this->assertTrue(str_contains($mappings_text, '…'));
+
+									break;
+								}
+							}
+						}
+					}
+				}
+				else {
+					$this->assertEquals('No data found.', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
+				}
+				$valuemap_overlay->close();
 			}
 			else {
-				$this->zbxTestAssertVisibleId('valuemapid');
-				$this->zbxTestAssertAttribute("//z-select[@id='valuemapid']", 'readonly');
+				$this->assertTrue($valuemap_field->isValid());
+				$this->assertFalse($valuemap_field->isEnabled());
 			}
 		}
 		else {
-			$this->zbxTestTextNotVisible(['Show value', 'show value mappings']);
-			$this->zbxTestAssertNotVisibleXpath('//z-select[@name="valuemapid"]');
+			$this->assertFalse($this->query('xpath://label[text()="Value mapping"]/../..')->one()->isDisplayed());
 		}
 
 		if ($type == 'Zabbix trapper') {

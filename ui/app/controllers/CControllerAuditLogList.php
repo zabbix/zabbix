@@ -113,7 +113,7 @@ class CControllerAuditLogList extends CController {
 
 		if ($data['userids']) {
 			$users = API::User()->get([
-				'output' => ['userid', 'alias', 'name', 'surname'],
+				'output' => ['userid', 'username', 'name', 'surname'],
 				'userids' => $data['userids']
 			]);
 
@@ -134,12 +134,12 @@ class CControllerAuditLogList extends CController {
 
 		if (!$users) {
 			$users = API::User()->get([
-				'output' => ['userid', 'alias'],
+				'output' => ['userid', 'username'],
 				'userids' => array_column($data['auditlogs'], 'userid', 'userid')
 			]);
 		}
 
-		$data['users'] = array_column($users, 'alias', 'userid');
+		$data['users'] = array_column($users, 'username', 'userid');
 
 		natsort($data['actions']);
 		natsort($data['resources']);
@@ -219,7 +219,8 @@ class CControllerAuditLogList extends CController {
 			AUDIT_RESOURCE_SETTINGS => _('Settings'),
 			AUDIT_RESOURCE_HOUSEKEEPING => _('Housekeeping'),
 			AUDIT_RESOURCE_AUTHENTICATION => _('Authentication'),
-			AUDIT_RESOURCE_TEMPLATE_DASHBOARD => _('Template dashboard')
+			AUDIT_RESOURCE_TEMPLATE_DASHBOARD => _('Template dashboard'),
+			AUDIT_RESOURCE_AUTH_TOKEN => _('API token')
 		];
 	}
 

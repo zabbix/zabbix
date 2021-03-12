@@ -48,6 +48,7 @@ $fields = [
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
+	'valuemaps'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
@@ -279,6 +280,47 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
+		$valuemaps = getRequest('valuemaps', []);
+		$ins_valuemaps = [];
+		$upd_valuemaps = [];
+		$del_valuemapids = [];
+
+		if (getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone') {
+			foreach ($valuemaps as &$valuemap) {
+				unset($valuemap['valuemapid']);
+			}
+			unset($valuemap);
+		}
+		else if (hasRequest('update')) {
+			$del_valuemapids = API::ValueMap()->get([
+				'output' => [],
+				'hostids' => $templateId,
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($valuemaps as $valuemap) {
+			if (array_key_exists('valuemapid', $valuemap)) {
+				$upd_valuemaps[] = $valuemap;
+				unset($del_valuemapids[$valuemap['valuemapid']]);
+			}
+			else {
+				$ins_valuemaps[] = $valuemap + ['hostid' => $templateId];
+			}
+		}
+
+		if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
+			throw new Exception();
+		}
+
+		if ($ins_valuemaps && !API::ValueMap()->create($ins_valuemaps)) {
+			throw new Exception();
+		}
+
+		if ($del_valuemapids && !API::ValueMap()->delete(array_keys($del_valuemapids))) {
+			throw new Exception();
+		}
+
 		// full clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
 			if (!copyApplications($cloneTemplateId, $templateId)) {
@@ -457,7 +499,8 @@ if (hasRequest('form')) {
 		'tags' => $tags,
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => false,
-		'macros' => $macros
+		'macros' => $macros,
+		'valuemaps' => array_values(getRequest('valuemaps', []))
 	];
 
 	if ($data['templateid'] != 0) {
@@ -467,6 +510,7 @@ if (hasRequest('form')) {
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
@@ -478,6 +522,15 @@ if (hasRequest('form')) {
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
+			order_result($data['dbTemplate']['valuemaps'], 'name');
+
+			foreach ($data['dbTemplate']['valuemaps'] as &$valuemap) {
+				order_result($valuemap['mappings'], 'value');
+				$valuemap['mappings'] = array_values($valuemap['mappings']);
+			}
+			unset($valuemap);
+
+			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 		}
 	}
 

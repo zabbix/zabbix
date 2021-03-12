@@ -161,7 +161,9 @@ class CTree {
 		$js.= 'var '.$this->treename.' = null';
 		$js.= '</script>'."\n";
 
-		zbx_add_post_js($this->treename.' = new CTree("tree_'.CWebUser::$data['alias'].'_'.$this->treename.'", '.$this->treename.'_tree);');
+		zbx_add_post_js($this->treename.' = new CTree("tree_'.CWebUser::$data['username'].'_'.$this->treename.'", '.
+			$this->treename.'_tree);'
+		);
 
 		return new CJsScript($js);
 	}

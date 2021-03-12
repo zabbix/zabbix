@@ -22,11 +22,11 @@
 #include "log.h"
 #include "proxy.h"
 
-#include "proxydata.h"
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxtasks.h"
 #include "mutexs.h"
 #include "daemon.h"
+
+#include "proxydata.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -34,19 +34,38 @@ static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 #define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(proxy_lock)
 
-int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info)
+int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int upload_status)
 {
 	struct zbx_json		json;
 	zbx_vector_ptr_t	tasks;
-	int			ret, flags = ZBX_TCP_PROTOCOL;
+	int			ret, flags = ZBX_TCP_PROTOCOL, status;
 
 	zbx_vector_ptr_create(&tasks);
 
-	zbx_tm_get_remote_tasks(&tasks, proxy->hostid);
-
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+	switch (upload_status)
+	{
+		case ZBX_PROXY_UPLOAD_DISABLED:
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED,
+					ZBX_JSON_TYPE_STRING);
+			status = FAIL;
+			break;
+		case ZBX_PROXY_UPLOAD_ENABLED:
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED,
+					ZBX_JSON_TYPE_STRING);
+			ZBX_FALLTHROUGH;
+		default:
+			status = SUCCEED;
+	}
+
+	if (SUCCEED == status)
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		zbx_tm_get_remote_tasks(&tasks, proxy->hostid);
+	}
+	else
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 
 	if (NULL != info && '\0' != *info)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, info, ZBX_JSON_TYPE_STRING);
@@ -84,7 +103,7 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
  ******************************************************************************/
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	int			ret = FAIL, status, version;
+	int			ret = FAIL, upload_status = 0, status, version;
 	char			*error = NULL;
 	DC_PROXY		proxy;
 
@@ -111,6 +130,14 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
+	if (FAIL == zbx_hc_check_proxy(proxy.hostid))
+	{
+		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
+		goto send_response;
+	}
+	else
+		upload_status = ZBX_PROXY_UPLOAD_ENABLED;
+
 	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
@@ -119,6 +146,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
+send_response:
 	if (!ZBX_IS_RUNNING())
 	{
 		error = zbx_strdup(error, "Zabbix server shutdown in progress");
@@ -128,7 +156,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 	else
-		zbx_send_proxy_data_response(&proxy, sock, error);
+		zbx_send_proxy_data_response(&proxy, sock, error, upload_status);
 
 out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */

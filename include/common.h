@@ -324,11 +324,19 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* item snmpv3 authentication protocol */
 #define ITEM_SNMPV3_AUTHPROTOCOL_MD5		0
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA		1
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA1		1
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA224		2
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA256		3
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA384		4
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA512		5
 
 /* item snmpv3 privacy protocol */
 #define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES128		1
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES192		2
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES256		3
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES192C	4
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES256C	5
 
 /* condition evaluation types */
 #define CONDITION_EVAL_TYPE_AND_OR		0
@@ -839,6 +847,7 @@ typedef struct
 	char		*command_orig;
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
+	int		timeout;
 }
 zbx_script_t;
 
@@ -847,6 +856,7 @@ zbx_script_t;
 #define ZBX_SCRIPT_TYPE_SSH		2
 #define ZBX_SCRIPT_TYPE_TELNET		3
 #define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4
+#define ZBX_SCRIPT_TYPE_WEBHOOK		5
 
 #define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
@@ -909,7 +919,8 @@ while (0)
 														\
 do														\
 {														\
-	zbx_error("ERROR [file:%s,line:%d] Something impossible has just happened.", __FILE__, __LINE__);	\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s] Something impossible has just happened.",    \
+			__FILE__, __func__, ZABBIX_REVISION);							\
 	zbx_backtrace();											\
 }														\
 while (0)
@@ -1378,8 +1389,14 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
 
-#define ZBX_SESSION_ACTIVE	0
-#define ZBX_SESSION_PASSIVE	1
+#define ZBX_SESSION_ACTIVE		0
+#define ZBX_SESSION_PASSIVE		1
+#define ZBX_AUTH_TOKEN_ENABLED		0
+#define ZBX_AUTH_TOKEN_DISABLED		1
+#define ZBX_AUTH_TOKEN_NEVER_EXPIRES	0
+
+#define	ZBX_SID_SESSION_LENGTH		32
+#define	ZBX_SID_AUTH_TOKEN_LENGTH	64
 
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 

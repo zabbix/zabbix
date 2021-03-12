@@ -588,8 +588,7 @@ class CDRule extends CApiService {
 				if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
 						|| $dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					if (!array_key_exists('snmpv3_authprotocol', $dcheck)
-							|| $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_MD5
-								&& $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_SHA) {
+							|| !array_key_exists($dcheck['snmpv3_authprotocol'], getSnmpV3AuthProtocols())) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value "%1$s" for "%2$s" field.',
 								$dcheck['snmpv3_authprotocol'], 'snmpv3_authprotocol'
@@ -601,8 +600,7 @@ class CDRule extends CApiService {
 				// snmpv3 privprotocol
 				if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					if (!array_key_exists('snmpv3_privprotocol', $dcheck)
-							|| $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_DES
-								&& $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_AES) {
+							|| !array_key_exists($dcheck['snmpv3_privprotocol'], getSnmpV3PrivProtocols())) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value "%1$s" for "%2$s" field.',
 								$dcheck['snmpv3_privprotocol'], 'snmpv3_privprotocol'
@@ -631,13 +629,13 @@ class CDRule extends CApiService {
 
 			switch ($dcheck['snmpv3_securitylevel']) {
 				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
-					$dcheck['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-					$dcheck['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+					$dcheck['snmpv3_authprotocol'] = ITEM_SNMPV3_AUTHPROTOCOL_MD5;
+					$dcheck['snmpv3_privprotocol'] = ITEM_SNMPV3_PRIVPROTOCOL_DES;
 					$dcheck['snmpv3_authpassphrase'] = '';
 					$dcheck['snmpv3_privpassphrase'] = '';
 					break;
 				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
-					$dcheck['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+					$dcheck['snmpv3_privprotocol'] = ITEM_SNMPV3_PRIVPROTOCOL_DES;
 					$dcheck['snmpv3_privpassphrase'] = '';
 					break;
 			}

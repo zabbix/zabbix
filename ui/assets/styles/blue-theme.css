@@ -1,4 +1,4 @@
-.sidebar .server-name, .list-table .action-container .label, .dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .list-table .action-container .label, .list-table.compact-view .action-container .link-action, .dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -753,6 +753,24 @@ footer {
   background-position: -90px -120px; }
 
 .icon-signout::before {
+  background-position: -90px -156px; }
+
+.is-expanded .icon-support::before {
+  background-position: -247px -48px; }
+
+.is-expanded .icon-share::before {
+  background-position: -90px -84px; }
+
+.is-expanded .icon-help::before {
+  background-position: -90px -48px; }
+
+.is-expanded .icon-guest::before {
+  background-position: -247px -156px; }
+
+.is-expanded .icon-profile::before {
+  background-position: -90px -120px; }
+
+.is-expanded .icon-signout::before {
   background-position: -90px -156px; }
 
 .menu-user {
@@ -3786,6 +3804,9 @@ z-select[disabled] button,
     max-width: 1024px; }
     .overlay-dialogue.modal-popup.modal-popup-medium {
       min-width: 450px; }
+    .overlay-dialogue.modal-popup.modal-popup-small {
+      max-width: 450px;
+      width: 100%; }
     .overlay-dialogue.modal-popup.modal-popup-static {
       max-width: 700px;
       width: 100%; }
@@ -5042,7 +5063,8 @@ svg {
   .sysmap-widget-container svg {
     flex-grow: 1; }
 
-.lld-overrides-operations-table {
+.lld-overrides-operations-table,
+.confirmation-msg {
   white-space: normal;
   word-break: break-word; }
 
@@ -5958,7 +5980,6 @@ svg {
       background: url("../img/icon-sprite.svg?20200407") no-repeat -604px -503px; }
 
 .checkbox-block {
-  display: none;
   margin: 10px 0; }
 
 #tbl_macros.massupdate-remove th,
@@ -6011,13 +6032,13 @@ svg {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
-.mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body {
+.debug-modal.overlay-dialogue.modal .overlay-dialogue-body {
   overflow-x: auto; }
-  .mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
+  .debug-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
     height: 9px; }
-.mediatypetest-modal .logitems pre {
+.debug-modal .logitems pre {
   white-space: nowrap; }
-.mediatypetest-modal .logtotalms {
+.debug-modal .logtotalms {
   color: #768d99;
   float: left;
   line-height: 24px; }
@@ -6112,3 +6133,21 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .host-macros-table .table-col-value,
 .host-macros-table .table-col-template-value {
   width: 300px; }
+
+.active-readonly[readonly] {
+  color: #1f2c33;
+  background-color: #ffffff !important;
+  border-color: #acbbc2; }
+
+.valuemap-list-table tbody td {
+  border-bottom: 1px solid #ebeef0; }
+  .valuemap-list-table tbody td.wordwrap {
+    white-space: normal; }
+.valuemap-list-table tbody tr:first-child td {
+  border-top: 1px solid #ebeef0; }
+
+.valuemap-checkbox {
+  margin-top: 10px; }
+
+.overlay-dialogue .valuemap-list-table td {
+  vertical-align: top; }

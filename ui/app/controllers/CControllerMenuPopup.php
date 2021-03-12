@@ -567,6 +567,7 @@ class CControllerMenuPopup extends CController {
 			$can_be_closed = ($db_trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 					&& CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 			);
+			$event = [];
 
 			if (array_key_exists('eventid', $data)) {
 				$menu_data['eventid'] = $data['eventid'];
@@ -622,6 +623,32 @@ class CControllerMenuPopup extends CController {
 							|| $can_be_closed
 						)
 				);
+			}
+
+			$scripts_by_hosts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
+				? $event ? API::Script()->getScriptsByHosts(array_keys($hosts)) : []
+				: [];
+
+			$scripts = [];
+			foreach ($scripts_by_hosts as &$host_scripts) {
+				foreach ($host_scripts as &$host_script) {
+					if (!array_key_exists($host_script['scriptid'], $scripts)) {
+						$host_script['name'] = trimPath($host_script['name']);
+						$scripts[$host_script['scriptid']] = $host_script;
+					}
+				}
+				unset($host_script);
+			}
+			unset($host_scripts);
+
+			CArrayHelper::sort($scripts, ['name']);
+
+			foreach (array_values($scripts) as $script) {
+				$menu_data['scripts'][] = [
+					'name' => $script['name'],
+					'scriptid' => $script['scriptid'],
+					'confirmation' => $script['confirmation']
+				];
 			}
 
 			return $menu_data;

@@ -275,9 +275,9 @@ class testFormItemTest extends CWebTest {
 						'context' => 'test_context',
 						'security' => 'test_security_name',
 						'security_level' => 'authPriv',
-						'authentication_protocol' => 'SHA',
+						'authentication_protocol' => 'SHA1',
 						'authentication_passphrase' => '{$TEST}',
-						'privacy_protocol' => 'AES',
+						'privacy_protocol' => 'AES128',
 						'privacy_passphrase' => 'test_privpassphrase'
 					]
 				]
@@ -708,9 +708,9 @@ class testFormItemTest extends CWebTest {
 						'context' => 'id:interface_details_contextname',
 						'security' => 'id:interface_details_securityname',
 						'security_level' => 'id:interface_details_securitylevel',
-						'authentication_protocol' => 'id:interface_details_authprotocol',
+						'authentication_protocol' => 'name:interfaces[details][authprotocol]',
 						'authentication_passphrase' => 'id:interface_details_authpassphrase',
-						'privacy_protocol' => 'id:interface_details_privprotocol',
+						'privacy_protocol' => 'name:interfaces[details][privprotocol]',
 						'privacy_passphrase' => 'id:interface_details_privpassphrase'
 					];
 				}

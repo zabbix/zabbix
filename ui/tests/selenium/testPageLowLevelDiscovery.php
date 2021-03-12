@@ -94,8 +94,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Checking Title, Header and Column names.
 		$headers = ['', 'Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts',
 				'Key', 'Interval', 'Type', 'Status', 'Info'];
-		$this->assertPageTitle('Configuration of discovery rules');
-		$this->assertPageHeader('Discovery rules');
+		$this->page->assertTitle('Configuration of discovery rules');
+		$this->page->assertHeader('Discovery rules');
 		$table = $this->query($this->selector)->asTable()->one();
 		$this->assertSame($headers, $table->getHeadersText());
 
@@ -281,7 +281,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Server hardware'
 					],
 					'context' => 'template',
-					'rows' => 39
+					'rows' => 40
 				]
 			],
 			[
