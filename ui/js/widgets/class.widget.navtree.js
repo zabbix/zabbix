@@ -18,7 +18,37 @@
 **/
 
 
+const WIDGET_NAVTREE_EVENT_SELECT = 'select';
+
 class CWidgetNavTree extends CWidget {
+
+	_init() {
+		super._init();
+
+		this._is_map_loaded = false;
+	}
+
+	announceWidgets(widgets) {
+		super.announceWidgets(widgets);
+
+		// if (this._is_map_loaded) {
+		// 	this._$target.zbx_navtree('onDashboardReady');
+		// }
+	}
+
+	setEditMode() {
+		super.setEditMode();
+
+		// this._$target.zbx_navtree('switchToEditMode');
+	}
+
+	_startUpdating(delay_sec = 0, {do_update_once = false} = {}) {
+		super._startUpdating(delay_sec, {do_update_once});
+
+		// if (this._is_map_loaded) {
+		// 	this._$target.zbx_navtree('beforeConfigLoad');
+		// }
+	}
 
 	_processUpdateResponse(response) {
 		super._processUpdateResponse(response);
@@ -33,25 +63,32 @@ class CWidgetNavTree extends CWidget {
 				maps_accessible: response.navtree_data.maps_accessible,
 				show_unavailable: response.navtree_data.show_unavailable,
 				initial_load: response.navtree_data.initial_load,
-				uniqueid: this._uniqueid,
+				uniqueid: this._unique_id,
 				max_depth: response.navtree_data.max_depth
 			}, this);
+
+			this._is_map_loaded = true;
 		}
 	}
 
-		// jQuery(function($) {'.
-		// 	'$("#'.$this->getId().'").zbx_navtree({'.
-		// 	'problems: '.json_encode($this->data['problems']).','.
-		// 	'severity_levels: '.json_encode($this->data['severity_config']).','.
-		// 	'navtree: '.json_encode($this->data['navtree']).','.
-		// 	'navtree_items_opened: "'.implode(',', $this->data['navtree_items_opened']).'",'.
-		// 	'navtree_item_selected: '.intval($this->data['navtree_item_selected']).','.
-		// 	'maps_accessible: '.json_encode(array_map('strval', $this->data['maps_accessible'])).','.
-		// 	'show_unavailable: '.$this->data['show_unavailable'].','.
-		// 	'initial_load: '.$this->data['initial_load'].','.
-		// 	'uniqueid: "'.$this->data['uniqueid'].'",'.
-		// 	'max_depth: '.WIDGET_NAVIGATION_TREE_MAX_DEPTH.
-		// 	'});'.
-		// 	'});'
-		// : '';
+	_registerEvents() {
+		super._registerEvents();
+
+		this._events = {
+			...this._events,
+
+			copy: () => {
+				// this._target.zbx_navtree('onWidgetCopy')
+			}
+		}
+
+
+		this.on(WIDGET_EVENT_COPY, this._events.copy);
+	}
+
+	_unregisterEvents() {
+		super._unregisterEvents();
+
+		this.off(WIDGET_EVENT_COPY, this._events.copy);
+	}
 }

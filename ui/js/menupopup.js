@@ -280,8 +280,7 @@ function getMenuPopupMapElementSubmap(options) {
 		submap_url;
 
 	if (typeof options.widget_uniqueid !== 'undefined') {
-		submap_url = new Curl('javascript: navigateToSubmap(' + options.sysmapid +
-			', "' + options.widget_uniqueid + '");', false);
+		submap_url = new Curl('javascript: navigateToSubmap(' + options.sysmapid + ', false);');
 	}
 	else {
 		if (!options.allowed_ui_maps) {

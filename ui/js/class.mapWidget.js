@@ -60,7 +60,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 	 *									  value to history (in case of true). This changes when user navigates in deeper
 	 *									  level or back to the top level.
 	 */
-	function navigateToSubmap(submapid, uniqueid, reset_previous) {
+	function navigateToSubmap(submapid, reset_previous) {
 		var widget = ZABBIX.Dashboard.getWidgetsBy('uniqueid', uniqueid),
 			reset_previous = reset_previous || false,
 			previous_maps = '';
@@ -104,21 +104,23 @@ jQuery(function($) {
 	 * @return object
 	 */
 	if (typeof($.fn.zbx_mapwidget) === 'undefined') {
-		$.fn.zbx_mapwidget = function(input, widget) {
-			var methods = {
+		$.fn.zbx_mapwidget = function(input) {
+
+			const methods = {
 				// Update map.
 				update: function() {
-					var $this = $(this);
-
 					return this.each(function() {
-						var widget_data = $this.data('widgetData');
+						const $this = $(this);
 
-						if (widget_data['is_refreshing'] === false) {
+						const widget = $this.data('widget');
+						const widget_data = $this.data('widgetData');
+console.log(widget);
+						if (widget._is_map_loaded && widget_data['is_refreshing'] === false) {
 							widget_data['is_refreshing'] = true;
 
-							var url = new Curl(widget_data['map_instance'].options.refresh);
+							const url = new Curl(widget_data['map_instance'].options.refresh);
 							url.setArgument('curtime', new CDate().getTime());
-							url.setArgument('uniqueid', widget['uniqueid']);
+							url.setArgument('uniqueid', widget.getUniqueId());
 
 							$.ajax({
 								'url': url.getUrl()
@@ -129,7 +131,9 @@ jQuery(function($) {
 									widget_data['map_instance'].update(data);
 								}
 								else {
-									ZABBIX.Dashboard.refreshWidget(widget_data['uniqueid']);
+									if (widget.getState() === WIDGET_STATE_ACTIVE) {
+										widget._startUpdating();
+									}
 								}
 							});
 						}
@@ -137,20 +141,18 @@ jQuery(function($) {
 				},
 
 				// initialization of widget
-				init: function(options) {
-
-					console.log(options);
-
-					var widget_data = $.extend({}, options);
+				init: function(options, widget) {
+					const widget_data = {...options};
 
 					return this.each(function() {
-						var $this = $(this);
+						const $this = $(this);
 
 						options['map_options']['canvas']['useViewBox'] = true;
 						options['map_options']['show_timestamp'] = false;
 						widget_data['map_instance'] = new SVGMap(options['map_options']);
 						widget_data['is_refreshing'] = false;
 						$this.data('widgetData', widget_data);
+						$this.data('widget', widget);
 					});
 				}
 			};

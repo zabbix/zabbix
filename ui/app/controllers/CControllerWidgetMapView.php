@@ -58,7 +58,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 
 		$sysmapid = array_key_exists('current_sysmapid', $storage)
 			? $storage['current_sysmapid']
-			: (array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null);
+			: array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null;
 
 		$sysmap_data = CMapHelper::get(($sysmapid === null) ? [] : [$sysmapid]);
 

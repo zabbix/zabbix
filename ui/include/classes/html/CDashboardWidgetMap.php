@@ -95,7 +95,6 @@ class CDashboardWidgetMap extends CDiv {
 	 * @param array|null	$widget_settings['previous_map']	Sysmapid and name of map linked as previous.
 	 * @param int			$widget_settings['initial_load']	Integer represents either this is initial load or
 	 *															repeated.
-	 * @param string		$widget_settings['uniqueid']		A string of widget's unique id assigned by dashboard.
 	 */
 	public function __construct(array $sysmap_data, array $widget_settings) {
 		parent::__construct();
@@ -107,7 +106,6 @@ class CDashboardWidgetMap extends CDiv {
 		$this->source_type = $widget_settings['source_type'];
 		$this->previous_map = $widget_settings['previous_map'];
 		$this->initial_load = $widget_settings['initial_load'];
-		$this->uniqueid = $widget_settings['uniqueid'];
 	}
 
 	/**
@@ -133,7 +131,7 @@ class CDashboardWidgetMap extends CDiv {
 		}
 
 		if ($this->sysmap_data && $this->error === null) {
-			$this->sysmap_data['container'] = '#map_'.$this->uniqueid;
+//			$this->sysmap_data['container'] = '#map_'.$this->uniqueid;
 
 			$map_data['map_options'] = $this->sysmap_data;
 		}
@@ -153,8 +151,6 @@ class CDashboardWidgetMap extends CDiv {
 		$this->setId(uniqid());
 
 		if ($this->error === null) {
-			$this->setAttribute('data-uniqueid', $this->uniqueid);
-
 			if ($this->previous_map) {
 				$go_back_div = (new CDiv())
 					->addClass(ZBX_STYLE_BTN_BACK_MAP_CONTAINER)
@@ -167,8 +163,7 @@ class CDashboardWidgetMap extends CDiv {
 									->addClass(ZBX_STYLE_BTN_BACK_MAP_CONTENT)
 									->addItem(_s('Go back to %1$s', $this->previous_map['name']))
 								),
-								'javascript: navigateToSubmap('.$this->previous_map['sysmapid'].', "'.
-									$this->uniqueid.'", true);'
+								'javascript: navigateToSubmap('.$this->previous_map['sysmapid'].', true);'
 						))
 					);
 
@@ -176,7 +171,7 @@ class CDashboardWidgetMap extends CDiv {
 			}
 
 			$map_div = (new CDiv((new CDiv($this->sysmap_data['aria_label']))->addClass(ZBX_STYLE_INLINE_SR_ONLY)))
-				->setId('map_'.$this->uniqueid)
+//				->setId('map_'.$this->uniqueid)
 				->addClass('sysmap-widget-container');
 
 			$this->addStyle('position:relative;');

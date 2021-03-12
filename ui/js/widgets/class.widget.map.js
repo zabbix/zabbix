@@ -25,12 +25,25 @@ class CWidgetMap extends CWidget {
 
 		this._filter_widget_reference = null;
 		this._map_options = null;
+		this._is_map_loaded = false;
+	}
+
+	announceWidgets(widgets) {
+		super.announceWidgets(widgets);
+	}
+
+	setConfiguration(configuration) {
+		super.setConfiguration(configuration);
+
+		this.storeValue('current_sysmapid', this._fields.sysmapid);
 	}
 
 	_startUpdating(delay_sec = 0) {
 		super._startUpdating(delay_sec);
 
-		// this._$target.zbx_mapwidget('update', this);
+		if (this._is_map_loaded) {
+			this._$target.zbx_mapwidget('update');
+		}
 	}
 
 	_processUpdateResponse(response) {
@@ -38,18 +51,20 @@ class CWidgetMap extends CWidget {
 
 		if (response.sysmap_data !== undefined) {
 			this._filter_widget_reference = response.sysmap_data.filter_widget_reference;
-			this._map_options = response.sysmap_data.sysmap_data;
+			this._map_options = response.sysmap_data.map_options;
+			this._is_map_loaded = true;
 
 			if (response.sysmap_data._current_sysmapid !== null) {
-				this.storeValue('current_sysmapid', response.sysmap_data._current_sysmapid);
+				this.storeValue('current_sysmapid', response.sysmap_data.current_sysmapid);
 			}
 
 			if (this._filter_widget_reference !== null) {
-				this._registerDataExchange();
+				// this._registerDataExchange();
 			}
 
 			if (this._map_options !== null) {
-				this._$target.zbx_mapwidget(this._map_options);
+				console.log(this._map_options);
+				this._$target.zbx_mapwidget(this._map_options, this);
 			}
 
 			if (response.sysmap_data.error_msg !== null) {
@@ -78,27 +93,5 @@ class CWidgetMap extends CWidget {
 		// 		grid: {widget: 1},
 		// 		trigger_name: `map_widget_on_edit_start_${this._uniqueid}`
 		// 	});
-	}
-
-	_registerEvents() {
-		super._registerEvents();
-
-		this._events = {
-			...this._events,
-
-			afterUpdateConfig: () => {
-				this.storeValue('current_sysmapid', this._fields.sysmapid);
-			}
-		}
-
-		// this
-			// .on(WIDGET_EVENT_CONFIG_AFTER_UPDATE, this._events.afterUpdateConfig);
-	}
-
-	_unregisterEvents() {
-		super._unregisterEvents();
-
-		// this
-			// .off(WIDGET_EVENT_CONFIG_AFTER_UPDATE, this._events.afterUpdateConfig);
 	}
 }
