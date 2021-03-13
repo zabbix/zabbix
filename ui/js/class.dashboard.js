@@ -117,6 +117,7 @@ class CDashboard extends CBaseComponent {
 		this._grid_min_rows = 0;
 
 		this._reserve_header_lines_timeout_id = null;
+		this._is_edit_widget_properties_cancel_subscribed = false;
 
 		if (!this._is_kiosk_mode) {
 			this._initTabs();
@@ -357,6 +358,11 @@ class CDashboard extends CBaseComponent {
 			catch (error) {
 			}
 		});
+
+		if (!this._is_edit_widget_properties_cancel_subscribed) {
+			this._is_edit_widget_properties_cancel_subscribed = true;
+			$.subscribe('overlay.close', this._events.editWidgetPropertiesCancel);
+		}
 	}
 
 	reloadWidgetProperties() {
@@ -417,39 +423,42 @@ class CDashboard extends CBaseComponent {
 			.then((configuration) => {
 				overlayDialogueDestroy(overlay.dialogueid);
 
-				this._resetNewWidgetPlaceholder();
 				this._resetHeaderLines();
 
 				if (widget !== null && widget.getType() === type) {
 					widget.updateProperties({name, view_mode, fields, configuration});
-				}
-				else {
-					const widget_data = {
-						type,
-						name,
-						view_mode,
-						fields,
-						configuration,
-						widgetid: null,
-						pos: widget === null ? this._new_widget_pos : widget.getPosition(),
-						is_new: widget === null,
-						rf_rate: 0,
-						unique_id: this._createUniqueId()
-					};
 
-					this
-						._promiseScrollIntoView(widget_data.pos)
-						.then(() => {
-							if (widget === null) {
-								this._new_widget_dashboard_page.addWidget(widget_data);
-								this._new_widget_dashboard_page = null;
-								this._new_widget_pos = null;
-							}
-							else {
-								dashboard_page.replaceWidget(widget, widget_data);
-							}
-						});
+					return Promise.resolve();
 				}
+
+				const widget_data = {
+					type,
+					name,
+					view_mode,
+					fields,
+					configuration,
+					widgetid: null,
+					pos: widget === null ? this._new_widget_pos : widget.getPosition(),
+					is_new: widget === null,
+					rf_rate: 0,
+					unique_id: this._createUniqueId()
+				};
+
+				return this
+					._promiseScrollIntoView(widget_data.pos)
+					.then(() => {
+						if (widget === null) {
+							this._new_widget_dashboard_page.addWidget(widget_data);
+							this._new_widget_dashboard_page = null;
+							this._new_widget_pos = null;
+						}
+						else {
+							dashboard_page.replaceWidget(widget, widget_data);
+						}
+					});
+			})
+			.then(() => {
+				this._resetNewWidgetPlaceholder();
 			})
 			.catch((error) => {
 				for (const el of form.parentNode.children) {
@@ -465,6 +474,10 @@ class CDashboard extends CBaseComponent {
 				form.parentNode.insertBefore(message_box, form);
 			})
 			.finally(() => overlay.unsetLoading());
+	}
+
+	_cancelEditingWidgetProperties() {
+		this._resetNewWidgetPlaceholder();
 	}
 
 	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
@@ -858,6 +871,12 @@ class CDashboard extends CBaseComponent {
 		let resize_timeout_id = null;
 
 		this._events = {
+			editWidgetPropertiesCancel: () => {
+				this._cancelEditingWidgetProperties();
+				this._is_edit_widget_properties_cancel_subscribed = false;
+				$.unsubscribe('overlay.close', this._events.editWidgetPropertiesCancel);
+			},
+
 			dashboardPageEdit: (e) => {
 				this.setEditMode();
 				this.fire(DASHBOARD_EVENT_EDIT);
@@ -1000,10 +1019,14 @@ class CDashboard extends CBaseComponent {
 
 				e.preventDefault();
 
+				this._containers.grid.removeEventListener('mousemove', events.mouseMove);
+				document.addEventListener('mousemove', events.mouseMove);
 				document.addEventListener('mouseup', events.documentMouseUp);
 			},
 
 			documentMouseUp: (e) => {
+				document.removeEventListener('mousemove', events.mouseMove);
+				this._containers.grid.addEventListener('mousemove', events.mouseMove);
 				document.removeEventListener('mouseup', events.documentMouseUp);
 
 				const new_widget_pos = {...this._new_widget_placeholder_pos};
@@ -1115,7 +1138,6 @@ class CDashboard extends CBaseComponent {
 							.showAtPosition(this._new_widget_placeholder_pos);
 					}
 					else {
-						this._new_widget_placeholder_pos = null;
 						this._new_widget_placeholder.hide();
 					}
 				}
@@ -1123,8 +1145,7 @@ class CDashboard extends CBaseComponent {
 
 			mouseLeave: (e) => {
 				if (this._new_widget_placeholder_clicked_pos === null) {
-					this._new_widget_placeholder_pos = null;
-					this._new_widget_placeholder.hide();
+					this._resetNewWidgetPlaceholder();
 				}
 			},
 

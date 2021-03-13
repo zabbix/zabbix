@@ -207,8 +207,8 @@ class CDashboardPage extends CBaseComponent {
 			...this._accommodatePosX(
 				{
 					...pos,
-					y: reverse_y ? pos.y + pos.height - 1 : pos.y,
-					height: 1
+					y: reverse_y ? pos.y + pos.height - 2 : pos.y,
+					height: 2
 				},
 				{reverse: reverse_x}
 			),
