@@ -1574,7 +1574,8 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 		{
 			const char	*op, *pattern =  function->parameter + params.values[1].l;
 
-			op = (3 <= params.values_num ? function->parameter + params.values[2].l : "eq");
+			if (3 > params.values_num || '\0' == *(op = function->parameter + params.values[2].l))
+				op = "eq";
 
 			/* set numeric pattern type for numeric items and numeric operators unless */
 			/* band operation pattern contains mask (separated by '/')                 */
