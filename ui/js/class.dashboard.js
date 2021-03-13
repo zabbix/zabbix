@@ -30,6 +30,7 @@ const DASHBIOARD_CLIPBOARD_TYPE_WIDGET = 'widget';
 const DASHBIOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE = 'dashboard-page';
 
 const DASHBOARD_EVENT_EDIT = 'edit';
+const DASHBOARD_EVENT_APPLY_PROPERTIES = 'apply-properties';
 
 class CDashboard extends CBaseComponent {
 
@@ -126,6 +127,10 @@ class CDashboard extends CBaseComponent {
 
 		this._state = DASHBOARD_STATE_ACTIVE;
 
+		if (this._is_edit_mode) {
+			this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+		}
+
 		this._selectDashboardPage(this._dashboard_pages.keys().next().value);
 		this._announceWidgets();
 	}
@@ -193,14 +198,46 @@ class CDashboard extends CBaseComponent {
 		this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
 	}
 
-	getProperties() {
-		return {
+	editProperties() {
+		const properties = {
 			template: this._data.templateid !== null ? 1 : undefined,
 			userid: this._data.templateid === null ? this._data.userid : undefined,
 			name: this._data.name,
 			display_period: this._data.display_period,
 			auto_start: this._data.auto_start
 		};
+
+		PopUp('dashboard.properties.edit', properties, 'dashboard_properties', document.activeElement);
+	}
+
+	applyProperties() {
+		const overlay = overlays_stack.getById('dashboard_properties');
+		const form = overlay.$dialogue.$body[0].querySelector('form');
+		const properties = getFormFields(form);
+
+		overlay.setLoading();
+
+		return new Promise((resolve) => resolve())
+			.then(() => ZABBIX.Dashboard.promiseApplyProperties(properties))
+			.then(() => {
+				overlayDialogueDestroy(overlay.dialogueid);
+
+				this.fire(DASHBOARD_EVENT_APPLY_PROPERTIES);
+			})
+			.catch((error) => {
+				for (const el of form.parentNode.children) {
+					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+						el.parentNode.removeChild(el);
+					}
+				}
+
+				const message_box = (typeof error === 'object' && 'html_string' in error)
+					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
+					: makeMessageBox('bad', [], t('Cannot update dashboard properties.'), true, false)[0];
+
+				form.parentNode.insertBefore(message_box, form);
+			})
+			.finally(() => overlay.unsetLoading());
 	}
 
 	promiseApplyProperties(data) {
@@ -304,48 +341,6 @@ class CDashboard extends CBaseComponent {
 		this.editWidgetProperties(properties);
 	}
 
-	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
-		const fields_str = Object.keys(fields).length > 0 ? JSON.stringify(fields) : undefined;
-
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', 'dashboard.widget.check');
-
-		return fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData({templateid, type, name, view_mode, fields: fields_str})
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
-				}
-			});
-	}
-
-	_promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}) {
-		const fields_str = Object.keys(fields).length > 0 ? JSON.stringify(fields) : undefined;
-
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', 'dashboard.widget.configure');
-
-		return fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData({templateid, type, view_mode, fields: fields_str})
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				return typeof response.configuration === 'object' ? response.configuration : {};
-			});
-	}
-
 	applyWidgetProperties() {
 		const overlay = overlays_stack.getById('widget_properties');
 		const form = overlay.$dialogue.$body[0].querySelector('form');
@@ -370,8 +365,8 @@ class CDashboard extends CBaseComponent {
 			? dashboard_page.getWidget(overlay.data.original_properties.unique_id)
 			: null;
 
-		this
-			._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields})
+		return new Promise((resolve) => resolve())
+			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
 			.then(() => this._promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}))
 			.then((configuration) => {
 				overlayDialogueDestroy(overlay.dialogueid);
@@ -423,6 +418,48 @@ class CDashboard extends CBaseComponent {
 				form.parentNode.insertBefore(message_box, form);
 			})
 			.finally(() => overlay.unsetLoading());
+	}
+
+	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
+		const fields_str = Object.keys(fields).length > 0 ? JSON.stringify(fields) : undefined;
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'dashboard.widget.check');
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: urlEncodeData({templateid, type, name, view_mode, fields: fields_str})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('errors' in response) {
+					throw {html_string: response.errors};
+				}
+			});
+	}
+
+	_promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}) {
+		const fields_str = Object.keys(fields).length > 0 ? JSON.stringify(fields) : undefined;
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'dashboard.widget.configure');
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: urlEncodeData({templateid, type, view_mode, fields: fields_str})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				return typeof response.configuration === 'object' ? response.configuration : {};
+			});
 	}
 
 	/**
