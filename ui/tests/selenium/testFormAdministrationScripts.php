@@ -391,7 +391,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
 						'Name' => '',
 						'Script' => 'Webhook: empty name'
@@ -450,7 +450,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
 						'Name' => '',
 						'Type' => 'Script',
@@ -520,7 +520,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
 						'Name' => '',
 						'Type' => 'IPMI',
@@ -597,7 +597,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
 						'Name' => '',
 						'Type' => 'SSH',
@@ -674,7 +674,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
 						'Name' => '',
 						'Type' => 'Telnet',

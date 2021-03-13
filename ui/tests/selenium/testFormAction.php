@@ -713,8 +713,8 @@ class testFormAction extends CLegacyWebTest {
 				case 'Triggers':
 				case 'Discovery':
 				case 'Autoregistration':
-					$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operations'));
-					$this->zbxTestDropdownSelectWait('operations', $new_operation_operationtype);
+					$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operation-select'));
+					$this->zbxTestDropdownSelectWait('operation[operationtype]', $new_operation_operationtype);
 					COverlayDialogElement::find()->one()->waitUntilReady();
 					break;
 				case 'Internal':
@@ -802,10 +802,10 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['new_operation_operationtype']) && $eventsource != 'Internal') {
 			$this->zbxTestTextPresent('Operations');
-			$this->zbxTestAssertVisibleXpath('//z-select[@name=\'operations\']');
+			$this->zbxTestAssertVisibleXpath('//z-select[@name=\'operation[operationtype]\']');
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath('//z-select[@name=\'operations\']');
+			$this->zbxTestAssertElementNotPresentXpath('//z-select[@name=\'operation[operationtype]\']');
 		}
 
 		if (isset($data['operationtype'])) {
@@ -1179,8 +1179,8 @@ class testFormAction extends CLegacyWebTest {
 		// Check available operation types depending on event source and the selected operation type.
 		$message_types = ($eventsource === 'Triggers') ? ['Send message', 'Reboot', 'Selenium script'] :
 				['Send message', 'Notify all involved'];
-		$this->zbxTestDropdownHasOptions('operations', $message_types);
-		$this->assertEquals('Send message', $operation_details->getField('Operations')->getValue());
+		$this->zbxTestDropdownHasOptions('operation[operationtype]', $message_types);
+		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
 		$this->assertFalse($operation_details->getField('Custom message')->getValue());
 		$this->zbxTestTextNotVisible(['Subject','Message']);
@@ -1487,7 +1487,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
 			if ($data['eventsource']!= EVENT_SOURCE_INTERNAL){
-				$this->zbxTestDropdownSelectWait('operations', $operation['type']);
+				$this->zbxTestDropdownSelectWait('operation[operationtype]', $operation['type']);
 			}
 				switch ($operation['type']) {
 					case 'Send message':
@@ -1597,7 +1597,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
-		$this->zbxTestDropdownSelectWait('operations', 'Reboot');
+		$this->zbxTestDropdownSelectWait('operation[operationtype]', 'Reboot');
 
 // add target current host
 		$this->zbxTestCheckboxSelect('operation-command-chst');
@@ -1623,14 +1623,14 @@ class testFormAction extends CLegacyWebTest {
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
-			"Run remote commands on current host ".
-			"Run remote commands on hosts: Simple form test host ".
-			"Run remote commands on host groups: Zabbix servers");
+			"Run script \"Reboot\" on current host ".
+			"Run script \"Reboot\" on hosts: Simple form test host ".
+			"Run script \"Reboot\" on host groups: Zabbix servers");
 
 		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
 		$this->zbxTestInputTypeOverwrite('operation_esc_step_to', '2');
-		$this->zbxTestDropdownSelectWait('operations', 'Reboot');
+		$this->zbxTestDropdownSelectWait('operation[operationtype]', 'Reboot');
 		$this->zbxTestCheckboxSelect('operation-command-chst');
 
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
@@ -1639,11 +1639,11 @@ class testFormAction extends CLegacyWebTest {
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
-			"Run remote commands on current host ".
-			"Run remote commands on hosts: Simple form test host ".
-			"Run remote commands on host groups: Zabbix servers");
+			"Run script \"Reboot\" on current host ".
+			"Run script \"Reboot\" on hosts: Simple form test host ".
+			"Run script \"Reboot\" on host groups: Zabbix servers");
 		$this->zbxTestAssertElementText("//tr[@id='operations_2']//span",
-			"Run remote commands on current host");
+			"Run script \"Reboot\" on current host");
 		$this->zbxTestAssertElementText('//tr[@id="operations_2"]//td', '1 - 2');
 
 		$this->zbxTestInputTypeOverwrite('esc_period', '123');
