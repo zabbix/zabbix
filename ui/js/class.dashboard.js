@@ -304,11 +304,54 @@ class CDashboard extends CBaseComponent {
 		this.editWidgetProperties(properties);
 	}
 
+	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
+		const fields_str = Object.keys(fields).length > 0 ? JSON.stringify(fields) : undefined;
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'dashboard.widget.check');
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: urlEncodeData({templateid, type, name, view_mode, fields: fields_str})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('errors' in response) {
+					throw {html_string: response.errors};
+				}
+			});
+	}
+
+	_promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}) {
+		const fields_str = Object.keys(fields).length > 0 ? JSON.stringify(fields) : undefined;
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'dashboard.widget.configure');
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: urlEncodeData({templateid, type, view_mode, fields: fields_str})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				return typeof response.configuration === 'object' ? response.configuration : {};
+			});
+	}
+
 	applyWidgetProperties() {
 		const overlay = overlays_stack.getById('widget_properties');
 		const form = overlay.$dialogue.$body[0].querySelector('form');
 		const fields = getFormFields(form);
 
+		const templateid = this._data.templateid ?? undefined;
 		const type = fields.type;
 		const name = fields.name;
 		const view_mode = fields.show_header == 1
@@ -327,61 +370,13 @@ class CDashboard extends CBaseComponent {
 			? dashboard_page.getWidget(overlay.data.original_properties.unique_id)
 			: null;
 
-		const request_data = {
-			templateid: this._data.templateid ?? undefined,
-			type,
-			name,
-			view_mode
-		};
-
-		if (Object.keys(fields).length > 0) {
-			request_data.fields = JSON.stringify(fields);
-		}
-
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', 'dashboard.widget.check');
-
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData(request_data)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
-				}
-
-				const request_data = {
-					templateid: this._data.templateid ?? undefined,
-					type,
-					view_mode
-				};
-
-				if (Object.keys(fields).length > 0) {
-					request_data.fields = JSON.stringify(fields);
-				}
-
-				const curl = new Curl('zabbix.php');
-
-				curl.setArgument('action', 'dashboard.widget.configure');
-
-				return fetch(curl.getUrl(), {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-					},
-					body: urlEncodeData(request_data)
-				});
-			})
-			.then((response) => response.json())
-			.then((response) => {
+		this
+			._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields})
+			.then(() => this._promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}))
+			.then((configuration) => {
 				overlayDialogueDestroy(overlay.dialogueid);
 
-				const configuration = (typeof response.configuration === 'object') ? response.configuration : {};
+				this._resetHeaderLines();
 
 				if (widget !== null && widget.getType() === type) {
 					widget.updateProperties({name, view_mode, fields, configuration});

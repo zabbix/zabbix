@@ -28,12 +28,11 @@ $output = [
 ];
 
 if ($data['is_resource_available']) {
+	$link_url = ($data['widget']['graph_url'] !== null) ? $data['widget']['graph_url'] : 'javascript:void(0)';
+
 	$output['body'] = (new CDiv())
 		->addClass('flickerfreescreen')
-		->addItem(($data['widget']['graph_url'] !== null)
-			? (new CLink(null, $data['widget']['graph_url']))->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
-			: (new CSpan())->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
-		)
+		->addItem((new CLink(null, $link_url))->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK))
 		->toString();
 
 	$output['async_data'] = $data['widget'];

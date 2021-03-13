@@ -921,7 +921,11 @@ function urlEncodeData(parameters, prefix = '') {
 		const prefixed_name = prefix !== '' ? `${prefix}[${name}]` : name;
 
 		if (Array.isArray(value) || (typeof value === 'object')) {
-			result.push(urlEncodeData(value, prefixed_name));
+			const result_part = urlEncodeData(value, prefixed_name);
+
+			if (result_part !== '') {
+				result.push(result_part);
+			}
 		}
 		else {
 			result.push([encodeURIComponent(prefixed_name), encodeURIComponent(value)].join('='));
