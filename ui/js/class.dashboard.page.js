@@ -98,12 +98,7 @@ class CDashboardPage extends CBaseComponent {
 					this.fire(DASHBOARD_PAGE_EVENT_EDIT);
 				}
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, {
-					properties: {
-						...widget.getProperties(),
-						dashboard_page_unique_id: this._unique_id
-					}
-				});
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, {widget});
 			},
 
 			widgetEnter: (e) => {
@@ -424,30 +419,19 @@ class CDashboardPage extends CBaseComponent {
 		return num_rows;
 	}
 
-	addWidget({
-		type,
-		name,
-		view_mode,
-		fields,
-		configuration,
-		widgetid,
-		pos,
-		is_new,
-		rf_rate,
-		unique_id
-	}, do_announce_widgets = true) {
+	addWidget({type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
 		const widget = new (eval(this._widget_defaults[type].js_class))({
-			type: type,
-			name: name,
-			view_mode: view_mode,
-			fields: fields,
-			configuration: configuration,
+			type,
+			name,
+			view_mode,
+			fields,
+			configuration,
 			defaults: this._widget_defaults[type],
 			parent: null,
-			widgetid: widgetid,
-			pos: pos,
-			is_new: is_new,
-			rf_rate: rf_rate,
+			widgetid,
+			pos,
+			is_new,
+			rf_rate,
 			dashboard: {
 				templateid: this._dashboard.templateid,
 				dashboardid: this._dashboard.dashboardid
@@ -463,14 +447,12 @@ class CDashboardPage extends CBaseComponent {
 			web_layout_mode: this._web_layout_mode,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
-			unique_id: unique_id
+			unique_id
 		});
 
 		this._widgets.set(widget, {});
 
-		if (do_announce_widgets) {
-			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
-		}
+		this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
 
 		if (this._state !== DASHBOARD_PAGE_STATE_INITIAL) {
 			widget.start();
@@ -484,7 +466,7 @@ class CDashboardPage extends CBaseComponent {
 		return widget;
 	}
 
-	deleteWidget(widget, do_announce_widgets = true) {
+	deleteWidget(widget, {is_batch_mode = false} = {}) {
 		if (widget.getState() === WIDGET_STATE_ACTIVE) {
 			this._dashboard_target.removeChild(widget.getView());
 			this._deactivateWidget(widget);
@@ -496,11 +478,15 @@ class CDashboardPage extends CBaseComponent {
 
 		this._widgets.delete(widget);
 
-		this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DELETE);
-
-		if (do_announce_widgets) {
+		if (!is_batch_mode) {
+			this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DELETE);
 			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
 		}
+	}
+
+	replaceWidget(widget, widget_data) {
+		this.deleteWidget(widget, {is_batch_mode: true});
+		this.addWidget(widget_data);
 	}
 
 	announceWidgets(dashboard_pages) {

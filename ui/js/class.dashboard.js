@@ -23,6 +23,9 @@ const ZBX_STYLE_DASHBRD_IS_EDIT_MODE = 'dashbrd-is-edit-mode';
 const ZBX_STYLE_DASHBRD_NAVIGATION_IS_SCROLLABLE = 'is-scrollable';
 const ZBX_STYLE_DASHBRD_SELECTED_TAB = 'selected-tab';
 
+const DASHBOARD_STATE_INITIAL = 'initial';
+const DASHBOARD_STATE_ACTIVE = 'active';
+
 const DASHBIOARD_CLIPBOARD_TYPE_WIDGET = 'widget';
 const DASHBIOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE = 'dashboard-page';
 
@@ -102,6 +105,8 @@ class CDashboard extends CBaseComponent {
 		this._new_widget_dashboard_page = null;
 		this._new_widget_pos = null;
 
+		this._min_grid_rows = 0;
+
 		if (this._web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 			const sortable = document.createElement('div');
 
@@ -113,6 +118,12 @@ class CDashboard extends CBaseComponent {
 	}
 
 	activate() {
+		if (this._dashboard_pages.size == 0) {
+			throw new Error('Cannot activate dashboard without dashboard pages.');
+		}
+
+		this._state = DASHBOARD_STATE_ACTIVE;
+
 		this._selectDashboardPage(this._dashboard_pages.keys().next().value);
 		this._announceWidgets();
 	}
@@ -314,9 +325,9 @@ class CDashboard extends CBaseComponent {
 
 		const request_data = {
 			templateid: this._data.templateid ?? undefined,
-			type: type,
-			name: name,
-			view_mode: view_mode
+			type,
+			name,
+			view_mode
 		};
 
 		if (Object.keys(fields).length > 0) {
@@ -340,17 +351,10 @@ class CDashboard extends CBaseComponent {
 					throw {html_string: response.errors};
 				}
 
-				// Set view mode of a reusable widget early to escape focus flickering.
-				if (widget !== null && widget.getType() === type) {
-					widget.setViewMode(view_mode);
-					widget.enter();
-					dashboard_page.leaveWidgetsExcept(widget);
-				}
-
 				const request_data = {
 					templateid: this._data.templateid ?? undefined,
-					type: type,
-					view_mode: view_mode
+					type,
+					view_mode
 				};
 
 				if (Object.keys(fields).length > 0) {
@@ -375,64 +379,40 @@ class CDashboard extends CBaseComponent {
 
 				const configuration = (typeof response.configuration === 'object') ? response.configuration : {};
 
-				if (widget === null) {
-					// In case of ADD widget, create and add widget to the dashboard page.
-
-					const new_widget_data = {
-						type: type,
-						name: name,
-						view_mode: view_mode,
-						fields: fields,
-						configuration: configuration,
+				if (widget !== null && widget.getType() === type) {
+					widget.updateProperties({name, view_mode, fields, configuration});
+				}
+				else {
+					const widget_data = {
+						type,
+						name,
+						view_mode,
+						fields,
+						configuration,
 						widgetid: null,
-						pos: this._new_widget_pos,
-						is_new: true,
+						pos: widget === null ? this._new_widget_pos : widget.getPosition(),
+						is_new: widget === null,
 						rf_rate: 0,
 						unique_id: this._createUniqueId()
 					};
 
 					this
-						._promiseScrollIntoView(this._new_widget_pos)
+						._promiseScrollIntoView(widget_data.pos)
 						.then(() => {
-							this._new_widget_dashboard_page.addWidget(new_widget_data);
-
-							this._new_widget_dashboard_page = null;
-							this._new_widget_pos = null;
-
-							this._resizeGrid();
+							if (widget === null) {
+								this._new_widget_dashboard_page.addWidget(widget_data);
+								this._new_widget_dashboard_page = null;
+								this._new_widget_pos = null;
+							}
+							else {
+								dashboard_page.replaceWidget(widget, widget_data);
+							}
 						});
-				}
-				else if (widget.getType() === type) {
-					// In case of EDIT widget, if type has not changed, update the widget.
-
-					widget.setName(name);
-					widget.setFields(fields);
-					widget.setConfiguration(configuration);
-					widget.updateOnce();
-				}
-				else {
-					// In case of EDIT widget, if type has changed, replace the widget.
-
-					const new_widget_data = {
-						type: type,
-						name: name,
-						view_mode: view_mode,
-						fields: fields,
-						configuration: configuration,
-						widgetid: null,
-						pos: widget.getPosition(),
-						is_new: false,
-						rf_rate: 0,
-						unique_id: this._createUniqueId()
-					};
-
-					dashboard_page.deleteWidget(widget);
-					dashboard_page.addWidget(new_widget_data);
 				}
 			})
 			.catch((error) => {
 				for (const el of form.parentNode.children) {
-					if (el.matches('.msg-good, .msg-bad')) {
+					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 						el.parentNode.removeChild(el);
 					}
 				}
@@ -464,7 +444,7 @@ class CDashboard extends CBaseComponent {
 		const wrapper_scroll_top_min = Math.max(0, widget_top + Math.min(0, widget_height - wrapper_height));
 		const wrapper_scroll_top_max = widget_top;
 
-		this._resizeGrid(pos.y + pos.height);
+		this._resizeGrid(pos.y + pos.height - 1);
 
 		return new Promise((resolve) => {
 			if (wrapper_scroll_top < wrapper_scroll_top_min) {
@@ -490,12 +470,18 @@ class CDashboard extends CBaseComponent {
 	 *
 	 * @param {int|null}  min_rows  Minimal desired rows count.
 	 */
-	_resizeGrid(min_rows = 0) {
+	_resizeGrid(min_rows = null) {
+		if (min_rows !== null) {
+			this._grid_min_rows = min_rows;
+		}
+
 		const $grid = $(this._containers.grid);
 
 		let num_rows = this._selected_dashboard_page.getNumRows();
 
-		num_rows = Math.max(num_rows, min_rows);
+		if (this._grid_min_rows !== null) {
+			num_rows = Math.max(num_rows, this._grid_min_rows);
+		}
 
 		let height = this._cell_height * num_rows;
 
@@ -554,6 +540,10 @@ class CDashboard extends CBaseComponent {
 			});
 		}
 
+		if (this._state === DASHBOARD_STATE_ACTIVE) {
+			this._announceWidgets();
+		}
+
 		if (this._web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 			this._addTab(dashboard_page);
 		}
@@ -562,10 +552,33 @@ class CDashboard extends CBaseComponent {
 	}
 
 	deleteDashboardPage(dashboard_page) {
-		if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
-			//? DASHBOARD_PAGE_STATE_ACTIVE
+		if (this._state === DASHBOARD_STATE_ACTIVE) {
+			if (dashboard_page === this._selected_dashboard_page) {
+				const dashboard_pages = this._dashboard_pages.keys();
+
+				for (let i = 0; i < dashboard_pages.size; i++) {
+					if (dashboard_pages[i] === dashboard_page) {
+						this._selectDashboardPage(dashboard_pages[i > 0 ? i - 1 : i + 1]);
+
+						break;
+					}
+				}
+
+				if (dashboard_page === this._selected_dashboard_page) {
+					throw new Error('Cannot delete the last dashboard page.');
+				}
+			}
 		}
-		// TODO ...
+
+		if (dashboard_page.getState() !== DASHBOARD_PAGE_STATE_INITIAL) {
+			dashboard_page.destroy();
+		}
+
+		this._dashboard_pages.delete(dashboard_page);
+
+		if (this._state === DASHBOARD_STATE_ACTIVE) {
+			this._announceWidgets();
+		}
 
 		this._target.classList.toggle(ZBX_STYLE_DASHBRD_IS_MULTIPAGE, this._dashboard_pages.size > 1);
 	}
@@ -652,6 +665,12 @@ class CDashboard extends CBaseComponent {
 		this._tabs_dashboard_pages.set(tab, dashboard_page);
 	}
 
+	_deleteTab(dashboard_page) {
+		const data = this._dashboard_pages.get(dashboard_page);
+
+		this._tabs.removeItem(data.tab);
+	}
+
 	_selectTab(dashboard_page) {
 		this._tabs.getList().querySelectorAll(`.${ZBX_STYLE_DASHBRD_SELECTED_TAB}`).forEach((el) => {
 			el.classList.remove(ZBX_STYLE_DASHBRD_SELECTED_TAB);
@@ -724,11 +743,17 @@ class CDashboard extends CBaseComponent {
 			},
 
 			dashboardPageWidgetEdit: (e) => {
-				const dashboard_page = e.target;
+				const dashboard_page = e.detail.target;
+				const widget = e.detail.widget;
 
 				this.editWidgetProperties({
 					templateid: this._data.templateid ?? undefined,
-					...e.detail.properties
+					type: widget.getType(),
+					name: widget.getName(),
+					view_mode: widget.getViewMode(),
+					fields: JSON.stringify(widget.getFields()),
+					unique_id: widget.getUniqueId(),
+					dashboard_page_unique_id: dashboard_page.getUniqueId()
 				});
 			},
 
@@ -793,16 +818,14 @@ class CDashboard extends CBaseComponent {
 			},
 
 			windowResize: () => {
-				window.addEventListener('resize', () => {
-					if (resize_timeout_id != null) {
-						clearTimeout(resize_timeout_id);
-					}
+				if (resize_timeout_id != null) {
+					clearTimeout(resize_timeout_id);
+				}
 
-					resize_timeout_id = setTimeout(() => {
-						resize_timeout_id = null;
-						this._resize();
-					}, 200);
-				});
+				resize_timeout_id = setTimeout(() => {
+					resize_timeout_id = null;
+					this._resize();
+				}, 200);
 			},
 
 			tabsResize: () => {

@@ -368,7 +368,7 @@
 			})
 			.catch((error) => {
 				for (const el of form.parentNode.children) {
-					if (el.matches('.msg-good, .msg-bad')) {
+					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 						el.parentNode.removeChild(el);
 					}
 				}

@@ -149,7 +149,7 @@ class CWidget extends CBaseComponent {
 
 	_doActivate() {
 		this._registerEvents();
-		this._startUpdating(0, {do_update_once: this._is_edit_mode});
+		this._startUpdating();
 	}
 
 	deactivate() {
@@ -210,7 +210,7 @@ class CWidget extends CBaseComponent {
 	resize() {
 	}
 
-	setName(name) {
+	_setName(name) {
 		this._name = name;
 
 		if (this._state !== WIDGET_STATE_INITIAL) {
@@ -218,27 +218,15 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	setFields(fields) {
+	_setFields(fields) {
 		this._fields = fields;
-
-		this._show_preloader_asap = true;
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating(0, {do_update_once: this._is_edit_mode});
-		}
 	}
 
-	setConfiguration(configuration) {
+	_setConfiguration(configuration) {
 		this._configuration = configuration;
-
-		this._show_preloader_asap = true;
 
 		if (this._state !== WIDGET_STATE_INITIAL) {
 			this._$content_body.toggleClass('no-padding', !this._configuration.padding);
-		}
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating(0, {do_update_once: this._is_edit_mode});
 		}
 	}
 
@@ -248,6 +236,10 @@ class CWidget extends CBaseComponent {
 
 	getType() {
 		return this._type;
+	}
+
+	getName() {
+		return this._name;
 	}
 
 	getView() {
@@ -261,7 +253,7 @@ class CWidget extends CBaseComponent {
 		return (this._$target.find('[data-expanded="true"], [aria-expanded="true"]').length > 0);
 	}
 
-	setViewMode(view_mode) {
+	_setViewMode(view_mode) {
 		if (this._view_mode !== view_mode) {
 			this._view_mode = view_mode;
 			this._$target.toggleClass(this._css_classes.hidden_header,
@@ -272,6 +264,10 @@ class CWidget extends CBaseComponent {
 
 	getViewMode() {
 		return this._view_mode;
+	}
+
+	getFields() {
+		return this._fields;
 	}
 
 	isEditMode() {
@@ -302,7 +298,7 @@ class CWidget extends CBaseComponent {
 		this._dynamic_hostid = dynamic_hostid;
 
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating(0, {do_update_once: this._is_edit_mode});
+			this._startUpdating();
 		}
 	}
 
@@ -351,18 +347,36 @@ class CWidget extends CBaseComponent {
 			.prop('disabled', true);
 	}
 
-	getProperties() {
-		return {
-			type: this._type,
-			name: this._name,
-			view_mode: this._view_mode,
-			fields: JSON.stringify(this._fields),
-			unique_id: this._unique_id
-		};
+	updateProperties({name, view_mode, fields, configuration}) {
+		if (name !== undefined) {
+			this._setName(name);
+		}
+
+		if (view_mode !== undefined) {
+			this._setViewMode(view_mode);
+		}
+
+		if (fields !== undefined) {
+			this._setFields(fields);
+		}
+
+		if (configuration !== undefined) {
+			this._setConfiguration(configuration);
+		}
+
+		this._show_preloader_asap = true;
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
+	}
+
+	getRfRate() {
+		return this._rf_rate;
 	}
 
 	_setRfRate(rf_rate) {
-		let update_promise;
+		this._rf_rate = rf_rate;
 
 		if (this._widgetid !== null) {
 			const curl = new Curl('zabbix.php');
@@ -374,25 +388,9 @@ class CWidget extends CBaseComponent {
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
 				},
-				body: urlEncodeData({widgetid: this._widgetid, rf_rate: rf_rate})
+				body: urlEncodeData({widgetid: this._widgetid, rf_rate})
 			});
 		}
-		else {
-			update_promise = Promise.resolve();
-		}
-
-		update_promise.then(() => {
-			this._rf_rate = rf_rate;
-
-			if (this._state === WIDGET_STATE_ACTIVE) {
-				if (this._rf_rate > 0) {
-					this._startUpdating(0, {do_update_once: this._is_edit_mode});
-				}
-				else {
-					this._stopUpdating();
-				}
-			}
-		});
 	}
 
 	getDataCopy() {
@@ -464,7 +462,18 @@ class CWidget extends CBaseComponent {
 				refresh_interval_section.items.push({
 					label: label,
 					selected: (rf_rate == this._rf_rate),
-					clickCallback: () => this._setRfRate(rf_rate)
+					clickCallback: () => {
+						this._setRfRate(rf_rate);
+
+						if (this._state === WIDGET_STATE_ACTIVE) {
+							if (this._rf_rate > 0) {
+								this._startUpdating();
+							}
+							else {
+								this._stopUpdating();
+							}
+						}
+					}
 				});
 			}
 
@@ -474,12 +483,12 @@ class CWidget extends CBaseComponent {
 		return menu;
 	}
 
-	updateOnce() {
-		this._startUpdating(0, true);
-	}
+	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
+		if (do_update_once === null) {
+			do_update_once = this._is_edit_mode;
+		}
 
-	_startUpdating(delay_sec = 0, {do_update_once = false} = {}) {
-		this._stopUpdating(false);
+		this._stopUpdating({do_abort: false});
 
 		if (delay_sec > 0) {
 			this._update_timeout_id = setTimeout(() => {
@@ -498,7 +507,7 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	_stopUpdating(do_abort = true) {
+	_stopUpdating({do_abort = true} = {}) {
 		if (this._update_timeout_id !== null) {
 			clearTimeout(this._update_timeout_id);
 			this._update_timeout_id = null;
@@ -611,7 +620,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	_setContents({name, body, messages, info, debug}) {
-		this.setName(name);
+		this._setName(name);
 
 		this._$content_body.empty();
 
