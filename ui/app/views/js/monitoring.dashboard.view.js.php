@@ -60,7 +60,7 @@
 					&& web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				is_edit_mode: dashboard.dashboardid === null,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
-				use_navigation_tabs: web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
+				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period: time_period,
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null
 			});

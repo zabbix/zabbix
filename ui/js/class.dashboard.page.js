@@ -77,7 +77,7 @@ class CDashboardPage extends CBaseComponent {
 		this._unique_id = unique_id;
 
 		this._init();
-		this._initEvents();
+		this._registerEvents();
 	}
 
 	_init() {
@@ -86,7 +86,7 @@ class CDashboardPage extends CBaseComponent {
 		this._widgets = new Map();
 	}
 
-	_initEvents() {
+	_registerEvents() {
 		this._events = {
 			widgetEdit: (e) => {
 				const widget = e.detail.target;
@@ -145,9 +145,6 @@ class CDashboardPage extends CBaseComponent {
 				this.deleteWidget(widget);
 			}
 		};
-
-		this._registerEvents = () => {};
-		this._unregisterEvents = () => {};
 	}
 
 	/**
@@ -175,14 +172,14 @@ class CDashboardPage extends CBaseComponent {
 			for (x = 0; x <= max_column && !found; x++) {
 				pos.x = x;
 				pos.y = y;
-				found = this._isPosFree(pos);
+				found = this.isPosFree(pos);
 			}
 		}
 
 		return pos;
 	}
 
-	_isPosFree(pos) {
+	isPosFree(pos) {
 		for (const widget of this._widgets.keys()) {
 			if (this._posOverlap(pos, widget.getPosition())) {
 				return false;
@@ -192,24 +189,86 @@ class CDashboardPage extends CBaseComponent {
 		return true;
 	}
 
-	_accommodatePos(pos) {
-		pos = {...pos};
+	accommodatePos(pos, {reverse_x = false, reverse_y = false} = {}) {
+		const pos_1 = this._accommodatePosX({
+			...this._accommodatePosY(
+				{
+					...pos,
+					x: reverse_x ? pos.x + pos.width - 1 : pos.x,
+					width: 1
+				},
+				{reverse: reverse_y}
+			),
+			x: pos.x,
+			width: pos.width
+		}, {reverse: reverse_x});
 
-		for (const widget of this._widgets.keys()) {
-			if (this._posOverlap(pos, widget.getPosition())) {
-				if (pos.x < widget.pos.x && pos.x + pos.width > widget.pos.x ) {
-					pos.width = widget.pos.x - pos.x;
+		const pos_2 = this._accommodatePosY({
+			...this._accommodatePosX(
+				{
+					...pos,
+					y: reverse_y ? pos.y + pos.height - 1 : pos.y,
+					height: 1
+				},
+				{reverse: reverse_x}
+			),
+			y: pos.y,
+			height: pos.height
+		}, {reverse: reverse_y});
+
+		return (pos_1.width * pos_1.height > pos_2.width * pos_2.height) ? pos_1 : pos_2;
+	}
+
+	_accommodatePosX(pos, {reverse = false} = {}) {
+		const max_pos = {...pos};
+
+		if (reverse) {
+			for (let x = pos.x + pos.width - 1, width = 1; x >= pos.x; x--, width++) {
+				if (!this.isPosFree({...max_pos, x, width})) {
+					break;
 				}
-				else if (pos.y < widget.pos.y && pos.y + pos.height > widget.pos.y) {
-					pos.height = widget.pos.y - pos.y;
+
+				max_pos.x = x;
+				max_pos.width = width;
+			}
+		}
+		else {
+			for (let width = 1; width <= pos.width; width++) {
+				if (!this.isPosFree({...max_pos, width})) {
+					break;
 				}
+
+				max_pos.width = width;
 			}
 		}
 
-		pos.width = Math.min(this._max_columns - pos.x, pos.width);
-		pos.height = Math.min(this._max_rows - pos.y, pos.height);
+		return max_pos;
+	}
 
-		return pos;
+	_accommodatePosY(pos, {reverse = false} = {}) {
+		const max_pos = {...pos};
+
+		if (reverse) {
+			for (let y = pos.y + pos.height - 1, height = 1; y >= pos.y; y--, height++) {
+				if (!this.isPosFree({...max_pos, y, height})) {
+					break;
+				}
+
+				max_pos.y = y;
+				max_pos.height = height;
+			}
+		}
+		else {
+			for (let height = 2; height <= pos.height; height++) {
+				if (!this.isPosFree({...max_pos, height})) {
+					break;
+				}
+
+				max_pos.height = height;
+			}
+		}
+
+		return max_pos;
 	}
 
 	/**
@@ -231,6 +290,10 @@ class CDashboardPage extends CBaseComponent {
 
 	getData() {
 		return this._data;
+	}
+
+	getNumWidgets() {
+		return this._widgets.size;
 	}
 
 	getWidget(unique_id) {
