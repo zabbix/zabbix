@@ -643,7 +643,7 @@ class CTriggerExpression {
 				&& $this->parseUsing($this->functionid_parser, CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO)) {
 			return true;
 		}
-		elseif (!$this->options['collapsed_expression'] && $this->parseFunction()) {
+		elseif ($this->parseFunction()) {
 			return true;
 		}
 
@@ -668,6 +668,7 @@ class CTriggerExpression {
 	private function parseFunction(): bool {
 		$start_pos = $this->pos;
 
+		// TODO miks: parser must support functionids as parameters based on value of $this->options['collapsed_expression'].
 		if ($this->function_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			return false;
 		}

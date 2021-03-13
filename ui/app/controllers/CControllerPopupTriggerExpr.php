@@ -519,7 +519,9 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					$params = array_map(function ($param) {
-						return $param['raw'];
+						return is_array($param)
+							? $param['raw']
+							: $param->match;
 					}, $params);
 
 					/*
