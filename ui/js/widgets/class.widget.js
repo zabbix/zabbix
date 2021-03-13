@@ -55,7 +55,6 @@ class CWidget extends CBaseComponent {
 		is_editable,
 		is_edit_mode,
 		can_edit_dashboards,
-		web_layout_mode,
 		time_period,
 		dynamic_hostid,
 		unique_id
@@ -87,7 +86,6 @@ class CWidget extends CBaseComponent {
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
-		this._web_layout_mode = web_layout_mode;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
 		this._unique_id = unique_id;

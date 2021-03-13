@@ -47,7 +47,7 @@ class CDashboard extends CBaseComponent {
 		is_editable,
 		is_edit_mode,
 		can_edit_dashboards,
-		web_layout_mode,
+		use_navigation_tabs,
 		time_period,
 		dynamic_hostid
 	}) {
@@ -81,7 +81,7 @@ class CDashboard extends CBaseComponent {
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
-		this._web_layout_mode = web_layout_mode,
+		this._use_navigation_tabs = use_navigation_tabs,
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
 
@@ -107,7 +107,9 @@ class CDashboard extends CBaseComponent {
 
 		this._min_grid_rows = 0;
 
-		if (this._web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+		this._reserve_header_lines_timeout_id = null;
+
+		if (this._use_navigation_tabs) {
 			const sortable = document.createElement('div');
 
 			this._containers.navigation_tabs.appendChild(sortable);
@@ -185,6 +187,8 @@ class CDashboard extends CBaseComponent {
 				dashboard_page.setEditMode();
 			}
 		}
+
+		this._resetHeaderLines();
 
 		this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
 	}
@@ -524,7 +528,6 @@ class CDashboard extends CBaseComponent {
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
 			can_edit_dashboards: this._can_edit_dashboards,
-			web_layout_mode: this._web_layout_mode,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
 			unique_id: this._createUniqueId()
@@ -544,7 +547,7 @@ class CDashboard extends CBaseComponent {
 			this._announceWidgets();
 		}
 
-		if (this._web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+		if (this._use_navigation_tabs) {
 			this._addTab(dashboard_page);
 		}
 
@@ -618,7 +621,7 @@ class CDashboard extends CBaseComponent {
 
 		this._activatePage(this._selected_dashboard_page);
 
-		if (this._web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+		if (this._use_navigation_tabs) {
 			this._selectTab(this._selected_dashboard_page);
 		}
 
@@ -732,9 +735,51 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
+	_reserveHeaderLines(num_lines) {
+		if (this._reserve_header_lines_timeout_id !== null) {
+			clearTimeout(this._reserve_header_lines_timeout_id);
+			this._reserve_header_lines_timeout_id = null;
+		}
+
+		let old_num_lines = 0;
+
+		for (let i = 2; i > 0; i--) {
+			if (this._containers.grid.classList.contains(`reserve-header-lines-${i}`)) {
+				old_num_lines = i;
+				break;
+			}
+		}
+
+		if (num_lines > old_num_lines) {
+			if (old_num_lines > 0) {
+				this._containers.grid.classList.remove(`reserve-header-lines-${old_num_lines}`);
+			}
+			this._containers.grid.classList.add(`reserve-header-lines-${num_lines}`);
+		}
+		else if (num_lines < old_num_lines) {
+			this._reserve_header_lines_timeout_id = setTimeout(() => {
+				this._reserve_header_lines_timeout_id = null;
+
+				this._containers.grid.classList.remove(`reserve-header-lines-${old_num_lines}`);
+
+				if (num_lines > 0) {
+					this._containers.grid.classList.add(`reserve-header-lines-${num_lines}`);
+				}
+			}, 2000);
+		}
+	}
+
+	_resetHeaderLines() {
+		if (this._reserve_header_lines_timeout_id !== null) {
+			clearTimeout(this._reserve_header_lines_timeout_id);
+			this._reserve_header_lines_timeout_id = null;
+		}
+
+		this._containers.grid.classList.remove('reserve-header-lines-1', 'reserve-header-lines-2');
+	}
+
 	_registerEvents() {
 		let resize_timeout_id = null;
-		let reserve_header_lines_timeout_id = null;
 
 		this._events = {
 			dashboardPageEdit: (e) => {
@@ -770,38 +815,7 @@ class CDashboard extends CBaseComponent {
 			},
 
 			dashboardPageReserveHeaderLines: (e) => {
-				if (reserve_header_lines_timeout_id !== null) {
-					clearTimeout(reserve_header_lines_timeout_id);
-					reserve_header_lines_timeout_id = null;
-				}
-
-				const new_num_header_lines = e.detail.num_header_lines;
-				let old_num_header_lines = 0;
-
-				for (let i = 2; i > 0; i--) {
-					if (this._containers.grid.classList.contains(`reserve-header-lines-${i}`)) {
-						old_num_header_lines = i;
-						break;
-					}
-				}
-
-				if (new_num_header_lines > old_num_header_lines) {
-					if (old_num_header_lines > 0) {
-						this._containers.grid.classList.remove(`reserve-header-lines-${old_num_header_lines}`);
-					}
-					this._containers.grid.classList.add(`reserve-header-lines-${new_num_header_lines}`);
-				}
-				else if (new_num_header_lines < old_num_header_lines) {
-					reserve_header_lines_timeout_id = setTimeout(() => {
-						reserve_header_lines_timeout_id = null;
-
-						this._containers.grid.classList.remove(`reserve-header-lines-${old_num_header_lines}`);
-
-						if (new_num_header_lines > 0) {
-							this._containers.grid.classList.add(`reserve-header-lines-${new_num_header_lines}`);
-						}
-					}, 2000);
-				}
+				this._reserveHeaderLines(e.detail.num_header_lines);
 			},
 
 			timeSelectorRangeUpdate: (e, time_period) => {
@@ -881,7 +895,7 @@ class CDashboard extends CBaseComponent {
 
 		window.addEventListener('resize', this._events.windowResize);
 
-		if (this._web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+		if (this._use_navigation_tabs) {
 			new ResizeObserver(this._events.tabsResize).observe(this._containers.navigation_tabs);
 
 			this._tabs.on(SORTABLE_EVENT_DRAG_END, this._events.tabsDragEnd);

@@ -166,7 +166,8 @@
 		}
 	}
 
-	&.dashbrd-is-multipage {
+	&.dashbrd-is-multipage,
+	&.dashbrd-is-edit-mode {
 		.dashbrd-grid-container {
 			&.reserve-header-lines-1 {
 				margin-top: 2rem;

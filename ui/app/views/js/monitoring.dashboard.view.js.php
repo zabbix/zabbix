@@ -25,8 +25,6 @@
 ?>
 
 <script>
-	const ZBX_LAYOUT_KIOSKMODE = <?= ZBX_LAYOUT_KIOSKMODE ?>;
-
 	const DASHBOARD_EVENT_APPLY_PROPERTIES = 'apply_properties';
 
 	function initializeView(dashboard, widget_defaults, time_period, dynamic, web_layout_mode) {
@@ -60,10 +58,11 @@
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
 				widget_defaults: widget_defaults,
-				is_editable: dashboard.can_edit_dashboards && dashboard.editable,
+				is_editable: dashboard.can_edit_dashboards && dashboard.editable
+					&& web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				is_edit_mode: dashboard.dashboardid === null,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
-				web_layout_mode: web_layout_mode,
+				use_navigation_tabs: web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period: time_period,
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null
 			});
@@ -89,7 +88,7 @@
 
 			jqBlink.blink();
 
-			if (web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+			if (web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				if (dashboard.dashboardid === null) {
 					ZABBIX.Dashboard.setEditMode();
 					edit();
