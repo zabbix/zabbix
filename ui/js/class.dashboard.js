@@ -26,8 +26,8 @@ const ZBX_STYLE_DASHBRD_SELECTED_TAB = 'selected-tab';
 const DASHBOARD_STATE_INITIAL = 'initial';
 const DASHBOARD_STATE_ACTIVE = 'active';
 
-const DASHBIOARD_CLIPBOARD_TYPE_WIDGET = 'widget';
-const DASHBIOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE = 'dashboard-page';
+const DASHBOARD_CLIPBOARD_TYPE_WIDGET = 'widget';
+const DASHBOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE = 'dashboard-page';
 
 const DASHBOARD_EVENT_EDIT = 'edit';
 const DASHBOARD_EVENT_APPLY_PROPERTIES = 'apply-properties';
@@ -738,7 +738,7 @@ class CDashboard extends CBaseComponent {
 
 	storeWidgetCopy(data) {
 		localStorage.setItem('dashboard.clipboard', JSON.stringify({
-			type: DASHBIOARD_CLIPBOARD_TYPE_WIDGET,
+			type: DASHBOARD_CLIPBOARD_TYPE_WIDGET,
 			data: data
 		}));
 	}
@@ -752,7 +752,7 @@ class CDashboard extends CBaseComponent {
 
 		clipboard = JSON.parse(clipboard);
 
-		if (clipboard.type !== DASHBIOARD_CLIPBOARD_TYPE_WIDGET) {
+		if (clipboard.type !== DASHBOARD_CLIPBOARD_TYPE_WIDGET) {
 			return null;
 		}
 
