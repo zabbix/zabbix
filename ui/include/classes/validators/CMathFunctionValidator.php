@@ -55,6 +55,27 @@ class CMathFunctionValidator extends CValidator {
 	 */
 	private $lldmacros = false;
 
+	/**
+	 * Number parser.
+	 *
+	 * @var CNumberParser
+	 */
+	protected $number_parser;
+
+	/**
+	 * Parser for user macros.
+	 *
+	 * @var CUserMacroParser
+	 */
+	protected $user_macro_parser;
+
+	/**
+	 * Parser for LLD macros.
+	 *
+	 * @var CLLDMacroParser
+	 */
+	protected $lld_macro_parser;
+
 	public function __construct(array $options = []) {
 		/*
 		 * CValidator is an abstract class, so no specific functionality should be bound to it. Thus putting
@@ -67,6 +88,15 @@ class CMathFunctionValidator extends CValidator {
 			unset($options['lldmacros']);
 		}
 		parent::__construct($options);
+
+		// Init parsers.
+		$this->user_macro_parser = new CUserMacroParser();
+		$this->lld_macro_parser = $this->lldmacros ? new CLLDMacroParser() : null;
+		$this->user_macro_parser = new CUserMacroParser();
+		$this->number_parser = new CNumberParser([
+			'with_minus' => true,
+			'with_suffix' => true
+		]);
 	}
 
 	/**
@@ -97,8 +127,22 @@ class CMathFunctionValidator extends CValidator {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
 				return false;
 			}
+			elseif ($param instanceof CFunctionParserResult) {
+				continue;
+			}
+			elseif (!$this->user_macro_parser->parse($param['raw'])
+					&& $this->number_parser->parse($param['raw'])
+					&& $this->checkString($param['raw'])
+					&& (!$this->lldmacros || $this->lld_macro_parser->parse($param['raw']))) {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
+				return false;
+			}
 		}
 
 		return true;
+	}
+
+	private function checkString(string $param): bool {
+		return preg_match('/^"([^"\\\\]|\\\\["\\\\])*"/', $param);
 	}
 }
