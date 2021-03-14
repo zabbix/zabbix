@@ -190,33 +190,42 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	accommodatePos(pos, {reverse_x = false, reverse_y = false} = {}) {
-		const pos_1 = this._accommodatePosX({
-			...this._accommodatePosY(
-				{
-					...pos,
-					x: reverse_x ? pos.x + pos.width - 1 : pos.x,
-					width: 1
-				},
-				{reverse: reverse_y}
-			),
-			x: pos.x,
-			width: pos.width
+		let pos_variants = [];
+
+		let pos_x = this._accommodatePosX({
+			...pos,
+			y: reverse_y ? pos.y + pos.height - 1 : pos.y,
+			height: 1
 		}, {reverse: reverse_x});
 
-		const pos_2 = this._accommodatePosY({
-			...this._accommodatePosX(
-				{
-					...pos,
-					y: reverse_y ? pos.y + pos.height - 2 : pos.y,
-					height: 2
-				},
-				{reverse: reverse_x}
-			),
-			y: pos.y,
-			height: pos.height
-		}, {reverse: reverse_y});
+		pos_x = {...pos_x, y: pos.y, height: pos.height};
 
-		return (pos_1.width * pos_1.height > pos_2.width * pos_2.height) ? pos_1 : pos_2;
+		if (reverse_x) {
+			for (let x = pos_x.x, width = pos_x.width; width >= 1; x++, width--) {
+				pos_variants.push(this._accommodatePosY({...pos_x, x, width}, {reverse: reverse_y}));
+			}
+		}
+		else {
+			for (let width = pos_x.width; width >= 1; width--) {
+				pos_variants.push(this._accommodatePosY({...pos_x, width}, {reverse: reverse_y}));
+			}
+		}
+
+		let pos_best = null;
+		let pos_best_value = null;
+
+		for (const pos_variant of pos_variants) {
+			const delta_x = Math.abs(reverse_x ? pos_variant.x - pos.x : pos_variant.width - pos.width);
+			const delta_y = Math.abs(reverse_y ? pos_variant.y - pos.y : pos_variant.height - pos.height);
+			const value = Math.sqrt(Math.pow(delta_x, 2) + Math.pow(delta_y, 2));
+
+			if (pos_best === null || (pos_best.width == 1 && pos_variant.width > 1) || value < pos_best_value) {
+				pos_best = {...pos_variant};
+				pos_best_value = value;
+			}
+		}
+
+		return pos_best;
 	}
 
 	_accommodatePosX(pos, {reverse = false} = {}) {
@@ -259,7 +268,7 @@ class CDashboardPage extends CBaseComponent {
 			}
 		}
 		else {
-			for (let height = 2; height <= pos.height; height++) {
+			for (let height = this._widget_min_rows; height <= pos.height; height++) {
 				if (!this.isPosFree({...max_pos, height})) {
 					break;
 				}

@@ -1031,7 +1031,7 @@ class CDashboard extends CBaseComponent {
 
 				const new_widget_pos = {...this._new_widget_placeholder_pos};
 
-				if (new_widget_pos.width == 2 && new_widget_pos.height == 2) {
+				if (new_widget_pos.width == 2 && new_widget_pos.height == this._widget_min_rows) {
 					delete new_widget_pos.width;
 					delete new_widget_pos.height;
 				}
@@ -1067,24 +1067,34 @@ class CDashboard extends CBaseComponent {
 							this._new_widget_placeholder_clicked_pos.height,
 							event_pos.y - this._new_widget_placeholder_clicked_pos.y + 1
 						);
+						this._new_widget_placeholder_pos.height = Math.min(this._widget_max_rows,
+							this._new_widget_placeholder_pos.height
+						);
 					}
 					else {
 						this._new_widget_placeholder_pos.y = event_pos.y;
 						this._new_widget_placeholder_pos.height = this._new_widget_placeholder_clicked_pos.y
 							- event_pos.y + this._new_widget_placeholder_clicked_pos.height;
 						reverse_y = true;
+
+						const delta_y = this._new_widget_placeholder_pos.height - this._widget_max_rows;
+
+						if (delta_y > 0) {
+							this._new_widget_placeholder_pos.y += delta_y;
+							this._new_widget_placeholder_pos.height -= delta_y;
+						}
 					}
 
 					this._new_widget_placeholder_pos = this._selected_dashboard_page.accommodatePos(
 						this._new_widget_placeholder_pos, {reverse_x, reverse_y}
 					);
 
-					const min_grid_rows = Math.min(this._max_rows,
+					const grid_min_rows = Math.min(this._max_rows,
 						this._new_widget_placeholder_pos.y + this._new_widget_placeholder_pos.height + 2
 					);
 
-					if (min_grid_rows > this._grid_min_rows) {
-						this._resizeGrid(min_grid_rows);
+					if (grid_min_rows > this._grid_min_rows) {
+						this._resizeGrid(grid_min_rows);
 					}
 
 					this._new_widget_placeholder
@@ -1097,7 +1107,7 @@ class CDashboard extends CBaseComponent {
 					const event_pos_1x1 = this._getGridEventPos(e, 1, 1);
 
 					if (this._selected_dashboard_page.isPosFree(event_pos_1x1)) {
-						let event_pos = this._getGridEventPos(e, 2, 2);
+						let event_pos = this._getGridEventPos(e, 2, this._widget_min_rows);
 
 						for (const width of [2, 1]) {
 							for (const offset_y of [0, -1, 1]) {
@@ -1106,7 +1116,7 @@ class CDashboard extends CBaseComponent {
 										x: event_pos.x + offset_x,
 										y: event_pos.y + offset_y,
 										width: width,
-										height: 2
+										height: this._widget_min_rows
 									};
 
 									if (pos.x < 0 || pos.x + pos.width > this._max_columns
@@ -1134,12 +1144,12 @@ class CDashboard extends CBaseComponent {
 					}
 
 					if (this._new_widget_placeholder_pos !== null) {
-						const min_grid_rows = Math.min(this._max_rows,
+						const grid_min_rows = Math.min(this._max_rows,
 							this._new_widget_placeholder_pos.y + this._new_widget_placeholder_pos.height + 2
 						);
 
-						if (min_grid_rows > this._grid_min_rows) {
-							this._resizeGrid(min_grid_rows);
+						if (grid_min_rows > this._grid_min_rows) {
+							this._resizeGrid(grid_min_rows);
 						}
 
 						this._new_widget_placeholder
