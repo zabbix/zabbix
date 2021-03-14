@@ -502,7 +502,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 					// Determine param type.
 					$params = $function_token->params_raw['parameters'];
-					if ($params[0]->type == CTriggerExprParserResult::TOKEN_TYPE_QUERY) {
+					if (!is_array($params[0]) && $params[0]->type == CTriggerExprParserResult::TOKEN_TYPE_QUERY) {
 						array_shift($params);
 					}
 
