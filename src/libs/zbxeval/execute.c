@@ -1283,7 +1283,7 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 	args = (0 == token->opt ? NULL : &output->values[output->values_num - token->opt]);
 
 	if (SUCCEED != ctx->function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
-			token->opt, args, &value, error))
+			token->opt, args, ctx->data_cb, &value, error))
 	{
 		return FAIL;
 	}
@@ -1532,15 +1532,17 @@ out:
  *                                                                            *
  * Purpose: initialize execution context                                      *
  *                                                                            *
- * Parameters: ctx   - [IN] the evaluation context                            *
- *             ts    - [IN] the timestamp of the execution time               *
+ * Parameters: ctx         - [IN] the evaluation context                      *
+ *             ts          - [IN] the timestamp of the execution time         *
  *             function_cb - [IN] the callback for function processing        *
+ *             data_cb     - [IN] the caller data to be passed to callbacks   *
  *                                                                            *
  ******************************************************************************/
 static void	eval_init_execute_context(zbx_eval_context_t *ctx, const zbx_timespec_t *ts,
-		zbx_eval_function_cb_t function_cb)
+		zbx_eval_function_cb_t function_cb, void *data_cb)
 {
 	ctx->function_cb = function_cb;
+	ctx->data_cb = data_cb;
 
 	if (NULL == ts)
 		ctx->ts.sec = ctx->ts.ns = 0;
@@ -1565,7 +1567,7 @@ static void	eval_init_execute_context(zbx_eval_context_t *ctx, const zbx_timespe
  ******************************************************************************/
 int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
-	eval_init_execute_context(ctx, ts, NULL);
+	eval_init_execute_context(ctx, ts, NULL, NULL);
 
 	return eval_execute(ctx, value, error);
 }
@@ -1591,9 +1593,9 @@ int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_vari
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_eval_function_cb_t function_cb,
-		zbx_variant_t *value, char **error)
+		void *data, zbx_variant_t *value, char **error)
 {
-	eval_init_execute_context(ctx, ts, function_cb);
+	eval_init_execute_context(ctx, ts, function_cb, data);
 
 	return eval_execute(ctx, value, error);
 }

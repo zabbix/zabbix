@@ -1340,4 +1340,25 @@ in:
   expression: '1 + ((/host/key,1d))'
 out:
   result: FAIL
+---
+test case: Succeed 'last(/host/key)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'last(/host/key)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 1}
+  result: SUCCEED
+---
+test case: Succeed 'last(/host/key,#1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'last(/host/key,#1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
+  result: SUCCEED
 ...

@@ -526,6 +526,45 @@ static int	eval_parse_time_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_t
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_parse_hnum_token                                            *
+ *                                                                            *
+ * Purpose: parse history num token (#N)                                      *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *             pos   - [IN] the starting position                             *
+ *             token - [OUT] the parsed token                                 *
+ *             error - [OUT] the error message in the case of failure         *
+ *                                                                            *
+ * Return value: SUCCEED - token was parsed successfully                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: History num token is the second argument of history functions    *
+ *           to specify the range in number of values.                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_parse_hnum_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
+{
+	const char	*ptr;
+
+	for (ptr = ctx->expression + pos + 1; 0 != isdigit((unsigned char)*ptr); ptr++)
+		;
+
+	if (ptr == ctx->expression + pos)
+	{
+		*error = zbx_dsprintf(*error, "invalid history number argument at \"%s\"", ctx->expression + pos);
+		return FAIL;
+	}
+
+	token->type = ZBX_EVAL_TOKEN_ARG_HNUM;
+	token->loc.l = pos;
+	token->loc.r = ptr - ctx->expression - 1;
+	zbx_variant_set_none(&token->value);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_parse_token                                                 *
  *                                                                            *
  * Purpose: parse token                                                       *
@@ -621,6 +660,13 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			ZBX_FALLTHROUGH;
 		case '.':
 			return eval_parse_number_token(ctx, pos, token, error);
+		case '#':
+			if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type &&
+				ZBX_EVAL_TOKEN_ARG_QUERY == ctx->stack.values[ctx->stack.values_num - 1].type)
+			{
+				return eval_parse_hnum_token(ctx, pos, token, error);
+			}
+			break;
 		case ',':
 			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION))
 			{
@@ -772,7 +818,8 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 			goto out;
 		}
 
-		if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx->last_token_type && ZBX_EVAL_TOKEN_COMMA != token.type)
+		if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx->last_token_type && ZBX_EVAL_TOKEN_COMMA != token.type &&
+				ZBX_EVAL_TOKEN_GROUP_CLOSE != token.type)
 		{
 			*error = zbx_dsprintf(*error, "invalid expression following query token at \"%s\"",
 					ctx->expression + pos);

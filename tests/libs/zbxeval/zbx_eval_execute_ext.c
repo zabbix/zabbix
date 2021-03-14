@@ -112,12 +112,13 @@ static void	mock_read_callbacks(const char *path)
 	}
 }
 
-static int 	callback_cb(const char *name, size_t len, int args_num, const zbx_variant_t *args,
+static int 	callback_cb(const char *name, size_t len, int args_num, const zbx_variant_t *args, void *data,
 		zbx_variant_t *value, char **error)
 {
 	int	i;
 
 	ZBX_UNUSED(args);
+	ZBX_UNUSED(data);
 
 	for (i = 0; i < callbacks.values_num; i++)
 	{
@@ -167,7 +168,7 @@ void	zbx_mock_test_entry(void **state)
 	mock_eval_read_values(&ctx, "in.replace");
 	mock_read_callbacks("in.callbacks");
 
-	returned_ret = zbx_eval_execute_ext(&ctx, NULL, callback_cb, &value, &error);
+	returned_ret = zbx_eval_execute_ext(&ctx, NULL, callback_cb, NULL, &value, &error);
 
 	if (SUCCEED != returned_ret)
 		printf("ERROR: %s\n", error);

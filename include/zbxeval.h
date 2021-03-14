@@ -73,6 +73,7 @@
 #define ZBX_EVAL_TOKEN_ARG_NULL		(29 | ZBX_EVAL_CLASS_OPERAND)
 #define ZBX_EVAL_TOKEN_ARG_RAW		(30 | ZBX_EVAL_CLASS_OPERAND)
 #define ZBX_EVAL_TOKEN_EXCEPTION	(31 | ZBX_EVAL_CLASS_FUNCTION)
+#define ZBX_EVAL_TOKEN_ARG_HNUM		(32 | ZBX_EVAL_CLASS_OPERAND)
 
 /* expression parsing rules */
 
@@ -122,6 +123,7 @@ typedef zbx_uint32_t zbx_token_type_t;
  *             len      - [IN] the function name length                       *
  *             args_num - [IN] the number of function arguments               *
  *             args     - [IN] an array of the function arguments.            *
+ *             data     - [IN] the caller data used for function evaluation   *
  *             value    - [OUT] the function return value                     *
  *             error    - [OUT] the error message if function failed          *
  *                                                                            *
@@ -130,7 +132,7 @@ typedef zbx_uint32_t zbx_token_type_t;
  *                                                                            *
  ******************************************************************************/
 typedef	int (*zbx_eval_function_cb_t)(const char *name, size_t len, int args_num, const zbx_variant_t *args,
-		zbx_variant_t *value, char **error);
+		void *data, zbx_variant_t *value, char **error);
 
 typedef struct
 {
@@ -154,6 +156,7 @@ typedef struct
 	zbx_vector_eval_token_t	stack;
 	zbx_vector_eval_token_t	ops;
 	zbx_eval_function_cb_t	function_cb;
+	void			*data_cb;
 }
 zbx_eval_context_t;
 
@@ -171,7 +174,7 @@ void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_u
 void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expression);
 int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
 int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_eval_function_cb_t function_cb,
-		zbx_variant_t *value, char **error);
+		void *data, zbx_variant_t *value, char **error);
 void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
 void	zbx_eval_get_functionids_ordered(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
 int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *hostids, int hostids_num,
@@ -197,4 +200,5 @@ void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const
 char	*zbx_eval_format_function_error(const char *function, const char *host, const char *key,
 		const char *parameter, const char *error);
 
+void	zbx_eval_extract_item_queries(zbx_eval_context_t *ctx, zbx_vector_str_t *queries);
 #endif
