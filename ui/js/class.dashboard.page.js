@@ -219,7 +219,9 @@ class CDashboardPage extends CBaseComponent {
 			const delta_y = Math.abs(reverse_y ? pos_variant.y - pos.y : pos_variant.height - pos.height);
 			const value = Math.sqrt(Math.pow(delta_x, 2) + Math.pow(delta_y, 2));
 
-			if (pos_best === null || (pos_best.width == 1 && pos_variant.width > 1) || value < pos_best_value) {
+			if (pos_best === null
+					|| (pos_best.width == 1 && pos_variant.width > 1)
+					|| ((pos_best.width > 1 === pos_variant.width > 1) && value < pos_best_value)) {
 				pos_best = {...pos_variant};
 				pos_best_value = value;
 			}
