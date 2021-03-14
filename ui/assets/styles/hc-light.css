@@ -1031,34 +1031,34 @@ footer {
       .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .msg-bad {
         margin: 0 10px; }
 
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-actions {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget-actions {
   opacity: 1; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode.dashbrd-positioning .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   transition: none; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-iterator.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode.dashbrd-positioning .dashbrd-grid-iterator.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   transition: none; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-widget-mask {
+.dashbrd.dashbrd-is-edit-mode.dashbrd-positioning .dashbrd-grid-widget-mask {
   display: block; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-iterator-mask {
+.dashbrd.dashbrd-is-edit-mode.dashbrd-positioning .dashbrd-grid-iterator-mask {
   display: block; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget .ui-resizable-handle {
   visibility: hidden; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.dashbrd-grid-widget-focus .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.dashbrd-grid-widget-focus .ui-resizable-handle {
   visibility: visible; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   margin-top: 0;
   height: 0;
   box-shadow: none; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging .ui-resizable-handle {
   visibility: hidden; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: .5; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging {
   z-index: 1000; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing::before, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging::before {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing::before, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging::before {
     content: '';
     display: block;
     position: absolute;
@@ -1068,32 +1068,32 @@ footer {
     bottom: .25rem;
     background-color: rgba(240, 240, 240, 0.75);
     box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-head {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-head, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-head {
     border-color: #909090; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-content, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-content {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-content, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-content {
     border-color: #909090; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .ui-resizable-handle {
   visibility: visible; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head {
   margin-top: 0;
   height: 0;
   box-shadow: none;
   opacity: 0; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .ui-resizable-handle {
   visibility: hidden; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: .5; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
   margin-top: -4rem;
   height: 4rem; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging {
   z-index: 1000; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing::before, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging::before {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing::before, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging::before {
     content: '';
     display: block;
     position: absolute;
@@ -1103,21 +1103,21 @@ footer {
     bottom: .25rem;
     background-color: rgba(240, 240, 240, 0.75);
     box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
     border-color: #909090; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head {
     border-color: #909090; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content {
     border-color: #909090; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div {
     border-color: #909090; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
     border: 1px solid #8b8b8b;
     border-top: 0; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget-placeholder {
   position: absolute;
   z-index: 999; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder > div {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget-placeholder > div {
     position: absolute;
     top: .25rem;
     left: .25rem;
@@ -6230,7 +6230,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashbrd-grid-widget-set-size .dashbrd-grid-new-widget-label::before {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -401px -888px; }
 
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
   border: 0; }
 
 .icon-maint {

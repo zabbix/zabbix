@@ -27,6 +27,9 @@ const DASHBOARD_PAGE_EVENT_EDIT = 'edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'widget-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'widget-copy';
 const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'widget-delete';
+const DASHBOARD_PAGE_EVENT_WIDGET_DRAG_START = 'widget-drag-start';
+const DASHBOARD_PAGE_EVENT_WIDGET_DRAG = 'widget-drag';
+const DASHBOARD_PAGE_EVENT_WIDGET_DRAG_END = 'widget-drag-end';
 const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'announce-widgets';
 const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'reserve-header-lines';
 
@@ -51,7 +54,7 @@ class CDashboardPage extends CBaseComponent {
 	}) {
 		super(document.createElement('div'));
 
-		this._dashboard_target = target;
+		this._dashboard_grid = target;
 
 		this._data = {
 			dashboard_pageid: data.dashboard_pageid,
@@ -84,6 +87,10 @@ class CDashboardPage extends CBaseComponent {
 		this._state = DASHBOARD_PAGE_STATE_INITIAL;
 
 		this._widgets = new Map();
+
+		if (this._is_edit_mode) {
+			this._initWidgetDragging();
+		}
 	}
 
 	_registerEvents() {
@@ -181,7 +188,7 @@ class CDashboardPage extends CBaseComponent {
 
 	isPosFree(pos) {
 		for (const widget of this._widgets.keys()) {
-			if (this._posOverlap(pos, widget.getPosition())) {
+			if (this._isOverlappingPos(pos, widget.getPosition())) {
 				return false;
 			}
 		}
@@ -194,8 +201,8 @@ class CDashboardPage extends CBaseComponent {
 
 		let pos_x = this._accommodatePosX({
 			...pos,
-			y: reverse_y ? pos.y + pos.height - 1 : pos.y,
-			height: 1
+			y: reverse_y ? pos.y + pos.height - this._widget_min_rows : pos.y,
+			height: this._widget_min_rows
 		}, {reverse: reverse_x});
 
 		pos_x = {...pos_x, y: pos.y, height: pos.height};
@@ -290,21 +297,24 @@ class CDashboardPage extends CBaseComponent {
 	 *
 	 * @returns {boolean}
 	 */
-	_posOverlap(pos_1, pos_2) {
+	_isOverlappingPos(pos_1, pos_2) {
 		return (
-			pos_1.x < (pos_2.x + pos_2.width)
-				&& (pos_1.x + pos_1.width) > pos_2.x
-				&& pos_1.y < (pos_2.y + pos_2.height)
-				&& (pos_1.y + pos_1.height) > pos_2.y
+			pos_1.x < (pos_2.x + pos_2.width) && (pos_1.x + pos_1.width) > pos_2.x
+				&& pos_1.y < (pos_2.y + pos_2.height) && (pos_1.y + pos_1.height) > pos_2.y
 		);
+	}
+
+	_isEqualPos(pos_1, pos_2) {
+		return (pos_1.x === pos_2.x && pos_1.y === pos_2.y
+			&& pos_1.width === pos_2.width && pos_1.height === pos_2.height);
 	}
 
 	getData() {
 		return this._data;
 	}
 
-	getNumWidgets() {
-		return this._widgets.size;
+	getWidgets() {
+		return Array.from(this._widgets.keys());
 	}
 
 	getWidget(unique_id) {
@@ -385,8 +395,12 @@ class CDashboardPage extends CBaseComponent {
 		this._state = DASHBOARD_PAGE_STATE_ACTIVE;
 
 		for (const widget of this._widgets.keys()) {
-			this._dashboard_target.appendChild(widget.getView());
+			this._dashboard_grid.appendChild(widget.getView());
 			this._activateWidget(widget);
+		}
+
+		if (this._is_edit_mode) {
+			this._activateWidgetDragging();
 		}
 	}
 
@@ -405,8 +419,12 @@ class CDashboardPage extends CBaseComponent {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
 
 		for (const widget of this._widgets.keys()) {
-			this._dashboard_target.removeChild(widget.getView());
+			this._dashboard_grid.removeChild(widget.getView());
 			this._deactivateWidget(widget);
+		}
+
+		if (this._is_edit_mode) {
+			this._dectivateWidgetDragging();
 		}
 	}
 
@@ -456,6 +474,12 @@ class CDashboardPage extends CBaseComponent {
 
 		for (const widget of this._widgets.keys()) {
 			widget.setEditMode();
+		}
+
+		this._initWidgetDragging();
+
+		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
+			this._activateWidgetDragging();
 		}
 	}
 
@@ -530,7 +554,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
-			this._dashboard_target.appendChild(widget.getView());
+			this._dashboard_grid.appendChild(widget.getView());
 			this._activateWidget(widget);
 		}
 
@@ -539,7 +563,7 @@ class CDashboardPage extends CBaseComponent {
 
 	deleteWidget(widget, {is_batch_mode = false} = {}) {
 		if (widget.getState() === WIDGET_STATE_ACTIVE) {
-			this._dashboard_target.removeChild(widget.getView());
+			this._dashboard_grid.removeChild(widget.getView());
 			this._deactivateWidget(widget);
 		}
 
@@ -570,5 +594,258 @@ class CDashboardPage extends CBaseComponent {
 		for (const widget of widgets) {
 			widget.announceWidgets(widgets);
 		}
+	}
+
+	_initWidgetDragging() {
+		const widget_helper = document.createElement('div');
+
+		widget_helper.classList.add('dashbrd-grid-widget-placeholder');
+		widget_helper.append(document.createElement('div'));
+
+		let dragging_widget = null;
+		let dragging_pos = null;
+		let drag_rel_x = null;
+		let drag_rel_y = null;
+
+		const showWidgetHelper = (pos) => {
+			this._dashboard_grid.prepend(widget_helper);
+
+			widget_helper.style.left = `${this._cell_width * pos.x}%`;
+			widget_helper.style.top = `${this._cell_height * pos.y}px`;
+			widget_helper.style.width = `${this._cell_width * pos.width}%`;
+			widget_helper.style.height = `${this._cell_height * pos.height}px`;
+		};
+
+		const hideWidgetHelper = () => {
+			widget_helper.remove();
+		};
+
+		const pullWidgetsUp = (widgets, max_delta) => {
+			do {
+				let widgets_below = [];
+
+				for (const widget of widgets) {
+					const data = this._widgets.get(widget);
+
+					for (let y = Math.max(0, data.pos.y - max_delta); y < data.pos.y; y++) {
+						const test_pos = {...data.pos, y};
+
+						if (isDataPosFree(test_pos, {except_widget: widget})) {
+							for (const [w, w_data] of this._widgets) {
+								if (w === widget || w === dragging_widget) {
+									continue;
+								}
+
+								if (this._isOverlappingPos(w_data.pos, {...data.pos, height: data.pos.height + 1})) {
+									widgets_below.push(w);
+								}
+							}
+
+							data.pos = test_pos;
+							break;
+						}
+					}
+				}
+
+				widgets = widgets_below;
+			}
+			while (widgets.length > 0);
+		};
+
+		const relocateWidget = (widget, pos) => {
+			if (pos.y + pos.height > this._max_rows) {
+				return false;
+			}
+
+			for (const [w, data] of this._widgets) {
+				if (w === widget || w === dragging_widget) {
+					continue;
+				}
+
+				if (this._isOverlappingPos(data.pos, pos)) {
+					const test_pos = {...data.pos, y: pos.y + pos.height};
+
+					if (!relocateWidget(w, test_pos)) {
+						return false;
+					}
+
+					data.pos = test_pos;
+				}
+			}
+
+			return true;
+		};
+
+		const isDataPosFree = (pos, {except_widget = null} = {}) => {
+			for (const [widget, data] of this._widgets) {
+				if (widget === except_widget || widget === dragging_widget) {
+					continue;
+				}
+
+				if (this._isOverlappingPos(data.pos, pos)) {
+					return false;
+				}
+			}
+
+			return true;
+		};
+
+		const allocatePos = (widget, pos) => {
+			for (const [w, w_data] of this._widgets) {
+				w_data.pos = w_data.original_pos;
+			}
+
+			const data = this._widgets.get(widget);
+			const original_pos = data.original_pos;
+
+			let widgets_below = [];
+
+			for (const [w, w_data] of this._widgets) {
+				if (w === widget || w === dragging_widget) {
+					continue;
+				}
+
+				if (this._isOverlappingPos(w_data.pos, {...original_pos, height: original_pos.height + 1})) {
+					widgets_below.push(w);
+				}
+			}
+
+			pullWidgetsUp(widgets_below, original_pos.height);
+
+			const result = relocateWidget(widget, pos);
+
+			for (const [w, w_data] of this._widgets) {
+				if (result && w !== widget) {
+					w.setPosition(w_data.pos);
+				}
+
+				delete w_data.pos;
+			}
+
+			return result;
+		};
+
+		const events = {
+			mouseDown: (e) => {
+				dragging_widget = null;
+
+				for (const widget of this._widgets.keys()) {
+					const widget_view = widget.getView();
+
+					if (widget_view.querySelector(`.${widget.getCssClass('head')}`).contains(e.target)
+							&& !widget_view.querySelector(`.${widget.getCssClass('actions')}`).contains(e.target)) {
+						dragging_widget = widget;
+						break;
+					}
+				}
+
+				if (dragging_widget === null) {
+					return;
+				}
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DRAG_START);
+
+				dragging_pos = dragging_widget.getPosition();
+
+				for (const [widget, data] of this._widgets) {
+					data.original_pos = widget.getPosition();
+				}
+
+				const widget_view = dragging_widget.getView();
+				const widget_view_computed_style = getComputedStyle(widget_view);
+
+				widget_view.classList.add('ui-draggable-dragging');
+
+				drag_rel_x = parseInt(widget_view_computed_style.getPropertyValue('left')) - e.clientX;
+				drag_rel_y = parseInt(widget_view_computed_style.getPropertyValue('top')) - e.clientY
+					- document.querySelector('.wrapper').scrollTop;
+
+				document.addEventListener('mouseup', events.mouseUp, {passive: false});
+				document.addEventListener('mousemove', events.mouseMove);
+				this._dashboard_grid.removeEventListener('mousemove', events.mouseMove);
+
+				e.preventDefault();
+			},
+
+			mouseUp: (e) => {
+				dragging_widget.getView().classList.remove('ui-draggable-dragging');
+				dragging_widget.setPosition(dragging_pos);
+				hideWidgetHelper();
+
+				dragging_widget = null;
+				dragging_pos = null;
+				drag_rel_x = null;
+				drag_rel_y = null;
+
+				for (const data of this._widgets.values()) {
+					delete data.original_position;
+				}
+
+				document.removeEventListener('mouseup', events.mouseUp);
+				document.removeEventListener('mousemove', events.mouseMove);
+				this._dashboard_grid.addEventListener('mousemove', events.mouseMove);
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DRAG_END);
+			},
+
+			mouseMove: (e) => {
+				if (dragging_widget === null) {
+					return;
+				}
+
+				const grid_rect = this._dashboard_grid.getBoundingClientRect();
+
+				const widget_pos = dragging_widget.getPosition();
+				const widget_view = dragging_widget.getView();
+				const widget_view_rect = widget_view.getBoundingClientRect();
+
+				const pos_left = Math.max(0, Math.min(grid_rect.width - widget_view_rect.width, e.pageX + drag_rel_x));
+				const pos_top = Math.max(0, Math.min(grid_rect.height - widget_view_rect.height,
+					e.pageY + drag_rel_y + document.querySelector('.wrapper').scrollTop
+				));
+
+				widget_view.style.left = `${pos_left}px`;
+				widget_view.style.top = `${pos_top}px`;
+
+				const pos = this._getGridPos({
+					x: pos_left,
+					y: pos_top,
+					width: widget_pos.width,
+					height: widget_pos.height
+				});
+
+				if (!this._isEqualPos(pos, dragging_pos)) {
+					if (allocatePos(dragging_widget, pos)) {
+						dragging_pos = pos;
+						showWidgetHelper(dragging_pos);
+
+						this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DRAG, {pos: dragging_pos});
+					}
+				}
+			}
+		};
+
+		this._dashboard_grid.addEventListener('mousedown', events.mouseDown, {passive: false});
+		this._dashboard_grid.addEventListener('mousemove', events.mouseMove);
+	}
+
+	_activateWidgetDragging() {
+	}
+
+	_deactivateWidgetDragging() {
+	}
+
+	_getGridPos({x, y, width, height}) {
+		const rect = this._dashboard_grid.getBoundingClientRect();
+
+		const pos_x = parseInt(x / rect.width * this._max_columns + 0.5);
+		const pos_y = parseInt(y / this._cell_height + 0.5);
+
+		return {
+			x: Math.max(0, Math.min(this._max_columns - width, pos_x)),
+			y: Math.max(0, Math.min(this._max_rows - height, pos_y)),
+			width,
+			height
+		};
 	}
 }

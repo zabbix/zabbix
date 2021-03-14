@@ -372,7 +372,7 @@ $dashboard-my-bg-color: #e0e0e0;
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
+.dashbrd.dashbrd-is-edit-mode {
 	.dashbrd-grid-widget {
 		&.ui-draggable-dragging {
 			&.dashbrd-grid-widget-hidden-header {

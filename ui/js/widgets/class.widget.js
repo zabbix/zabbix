@@ -119,6 +119,10 @@ class CWidget extends CBaseComponent {
 		this._storage = {};
 	}
 
+	getCssClass(name) {
+		return this._css_classes[name];
+	}
+
 	start() {
 		if (this._state !== WIDGET_STATE_INITIAL) {
 			throw new Error('Unsupported state change.');
@@ -278,6 +282,27 @@ class CWidget extends CBaseComponent {
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this._stopUpdating();
 		}
+
+		this._target.classList.add('ui-draggable', 'ui-resizable');
+	}
+
+	_setEditModeStyle() {
+
+//		const handles = {};
+
+//		for (const direction of ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw']) {
+//			const $handle = $('<div>').addClass('ui-resizable-handle').addClass(`ui-resizable-${direction}`);
+
+//			if (['n', 'e', 's', 'w'].includes(direction)) {
+//				$handle
+//					.append($('<div>', {'class': 'ui-resize-dot'}))
+//					.append($('<div>', {'class': `ui-resizable-border-${direction}`}));
+//			}
+
+//			this._$target.append($handle);
+//			handles[direction] = $handle;
+//		}
+
 	}
 
 	getUniqueId() {
@@ -766,6 +791,8 @@ class CWidget extends CBaseComponent {
 		this._$target
 			.append(this._$container, this._$mask)
 			.addClass(this._css_classes.root)
+			.toggleClass('ui-draggable', this._is_edit_mode)
+			.toggleClass('ui-resizable', this._is_edit_mode)
 			.toggleClass(this._css_classes.hidden_header, this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 			.toggleClass('new-widget', this._is_new);
 
