@@ -277,9 +277,7 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 		const zbx_eval_token_t *token)
 {
 	int		quoted = 0, check_value = 0;
-	const char	*src, *value_str;
-	char		*dst;
-	size_t		size;
+	const char	*value_str;
 
 	if (ZBX_VARIANT_NONE == token->value.type)
 		return;
@@ -332,55 +330,9 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	value_str = zbx_variant_value_desc(&token->value);
 
 	if (0 == quoted)
-	{
 		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
-		return;
-	}
-
-	for (size = 2, src = value_str; '\0' != *src; src++)
-	{
-		switch (*src)
-		{
-			case '\\':
-			case '"':
-				size++;
-		}
-		size++;
-	}
-
-	if (*str_alloc <= *str_offset + size)
-	{
-		if (0 == *str_alloc)
-			*str_alloc = size;
-
-		do
-		{
-			*str_alloc *= 2;
-		}
-		while (*str_alloc - *str_offset <= size);
-
-		*str = zbx_realloc(*str, *str_alloc);
-	}
-
-	dst = *str + *str_offset;
-	*dst++ = '"';
-
-	for (src = value_str; '\0' != *src; src++, dst++)
-	{
-		switch (*src)
-		{
-			case '\\':
-			case '"':
-				*dst++ = '\\';
-				break;
-		}
-
-		*dst = *src;
-	}
-
-	*dst++ = '"';
-	*dst = '\0';
-	*str_offset += size;
+	else
+		zbx_strquote_alloc(str, str_alloc, str_offset, value_str);
 }
 
 /******************************************************************************

@@ -124,6 +124,7 @@ typedef zbx_uint32_t zbx_token_type_t;
  *             args_num - [IN] the number of function arguments               *
  *             args     - [IN] an array of the function arguments.            *
  *             data     - [IN] the caller data used for function evaluation   *
+ *             ts       - [IN] the function execution time                    *
  *             value    - [OUT] the function return value                     *
  *             error    - [OUT] the error message if function failed          *
  *                                                                            *
@@ -132,7 +133,7 @@ typedef zbx_uint32_t zbx_token_type_t;
  *                                                                            *
  ******************************************************************************/
 typedef	int (*zbx_eval_function_cb_t)(const char *name, size_t len, int args_num, const zbx_variant_t *args,
-		void *data, zbx_variant_t *value, char **error);
+		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
 
 typedef struct
 {

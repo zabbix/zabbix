@@ -1361,4 +1361,38 @@ out:
   - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
   result: SUCCEED
+---
+test case: Succeed 'count(//trap[1],#5,,0)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'count(//trap[1],#5,,0)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
+---
+test case: Succeed 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h ","1 ")'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h","1")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/Trapper/trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '5m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1h"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
+  result: SUCCEED
 ...
+
+

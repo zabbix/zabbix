@@ -1276,21 +1276,21 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 
 	if (NULL == ctx->function_cb)
 	{
-		*error = zbx_dsprintf(*error, "unknown function at \"%s\"", ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "Unknown function at \"%s\".", ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
 	args = (0 == token->opt ? NULL : &output->values[output->values_num - token->opt]);
 
 	if (SUCCEED != ctx->function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
-			token->opt, args, ctx->data_cb, &value, error))
+			token->opt, args, ctx->data_cb, &ctx->ts, &value, error))
 	{
 		return FAIL;
 	}
 
 	if (ZBX_VARIANT_ERR == value.type && 0 == (ctx->rules & ZBX_EVAL_PROCESS_ERROR))
 	{
-		*error = zbx_dsprintf(*error, "%s at \"%s\"", value.data.err, ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "%s at \"%s\".", value.data.err, ctx->expression + token->loc.l);
 		zbx_variant_clear(&value);
 		return FAIL;
 	}
@@ -1466,6 +1466,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 					break;
 				case ZBX_EVAL_TOKEN_ARG_QUERY:
 				case ZBX_EVAL_TOKEN_ARG_TIME:
+				case ZBX_EVAL_TOKEN_ARG_HNUM:
 					if (SUCCEED != eval_execute_push_value(ctx, token, &output, error))
 						goto out;
 					break;
