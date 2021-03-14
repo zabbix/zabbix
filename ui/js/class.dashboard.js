@@ -1079,6 +1079,14 @@ class CDashboard extends CBaseComponent {
 						this._new_widget_placeholder_pos, {reverse_x, reverse_y}
 					);
 
+					const min_grid_rows = Math.min(this._max_rows,
+						this._new_widget_placeholder_pos.y + this._new_widget_placeholder_pos.height + 2
+					);
+
+					if (min_grid_rows > this._grid_min_rows) {
+						this._resizeGrid(min_grid_rows);
+					}
+
 					this._new_widget_placeholder
 						.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
 						.showAtPosition(this._new_widget_placeholder_pos);
@@ -1126,11 +1134,12 @@ class CDashboard extends CBaseComponent {
 					}
 
 					if (this._new_widget_placeholder_pos !== null) {
-						if (this._new_widget_placeholder_pos.y + this._new_widget_placeholder_pos.height
-								> this._grid_min_rows) {
-							this._resizeGrid(this._new_widget_placeholder_pos.y
-								+ this._new_widget_placeholder_pos.height + 1
-							);
+						const min_grid_rows = Math.min(this._max_rows,
+							this._new_widget_placeholder_pos.y + this._new_widget_placeholder_pos.height + 2
+						);
+
+						if (min_grid_rows > this._grid_min_rows) {
+							this._resizeGrid(min_grid_rows);
 						}
 
 						this._new_widget_placeholder
@@ -1163,6 +1172,7 @@ class CDashboard extends CBaseComponent {
 
 		document.querySelector('.wrapper').addEventListener('scroll', events.wrapperScroll);
 	}
+
 
 	_getGridEventPos(e, width, height) {
 		const rect = this._containers.grid.getBoundingClientRect();
