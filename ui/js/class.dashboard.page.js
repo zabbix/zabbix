@@ -564,7 +564,7 @@ class CDashboardPage extends CBaseComponent {
 		let widgets = [];
 
 		for (const dashboard_page of dashboard_pages) {
-			widgets = widgets.concat(dashboard_page._widgets);
+			widgets = widgets.concat(Array.from(dashboard_page._widgets.keys()));
 		}
 
 		for (const widget of widgets) {

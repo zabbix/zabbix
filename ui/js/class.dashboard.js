@@ -22,6 +22,7 @@ const ZBX_STYLE_DASHBRD_IS_MULTIPAGE = 'dashbrd-is-multipage';
 const ZBX_STYLE_DASHBRD_IS_EDIT_MODE = 'dashbrd-is-edit-mode';
 const ZBX_STYLE_DASHBRD_NAVIGATION_IS_SCROLLABLE = 'is-scrollable';
 const ZBX_STYLE_DASHBRD_SELECTED_TAB = 'selected-tab';
+const ZBX_STYLE_DASHBRD_POSITIONING = 'dashbrd-positioning';
 
 const DASHBOARD_STATE_INITIAL = 'initial';
 const DASHBOARD_STATE_ACTIVE = 'active';
@@ -717,7 +718,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_announceWidgets() {
-		const dashboard_pages = this._dashboard_pages.keys();
+		const dashboard_pages = Array.from(this._dashboard_pages.keys());
 
 		for (const dashboard_page of dashboard_pages) {
 			dashboard_page.announceWidgets(dashboard_pages);
