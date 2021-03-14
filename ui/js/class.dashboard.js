@@ -89,14 +89,6 @@ class CDashboard extends CBaseComponent {
 
 		this._init();
 		this._registerEvents();
-
-		if (!this._is_kiosk_mode) {
-			this._registerTabsEvents();
-		}
-
-		if (this._is_edit_mode) {
-			this._registerPlaceholderEvents();
-		}
 	}
 
 	_init() {
@@ -121,47 +113,18 @@ class CDashboard extends CBaseComponent {
 		this._is_edit_widget_properties_cancel_subscribed = false;
 
 		if (!this._is_kiosk_mode) {
-			this._initTabs();
+			const sortable = document.createElement('div');
+
+			this._containers.navigation_tabs.appendChild(sortable);
+
+			this._tabs = new CSortable(sortable, {is_vertical: false});
+			this._tabs_dashboard_pages = new Map();
+
+			this._registerTabsEvents();
 		}
 
-		this._initNewWidgetPlaceholder();
-	}
-
-	_initTabs() {
-		const sortable = document.createElement('div');
-
-		this._containers.navigation_tabs.appendChild(sortable);
-
-		this._tabs = new CSortable(sortable, {is_vertical: false});
-		this._tabs_dashboard_pages = new Map();
-	}
-
-	_initNewWidgetPlaceholder() {
-		this._new_widget_placeholder = new CDashboardWidgetPlaceholder(this._cell_width, this._cell_height);
-		this._new_widget_placeholder_pos = null;
-		this._new_widget_placeholder_clicked_pos = null;
-
-		this._containers.grid.appendChild(this._new_widget_placeholder.getNode());
-	}
-
-	_resetNewWidgetPlaceholder() {
-		this._new_widget_placeholder_pos = null;
-		this._new_widget_placeholder_clicked_pos = null;
-
-		if (this._is_editable) {
-			if (this._is_kiosk_mode) {
-				this._new_widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_KIOSK_MODE);
-			}
-			else {
-				this._new_widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW);
-			}
-		}
-		else {
-			this._new_widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_READONLY);
-		}
-
-		if (this._selected_dashboard_page.getNumWidgets() == 0) {
-			this._new_widget_placeholder.showAtDefaultPosition();
+		if (this._is_edit_mode) {
+			this._initWidgetPlaceholder();
 		}
 	}
 
@@ -172,14 +135,13 @@ class CDashboard extends CBaseComponent {
 
 		this._state = DASHBOARD_STATE_ACTIVE;
 
-		if (this._is_edit_mode) {
-			this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
-		}
-
 		this._selectDashboardPage(this._dashboard_pages.keys().next().value);
 		this._announceWidgets();
 
-		this._resetNewWidgetPlaceholder();
+		if (this._is_edit_mode) {
+			this._activateWidgetPlaceholder();
+			this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+		}
 	}
 
 	getData() {
@@ -232,7 +194,8 @@ class CDashboard extends CBaseComponent {
 	setEditMode() {
 		this._is_edit_mode = true;
 
-		this._registerPlaceholderEvents();
+		this._initWidgetPlaceholder();
+		this._activateWidgetPlaceholder();
 
 		for (const dashboard_page of this._dashboard_pages.keys()) {
 			if (!dashboard_page.isEditMode()) {
@@ -459,7 +422,7 @@ class CDashboard extends CBaseComponent {
 					});
 			})
 			.then(() => {
-				this._resetNewWidgetPlaceholder();
+				this._resetWidgetPlaceholder();
 			})
 			.catch((error) => {
 				for (const el of form.parentNode.children) {
@@ -478,7 +441,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_cancelEditingWidgetProperties() {
-		this._resetNewWidgetPlaceholder();
+		this._resetWidgetPlaceholder();
 	}
 
 	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
@@ -818,7 +781,10 @@ class CDashboard extends CBaseComponent {
 
 	_resize() {
 		this._resizeGrid();
-		this._new_widget_placeholder.resize();
+
+		if (this._is_edit_mode) {
+			this._widget_placeholder.resize();
+		}
 
 		for (const dashboard_page of this._dashboard_pages.keys()) {
 			dashboard_page.resize();
@@ -1005,32 +971,32 @@ class CDashboard extends CBaseComponent {
 		this._buttons.next_page.addEventListener('click', events.nextPageClick);
 	}
 
-	_registerPlaceholderEvents() {
-		const events = {
-			newWidgetPlaceholderMouseDown: (e) => {
-				if (this._new_widget_placeholder_pos === null) {
+	_initWidgetPlaceholder() {
+		this._widget_placeholder_events = {
+			mouseDown: (e) => {
+				if (this._widget_placeholder_pos === null) {
 					return;
 				}
 
-				this._new_widget_placeholder_clicked_pos = this._new_widget_placeholder_pos;
+				this._widget_placeholder_clicked_pos = this._widget_placeholder_pos;
 
-				this._new_widget_placeholder
+				this._widget_placeholder
 					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
-					.showAtPosition(this._new_widget_placeholder_clicked_pos);
+					.showAtPosition(this._widget_placeholder_clicked_pos);
 
 				e.preventDefault();
 
-				this._containers.grid.removeEventListener('mousemove', events.mouseMove);
-				document.addEventListener('mousemove', events.mouseMove);
-				document.addEventListener('mouseup', events.documentMouseUp);
+				this._containers.grid.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+				document.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+				document.addEventListener('mouseup', this._widget_placeholder_events.mouseUp);
 			},
 
-			documentMouseUp: (e) => {
-				document.removeEventListener('mousemove', events.mouseMove);
-				this._containers.grid.addEventListener('mousemove', events.mouseMove);
-				document.removeEventListener('mouseup', events.documentMouseUp);
+			mouseUp: (e) => {
+				document.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+				this._containers.grid.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+				document.removeEventListener('mouseup', this._widget_placeholder_events.mouseUp);
 
-				const new_widget_pos = {...this._new_widget_placeholder_pos};
+				const new_widget_pos = {...this._widget_placeholder_pos};
 
 				if (new_widget_pos.width == 2 && new_widget_pos.height == this._widget_min_rows) {
 					delete new_widget_pos.width;
@@ -1041,69 +1007,69 @@ class CDashboard extends CBaseComponent {
 			},
 
 			mouseMove: (e) => {
-				if (this._new_widget_placeholder_clicked_pos !== null) {
+				if (this._widget_placeholder_clicked_pos !== null) {
 					let event_pos = this._getGridEventPos(e, 1, 1);
 					let reverse_x = false;
 					let reverse_y = false;
 
-					this._new_widget_placeholder_pos = {};
+					this._widget_placeholder_pos = {};
 
-					if (event_pos.x >= this._new_widget_placeholder_clicked_pos.x) {
-						this._new_widget_placeholder_pos.x = this._new_widget_placeholder_clicked_pos.x;
-						this._new_widget_placeholder_pos.width = Math.max(
-							this._new_widget_placeholder_clicked_pos.width,
-							event_pos.x - this._new_widget_placeholder_clicked_pos.x + 1
+					if (event_pos.x >= this._widget_placeholder_clicked_pos.x) {
+						this._widget_placeholder_pos.x = this._widget_placeholder_clicked_pos.x;
+						this._widget_placeholder_pos.width = Math.max(
+							this._widget_placeholder_clicked_pos.width,
+							event_pos.x - this._widget_placeholder_clicked_pos.x + 1
 						);
 					}
 					else {
-						this._new_widget_placeholder_pos.x = event_pos.x;
-						this._new_widget_placeholder_pos.width = this._new_widget_placeholder_clicked_pos.x
-							- event_pos.x + this._new_widget_placeholder_clicked_pos.width;
+						this._widget_placeholder_pos.x = event_pos.x;
+						this._widget_placeholder_pos.width = this._widget_placeholder_clicked_pos.x
+							- event_pos.x + this._widget_placeholder_clicked_pos.width;
 						reverse_x = true;
 					}
 
-					if (event_pos.y >= this._new_widget_placeholder_clicked_pos.y) {
-						this._new_widget_placeholder_pos.y = this._new_widget_placeholder_clicked_pos.y;
-						this._new_widget_placeholder_pos.height = Math.max(
-							this._new_widget_placeholder_clicked_pos.height,
-							event_pos.y - this._new_widget_placeholder_clicked_pos.y + 1
+					if (event_pos.y >= this._widget_placeholder_clicked_pos.y) {
+						this._widget_placeholder_pos.y = this._widget_placeholder_clicked_pos.y;
+						this._widget_placeholder_pos.height = Math.max(
+							this._widget_placeholder_clicked_pos.height,
+							event_pos.y - this._widget_placeholder_clicked_pos.y + 1
 						);
-						this._new_widget_placeholder_pos.height = Math.min(this._widget_max_rows,
-							this._new_widget_placeholder_pos.height
+						this._widget_placeholder_pos.height = Math.min(this._widget_max_rows,
+							this._widget_placeholder_pos.height
 						);
 					}
 					else {
-						this._new_widget_placeholder_pos.y = event_pos.y;
-						this._new_widget_placeholder_pos.height = this._new_widget_placeholder_clicked_pos.y
-							- event_pos.y + this._new_widget_placeholder_clicked_pos.height;
+						this._widget_placeholder_pos.y = event_pos.y;
+						this._widget_placeholder_pos.height = this._widget_placeholder_clicked_pos.y
+							- event_pos.y + this._widget_placeholder_clicked_pos.height;
 						reverse_y = true;
 
-						const delta_y = this._new_widget_placeholder_pos.height - this._widget_max_rows;
+						const delta_y = this._widget_placeholder_pos.height - this._widget_max_rows;
 
 						if (delta_y > 0) {
-							this._new_widget_placeholder_pos.y += delta_y;
-							this._new_widget_placeholder_pos.height -= delta_y;
+							this._widget_placeholder_pos.y += delta_y;
+							this._widget_placeholder_pos.height -= delta_y;
 						}
 					}
 
-					this._new_widget_placeholder_pos = this._selected_dashboard_page.accommodatePos(
-						this._new_widget_placeholder_pos, {reverse_x, reverse_y}
+					this._widget_placeholder_pos = this._selected_dashboard_page.accommodatePos(
+						this._widget_placeholder_pos, {reverse_x, reverse_y}
 					);
 
 					const grid_min_rows = Math.min(this._max_rows,
-						this._new_widget_placeholder_pos.y + this._new_widget_placeholder_pos.height + 2
+						this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
 					);
 
 					if (grid_min_rows > this._grid_min_rows) {
 						this._resizeGrid(grid_min_rows);
 					}
 
-					this._new_widget_placeholder
+					this._widget_placeholder
 						.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
-						.showAtPosition(this._new_widget_placeholder_pos);
+						.showAtPosition(this._widget_placeholder_pos);
 				}
 				else {
-					this._new_widget_placeholder_pos = null;
+					this._widget_placeholder_pos = null;
 
 					const event_pos_1x1 = this._getGridEventPos(e, 1, 1);
 
@@ -1127,63 +1093,107 @@ class CDashboard extends CBaseComponent {
 
 									if (this._selected_dashboard_page._posOverlap(pos, event_pos_1x1)) {
 										if (this._selected_dashboard_page.isPosFree(pos)) {
-											this._new_widget_placeholder_pos = pos;
+											this._widget_placeholder_pos = pos;
 											break;
 										}
 									}
 								}
 
-								if (this._new_widget_placeholder_pos !== null) {
+								if (this._widget_placeholder_pos !== null) {
 									break;
 								}
 							}
 
-							if (this._new_widget_placeholder_pos !== null) {
+							if (this._widget_placeholder_pos !== null) {
 								break;
 							}
 						}
 					}
 
-					if (this._new_widget_placeholder_pos !== null) {
+					if (this._widget_placeholder_pos !== null) {
 						const grid_min_rows = Math.min(this._max_rows,
-							this._new_widget_placeholder_pos.y + this._new_widget_placeholder_pos.height + 2
+							this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
 						);
 
 						if (grid_min_rows > this._grid_min_rows) {
 							this._resizeGrid(grid_min_rows);
 						}
 
-						this._new_widget_placeholder
+						this._widget_placeholder
 							.setState(WIDGET_PLACEHOLDER_STATE_POSITIONING)
-							.showAtPosition(this._new_widget_placeholder_pos);
+							.showAtPosition(this._widget_placeholder_pos);
 					}
 					else {
-						this._new_widget_placeholder.hide();
+						this._widget_placeholder.hide();
 					}
 				}
 			},
 
 			mouseLeave: (e) => {
-				if (this._new_widget_placeholder_clicked_pos === null) {
-					this._resetNewWidgetPlaceholder();
+				if (this._widget_placeholder_clicked_pos === null) {
+					this._resetWidgetPlaceholder();
 				}
 			},
 
-			wrapperScroll: (e) => {
+			scroll: (e) => {
 				if (e.target.scrollTop == 0) {
 					this._resizeGrid(0);
 				}
 			}
 		}
 
-		this._new_widget_placeholder.on('mousedown', events.newWidgetPlaceholderMouseDown);
+		this._widget_placeholder = new CDashboardWidgetPlaceholder(this._cell_width, this._cell_height);
+		this._widget_placeholder_pos = null;
+		this._widget_placeholder_clicked_pos = null;
 
-		this._containers.grid.addEventListener('mousemove', events.mouseMove);
-		this._containers.grid.addEventListener('mouseleave', events.mouseLeave);
-
-		document.querySelector('.wrapper').addEventListener('scroll', events.wrapperScroll);
+		this._containers.grid.appendChild(this._widget_placeholder.getNode());
 	}
 
+	_activateWidgetPlaceholder() {
+		this._widget_placeholder.on('mousedown', this._widget_placeholder_events.mouseDown);
+
+		this._containers.grid.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+		this._containers.grid.addEventListener('mouseleave', this._widget_placeholder_events.mouseLeave);
+
+		document.querySelector('.wrapper').addEventListener('scroll', this._widget_placeholder_events.scroll);
+
+		this._resetWidgetPlaceholder();
+	}
+
+	_deactivateWidgetPlaceholder() {
+		this._widget_placeholder.off('mousedown', this._widget_placeholder_events.mouseDown);
+
+		this._containers.grid.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+		this._containers.grid.removeEventListener('mouseleave', this._widget_placeholder_events.mouseLeave);
+
+		document.querySelector('.wrapper').removeEventListener('scroll', this._widget_placeholder_events.scroll);
+
+		document.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+		document.removeEventListener('mouseup', this._widget_placeholder_events.mouseUp);
+
+		this._widget_placeholder.hide();
+	}
+
+	_resetWidgetPlaceholder() {
+		this._widget_placeholder_pos = null;
+		this._widget_placeholder_clicked_pos = null;
+
+		if (this._is_editable) {
+			if (this._is_kiosk_mode) {
+				this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_KIOSK_MODE);
+			}
+			else {
+				this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW);
+			}
+		}
+		else {
+			this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_READONLY);
+		}
+
+		if (this._selected_dashboard_page.getNumWidgets() == 0) {
+			this._widget_placeholder.showAtDefaultPosition();
+		}
+	}
 
 	_getGridEventPos(e, width, height) {
 		const rect = this._containers.grid.getBoundingClientRect();
