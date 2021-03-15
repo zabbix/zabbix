@@ -713,8 +713,8 @@ class testFormAction extends CLegacyWebTest {
 				case 'Triggers':
 				case 'Discovery':
 				case 'Autoregistration':
-					$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operation-select'));
-					$this->zbxTestDropdownSelectWait('operation[operationtype]', $new_operation_operationtype);
+					$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operationtype'));
+					$this->zbxTestDropdownSelectWait('operation-type-select', $new_operation_operationtype);
 					COverlayDialogElement::find()->one()->waitUntilReady();
 					break;
 				case 'Internal':
@@ -802,10 +802,10 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['new_operation_operationtype']) && $eventsource != 'Internal') {
 			$this->zbxTestTextPresent('Operations');
-			$this->zbxTestAssertVisibleXpath('//z-select[@name=\'operation[operationtype]\']');
+			$this->zbxTestAssertVisibleXpath('//z-select[@id=\'operation-type-select\']');
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath('//z-select[@name=\'operation[operationtype]\']');
+			$this->zbxTestAssertElementNotPresentXpath('//z-select[@id=\'operation-type-select\']');
 		}
 
 		if (isset($data['operationtype'])) {
@@ -1179,7 +1179,7 @@ class testFormAction extends CLegacyWebTest {
 		// Check available operation types depending on event source and the selected operation type.
 		$message_types = ($eventsource === 'Triggers') ? ['Send message', 'Reboot', 'Selenium script'] :
 				['Send message', 'Notify all involved'];
-		$this->zbxTestDropdownHasOptions('operation[operationtype]', $message_types);
+		$this->zbxTestDropdownHasOptions('operation-type-select', $message_types);
 		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
 		$this->assertFalse($operation_details->getField('Custom message')->getValue());
@@ -1487,7 +1487,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
 			if ($data['eventsource']!= EVENT_SOURCE_INTERNAL){
-				$this->zbxTestDropdownSelectWait('operation[operationtype]', $operation['type']);
+				$this->zbxTestDropdownSelectWait('operation-type-select', $operation['type']);
 			}
 				switch ($operation['type']) {
 					case 'Send message':
@@ -1597,7 +1597,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
-		$this->zbxTestDropdownSelectWait('operation[operationtype]', 'Reboot');
+		$this->zbxTestDropdownSelectWait('operation-type-select', 'Reboot');
 
 // add target current host
 		$this->zbxTestCheckboxSelect('operation-command-chst');
@@ -1630,7 +1630,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
 		$this->zbxTestInputTypeOverwrite('operation_esc_step_to', '2');
-		$this->zbxTestDropdownSelectWait('operation[operationtype]', 'Reboot');
+		$this->zbxTestDropdownSelectWait('operation-type-select', 'Reboot');
 		$this->zbxTestCheckboxSelect('operation-command-chst');
 
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
