@@ -3643,6 +3643,9 @@ z-select[disabled] button,
   height: 24px;
   background: url("../img/icon-sprite.svg?20200407") no-repeat -6px -762px; }
 
+.ui-draggable:not(.ui-draggable-dragging) {
+  transition: top .1s, left .1s; }
+
 .icon-info {
   position: relative;
   width: 8px;
@@ -5049,10 +5052,10 @@ span.is-loading {
   cursor: move;
   cursor: grab; }
 
-.ui-draggable-dragging .drag-icon,
-.ui-draggable-dragging .dashbrd-widget-head,
-.ui-draggable-dragging .dashbrd-grid-widget-head,
-.ui-draggable-dragging .dashbrd-grid-iterator-head, .cursor-dragging {
+.ui-draggable .drag-icon,
+.ui-draggable .dashbrd-widget-head,
+.ui-draggable .dashbrd-grid-widget-head,
+.ui-draggable .dashbrd-grid-iterator-head, .cursor-dragging {
   cursor: move;
   cursor: grabbing; }
 

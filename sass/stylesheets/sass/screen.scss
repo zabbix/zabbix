@@ -2681,12 +2681,18 @@ $form-icon-btn: (
 	@extend %cursor-drag;
 }
 
-.ui-draggable-dragging {
+.ui-draggable {
 	.drag-icon,
 	.dashbrd-widget-head,
 	.dashbrd-grid-widget-head,
 	.dashbrd-grid-iterator-head {
 		@extend %cursor-dragging;
+	}
+
+	@if $ui-transitions {
+		&:not(.ui-draggable-dragging) {
+			transition: top .1s, left .1s;
+		}
 	}
 }
 
