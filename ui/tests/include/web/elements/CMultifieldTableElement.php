@@ -176,9 +176,17 @@ class CMultifieldTableElement extends CTableElement {
 					$pos = strrpos($value, '[');
 					if ($pos !== false) {
 						$name = substr($value, $pos + 1, -1);
+						if (is_numeric($name)) {
+							$value = substr($value, 0, $pos);
+							$pos = strrpos($value, '[');
+
+							if ($pos !== false) {
+								$name = substr($value, $pos + 1, -1);
+							}
+						}
 					}
 
-					if (!$name) {
+					if (!$name || is_numeric($name)) {
 						$name = $label;
 					}
 				}
@@ -200,7 +208,7 @@ class CMultifieldTableElement extends CTableElement {
 		}
 
 		return $result;
-	}
+		}
 
 	/**
 	 * Get controls from row.
@@ -436,12 +444,12 @@ class CMultifieldTableElement extends CTableElement {
 			$data = [$data];
 		}
 
+		if ($this->mapping === null) {
+			$this->mapping = $this->detectFieldMapping();
+		}
+
 		$rows = $this->getRows()->count();
 		if (count($data) >= 1 && CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
-			if ($this->mapping === null) {
-				$this->mapping = $this->detectFieldMapping();
-			}
-
 			$fields = [];
 			foreach ($this->mapping as $mapping) {
 				if (!is_array($mapping) || !array_key_exists('name', $mapping) || !array_key_exists('class', $mapping)) {

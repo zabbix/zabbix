@@ -29,31 +29,28 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 class testPageMassUpdateItems extends CWebTest{
 
 	const HOSTID = 40001;	// Simple form test host.
+
 	const INTERVAL_MAPPING = [
 		'Type' => [
-			'selector' => 'class:radio-list-control',
-			'class' => 'CSegmentedRadioElement'
+			'name' => 'type',
+			'class' => 'CSegmentedRadioElement',
+			'selector' => 'xpath:./ul[contains(@class, "radio-list-control")]'.
+					'|./ul/li/ul[contains(@class, "radio-list-control")]|./div/ul[contains(@class, "radio-list-control")]'
 		],
 		'Interval' => [
-			'selector' => 'xpath:./input',
-			'class' => 'CElement'
+			'name' => 'delay',
+			'class' => 'CElement',
+			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
+					'not(contains(@style,"display: none"))]|./textarea[@name]'
 		],
 		'Period' => [
-			'selector' => 'xpath:./input',
-			'class' => 'CElement'
+			'name' => 'period',
+			'class' => 'CElement',
+			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
+					'not(contains(@style,"display: none"))]|./textarea[@name]'
 		]
 	];
 
-	const HEADERS_MAPPING = [
-		'Name' => [
-			'selector' => 'xpath:./input',
-			'class' => 'CElement'
-		],
-		'Value' => [
-			'selector' => 'xpath:./input',
-			'class' => 'CElement'
-		]
-	];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -180,14 +177,14 @@ class testPageMassUpdateItems extends CWebTest{
 								[
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
-									'Type' => 'Flexible',
-									'Interval' => '60s',
-									'Period' => '2-5,3:00-17:00'
+									'type' => 'Flexible',
+									'delay' => '60s',
+									'period' => '2-5,3:00-17:00'
+								],
+								[
+									'type' => 'Scheduling',
+									'delay' => 'wd3-4h1-15'
 								]
-//								[
-//									'Type' => 'Scheduling',
-//									'Interval' => 'wd3-4h1-15'
-//								]
 							]
 						],
 						'History storage period' => [
@@ -198,10 +195,10 @@ class testPageMassUpdateItems extends CWebTest{
 							'radio' => ['id' => 'trends_mode', 'value' => 'Do not keep trends']
 						],
 						'Show value' => ['id' => 'valuemapid', 'value' => 'TruthValue'],
-//						'Applications' => [
-//							'action' => 'Add',
-//							'application' => 'New application'
-//						],
+						'Applications' => [
+							'action' => 'Add',
+							'application' => 'New application'
+						],
 						'Description' => ['id' => 'description', 'value' => 'New mass updated description'],
 						'Status' => ['id' => 'status', 'value' => 'Disabled']
 					]
@@ -238,14 +235,14 @@ class testPageMassUpdateItems extends CWebTest{
 								[
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
-									'Type' => 'Flexible',
-									'Interval' => '99s',
-									'Period' => '1-2,7:00-8:00'
+									'type' => 'Scheduling',
+									'delay' => 'wd3-4h1-15'
+								],
+								[
+									'type' => 'Flexible',
+									'delay' => '99s',
+									'period' => '1-2,7:00-8:00'
 								]
-//								[
-//									'Type' => 'Scheduling',
-//									'Interval' => 'wd3-4h1-15'
-//								]
 							]
 						],
 //						'Applications' => [
@@ -313,12 +310,12 @@ class testPageMassUpdateItems extends CWebTest{
 							[
 								'action' => USER_ACTION_UPDATE,
 								'index' => 0,
-								'Name' => 'parameter name 1',
-								'Value' => 'parameter value 1'
+								'name' => 'header name 1',
+								'value' => 'header value 1'
 							],
 							[
-								'Name' => 'parameter name 2',
-								'Value' => 'parameter value 2'
+								'name' => 'header name 2',
+								'value' => 'header value 2'
 							]
 						]
 					]
@@ -411,6 +408,7 @@ class testPageMassUpdateItems extends CWebTest{
 				case 'URL':
 					$form->query('id', $value['id'])->one()->fill($value['value']);
 					break;
+
 				case 'Request body type':
 					$form->query('id', $value['id'])->one()->asSegmentedRadio()->fill($value['value']);
 					break;
@@ -420,9 +418,9 @@ class testPageMassUpdateItems extends CWebTest{
 					$container_table->getRow(0)->getColumn(1)->query('id:delay')->one()->fill($value['Delay']);
 
 					if(array_key_exists('Custom intervals', $value)){
-						$intervals_table = $container_table->getRow(1)->getColumn(1)->query('id:custom_intervals')
-								->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one();
-						$intervals_table->fill($value['Custom intervals']);
+						$container_table->getRow(1)->getColumn(1)->query('id:custom_intervals')->asMultifieldTable(
+								['mapping' => self::INTERVAL_MAPPING])->one()->fill($value['Custom intervals']);
+
 					}
 					break;
 
@@ -436,12 +434,11 @@ class testPageMassUpdateItems extends CWebTest{
 
 				case 'Applications':
 					$form->query('id:massupdate_app_action')->asSegmentedRadio()->one()->fill($value['action']);
-					$form->query('id:applications_')->asMultiselect()->one()->fill($value['application']);
+					$form->query('xpath://*[@id="applications_"]/..')->asMultiselect()->one()->fill($value['application']);
 					break;
 
 				case 'Headers':
-					$form->query('xpath:.//div[@id="headers_pairs"]/table')
-							->asMultifieldTable(['mapping' => self::HEADERS_MAPPING])->one()->fill($value);
+					$form->query('xpath:.//div[@id="headers_pairs"]/table')->asMultifieldTable()->one()->fill($value);
 					break;
 
 				case 'Security name':
@@ -464,6 +461,7 @@ class testPageMassUpdateItems extends CWebTest{
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Items updated');
 
+		// Check changed fields in saved item form.
 		foreach ($data['names'] as $name) {
 			$table->query('link', $name)->one()->waitUntilClickable()->click();
 			$form->invalidate();
@@ -502,14 +500,14 @@ class testPageMassUpdateItems extends CWebTest{
 						break;
 
 					case 'Headers':
-							// Remove action and index fields.
-							foreach ($value as &$header) {
-								unset($header['action'], $header['index']);
-							}
-							unset($header);
-						$headers_table = $form->query('xpath:.//div[@id="headers_pairs"]/table')
-								->asMultifieldTable(['mapping' => self::HEADERS_MAPPING])->one();
-						$this->assertEquals($value, $headers_table->getValue());
+						// Remove action and index fields.
+						foreach ($value as &$header) {
+							unset($header['action'], $header['index']);
+						}
+						unset($header);
+
+						$this->assertEquals($value, $form->query('xpath:.//div[@id="headers_pairs"]/table')
+								->asMultifieldTable()->one()->getValue());
 				}
 			}
 
