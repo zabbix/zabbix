@@ -117,6 +117,8 @@ class CWidget extends CBaseComponent {
 		this._preloader_timeout_sec = 10;
 		this._show_preloader_asap = true;
 		this._storage = {};
+
+		this._resizable_handles = [];
 	}
 
 	getCssClass(name) {
@@ -191,6 +193,10 @@ class CWidget extends CBaseComponent {
 	 * Focus specified top-level widget.
 	 */
 	enter() {
+		if (this._is_edit_mode) {
+			this._addResizeHandles();
+		}
+
 		this._$target.addClass(this._css_classes.focus);
 	}
 
@@ -198,6 +204,10 @@ class CWidget extends CBaseComponent {
 	 * Blur specified top-level widget.
 	 */
 	leave() {
+		if (this._is_edit_mode) {
+			this._removeResizeHandles();
+		}
+
 		if (this._$content_header.has(document.activeElement).length != 0) {
 			document.activeElement.blur();
 		}
@@ -286,23 +296,37 @@ class CWidget extends CBaseComponent {
 		this._target.classList.add('ui-draggable', 'ui-resizable');
 	}
 
-	_setEditModeStyle() {
+	_addResizeHandles() {
+		this._resizable_handles = {};
 
-//		const handles = {};
+		for (const direction of ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw']) {
+			const resizable_handle = document.createElement('div');
 
-//		for (const direction of ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw']) {
-//			const $handle = $('<div>').addClass('ui-resizable-handle').addClass(`ui-resizable-${direction}`);
+			resizable_handle.classList.add('ui-resizable-handle', `ui-resizable-${direction}`);
 
-//			if (['n', 'e', 's', 'w'].includes(direction)) {
-//				$handle
-//					.append($('<div>', {'class': 'ui-resize-dot'}))
-//					.append($('<div>', {'class': `ui-resizable-border-${direction}`}));
-//			}
+			if (['n', 'e', 's', 'w'].includes(direction)) {
+				const ui_resize_dot = document.createElement('div');
 
-//			this._$target.append($handle);
-//			handles[direction] = $handle;
-//		}
+				ui_resize_dot.classList.add('ui-resize-dot');
+				resizable_handle.appendChild(ui_resize_dot);
 
+				const ui_resizable_border = document.createElement('div');
+
+				ui_resizable_border.classList.add(`ui-resizable-border-${direction}`);
+				resizable_handle.appendChild(ui_resizable_border);
+			}
+
+			this._target.append(resizable_handle);
+			this._resizable_handles[direction] = resizable_handle;
+		}
+	}
+
+	_removeResizeHandles() {
+		for (const resizable_handle of Object.values(this._resizable_handles)) {
+			resizable_handle.remove();
+		}
+
+		this._resizable_handles = {};
 	}
 
 	getUniqueId() {
