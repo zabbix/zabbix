@@ -1609,7 +1609,6 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 				ZBX_DBPATCH_ARG_CONST_STR, "like",
 				ZBX_DBPATCH_ARG_STR, 0,
 				ZBX_DBPATCH_ARG_NONE);
-		zabbix_log(LOG_LEVEL_DEBUG, "STR: %s => %s", function->parameter, parameter);
 		dbpatch_update_function(function, "find", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
 	}
 	else if (0 == strcmp(function->name, "last"))
