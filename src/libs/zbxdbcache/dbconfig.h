@@ -238,8 +238,9 @@ ZBX_DC_JMXITEM;
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	const char	*params;
+	zbx_uint64_t		itemid;
+	const char		*params;
+	const unsigned char	*formula_bin;
 }
 ZBX_DC_CALCITEM;
 

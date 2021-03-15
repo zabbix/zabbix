@@ -2712,6 +2712,39 @@ static void	dc_interface_update_agent_stats(ZBX_DC_INTERFACE *interface, unsigne
 		interface->items_num += num;
 }
 
+static unsigned char	*dup_serialized_expression(const unsigned char *src)
+{
+	zbx_uint32_t	offset, len;
+	unsigned char	*dst;
+
+	if (NULL == src || '\0' == *src)
+		return NULL;
+
+	offset = zbx_deserialize_uint31_compact(src, &len);
+	if (0 == len)
+		return NULL;
+
+	dst = (unsigned char *)zbx_malloc(NULL, offset + len);
+	memcpy(dst, src, offset + len);
+
+	return dst;
+}
+
+static unsigned char	*config_decode_serialized_expression(const char *src)
+{
+	unsigned char	*dst;
+	int		data_len, src_len;
+
+	if (NULL == src || '\0' == *src)
+		return NULL;
+
+	src_len = strlen(src) * 3 / 4;
+	dst = __config_mem_malloc_func(NULL, src_len);
+	str_base64_decode(src, (char *)dst, src_len, &data_len);
+
+	return dst;
+}
+
 static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 {
 	char			**row;
@@ -3141,14 +3174,22 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		if (ITEM_TYPE_CALCULATED == item->type)
 		{
-			calcitem = (ZBX_DC_CALCITEM *)DCfind_id(&config->calcitems, itemid, sizeof(ZBX_DC_CALCITEM), &found);
+			calcitem = (ZBX_DC_CALCITEM *)DCfind_id(&config->calcitems, itemid, sizeof(ZBX_DC_CALCITEM),
+					&found);
 
 			DCstrpool_replace(found, &calcitem->params, row[11]);
+
+			if (1 == found && NULL != calcitem->formula_bin)
+				__config_mem_free_func((void *)calcitem->formula_bin);
+
+			calcitem->formula_bin = config_decode_serialized_expression(row[51]);
 		}
 		else if (NULL != (calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid)))
 		{
 			/* remove calculated item parameters */
 
+			if (NULL != calcitem->formula_bin)
+				__config_mem_free_func((void *)calcitem->formula_bin);
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
@@ -3442,6 +3483,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		{
 			calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid);
 			zbx_strpool_release(calcitem->params);
+
+			if (NULL != calcitem->formula_bin)
+				__config_mem_free_func((void *)calcitem->formula_bin);
+
 			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
@@ -3585,39 +3630,6 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static unsigned char	*dup_serialized_expression(const unsigned char *src)
-{
-	zbx_uint32_t	offset, len;
-	unsigned char	*dst;
-
-	if (NULL == src || '\0' == *src)
-		return NULL;
-
-	offset = zbx_deserialize_uint31_compact(src, &len);
-	if (0 == len)
-		return NULL;
-
-	dst = (unsigned char *)zbx_malloc(NULL, offset + len);
-	memcpy(dst, src, offset + len);
-
-	return dst;
-}
-
-static unsigned char	*config_decode_serialized_expression(const char *src)
-{
-	unsigned char	*dst;
-	int		data_len, src_len;
-
-	if (NULL == src || '\0' == *src)
-		return NULL;
-
-	src_len = strlen(src) * 3 / 4;
-	dst = __config_mem_malloc_func(NULL, src_len);
-	str_base64_decode(src, (char *)dst, src_len, &data_len);
-
-	return dst;
 }
 
 static void	DCsync_triggers(zbx_dbsync_t *sync)
@@ -7741,8 +7753,18 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->jmx_endpoint = NULL;
 			break;
 		case ITEM_TYPE_CALCULATED:
-			calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &src_item->itemid);
-			dst_item->params = zbx_strdup(NULL, NULL != calcitem ? calcitem->params : "");
+			if (NULL != (calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems,
+					&src_item->itemid)))
+			{
+				dst_item->params = zbx_strdup(NULL, calcitem->params);
+				dst_item->formula_bin = dup_serialized_expression(calcitem->formula_bin);
+			}
+			else
+			{
+				dst_item->params = zbx_strdup(NULL, "");
+				dst_item->formula_bin = NULL;
+			}
+
 			break;
 		default:
 			/* nothing to do */;
@@ -7779,8 +7801,11 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
+				zbx_free(items[i].params);
+				break;
 			case ITEM_TYPE_CALCULATED:
 				zbx_free(items[i].params);
+				zbx_free(items[i].formula_bin);
 				break;
 		}
 

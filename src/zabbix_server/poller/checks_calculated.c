@@ -359,14 +359,15 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __func__, dc_item->key_orig, dc_item->params);
 
-	if (SUCCEED != zbx_eval_parse_expression(&ctx, dc_item->params, ZBX_EVAL_PARSE_CALC_EXPRESSSION, &error))
+	if (NULL == dc_item->formula_bin)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() error:%s", __func__, error);
-		SET_MSG_RESULT(result, error);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot evaluate calculated item:"
+				" serialized formula is not set"));
 		error = NULL;
 		goto out;
 	}
 
+	zbx_eval_deserialize(&ctx, dc_item->params, ZBX_EVAL_PARSE_CALC_EXPRESSSION, dc_item->formula_bin);
 	calc_eval_init(&eval, dc_item, &ctx);
 
 	zbx_timespec(&ts);

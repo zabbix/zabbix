@@ -194,6 +194,7 @@ typedef struct
 	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	char			*script_params;
 	char			*error;
+	unsigned char		*formula_bin;
 }
 DC_ITEM;
 

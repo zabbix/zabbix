@@ -419,6 +419,82 @@ int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsign
 
 /******************************************************************************
  *                                                                            *
+ * Function: encode_expression                                                *
+ *                                                                            *
+ * Purpose: encode serialized expression to be returned as db field           *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static char	*encode_expression(const zbx_eval_context_t *ctx)
+{
+	unsigned char	*data;
+	size_t		len;
+	char		*str = NULL;
+
+	len = zbx_eval_serialize(ctx, NULL, &data);
+	str_base64_encode_dyn((const char *)data, &str, len);
+	zbx_free(data);
+
+	return str;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbsync_compare_serialized_expression                             *
+ *                                                                            *
+ * Purpose: compare serialized expression                                     *
+ *                                                                            *
+ * Parameter: col   - [IN] the base64 encoded expression                      *
+ *            data2 - [IN] the serialized expression in cache                 *
+ *                                                                            *
+ * Return value: SUCCEED - the expressions are identical                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbsync_compare_serialized_expression(const char *col, const unsigned char *data2)
+{
+	zbx_uint32_t	offset1, len1, offset2, len2;
+	unsigned char	*data1;
+	int		col_len, data1_len, ret = FAIL;
+
+	if (NULL == data2)
+	{
+		if (NULL == col || '\0' == *col)
+			return SUCCEED;
+		return FAIL;
+	}
+
+	if (NULL == col || '\0' == *col)
+		return FAIL;
+
+	col_len = strlen(col);
+	data1 = zbx_malloc(NULL, col_len);
+
+	str_base64_decode(col, (char *)data1, col_len, &data1_len);
+
+	offset1 = zbx_deserialize_uint31_compact((const unsigned char *)data1, &len1);
+	offset2 = zbx_deserialize_uint31_compact((const unsigned char *)data2, &len2);
+
+	if (offset1 != offset2 || len1 != len2)
+		goto out;
+
+	if (0 != memcmp(data1 + offset1, data2 + offset2, len1))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zbx_free(data1);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dbsync_compare_config                                        *
  *                                                                            *
  * Purpose: compares config table with cached configuration data              *
@@ -1648,6 +1724,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 
 		if (FAIL == dbsync_compare_str(dbrow[11], calcitem->params))
 			return FAIL;
+
+		if (FAIL == dbsync_compare_serialized_expression(dbrow[51], calcitem->formula_bin))
+			return FAIL;
 	}
 	else if (NULL != calcitem)
 		return FAIL;
@@ -1802,7 +1881,30 @@ static char	**dbsync_item_preproc_row(char **row)
 		row[23] = dc_expand_user_macros(row[23], &hostid, 1);
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_CALCITEM))
+	{
+		zbx_eval_context_t	ctx;
+		char			*error = NULL;
+
 		row[11] = dc_expand_user_macros_in_calcitem(row[11], hostid);
+
+		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSSION, &error))
+		{
+			zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "cannot parse formula: %s", error));
+			zbx_free(error);
+		}
+		else
+		{
+			if (SUCCEED != zbx_eval_expand_user_macros(&ctx, &hostid, 1, dc_expand_user_macros_len, &error))
+			{
+				zbx_eval_clear(&ctx);
+				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "cannot evaluate formula: %s", error));
+				zbx_free(error);
+			}
+		}
+
+		row[51] = encode_expression(&ctx);
+		zbx_eval_clear(&ctx);
+	}
 
 	return row;
 
@@ -1839,7 +1941,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.master_itemid,i.timeout,i.url,i.query_fields,i.posts,i.status_codes,"
 				"i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,"
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
-				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,id.parent_itemid"
+				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,id.parent_itemid,null"
 			" from items i"
 			" inner join hosts h on i.hostid=h.hostid"
 			" left join item_discovery id on i.itemid=id.itemid"
@@ -1851,7 +1953,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 50, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 52, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -2061,56 +2163,6 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_compare_serialized_expression                             *
- *                                                                            *
- * Purpose: compare serialized expression                                     *
- *                                                                            *
- * Parameter: col   - [IN] the base64 encoded expression                      *
- *            data2 - [IN] the serialized expression in cache                 *
- *                                                                            *
- * Return value: SUCCEED - the expressions are identical                      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_compare_serialized_expression(const char *col, const unsigned char *data2)
-{
-	zbx_uint32_t	offset1, len1, offset2, len2;
-	unsigned char	*data1;
-	int		col_len, data1_len, ret = FAIL;
-
-	if (NULL == data2)
-	{
-		if (NULL == col || '\0' == *col)
-			return SUCCEED;
-		return FAIL;
-	}
-
-	if (NULL == col || '\0' == *col)
-		return FAIL;
-
-	col_len = strlen(col);
-	data1 = zbx_malloc(NULL, col_len);
-
-	str_base64_decode(col, (char *)data1, col_len, &data1_len);
-
-	offset1 = zbx_deserialize_uint31_compact((const unsigned char *)data1, &len1);
-	offset2 = zbx_deserialize_uint31_compact((const unsigned char *)data2, &len2);
-
-	if (offset1 != offset2 || len1 != len2)
-		goto out;
-
-	if (0 != memcmp(data1 + offset1, data2 + offset2, len1))
-		goto out;
-
-	ret = SUCCEED;
-out:
-	zbx_free(data1);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dbsync_compare_trigger                                           *
  *                                                                            *
  * Purpose: compares triggers table row with cached configuration data        *
@@ -2167,19 +2219,6 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
 	}
 
 	return SUCCEED;
-}
-
-static char	*encode_expression(const zbx_eval_context_t *ctx)
-{
-	unsigned char	*data;
-	size_t		len;
-	char		*str = NULL;
-
-	len = zbx_eval_serialize(ctx, NULL, &data);
-	str_base64_encode_dyn((const char *)data, &str, len);
-	zbx_free(data);
-
-	return str;
 }
 
 /******************************************************************************
