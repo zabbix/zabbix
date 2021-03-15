@@ -201,5 +201,5 @@ void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const
 char	*zbx_eval_format_function_error(const char *function, const char *host, const char *key,
 		const char *parameter, const char *error);
 
-void	zbx_eval_extract_item_queries(zbx_eval_context_t *ctx, zbx_vector_str_t *queries);
+void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs);
 #endif

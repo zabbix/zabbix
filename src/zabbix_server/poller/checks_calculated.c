@@ -22,94 +22,276 @@
 #include "log.h"
 #include "../../libs/zbxserver/evalfunc.h"
 
+typedef enum
+{
+	ZBX_ITEM_REF_UNKNOWN,
+	ZBX_ITEM_REF_SINGLE,
+	ZBX_ITEM_REF_MULTI
+}
+zbx_item_ref_type_t;
+
 typedef struct
 {
-	zbx_host_key_t	*hostkeys;
-	DC_ITEM		*items;
-	int		*errcodes;
-	int		num;
+	char			*query;
+	char			*host;
+	char			*key;
+	char			*filter;
+	zbx_item_ref_type_t	type;
+	int			index;
 }
-zbx_dc_items_t;
+zbx_item_ref_t;
+
+typedef struct
+{
+	zbx_host_key_t		*hostkeys;
+	DC_ITEM			*items;
+	int			*errcodes;
+	int			items_num;
+
+	zbx_vector_ptr_t	itemrefs;
+}
+zbx_calc_eval_t;
+
+
+static void	itemref_free(zbx_item_ref_t *ref)
+{
+	zbx_free(ref->query);
+	zbx_free(ref);
+}
 
 /******************************************************************************
  *                                                                            *
- * Typedef: calcitem_parse_item_query                                         *
+ * Function: calcitem_parse_item_filter                                       *
  *                                                                            *
- * Purpose: parse item query /host/key into host, key components              *
+ * Purpose: parse item filter /host/key?[filter] into host, key and filter    *
+ *          components                                                        *
  *                                                                            *
- * Parameters: dc_item - [IN] the calculated item                             *
- *             query   - [IN] the item query, can change contents during      *
+ * Parameters: query   - [IN] the item query, can change contents during      *
  *                            processing                                      *
- *             hostkey - [OUT] the host key values referencing to the query   *
  *                                                                            *
- * Comments: The host key values is not allocated but will point at the host, *
- *           key values in the item query. If host is absent in query, then   *
- *           hostkey->host will point at the host.host from dc_item           *
+ * Return value: The allocated item reference or NULL in the case of error.   *
  *                                                                            *
  ******************************************************************************/
-static void	calcitem_parse_item_query(const DC_ITEM *dc_item, char *query, zbx_host_key_t *hostkey)
+static zbx_item_ref_t	*calcitem_parse_item_filter(char *query)
 {
-	char	*key;
+	zbx_item_ref_t	*ref;
 
-	if ('/' != *query || NULL == (key = strchr(++query, '/')))
+	ref = (zbx_item_ref_t *)zbx_malloc(NULL, sizeof(zbx_item_ref_t));
+	memset(ref, 0, sizeof(zbx_item_ref_t));
+	ref->query = query;
+
+	if ('/' != *query || NULL == (ref->key = strchr(++query, '/')))
 	{
-		hostkey->host = "";
-		hostkey->key = "";
-		return;
+		ref->type = ZBX_ITEM_REF_UNKNOWN;
+		return ref;
 	}
 
-	hostkey->host = (char *)(query == key ? dc_item->host.host : query);
-	*key++ = '\0';
-	hostkey->key = key;
+	if (query != ref->key)
+	{
+		ref->host = query;
+		*ref->key = '\0';
+	}
+
+	ref->key++;
+	ref->type = ZBX_ITEM_REF_SINGLE;
+
+	return ref;
 }
 
 /******************************************************************************
  *                                                                            *
- * Typedef: calcitem_get_items                                                *
+ * Function: calc_eval_init                                                   *
  *                                                                            *
- * Purpose: get items referred by queries from configuration cache            *
+ * Purpose: initialize calculated item evaluation data                        *
  *                                                                            *
- * Parameters: dc_item - [IN] the calculated item                             *
- *             queries - [IN] the item queries (/host/key references)         *
- *                            in calculated item formula                      *
- *             dcitems - [OUT] item errorcodes and data                       *
- *                                                                            *
- * Comments: Call calcitem_dcitems_clear() to free the allocated resources.   *
+ * Parameters: eval     - [IN] the evaluation data                            *
+ *             dc_item  - [IN] the calculated item                            *
+ *             ctx      - [IN] parsed calculated item formula                 *
  *                                                                            *
  ******************************************************************************/
-static void	calcitem_get_items(const DC_ITEM *dc_item, zbx_vector_str_t *queries, zbx_dc_items_t *dcitems)
+static void	calc_eval_init(zbx_calc_eval_t *eval, DC_ITEM *dc_item, zbx_eval_context_t *ctx)
 {
-	int		i;
+	int			i;
+	zbx_item_ref_t		*ref;
+	zbx_vector_str_t	filters;
 
-	dcitems->num = queries->values_num;
-	dcitems->hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * dcitems->num);
-	dcitems->items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * dcitems->num);
-	dcitems->errcodes = (int *)zbx_malloc(NULL, sizeof(int) * dcitems->num);
+	zbx_vector_str_create(&filters);
+	zbx_eval_extract_item_refs(ctx, &filters);
 
-	for (i = 0; i < queries->values_num; i++)
-		calcitem_parse_item_query(dc_item, queries->values[i], &dcitems->hostkeys[i]);
+	zbx_vector_ptr_create(&eval->itemrefs);
+	eval->items_num = 0;
 
-	DCconfig_get_items_by_keys(dcitems->items, dcitems->hostkeys, dcitems->errcodes, dcitems->num);
+	for (i = 0; i < filters.values_num; i++)
+	{
+		ref = calcitem_parse_item_filter(filters.values[i]);
+		zbx_vector_ptr_append(&eval->itemrefs, ref);
+
+		if (ZBX_ITEM_REF_SINGLE == ref->type)
+			ref->index = eval->items_num++;
+	}
+
+	/* get data for functions working with single item filters */
+	if (0 != eval->items_num)
+	{
+		eval->hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * eval->items_num);
+		eval->items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * eval->items_num);
+		eval->errcodes = (int *)zbx_malloc(NULL, sizeof(int) * eval->items_num);
+
+		for (i = 0; i < eval->itemrefs.values_num; i++)
+		{
+			ref = (zbx_item_ref_t *)eval->itemrefs.values[i];
+
+			if (ZBX_ITEM_REF_SINGLE != ref->type)
+				continue;
+
+			eval->hostkeys[ref->index].host = (NULL == ref->host ? dc_item->host.host : ref->host);
+			eval->hostkeys[ref->index].key = ref->key;
+		}
+
+		DCconfig_get_items_by_keys(eval->items, eval->hostkeys, eval->errcodes, eval->items_num);
+	}
+
+	zbx_vector_str_destroy(&filters);
 }
 
 /******************************************************************************
  *                                                                            *
- * Typedef: calcitem_dcitems_clear                                            *
+ * Function: calc_eval_clear                                                  *
  *                                                                            *
- * Purpose: clears resources allocated by calcitem_get_items() function       *
+ * Purpose: free resources allocated by calculated item evaluation data       *
+ *                                                                            *
+ * Parameters: eval     - [IN] the evaluation data                            *
  *                                                                            *
  ******************************************************************************/
-static void	calcitem_dcitems_clear(zbx_dc_items_t *dcitems)
+static void	calc_eval_clear(zbx_calc_eval_t *eval)
 {
-	DCconfig_clean_items(dcitems->items, dcitems->errcodes, dcitems->num);
-	zbx_free(dcitems->hostkeys);
-	zbx_free(dcitems->errcodes);
-	zbx_free(dcitems->items);
+	if (0 != eval->items_num)
+	{
+		DCconfig_clean_items(eval->items, eval->errcodes, eval->items_num);
+		zbx_free(eval->items);
+		zbx_free(eval->errcodes);
+		zbx_free(eval->hostkeys);
+	}
+
+	zbx_vector_ptr_clear_ext(&eval->itemrefs, (zbx_clean_func_t)itemref_free);
+	zbx_vector_ptr_destroy(&eval->itemrefs);
 }
 
 /******************************************************************************
  *                                                                            *
- * Typedef: calcitem_eval                                                     *
+ * Function: calcitem_eval_single                                             *
+ *                                                                            *
+ * Purpose: evaluate historical function for single item                      *
+ *                                                                            *
+ * Parameters: eval     - [IN] the evaluation data                            *
+ *             ref      - [IN] the item reference (host, key ..)              *
+ *             name     - [IN] the function name (not zero terminated)        *
+ *             len      - [IN] the function name length                       *
+ *             args_num - [IN] the number of function arguments               *
+ *             args     - [IN] an array of the function arguments.            *
+ *             data     - [IN] the caller data used for function evaluation   *
+ *             ts       - [IN] the function execution time                    *
+ *             value    - [OUT] the function return value                     *
+ *             error    - [OUT] the error message if function failed          *
+ *                                                                            *
+ * Return value: SUCCEED - the function was executed successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	calcitem_eval_single(zbx_calc_eval_t *eval, zbx_item_ref_t *ref, const char *name, size_t len,
+		int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+{
+	char		func_name[MAX_STRING_LEN], *params = NULL;
+	size_t		params_alloc = 0, params_offset = 0;
+	DC_ITEM		*item;
+	int		i, ret = FAIL;
+
+	if (SUCCEED != eval->errcodes[ref->index])
+	{
+		*error = zbx_dsprintf(NULL, "Cannot evaluate function because item \"/%s/%s\" does not exist",
+				eval->hostkeys[ref->index].host, eval->hostkeys[ref->index].key);
+		goto out;
+	}
+
+	item = &eval->items[ref->index];
+
+	/* do not evaluate if the item is disabled or belongs to a disabled host */
+
+	if (ITEM_STATUS_ACTIVE != item->status)
+	{
+		*error = zbx_dsprintf(NULL, "Cannot evaluate function with disabled item \"/%s/%s\"",
+				eval->hostkeys[ref->index].host, eval->hostkeys[ref->index].key);
+		goto out;
+	}
+
+	if (HOST_STATUS_MONITORED != item->host.status)
+	{
+		*error = zbx_dsprintf(NULL, "Cannot evaluate function with item \"/%s/%s\" belonging to a disabled host",
+				eval->hostkeys[ref->index].host, eval->hostkeys[ref->index].key);
+		goto out;
+	}
+
+	memcpy(func_name, name, len);
+	func_name[len] = '\0';
+
+	/* If the item is NOTSUPPORTED then evaluation is allowed for:   */
+	/*   - functions white-listed in evaluatable_for_notsupported(). */
+	/*     Their values can be evaluated to regular numbers even for */
+	/*     NOTSUPPORTED items. */
+	/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
+
+	if (ITEM_STATE_NOTSUPPORTED == item->state && FAIL == zbx_evaluatable_for_notsupported(func_name))
+	{
+		/* compose and store 'unknown' message for future use */
+		*error = zbx_dsprintf(NULL,"Cannot evaluate function with not supported item \"/%s/%s\"",
+				eval->hostkeys[ref->index].host, eval->hostkeys[ref->index].key);
+		goto out;
+	}
+
+	if (0 == args_num)
+	{
+		ret = evaluate_function2(value, item, func_name, "", ts, error);
+		goto out;
+	}
+
+	for (i = 0; i < args_num; i++)
+	{
+		if (0 != i)
+			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, ',');
+
+		switch (args[i].type)
+		{
+			case ZBX_VARIANT_DBL:
+				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_DBL64,
+						args[i].data.dbl);
+				break;
+			case ZBX_VARIANT_STR:
+				zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
+				break;
+			case ZBX_VARIANT_UI64:
+				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64,
+						args[i].data.ui64);
+				break;
+			case ZBX_VARIANT_NONE:
+				break;
+			default:
+				*error = zbx_dsprintf(NULL,"Cannot evaluate function \"%s\":"
+						" unsupported argument #%d type: %s",
+						func_name, i + 1, zbx_variant_type_desc(&args[i]));
+				goto out;
+		}
+	}
+
+	ret = evaluate_function2(value, item, func_name, params, ts, error);
+out:
+	zbx_free(params);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: calcitem_eval                                                    *
  *                                                                            *
  * Purpose: evaluate historical function                                      *
  *                                                                            *
@@ -129,11 +311,9 @@ static void	calcitem_dcitems_clear(zbx_dc_items_t *dcitems)
 static int	calcitem_eval(const char *name, size_t len, int args_num, const zbx_variant_t *args,
 		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
-	int		index, ret = FAIL, i;
-	zbx_dc_items_t	*dcitems;
-	DC_ITEM		*item;
-	char		func_name[MAX_STRING_LEN], *params = NULL;
-	size_t		params_alloc = 0, params_offset = 0;
+	int		ret = FAIL;
+	zbx_calc_eval_t	*eval;
+	zbx_item_ref_t	*ref;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:%.*s", __func__, (int)len, name);
 
@@ -141,98 +321,27 @@ static int	calcitem_eval(const char *name, size_t len, int args_num, const zbx_v
 
 	if (0 == args_num)
 	{
-		*error = zbx_strdup(NULL, "invalid number of arguments");
+		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid number of arguments");
 		goto out;
 	}
 
 	if (len >= MAX_STRING_LEN)
 	{
-		*error = zbx_strdup(NULL, "too long function name");
+		*error = zbx_strdup(NULL, "Cannot evaluate function: name too long");
 		goto out;
 	}
 
-	dcitems = (zbx_dc_items_t *)data;
+	eval = (zbx_calc_eval_t *)data;
 
-	/* the historical function item query argument is replaced with corresponding DC_ITEM index */
-	index = (int)args[0].data.ui64;
+	/* the historical function item query argument is replaced with corresponding itemrefs index */
+	ref = (zbx_item_ref_t *)eval->itemrefs.values[(int)args[0].data.ui64];
 
-	if (SUCCEED != dcitems->errcodes[index])
-	{
-		*error = zbx_dsprintf(NULL, "Cannot evaluate function because item \"/%s/%s\" does not exist",
-				dcitems->hostkeys[index].host, dcitems->hostkeys[index].key);
-		goto out;
-	}
+	if (ZBX_ITEM_REF_SINGLE == ref->type)
+		ret = calcitem_eval_single(eval, ref, name, len, args_num - 1, args + 1, ts, value, error);
+	else
+		*error = zbx_strdup(NULL, "Cannot evaluate function: multiple item filters are not supported");
 
-	item = &dcitems->items[index];
-
-	/* do not evaluate if the item is disabled or belongs to a disabled host */
-
-	if (ITEM_STATUS_ACTIVE != item->status)
-	{
-		*error = zbx_dsprintf(NULL, "Cannot evaluate function with disabled item \"/%s/%s\"",
-				dcitems->hostkeys[index].host, dcitems->hostkeys[index].key);
-		goto out;
-	}
-
-	if (HOST_STATUS_MONITORED != item->host.status)
-	{
-		*error = zbx_dsprintf(NULL, "Cannot evaluate function with item \"/%s/%s\" belonging to a disabled host",
-				dcitems->hostkeys[index].host, dcitems->hostkeys[index].key);
-		goto out;
-	}
-
-	memcpy(func_name, name, len);
-	func_name[len] = '\0';
-
-	/* If the item is NOTSUPPORTED then evaluation is allowed for:   */
-	/*   - functions white-listed in evaluatable_for_notsupported(). */
-	/*     Their values can be evaluated to regular numbers even for */
-	/*     NOTSUPPORTED items. */
-	/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
-
-	if (ITEM_STATE_NOTSUPPORTED == item->state && FAIL == zbx_evaluatable_for_notsupported(func_name))
-	{
-		/* compose and store 'unknown' message for future use */
-		*error = zbx_dsprintf(NULL,"Cannot evaluate function with not supported item \"/%s/%s\"",
-				dcitems->hostkeys[index].host, dcitems->hostkeys[index].key);
-		goto out;
-	}
-
-	if (1 == args_num)
-	{
-		ret = evaluate_function2(value, item, func_name, "", ts, error);
-		goto out;
-	}
-
-	for (i = 1; i < args_num; i++)
-	{
-		if (1 < i)
-			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, ',');
-
-		switch (args[i].type)
-		{
-		case ZBX_VARIANT_DBL:
-			zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_DBL64, args[i].data.dbl);
-			break;
-		case ZBX_VARIANT_STR:
-			zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
-			break;
-		case ZBX_VARIANT_UI64:
-			zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64, args[i].data.ui64);
-			break;
-		case ZBX_VARIANT_NONE:
-			break;
-		default:
-			*error = zbx_dsprintf(NULL,"Cannot evaluate function \"%s\": unsupported argument #%d type: %s",
-					func_name, i + 1, zbx_variant_type_desc(&args[i]));
-			goto out;
-		}
-	}
-
-	ret = evaluate_function2(value, item, func_name, params, ts, error);
 out:
-	zbx_free(params);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:%s", __func__, zbx_result_string(ret),
 			zbx_variant_value_desc(value));
 
@@ -244,14 +353,11 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	int			ret = NOTSUPPORTED;
 	char			*error = NULL;
 	zbx_eval_context_t	ctx;
-	zbx_vector_str_t	queries;
-	zbx_dc_items_t		dcitems;
+	zbx_calc_eval_t		eval;
 	zbx_timespec_t		ts;
 	zbx_variant_t		value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __func__, dc_item->key_orig, dc_item->params);
-
-	zbx_vector_str_create(&queries);
 
 	if (SUCCEED != zbx_eval_parse_expression(&ctx, dc_item->params, ZBX_EVAL_PARSE_CALC_EXPRESSSION, &error))
 	{
@@ -261,12 +367,11 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	zbx_eval_extract_item_queries(&ctx, &queries);
-	calcitem_get_items(dc_item, &queries, &dcitems);
+	calc_eval_init(&eval, dc_item, &ctx);
 
 	zbx_timespec(&ts);
 
-	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, calcitem_eval, (void *)&dcitems, &value, &error))
+	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, calcitem_eval, (void *)&eval, &value, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() error:%s", __func__, error);
 		SET_MSG_RESULT(result, error);
@@ -293,9 +398,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 		ret = SUCCEED;
 	}
 
-	calcitem_dcitems_clear(&dcitems);
-	zbx_vector_str_clear_ext(&queries, zbx_str_free);
-	zbx_vector_str_destroy(&queries);
+	calc_eval_clear(&eval);
 	zbx_eval_clear(&ctx);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

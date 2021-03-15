@@ -919,15 +919,15 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_extract_item_queries                                    *
+ * Function: zbx_eval_extract_history_queries                                 *
  *                                                                            *
- * Purpose: copy item query into vector and replace it with vector index      *
+ * Purpose: copy history query into vector and replace it with vector index   *
  *                                                                            *
- * Parameters: ctx     - [IN] the evaluation context                          *
- *             queries - [OUT] the item queries                               *
+ * Parameters: ctx  - [IN] the evaluation context                             *
+ *             refs - [OUT] the item references                               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eval_extract_item_queries(zbx_eval_context_t *ctx, zbx_vector_str_t *queries)
+void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs)
 {
 	int	i;
 
@@ -938,7 +938,7 @@ void	zbx_eval_extract_item_queries(zbx_eval_context_t *ctx, zbx_vector_str_t *qu
 		if (ZBX_EVAL_TOKEN_ARG_QUERY != token->type)
 			continue;
 
-		zbx_variant_set_ui64(&token->value, queries->values_num);
-		zbx_vector_str_append(queries, zbx_substr(ctx->expression, token->loc.l, token->loc.r));
+		zbx_variant_set_ui64(&token->value, refs->values_num);
+		zbx_vector_str_append(refs, zbx_substr(ctx->expression, token->loc.l, token->loc.r));
 	}
 }
