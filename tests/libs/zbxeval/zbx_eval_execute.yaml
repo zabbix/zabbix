@@ -95,6 +95,14 @@ out:
   result: SUCCEED
   value: '-1'
 ---
+test case: Expression '--1'
+in:
+  rules: []
+  expression: '--1'
+out:
+  result: SUCCEED
+  value: '1'
+---
 test case: Expression '- "2"'
 in:
   rules: []
