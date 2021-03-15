@@ -1361,7 +1361,7 @@ static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, con
 				continue;
 		}
 
-		value = zbx_substr(ctx.expression, token->loc.l, token->loc.r);
+		value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 
 		if (FAIL == substitute_lld_macros(&value, jp_row, lld_macros, ZBX_MACRO_ANY, err, err_len))
 		{

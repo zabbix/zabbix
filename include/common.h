@@ -1704,5 +1704,6 @@ int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
 
 char	*zbx_substr(const char *src, size_t left, size_t right);
+char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 
 #endif

@@ -425,7 +425,7 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *hos
 
 					continue;
 				}
-				tmp = zbx_substr(ctx->expression, token->loc.l, token->loc.r);
+				tmp = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 				ret = resolver_cb(tmp, strlen(tmp), hostids, hostids_num, &value, error);
 				zbx_free(tmp);
 				break;
@@ -550,7 +550,7 @@ zbx_eval_context_t	*zbx_eval_deserialize_dyn(const unsigned char *data, const ch
 				if (0 != (mask & ZBX_EVAL_EXTRACT_VAR_STR) && ZBX_VARIANT_NONE == token->value.type)
 				{
 					/* extract string variable value for macro resolving */
-					value = zbx_substr(expression, token->loc.l, token->loc.r);
+					value = zbx_substr_unquote(expression, token->loc.l, token->loc.r);
 					zbx_variant_set_str(&token->value, value);
 				}
 				break;
@@ -558,7 +558,7 @@ zbx_eval_context_t	*zbx_eval_deserialize_dyn(const unsigned char *data, const ch
 				if (0 != (mask & ZBX_EVAL_EXTRACT_VAR_MACRO) && ZBX_VARIANT_NONE == token->value.type)
 				{
 					/* extract macro for resolving */
-					value = zbx_substr(expression, token->loc.l, token->loc.r);
+					value = zbx_substr_unquote(expression, token->loc.l, token->loc.r);
 					zbx_variant_set_str(&token->value, value);
 				}
 				break;
@@ -764,7 +764,7 @@ void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **valu
 					if (ZBX_VARIANT_NONE != token->value.type)
 						*value = zbx_strdup(NULL, zbx_variant_value_desc(&token->value));
 					else
-						*value = zbx_substr(ctx->expression, token->loc.l, token->loc.r);
+						*value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 					return;
 				}
 				break;

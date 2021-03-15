@@ -1369,7 +1369,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 					char	*str;
 
 					loc = &params->values[index];
-					str = zbx_substr(parameter, loc->l, loc->r);
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
 					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
 					zbx_free(str);
 				}
@@ -1378,7 +1378,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 					char	*str;
 
 					loc = &params->values[index];
-					str = zbx_substr(parameter, loc->l, loc->r);
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
 					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ':');
 					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
 					zbx_free(str);
@@ -1991,7 +1991,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 			zbx_free(key);
 
 			if (')' != ptr[par_l + 1 + sep_pos])
-				func->parameter = zbx_substr(ptr, par_l + 1 + sep_pos + 1, par_r - 1);
+				func->parameter = zbx_substr(ptr, par_l + sep_pos + 2, par_r - 1);
 			else
 				func->parameter = zbx_strdup(NULL, "");
 
