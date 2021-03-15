@@ -27,6 +27,7 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'url' =>							'db config.url',
 			'discovery_groupid' =>				'db config.discovery_groupid',
 			'default_inventory_mode' =>			'db config.default_inventory_mode',
 			'alert_usrgrpid' =>					'db config.alert_usrgrpid',
@@ -60,6 +61,7 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function doAction() {
 		$data = [
+			'url' => $this->getInput('url', CSettingsHelper::get(CSettingsHelper::URL)),
 			'discovery_groupid' => $this->getInput('discovery_groupid', CSettingsHelper::get(
 				CSettingsHelper::DISCOVERY_GROUPID
 			)),

@@ -55,6 +55,7 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 								.prev('.msg-bad')
 								.remove();
 
+							$('#url').val("<?= DB::getDefault('config', 'url') ?>");
 							$('#discovery_groupid').multiSelect('clean');
 							$('#default_inventory_mode input[value=<?= $default_inventory_mode ?>]')
 								.prop('checked', true);

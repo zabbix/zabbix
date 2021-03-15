@@ -23,6 +23,7 @@ class CControllerMiscConfigUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'url' =>							'db config.url',
 			'discovery_groupid' =>				'required|db config.discovery_groupid',
 			'default_inventory_mode' =>			'required|in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
 			'alert_usrgrpid' =>					'db config.alert_usrgrpid',
@@ -74,6 +75,7 @@ class CControllerMiscConfigUpdate extends CController {
 
 	protected function doAction() {
 		$settings = [
+			CSettingsHelper::URL => $this->getInput('url'),
 			CSettingsHelper::DISCOVERY_GROUPID => $this->getInput('discovery_groupid'),
 			CSettingsHelper::DEFAULT_INVENTORY_MODE => $this->getInput('default_inventory_mode'),
 			CSettingsHelper::SNMPTRAP_LOGGING => $this->getInput('snmptrap_logging'),

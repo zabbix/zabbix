@@ -31,6 +31,12 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $from_list = (new CFormList())
+	->addRow(new CLabel(_('Frontend URL'), 'url'),
+		(new CTextBox('url', $data['url'], false, DB::getFieldLength('config', 'url')))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAttribute('placeholder', _('Example: https://localhost/zabbix/ui/'))
+			->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow((new CLabel(_('Group for discovered hosts'), 'discovery_groupid'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'discovery_groupid',
