@@ -368,8 +368,17 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	}
 
 	zbx_eval_deserialize(&ctx, dc_item->params, ZBX_EVAL_PARSE_CALC_EXPRESSSION, dc_item->formula_bin);
-	calc_eval_init(&eval, dc_item, &ctx);
 
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		char	*expression = NULL;
+
+		zbx_eval_compose_expression(&ctx, &expression);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() expanded expression:'%s'", __func__, expression);
+		zbx_free(expression);
+	}
+
+	calc_eval_init(&eval, dc_item, &ctx);
 	zbx_timespec(&ts);
 
 	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, calcitem_eval, (void *)&eval, &value, &error))
