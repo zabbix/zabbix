@@ -1889,7 +1889,7 @@ static char	**dbsync_item_preproc_row(char **row)
 
 		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSSION, &error))
 		{
-			zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "cannot parse formula: %s", error));
+			zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
 			zbx_free(error);
 		}
 		else
@@ -1897,7 +1897,7 @@ static char	**dbsync_item_preproc_row(char **row)
 			if (SUCCEED != zbx_eval_expand_user_macros(&ctx, &hostid, 1, dc_expand_user_macros_len, &error))
 			{
 				zbx_eval_clear(&ctx);
-				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "cannot evaluate formula: %s", error));
+				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot evaluate formula: %s", error));
 				zbx_free(error);
 			}
 		}
