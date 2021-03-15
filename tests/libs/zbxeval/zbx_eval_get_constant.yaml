@@ -1,11 +1,4 @@
 ---
-test case: 'extract token 0'
-in:
-  expression: '("ccc")="ccca"'
-  index: 0
-out:
-  return: 'ccc'
----
 test case: 'extract token 1'
 in:
   expression: '("ccc")="ccca"'
@@ -71,7 +64,7 @@ out:
 ---
 test case: 'escape function'
 in:
-  expression: '{0286} (0)<>("-2"/1 - {2370897})'
+  expression: '{0286} + (0)<>("-2"/1 - {2370897})'
   index: 1
 out:
   return: '0'
@@ -125,13 +118,6 @@ in:
 out:
   return: '{$MACRO:"x:\"1\""}'
 ---
-test case: 'broken user macro with context'
-in:
-  expression: '{19928}<>{$MACRO:"x:\"1} and 1'
-  index: 1
-out:
-  return: ''
----
 test case: 'fraction'
 in:
   expression: '{19928}<>.5'
@@ -145,13 +131,6 @@ in:
   index: 1
 out:
   return: '-.5'
----
-test case: 'invalid number .5.5.5'
-in:
-  expression: '{19928}<>.5.5.5'
-  index: 1
-out:
-  return: ''
 ---
 test case: 'constant after macro'
 in:
@@ -173,13 +152,6 @@ in:
   index: 1
 out:
   return: '1e-5'
----
-test case: 'constant 1e-5.0'
-in:
-  expression: '{19928}=1e-5.0'
-  index: 1
-out:
-  return: ''
 ---
 test case: 'string constant -10e-10'
 in:

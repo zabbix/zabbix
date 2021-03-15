@@ -4,7 +4,8 @@ SERVER_tests = \
 	zbx_eval_serialize \
 	zbx_eval_compose_expression \
 	zbx_eval_execute \
-	zbx_eval_execute_ext
+	zbx_eval_execute_ext \
+	zbx_eval_get_constant
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -153,5 +154,18 @@ zbx_eval_execute_ext_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_eval_execute_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+
+zbx_eval_get_constant_SOURCES = \
+	zbx_eval_get_constant.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_get_constant_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_get_constant_LDADD += @SERVER_LIBS@
+
+zbx_eval_get_constant_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_get_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
 endif
 

@@ -1,6 +1,5 @@
 if SERVER
 SERVER_tests = \
-	get_trigger_expression_constant \
 	evaluate_function \
 	substitute_lld_macros \
 	macro_fmttime
@@ -83,18 +82,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
-
-get_trigger_expression_constant_SOURCES = \
-	get_trigger_expression_constant.c
-
-get_trigger_expression_constant_LDADD = \
-	$(COMMON_LIB_FILES)
-
-get_trigger_expression_constant_LDADD += @SERVER_LIBS@
-
-get_trigger_expression_constant_LDFLAGS = @SERVER_LDFLAGS@
-
-get_trigger_expression_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
 substitute_lld_macros_SOURCES = \

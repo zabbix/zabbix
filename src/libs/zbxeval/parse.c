@@ -120,7 +120,6 @@ static int	eval_parse_macro(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			SUCCEED == zbx_token_parse_macro(ctx->expression, ctx->expression + pos, &tok))
 	{
 		token->type = ZBX_EVAL_TOKEN_VAR_MACRO;
-		eval_update_const_variable(ctx, token);
 	}
 	else if (0 != (ctx->rules & ZBX_EVAL_PARSE_USERMACRO) && '$' == ctx->expression[pos + 1] &&
 			SUCCEED == zbx_token_parse_user_macro(ctx->expression, ctx->expression + pos, &tok))
@@ -298,7 +297,6 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
  * Parameters: ctx   - [IN] the evaluation context                            *
  *             pos   - [IN] the starting position                             *
  *             token - [OUT] the parsed token                                 *
- *             error - [OUT] the error message in the case of failure         *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
@@ -306,14 +304,19 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
  *  Comments: Time suffixes s,m,h,d,w are supported.                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
+static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token)
 {
-	int		len;
+	int		len, offset = 0;
 	char		*end;
 	double		tmp;
 
-	if (FAIL == zbx_suffixed_number_parse(ctx->expression + pos, &len))
-		goto error;
+	if ('-' == ctx->expression[pos])
+		offset++;
+
+	if (FAIL == zbx_suffixed_number_parse(ctx->expression + pos + offset, &len))
+		return FAIL;
+
+	len += offset;
 
 	switch (ctx->expression[pos + len - 1])
 	{
@@ -331,16 +334,13 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 	tmp = strtod(ctx->expression + pos, &end) * suffix2factor(ctx->expression[pos + len - 1]);
 	if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
-		goto error;
+		return FAIL;
 
 	token->loc.l = pos;
 	token->loc.r = pos + len - 1;
 	eval_update_const_variable(ctx, token);
 
 	return SUCCEED;
-error:
-	*error = zbx_dsprintf(*error, "invalid numeric value at \"%s\"", ctx->expression + pos);
-	return FAIL;
 }
 
 /******************************************************************************
@@ -555,7 +555,10 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			return SUCCEED;
 		case '-':
 			if (0 == (ctx->last_token_type & ZBX_EVAL_CLASS_OPERAND))
-				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_MINUS, token);
+			{
+				if (SUCCEED != eval_parse_number_token(ctx, pos, token))
+					eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_MINUS, token);
+			}
 			else
 				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_SUB, token);
 			return SUCCEED;
@@ -620,7 +623,12 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			}
 			ZBX_FALLTHROUGH;
 		case '.':
-			return eval_parse_number_token(ctx, pos, token, error);
+			if (FAIL == eval_parse_number_token(ctx, pos, token))
+			{
+				*error = zbx_dsprintf(*error, "invalid numeric value at \"%s\"", ctx->expression + pos);
+				return FAIL;
+			}
+			return SUCCEED;
 		case ',':
 			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION))
 			{
