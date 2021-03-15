@@ -782,9 +782,6 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 		if (ZBX_EVAL_TOKEN_GROUP_CLOSE == token.type && ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type)
 			eval_append_arg_null(ctx);
 
-		if (ZBX_EVAL_TOKEN_COMMA == token.type && 0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR))
-			eval_append_arg_null(ctx);
-
 		if (ZBX_EVAL_TOKEN_GROUP_OPEN == token.type)
 		{
 			if (0 == (ctx->last_token_type & (ZBX_EVAL_BEFORE_OPERAND | ZBX_EVAL_CLASS_FUNCTION)))
@@ -804,6 +801,45 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 						" at \"%s\"", ctx->expression + pos);
 				goto out;
 			}
+			zbx_vector_eval_token_append_ptr(&ctx->ops, &token);
+		}
+		else if (ZBX_EVAL_TOKEN_COMMA == token.type)
+		{
+			/* comma must follow and operand, comma or function */
+			if (0 == (ctx->last_token_type & ZBX_EVAL_CLASS_OPERAND) &&
+					(0 == (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR)))
+			{
+				*error = zbx_dsprintf(*error, "comma must follow an operand or separator at \"%s\"",
+						ctx->expression + pos);
+				goto out;
+			}
+
+			if (0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR))
+				eval_append_arg_null(ctx);
+
+			for (optoken = NULL; 0 < ctx->ops.values_num; ctx->ops.values_num--)
+			{
+				optoken = &ctx->ops.values[ctx->ops.values_num - 1];
+
+				if (ZBX_EVAL_TOKEN_GROUP_OPEN == optoken->type)
+					break;
+
+				if (ZBX_EVAL_TOKEN_COMMA == optoken->type)
+				{
+					ctx->ops.values_num--;
+					break;
+				}
+
+				eval_append_operator(ctx, optoken);
+			}
+
+			if (NULL == optoken)
+			{
+				*error = zbx_dsprintf(*error, "missing function argument separator for comma at\"%s\"",
+						ctx->expression + pos);
+				goto out;
+			}
+
 			zbx_vector_eval_token_append_ptr(&ctx->ops, &token);
 		}
 		else if (ZBX_EVAL_TOKEN_GROUP_CLOSE == token.type)
@@ -829,7 +865,8 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 					break;
 				}
 
-				eval_append_operator(ctx, optoken);
+				if (ZBX_EVAL_TOKEN_COMMA != optoken->type)
+					eval_append_operator(ctx, optoken);
 			}
 
 			if (NULL == optoken)
@@ -888,7 +925,7 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 						0 != (token.type & ZBX_EVAL_CLASS_OPERATOR1))
 					break;
 
-				if (ZBX_EVAL_TOKEN_GROUP_OPEN == optoken->type)
+				if (ZBX_EVAL_TOKEN_GROUP_OPEN == optoken->type || ZBX_EVAL_TOKEN_COMMA == optoken->type)
 					break;
 
 				eval_append_operator(ctx, optoken);
