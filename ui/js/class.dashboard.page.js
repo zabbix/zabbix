@@ -24,12 +24,9 @@ const DASHBOARD_PAGE_STATE_INACTIVE = 'inactive';
 const DASHBOARD_PAGE_STATE_DESTROYED = 'destroyed';
 
 const DASHBOARD_PAGE_EVENT_EDIT = 'edit';
+const DASHBOARD_PAGE_EVENT_WIDGET_ADD = 'widget-add';
 const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'widget-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'widget-copy';
-const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'widget-delete';
-const DASHBOARD_PAGE_EVENT_WIDGET_DRAG_START = 'widget-drag-start';
-const DASHBOARD_PAGE_EVENT_WIDGET_DRAG = 'widget-drag';
-const DASHBOARD_PAGE_EVENT_WIDGET_DRAG_END = 'widget-drag-end';
 const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'announce-widgets';
 const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'reserve-header-lines';
 
@@ -88,7 +85,10 @@ class CDashboardPage extends CBaseComponent {
 
 		this._widgets = new Map();
 
+		this._grid_min_rows = 0;
+
 		if (this._is_edit_mode) {
+			this._initWidgetPlaceholder();
 			this._initWidgetDragging();
 		}
 	}
@@ -155,6 +155,40 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	/**
+	 * @param {int|null}  min_rows  Min number of rows or null not to update the current one.
+	 */
+	_resizeGrid(min_rows = null) {
+		if (min_rows !== null) {
+			this._grid_min_rows = min_rows;
+		}
+
+		let num_rows = this._getNumRows();
+
+		if (this._grid_min_rows !== null) {
+			num_rows = Math.max(num_rows, this._grid_min_rows);
+		}
+
+		let height = this._cell_height * num_rows;
+
+		if (this._is_edit_mode) {
+			let min_height = window.innerHeight - document.querySelector('.wrapper > footer').clientHeight
+				- this._dashboard_grid.offsetTop;
+
+			let element = this._dashboard_grid;
+
+			do {
+				min_height -= parseInt(getComputedStyle(element).getPropertyValue('padding-bottom'));
+				element = element.parentElement;
+			}
+			while (!element.classList.contains('wrapper'));
+
+			height = Math.max(height, min_height);
+		}
+
+		this._dashboard_grid.style.height = `${height}px`;
+	}
+
+	/**
 	 * Find free position of the given width and height.
 	 *
 	 * @param {int} width
@@ -179,14 +213,14 @@ class CDashboardPage extends CBaseComponent {
 			for (x = 0; x <= max_column && !found; x++) {
 				pos.x = x;
 				pos.y = y;
-				found = this.isPosFree(pos);
+				found = this._isPosFree(pos);
 			}
 		}
 
 		return pos;
 	}
 
-	isPosFree(pos) {
+	_isPosFree(pos) {
 		for (const widget of this._widgets.keys()) {
 			if (this._isOverlappingPos(pos, widget.getPosition())) {
 				return false;
@@ -242,7 +276,7 @@ class CDashboardPage extends CBaseComponent {
 
 		if (reverse) {
 			for (let x = pos.x + pos.width - 1, width = 1; x >= pos.x; x--, width++) {
-				if (!this.isPosFree({...max_pos, x, width})) {
+				if (!this._isPosFree({...max_pos, x, width})) {
 					break;
 				}
 
@@ -252,7 +286,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 		else {
 			for (let width = 1; width <= pos.width; width++) {
-				if (!this.isPosFree({...max_pos, width})) {
+				if (!this._isPosFree({...max_pos, width})) {
 					break;
 				}
 
@@ -268,7 +302,7 @@ class CDashboardPage extends CBaseComponent {
 
 		if (reverse) {
 			for (let y = pos.y + pos.height - 1, height = 1; y >= pos.y; y--, height++) {
-				if (!this.isPosFree({...max_pos, y, height})) {
+				if (!this._isPosFree({...max_pos, y, height})) {
 					break;
 				}
 
@@ -278,7 +312,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 		else {
 			for (let height = this._widget_min_rows; height <= pos.height; height++) {
-				if (!this.isPosFree({...max_pos, height})) {
+				if (!this._isPosFree({...max_pos, height})) {
 					break;
 				}
 
@@ -311,10 +345,6 @@ class CDashboardPage extends CBaseComponent {
 
 	getData() {
 		return this._data;
-	}
-
-	getWidgets() {
-		return Array.from(this._widgets.keys());
 	}
 
 	getWidget(unique_id) {
@@ -400,8 +430,11 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		if (this._is_edit_mode) {
+			this._activateWidgetPlaceholder();
 			this._activateWidgetDragging();
 		}
+
+		this._resizeGrid();
 	}
 
 	_activateWidget(widget) {
@@ -424,6 +457,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		if (this._is_edit_mode) {
+			this._deactivateWidgetPlaceholder();
 			this._dectivateWidgetDragging();
 		}
 	}
@@ -456,9 +490,15 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	resize() {
+		if (this._is_edit_mode) {
+			this._widget_placeholder.resize();
+		}
+
 		for (const widget of this._widgets.keys()) {
 			widget.resize();
 		}
+
+		this._resizeGrid();
 	}
 
 	getState() {
@@ -476,9 +516,11 @@ class CDashboardPage extends CBaseComponent {
 			widget.setEditMode();
 		}
 
+		this._initWidgetPlaceholder();
 		this._initWidgetDragging();
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
+			this._activateWidgetPlaceholder();
 			this._activateWidgetDragging();
 		}
 	}
@@ -503,7 +545,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 	}
 
-	getNumRows() {
+	_getNumRows() {
 		let num_rows = 0;
 
 		for (const widget of this._widgets.keys()) {
@@ -513,6 +555,64 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		return num_rows;
+	}
+
+	/**
+	 * @param {object} pos
+	 *
+	 * @returns {Promise}
+	 */
+	promiseScrollIntoView(pos) {
+		const wrapper = document.querySelector('.wrapper');
+		const wrapper_offset_top = wrapper.scrollTop + this._dashboard_grid.getBoundingClientRect().top;
+
+		const margin = 5;
+
+		const pos_top = wrapper_offset_top + pos.y * this._cell_height - margin;
+		const pos_height = pos.height * this._cell_height + margin * 2;
+
+		const wrapper_scroll_top_min = Math.max(0, pos_top + Math.min(0, pos_height - wrapper.clientHeight));
+		const wrapper_scroll_top_max = pos_top;
+
+		this._resizeGrid(pos.y + pos.height);
+
+		return new Promise((resolve) => {
+			let scroll_to = null;
+
+			if (wrapper.scrollTop < wrapper_scroll_top_min) {
+				scroll_to = wrapper_scroll_top_min;
+			}
+			else if (wrapper.scrollTop > wrapper_scroll_top_max) {
+				scroll_to = wrapper_scroll_top_max;
+			}
+			else {
+				return resolve();
+			}
+
+			const start_scroll = wrapper.scrollTop;
+			const start_time = Date.now();
+			const end_time = start_time + 300;
+
+			const animate = () => {
+				const time = Date.now();
+
+				if (time <= end_time) {
+					const progress = (time - start_time) / (end_time - start_time);
+					const smooth_progress = 0.5 + Math.sin(Math.PI * (progress - 0.5)) / 2;
+
+					wrapper.scrollTop = parseInt(start_scroll + (scroll_to - start_scroll) * smooth_progress);
+
+					requestAnimationFrame(animate);
+				}
+				else {
+					wrapper.scrollTop = scroll_to;
+
+					return resolve();
+				}
+			};
+
+			requestAnimationFrame(animate);
+		});
 	}
 
 	addWidget({type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
@@ -574,8 +674,8 @@ class CDashboardPage extends CBaseComponent {
 		this._widgets.delete(widget);
 
 		if (!is_batch_mode) {
-			this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DELETE);
 			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+			this._resizeGrid();
 		}
 	}
 
@@ -593,6 +693,258 @@ class CDashboardPage extends CBaseComponent {
 
 		for (const widget of widgets) {
 			widget.announceWidgets(widgets);
+		}
+	}
+
+	_initWidgetPlaceholder() {
+		this._widget_placeholder = new CDashboardWidgetPlaceholder(this._cell_width, this._cell_height);
+		this._widget_placeholder_pos = null;
+		this._widget_placeholder_clicked_pos = null;
+
+		this._dashboard_grid.appendChild(this._widget_placeholder.getNode());
+
+		const getGridEventPos = (e, {width, height}) => {
+			const rect = this._dashboard_grid.getBoundingClientRect();
+			const x = Math.round((e.pageX - rect.x) / rect.width * this._max_columns - width / 2);
+			const y = Math.round((e.pageY - rect.y) / this._cell_height - height / 2);
+
+			return {
+				x: Math.max(0, Math.min(this._max_columns - width, x)),
+				y: Math.max(0, Math.min(this._max_rows - height, y)),
+				width: width,
+				height: height
+			}
+		};
+
+		this._widget_placeholder_events = {
+			mouseDown: (e) => {
+				if (this._widget_placeholder_pos === null) {
+					return;
+				}
+
+				this._widget_placeholder_clicked_pos = this._widget_placeholder_pos;
+
+				this._widget_placeholder
+					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
+					.showAtPosition(this._widget_placeholder_clicked_pos);
+
+				e.preventDefault();
+
+				document.addEventListener('mouseup', this._widget_placeholder_events.mouseUp);
+				document.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+				this._dashboard_grid.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+			},
+
+			mouseUp: (e) => {
+				const new_widget_pos = {...this._widget_placeholder_pos};
+
+				if (new_widget_pos.width == 2 && new_widget_pos.height == this._widget_min_rows) {
+					delete new_widget_pos.width;
+					delete new_widget_pos.height;
+				}
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_ADD, {new_widget_pos});
+
+				document.removeEventListener('mouseup', this._widget_placeholder_events.mouseUp);
+				document.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+				this._dashboard_grid.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+			},
+
+			mouseMove: (e) => {
+				if (this._widget_placeholder_clicked_pos !== null) {
+					let event_pos = getGridEventPos(e, {width: 1, height: 1});
+					let reverse_x = false;
+					let reverse_y = false;
+
+					const delta_x = event_pos.x - this._widget_placeholder_clicked_pos.x;
+
+					this._widget_placeholder_pos = {};
+
+					if (this._widget_placeholder_clicked_pos.width == 2) {
+						if (delta_x <= 0) {
+							this._widget_placeholder_clicked_pos.width = 1;
+						}
+						else if (delta_x >= 1) {
+							this._widget_placeholder_clicked_pos.x++;
+							this._widget_placeholder_clicked_pos.width = 1;
+						}
+					}
+
+					if (delta_x > 0) {
+						this._widget_placeholder_pos.x = this._widget_placeholder_clicked_pos.x;
+						this._widget_placeholder_pos.width = Math.max(
+							this._widget_placeholder_clicked_pos.width,
+							event_pos.x - this._widget_placeholder_clicked_pos.x + 1
+						);
+					}
+					else {
+						this._widget_placeholder_pos.x = event_pos.x;
+						this._widget_placeholder_pos.width = this._widget_placeholder_clicked_pos.x
+							- event_pos.x + this._widget_placeholder_clicked_pos.width;
+						reverse_x = true;
+					}
+
+					if (event_pos.y >= this._widget_placeholder_clicked_pos.y) {
+						this._widget_placeholder_pos.y = this._widget_placeholder_clicked_pos.y;
+						this._widget_placeholder_pos.height = Math.max(
+							this._widget_placeholder_clicked_pos.height,
+							event_pos.y - this._widget_placeholder_clicked_pos.y + 1
+						);
+						this._widget_placeholder_pos.height = Math.min(this._widget_max_rows,
+							this._widget_placeholder_pos.height
+						);
+					}
+					else {
+						this._widget_placeholder_pos.y = event_pos.y;
+						this._widget_placeholder_pos.height = this._widget_placeholder_clicked_pos.y
+							- event_pos.y + this._widget_placeholder_clicked_pos.height;
+						reverse_y = true;
+
+						const delta_y = this._widget_placeholder_pos.height - this._widget_max_rows;
+
+						if (delta_y > 0) {
+							this._widget_placeholder_pos.y += delta_y;
+							this._widget_placeholder_pos.height -= delta_y;
+						}
+					}
+
+					this._widget_placeholder_pos = this.accommodatePos(
+						this._widget_placeholder_pos, {reverse_x, reverse_y}
+					);
+
+					const grid_min_rows = Math.min(this._max_rows,
+						this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
+					);
+
+					if (grid_min_rows > this._grid_min_rows) {
+						this._resizeGrid(grid_min_rows);
+					}
+
+					this._widget_placeholder
+						.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
+						.showAtPosition(this._widget_placeholder_pos);
+				}
+				else {
+					if (this._widget_placeholder_pos !== null
+							&& this._widget_placeholder.getNode().contains(e.target)) {
+						return;
+					}
+
+					this._widget_placeholder_pos = null;
+
+					const event_pos_1x1 = getGridEventPos(e, {width: 1, height: 1});
+
+					if (this._isPosFree(event_pos_1x1)) {
+						let event_pos = getGridEventPos(e, {width: 2, height: this._widget_min_rows});
+
+						for (const width of [2, 1]) {
+							for (const offset_y of [0, -1, 1]) {
+								for (const offset_x of [0, -1, 1]) {
+									const pos = {
+										x: event_pos.x + offset_x,
+										y: event_pos.y + offset_y,
+										width: width,
+										height: this._widget_min_rows
+									};
+
+									if (pos.x < 0 || pos.x + pos.width > this._max_columns
+											|| pos.y < 0 || pos.y + pos.height > this._max_rows) {
+										continue;
+									}
+
+									if (this._isOverlappingPos(pos, event_pos_1x1) && this._isPosFree(pos)) {
+										this._widget_placeholder_pos = pos;
+										break;
+									}
+								}
+
+								if (this._widget_placeholder_pos !== null) {
+									break;
+								}
+							}
+
+							if (this._widget_placeholder_pos !== null) {
+								break;
+							}
+						}
+					}
+
+					if (this._widget_placeholder_pos !== null) {
+						const grid_min_rows = Math.min(this._max_rows,
+							this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
+						);
+
+						if (grid_min_rows > this._grid_min_rows) {
+							this._resizeGrid(grid_min_rows);
+						}
+
+						this._widget_placeholder
+							.setState(WIDGET_PLACEHOLDER_STATE_POSITIONING)
+							.showAtPosition(this._widget_placeholder_pos);
+					}
+					else {
+						this._widget_placeholder.hide();
+					}
+				}
+			},
+
+			mouseLeave: (e) => {
+				if (this._widget_placeholder_clicked_pos === null) {
+					this.resetWidgetPlaceholder();
+				}
+			},
+
+			scroll: (e) => {
+				if (e.target.scrollTop == 0) {
+					this._resizeGrid(0);
+				}
+			}
+		}
+	}
+
+	_activateWidgetPlaceholder() {
+		this._widget_placeholder.on('mousedown', this._widget_placeholder_events.mouseDown);
+
+		this._dashboard_grid.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+		this._dashboard_grid.addEventListener('mouseleave', this._widget_placeholder_events.mouseLeave);
+
+		document.querySelector('.wrapper').addEventListener('scroll', this._widget_placeholder_events.scroll);
+
+		this.resetWidgetPlaceholder();
+	}
+
+	_deactivateWidgetPlaceholder() {
+		this._widget_placeholder.off('mousedown', this._widget_placeholder_events.mouseDown);
+
+		this._dashboard_grid.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+		this._dashboard_grid.removeEventListener('mouseleave', this._widget_placeholder_events.mouseLeave);
+
+		document.querySelector('.wrapper').removeEventListener('scroll', this._widget_placeholder_events.scroll);
+
+		document.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+		document.removeEventListener('mouseup', this._widget_placeholder_events.mouseUp);
+
+		this._widget_placeholder.hide();
+	}
+
+	resetWidgetPlaceholder() {
+		this._widget_placeholder_pos = null;
+		this._widget_placeholder_clicked_pos = null;
+
+		if (this._is_editable) {
+			if (this._is_kiosk_mode) {
+				this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_KIOSK_MODE);
+			}
+			else {
+				this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW);
+			}
+		}
+		else {
+			this._widget_placeholder.setState(WIDGET_PLACEHOLDER_STATE_READONLY);
+		}
+
+		if (this._widgets.size == 0) {
+			this._widget_placeholder.showAtDefaultPosition();
 		}
 	}
 
@@ -743,7 +1095,7 @@ class CDashboardPage extends CBaseComponent {
 					return;
 				}
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DRAG_START);
+				this._deactivateWidgetPlaceholder();
 
 				dragging_pos = dragging_widget.getPosition();
 
@@ -785,7 +1137,7 @@ class CDashboardPage extends CBaseComponent {
 				document.removeEventListener('mousemove', events.mouseMove);
 				this._dashboard_grid.addEventListener('mousemove', events.mouseMove);
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DRAG_END);
+				this._activateWidgetPlaceholder();
 			},
 
 			mouseMove: (e) => {
@@ -819,7 +1171,7 @@ class CDashboardPage extends CBaseComponent {
 						dragging_pos = pos;
 						showWidgetHelper(dragging_pos);
 
-						this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DRAG, {pos: dragging_pos});
+						this._resizeGrid(Math.min(this._max_rows, dragging_pos.y + dragging_pos.height + 2));
 					}
 				}
 			}
