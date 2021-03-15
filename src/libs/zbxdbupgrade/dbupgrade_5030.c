@@ -2117,9 +2117,6 @@ static int	DBpatch_5030059(void)
 		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
 		zbx_free(expression);
 		zbx_free(out);
-
-		if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-			break;
 	}
 
 	DBfree_result(result);
