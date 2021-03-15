@@ -74,10 +74,7 @@ $fields = [
 										'isset({add}) || isset({update})'
 									],
 	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
-	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,
-										'(isset({add}) || isset({update})) && isset({value_type})'.
-											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
-									],
+	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'authtype' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH
 									],
@@ -307,10 +304,6 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
-	unset($_REQUEST['itemid']);
-	$_REQUEST['form'] = 'clone';
-}
 elseif (hasRequest('add') || hasRequest('update')) {
 	$applications = getRequest('applications', []);
 	$application = reset($applications);
@@ -494,7 +487,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				: getRequest('history'),
 			'units'			=> getRequest('units'),
 			'logtimefmt'	=> getRequest('logtimefmt'),
-			'valuemapid'	=> getRequest('valuemapid'),
+			'valuemapid'	=> getRequest('valuemapid', 0),
 			'authtype'		=> getRequest('authtype'),
 			'username'		=> getRequest('username'),
 			'password'		=> getRequest('password'),
@@ -733,11 +726,11 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$itemPrototype = [];
 	$has_errors = false;
 
-	if (hasRequest('itemid')) {
+	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$itemPrototype = API::ItemPrototype()->get([
 			'itemids' => getRequest('itemid'),
 			'output' => [
@@ -804,7 +797,8 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
-	$data = getItemFormData($itemPrototype);
+	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
+	$data = getItemFormData($itemPrototype, ['form' => $form_action]);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');

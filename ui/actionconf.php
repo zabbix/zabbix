@@ -601,7 +601,9 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, new CUrl('actionconf.php'));
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sortOrder, (new CUrl('actionconf.php'))
+		->setArgument('eventsource', $eventsource)
+	);
 
 	// render view
 	echo (new CView('configuration.action.list', $data))->getOutput();

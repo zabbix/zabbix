@@ -519,7 +519,9 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					$params = array_map(function ($param) {
-						return $param['raw'];
+						return is_array($param)
+							? $param['raw']
+							: $param->match;
 					}, $params);
 
 					/*
@@ -680,11 +682,13 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					// Combince sec|#num and <time_shift> parameters into one.
-					array_unshift($data['params'], implode(':', array_filter([
-						$data['params']['last'],
-						array_key_exists('shift', $data['params']) ? $data['params']['shift'] : null
-					])));
-					unset($data['params']['last'], $data['params']['shift']);
+					if (array_key_exists('last', $data['params'])) {
+						array_unshift($data['params'], implode(':', array_filter([
+							$data['params']['last'],
+							array_key_exists('shift', $data['params']) ? $data['params']['shift'] : null
+						])));
+						unset($data['params']['last'], $data['params']['shift']);
+					}
 
 					// Quote function param.
 					$quoted_params = [];
@@ -692,15 +696,24 @@ class CControllerPopupTriggerExpr extends CController {
 						$quoted_params[] = quoteFunctionParam($param);
 					}
 
-					$fn_params = rtrim(implode(',', $quoted_params), ',');
-					$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
-						$function,
-						$item_host_data['host'],
-						$data['item_key'],
-						($fn_params === '') ? '' : ','.$fn_params,
-						$operator,
-						CTriggerExpression::quoteString($data['value'])
-					);
+					if (in_array($function, ['date', 'dayofmonth', 'dayofweek', 'now', 'time'])) {
+						$data['expression'] = sprintf('%s()%s%s',
+							$function,
+							$operator,
+							CTriggerExpression::quoteString($data['value'])
+						);
+					}
+					else {
+						$fn_params = rtrim(implode(',', $quoted_params), ',');
+						$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
+							$function,
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
+							$operator,
+							CTriggerExpression::quoteString($data['value'])
+						);
+					}
 
 					// Validate trigger expression.
 					$trigger_expression = new CTriggerExpression();
@@ -708,15 +721,10 @@ class CControllerPopupTriggerExpr extends CController {
 					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
 						// Validate trigger function.
 						$trigger_function_validator = new CFunctionValidator();
-						$function_token = $result->getTokens()[0];
-						$is_valid = $trigger_function_validator->validate([
-							'function' => $function_token->match,
-							'functionName' => $function_token->function,
-							'functionParamList' => $function_token->params_raw['parameters'],
-							'valueType' => $data['itemValueType']
-						]);
+						$fn = $result->getTokens()[0];
 
-						if ($is_valid === false) {
+						if (!$trigger_function_validator->validate($fn)
+								|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
 							error($trigger_function_validator->getError());
 						}
 					}

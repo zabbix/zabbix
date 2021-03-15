@@ -60,7 +60,7 @@ No specific Zabbix configuration is required.
 |#{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
 |Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.serialnumber.diff()}=1 and {TEMPLATE_NAME:system.hw.serialnumber.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.firmware.diff()}=1 and {TEMPLATE_NAME:system.hw.firmware.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|#{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 
 ## Feedback
 

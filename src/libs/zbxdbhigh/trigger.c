@@ -445,9 +445,6 @@ void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_ui
 
 	if (NULL != (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R)))
 		zbx_eval_get_functionids(&cache->eval_ctx_r, functionids);
-
-	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -591,8 +588,8 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 
 	if (0 != functionids_ordered.values_num)
 	{
-		DC_FUNCTION	*function, *functions;
-		int		i, *errcodes;
+		DC_FUNCTION	*functions;
+		int		i, *errcodes, index;
 
 		zbx_vector_uint64_append_array(&functionids, functionids_ordered.values,
 				functionids_ordered.values_num);
@@ -608,15 +605,20 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 
 		for (i = 0; i < functionids_ordered.values_num; i++)
 		{
-			if (NULL != (function = bsearch(&functionids_ordered.values[i], functions,
-					functionids.values_num, sizeof(DC_FUNCTION),
+			if (-1 == (index = zbx_vector_uint64_bsearch(&functionids, functionids_ordered.values[i],
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				if (FAIL == zbx_vector_uint64_search(itemids, function->itemid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					zbx_vector_uint64_append(itemids, function->itemid);
-				}
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (SUCCEED != errcodes[index])
+				continue;
+
+			if (FAIL == zbx_vector_uint64_search(itemids, functions[index].itemid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zbx_vector_uint64_append(itemids, functions[index].itemid);
 			}
 		}
 

@@ -58,7 +58,7 @@ class testPageHostInterfaces extends CWebTest {
 				'main' => 1,
 				'useip' => 1,
 				'ip' => '127.0.0.98',
-				'dns' => 'snmpv2zabbix.com',
+				'dns' => 'snmpv3zabbix.com',
 				'port' => '163',
 				'details' => [
 					'version' => '3',
@@ -70,9 +70,25 @@ class testPageHostInterfaces extends CWebTest {
 			[
 				'type' => 2,
 				'main' => 0,
+				'useip' => 0,
+				'ip' => '',
+				'dns' => 'snmpv3auth.com',
+				'port' => '163',
+				'details' => [
+					'version' => '3',
+					'bulk' => '1',
+					'securitylevel' => 2,
+					'authprotocol' => 2,
+					'privprotocol' => 4
+				],
+				'available' => 1
+			],
+			[
+				'type' => 2,
+				'main' => 0,
 				'useip' => 1,
 				'ip' => '127.0.0.99',
-				'dns' => 'snmpv3zabbix.com',
+				'dns' => 'snmpv2zabbix.com',
 				'port' => '162',
 				'details' => [
 					'version' => '2',
@@ -225,6 +241,14 @@ class testPageHostInterfaces extends CWebTest {
 										'color' => self::RED
 									],
 									'Error' => ''
+								],
+								[
+									'Interface' => "snmpv3auth.com:163\nSNMPv3, Context name: , (priv: AES192C, auth: SHA224)",
+									'Status' => [
+										'text' => 'Available',
+										'color' => self::GREEN
+									],
+									'Error' => ''
 								]
 							]
 						],
@@ -343,7 +367,7 @@ class testPageHostInterfaces extends CWebTest {
 									'Interface' => "zabbixzabbixzabbix.com:10050\nSNMPv2, Community: {\$SNMP_COMMUNITY}",
 									'Status' => [
 										'text' => 'Available',
-										'color' => self::GREEN,
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								]

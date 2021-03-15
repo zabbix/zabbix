@@ -277,7 +277,7 @@ abstract class CControllerHost extends CController {
 		$data = [];
 
 		if ($filter['groupids']) {
-			$groups= API::HostGroup()->get([
+			$groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groupids']
 			]);

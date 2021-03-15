@@ -514,6 +514,10 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
 void	DBcheck_capabilities(void);
 
+#ifdef HAVE_POSTGRESQL
+char	*zbx_db_get_schema_esc(void);
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Type: ZBX_GRAPH_ITEMS                                                      *
@@ -610,7 +614,7 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
-int	DBget_user_names(zbx_uint64_t userid, char **alias, char **name, char **surname);
+int	DBget_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
@@ -749,6 +753,7 @@ ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *);
 
 void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
+int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
 
 typedef struct
 {

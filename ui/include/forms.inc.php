@@ -92,6 +92,7 @@ function getItemFilterForm(&$data) {
 	$filter_status				= getRequest('filter_status');
 	$filter_inherited			= getRequest('filter_inherited');
 	$filter_with_triggers		= getRequest('filter_with_triggers');
+	$filter_valuemapids			= getRequest('filter_valuemapids');
 	$subfilter_hosts			= getRequest('subfilter_hosts');
 	$subfilter_apps				= getRequest('subfilter_apps');
 	$subfilter_types			= getRequest('subfilter_types');
@@ -191,7 +192,7 @@ function getItemFilterForm(&$data) {
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
-					'enrich_parent_groups' => true,
+					'enrich_parent_groups' => true
 				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -327,6 +328,39 @@ function getItemFilterForm(&$data) {
 	$filterColumn1->addRow(_('Key'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
+
+	if ($host_template_filter) {
+		$valuemaps_filter = $filter_valuemapids
+			? CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'valuemapids' => $filter_valuemapids
+			]), ['valuemapid' => 'id'])
+			: [];
+
+		$filterColumn2->addRow(_('Value mapping'),
+			(new CMultiSelect([
+				'name' => 'filter_valuemapids[]',
+				'object_name' => 'valuemap_names',
+				'data' => array_values(array_column($valuemaps_filter, null, 'name')),
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'valuemap_names',
+						'srcfld1' => 'valuemapid',
+						'dstfrm' => $filter->getName(),
+						'dstfld1' => 'filter_valuemapids_',
+						'hostids' => array_column($host_template_filter, 'id'),
+						'with_inherited' => true,
+						'context' => $data['context']
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		);
+	}
+	else {
+		foreach ($filter_valuemapids as $filter_valuemapid) {
+			$filter->addVar('filter_valuemapids[]', $filter_valuemapid);
+		}
+	}
 
 	if ($data['context'] === 'host') {
 		$filterColumn4->addRow(_('Discovered'),
@@ -860,13 +894,14 @@ function prepareScriptItemFormData(array $item): array {
  *
  * @param array  $item                          Item, item prototype, LLD rule or LLD item to take the data from.
  * @param array  $options
- * @param bool   $options['is_discovery_rule']
+ * @param bool   $options['form']               (mandatory)
+ * @param bool   $options['is_discovery_rule']  (optional)
  *
  * @return array
  */
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
-		'form' => getRequest('form'),
+		'form' => $options['form'],
 		'form_refresh' => getRequest('form_refresh'),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
@@ -899,7 +934,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'publickey' => getRequest('publickey', ''),
 		'privatekey' => getRequest('privatekey', ''),
 		'logtimefmt' => getRequest('logtimefmt', ''),
-		'valuemaps' => null,
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
@@ -999,11 +1033,13 @@ function getItemFormData(array $item = [], array $options = []) {
 	if ($data['parent_discoveryid'] != 0) {
 		$discoveryRule = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
+			'selectHosts' => ['flags'],
 			'itemids' => $data['parent_discoveryid'],
 			'editable' => true
 		]);
 		$discoveryRule = reset($discoveryRule);
 		$data['hostid'] = $discoveryRule['hostid'];
+		$data['host'] = $discoveryRule['hosts'][0];
 
 		$data['new_application_prototype'] = getRequest('new_application_prototype', '');
 		$data['application_prototypes'] = getRequest('application_prototypes', []);
@@ -1254,25 +1290,42 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] == 0
-			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
+	if (!$data['is_discovery_rule'] && $data['form'] === 'clone') {
 		if ($data['valuemapid'] != 0) {
-			$valuemaps = API::ValueMap()->get([
-				'output' => ['name'],
-				'valuemapids' => [$data['valuemapid']]
+			$entity = ($data['parent_discoveryid'] == 0) ? API::Item() : API::ItemPrototype();
+			$cloned_item = $entity->get([
+				'output' => ['templateid'],
+				'selectValueMap' => ['name'],
+				'itemids' => $data['itemid']
 			]);
+			$cloned_item = reset($cloned_item);
 
-			if ($valuemaps) {
-				$data['valuemaps'] = $valuemaps[0]['name'];
+			if ($cloned_item['templateid'] != 0) {
+				$host_valuemaps = API::ValueMap()->get([
+					'output' => ['valuemapid'],
+					'hostids' => $data['hostid'],
+					'filter' => ['name' => $cloned_item['valuemap']['name']]
+				]);
+
+				$data['valuemapid'] = $host_valuemaps ? $host_valuemaps[0]['valuemapid'] : 0;
 			}
 		}
+
+		$data['itemid'] = 0;
+		$data['form'] = 'create';
+	}
+
+	if ($data['is_discovery_rule']) {
+		unset($data['valuemapid']);
+	}
+	else if ($data['valuemapid'] != 0) {
+		$data['valuemap'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'valuemapids' => $data['valuemapid']
+		]), ['valuemapid' => 'id']);
 	}
 	else {
-		$data['valuemaps'] = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name']
-		]);
-
-		CArrayHelper::sort($data['valuemaps'], ['name']);
+		$data['valuemap'] = [];
 	}
 
 	// possible host inventories

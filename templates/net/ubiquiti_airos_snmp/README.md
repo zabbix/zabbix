@@ -49,7 +49,7 @@ No specific Zabbix configuration is required.
 |----|-----------|----|----|----|
 |High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:system.cpu.util[loadValue.2].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
 |Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.firmware.diff()}=1 and {TEMPLATE_NAME:system.hw.firmware.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[memoryUsedPercentage].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[memoryUsedPercentage].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 
 ## Feedback
 

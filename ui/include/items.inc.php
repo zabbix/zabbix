@@ -356,7 +356,7 @@ function interfaceType2str($type) {
 
 function itemTypeInterface($type = null) {
 	$types = [
-		ITEM_TYPE_SNMP =>  INTERFACE_TYPE_SNMP,
+		ITEM_TYPE_SNMP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_SNMPTRAP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
 		ITEM_TYPE_ZABBIX => INTERFACE_TYPE_AGENT,
@@ -453,6 +453,32 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		'templated_hosts' => true
 	]);
 
+	$src_valuemapids = array_column($items, 'valuemapid', 'valuemapid');
+	unset($src_valuemapids[0]);
+
+	if ($src_valuemapids) {
+		$valuemapids_map = [];
+		$src_valuemaps = API::ValueMap()->get([
+			'output' => ['name'],
+			'valuemapids' => $src_valuemapids,
+			'preservekeys' => true
+		]);
+		$dst_valuemaps = API::ValueMap()->get([
+			'output' => ['name', 'hostid'],
+			'hostids' => $dst_hostids,
+			'filter' => ['name' => array_column($src_valuemaps, 'name')],
+			'preservekeys' => true
+		]);
+
+		foreach ($src_valuemaps as $src_valuemapid => $src_valuemap) {
+			foreach ($dst_valuemaps as $dst_valuemapid => $dst_valuemap) {
+				if ($dst_valuemap['name'] === $src_valuemap['name']) {
+					$valuemapids_map[$src_valuemapid][$dst_valuemap['hostid']] = $dst_valuemapid;
+				}
+			}
+		}
+	}
+
 	foreach ($dstHosts as $dstHost) {
 		$interfaceids = [];
 
@@ -507,6 +533,17 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 				}
 			}
 			unset($item['itemid']);
+
+			if ($item['valuemapid'] != 0) {
+				if (array_key_exists($item['valuemapid'], $valuemapids_map)
+						&& array_key_exists($dstHost['hostid'], $valuemapids_map[$item['valuemapid']])) {
+					$item['valuemapid'] = $valuemapids_map[$item['valuemapid']][$dstHost['hostid']];
+				}
+				else {
+					$item['valuemapid'] = 0;
+				}
+			}
+
 			$item['hostid'] = $dstHost['hostid'];
 			$item['applications'] = get_same_applications_for_host(
 				zbx_objectValues($item['applications'], 'applicationid'),
@@ -567,6 +604,7 @@ function copyItems($srcHostId, $dstHostId) {
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+		'selectValueMap' => ['name'],
 		'hostids' => $srcHostId,
 		'webitems' => true,
 		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
@@ -581,6 +619,22 @@ function copyItems($srcHostId, $dstHostId) {
 		'templated_hosts' => true
 	]);
 	$dstHost = reset($dstHosts);
+	$src_valuemap_names = [];
+	$valuemap_map = [];
+
+	foreach ($srcItems as $src_item) {
+		if ($src_item['valuemap'] && $src_item['templateid'] == 0) {
+			$src_valuemap_names[] = $src_item['valuemap']['name'];
+		}
+	}
+
+	if ($src_valuemap_names) {
+		$valuemap_map = array_column(API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'hostids' => $dstHostId,
+			'filter' => ['name' => $src_valuemap_names]
+		]), 'valuemapid', 'name');
+	}
 
 	$create_order = [];
 	$src_itemid_to_key = [];
@@ -626,7 +680,7 @@ function copyItems($srcHostId, $dstHostId) {
 			$create_items = [];
 		}
 
-		if ($srcItem['templateid']) {
+		if ($srcItem['templateid'] != 0) {
 			$srcItem = get_same_item_for_host($srcItem, $dstHost['hostid']);
 
 			if (!$srcItem) {
@@ -634,6 +688,11 @@ function copyItems($srcHostId, $dstHostId) {
 			}
 			$itemkey_to_id[$srcItem['key_']] = $srcItem['itemid'];
 			continue;
+		}
+		else if ($srcItem['valuemapid'] != 0) {
+			$srcItem['valuemapid'] = array_key_exists($srcItem['valuemap']['name'], $valuemap_map)
+				? $valuemap_map[$srcItem['valuemap']['name']]
+				: 0;
 		}
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1115,8 +1174,9 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 
 	if ($application !== '') {
 		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
 			'selectHosts' => ['name'],
+			'selectValueMap' => ['mappings'],
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
@@ -1125,8 +1185,9 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 	}
 	else {
 		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
 			'selectHosts' => ['name'],
+			'selectValueMap' => ['mappings'],
 			'hostids' => $hostids,
 			'groupids' => $groupids,
 			'monitored' => true,
@@ -1181,7 +1242,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 			'itemid' => $db_item['itemid'],
 			'value_type' => $db_item['value_type'],
 			'units' => $db_item['units'],
-			'valuemapid' => $db_item['valuemapid'],
+			'valuemap' => $db_item['valuemap'],
 			'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
 		];
 
@@ -1204,7 +1265,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	}
 
 	CArrayHelper::sort($db_hosts, [
-		['field' => 'name', 'order' => ZBX_SORT_UP],
+		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
 
 	$data_display_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
@@ -1256,16 +1317,7 @@ function getInterfaceSelect(array $interfaces): CSelect {
 		$option = new CSelectOption($interface['interfaceid'], getHostInterface($interface));
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-			$version = $interface['details']['version'];
-			if ($version == SNMP_V3) {
-				$option->setExtra('description', sprintf('%s, %s: %s', _s('SNMPv%1$d', $version),
-					_('Context name'), $interface['details']['contextname']
-				));
-			} else {
-				$option->setExtra('description', sprintf('%s, %s: %s', _s('SNMPv%1$d', $version),
-					_x('Community', 'SNMP Community'), $interface['details']['community']
-				));
-			}
+			$option->setExtra('description', getSnmpInterfaceDescription($interface));
 		}
 
 		$options_by_type[$interface['type']][] = $option;
@@ -1286,6 +1338,78 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	}
 
 	return $interface_select;
+}
+
+/**
+ * Creates SNMP interface description.
+ *
+ * @param array $interface
+ * @param int   $interface['details']['version']        Interface SNMP version.
+ * @param int   $interface['details']['contextname']    Interface context name for SNMP version 3.
+ * @param int   $interface['details']['community']      Interface community for SNMP non version 3 interface.
+ * @param int   $interface['details']['securitylevel']  Security level for SNMP version 3 interface.
+ * @param int   $interface['details']['authprotocol']   Authentication protocol for SNMP version 3 interface.
+ * @param int   $interface['details']['privprotocol']   Privacy protocol for SNMP version 3 interface.
+ *
+ * @return string
+ */
+function getSnmpInterfaceDescription(array $interface): string {
+	$snmp_desc = [
+		_s('SNMPv%1$d', $interface['details']['version'])
+	];
+
+	if ($interface['details']['version'] == SNMP_V3) {
+		$snmp_desc[] = _('Context name').': '.$interface['details']['contextname'];
+
+		if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+			[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
+			[$interface['details']['privprotocol'] => $priv_protocol] = getSnmpV3PrivProtocols();
+
+			$snmp_desc[] = '(priv: '.$priv_protocol.', auth: '.$auth_protocol.')';
+		}
+		elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+			[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
+
+			$snmp_desc[] = '(auth: '.$auth_protocol.')';
+		}
+
+	} else {
+		$snmp_desc[] = _x('Community', 'SNMP Community').': '.$interface['details']['community'];
+	}
+
+	return implode(', ', $snmp_desc);
+}
+
+/**
+ * Named SNMPv3 authentication protocols.
+ *
+ * @return array
+ */
+function getSnmpV3AuthProtocols(): array {
+	return [
+		ITEM_SNMPV3_AUTHPROTOCOL_MD5 => 'MD5',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA1 => 'SHA1',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA224 => 'SHA224',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA256 => 'SHA256',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA384 => 'SHA384',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA512 => 'SHA512'
+	];
+}
+
+/**
+ * Named SNMPv3 privacy protocols.
+ *
+ * @return array
+ */
+function getSnmpV3PrivProtocols(): array {
+	return [
+		ITEM_SNMPV3_PRIVPROTOCOL_DES => 'DES',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES128 => 'AES128',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES192 => 'AES192',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES256 => 'AES256',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES192C => 'AES192C',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES256C => 'AES256C'
+	];
 }
 
 /**
@@ -1377,9 +1501,9 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
  *
  * @param mixed     $value
  * @param array     $item
- * @param int       $item['value_type']     type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param string    $item['units']          units of item
- * @param int       $item['valuemapid']     id of mapping set of values
+ * @param int       $item['value_type']  type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
+ * @param string    $item['units']       units of item
+ * @param array     $item['valuemap']
  * @param bool      $trim
  *
  * @return string
@@ -1401,7 +1525,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 	// apply value mapping
 	switch ($item['value_type']) {
 		case ITEM_VALUE_TYPE_STR:
-			$mapping = getMappedValue($value, $item['valuemapid']);
+			$mapping = CValueMapHelper::getMappedValue($value, $item['valuemap']);
 			// break; is not missing here
 
 		case ITEM_VALUE_TYPE_TEXT:
@@ -1417,7 +1541,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 			break;
 
 		default:
-			$value = applyValueMap($value, $item['valuemapid']);
+			$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
 	}
 
 	return $value;

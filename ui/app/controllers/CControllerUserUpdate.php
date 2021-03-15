@@ -32,7 +32,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 
 		$fields = [
 			'userid' =>			'fatal|required|db users.userid',
-			'alias' =>			'required|db users.alias|not_empty',
+			'username' =>		'required|db users.username|not_empty',
 			'name' =>			'db users.name',
 			'surname' =>		'db users.surname',
 			'user_groups' =>	'required|array_id|not_empty',
@@ -92,7 +92,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	protected function doAction() {
 		$user = [];
 
-		$this->getInputs($user, ['userid', 'alias', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
+		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');

@@ -21,12 +21,14 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 #include "zbxserver.h"
-#include "trapper_item_test.h"
 #include "../poller/poller.h"
 #include "zbxtasks.h"
 #ifdef HAVE_OPENIPMI
 #include "../ipmi/ipmi.h"
 #endif
+
+#include "trapper_auth.h"
+#include "trapper_item_test.h"
 
 static void	dump_item(const DC_ITEM *item)
 {
@@ -391,7 +393,6 @@ out:
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	char			sessionid[MAX_STRING_LEN];
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
 	struct zbx_json		json;
@@ -402,8 +403,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
-			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_ZABBIX_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
 		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
 		return;

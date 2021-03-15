@@ -21,6 +21,7 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 #include "../zbxalgo/vectorimpl.h"
 
 /*
@@ -370,6 +371,585 @@ static int	DBpatch_5030025(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5030026(void)
+{
+	const ZBX_TABLE table =
+		{"token", "tokenid", 0,
+			{
+				{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, 0, 0},
+				{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"created_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"creator_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030027(void)
+{
+	return DBcreate_index("token", "token_1", "name", 0);
+}
+
+static int	DBpatch_5030028(void)
+{
+	return DBcreate_index("token", "token_2", "userid,name", 1);
+}
+
+static int	DBpatch_5030029(void)
+{
+	return DBcreate_index("token", "token_3", "token", 1);
+}
+
+static int	DBpatch_5030030(void)
+{
+	return DBcreate_index("token", "token_4", "creator_userid", 0);
+}
+
+static int	DBpatch_5030031(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("token", 1, &field);
+}
+
+static int	DBpatch_5030032(void)
+{
+	const ZBX_FIELD field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("token", 2, &field);
+}
+
+static int	DBpatch_5030033(void)
+{
+	const ZBX_FIELD	field = {"timeout", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030034(void)
+{
+	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("scripts", &field, &old_field);
+}
+
+static int	DBpatch_5030035(void)
+{
+	const ZBX_TABLE	table =
+			{"script_param", "script_paramid", 0,
+				{
+					{"script_paramid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"scriptid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030036(void)
+{
+	const ZBX_FIELD	field = {"scriptid", NULL, "scripts", "scriptid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("script_param", 1, &field);
+}
+
+static int	DBpatch_5030037(void)
+{
+	return DBcreate_index("script_param", "script_param_1", "scriptid,name", 1);
+}
+
+static int	DBpatch_5030038(void)
+{
+	const ZBX_FIELD field = {"type", "5", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("scripts", &field);
+}
+
+static int	DBpatch_5030039(void)
+{
+	const ZBX_TABLE table =
+		{"valuemap", "valuemapid", 0,
+			{
+				{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030040(void)
+{
+	return DBcreate_index("valuemap", "valuemap_1", "hostid,name", 1);
+}
+
+static int	DBpatch_5030041(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("valuemap", 1, &field);
+}
+
+static int	DBpatch_5030042(void)
+{
+	const ZBX_TABLE table =
+		{"valuemap_mapping", "valuemap_mappingid", 0,
+			{
+				{"valuemap_mappingid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"newvalue", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030043(void)
+{
+	return DBcreate_index("valuemap_mapping", "valuemap_mapping_1", "valuemapid,value", 1);
+}
+
+static int	DBpatch_5030044(void)
+{
+	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("valuemap_mapping", 1, &field);
+}
+
+static int	DBpatch_5030045(void)
+{
+	return DBdrop_foreign_key("items", 3);
+}
+
+typedef struct
+{
+	zbx_uint64_t		valuemapid;
+	char			*name;
+	zbx_vector_ptr_pair_t	mappings;
+}
+zbx_valuemap_t;
+
+typedef struct
+{
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		valuemapid;
+	zbx_vector_uint64_t	itemids;
+}
+zbx_host_t;
+
+static int	host_compare_func(const void *d1, const void *d2)
+{
+	const zbx_host_t	*h1 = *(const zbx_host_t **)d1;
+	const zbx_host_t	*h2 = *(const zbx_host_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(h1->hostid, h2->hostid);
+	ZBX_RETURN_IF_NOT_EQUAL(h1->valuemapid, h2->valuemapid);
+
+	return 0;
+}
+
+static void	get_discovered_itemids(const zbx_vector_uint64_t *itemids, zbx_vector_uint64_t *discovered_itemids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from item_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid", itemids->values, itemids->values_num);
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		zbx_vector_uint64_append(discovered_itemids, itemid);
+	}
+	DBfree_result(result);
+}
+
+static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids, zbx_vector_uint64_t *itemids,
+		zbx_vector_uint64_t *discovered_itemids)
+{
+	DB_RESULT		result;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_ROW			row;
+	zbx_vector_uint64_t	templateids_tmp;
+
+	zbx_vector_uint64_create(&templateids_tmp);
+	zbx_vector_uint64_append_array(&templateids_tmp, templateids->values, templateids->values_num);
+
+	zbx_vector_uint64_clear(templateids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i1.itemid"
+			" from items i1"
+				" where exists ("
+					"select null"
+					" from items i2"
+					" where i2.templateid=i1.itemid"
+				")"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids_tmp.values,
+			templateids_tmp.values_num);
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		zbx_vector_uint64_append(templateids, itemid);
+	}
+	DBfree_result(result);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i2.itemid"
+			" from items i1,item_discovery i2"
+			" where i2.parent_itemid=i1.itemid"
+			" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids_tmp.values,
+			templateids_tmp.values_num);
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		zbx_vector_uint64_append(discovered_itemids, itemid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&templateids_tmp);
+
+	if (0 == templateids->values_num)
+		return;
+
+	zbx_vector_uint64_append_array(itemids, templateids->values, templateids->values_num);
+
+	get_template_itemids_by_templateids(templateids, itemids, discovered_itemids);
+}
+
+static void	host_free(zbx_host_t *host)
+{
+	zbx_vector_uint64_destroy(&host->itemids);
+	zbx_free(host);
+}
+
+static int	DBpatch_5030046(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			i, j;
+	zbx_hashset_t		valuemaps;
+	zbx_hashset_iter_t	iter;
+	zbx_valuemap_t		valuemap_local, *valuemap;
+	zbx_uint64_t		valuemapid;
+	zbx_vector_ptr_t	hosts;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	templateids, discovered_itemids;
+	zbx_db_insert_t		db_insert_valuemap, db_insert_valuemap_mapping;
+
+	zbx_hashset_create(&valuemaps, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_ptr_create(&hosts);
+	zbx_vector_ptr_reserve(&hosts, 1000);
+
+	zbx_vector_uint64_create(&templateids);
+	zbx_vector_uint64_reserve(&templateids, 1000);
+
+	zbx_vector_uint64_create(&discovered_itemids);
+	zbx_vector_uint64_reserve(&discovered_itemids, 1000);
+
+	result = DBselect(
+			"select m.valuemapid,v.name,m.value,m.newvalue"
+			" from valuemaps v"
+			" left join mappings m on v.valuemapid=m.valuemapid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_ptr_pair_t	pair;
+
+		if (SUCCEED == DBis_null(row[0]))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "empty valuemap '%s' was removed", row[1]);
+			continue;
+		}
+
+		ZBX_STR2UINT64(valuemap_local.valuemapid, row[0]);
+
+		if (NULL == (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &valuemap_local)))
+		{
+			valuemap = zbx_hashset_insert(&valuemaps, &valuemap_local, sizeof(valuemap_local));
+			valuemap->name = zbx_strdup(NULL, row[1]);
+			zbx_vector_ptr_pair_create(&valuemap->mappings);
+		}
+
+		pair.first = zbx_strdup(NULL, row[2]);
+		pair.second = zbx_strdup(NULL, row[3]);
+
+		zbx_vector_ptr_pair_append(&valuemap->mappings, pair);
+	}
+	DBfree_result(result);
+
+	result = DBselect("select h.flags,i.hostid,i.valuemapid,i.itemid"
+			" from items i,hosts h"
+			" where i.templateid is null"
+				" and i.valuemapid is not null"
+				" and i.flags in (0,2)"
+				" and h.hostid=i.hostid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_host_t	host_local, *host;
+		zbx_uint64_t	itemid;
+		unsigned char	flags;
+
+		ZBX_STR2UCHAR(flags, row[0]);
+		ZBX_STR2UINT64(host_local.hostid, row[1]);
+
+		if (ZBX_FLAG_DISCOVERY_CREATED == flags)
+			host_local.valuemapid = 0;
+		else
+			ZBX_STR2UINT64(host_local.valuemapid, row[2]);
+
+		ZBX_STR2UINT64(itemid, row[3]);
+
+		if (FAIL == (i = zbx_vector_ptr_search(&hosts, &host_local, host_compare_func)))
+		{
+			host = zbx_malloc(NULL, sizeof(zbx_host_t));
+			host->hostid = host_local.hostid;
+			host->valuemapid = host_local.valuemapid;
+			zbx_vector_uint64_create(&host->itemids);
+
+			zbx_vector_ptr_append(&hosts, host);
+		}
+		else
+			host = (zbx_host_t *)hosts.values[i];
+
+		zbx_vector_uint64_append(&host->itemids, itemid);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", NULL);
+	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
+			"valuemapid", "value", "newvalue", NULL);
+
+	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
+	{
+		zbx_host_t	*host;
+
+		host = (zbx_host_t *)hosts.values[i];
+
+		if (NULL != (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
+		{
+			zbx_db_insert_add_values(&db_insert_valuemap, ++valuemapid, host->hostid, valuemap->name);
+
+			for (j = 0; j < valuemap->mappings.values_num; j++)
+			{
+				zbx_db_insert_add_values(&db_insert_valuemap_mapping, __UINT64_C(0), valuemapid,
+						valuemap->mappings.values[j].first,
+						valuemap->mappings.values[j].second);
+			}
+		}
+	}
+
+	zbx_db_insert_execute(&db_insert_valuemap);
+	zbx_db_insert_clean(&db_insert_valuemap);
+
+	zbx_db_insert_autoincrement(&db_insert_valuemap_mapping, "valuemap_mappingid");
+	zbx_db_insert_execute(&db_insert_valuemap_mapping);
+	zbx_db_insert_clean(&db_insert_valuemap_mapping);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
+	{
+		zbx_host_t	*host;
+		char		buffer[MAX_STRING_LEN];
+
+		host = (zbx_host_t *)hosts.values[i];
+
+		if (NULL != zbx_hashset_search(&valuemaps, &host->valuemapid))
+		{
+			zbx_snprintf(buffer, sizeof(buffer), "update items set valuemapid=" ZBX_FS_UI64 " where",
+					++valuemapid);
+		}
+		else
+			zbx_strlcpy(buffer, "update items set valuemapid=null where", sizeof(buffer));
+
+		/* update valuemapid for top level items on a template/host */
+		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buffer);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", host->itemids.values,
+				host->itemids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		/* get discovered itemids for not templated item prototypes on a host */
+		get_discovered_itemids(&host->itemids, &discovered_itemids);
+
+		zbx_vector_uint64_append_array(&templateids, host->itemids.values, host->itemids.values_num);
+		get_template_itemids_by_templateids(&templateids, &host->itemids, &discovered_itemids);
+
+		/* make sure if multiple hosts are linked to same not nested template then there is only */
+		/* update by templateid from template and no selection by numerous itemids               */
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buffer);
+		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid", host->itemids.values,
+				host->itemids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		if (0 != discovered_itemids.values_num)
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buffer);
+			zbx_vector_uint64_sort(&discovered_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", discovered_itemids.values,
+					discovered_itemids.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_vector_uint64_clear(&discovered_itemids);
+		}
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	zbx_hashset_iter_reset(&valuemaps, &iter);
+	while (NULL != (valuemap = (zbx_valuemap_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_free(valuemap->name);
+
+		for (i = 0; i < valuemap->mappings.values_num; i++)
+		{
+			zbx_free(valuemap->mappings.values[i].first);
+			zbx_free(valuemap->mappings.values[i].second);
+		}
+		zbx_vector_ptr_pair_destroy(&valuemap->mappings);
+	}
+
+	zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)host_free);
+	zbx_vector_ptr_destroy(&hosts);
+	zbx_hashset_destroy(&valuemaps);
+
+	zbx_vector_uint64_destroy(&templateids);
+	zbx_vector_uint64_destroy(&discovered_itemids);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030047(void)
+{
+	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("items", 3, &field);
+}
+
+static int	DBpatch_5030048(void)
+{
+	return DBdrop_table("mappings");
+}
+
+static int	DBpatch_5030049(void)
+{
+	return DBdrop_table("valuemaps");
+}
+
+static int	DBpatch_5030050(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where"
+			" idx in ('web.valuemap.list.sort', 'web.valuemap.list.sortorder')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030051(void)
+{
+	return DBdrop_field("config", "compression_availability");
+}
+
+static int	DBpatch_5030052(void)
+{
+	return DBdrop_index("users", "users_1");
+}
+
+static int	DBpatch_5030053(void)
+{
+	const ZBX_FIELD	field = {"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("users", "alias", &field);
+}
+
+static int	DBpatch_5030054(void)
+{
+	return DBcreate_index("users", "users_1", "username", 1);
+}
+
+static int	DBpatch_5030055(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter_username' where idx='web.user.filter_alias'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030056(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set value_str='username' where idx='web.user.sort' and value_str like 'alias'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /* trigger function conversion to new syntax */
 
 #define ZBX_DBPATCH_FUNCTION_UPDATE_NAME		0x01
@@ -468,7 +1048,7 @@ static zbx_dbpatch_function_t	*dbpatch_new_function(zbx_uint64_t functionid, zbx
 	return func;
 }
 
-static void	dbpatch_add_function(zbx_dbpatch_function_t *template, zbx_uint64_t functionid, const char *name,
+static void	dbpatch_add_function(const zbx_dbpatch_function_t *template, zbx_uint64_t functionid, const char *name,
 		const char *parameter, unsigned char flags, zbx_vector_ptr_t *functions)
 {
 	zbx_dbpatch_function_t	*func;
@@ -1029,7 +1609,6 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 				ZBX_DBPATCH_ARG_CONST_STR, "like",
 				ZBX_DBPATCH_ARG_STR, 0,
 				ZBX_DBPATCH_ARG_NONE);
-		zabbix_log(LOG_LEVEL_DEBUG, "STR: %s => %s", function->parameter, parameter);
 		dbpatch_update_function(function, "find", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
 	}
 	else if (0 == strcmp(function->name, "last"))
@@ -1223,7 +1802,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	return SUCCEED;
 }
 
-static int	DBpatch_5030026(void)
+static int	DBpatch_5030057(void)
 {
 	int			i, ret = SUCCEED;
 	DB_ROW			row;
@@ -1358,7 +1937,7 @@ static int	DBpatch_5030026(void)
 	return ret;
 }
 
-static int	DBpatch_5030027(void)
+static int	DBpatch_5030058(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1434,7 +2013,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 	return exp;
 }
 
-static int	DBpatch_5030028(void)
+static int	DBpatch_5030059(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -1591,5 +2170,36 @@ DBPATCH_ADD(5030025, 0, 1)
 DBPATCH_ADD(5030026, 0, 1)
 DBPATCH_ADD(5030027, 0, 1)
 DBPATCH_ADD(5030028, 0, 1)
+DBPATCH_ADD(5030029, 0, 1)
+DBPATCH_ADD(5030030, 0, 1)
+DBPATCH_ADD(5030031, 0, 1)
+DBPATCH_ADD(5030032, 0, 1)
+DBPATCH_ADD(5030033, 0, 1)
+DBPATCH_ADD(5030034, 0, 1)
+DBPATCH_ADD(5030035, 0, 1)
+DBPATCH_ADD(5030036, 0, 1)
+DBPATCH_ADD(5030037, 0, 1)
+DBPATCH_ADD(5030038, 0, 1)
+DBPATCH_ADD(5030039, 0, 1)
+DBPATCH_ADD(5030040, 0, 1)
+DBPATCH_ADD(5030041, 0, 1)
+DBPATCH_ADD(5030042, 0, 1)
+DBPATCH_ADD(5030043, 0, 1)
+DBPATCH_ADD(5030044, 0, 1)
+DBPATCH_ADD(5030045, 0, 1)
+DBPATCH_ADD(5030046, 0, 1)
+DBPATCH_ADD(5030047, 0, 1)
+DBPATCH_ADD(5030048, 0, 1)
+DBPATCH_ADD(5030049, 0, 1)
+DBPATCH_ADD(5030050, 0, 1)
+DBPATCH_ADD(5030051, 0, 1)
+DBPATCH_ADD(5030052, 0, 1)
+DBPATCH_ADD(5030053, 0, 1)
+DBPATCH_ADD(5030054, 0, 1)
+DBPATCH_ADD(5030055, 0, 1)
+DBPATCH_ADD(5030056, 0, 1)
+DBPATCH_ADD(5030057, 0, 1)
+DBPATCH_ADD(5030058, 0, 1)
+DBPATCH_ADD(5030059, 0, 1)
 
 DBPATCH_END()

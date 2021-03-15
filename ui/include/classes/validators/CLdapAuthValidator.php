@@ -44,7 +44,7 @@ class CLdapAuthValidator extends CValidator {
 	 * Checks if the given user name and password are valid.
 	 *
 	 * The $value array must have the following attributes:
-	 * - user       - user name
+	 * - username   - user name
 	 * - password   - password
 	 *
 	 * @param array $value
@@ -56,7 +56,7 @@ class CLdapAuthValidator extends CValidator {
 
 		$ldap = new CLdap($this->conf);
 
-		$status = $ldap->checkPass($value['user'], $value['password']);
+		$status = $ldap->checkPass($value['username'], $value['password']);
 
 		if (!$status) {
 			$this->setError($ldap->error);

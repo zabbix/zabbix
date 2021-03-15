@@ -51,7 +51,7 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	}()
 
 	var data []byte
-	if data, err = conn.Read(time.Second * time.Duration(sl.options.Timeout)); err != nil {
+	if data, err = conn.Read(); err != nil {
 		return
 	}
 
@@ -68,7 +68,9 @@ func (sl *ServerListener) run() {
 	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
 
 	for {
-		conn, err := sl.listener.Accept()
+		conn, err := sl.listener.Accept(time.Second*time.Duration(sl.options.Timeout),
+			zbxcomms.TimeoutModeShift)
+
 		if err == nil {
 			if !sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {
 				conn.Close()

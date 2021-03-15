@@ -1510,7 +1510,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			$data = [
 				'header' => _('Access denied'),
 				'messages' => [
-					_s('You are logged in as "%1$s".', CWebUser::$data['alias']).' '._('You have no permissions to access this page.'),
+					_s('You are logged in as "%1$s".',
+						CWebUser::$data['username']).' '._('You have no permissions to access this page.'
+					),
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => []
@@ -1680,7 +1682,7 @@ function getMessages(bool $good = false, string $title = null, bool $show_close_
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good, $messages, $title, $show_close_box)
+		? makeMessageBox($good, $messages, $title, $show_close_box, !$good)
 		: null;
 
 	return $message_box;

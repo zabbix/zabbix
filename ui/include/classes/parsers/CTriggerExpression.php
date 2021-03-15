@@ -87,6 +87,7 @@ class CTriggerExpression {
 	 */
 	public $options = [
 		'lldmacros' => true,
+		'lowercase_errors' => false,
 		'collapsed_expression' => false,
 		'calculated' => false,
 		'host_macro' => []
@@ -200,6 +201,7 @@ class CTriggerExpression {
 	/**
 	 * @param array $options
 	 * @param bool  $options['lldmacros']
+	 * @param bool  $options['lowercase_errors']
 	 * @param bool  $options['collapsed_expression']
 	 * @param bool  $options['calculated']
 	 * @param bool  $options['host_macro']
@@ -545,9 +547,14 @@ class CTriggerExpression {
 		}
 
 		if ($this->pos == 0) {
-			$this->error = $this->options['calculated']
-				? _('incorrect calculated item formula')
-				: _('Incorrect trigger expression.');
+			if ($this->options['calculated']) {
+				$this->error = _('incorrect calculated item formula');
+			}
+			else {
+				$this->error = $this->options['lowercase_errors']
+					? _('incorrect trigger expression')
+					: _('Incorrect trigger expression.');
+			}
 			$this->is_valid = false;
 		}
 
@@ -561,9 +568,15 @@ class CTriggerExpression {
 
 		if ($error) {
 			$exp_part = substr($this->expression, ($this->pos == 0) ? 0 : $this->pos - 1);
-			$this->error = $this->options['calculated']
-				? _s('incorrect calculated item formula starting from "%1$s"', $exp_part)
-				: _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".', $exp_part);
+			if ($this->options['calculated']) {
+				$this->error = _s('incorrect calculated item formula starting from "%1$s"', $exp_part);
+			}
+			else {
+				$this->error = $this->options['lowercase_errors']
+					? _s('incorrect trigger expression starting from "%1$s"', $exp_part)
+					: _('Incorrect trigger expression.').' '.
+						_s('Check expression part starting from "%1$s".', $exp_part);
+			}
 			$this->error_type = $error;
 			$this->error_pos = $this->pos;
 			$this->is_valid = false;
@@ -630,7 +643,7 @@ class CTriggerExpression {
 				&& $this->parseUsing($this->functionid_parser, CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO)) {
 			return true;
 		}
-		elseif (!$this->options['collapsed_expression'] && $this->parseFunction()) {
+		elseif ($this->parseFunction()) {
 			return true;
 		}
 
@@ -655,6 +668,7 @@ class CTriggerExpression {
 	private function parseFunction(): bool {
 		$start_pos = $this->pos;
 
+		// TODO miks: parser must support functionids as parameters based on value of $this->options['collapsed_expression'].
 		if ($this->function_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
