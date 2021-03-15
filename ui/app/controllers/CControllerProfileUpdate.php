@@ -63,6 +63,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.overview.filter.active':
 				case 'web.problem.filter.active':
 				case 'web.proxies.filter.active':
+				case 'web.scheduledreport.filter.active':
 				case 'web.screenconf.filter.active':
 				case 'web.screens.filter.active':
 				case 'web.scripts.filter.active':

@@ -85,7 +85,7 @@ class CControllerScheduledReportList extends CController {
 			'sortorder' => $sort_order,
 			'filter' => $filter,
 			'profileIdx' => 'web.scheduledreport.filter',
-			'active_tab' => CProfile::get('web.scheduledreport.active', 1),
+			'active_tab' => CProfile::get('web.scheduledreport.filter.active', 1),
 			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS)
 		];
 
