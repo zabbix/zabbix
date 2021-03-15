@@ -39,6 +39,13 @@ class CQueryParser extends CParser {
 	private $host_name_parser;
 
 	/**
+	 * Parser for item additional filter
+	 *
+	 * @var CFilterAttributeParser
+	 */
+	private $item_filter_parser;
+
+	/**
 	 * Parsed data.
 	 *
 	 * @var CQueryParserResult
@@ -51,6 +58,7 @@ class CQueryParser extends CParser {
 	public function __construct() {
 		$this->item_key_parser = new CItemKey();
 		$this->host_name_parser = new CHostNameParser();
+		$this->item_filter_parser = new CFilterAttributeParser();
 	}
 
 	/**
@@ -85,10 +93,15 @@ class CQueryParser extends CParser {
 		}
 		$pos += $this->item_key_parser->getLength();
 
+		if ($this->item_filter_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->item_filter_parser->getLength();
+		}
+
 		$this->length = $pos - $start_pos;
 		$this->result->match = substr($source, $start_pos, $this->length);
 		$this->result->host = $this->host_name_parser->getMatch();
 		$this->result->item = $this->item_key_parser->getMatch();
+		$this->result->item_filter = $this->item_filter_parser->getMatch();
 		$this->result->length = $this->length;
 		$this->result->pos = $start_pos;
 
