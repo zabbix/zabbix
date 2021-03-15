@@ -2031,7 +2031,7 @@ static int	DBpatch_5030059(void)
 
 	result = DBselect("select itemid,params,value_type from items where type=15 order by itemid");
 
-	while (NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	itemid, index;
 		char		*expression, *out = NULL;
@@ -2110,8 +2110,7 @@ static int	DBpatch_5030059(void)
 					ZBX_FS_UI64 ";\n", esc, itemid);
 			zbx_free(esc);
 
-			if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-				break;
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
