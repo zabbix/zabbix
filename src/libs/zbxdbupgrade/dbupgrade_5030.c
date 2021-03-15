@@ -1236,7 +1236,7 @@ static void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int ext
 static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_t *params)
 {
 	const char	*ptr;
-	size_t		len, pos, sep = 0, eol;
+	size_t		len, pos, sep, eol;
 	zbx_strloc_t	loc;
 
 	eol = strlen(parameter);
@@ -1353,13 +1353,16 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 					}
 					else if ('\0' != parameter[loc->l])
 					{
-						char raw[FUNCTION_PARAM_LEN * 4 + 1], quoted[sizeof(raw)];
+						char	*raw, *quoted;
 
-						zbx_strlcpy(raw, parameter + loc->l, loc->r - loc->l + 2);
-						zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");
+						raw = zbx_substr(parameter, loc->l, loc->r);
+						quoted = zbx_dyn_escape_string(raw, "\"\\");
 						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
 						zbx_strcpy_alloc(out, &out_alloc, &out_offset, quoted);
 						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
+
+						zbx_free(quoted);
+						zbx_free(raw);
 					}
 				}
 				break;
