@@ -1,5 +1,5 @@
 
-# MongoDB cluster by Zabbix Agent 2
+# Template DB MongoDB cluster by Zabbix Agent 2
 
 ## Overview
 
@@ -7,7 +7,7 @@ For Zabbix version: 5.0 and higher
 The template to monitor MongoDB sharded cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`Template DB MongoDB cluster` — collects metrics by polling zabbix-agent2.
+`Template DB MongoDB cluster by Zabbix Agent 2` — collects metrics by polling zabbix-agent2.
 
 
 This template was tested on:
@@ -25,7 +25,7 @@ This template was tested on:
 
 Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macroses {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
 
-All sharded Mongodb nodes (mongod) will be discovered with attached template "MongoDB node".
+All sharded Mongodb nodes (mongod) will be discovered with attached template "Template DB MongoDB node by Zabbix Agent 2".
 
 
 Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]"`
