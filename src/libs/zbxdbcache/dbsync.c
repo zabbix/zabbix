@@ -1860,7 +1860,7 @@ static char	**dbsync_item_preproc_row(char **row)
 	if (SUCCEED == dbsync_check_row_macros(row, 24))
 		flags |= ZBX_DBSYNC_ITEM_COLUMN_TRENDS;
 
-	if (ITEM_TYPE_CALCULATED == type && SUCCEED == dbsync_check_row_macros(row, 11))
+	if (ITEM_TYPE_CALCULATED == type)
 		flags |= ZBX_DBSYNC_ITEM_COLUMN_CALCITEM;
 
 	if (0 == flags)
@@ -1880,12 +1880,10 @@ static char	**dbsync_item_preproc_row(char **row)
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_TRENDS))
 		row[23] = dc_expand_user_macros(row[23], &hostid, 1);
 
-	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_CALCITEM))
+	if (ITEM_TYPE_CALCULATED == type)
 	{
 		zbx_eval_context_t	ctx;
 		char			*error = NULL;
-
-		row[11] = dc_expand_user_macros_in_calcitem(row[11], hostid);
 
 		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSSION, &error))
 		{

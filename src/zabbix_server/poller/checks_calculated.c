@@ -361,6 +361,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	if (NULL == dc_item->formula_bin)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() serialized formula is not set", __func__);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot evaluate calculated item:"
 				" serialized formula is not set"));
 		error = NULL;
