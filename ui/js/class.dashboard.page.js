@@ -1077,7 +1077,7 @@ class CDashboardPage extends CBaseComponent {
 			return result;
 		};
 
-		const events = {
+		this._widget_dragging_events = {
 			mouseDown: (e) => {
 				dragging_widget = null;
 
@@ -1112,9 +1112,9 @@ class CDashboardPage extends CBaseComponent {
 				drag_rel_y = parseInt(widget_view_computed_style.getPropertyValue('top')) - e.clientY
 					- document.querySelector('.wrapper').scrollTop;
 
-				document.addEventListener('mouseup', events.mouseUp, {passive: false});
-				document.addEventListener('mousemove', events.mouseMove);
-				this._dashboard_grid.removeEventListener('mousemove', events.mouseMove);
+				document.addEventListener('mouseup', this._widget_dragging_events.mouseUp, {passive: false});
+				document.addEventListener('mousemove', this._widget_dragging_events.mouseMove);
+				this._dashboard_grid.removeEventListener('mousemove', this._widget_dragging_events.mouseMove);
 
 				e.preventDefault();
 			},
@@ -1133,9 +1133,9 @@ class CDashboardPage extends CBaseComponent {
 					delete data.original_position;
 				}
 
-				document.removeEventListener('mouseup', events.mouseUp);
-				document.removeEventListener('mousemove', events.mouseMove);
-				this._dashboard_grid.addEventListener('mousemove', events.mouseMove);
+				document.removeEventListener('mouseup', this._widget_dragging_events.mouseUp);
+				document.removeEventListener('mousemove', this._widget_dragging_events.mouseMove);
+				this._dashboard_grid.addEventListener('mousemove', this._widget_dragging_events.mouseMove);
 
 				this._activateWidgetPlaceholder();
 			},
@@ -1176,15 +1176,19 @@ class CDashboardPage extends CBaseComponent {
 				}
 			}
 		};
-
-		this._dashboard_grid.addEventListener('mousedown', events.mouseDown, {passive: false});
-		this._dashboard_grid.addEventListener('mousemove', events.mouseMove);
 	}
 
 	_activateWidgetDragging() {
+		this._dashboard_grid.addEventListener('mousedown', this._widget_dragging_events.mouseDown, {passive: false});
+		this._dashboard_grid.addEventListener('mousemove', this._widget_dragging_events.mouseMove);
 	}
 
 	_deactivateWidgetDragging() {
+		this._dashboard_grid.removeEventListener('mousedown', this._widget_dragging_events.mouseDown);
+		this._dashboard_grid.removeEventListener('mousemove', this._widget_dragging_events.mouseMove);
+
+		document.removeEventListener('mouseup', this._widget_dragging_events.mouseUp);
+		document.removeEventListener('mousemove', this._widget_dragging_events.mouseMove);
 	}
 
 	_getGridPos({x, y, width, height}) {
