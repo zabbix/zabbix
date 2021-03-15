@@ -430,7 +430,7 @@ class CWidget extends CBaseComponent {
 
 			curl.setArgument('action', 'dashboard.widget.rfrate');
 
-			update_promise = fetch(curl.getUrl(), {
+			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
