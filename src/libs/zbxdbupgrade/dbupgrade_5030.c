@@ -1574,7 +1574,8 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 		{
 			const char	*op, *pattern =  function->parameter + params.values[1].l;
 
-			op = (3 <= params.values_num ? function->parameter + params.values[2].l : "eq");
+			if (3 > params.values_num || '\0' == *(op = function->parameter + params.values[2].l))
+				op = "eq";
 
 			/* set numeric pattern type for numeric items and numeric operators unless */
 			/* band operation pattern contains mask (separated by '/')                 */
@@ -1608,7 +1609,6 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 				ZBX_DBPATCH_ARG_CONST_STR, "like",
 				ZBX_DBPATCH_ARG_STR, 0,
 				ZBX_DBPATCH_ARG_NONE);
-		zabbix_log(LOG_LEVEL_DEBUG, "STR: %s => %s", function->parameter, parameter);
 		dbpatch_update_function(function, "find", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
 	}
 	else if (0 == strcmp(function->name, "last"))

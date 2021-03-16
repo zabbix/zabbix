@@ -30,8 +30,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	param_handle;
 	zbx_uint64_t		index = 0;
 	const char		*expected_result = NULL, *expression = NULL;
-	char			*actual_result = NULL;
-	zbx_token_reference_t	token;
+	char			*actual_result = NULL, *errmsg = NULL;
+	zbx_eval_context_t	ctx;
 
 	ZBX_UNUSED(state);
 
@@ -54,10 +54,15 @@ void	zbx_mock_test_entry(void **state)
 				zbx_mock_error_string(error));
 	}
 
-	token.index = index;
-	get_trigger_expression_constant(expression, &token, &actual_result);
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_TRIGGER_EXPRESSION, &errmsg))
+		fail_msg("Cannot parse expression: %s", errmsg);
+
+	zbx_eval_get_constant(&ctx, index, &actual_result);
+	if (NULL == actual_result)
+		actual_result = zbx_strdup(NULL, "");
 
 	zbx_mock_assert_str_eq("Invalid result", expected_result, actual_result);
 
 	zbx_free(actual_result);
+	zbx_eval_clear(&ctx);
 }

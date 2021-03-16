@@ -95,6 +95,14 @@ out:
   result: SUCCEED
   value: '-1'
 ---
+test case: Expression '--1'
+in:
+  rules: []
+  expression: '--1'
+out:
+  result: SUCCEED
+  value: '1'
+---
 test case: Expression '- "2"'
 in:
   rules: []
@@ -444,6 +452,14 @@ in:
   expression: 'max("2", "a")'
 out:
   result: FAIL
+---
+test case: Expression 'min(1 + 2, 0.5 + 1.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'min(1 + 2, 0.5 + 1.5)'
+out:
+  result: SUCCEED
+  value: '2'
 ---
 test case: Expression '{$M} or 1'
 in:

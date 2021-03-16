@@ -166,6 +166,7 @@ tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxeval/zbx_eval_compose_expression
 tests/libs/zbxeval/zbx_eval_execute
 tests/libs/zbxeval/zbx_eval_execute_ext
+tests/libs/zbxeval/zbx_eval_get_constant
 tests/libs/zbxeval/zbx_eval_parse_expression
 tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxhistory/zbx_history_get_values
@@ -180,7 +181,6 @@ tests/libs/zbxprometheus/zbx_prometheus_pattern
 tests/libs/zbxprometheus/zbx_prometheus_to_json
 tests/libs/zbxregexp/wildcard_match
 tests/libs/zbxserver/evaluate_function
-tests/libs/zbxserver/get_trigger_expression_constant
 tests/libs/zbxserver/macro_fmttime
 tests/libs/zbxserver/substitute_lld_macros
 tests/libs/zbxsysinfo/check_key_access_rules
