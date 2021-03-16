@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-12T14:56:08Z</date>
+   <date>2021-03-16T09:40:17Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -16,7 +16,7 @@
   2. Set the {$MONGODB.CONNSTRING} such as &lt;protocol(host:port)&gt; or named session.&#13;
   3. Set the user name and password in host macros ({$MONGODB.USER}, {$MONGODB.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.&#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
@@ -2925,7 +2925,7 @@ Secondary nodes send getMore operations as part of the replication process.</des
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
-                        <name>Replica set node state</name>
+                        <name>ReplicaSet node state</name>
                      </valuemap>
                      <preprocessing>
                         <step>
@@ -2944,9 +2944,9 @@ Secondary nodes send getMore operations as part of the replication process.</des
                         <trigger_prototype>
                            <expression>{change()}=1</expression>
                            <recovery_mode>NONE</recovery_mode>
-                           <name>MongoDB: Node in replica set changed the state (new state: {ITEM.VALUE})</name>
+                           <name>MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})</name>
                            <priority>WARNING</priority>
-                           <description>Node in replica set  changed the state. Ack to close.</description>
+                           <description>Node in ReplicaSet  changed the state. Ack to close.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -2959,7 +2959,7 @@ Secondary nodes send getMore operations as part of the replication process.</des
                      <history>7d</history>
                      <status>ENABLED</status>
                      <discover>NO_DISCOVER</discover>
-                     <description>The number of replucated nodes in current replica set.</description>
+                     <description>The number of replucated nodes in current ReplicaSet.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MongoDB Replica Set: {#RS_NAME}</name>
@@ -3017,7 +3017,7 @@ Secondary nodes send getMore operations as part of the replication process.</des
                      <status>ENABLED</status>
                      <discover>NO_DISCOVER</discover>
                      <value_type>CHAR</value_type>
-                     <description>The replicated nodes in current replica set with member health value  = 0.</description>
+                     <description>The replicated nodes in current ReplicaSet with member health value  = 0.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MongoDB Replica Set: {#RS_NAME}</name>
@@ -3048,7 +3048,7 @@ return value.length ? JSON.stringify(value) : '';
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy_count[{#RS_NAME}].last()}&gt;0  and {Template DB MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy[{#RS_NAME}].strlen()}&gt;0</expression>
-                     <name>MongoDB: There are unhealthy replicas in replicaset</name>
+                     <name>MongoDB: There are unhealthy replicas in ReplicaSet</name>
                      <priority>AVERAGE</priority>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -3948,7 +3948,7 @@ When the number of available write tickets remaining reaches zero, new write req
          </mappings>
       </value_map>
       <value_map>
-         <name>Replica set node state</name>
+         <name>ReplicaSet node state</name>
          <mappings>
             <mapping>
                <value>0</value>

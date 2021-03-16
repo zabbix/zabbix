@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-12T14:56:07Z</date>
+   <date>2021-03-16T09:40:16Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -18,7 +18,7 @@
 &#13;
   All sharded Mongodb nodes (mongod) will be discovered with attached template "MongoDB node".&#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
