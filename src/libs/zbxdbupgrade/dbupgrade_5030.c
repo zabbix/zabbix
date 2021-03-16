@@ -1017,7 +1017,7 @@ static int	DBpatch_5030064(void)
 	return DBadd_field("valuemap", &field);
 }
 
-static char *update_template_name(char *old)
+static char	*update_template_name(char *old)
 {
 	char	*ptr, new[MAX_STRING_LEN];
 
@@ -1037,19 +1037,19 @@ static char *update_template_name(char *old)
 
 static int	DBpatch_5030065(void)
 {
-	int			ret = SUCCEED;
-	char			*name, *uuid, *sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*name, *uuid, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-				"select h.hostid,h.name"
-				" from hosts h"
-				" where h.status=%d",
-				HOST_STATUS_TEMPLATE);
+			"select h.hostid,h.name"
+			" from hosts h"
+			" where h.status=%d",
+			HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1078,20 +1078,20 @@ out:
 
 static int	DBpatch_5030066(void)
 {
-	int			ret = SUCCEED;
-	char			*name, *uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-				"select i.itemid,i.key_,h.name"
-				" from items i"
-				" join hosts h on h.hostid=i.hostid"
-				" where h.status=%d and i.flags in (%d,%d) and i.templateid is null",
-				HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE);
+			"select i.itemid,i.key_,h.name"
+			" from items i"
+			" join hosts h on h.hostid=i.hostid"
+			" where h.status=%d and i.flags in (%d,%d) and i.templateid is null",
+			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1212,11 +1212,11 @@ out:
 
 static int	DBpatch_5030068(void)
 {
-	int			ret = SUCCEED;
-	char			*name, *host_name, *uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*name, *host_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = DBselect(
@@ -1230,8 +1230,8 @@ static int	DBpatch_5030068(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DB_ROW			row2;
-		DB_RESULT		result2;
+		DB_ROW		row2;
+		DB_RESULT	result2;
 
 		name = zbx_strdup(NULL, row[1]);
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset,"%s", name);
@@ -1246,7 +1246,7 @@ static int	DBpatch_5030068(void)
 
 		while (NULL != (row2 = DBfetch(result2)))
 		{
-			int status;
+			int	status;
 
 			status = atoi(row2[1]);
 			host_name = zbx_strdup(NULL, row2[0]);
@@ -1284,11 +1284,11 @@ out:
 
 static int	DBpatch_5030069(void)
 {
-	int			ret = SUCCEED;
-	char			*dashboard_name, *dashboard, *uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*dashboard_name, *dashboard, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1330,11 +1330,11 @@ out:
 
 static int	DBpatch_5030070(void)
 {
-	int			ret = SUCCEED;
-	char			*template_name, *httptest, *uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*template_name, *httptest, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1376,11 +1376,11 @@ out:
 
 static int	DBpatch_5030071(void)
 {
-	int			ret = SUCCEED;
-	char			*template_name, *valuemap, *uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*template_name, *valuemap, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1422,11 +1422,11 @@ out:
 
 static int	DBpatch_5030072(void)
 {
-	int			ret = SUCCEED;
-	char			*group_name, *uuid, *sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*group_name, *uuid, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1458,11 +1458,11 @@ out:
 
 static int	DBpatch_5030073(void)
 {
-	int			ret = SUCCEED;
-	char			*template_name, *key, *key_discovery, *uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*template_name, *key, *key_discovery, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1531,7 +1531,7 @@ static int	DBpatch_5030074(void)
 		char		*trigger_expr, *total_expr = NULL;
 		int		i;
 		size_t		total_expr_alloc = 0, total_expr_offset = 0;
-		zbx_uint64_t 	functionid;
+		zbx_uint64_t	functionid;
 		DB_ROW		row2;
 		DB_RESULT	result2;
 
@@ -1616,11 +1616,11 @@ out:
 
 static int	DBpatch_5030075(void)
 {
-	int			ret = SUCCEED;
-	char			*graph_name, *templ_name, *key, *uuid, *sql = NULL, *seed = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*graph_name, *templ_name, *key, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = DBselect(
@@ -1668,11 +1668,11 @@ out:
 
 static int	DBpatch_5030076(void)
 {
-	int			ret = SUCCEED;
-	char			*host_name, *name_tmpl, *key, *uuid, *seed = NULL, *sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_ROW			row;
-	DB_RESULT		result;
+	int		ret = SUCCEED;
+	char		*host_name, *name_tmpl, *key, *uuid, *seed = NULL, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
