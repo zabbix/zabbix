@@ -29,7 +29,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 *
 	 * @var array
 	 */
-	protected $standalone_functions = ['date', 'dayofmonth', 'dayofweek', 'time', 'now'];
+	protected $standalone_functions;
 
 	/**
 	 * State of each host reference being present in some non-standalone function.
@@ -68,6 +68,7 @@ class C52TriggerExpressionConverter extends CConverter {
 
 	public function __construct() {
 		$this->parser = new C10TriggerExpression(['allow_func_only' => true]);
+		$this->standalone_functions = getStandaloneFunctions();
 	}
 
 	/**
