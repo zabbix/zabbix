@@ -879,12 +879,6 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 				if (ZBX_EVAL_TOKEN_GROUP_OPEN == optoken->type)
 					break;
 
-				if (ZBX_EVAL_TOKEN_COMMA == optoken->type)
-				{
-					ctx->ops.values_num--;
-					break;
-				}
-
 				eval_append_operator(ctx, optoken);
 			}
 
@@ -894,8 +888,6 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 						ctx->expression + pos);
 				goto out;
 			}
-
-			zbx_vector_eval_token_append_ptr(&ctx->ops, &token);
 		}
 		else if (ZBX_EVAL_TOKEN_GROUP_CLOSE == token.type)
 		{
@@ -920,8 +912,7 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 					break;
 				}
 
-				if (ZBX_EVAL_TOKEN_COMMA != optoken->type)
-					eval_append_operator(ctx, optoken);
+				eval_append_operator(ctx, optoken);
 			}
 
 			if (NULL == optoken)
@@ -980,7 +971,7 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 						0 != (token.type & ZBX_EVAL_CLASS_OPERATOR1))
 					break;
 
-				if (ZBX_EVAL_TOKEN_GROUP_OPEN == optoken->type || ZBX_EVAL_TOKEN_COMMA == optoken->type)
+				if (ZBX_EVAL_TOKEN_GROUP_OPEN == optoken->type)
 					break;
 
 				eval_append_operator(ctx, optoken);
