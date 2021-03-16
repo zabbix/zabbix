@@ -16,7 +16,6 @@ libzbxalgo_a_SOURCES = \
 	$(EVALUATE_C) \
 	hashmap.c \
 	hashset.c \
-	linked_list.c \
 	int128.c \
 	linked_list.c \
 	prediction.c \
