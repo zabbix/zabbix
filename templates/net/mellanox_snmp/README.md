@@ -4,6 +4,7 @@
 ## Overview
 
 For Zabbix version: 5.0 and higher  
+The updated template for monitoring the Mellanox network switches over SNMP agent. All items collected in one template without any linked templates.
 
 ## Setup
 
@@ -11,46 +12,46 @@ Refer to the vendor documentation.
 
 ## Zabbix configuration
 
-No specific Zabbix configuration is required.
+The template uses context macros for the temperature trigger expression. By default, it uses a macro value like {$TEMP.MAX.CRIT}. To adjust the threshold for a certain sensor you can define context macros on the host level, with a value corresponding to your device specifications, for example: {$TEMP.MAX.CRIT:"MGMT/BOARD_MONITOR"}. Please, read https://www.zabbix.com/documentation/5.0/manual/config/macros/user_macros_context for more detailed info on user context macros.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CPU.UTIL.CRIT} |<p>-</p> |`90` |
-|{$FAN.STATUS.CRIT} |<p>-</p> |`3` |
+|{$FAN.STATUS.CRIT} |<p>The critical value of the FAN sensor for trigger expression.</p> |`3` |
 |{$ICMP.LOSS.WARN} |<p>-</p> |`20` |
 |{$ICMP.RESPONSE_TIME.WARN} |<p>-</p> |`0.15` |
 |{$IF.ERRORS.WARN} |<p>-</p> |`2` |
 |{$IF.UTIL.MAX} |<p>-</p> |`90` |
 |{$IFCONTROL} |<p>-</p> |`1` |
-|{$MEMORY.NAME.MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host or linked template level.</p> |`.*` |
-|{$MEMORY.NAME.NOT_MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</p> |`CHANGE_IF_NEEDED` |
-|{$MEMORY.TYPE.MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host or linked template level.</p> |`.*(\.2|hrStorageRam)$` |
-|{$MEMORY.TYPE.NOT_MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</p> |`CHANGE_IF_NEEDED` |
+|{$MEMORY.NAME.MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host level.</p> |`.*` |
+|{$MEMORY.NAME.NOT_MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host level if you need to filter out results.</p> |`CHANGE_IF_NEEDED` |
+|{$MEMORY.TYPE.MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host level.</p> |`.*(\.2|hrStorageRam)$` |
+|{$MEMORY.TYPE.NOT_MATCHES} |<p>This macro is used in memory discovery. Can be overridden on the host level if you need to filter out results.</p> |`CHANGE_IF_NEEDED` |
 |{$MEMORY.UTIL.MAX} |<p>The warning threshold of the "Physical memory: Memory utilization" item.</p> |`90` |
 |{$NET.IF.IFADMINSTATUS.MATCHES} |<p>Ignore notPresent(6)</p> |`^.*` |
-|{$NET.IF.IFADMINSTATUS.NOT_MATCHES} |<p>Ignore down(2) administrative status</p> |`^2$` |
+|{$NET.IF.IFADMINSTATUS.NOT_MATCHES} |<p>Ignore down(2) administrative status.</p> |`^2$` |
 |{$NET.IF.IFALIAS.MATCHES} |<p>-</p> |`.*` |
 |{$NET.IF.IFALIAS.NOT_MATCHES} |<p>-</p> |`CHANGE_IF_NEEDED` |
 |{$NET.IF.IFDESCR.MATCHES} |<p>-</p> |`.*` |
 |{$NET.IF.IFDESCR.NOT_MATCHES} |<p>-</p> |`CHANGE_IF_NEEDED` |
 |{$NET.IF.IFNAME.MATCHES} |<p>-</p> |`^.*$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default.</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
 |{$NET.IF.IFOPERSTATUS.MATCHES} |<p>-</p> |`^.*$` |
-|{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6)</p> |`^6$` |
+|{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6).</p> |`^6$` |
 |{$NET.IF.IFTYPE.MATCHES} |<p>-</p> |`.*` |
 |{$NET.IF.IFTYPE.NOT_MATCHES} |<p>-</p> |`CHANGE_IF_NEEDED` |
-|{$PSU.STATUS.CRIT} |<p>-</p> |`2` |
-|{$SNMP.TIMEOUT} |<p>-</p> |`5m` |
-|{$TEMP.MAX.CRIT} |<p>-</p> |`60` |
-|{$TEMP.MAX.WARN} |<p>-</p> |`50` |
-|{$TEMP.MIN.CRIT} |<p>-</p> |`5` |
-|{$TEMP.STATUS.WARN} |<p>-</p> |`3` |
-|{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.+` |
-|{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^(/dev|/sys|/$|/run|/proc|.+/shm$)` |
-|{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$` |
-|{$VFS.FS.FSTYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
+|{$PSU.STATUS.CRIT} |<p>The critical value of the PSU sensor for trigger expression.</p> |`2` |
+|{$SNMP.TIMEOUT} |<p>The time interval for SNMP agent availability trigger expression.</p> |`5m` |
+|{$TEMP.MAX.CRIT} |<p>The temperature maximum critical value for trigger expression.</p> |`60` |
+|{$TEMP.MAX.WARN} |<p>The temperature maximum warning value for trigger expression.</p> |`50` |
+|{$TEMP.MIN.CRIT} |<p>The temperature minimum critical value for trigger expression.</p> |`5` |
+|{$TEMP.STATUS.WARN} |<p>The critical value of the TEMP sensor for trigger expression.</p> |`3` |
+|{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host level.</p> |`.+` |
+|{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host level.</p> |`^(/dev|/sys|/$|/run|/proc|.+/shm$)` |
+|{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host level.</p> |`.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$` |
+|{$VFS.FS.FSTYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host level.</p> |`CHANGE_IF_NEEDED` |
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>-</p> |`90` |
 |{$VFS.FS.PUSED.MAX.WARN} |<p>-</p> |`80` |
 
@@ -107,7 +108,7 @@ There are no template links in this template.
 |Storage |{#FSNAME}: Total space |<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in units of hrStorageAllocationUnits.</p><p>This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.</p><p>For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.</p> |SNMP |vfs.fs.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ALLOC_UNITS}`</p> |
 |Storage |{#FSNAME}: Space utilization |<p>Space utilization in % for {#FSNAME}</p> |CALCULATED |vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]<p>**Expression**:</p>`(last("vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]")/last("vfs.fs.total[hrStorageSize.{#SNMPINDEX}]"))*100` |
 |Temperature |{#SENSOR_INFO}: Temperature |<p>MIB: ENTITY-SENSORS-MIB</p><p>The most recent measurement obtained by the agent for this sensor.</p><p>To correctly interpret the value of this object, the associated entPhySensorType,</p><p>entPhySensorScale, and entPhySensorPrecision objects must also be examined.</p> |SNMP |sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p> |
-|Temperature |{#SENSOR_INFO}: Temperature status |<p>MIB: ENTITY-SENSORS-MIB</p><p>The operational status of the sensor {#SENSOR_INFO}. Possible value:</p><p>- ok(1) indicates that the agent can obtain the sensor value.</p><p>- unavailable(2) indicates that the agent presently cannot obtain the sensor value.</p><p>- nonoperational(3) indicates that the agent believes the sensor is broken. The sensor could have a hard failure (disconnected wire), or a soft failure such as out-of-range, jittery, or wildly fluctuating readings.</p> |SNMP |sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}] |
+|Temperature |{#SENSOR_INFO}: Temperature status |<p>MIB: ENTITY-SENSORS-MIB</p><p>The operational status of the sensor {#SENSOR_INFO}. Possible values:</p><p>- ok(1) indicates that the agent can obtain the sensor value.</p><p>- unavailable(2) indicates that the agent presently cannot obtain the sensor value.</p><p>- nonoperational(3) indicates that the agent believes the sensor is broken. The sensor could have a hard failure (disconnected wire), or a soft failure such as out-of-range, jittery, or wildly fluctuating readings.</p> |SNMP |sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}] |
 
 ## Triggers
 

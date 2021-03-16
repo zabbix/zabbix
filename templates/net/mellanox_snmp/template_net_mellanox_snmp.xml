@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-12T18:00:45Z</date>
+   <date>2021-03-16T08:47:30Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Mellanox SNMP</template>
          <name>Template Net Mellanox SNMP</name>
-         <description>Template Net Mellanox&#13;
+         <description>The updated template for monitoring the Mellanox network switches over SNMP agent. All items collected in one template without any linked templates.&#13;
 &#13;
 MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
@@ -1084,7 +1084,7 @@ and {Template Net Mellanox SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(
                      <history>2w</history>
                      <trends>0d</trends>
                      <description>MIB: ENTITY-SENSORS-MIB&#13;
-The operational status of the sensor {#SENSOR_INFO}. Possible value:&#13;
+The operational status of the sensor {#SENSOR_INFO}. Possible values:&#13;
 - ok(1) indicates that the agent can obtain the sensor value.&#13;
 - unavailable(2) indicates that the agent presently cannot obtain the sensor value.&#13;
 - nonoperational(3) indicates that the agent believes the sensor is broken. The sensor could have a hard failure (disconnected wire), or a soft failure such as out-of-range, jittery, or wildly fluctuating readings.</description>
@@ -1479,6 +1479,7 @@ The amount of the storage represented by this entry that is allocated, in units 
             <macro>
                <macro>{$FAN.STATUS.CRIT}</macro>
                <value>3</value>
+               <description>The critical value of the FAN sensor for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ICMP.LOSS.WARN}</macro>
@@ -1503,22 +1504,22 @@ The amount of the storage represented by this entry that is allocated, in units 
             <macro>
                <macro>{$MEMORY.NAME.MATCHES}</macro>
                <value>.*</value>
-               <description>This macro is used in memory discovery. Can be overridden on the host or linked template level.</description>
+               <description>This macro is used in memory discovery. Can be overridden on the host level.</description>
             </macro>
             <macro>
                <macro>{$MEMORY.NAME.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
-               <description>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</description>
+               <description>This macro is used in memory discovery. Can be overridden on the host level if you need to filter out results.</description>
             </macro>
             <macro>
                <macro>{$MEMORY.TYPE.MATCHES}</macro>
                <value>.*(\.2|hrStorageRam)$</value>
-               <description>This macro is used in memory discovery. Can be overridden on the host or linked template level.</description>
+               <description>This macro is used in memory discovery. Can be overridden on the host level.</description>
             </macro>
             <macro>
                <macro>{$MEMORY.TYPE.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
-               <description>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</description>
+               <description>This macro is used in memory discovery. Can be overridden on the host level if you need to filter out results.</description>
             </macro>
             <macro>
                <macro>{$MEMORY.UTIL.MAX}</macro>
@@ -1533,7 +1534,7 @@ The amount of the storage represented by this entry that is allocated, in units 
             <macro>
                <macro>{$NET.IF.IFADMINSTATUS.NOT_MATCHES}</macro>
                <value>^2$</value>
-               <description>Ignore down(2) administrative status</description>
+               <description>Ignore down(2) administrative status.</description>
             </macro>
             <macro>
                <macro>{$NET.IF.IFALIAS.MATCHES}</macro>
@@ -1558,7 +1559,7 @@ The amount of the storage represented by this entry that is allocated, in units 
             <macro>
                <macro>{$NET.IF.IFNAME.NOT_MATCHES}</macro>
                <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
-               <description>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</description>
+               <description>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default.</description>
             </macro>
             <macro>
                <macro>{$NET.IF.IFOPERSTATUS.MATCHES}</macro>
@@ -1567,7 +1568,7 @@ The amount of the storage represented by this entry that is allocated, in units 
             <macro>
                <macro>{$NET.IF.IFOPERSTATUS.NOT_MATCHES}</macro>
                <value>^6$</value>
-               <description>Ignore notPresent(6)</description>
+               <description>Ignore notPresent(6).</description>
             </macro>
             <macro>
                <macro>{$NET.IF.IFTYPE.MATCHES}</macro>
@@ -1580,46 +1581,52 @@ The amount of the storage represented by this entry that is allocated, in units 
             <macro>
                <macro>{$PSU.STATUS.CRIT}</macro>
                <value>2</value>
+               <description>The critical value of the PSU sensor for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$SNMP.TIMEOUT}</macro>
                <value>5m</value>
+               <description>The time interval for SNMP agent availability trigger expression.</description>
             </macro>
             <macro>
                <macro>{$TEMP.MAX.CRIT}</macro>
                <value>60</value>
+               <description>The temperature maximum critical value for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$TEMP.MAX.WARN}</macro>
                <value>50</value>
+               <description>The temperature maximum warning value for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$TEMP.MIN.CRIT}</macro>
                <value>5</value>
+               <description>The temperature minimum critical value for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$TEMP.STATUS.WARN}</macro>
                <value>3</value>
+               <description>The critical value of the TEMP sensor for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.MATCHES}</macro>
                <value>.+</value>
-               <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
+               <description>This macro is used in filesystems discovery. Can be overridden on the host level.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.NOT_MATCHES}</macro>
                <value>^(/dev|/sys|/$|/run|/proc|.+/shm$)</value>
-               <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
+               <description>This macro is used in filesystems discovery. Can be overridden on the host level.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.FSTYPE.MATCHES}</macro>
                <value>.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$</value>
-               <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
+               <description>This macro is used in filesystems discovery. Can be overridden on the host level.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.FSTYPE.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
-               <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
+               <description>This macro is used in filesystems discovery. Can be overridden on the host level.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.PUSED.MAX.CRIT}</macro>
