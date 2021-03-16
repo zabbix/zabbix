@@ -119,6 +119,7 @@ static int 	callback_cb(const char *name, size_t len, int args_num, const zbx_va
 
 	ZBX_UNUSED(args);
 	ZBX_UNUSED(data);
+	ZBX_UNUSED(ts);
 
 	for (i = 0; i < callbacks.values_num; i++)
 	{

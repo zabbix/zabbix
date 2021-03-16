@@ -151,8 +151,6 @@ tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib
 tests/libs/zbxcommshigh/zbx_tcp_recv_raw_ext
 tests/libs/zbxconf/parse_cfg_file
 tests/libs/zbxdbcache/dc_check_maintenance_period
-tests/libs/zbxdbcache/dc_expand_user_macros_in_calcitem
-tests/libs/zbxdbcache/dc_expand_user_macros_in_expression
 tests/libs/zbxdbcache/dc_expand_user_macros_in_func_params
 tests/libs/zbxdbcache/dc_item_poller_type_update
 tests/libs/zbxdbcache/dc_maintenance_match_tags
