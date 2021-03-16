@@ -103,10 +103,11 @@ $widget = (new CWidget())
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashbrd-actions')
 							->setTitle(_('Actions'))
-							->setEnabled($data['allowed_edit'])
+							->setEnabled($data['allowed_edit'] || $data['allowed_manage_reports'])
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
-								$data['dashboard']['editable']
+								$data['dashboard']['editable'], $data['dashboard']['has_related_reports'],
+								$data['allowed_edit'], $data['allowed_manage_reports']
 							))
 					)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))

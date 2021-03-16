@@ -664,64 +664,102 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 }
 
 /**
- * Get menu popup trigger section data.
+ * Get menu popup dashboard actions data.
  *
  * @param {string} options['dashboardid']
  * @param {bool}   options['editable']
- * @param {object} trigger_elmnt           UI element which triggered opening of overlay dialogue.
+ * @param {bool}   options['has_related_reports']
+ * @param {bool}   options['allowed_edit']
+ * @param {bool}   options['allowed_manage_reports']
+ * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
 function getMenuPopupDashboard(options, trigger_elmnt) {
-	var	url_create = new Curl('zabbix.php', false),
-		url_clone = new Curl('zabbix.php', false),
-		url_delete = new Curl('zabbix.php', false);
+	const sections = [];
+	const popup_options = {
+		dashboardid: options.dashboardid
+	};
 
-	url_create.setArgument('action', 'dashboard.view');
-	url_create.setArgument('new', '1');
+	// dashboard actions
+	if (options.allowed_edit) {
+		let url_create = new Curl('zabbix.php', false);
+		let url_clone = new Curl('zabbix.php', false);
+		let url_delete = new Curl('zabbix.php', false);
 
-	url_clone.setArgument('action', 'dashboard.view');
-	url_clone.setArgument('source_dashboardid', options.dashboardid);
+		url_create.setArgument('action', 'dashboard.view');
+		url_create.setArgument('new', '1');
 
-	url_delete.setArgument('action', 'dashboard.delete');
-	url_delete.setArgument('dashboardids', [options.dashboardid]);
+		url_clone.setArgument('action', 'dashboard.view');
+		url_clone.setArgument('source_dashboardid', options.dashboardid);
 
-	return [{
-		label: t('Actions'),
-		items: [
-			{
-				label: t('Sharing'),
-				clickCallback: function () {
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+		url_delete.setArgument('action', 'dashboard.delete');
+		url_delete.setArgument('dashboardids', [options.dashboardid]);
 
-					var popup_options = {'dashboardid': options.dashboardid};
-					PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+		sections.push({
+			label: t('Actions'),
+			items: [
+				{
+					label: t('Sharing'),
+					clickCallback: function () {
+						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+						PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+					},
+					disabled: !options.editable
 				},
-				disabled: !options.editable
-			},
-			{
-				label: t('Create new'),
-				url: url_create.getUrl()
-			},
-			{
-				label: t('Clone'),
-				url: url_clone.getUrl()
-			},
-			{
-				label: t('Delete'),
-				clickCallback: function () {
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+				{
+					label: t('Create new'),
+					url: url_create.getUrl()
+				},
+				{
+					label: t('Clone'),
+					url: url_clone.getUrl()
+				},
+				{
+					label: t('Delete'),
+					clickCallback: function () {
+						jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					if (!confirm(t('Delete dashboard?'))) {
-						return false;
+						if (!confirm(t('Delete dashboard?'))) {
+							return false;
+						}
+
+						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+					},
+					disabled: !options.editable
+				}
+			]
+		});
+	}
+
+	// report actions
+	if (options.allowed_manage_reports) {
+		sections.push({
+			label: options.allowed_edit ? null: t('Actions'),
+			items: [
+				{
+					label: t('Create new report'),
+					clickCallback: function () {
+						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+						PopUp('popup.scheduledreport.edit', popup_options, null, trigger_elmnt);
 					}
-
-					redirect(url_delete.getUrl(), 'post', 'sid', true, true);
 				},
-				disabled: !options.editable
-			}
-		]
-	}];
+				{
+					label: t('View related reports'),
+					clickCallback: function () {
+						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+						PopUp('popup.scheduledreport.list', popup_options, null, trigger_elmnt);
+					},
+					disabled: !options.has_related_reports
+				}
+			]
+		});
+	}
+
+	return sections;
 }
 
 /**

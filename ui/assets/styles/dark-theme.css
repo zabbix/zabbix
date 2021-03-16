@@ -492,6 +492,8 @@ footer {
     line-height: 24px;
     text-align: right;
     word-wrap: break-word; }
+  .form-grid.form-grid-offset > label {
+    min-width: 185px; }
   .form-grid .form-actions,
   .form-grid .form-field,
   .form-grid .field-fluid {

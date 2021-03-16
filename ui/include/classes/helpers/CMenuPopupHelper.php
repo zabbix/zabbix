@@ -24,14 +24,24 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for dashboard popup menu.
 	 *
-	 * @param string $dashboardid
+	 * @param string|null $dashboardid
+	 * @param bool        $editable
+	 * @param bool        $has_related_reports
+	 * @param bool        $allowed_edit
+	 * @param bool        $allowed_manage_reports
+	 *
+	 * @return array
 	 */
-	public static function getDashboard($dashboardid, $editable) {
+	public static function getDashboard(?string $dashboardid, bool $editable, bool $has_related_reports,
+			bool $allowed_edit, bool $allowed_manage_reports): array {
 		return [
 			'type' => 'dashboard',
 			'data' => [
 				'dashboardid' => $dashboardid,
-				'editable' => $editable
+				'editable' => $editable,
+				'has_related_reports' => $has_related_reports,
+				'allowed_edit' => $allowed_edit,
+				'allowed_manage_reports' => $allowed_manage_reports
 			]
 		];
 	}

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,21 +19,27 @@
 **/
 
 
-class CFormGrid extends CTag {
+/**
+ * @var CPartial $this
+ */
+?>
 
-	/**
-	 * Default CSS class name for HTML root element.
-	 */
-	private const ZBX_STYLE_CLASS = 'form-grid';
+<script>
+	jQuery(document).ready(function() {
+		<?= $data['user_multiselect'] ?>
+		<?= $data['dashboard_multiselect'] ?>
+	});
+</script>
 
-	public const ZBX_STYLE_FORM_GRID_OFFSET = 'form-grid-offset';
+<script>
+	(() => {
+		document.querySelector('#cycle').addEventListener('change', (event) => {
+			const show_weekdays = (event.target.value == <?= ZBX_REPORT_CYCLE_DAILY ?>
+					|| event.target.value == <?= ZBX_REPORT_CYCLE_WEEKLY ?>);
 
-	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
-	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
-
-	public function __construct() {
-		parent::__construct('div', true);
-
-		$this->addClass(self::ZBX_STYLE_CLASS);
-	}
-}
+			document.querySelectorAll('#weekdays-label, #weekdays').forEach((elem) => {
+				elem.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_weekdays);
+			});
+		});
+	})();
+</script>

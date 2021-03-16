@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,21 +19,17 @@
 **/
 
 
-class CFormGrid extends CTag {
+class CControllerPopupScheduledReportCreate extends CController {
 
-	/**
-	 * Default CSS class name for HTML root element.
-	 */
-	private const ZBX_STYLE_CLASS = 'form-grid';
+	protected function checkInput() {
+		// TODO: Implement checkInput() method.
+	}
 
-	public const ZBX_STYLE_FORM_GRID_OFFSET = 'form-grid-offset';
+	protected function checkPermissions() {
+		// TODO: Implement checkPermissions() method.
+	}
 
-	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
-	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
-
-	public function __construct() {
-		parent::__construct('div', true);
-
-		$this->addClass(self::ZBX_STYLE_CLASS);
+	protected function doAction() {
+		// TODO: Implement doAction() method.
 	}
 }

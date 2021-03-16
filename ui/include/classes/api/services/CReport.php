@@ -201,17 +201,17 @@ class CReport extends CApiService {
 										['if' => ['field' => 'cycle', 'in' => ZBX_REPORT_CYCLE_MONTHLY.','.ZBX_REPORT_CYCLE_YEARLY], 'type' => API_INT32, 'in' => 0]
 			]],
 			'start_time' =>			['type' => API_INT32, 'in' => '0:86340'],
-			'active_since' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'default' => DB::getDefault('report_param', 'active_since')],
-			'active_till' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'default' => DB::getDefault('report_param', 'active_till')],
+			'active_since' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'default' => DB::getDefault('report', 'active_since')],
+			'active_till' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'default' => DB::getDefault('report', 'active_till')],
 			// The length of the "report.subject" and "media_type_message.subject" fields should match.
 			'subject' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'subject')],
 			'message' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('report_param', 'value')],
-			'users' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
+			'users' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'default' => [], 'fields' => [
 				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'access_userid' =>		['type' => API_ID],
 				'exclude' =>			['type' => API_INT32, 'in' => ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE]
 			]],
-			'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['usrgrpid']], 'fields' => [
+			'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['usrgrpid']], 'default' => [], 'fields' => [
 				'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 				'access_userid' =>		['type' => API_ID]
 			]]
@@ -220,13 +220,30 @@ class CReport extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		foreach ($reports as $index => $report) {
-			if ($report['active_till'] > 0 && ($report['active_since'] > $report['active_till'])) {
+		foreach ($reports as $index => &$report) {
+			if ($report['active_till'] > 0 && $report['active_since'] > $report['active_till']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('"%1$s" must be greater than or equal to "%2$s".', 'active_till', 'active_since')
 				);
 			}
+
+			if ($report['active_since'] > 0) {
+				$report['active_since'] = (new DateTime('@'.$report['active_since']))
+					->setTime(0,0)
+					->getTimestamp();
+			}
+
+			if ($report['active_till'] > 0) {
+				$report['active_till'] = (new DateTime('@'.((string)$report['active_till'])))
+					->setTime(23,59,59)
+					->getTimestamp();
+			}
+
+			if (!$report['users'] && !$report['user_groups']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one user or user group must be specified.'));
+			}
 		}
+		unset($report);
 
 		$this->checkDuplicates(array_column($reports, 'name'));
 	}
@@ -353,13 +370,38 @@ class CReport extends CApiService {
 
 		$names = [];
 
-		foreach ($reports as $report) {
+		foreach ($reports as &$report) {
 			$db_report = $db_reports[$report['reportid']];
 
 			if (array_key_exists('name', $report) && $report['name'] !== $db_report['name']) {
 				$names[] = $report['name'];
 			}
+
+			$active_since = $db_report['active_since'];
+			if (array_key_exists('active_since', $report) && $report['active_since'] != 0) {
+				$active_since = (new DateTime('@'.$report['active_since']))
+					->setTime(0,0)
+					->getTimestamp();
+			}
+
+			$active_till = $db_report['active_till'];
+			if (array_key_exists('active_till', $report) && $report['active_till'] != 0) {
+				$active_till = (new DateTime('@'.$report['active_till']))
+					->setTime(23,59,59)
+					->getTimestamp();
+
+			}
+
+			if ($active_till > 0 && $active_since > $active_till) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('"%1$s" must be greater than or equal to "%2$s".', 'active_till', 'active_since')
+				);
+			}
+
+			$report['active_since'] = $active_since;
+			$report['active_till'] = $active_till;
 		}
+		unset($report);
 
 		if ($names) {
 			$this->checkDuplicates($names);

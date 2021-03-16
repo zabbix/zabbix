@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,21 +19,40 @@
 **/
 
 
-class CFormGrid extends CTag {
+/**
+ * @var CView $this
+ */
 
-	/**
-	 * Default CSS class name for HTML root element.
-	 */
-	private const ZBX_STYLE_CLASS = 'form-grid';
+$this->addJsFile('multiselect.js');
 
-	public const ZBX_STYLE_FORM_GRID_OFFSET = 'form-grid-offset';
+$form = (new CForm())
+	->setId('scheduledreport-form')
+	->setName('scheduledreport_form');
 
-	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
-	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
+$form->addItem(new CPartial('scheduledreport.formgrid.html', [
+	'source' => 'popup',
+	'form' => $form->getName()
+] + $data));
 
-	public function __construct() {
-		parent::__construct('div', true);
+$output = [
+	'header' => $data['title'],
+	'body' => $form->toString(),
+	'buttons' => [
+		[
+			'title' => _('Add'),
+			'keepOpen' => true,
+			'isSubmit' => true
+		]
+	]
+];
 
-		$this->addClass(self::ZBX_STYLE_CLASS);
-	}
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
 }
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

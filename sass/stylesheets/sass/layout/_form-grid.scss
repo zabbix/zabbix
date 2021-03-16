@@ -10,6 +10,12 @@
 		word-wrap: break-word;
 	}
 
+	&.form-grid-offset {
+		> label {
+			min-width: 185px;
+		}
+	}
+
 	.form-actions,
 	.form-field,
 	.field-fluid {
