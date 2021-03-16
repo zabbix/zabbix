@@ -202,11 +202,11 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Searches for circular linkages for specific template.
 	 *
-	 * @throw APIException rises exception if circular linkage is found.
-	 *
 	 * @param array  $links[<templateid>][<hostid>]  The list of linkages.
 	 * @param string $templateid                     ID of the template to check circular linkages.
 	 * @param array  $hostids[<hostid>]
+	 *
+	 * @throws APIException if circular linkage is found.
 	 */
 	private static function checkTemplateCircularLinkage(array $links, $templateid, array $hostids) {
 		if (array_key_exists($templateid, $hostids)) {
@@ -266,12 +266,12 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Searches for double linkages.
 	 *
-	 * @throw APIException rises exception if double linkage is found.
-	 *
 	 * @param array  $links[<hostid>][<templateid>]  The list of linked template IDs by host ID.
 	 * @param string $hostid
 	 *
-	 * @return array  of the linked templates for the selected host.
+	 * @throws APIException if double linkage is found.
+	 *
+	 * @return array  An array of the linked templates for the selected host.
 	 */
 	private static function checkTemplateDoubleLinkage(array $links, $hostid) {
 		$templateids = $links[$hostid];
