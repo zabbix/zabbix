@@ -2119,6 +2119,7 @@ static int	DBpatch_5030059(void)
 	}
 
 	DBfree_result(result);
+	zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
 	zbx_vector_ptr_destroy(&functions);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
