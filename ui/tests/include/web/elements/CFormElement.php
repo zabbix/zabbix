@@ -127,8 +127,13 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getLabel($name) {
-		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
-		$labels = $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
+		if (get_called_class() === 'CFluidFormElement') {
+			$labels = $this->query('xpath:.//div[contains(@class, "form-grid")]/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
+		}
+		else {
+			$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
+			$labels = $this->query($prefix.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
+		}
 
 		if ($labels->isEmpty()) {
 			throw new Exception('Failed to find form label by name: "'.$name.'".');

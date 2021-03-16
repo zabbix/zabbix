@@ -23,8 +23,6 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 require_once dirname(__FILE__).'/CFormElement.php';
 
-use Facebook\WebDriver\Remote\RemoteWebElement;
-
 /**
  * Form element.
  */
@@ -41,51 +39,11 @@ class CFluidFormElement extends CFormElement {
 	public function getLabels() {
 		$labels = $this->query('xpath:.//'.self::TABLE_FORM.'/label')->all();
 
-		foreach ($labels as $key => $label) {
-			if ($label->getText() === '') {
-				$element = $this->getFieldByLabelElement($label);
-				if ($element->isValid() && get_class($element) === CCheckboxElement::class) {
-					$labels->set($key, $element->query('xpath:../label')->one(false));
-				}
-			}
-		}
-
 		if ($this->filter !== null) {
 			return $labels->filter($this->filter);
 		}
 
 		return $labels;
-	}
-
-	/**
-	 * Get form label element by text.
-	 *
-	 * @param string $name    field label text
-	 *
-	 * @return CElement
-	 *
-	 * @throws Exception
-	 */
-	public function getLabel($name) {
-		$labels = $this->query('xpath:.//'.self::TABLE_FORM.'/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
-
-		if ($labels->isEmpty()) {
-			throw new Exception('Failed to find form label by name: "'.$name.'".');
-		}
-
-		if ($labels->count() > 1) {
-			$labels = $labels->filter(new CElementFilter(CElementFilter::VISIBLE));
-
-			if ($labels->isEmpty()) {
-				throw new Exception('Failed to find visible form label by name: "'.$name.'".');
-			}
-
-			if ($labels->count() > 1) {
-				CTest::addWarning('Form label "'.$name.'" is not unique.');
-			}
-		}
-
-		return $labels->first();
 	}
 
 	/**
