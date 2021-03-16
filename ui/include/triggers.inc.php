@@ -1901,15 +1901,25 @@ function get_item_function_info($expr) {
 
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION)):
 			$expr_part = reset($expr_data->expressions);
+			$hosts = $expr_data->result->getHosts();
+			$items = $expr_data->result->getItems();
 
 			if (!array_key_exists($expr_part['functionName'], $functions)) {
 				$result = EXPRESSION_FUNCTION_UNKNOWN;
 				break;
 			}
+			elseif (!$hosts) {
+				$result = EXPRESSION_HOST_UNKNOWN;
+				break;
+			}
+			elseif (!$items) {
+				$result = EXPRESSION_HOST_ITEM_UNKNOWN;
+				break;
+			}
 
 			$host = API::Host()->get([
 				'output' => ['hostid'],
-				'filter' => ['host' => $expr_data->result->getHosts()[0]],
+				'filter' => ['host' => $hosts[0]],
 				'templated_hosts' => true
 			]);
 
@@ -1922,7 +1932,7 @@ function get_item_function_info($expr) {
 				'output' => ['value_type'],
 				'hostids' => $host[0]['hostid'],
 				'filter' => [
-					'key_' => $expr_data->result->getItems()[0]
+					'key_' => $items[0]
 				],
 				'webitems' => true
 			]);
