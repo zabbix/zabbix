@@ -3524,7 +3524,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_TRIGGER_EXPRESSION],
 				'9 and 1',
 				'/1/expression',
-				'Invalid parameter "/1/expression": trigger expression must contain at least one host:key reference.'
+				'Invalid parameter "/1/expression": trigger expression must contain at least one /host/key reference.'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],

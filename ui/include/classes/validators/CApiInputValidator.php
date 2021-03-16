@@ -2007,7 +2007,7 @@ class CApiInputValidator {
 
 		if (!$expression_data->expressions) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('trigger expression must contain at least one host:key reference')
+				_('trigger expression must contain at least one /host/key reference')
 			);
 			return false;
 		}
