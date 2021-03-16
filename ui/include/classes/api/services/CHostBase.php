@@ -315,7 +315,7 @@ abstract class CHostBase extends CApiService {
 
 		do {
 			$result = DBselect(
-				'SELECT ht.templateid,ht.hostid'.
+				'SELECT ht.hostid'.
 				' FROM hosts_templates ht'.
 				' WHERE '.dbConditionId('ht.templateid', $_hostids)
 			);
