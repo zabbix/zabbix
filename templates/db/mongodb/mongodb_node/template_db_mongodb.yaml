@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-15T08:28:20Z'
+  date: '2021-03-16T09:50:57Z'
   groups:
     -
       name: Templates/Databases
@@ -2258,7 +2258,7 @@ zabbix_export:
                 -
                   name: 'MongoDB Replica Set: {#RS_NAME}'
               valuemap:
-                name: 'Replica set node state'
+                name: 'ReplicaSet node state'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2274,9 +2274,9 @@ zabbix_export:
                 -
                   expression: '{change()}=1'
                   recovery_mode: NONE
-                  name: 'MongoDB: Node in replica set changed the state (new state: {ITEM.VALUE})'
+                  name: 'MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Node in replica set  changed the state. Ack to close.'
+                  description: 'Node in ReplicaSet  changed the state. Ack to close.'
                   manual_close: 'YES'
             -
               name: 'MongoDB: Number of replicas'
@@ -2285,7 +2285,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               discover: NO_DISCOVER
-              description: 'The number of replucated nodes in current replica set.'
+              description: 'The number of replucated nodes in current ReplicaSet.'
               application_prototypes:
                 -
                   name: 'MongoDB Replica Set: {#RS_NAME}'
@@ -2309,7 +2309,7 @@ zabbix_export:
               trends: '0'
               discover: NO_DISCOVER
               value_type: CHAR
-              description: 'The replicated nodes in current replica set with member health value  = 0.'
+              description: 'The replicated nodes in current ReplicaSet with member health value  = 0.'
               application_prototypes:
                 -
                   name: 'MongoDB Replica Set: {#RS_NAME}'
@@ -2356,7 +2356,7 @@ zabbix_export:
           trigger_prototypes:
             -
               expression: '{MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy_count[{#RS_NAME}].last()}>0  and {MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy[{#RS_NAME}].strlen()}>0'
-              name: 'MongoDB: There are unhealthy replicas in replicaset'
+              name: 'MongoDB: There are unhealthy replicas in ReplicaSet'
               priority: AVERAGE
           graph_prototypes:
             -
@@ -3015,7 +3015,7 @@ zabbix_export:
           value: '1'
           newvalue: 'True'
     -
-      name: 'Replica set node state'
+      name: 'ReplicaSet node state'
       mappings:
         -
           value: '0'
