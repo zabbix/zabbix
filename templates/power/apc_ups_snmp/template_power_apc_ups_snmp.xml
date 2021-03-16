@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-04T18:37:03Z</date>
+   <date>2021-03-16T13:29:40Z</date>
    <groups>
       <group>
          <name>Templates/Power</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 PowerNet-MIB&#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <templates>
@@ -608,20 +608,9 @@ An 8-character string identifying the serial number of&#13;
             <discovery_rule>
                <name>External bad battery packs discovery</name>
                <type>SNMP_AGENT</type>
-               <snmp_oid>discovery[{#EXTERNAL_PACKS},1.3.6.1.4.1.318.1.1.1.2.2.5]</snmp_oid>
+               <snmp_oid>discovery[{#EXTERNAL_PACKS},1.3.6.1.4.1.318.1.1.1.2.2.6]</snmp_oid>
                <key>battery.packs.bad.discovery</key>
                <delay>1h</delay>
-               <filter>
-                  <evaltype>AND</evaltype>
-                  <conditions>
-                     <condition>
-                        <macro>{#EXTERNAL_PACKS}</macro>
-                        <value>0</value>
-                        <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>A</formulaid>
-                     </condition>
-                  </conditions>
-               </filter>
                <description>Discovery of the number of external defective battery packs.</description>
                <item_prototypes>
                   <item_prototype>
@@ -1125,7 +1114,7 @@ The sensor's current temperature reading in degrees Celsius.&#13;
                      <value_type>FLOAT</value_type>
                      <units>A</units>
                      <description>MIB: PowerNet-MIB&#13;
-The input current in 0.1 amperes, or -1 if it's&#13;
+The input current in 0.1 amperes, or -0.1 if it's&#13;
  unsupported by this UPS.</description>
                      <applications>
                         <application>

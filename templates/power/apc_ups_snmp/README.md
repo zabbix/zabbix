@@ -10,7 +10,7 @@ The template to monitor APC UPS Symmetra LX by Zabbix SNMP agent.
 
 This template was tested on:
 
-- APC UPS Symmetra LX
+- APC UPS Symmetra LX (without external batteries)
 
 ## Setup
 
@@ -50,7 +50,7 @@ No specific Zabbix configuration is required.
 |----|-----------|----|----|
 |Input phases discovery |<p>The input phase identifier. OID upsPhaseInputPhaseIndex.1.1</p> |SNMP |input.phases.discovery |
 |External battery packs discovery | |SNMP |battery.packs.discovery<p>**Filter**:</p>AND <p>- A: {#CARTRIDGE_STATUS} NOT_MATCHES_REGEX `^$`</p> |
-|External bad battery packs discovery |<p>Discovery of the number of external defective battery packs.</p> |SNMP |battery.packs.bad.discovery<p>**Filter**:</p>AND <p>- A: {#EXTERNAL_PACKS} NOT_MATCHES_REGEX `0`</p> |
+|External bad battery packs discovery |<p>Discovery of the number of external defective battery packs.</p> |SNMP |battery.packs.bad.discovery |
 |External sensor port 1 discovery |<p>uioSensorStatusTable</p> |SNMP |external.sensor1.discovery |
 |External sensor port 2 discovery |<p>uioSensorStatusTable</p> |SNMP |external.sensor2.discovery |
 
@@ -76,7 +76,7 @@ No specific Zabbix configuration is required.
 |General |Output current |<p>MIB: PowerNet-MIB</p><p>The current in amperes drawn by the load on the UPS.</p> |SNMP |output.current[upsHighPrecOutputCurrent]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |Output status |<p>MIB: PowerNet-MIB</p><p>The current state of the UPS. If the UPS is unable to</p><p> determine the state of the UPS this variable is set</p><p> to unknown(1).</p><p>During self-test most UPSes report onBattery(3) but</p><p> some that support it will report onBatteryTest(15).</p><p> To determine self-test status across all UPSes, refer</p><p> to the upsBasicStateOutputState OID.</p> |SNMP |output.status[upsBasicOutputStatus]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |{#PHASEINDEX}: Phase input voltage |<p>MIB: PowerNet-MIB</p><p>The input voltage in VAC, or -1 if it's unsupported</p><p> by this UPS.</p> |SNMP |phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|General |{#PHASEINDEX}: Phase input current |<p>MIB: PowerNet-MIB</p><p>The input current in 0.1 amperes, or -1 if it's</p><p> unsupported by this UPS.</p> |SNMP |phase.input.current[upsPhaseInputCurrent.1.1.{#PHASEINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|General |{#PHASEINDEX}: Phase input current |<p>MIB: PowerNet-MIB</p><p>The input current in 0.1 amperes, or -0.1 if it's</p><p> unsupported by this UPS.</p> |SNMP |phase.input.current[upsPhaseInputCurrent.1.1.{#PHASEINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status |<p>MIB: PowerNet-MIB</p><p>The battery cartridge status.</p><p>bit 0 Disconnected</p><p>bit 1 Overvoltage</p><p>bit 2 NeedsReplacement</p><p>bit 3 OvertemperatureCritical</p><p>bit 4 Charger</p><p>bit 5 TemperatureSensor</p><p>bit 6 BusSoftStart</p><p>bit 7 OvertemperatureWarning</p><p>bit 8 GeneralError</p><p>bit 9 Communication</p><p>bit 10 DisconnectedFrame</p><p>bit 11 FirmwareMismatch</p> |SNMP |battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery temperature |<p>MIB: PowerNet-MIB</p><p>The battery pack temperature measured in Celsius.</p> |SNMP |battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Serial number |<p>MIB: PowerNet-MIB</p><p>The battery pack serial number.</p> |SNMP |system.sn[upsHighPrecBatteryPackSerialNumber.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -127,5 +127,5 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups).
 
