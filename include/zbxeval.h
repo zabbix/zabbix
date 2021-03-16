@@ -111,6 +111,11 @@
 					ZBX_EVAL_COMPOSE_LLD | \
 					ZBX_EVAL_COMPOSE_FUNCTIONID)
 
+#define ZBX_EVAL_CALC_EXPRESSION_LLD	(ZBX_EVAL_PARSE_CALC_EXPRESSSION | \
+					ZBX_EVAL_PARSE_LLDMACRO | \
+					ZBX_EVAL_COMPOSE_LLD)
+
+
 typedef zbx_uint32_t zbx_token_type_t;
 
 /******************************************************************************
