@@ -2019,6 +2019,7 @@ static char	*dbpatch_formula_to_expression(const char *calchost, zbx_uint64_t it
 
 			if (FAIL == ret)
 			{
+				zbx_vector_ptr_clear_ext(functions, (zbx_clean_func_t)dbpatch_function_free);
 				zbx_free(exp);
 				return NULL;
 			}
@@ -2163,7 +2164,6 @@ static int	DBpatch_5030059(void)
 	}
 
 	DBfree_result(result);
-	zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
 	zbx_vector_ptr_destroy(&functions);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
