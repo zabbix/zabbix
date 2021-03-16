@@ -1932,7 +1932,7 @@ function get_item_function_info($expr) {
 					'output' => ['value_type'],
 					'hostids' => $host[0]['hostid'],
 					'filter' => [
-						'key_' => $item_keys
+						'key_' => $expr_data->result->getItems()[0]
 					]
 				]);
 			}
