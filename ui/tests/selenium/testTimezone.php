@@ -74,7 +74,7 @@ class testTimezone extends CWebTest {
 				[
 					'user_timezone' => '(UTC-11:00) Pacific/Niue',
 					'timezone_db' => 'Pacific/Niue',
-					'time_diff' => '-11 hours'
+					'time_diff' => '-14 hours'
 				]
 			],
 			[
@@ -158,7 +158,7 @@ class testTimezone extends CWebTest {
 						'Password (once again)' => 'test',
 						'Time zone' => '(UTC-11:00) Pacific/Niue'
 					],
-					'time_diff' => '-11 hours',
+					'time_diff' => '-14 hours',
 					'timezone_db' => 'Pacific/Niue'
 				]
 			],
