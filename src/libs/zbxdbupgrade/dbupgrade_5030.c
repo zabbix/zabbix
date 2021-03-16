@@ -1005,6 +1005,7 @@ typedef struct
 	char		*arg0;
 
 	unsigned char	flags;
+	unsigned char	value_type;
 }
 zbx_dbpatch_function_t;
 
@@ -1033,7 +1034,7 @@ static void	dbpatch_trigger_clear(zbx_dbpatch_trigger_t *trigger)
 }
 
 static zbx_dbpatch_function_t	*dbpatch_new_function(zbx_uint64_t functionid, zbx_uint64_t itemid, const char *name,
-		const char *parameter, unsigned char flags)
+		const char *parameter, unsigned char flags, unsigned char value_type)
 {
 	zbx_dbpatch_function_t	*func;
 
@@ -1043,6 +1044,7 @@ static zbx_dbpatch_function_t	*dbpatch_new_function(zbx_uint64_t functionid, zbx
 	func->name = (NULL != name ? zbx_strdup(NULL, name) : NULL);
 	func->parameter = (NULL != parameter ? zbx_strdup(NULL, parameter) : NULL);
 	func->flags = flags;
+	func->value_type = value_type;
 	func->arg0 = NULL;
 
 	return func;
@@ -1053,7 +1055,7 @@ static void	dbpatch_add_function(const zbx_dbpatch_function_t *template, zbx_uin
 {
 	zbx_dbpatch_function_t	*func;
 
-	func = dbpatch_new_function(functionid, template->itemid, name, parameter, flags);
+	func = dbpatch_new_function(functionid, template->itemid, name, parameter, flags, template->value_type);
 	func->arg0 = (NULL != template->arg0 ? zbx_strdup(NULL, template->arg0) : NULL);
 
 	zbx_vector_ptr_append(functions, func);
@@ -1459,7 +1461,6 @@ static int	dbpatch_is_numeric_count_pattern(const char *op, const char *pattern)
  * Purpose: convert function to new parameter syntax/order                    *
  *                                                                            *
  * Parameters: function   - [IN/OUT] the function to convert                  *
- *             value_type - [IN] the function item value type                 *
  *             replace    - [OUT] the replacement for {functionid} in the     *
  *                          expression                                        *
  *             functions  - [IN/OUT] the functions                            *
@@ -1468,8 +1469,7 @@ static int	dbpatch_is_numeric_count_pattern(const char *op, const char *pattern)
  *           added.                                                           *
  *                                                                            *
  ******************************************************************************/
-static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned char value_type,
-		char **replace, zbx_vector_ptr_t *functions)
+static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, zbx_vector_ptr_t *functions)
 {
 	zbx_vector_loc_t	params;
 	char			*parameter = NULL;
@@ -1480,7 +1480,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 
 	if (0 == strcmp(function->name, "abschange"))
 	{
-		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
+		if (ITEM_VALUE_TYPE_FLOAT == function->value_type || ITEM_VALUE_TYPE_UINT64 == function->value_type)
 			dbpatch_update_func_change(function, "abs(change(", "))", replace, functions);
 		else
 			dbpatch_update_func_diff(function, replace, functions);
@@ -1495,7 +1495,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	}
 	else if (0 == strcmp(function->name, "change"))
 	{
-		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
+		if (ITEM_VALUE_TYPE_FLOAT == function->value_type || ITEM_VALUE_TYPE_UINT64 == function->value_type)
 			dbpatch_update_func_change(function, "change(", ")", replace, functions);
 		else
 			dbpatch_update_func_diff(function, replace, functions);
@@ -1582,7 +1582,8 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 
 			/* set numeric pattern type for numeric items and numeric operators unless */
 			/* band operation pattern contains mask (separated by '/')                 */
-			if ((ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type) &&
+			if ((ITEM_VALUE_TYPE_FLOAT == function->value_type ||
+						ITEM_VALUE_TYPE_UINT64 == function->value_type) &&
 					SUCCEED == dbpatch_is_numeric_count_pattern(op, pattern))
 			{
 				arg_type = ZBX_DBPATCH_ARG_NUM;
@@ -1714,7 +1715,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 			zbx_snprintf(func_name, sizeof(func_name), "%s()", row[2]);
 			dbpatch_update_trigger(trigger, functionid, func_name);
 
-			func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
+			func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0, value_type);
 			func->hostid = hostid;
 			zbx_vector_ptr_append(&common_functions, func);
 
@@ -1723,9 +1724,9 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 		zbx_vector_uint64_append(&hostids, hostid);
 
-		func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
+		func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0, value_type);
 		zbx_vector_ptr_append(functions, func);
-		dbpatch_convert_function(func, value_type, &replace, functions);
+		dbpatch_convert_function(func, &replace, functions);
 
 		if (NULL != replace)
 		{
@@ -1951,7 +1952,45 @@ static int	DBpatch_5030058(void)
 	return SUCCEED;
 }
 
-static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *formula, zbx_vector_ptr_t *functions)
+static unsigned char	dbpatch_get_hostkey_valuetype(const char *host, const char *key)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	char		*sql = NULL, *host_esc, *key_esc;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	unsigned char	value_type;
+
+	host_esc = DBdyn_escape_string(host);
+	key_esc = DBdyn_escape_string(key);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select i.value_type from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and h.host='%s'"
+				" and i.key_='%s'",
+			host_esc, key_esc);
+
+	zbx_free(key_esc);
+	zbx_free(host_esc);
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		value_type = ITEM_VALUE_TYPE_TEXT;
+	}
+	else
+		ZBX_STR2UCHAR(value_type, row[0]);
+
+	DBfree_result(result);
+
+	return value_type;
+}
+
+static char	*dbpatch_formula_to_expression(const char *calchost, zbx_uint64_t itemid, const char *formula,
+		zbx_vector_ptr_t *functions)
 {
 	zbx_dbpatch_function_t	*func;
 	const char		*ptr;
@@ -1988,6 +2027,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 			func->itemid = itemid;
 			func->name = zbx_substr(ptr, pos, par_l - 1);
 			func->flags = 0;
+			func->value_type = dbpatch_get_hostkey_valuetype((NULL == host ? calchost : host), key);
 
 			func->arg0 = zbx_dsprintf(NULL, "/%s/%s", ZBX_NULL2EMPTY_STR(host), key);
 			zbx_free(host);
@@ -2029,7 +2069,11 @@ static int	DBpatch_5030059(void)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select itemid,params,value_type from items where type=15 order by itemid");
+	result = DBselect("select i.itemid,i.params,i.value_type,h.host"
+			" from items i,hosts h"
+			" where i.type=15"
+				" and h.hostid=i.hostid"
+			" order by i.itemid");
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
@@ -2040,7 +2084,7 @@ static int	DBpatch_5030059(void)
 		size_t		out_alloc = 0, out_offset = 0;
 
 		ZBX_STR2UINT64(itemid, row[0]);
-		if (NULL == (expression = dbpatch_formula_to_expression(itemid, row[1], &functions)))
+		if (NULL == (expression = dbpatch_formula_to_expression(row[3], itemid, row[1], &functions)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\"formula",
 					itemid);
@@ -2052,7 +2096,7 @@ static int	DBpatch_5030059(void)
 			char			*replace = NULL;
 			zbx_dbpatch_function_t	*func = functions.values[i];
 
-			dbpatch_convert_function(func, atoi(row[2]), &replace, &functions);
+			dbpatch_convert_function(func, &replace, &functions);
 			if (NULL != replace)
 			{
 				dbpatch_update_expression(&expression, func->functionid, replace);
