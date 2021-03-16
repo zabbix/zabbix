@@ -312,7 +312,7 @@ class testTriggerValidation extends CAPITest {
 						'recovery_expression' => '1+1'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/recovery_expression": trigger expression must contain at least one host:key reference.'
+				'expected_error' => 'Invalid parameter "/1/recovery_expression": trigger expression must contain at least one /host/key reference.'
 			],
 			'Trigger with unexpected correlation tag #1' => [
 				'triggers' => [
