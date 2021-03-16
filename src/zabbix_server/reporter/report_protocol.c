@@ -115,7 +115,6 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 	for (i = 0; i < params_num; i++)
 	{
 		zbx_ptr_pair_t	pair;
-		zbx_uint32_t	len;
 
 		data += zbx_deserialize_str(data, (char **)&pair.first, len);
 		data += zbx_deserialize_str(data, (char **)&pair.second, len);

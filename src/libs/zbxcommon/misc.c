@@ -3914,20 +3914,20 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
  *                               bitmask (0x01 - Monday, 0x02 - Tuesday...)   *
  *             start_time - [IN] the report start time in seconds after       *
  *                               midnight                                     *
- *             timezone   - [IN] the report starting timezone                 *
+ *             tz         - [IN] the report starting timezone                 *
  *                                                                            *
  * Return value: The timestamp when the report must be prepared or -1 if an   *
  *               error occurred.                                              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
-		const char *timezone)
+		const char *tz)
 {
 	struct tm	*tm;
 	time_t		yesterday = now - SEC_PER_DAY;
 	int		nextcheck, tm_hour, tm_min, tm_sec;
 
-	if (NULL == (tm = zbx_localtime(&yesterday, timezone)))
+	if (NULL == (tm = zbx_localtime(&yesterday, tz)))
 		return -1;
 
 	tm_sec = start_time % 60;

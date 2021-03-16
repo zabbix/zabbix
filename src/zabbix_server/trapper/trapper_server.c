@@ -52,8 +52,6 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		char	*error;
-
 		error = zbx_dsprintf(NULL, "cannot find tag: %s", ZBX_PROTO_TAG_DATA);
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zbx_free(error);

@@ -1053,7 +1053,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 	zbx_hashset_iter_t	iter;
 	zbx_rm_report_t		*report, report_local;
 	zbx_config_t		cfg;
-	const char		*timezone;
+	const char		*tz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1076,9 +1076,9 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		ZBX_STR2UINT64(reportid, row[0]);
 		zbx_vector_uint64_append(&reportids, reportid);
 
-		timezone = row[10];
-		if (0 == strcmp(timezone, ZBX_TIMEZONE_DEFAULT_VALUE))
-			timezone = cfg.default_timezone;
+		tz = row[10];
+		if (0 == strcmp(tz, ZBX_TIMEZONE_DEFAULT_VALUE))
+			tz = cfg.default_timezone;
 
 		ZBX_STR2UCHAR(period, row[4]);
 		ZBX_STR2UCHAR(cycle, row[5]);
@@ -1098,7 +1098,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 			zbx_vector_recipient_create(&report->users);
 			zbx_vector_uint64_create(&report->users_excl);
 			report->name = zbx_strdup(NULL, row[2]);
-			report->timezone = zbx_strdup(NULL, timezone);
+			report->timezone = zbx_strdup(NULL, tz);
 			report->nextcheck = 0;
 			ZBX_STR2UCHAR(report->state, row[11]);
 			report->error = zbx_strdup(NULL, row[12]);
@@ -1119,9 +1119,9 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 			if (0 != strcmp(report->name, row[2]))
 				report->name = zbx_strdup(report->name, row[2]);
 
-			if (0 != strcmp(report->timezone, timezone))
+			if (0 != strcmp(report->timezone, tz))
 			{
-				report->timezone = zbx_strdup(report->timezone, timezone);
+				report->timezone = zbx_strdup(report->timezone, tz);
 				reschedule = 1;
 			}
 		}
@@ -1580,14 +1580,14 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int	width, bottom, min_width = 8, coeff;
+		int	dashboard_width, bottom, min_width = 8, coeff;
 		size_t	i;
 
 		bottom = atoi(row[2]) + atoi(row[3]);
 		if (bottom > y_max)
 			y_max = bottom;
 
-		width = atoi(row[1]);
+		dashboard_width = atoi(row[1]);
 
 		for (i = 0; i < ARRSIZE(widgets); i++)
 		{
@@ -1598,7 +1598,7 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
 			}
 		}
 
-		coeff = (width < min_width ? ceil((double)min_width / width) : 1);
+		coeff = (dashboard_width < min_width ? ceil((double)min_width / dashboard_width) : 1);
 
 		if (coeff > x_coeff)
 			x_coeff = coeff;
@@ -2129,11 +2129,11 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
 
 		if (NULL != (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &batch->reportid)))
 		{
-			char	info[MAX_STRING_LEN];
+			char	str[MAX_STRING_LEN];
 
-			zbx_snprintf(info, sizeof(info), "Failed to send %d reports:\n%s", batch->error_num,
+			zbx_snprintf(str, sizeof(str), "Failed to send %d reports:\n%s", batch->error_num,
 					batch->info);
-			rm_update_report(manager, report, (0 == batch->error_num ? SUCCEED : FAIL), batch->info);
+			rm_update_report(manager, report, (0 == batch->error_num ? SUCCEED : FAIL), info);
 		}
 
 		rm_batch_clean(batch);
