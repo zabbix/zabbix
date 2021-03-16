@@ -324,9 +324,10 @@ abstract class CHostBase extends CApiService {
 
 			while ($row = DBfetch($result)) {
 				if (!array_key_exists($row['hostid'], $hostids)) {
-					$hostids[$row['hostid']] = true;
 					$_hostids[$row['hostid']] = true;
 				}
+
+				$hostids[$row['hostid']] = true;
 			}
 
 			$_hostids = array_keys($_hostids);
@@ -347,10 +348,10 @@ abstract class CHostBase extends CApiService {
 
 			while ($row = DBfetch($result)) {
 				if (!array_key_exists($row['templateid'], $templateids)) {
-					$templateids[$row['templateid']] = true;
 					$_templateids[$row['templateid']] = true;
 				}
 
+				$templateids[$row['templateid']] = true;
 				$links[$row['hostid']][$row['templateid']] = true;
 			}
 
