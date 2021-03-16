@@ -17,26 +17,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package mongodb
 
 import (
-	_ "zabbix.com/plugins/ceph"
-	_ "zabbix.com/plugins/docker"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/modbus"
-	_ "zabbix.com/plugins/mongodb"
-	_ "zabbix.com/plugins/mysql"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/smart"
-	_ "zabbix.com/plugins/system/sw"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"encoding/json"
+	"sort"
+
+	"zabbix.com/pkg/zbxerr"
 )
+
+type dbEntity struct {
+	DBName string `json:"{#DBNAME}"`
+}
+
+// databasesDiscoveryHandler
+// https://docs.mongodb.com/manual/reference/command/listDatabases/
+func databasesDiscoveryHandler(s Session, _ map[string]string) (interface{}, error) {
+	dbs, err := s.DatabaseNames()
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	lld := make([]dbEntity, 0)
+
+	sort.Strings(dbs)
+
+	for _, db := range dbs {
+		lld = append(lld, dbEntity{DBName: db})
+	}
+
+	jsonLLD, err := json.Marshal(lld)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return string(jsonLLD), nil
+}
