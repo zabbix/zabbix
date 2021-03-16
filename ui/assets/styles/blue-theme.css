@@ -3643,9 +3643,6 @@ z-select[disabled] button,
   height: 24px;
   background: url("../img/icon-sprite.svg?20200407") no-repeat -6px -762px; }
 
-.ui-draggable:not(.ui-draggable-dragging) {
-  transition: top .1s, left .1s; }
-
 .icon-info {
   position: relative;
   width: 8px;

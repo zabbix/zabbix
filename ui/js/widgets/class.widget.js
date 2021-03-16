@@ -102,7 +102,8 @@ class CWidget extends CBaseComponent {
 			head: 'dashbrd-grid-widget-head',
 			hidden_header: 'dashbrd-grid-widget-hidden-header',
 			mask: 'dashbrd-grid-widget-mask',
-			root: 'dashbrd-grid-widget'
+			root: 'dashbrd-grid-widget',
+			resize_handle: 'ui-resizable-handle'
 		};
 
 		this._state = WIDGET_STATE_INITIAL;
@@ -262,7 +263,42 @@ class CWidget extends CBaseComponent {
 	}
 
 	isInteracting() {
-		return (this._$target.find('[data-expanded="true"], [aria-expanded="true"]').length > 0);
+		return (this._isResizing() || this._isDragging()
+			|| this._$target.find('[data-expanded="true"], [aria-expanded="true"]').length > 0
+		);
+	}
+
+	_isResizing() {
+		return this._target.classList.contains('ui-resizable-resizing');
+	}
+
+	setResizing(is_resizing) {
+		this._target.classList.toggle('ui-resizable-resizing', is_resizing);
+	}
+
+	_isDragging() {
+		return this._target.classList.contains('ui-draggable-dragging');
+	}
+
+	setDragging(is_dragging) {
+		this._target.classList.toggle('ui-draggable-dragging', is_dragging);
+	}
+
+	getResizeHandleSides(resize_handle) {
+		return {
+			top: resize_handle.classList.contains('ui-resizable-nw')
+				|| resize_handle.classList.contains('ui-resizable-n')
+				|| resize_handle.classList.contains('ui-resizable-ne'),
+			right: resize_handle.classList.contains('ui-resizable-ne')
+				|| resize_handle.classList.contains('ui-resizable-e')
+				|| resize_handle.classList.contains('ui-resizable-se'),
+			bottom: resize_handle.classList.contains('ui-resizable-se')
+				|| resize_handle.classList.contains('ui-resizable-s')
+				|| resize_handle.classList.contains('ui-resizable-sw'),
+			left: resize_handle.classList.contains('ui-resizable-sw')
+				|| resize_handle.classList.contains('ui-resizable-w')
+				|| resize_handle.classList.contains('ui-resizable-nw')
+		};
 	}
 
 	_setViewMode(view_mode) {
