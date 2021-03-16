@@ -1087,6 +1087,14 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggerid = DB::reserveIds('triggers', count($new_triggers));
 
 		foreach ($new_triggers as $tnum => &$new_trigger) {
+
+			if (!array_key_exists($tnum, $triggers_functions)) {
+				$path = '/'.($tnum+1).'/expression';
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+					_('trigger expression must contain at least one /host/key reference')
+				));
+			}
+
 			$new_trigger['triggerid'] = $triggerid;
 			$triggers[$tnum]['triggerid'] = $triggerid;
 
