@@ -1557,7 +1557,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 				// Validate functions of trigger expression. Colect trigger functions in $triggers_functions.
 				foreach ($expressionData->result->getFunctions() as $fn) {
-					foreach ([$trigger_function_validator, $math_function_validator] as $validator) {
+					foreach ([$math_function_validator, $trigger_function_validator] as $validator) {
 						if ($validator->validate($fn)) {
 							$error_msg = '';
 							break;
