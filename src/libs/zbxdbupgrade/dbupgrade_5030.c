@@ -1247,8 +1247,17 @@ static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_
 	{
 		zbx_function_param_parse(ptr, &pos, &len, &sep);
 
-		loc.l = ptr - parameter + (0 < len ? pos : eol - (ptr - parameter));
-		loc.r = loc.l + len - 1;
+		if (0 < len)
+		{
+			loc.l = ptr - parameter + pos;
+			loc.r = loc.l + len - 1;
+		}
+		else
+		{
+			loc.l = ptr - parameter + eol - (ptr - parameter);
+			loc.r = loc.l;
+		}
+
 		zbx_vector_loc_append_ptr(params, &loc);
 	}
 
