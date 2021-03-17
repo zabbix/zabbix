@@ -1246,7 +1246,7 @@ static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_
 		}
 		else
 		{
-			loc.l = ptr - parameter + eol - (ptr - parameter);
+			loc.l = eol;
 			loc.r = loc.l;
 		}
 
