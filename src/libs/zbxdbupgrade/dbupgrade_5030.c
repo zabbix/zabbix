@@ -1145,18 +1145,10 @@ static void	dbpatch_update_trigger(zbx_dbpatch_trigger_t *trigger, zbx_uint64_t 
 	}
 }
 
-static void	dbpatch_update_func_change(zbx_dbpatch_function_t *function, const char *prefix, const char *suffix,
-		char **replace, zbx_vector_ptr_t *functions)
+static void	dbpatch_update_func_abschange(zbx_dbpatch_function_t *function, char **replace)
 {
-	zbx_uint64_t	functionid2;
-
-	dbpatch_update_function(function, "last", "#2", ZBX_DBPATCH_FUNCTION_UPDATE);
-
-	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
-	dbpatch_add_function(function, functionid2, "last", "#1", ZBX_DBPATCH_FUNCTION_CREATE, functions);
-
-	*replace = zbx_dsprintf(NULL, "%s{" ZBX_FS_UI64 "},{" ZBX_FS_UI64 "}%s", prefix, function->functionid,
-			functionid2, suffix);
+	dbpatch_update_function(function, "change", NULL, ZBX_DBPATCH_FUNCTION_UPDATE_NAME);
+	*replace = zbx_dsprintf(NULL, "abs({" ZBX_FS_UI64 "})", function->functionid);
 }
 
 static void	dbpatch_update_func_delta(zbx_dbpatch_function_t *function, const char *parameter, char **replace,
@@ -1486,10 +1478,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 
 	if (0 == strcmp(function->name, "abschange"))
 	{
-		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
-			dbpatch_update_func_change(function, "abs(change(", "))", replace, functions);
-		else
-			dbpatch_update_func_diff(function, replace, functions);
+		dbpatch_update_func_abschange(function, replace);
 	}
 	else if (0 == strcmp(function->name, "avg") || 0 == strcmp(function->name, "max") ||
 			0 == strcmp(function->name, "min") || 0 == strcmp(function->name, "sum"))
@@ -1498,13 +1487,6 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 				ZBX_DBPATCH_ARG_HIST, 0, 1,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
-	}
-	else if (0 == strcmp(function->name, "change"))
-	{
-		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
-			dbpatch_update_func_change(function, "change(", ")", replace, functions);
-		else
-			dbpatch_update_func_diff(function, replace, functions);
 	}
 	else if (0 == strcmp(function->name, "delta"))
 	{
