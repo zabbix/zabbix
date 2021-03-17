@@ -1150,5 +1150,123 @@ in:
 out:
   return: FAIL
   value: 3600
+---
+test case: Evaluate change() <- 0.1, 0.2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.1
+---
+test case: Evaluate change() <- 10, 7
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 10
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 7
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: -3
+---
+test case: Evaluate change() <- 'a', 'b'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: a
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: b
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate change() <- 'x', 'x'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: x
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: x
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate change() <- @log 'a', 'b'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: b
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate change() <- @log 'x', 'x'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: x
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: x
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
 ...
 
