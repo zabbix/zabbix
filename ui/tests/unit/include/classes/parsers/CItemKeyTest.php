@@ -1342,4 +1342,152 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $rc);
 	}
 
+	public function providerItemKeyFilter() {
+		return [
+			[
+				'key?[(]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _('unexpected end of key'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[()]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', ')]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[ ]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _('unexpected end of key'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[unknown="name"]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'unknown="name"]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[(group="Zabbix Servers") and]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'and]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[group="name" and]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'and]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[tag="name"] test', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => _s('incorrect syntax near "%1$s"', ' test'),
+					'match' => 'key?[tag="name"]',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[tag="name"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key?[tag="name"]',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key[,b]?[tag="name"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key[,b]?[tag="name"]',
+					'key' => 'key',
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[,b]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'b',
+									'pos' => 2
+								]
+							]
+						]
+					]
+				],
+				['', 'b']
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider providerItemKeyFilter
+	 */
+	public function testItemKeyFilter($key, $pos, $expectedResult, $unquoted_params) {
+		static $item_key_parser = null;
+
+		if ($item_key_parser === null) {
+			$item_key_parser = new CItemKey(['with_filter' => true]);
+		}
+
+		$rc = $item_key_parser->parse($key, $pos);
+
+		$result = [
+			'rc' => $rc,
+			'error' => $item_key_parser->getError(),
+			'match' => $item_key_parser->getMatch(),
+			'key' => $item_key_parser->getKey(),
+			'parameters' => $item_key_parser->getParamsRaw()
+		];
+		$this->assertEquals($expectedResult, $result);
+		$this->assertEquals(count($unquoted_params), $item_key_parser->getParamsNum());
+
+		for ($n = 0, $count = $item_key_parser->getParamsNum(); $n < $count; $n++) {
+			$this->assertEquals($unquoted_params[$n], $item_key_parser->getParam($n));
+		}
+	}
 }

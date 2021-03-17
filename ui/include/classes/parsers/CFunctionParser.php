@@ -144,7 +144,7 @@ class CFunctionParser extends CParser {
 		$state = self::STATE_NEW;
 		$num = 0;
 
-		$query_parser = new CQueryParser();
+		$query_parser = new CQueryParser($this->options);
 		$function_parser = new self($this->options, $this->depth + 1);
 
 		if ($this->options['collapsed_expression']) {

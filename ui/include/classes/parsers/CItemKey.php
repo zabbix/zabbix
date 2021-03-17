@@ -30,6 +30,11 @@ class CItemKey extends CParser {
 	const STATE_QUOTED = 3;
 	const STATE_END_OF_PARAMS = 4;
 
+	const STATE_AFTER_OPEN_BRACE = 1;
+	const STATE_AFTER_LOGICAL_OPERATOR = 3;
+	const STATE_AFTER_CLOSE_BRACE = 6;
+	const STATE_AFTER_CONSTANT = 7;
+
 	const PARAM_ARRAY = 0;
 	const PARAM_UNQUOTED = 1;
 	const PARAM_QUOTED = 2;
@@ -38,25 +43,30 @@ class CItemKey extends CParser {
 	private $parameters = [];
 
 	/**
+	 * Array of parsed item key filter attributes.
+	 *
+	 * @var array $attributes
+	 */
+	private $attributes = [];
+
+	/**
 	 * An options array
 	 *
 	 * Supported options:
 	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
+	 *   'with_filter'                  allow additional item key filter
 	 *
 	 * @var array
 	 */
-	private $options = ['18_simple_checks' => false];
+	private $options = ['18_simple_checks' => false, 'with_filter' => false];
 
 	/**
 	 * @param array $options
 	 */
 	public function __construct($options = []) {
+		$this->options = $options + $this->options;
 		$this->error_msgs['empty'] = _('key is empty');
 		$this->error_msgs['unexpected_end'] = _('unexpected end of key');
-
-		if (array_key_exists('18_simple_checks', $options)) {
-			$this->options['18_simple_checks'] = $options['18_simple_checks'];
-		}
 	}
 
 	/**
@@ -136,6 +146,14 @@ class CItemKey extends CParser {
 				$this->parameters[] = $_parameters;
 				$p = $p2;
 			}
+		}
+
+		if ($this->options['with_filter'] && substr($data, $p, 2) === '?[') {
+			if (!$this->parseKeyAttributes($data, $p)) {
+				return self::PARSE_FAIL;
+			}
+
+			$p2 = $p;
 		}
 
 		$this->length = $p - $offset;
@@ -279,6 +297,104 @@ class CItemKey extends CParser {
 		$pos = $p;
 
 		return ($state == self::STATE_END_OF_PARAMS);
+	}
+
+	/**
+	 * Parse a filter attributes. Filter should starts with question mark character and should be defined
+	 * in square brackets.
+	 *
+	 * @param string $source
+	 * @param int    $pos
+	 *
+	 * @return int
+	 */
+	public function parseKeyAttributes($source, &$pos) {
+		$attributes = [];
+		$pos += 2;
+		$level = 0;
+		$state = self::STATE_AFTER_LOGICAL_OPERATOR;
+		$logical_parser = new CSetParser(['and', 'or']);
+		$attribute_parser = new CAttributeParser();
+
+		while (isset($source[$pos]) && $source[$pos] !== ']') {
+			$last_pos = $pos;
+
+			if ($source[$pos] === ' ') {
+				$pos++;
+				continue;
+			}
+
+			switch ($source[$pos]) {
+				case '(':
+					if ($state != self::STATE_AFTER_LOGICAL_OPERATOR) {
+						$this->errorPos(substr($source, $pos), 0);
+
+						return false;
+					}
+
+					$pos++;
+					$level++;
+					$state = self::STATE_AFTER_OPEN_BRACE;
+
+					break;
+
+				case ')':
+					if ($level == 0 || $state != self::STATE_AFTER_CONSTANT) {
+						$this->errorPos(substr($source, $pos), 0);
+
+						return false;
+					}
+
+					$pos++;
+					$level--;
+					$state = self::STATE_AFTER_CLOSE_BRACE;
+
+					break;
+
+				default:
+					if ($state != self::STATE_AFTER_LOGICAL_OPERATOR
+							&& $logical_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
+						$state = self::STATE_AFTER_LOGICAL_OPERATOR;
+						$pos += $logical_parser->getLength();
+					}
+					else if ($state != self::STATE_AFTER_CONSTANT
+							&& $attribute_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
+						$state = self::STATE_AFTER_CONSTANT;
+						$pos += $attribute_parser->getLength();
+						$attributes[] = $attribute_parser->getMatch();
+					}
+					else {
+						$this->errorPos(substr($source, $pos), 0);
+
+						return false;
+					}
+
+					break;
+			}
+		}
+
+		if ($level > 0 || !isset($source[$pos]) || $source[$pos] !== ']') {
+			$this->errorPos($source, strlen($source) + 1);
+
+			return false;
+		}
+		$pos++;
+
+		if (!$attributes) {
+			$this->errorPos(substr($source, $pos), 1);
+
+			return false;
+		}
+
+		if ($state != self::STATE_AFTER_CONSTANT && $state != self::STATE_AFTER_CLOSE_BRACE) {
+			$this->errorPos(substr($source, $last_pos), 0);
+
+			return false;
+		}
+
+		$this->attributes = $attributes;
+
+		return true;
 	}
 
 	/**
