@@ -502,7 +502,8 @@ class CControllerPopupTriggerExpr extends CController {
 
 					// Determine param type.
 					$params = $function_token->params_raw['parameters'];
-					if (!is_array($params[0]) && $params[0]->type == CTriggerExprParserResult::TOKEN_TYPE_QUERY) {
+					if (array_key_exists(0, $params) && !is_array($params[0])
+							&& $params[0]->type == CTriggerExprParserResult::TOKEN_TYPE_QUERY) {
 						array_shift($params);
 					}
 
@@ -525,10 +526,12 @@ class CControllerPopupTriggerExpr extends CController {
 					}, $params);
 
 					/*
-					 * Try to find an operator and a value.
+					 * Try to find an operator, a value and item.
 					 * The value and operator can be extracted only if they immediately follow the function.
 					 */
 					$tokens = $result->getTokens();
+					$items = [];
+
 					foreach ($tokens as $key => $token) {
 						if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION) {
 							if (!array_key_exists($key + 2, $tokens)) {
@@ -557,26 +560,24 @@ class CControllerPopupTriggerExpr extends CController {
 							else {
 								break;
 							}
+
+							if (!in_array($fn_name, getStandaloneFunctions())) {
+								$items = API::Item()->get([
+									'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+									'selectHosts' => ['name'],
+									'webitems' => true,
+									'filter' => [
+										'host' => $function_token->getHosts()[0],
+										'key_' => $function_token->getItems()[0],
+										'flags' => null
+									]
+								]);
+
+								if (($item = reset($items)) === false) {
+									error(_('Unknown host item, no such item in selected host'));
+								}
+							}
 						}
-					}
-
-					// Find the item.
-					$item = API::Item()->get([
-						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
-						'selectHosts' => ['name'],
-						'webitems' => true,
-						'filter' => [
-							'host' => $function_token->getHosts()[0],
-							'key_' => $function_token->getItems()[0],
-							'flags' => null
-						]
-					]);
-
-					if (($item = reset($item)) !== false) {
-						$itemid = $item['itemid'];
-					}
-					else {
-						error(_('Unknown host item, no such item in selected host'));
 					}
 				}
 			}

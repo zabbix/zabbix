@@ -1901,6 +1901,7 @@ function get_item_function_info($expr) {
 
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION)):
 			$expr_part = reset($expr_data->expressions);
+			$is_standalone = in_array($expr_part['functionName'], getStandaloneFunctions());
 			$hosts = $expr_data->result->getHosts();
 			$items = $expr_data->result->getItems();
 
@@ -1908,12 +1909,16 @@ function get_item_function_info($expr) {
 				$result = EXPRESSION_FUNCTION_UNKNOWN;
 				break;
 			}
-			elseif (!$hosts) {
+			elseif (!$is_standalone && !$hosts) {
 				$result = EXPRESSION_HOST_UNKNOWN;
 				break;
 			}
-			elseif (!$items) {
+			elseif (!$is_standalone && !$items) {
 				$result = EXPRESSION_HOST_ITEM_UNKNOWN;
+				break;
+			}
+			elseif ($is_standalone) {
+				$result = $functions[$expr_part['functionName']]['any'];
 				break;
 			}
 
@@ -2552,4 +2557,13 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 	}
 
 	return $result;
+}
+
+/**
+ * Return list of functions that can be used without /host/key reference.
+ *
+ * @return array
+ */
+function getStandaloneFunctions(): array {
+	return ['date', 'dayofmonth', 'dayofweek', 'time', 'now'];
 }
