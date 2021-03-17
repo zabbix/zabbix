@@ -1177,8 +1177,9 @@ class testFormAction extends CLegacyWebTest {
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$operation_details = $this->query('name:popup.operation')->asForm()->one();
 		// Check available operation types depending on event source and the selected operation type.
-		$message_types = ($eventsource === 'Triggers') ? ['Send message', 'Reboot', 'Selenium script'] :
-				['Send message', 'Notify all involved'];
+		$message_types = ($eventsource === 'Triggers')
+			? ['Send message', 'Reboot', 'Selenium script']
+			: ['Send message', 'Notify all involved'];
 		$this->zbxTestDropdownHasOptions('operation-type-select', $message_types);
 		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
