@@ -338,14 +338,13 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
  ******************************************************************************/
 static int	rw_end_report(zbx_alerter_dispatch_t *dispatch, char **error)
 {
-	int	ret, sent_num;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = zbx_alerter_end_dispatch(dispatch, &sent_num, error);
+	ret = zbx_alerter_end_dispatch(dispatch, error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s sent:%d/%d", __func__, zbx_result_string(ret), sent_num,
-			dispatch->total_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -361,14 +360,14 @@ static int	rw_end_report(zbx_alerter_dispatch_t *dispatch, char **error)
  *             error  - [IN] the error message                                *
  *                                                                            *
  ******************************************************************************/
-static void	rw_send_result(zbx_ipc_socket_t *socket, int status, char *error)
+static void	rw_send_result(zbx_ipc_socket_t *socket, zbx_alerter_dispatch_t *dispatch, int status, char *error)
 {
 	unsigned char	*data;
 	zbx_uint32_t	size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() status:%d error:%s", __func__, status, ZBX_NULL2EMPTY_STR(error));
 
-	size = report_serialize_response(&data, status, error);
+	size = report_serialize_response(&data, status, error, &dispatch->results);
 	zbx_ipc_socket_write(socket, ZBX_IPC_REPORTER_RESULT, data, size);
 	zbx_free(data);
 
@@ -478,7 +477,9 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 						finished_num++;
 				}
 
-				rw_send_result(&socket, report_status, error);
+				rw_send_result(&socket, &dispatch, report_status, error);
+
+				zbx_alerter_clear_dispatch(&dispatch);
 				zbx_free(error);
 				break;
 		}

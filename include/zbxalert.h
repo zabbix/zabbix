@@ -35,8 +35,17 @@ zbx_am_source_stats_t;
 
 typedef struct
 {
+	char	*recipient;
+	char	*info;
+	int	status;
+}
+zbx_alerter_dispatch_result_t;
+
+typedef struct
+{
 	zbx_ipc_async_socket_t	alerter;
 	int			total_num;
+	zbx_vector_ptr_t	results;
 }
 zbx_alerter_dispatch_t;
 
@@ -49,6 +58,8 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 		char **error);
 int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const DB_MEDIATYPE *mt,
 		const zbx_vector_str_t *recipients, char **error);
-int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, int *sent_num, char **error);
+int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error);
+void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result);
+void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch);
 
 #endif

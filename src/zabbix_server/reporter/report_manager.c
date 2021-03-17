@@ -2158,7 +2158,7 @@ static void	rm_send_test_error_result(zbx_ipc_client_t *client, const char *erro
 	unsigned char	*data;
 	zbx_uint32_t	size;
 
-	size = report_serialize_response(&data, FAIL, error);
+	size = report_serialize_response(&data, FAIL, error, NULL);
 	zbx_ipc_client_send(client, ZBX_IPC_REPORTER_TEST_RESULT, data, size);
 	zbx_free(data);
 }
@@ -2293,7 +2293,7 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 	}
 	else
 	{
-		report_deserialize_response(message->data, &status, &error);
+		report_deserialize_response(message->data, &status, &error, NULL);
 		rm_finish_job(manager, writer->job, status, error);
 		zbx_free(error);
 	}

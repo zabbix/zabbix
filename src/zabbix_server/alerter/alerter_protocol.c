@@ -1221,8 +1221,10 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 		goto out;
 	}
 
+	zbx_vector_ptr_create(&dispatch->results);
 	dispatch->total_num = 0;
 	ret = SUCCEED;
+
 out:
 	zbx_free(data);
 
@@ -1290,10 +1292,11 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, int *sent_num, char **error)
+int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error)
 {
-	int	i, ret = FAIL;
-	time_t	time_stop;
+	int				i, ret = FAIL;
+	time_t				time_stop;
+	zbx_alerter_dispatch_result_t	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1311,13 +1314,11 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, int *sent_num, ch
 
 	/* wait for the send alert responses for all recipients */
 
-	*sent_num = 0;
 	time_stop = time(NULL) + ZBX_ALERTER_REPORT_TIMEOUT;
 
 	for (i = 0; i < dispatch->total_num; i++)
 	{
-		int			errcode;
-		char			*recipient = NULL, *value = NULL, *errmsg = NULL, *debug = NULL;
+		char			*value = NULL, *errmsg = NULL, *debug = NULL;
 		zbx_ipc_message_t	*message;
 		time_t			now;
 
@@ -1342,18 +1343,29 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, int *sent_num, ch
 		switch (message->code)
 		{
 			case ZBX_IPC_ALERTER_SEND_ALERT:
-				zbx_alerter_deserialize_result_ext(message->data, &recipient, &value, &errcode, &errmsg,
-						&debug);
+				result = (zbx_alerter_dispatch_result_t *)zbx_malloc(NULL,
+						sizeof(zbx_alerter_dispatch_result_t));
+				memset(result, 0, sizeof(zbx_alerter_dispatch_result_t));
 
-				if (SUCCEED != errcode)
+				zbx_alerter_deserialize_result_ext(message->data, &result->recipient, &value,
+						&result->status, &errmsg, &debug);
+
+				if (SUCCEED != result->status)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "failed to send report to \"%s\": %s",
-							recipient, ZBX_NULL2EMPTY_STR(errmsg));
+							result->recipient, ZBX_NULL2EMPTY_STR(errmsg));
+
+					result->info = errmsg;
+					errmsg = NULL;
 				}
 				else
-					(*sent_num)++;
+				{
+					result->info = value;
+					value = NULL;
+				}
 
-				zbx_free(recipient);
+				zbx_vector_ptr_append(&dispatch->results, result);
+
 				zbx_free(value);
 				zbx_free(errmsg);
 				zbx_free(debug);
@@ -1370,10 +1382,24 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, int *sent_num, ch
 
 	ret = SUCCEED;
 out:
-	zbx_ipc_async_socket_close(&dispatch->alerter);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s sent_num:%d error:%s", __func__, zbx_result_string(ret), *sent_num,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:%s", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
+}
+
+void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result)
+{
+	zbx_free(result->recipient);
+	zbx_free(result->info);
+	zbx_free(result);
+}
+
+void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch)
+{
+	if (SUCCEED == zbx_ipc_async_socket_connected(&dispatch->alerter))
+		zbx_ipc_async_socket_close(&dispatch->alerter);
+
+	zbx_vector_ptr_clear_ext(&dispatch->results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
+	zbx_vector_ptr_destroy(&dispatch->results);
 }

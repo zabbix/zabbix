@@ -24,6 +24,7 @@
 #include "zbxserialize.h"
 #include "zbxalgo.h"
 #include "db.h"
+#include "zbxalert.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {
@@ -122,6 +123,8 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 	}
 }
 
+#include "log.h"
+
 /******************************************************************************
  *                                                                            *
  * ZBX_IPC_REPORTER_TEST_REPORT_RESULT, ZBX_IPC_REPORTER_REPORT_RESULT        *
@@ -129,29 +132,92 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
  *                                                                            *
  ******************************************************************************/
 
-zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const char *error)
+zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const char *error,
+		const zbx_vector_ptr_t *results)
 {
-	zbx_uint32_t	data_len = 0, error_len;
-	unsigned char	*ptr;
+	zbx_uint32_t			data_len = 0, error_len, *recipient_len, *info_len;
+	unsigned char			*ptr;
+	int				i;
+	zbx_alerter_dispatch_result_t	*result;
 
 	zbx_serialize_prepare_value(data_len, status);
 	zbx_serialize_prepare_str(data_len, error);
+
+	if (SUCCEED == status)
+	{
+		zbx_serialize_prepare_value(data_len, results->values_num);
+		recipient_len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * results->values_num);
+		info_len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * results->values_num);
+
+		for (i = 0; i < results->values_num; i++)
+		{
+			result = (zbx_alerter_dispatch_result_t *)results->values[i];
+			zbx_serialize_prepare_value(data_len, result->status);
+			zbx_serialize_prepare_str_len(data_len, result->recipient, recipient_len[i]);
+			zbx_serialize_prepare_str_len(data_len, result->info, info_len[i]);
+		}
+	}
+	else
+	{
+		i = 0;
+		zbx_serialize_prepare_value(data_len, i);
+	}
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr = *data;
 
 	ptr += zbx_serialize_value(ptr, status);
-	(void)zbx_serialize_str(ptr, error, error_len);
+	ptr += zbx_serialize_str(ptr, error, error_len);
+
+	if (SUCCEED == status)
+	{
+		ptr += zbx_serialize_value(ptr, results->values_num);
+
+		for (i = 0; i < results->values_num; i++)
+		{
+			result = (zbx_alerter_dispatch_result_t *)results->values[i];
+			ptr += zbx_serialize_value(ptr, result->status);
+			ptr += zbx_serialize_str(ptr, result->recipient, recipient_len[i]);
+			ptr += zbx_serialize_str(ptr, result->info, info_len[i]);
+		}
+
+		zbx_free(info_len);
+		zbx_free(recipient_len);
+	}
+	else
+		(void)zbx_serialize_value(ptr, i);
 
 	return data_len;
 }
 
-void	report_deserialize_response(const unsigned char *data, int *status, char **error)
+void	report_deserialize_response(const unsigned char *data, int *status, char **error, zbx_vector_ptr_t *results)
 {
 	zbx_uint32_t	len;
 
-	data += zbx_deserialize_int(data, status);
-	(void)zbx_deserialize_str(data, error, len);
+	data += zbx_deserialize_value(data, status);
+	data += zbx_deserialize_str(data, error, len);
+
+	if (SUCCEED == *status && NULL != results)
+	{
+		int				i, results_num;
+		zbx_alerter_dispatch_result_t	*result;
+
+		data += zbx_deserialize_value(data, &results_num);
+
+		if (0 != results_num)
+		{
+			zbx_vector_ptr_reserve(results, results_num);
+
+			for (i = 0; i < results_num; i++)
+			{
+				result = zbx_malloc(NULL, sizeof(zbx_alerter_dispatch_result_t));
+				data += zbx_deserialize_value(data, &result->status);
+				data += zbx_deserialize_str(data, &result->recipient, len);
+				data += zbx_deserialize_str(data, &result->info, len);
+				zbx_vector_ptr_append(results, result);
+			}
+		}
+	}
 }
 
 /******************************************************************************
@@ -309,36 +375,38 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
 	zbx_vector_ptr_pair_destroy(params);
 }
 
-int	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, char **error)
+void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j)
 {
 	zbx_uint64_t		dashboardid, viewer_userid, ui64;
 	int			ret = FAIL, period, report_time;
 	struct zbx_json_parse	jp_params;
 	zbx_vector_ptr_pair_t	params;
+	zbx_vector_ptr_t	results;
 	zbx_uint32_t		size;
 	unsigned char		*data = NULL, *response = NULL;
-	char			*name = NULL;
+	char			*name = NULL, *error = NULL;
 	size_t			name_alloc = 0;
 
 	zbx_vector_ptr_pair_create(&params);
+	zbx_vector_ptr_create(&results);
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_NAME, &name, &name_alloc, NULL))
 	{
-		*error = zbx_dsprintf(*error, "cannot find tag: %s", ZBX_PROTO_TAG_NAME);
+		error = zbx_dsprintf(error, "cannot find tag: %s", ZBX_PROTO_TAG_NAME);
 		goto out;
 	}
 
-	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_DASHBOARDID, &dashboardid, error))
+	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_DASHBOARDID, &dashboardid, &error))
 		goto out;
 
-	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_USERID, &viewer_userid, error))
+	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_USERID, &viewer_userid, &error))
 		goto out;
 
-	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_PERIOD, &ui64, error))
+	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_PERIOD, &ui64, &error))
 		goto out;
 	period = (int)ui64;
 
-	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_NOW, &ui64, error))
+	if (SUCCEED != json_uint_by_tag(jp, ZBX_PROTO_TAG_NOW, &ui64, &error))
 		goto out;
 	report_time = (int)ui64;
 
@@ -364,18 +432,49 @@ int	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, char *
 			&params);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_REPORTER, ZBX_IPC_REPORTER_TEST,
-			SEC_PER_MIN, data, size, &response, error))
+			SEC_PER_MIN, data, size, &response, &error))
 	{
 		goto out;
 	}
 
-	report_deserialize_response(response, &ret, error);
+	report_deserialize_response(response, &ret, &error, &results);
 out:
+	zbx_json_init(j, 1024);
+
+	if (SUCCEED == ret)
+	{
+		int				i;
+		zbx_alerter_dispatch_result_t	*result;
+
+		zbx_json_addstring(j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		zbx_json_addobject(j, ZBX_PROTO_TAG_DATA);
+		zbx_json_addarray(j, ZBX_PROTO_TAG_RECIPIENTS);
+
+		for (i = 0; i < results.values_num; i++)
+		{
+			zbx_json_addobject(j, NULL);
+
+			result = (zbx_alerter_dispatch_result_t *)results.values[i];
+			zbx_json_addint64(j, ZBX_PROTO_TAG_STATUS, result->status);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_RECIPIENT, result->recipient, ZBX_JSON_TYPE_STRING);
+			if (NULL != result->info)
+				zbx_json_addstring(j, ZBX_PROTO_TAG_INFO, result->info, ZBX_JSON_TYPE_STRING);
+
+			zbx_json_close(j);
+		}
+	}
+	else
+	{
+		zbx_json_addstring(j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
+	}
+
+	zbx_free(error);
 	zbx_free(response);
 	zbx_free(data);
 	zbx_free(name);
 
+	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
+	zbx_vector_ptr_destroy(&results);
 	report_destroy_params(&params);
-
-	return ret;
 }

@@ -174,6 +174,8 @@
 #define ZBX_PROTO_TAG_SESSIONID			"sessionid"
 #define ZBX_PROTO_TAG_SIGN			"sign"
 #define ZBX_PROTO_TAG_DETAIL			"detail"
+#define ZBX_PROTO_TAG_RECIPIENT			"recipient"
+#define ZBX_PROTO_TAG_RECIPIENTS		"recipients"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
