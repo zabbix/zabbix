@@ -25,5 +25,33 @@
 ?>
 
 function submitScheduledReportSubscription(overlay) {
-	// TODO
+	var $form = overlay.$dialogue.find('form');
+	var url = new Curl($form.attr('action'));
+
+	fetch(url.getUrl(), {
+		method: 'POST',
+		body: new URLSearchParams(new FormData($form.get(0)))
+	})
+		.then(response => response.json())
+		.then(response => {
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+
+			if (response.errors) {
+				document
+					.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
+					.prepend($(response.errors).get(0));
+				overlay.unsetLoading();
+
+				return;
+			}
+
+			new ReportSubscription(response, response.edit ? overlay.element.closest('tr') : null);
+			overlayDialogueDestroy(overlay.dialogueid);
+		})
+		.catch((e) => {
+			document
+				.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
+				.prepend(makeMessageBox('bad', e, null)[0]);
+			overlay.unsetLoading();
+		});
 }

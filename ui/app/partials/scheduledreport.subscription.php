@@ -29,23 +29,24 @@ $table = (new CTable())
 	->setAriaRequired()
 	->setHeader([_('Recipient'), _('Generate report by'), _('Status'), _('Action')])
 	->setFooter(
-		(new CCol([
-			(new CSimpleButton(_('Add user')))
-				->setAttribute('data-action', 'add_user')
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->setEnabled($data['allowed_edit']),
-			(new CSimpleButton(_('Add user group')))
-				->setAttribute('data-action', 'add_usergroup')
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->setEnabled($data['allowed_edit'])
+		(new CCol(
+			new CHorList([
+				(new CSimpleButton(_('Add user')))
+					->addClass('js-add-user')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled($data['allowed_edit']),
+				(new CSimpleButton(_('Add user group')))
+					->addClass('js-add-user-group')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled($data['allowed_edit'])
 			])
-		)->setColSpan(4)
+		))->setColSpan(4)
 	);
 
 (new CDiv($table))
 	->setId('subscriptions')
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->show();
 
 $this->includeJsFile('scheduledreport.subscription.js.php', [

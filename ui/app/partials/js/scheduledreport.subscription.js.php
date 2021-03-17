@@ -25,6 +25,30 @@
 ?>
 
 <script>
-	const users = <?= json_encode($data['user_groups']) ?>;
+	document.querySelectorAll('#subscriptions-table .js-add-user')
+		.forEach((elm) => elm.addEventListener('click',
+			(event) => PopUp("popup.scheduledreport.subscription.edit",
+				{recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>}, null, event.target
+			)
+		));
+	document.querySelectorAll('#subscriptions-table .js-add-user-group')
+		.forEach((elm) => elm.addEventListener('click',
+			(event) => PopUp("popup.scheduledreport.subscription.edit",
+				{recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP ?>}, null, event.target
+			)
+		));
+</script>
+<script>
+	const users = <?= json_encode($data['users']) ?>;
 	const user_groups = <?= json_encode($data['user_groups']) ?>;
+
+	class ReportSubscription {
+
+		constructor(data, edit = null) {
+			this.data = data;
+
+			this.row = document.createElement('tr');
+			console.log(this.data);
+		}
+	}
 </script>
