@@ -4541,6 +4541,7 @@ out:
 	zbx_xml_free_doc(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s last_key:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
 			(SUCCEED == ret ? xml_event.id : 0));
+
 	return ret;
 
 #	undef ZBX_POST_VMWARE_LASTEVENT
