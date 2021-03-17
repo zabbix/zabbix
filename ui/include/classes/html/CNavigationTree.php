@@ -20,6 +20,7 @@
 
 
 class CNavigationTree extends CDiv {
+
 	private $error;
 	private $data;
 
@@ -43,8 +44,8 @@ class CNavigationTree extends CDiv {
 			'problems' => $this->data['problems'],
 			'severity_levels' => $this->data['severity_config'],
 			'navtree' => $this->data['navtree'],
-			'navtree_items_opened' => implode(',', $this->data['navtree_items_opened']),
-			'navtree_item_selected' => (int) $this->data['navtree_item_selected'],
+			'navtree_items_opened' => $this->data['navtree_items_opened'],
+			'navtree_item_selected' => $this->data['navtree_item_selected'],
 			'maps_accessible' => array_map('strval', $this->data['maps_accessible']),
 			'show_unavailable' => $this->data['show_unavailable'],
 			'initial_load' => $this->data['initial_load'],

@@ -460,6 +460,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$navtree_items_opened = [];
 		if ($widgetid) {
 			$navtree_items_opened = CProfile::findByIdxPattern('web.dashbrd.navtree-%.toggle', $widgetid);
+
 			// Keep only numerical value from idx key name.
 			foreach ($navtree_items_opened as &$item_opened) {
 				$item_opened = substr($item_opened, 20, -7);

@@ -347,9 +347,9 @@ jQuery(function($) {
 			$('#' + data.parentId).multiSelect('addData', items);
 		}
 		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
-				&& typeof addPopupValues !== 'undefined') {
+				&& typeof window.addPopupValues !== 'undefined') {
 			// execute function if they exist
-			addPopupValues(data);
+			window.addPopupValues(data);
 		}
 		else {
 			$('#' + data.parentId).val(data.values[0].name);

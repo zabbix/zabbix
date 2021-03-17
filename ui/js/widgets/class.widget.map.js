@@ -18,80 +18,175 @@
 **/
 
 
+const WIDGET_SYSMAP_SOURCETYPE_MAP = 1;
+const WIDGET_SYSMAP_SOURCETYPE_FILTER = 2;
+
 class CWidgetMap extends CWidget {
 
 	_init() {
 		super._init();
 
+		this._filter_widget = null;
 		this._filter_widget_reference = null;
 		this._map_options = null;
+
+		this._previous_maps = new Array();
+		this._current_sysmapid = null;
+
 		this._is_map_loaded = false;
+	}
+
+	_doActivate() {
+		super._doActivate();
+	}
+
+	_doDeactivate() {
+		super._doDeactivate();
 	}
 
 	announceWidgets(widgets) {
 		super.announceWidgets(widgets);
+
+		// if (this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+		// 	for (const widget of widgets) {
+		// 		if (widget instanceof CWidgetNavTree
+		// 				&& widget._fields.reference === this._fields.filter_widget_reference) {
+		// 			this._filter_widget = widget;
+		// 		}
+		// 	}
+		// }
 	}
 
-	setConfiguration(configuration) {
-		super.setConfiguration(configuration);
+	// setConfiguration(configuration) {
+	// 	super.setConfiguration(configuration);
 
-		this.storeValue('current_sysmapid', this._fields.sysmapid);
-	}
+	// 	this._current_sysmapid = this._fields.sysmapid;
+	// }
+
+	// navigateToMap(sysmapid) {
+	// 	this._current_sysmapid = sysmapid;
+
+	// 	if (this._state == WIDGET_STATE_ACTIVE) {
+	// 		this._startUpdating();
+
+	// 		// TODO
+	// 		// ZABBIX.Dashboard.widgetDataShare(widget[0], 'current_sysmapid',
+	// 		// 	{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0}
+	// 		// );
+
+	// 		$('.menu-popup').menuPopup('close', null);
+	// 	}
+	// }
+
+	// navigateToSubmap(submapid, reset_previous = false) {
+	// 	if (this._current_sysmapid !== null) {
+	// 		if (reset_previous && this._previous_maps.length > 0) {
+	// 			this._previous_maps.pop();
+	// 		}
+	// 		else {
+	// 			this._previous_maps.push(this._current_sysmapid);
+	// 		}
+	// 	}
+
+	// 	this.navigateToMap(submapid);
+	// }
 
 	_startUpdating(delay_sec = 0) {
 		super._startUpdating(delay_sec);
 
 		if (this._is_map_loaded) {
-			this._$target.zbx_mapwidget('update');
+
+			// const $this = $(this);
+
+			// const widget = $this.data('widget');
+			// const widget_data = $this.data('widgetData');
+
+			// if (widget._is_map_loaded && widget_data['is_refreshing'] === false) {
+			// 	widget_data['is_refreshing'] = true;
+
+			// 	const url = new Curl(widget_data['map_instance'].options.refresh);
+			// 	url.setArgument('curtime', new CDate().getTime());
+			// 	url.setArgument('uniqueid', widget.getUniqueId());
+
+			// 	$.ajax({
+			// 		'url': url.getUrl()
+			// 	})
+			// 		.done(function(data) {
+			// 			widget_data['is_refreshing'] = false;
+			// 			if (data.mapid > 0) {
+			// 				widget_data['map_instance'].update(data);
+			// 			}
+			// 			else {
+			// 				if (widget.getState() === WIDGET_STATE_ACTIVE) {
+			// 					widget._startUpdating();
+			// 				}
+			// 			}
+			// 		});
+			// }
+
+			// this._$target.zbx_mapwidget('update');
+
+
+
 		}
 	}
 
 	_processUpdateResponse(response) {
 		super._processUpdateResponse(response);
 
-		if (response.sysmap_data !== undefined) {
-			this._filter_widget_reference = response.sysmap_data.filter_widget_reference;
-			this._map_options = response.sysmap_data.map_options;
-			this._is_map_loaded = true;
+		// if (response.sysmap_data !== undefined) {
+		// 	this._current_sysmapid = response.sysmap_data.current_sysmapid;
+		// 	this._filter_widget_reference = response.sysmap_data.filter_widget_reference;
+		// 	this._map_options = response.sysmap_data.map_options;
+		// 	this._is_map_loaded = true;
 
-			if (response.sysmap_data._current_sysmapid !== null) {
-				this.storeValue('current_sysmapid', response.sysmap_data.current_sysmapid);
-			}
+		// 	if (this._filter_widget_reference !== null) {
 
-			if (this._filter_widget_reference !== null) {
-				// this._registerDataExchange();
-			}
+		// 	}
 
-			if (this._map_options !== null) {
-				console.log(this._map_options);
-				this._$target.zbx_mapwidget(this._map_options, this);
-			}
+		// 	if (this._map_options !== null) {
+		// 		console.log(this._map_options);
+		// 		this._$target.zbx_mapwidget(this._map_options, this);
+		// 		const widget_data = {...this._map_options};
 
-			if (response.sysmap_data.error_msg !== null) {
-				this._$content_body.append(response.sysmap_data.error_msg);
-			}
-		}
+		// 		this._map_options.canvas.useViewBox = true;
+		// 		this._map_options.show_timestamp = false;
+		// 		widget_data.map_instance = new SVGMap(options['map_options']);
+		// 		widget_data.is_refreshing = false;
+		// 		this._$target.data('widgetData', widget_data);
+		// 		this._$target.data('widget', this);
+		// 	}
+
+		// 	if (response.sysmap_data.error_msg !== null) {
+		// 		this._$content_body.append(response.sysmap_data.error_msg);
+		// 	}
+		// }
 	}
 
-	_registerDataExchange() {
-		// ZABBIX.Dashboard.registerDataExchange({
-		// 	uniqueid: this._uniqueid,
-		// 	linkedto: this._filter_widget_reference,
-		// 	data_name: 'selected_mapid',
-		// 	callback: (widget, data) => {
-		// 		widget.storeValue('current_sysmapid', data.mapid);
-		// 		ZABBIX.Dashboard.setWidgetStorageValue(widget._uniqueid, 'previous_maps', '');
-		// 		ZABBIX.Dashboard.refreshWidget(widget._widgetid);
+	_registerEvents() {
+		super._registerEvents();
+
+		// this._events = {
+		// 	...this._events,
+
+		// 	select: (e) => {
+		// 		if (this._mapid != e.detail.mapid) {
+		// 			this._current_sysmapid = e.detail.mapid;
+		// 			this._is_map_loaded = false;
+		// 		}
 		// 	}
-		// });
+		// }
 
-		// ZABBIX.Dashboard.callWidgetDataShare();
+		// if (this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && this._filter_widget !== null) {
+		// 	this._filter_widget.on(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+		// }
+	}
 
-		// ZABBIX.Dashboard.addAction(DASHBOARD_PAGE_EVENT_EDIT,
-		// 	'zbx_sysmap_widget_trigger', this._uniqueid, {
-		// 		parameters: [DASHBOARD_PAGE_EVENT_EDIT],
-		// 		grid: {widget: 1},
-		// 		trigger_name: `map_widget_on_edit_start_${this._uniqueid}`
-		// 	});
+	_unregisterEvents() {
+		super._unregisterEvents();
+
+		// if (this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && this._filter_widget !== null) {
+		// 	this._filter_widget.off(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+		// }
 	}
 }

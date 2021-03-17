@@ -46,7 +46,6 @@ $page['scripts'] = [
 	'colorpicker.js',
 	'class.csvggraph.js',
 	'class.cnavtree.js',
-	'class.mapWidget.js',
 	'class.svg.canvas.js',
 	'class.svg.map.js',
 	'class.tab-indicators.js',

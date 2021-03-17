@@ -108,7 +108,6 @@ $availableJScripts = [
 	'class.overlaycollection.js' => '',
 	'class.overlay.js' => '',
 	'class.cverticalaccordion.js' => '',
-	'class.mapWidget.js' => '',
 	'class.scrollable.js' => '',
 	'class.sidebar.js' => '',
 	'class.sortable.js' => '',
