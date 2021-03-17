@@ -85,7 +85,14 @@ class CDashboardPage extends CBaseComponent {
 
 		this._widgets = new Map();
 
+		this._original_properties = {
+			name: this._data.name,
+			display_period: this._data.display_period
+		};
+
 		this._grid_min_rows = 0;
+
+		this._is_unsaved = false;
 
 		if (this._is_edit_mode) {
 			this._initWidgetPlaceholder();
@@ -153,6 +160,22 @@ class CDashboardPage extends CBaseComponent {
 				this.deleteWidget(widget);
 			}
 		};
+	}
+
+	getName() {
+		return this._data.name;
+	}
+
+	setName(name) {
+		this._data.name = name;
+	}
+
+	getDisplayPeriod() {
+		return this._data.display_period;
+	}
+
+	setDisplayPeriod(display_period) {
+		this._data.display_period = display_period;
 	}
 
 	/**
@@ -344,10 +367,6 @@ class CDashboardPage extends CBaseComponent {
 			&& pos_1.width === pos_2.width && pos_1.height === pos_2.height);
 	}
 
-	getData() {
-		return this._data;
-	}
-
 	getWidget(unique_id) {
 		for (const widget of this._widgets.keys()) {
 			if (widget.getUniqueId() === unique_id) {
@@ -362,16 +381,18 @@ class CDashboardPage extends CBaseComponent {
 		return this._unique_id;
 	}
 
-	isUpdated() {
+	isUnsaved() {
+		if (this._is_unsaved) {
+			return true;
+		}
 
-	}
+		for (const [name, value] of Object.entries(this._original_properties)) {
+			if (value != this._data[name]) {
+				return true;
+			}
+		}
 
-	editProperties() {
-
-	}
-
-	applyProperties() {
-
+		return false;
 	}
 
 	_reserveHeaderLines() {
@@ -456,8 +477,8 @@ class CDashboardPage extends CBaseComponent {
 
 		if (this._is_edit_mode) {
 			this._deactivateWidgetPlaceholder();
-			this._dectivateWidgetDragging();
-			this._dectivateWidgetResizing();
+			this._deactivateWidgetDragging();
+			this._deactivateWidgetResizing();
 		}
 	}
 
@@ -659,6 +680,10 @@ class CDashboardPage extends CBaseComponent {
 			this._activateWidget(widget);
 		}
 
+		if (widgetid === null) {
+			this._is_unsaved = true;
+		}
+
 		return widget;
 	}
 
@@ -678,11 +703,15 @@ class CDashboardPage extends CBaseComponent {
 			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
 			this._resizeGrid();
 		}
+
+		this._is_unsaved = true;
 	}
 
 	replaceWidget(widget, widget_data) {
 		this.deleteWidget(widget, {is_batch_mode: true});
 		this.addWidget(widget_data);
+
+		this._is_unsaved = true;
 	}
 
 	announceWidgets(dashboard_pages) {
@@ -1167,6 +1196,8 @@ class CDashboardPage extends CBaseComponent {
 
 				document.addEventListener('mouseup', this._widget_dragging_events.mouseUp, {passive: false});
 				document.addEventListener('mousemove', this._widget_dragging_events.mouseMove);
+
+				this._is_unsaved = true;
 
 				e.preventDefault();
 			},
@@ -1697,6 +1728,8 @@ class CDashboardPage extends CBaseComponent {
 
 				document.addEventListener('mouseup', this._widget_resizing_events.mouseUp, {passive: false});
 				document.addEventListener('mousemove', this._widget_resizing_events.mouseMove);
+
+				this._is_unsaved = true;
 
 				e.preventDefault();
 			},

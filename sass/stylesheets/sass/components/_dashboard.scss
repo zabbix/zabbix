@@ -72,6 +72,9 @@
 		outline: none;
 
 		& > div {
+			display: flex;
+			align-items: center;
+
 			min-height: 22px;
 			line-height: 22px;
 			box-sizing: border-box;
@@ -90,6 +93,16 @@
 
 			@if $ui-transitions {
 				transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
+			}
+
+			button {
+				margin: 0 -8px 0 4px;
+			}
+
+			&:not(.selected-tab) {
+				button {
+					display: none;
+				}
 			}
 		}
 	}

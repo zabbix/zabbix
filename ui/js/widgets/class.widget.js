@@ -167,6 +167,11 @@ class CWidget extends CBaseComponent {
 	}
 
 	_doDeactivate() {
+		if (this._is_new) {
+			this._is_new = false;
+			this._target.classList.remove('new-widget');
+		}
+
 		this._unregisterEvents();
 		this._stopUpdating();
 	}

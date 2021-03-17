@@ -59,7 +59,7 @@ class CControllerDashboardPropertiesEdit extends CController {
 		}
 		else {
 			return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
-					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+				&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 	}
 

@@ -293,7 +293,7 @@
 			},
 
 			beforeUnload: (e) => {
-				if (ZABBIX.Dashboard.isUpdated()) {
+				if (ZABBIX.Dashboard.isUnsaved()) {
 					// Display confirmation message.
 					e.preventDefault();
 					e.returnValue = '';
