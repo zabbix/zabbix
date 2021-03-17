@@ -35,6 +35,7 @@ class CAudit {
 		AUDIT_RESOURCE_DISCOVERY_RULE =>	['druleid', 'name', 'drules'],
 		AUDIT_RESOURCE_GRAPH =>				['graphid', 'name', 'graphs'],
 		AUDIT_RESOURCE_GRAPH_PROTOTYPE =>	['graphid', 'name', 'graphs'],
+		AUDIT_RESOURCE_TEMPLATE =>			['hostid', 'name', 'hosts'],
 		AUDIT_RESOURCE_HOST =>				['hostid', 'name', 'hosts'],
 		AUDIT_RESOURCE_HOST_GROUP =>		['groupid', 'name', 'groups'],
 		AUDIT_RESOURCE_HOST_PROTOTYPE =>	['hostid', 'host', 'hosts'],
