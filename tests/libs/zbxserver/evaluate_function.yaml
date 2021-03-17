@@ -1268,5 +1268,39 @@ in:
 out:
   return: SUCCEED
   value: 0
+---
+test case: Evaluate change() <- 18446744073709551610, 18446744073709551615
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 18446744073709551610
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 18446744073709551615
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 5
+---
+test case: Evaluate change() <- 18446744073709551615, 18446744073709551610
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 18446744073709551615
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 18446744073709551610
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: -5
 ...
 
