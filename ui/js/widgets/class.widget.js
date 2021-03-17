@@ -326,7 +326,7 @@ class CWidget extends CBaseComponent {
 		this._is_edit_mode = true;
 
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating();
+			this._stopUpdating({do_abort: false});
 		}
 
 		this._target.classList.add('ui-draggable', 'ui-resizable');

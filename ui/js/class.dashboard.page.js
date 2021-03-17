@@ -990,7 +990,9 @@ class CDashboardPage extends CBaseComponent {
 		};
 
 		const showWidgetHelper = (pos) => {
-			this._dashboard_grid.prepend(widget_helper);
+			if (widget_helper.parentNode === null) {
+				this._dashboard_grid.prepend(widget_helper);
+			}
 
 			widget_helper.style.left = `${this._cell_width * pos.x}%`;
 			widget_helper.style.top = `${this._cell_height * pos.y}px`;
@@ -1120,7 +1122,11 @@ class CDashboardPage extends CBaseComponent {
 					drag_pos = pos;
 					showWidgetHelper(drag_pos);
 
-					this._resizeGrid(Math.min(this._max_rows, drag_pos.y + drag_pos.height + 2));
+					const grid_min_rows = Math.min(this._max_rows, drag_pos.y + drag_pos.height + 2);
+
+					if (grid_min_rows > this._grid_min_rows) {
+						this._resizeGrid(grid_min_rows);
+					}
 				}
 			}
 		};
@@ -1621,7 +1627,11 @@ class CDashboardPage extends CBaseComponent {
 
 				resize_widget.resize();
 
-				this._resizeGrid(Math.min(this._max_rows, resize_pos.y + resize_pos.height + 2));
+				const grid_min_rows = Math.min(this._max_rows, resize_pos.y + resize_pos.height + 2);
+
+				if (grid_min_rows > this._grid_min_rows) {
+					this._resizeGrid(grid_min_rows);
+				}
 			}
 		};
 
