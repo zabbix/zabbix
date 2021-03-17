@@ -207,4 +207,25 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 		const char *parameter, const char *error);
 
 void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs);
+
+typedef enum
+{
+	ZBX_ITEM_QUERY_UNKNOWN,
+	ZBX_ITEM_QUERY_SINGLE,
+	ZBX_ITEM_QUERY_MULTI
+}
+zbx_item_query_type_t;
+
+typedef struct
+{
+	char			*host;
+	char			*key;
+	zbx_item_query_type_t	type;
+	int			index;
+}
+zbx_item_query_t;
+
+void	zbx_eval_parse_query(const char *str, size_t len, zbx_item_query_t *query);
+void	zbx_eval_clear_query(zbx_item_query_t *query);
+
 #endif

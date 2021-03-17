@@ -1898,10 +1898,33 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	substitute_item_filter_macros(zbx_eval_context_t *ctx, zbx_eval_token_t *token,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **error)
+static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **filter,
+		char **error)
 {
+	zbx_item_query_t	query;
+	char			err[128];
+	int			ret;
 
+	zbx_eval_parse_query(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1, &query);
+
+	if (ZBX_ITEM_QUERY_UNKNOWN == query.type)
+	{
+		*error = zbx_strdup(NULL, "invalid item reference");
+		return FAIL;
+	}
+
+	if (SUCCEED == (ret = substitute_key_macros(&query.key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
+			err, sizeof(err))))
+	{
+		*filter = zbx_dsprintf(NULL, "/%s/%s", ZBX_NULL2EMPTY_STR(query.host), query.key);
+	}
+	else
+		*error = zbx_strdup(NULL, err);
+
+	zbx_eval_clear_query(&query);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1937,7 +1960,11 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 		switch(token->type)
 		{
 			case ZBX_EVAL_TOKEN_ARG_QUERY:
-
+				if (FAIL == substitute_item_filter_macros(&ctx, token, jp_row, lld_macro_paths, &value,
+						error))
+				{
+					goto clean;
+				}
 				break;
 			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
@@ -1949,13 +1976,12 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 				{
 					*error = zbx_strdup(NULL, err);
 					zbx_free(value);
-					goto out;
+					goto clean;
 				}
 				break;
 			default:
 				continue;
 		}
-
 
 		zbx_variant_clear(&token->value);
 		zbx_variant_set_str(&token->value, value);
@@ -1966,6 +1992,8 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 	zbx_free(*data);
 	*data = exp;
 	exp = NULL;
+
+	ret = SUCCEED;
 clean:
 	zbx_free(exp);
 	zbx_eval_clear(&ctx);
