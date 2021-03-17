@@ -11,7 +11,7 @@ New features:
 Bug fixes:
 ...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
 .........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
-A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 .........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 ...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
@@ -1997,7 +1997,7 @@ Changes for 4.0.30rc1
 New features:
 
 Bug fixes:
-A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 
 --------------------------------------------------------------------------------
