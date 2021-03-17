@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/common/testFormValueMappings.php';
 class testFormValueMappingsHost extends testFormValueMappings {
 
 	/**
-	 * Function creates the given Value mappings for the specified host.
+	 * Function creates the given value mappings for the specified host.
 	 */
 	public static function prepareHostValueMappings() {
 		CDataHelper::setSessionId(null);
@@ -122,7 +122,7 @@ class testFormValueMappingsHost extends testFormValueMappings {
 	}
 
 	/**
-	 * @backup-once valuemap
+	 * @backup valuemap
 	 */
 	public function testFormValueMappingsHost_Delete() {
 		$this->checkDelete('host');

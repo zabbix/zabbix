@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/common/testFormValueMappings.php';
  */
 class testFormValueMappingsTemplate extends testFormValueMappings {
 	/**
-	 * Function creates the given Value mappings for the specified template.
+	 * Function creates the given value mappings for the specified template.
 	 */
 	public static function prepareTemplateValueMappings() {
 		CDataHelper::setSessionId(null);
@@ -121,7 +121,7 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 	}
 
 	/**
-	 * @backup-once valuemap
+	 * @backup valuemap
 	 */
 	public function testFormValueMappingsTemplate_Delete() {
 		$this->checkDelete('template');
