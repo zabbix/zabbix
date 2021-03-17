@@ -1947,15 +1947,15 @@ static unsigned char	dbpatch_get_hostkey_valuetype(const char *host, const char 
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	char		*sql = NULL, *host_esc, *key_esc;
-	size_t		sql_alloc = 0, sql_offset = 0;
+	char		*host_esc, *key_esc;
 	unsigned char	value_type;
 
 	host_esc = DBdyn_escape_string(host);
 	key_esc = DBdyn_escape_string(key);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.value_type from items i,hosts h"
+	result = DBselect(
+			"select i.value_type"
+			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.host='%s'"
 				" and i.key_='%s'",
@@ -1964,14 +1964,8 @@ static unsigned char	dbpatch_get_hostkey_valuetype(const char *host, const char 
 	zbx_free(key_esc);
 	zbx_free(host_esc);
 
-	result = DBselect("%s", sql);
-	zbx_free(sql);
-
 	if (NULL == (row = DBfetch(result)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
 		value_type = ITEM_VALUE_TYPE_TEXT;
-	}
 	else
 		ZBX_STR2UCHAR(value_type, row[0]);
 
