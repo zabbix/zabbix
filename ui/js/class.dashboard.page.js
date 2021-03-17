@@ -223,7 +223,7 @@ class CDashboardPage extends CBaseComponent {
 
 	_isPosFree(pos) {
 		for (const widget of this._widgets.keys()) {
-			if (this._isOverlappingPos(pos, widget.getPosition())) {
+			if (this._isPosOverlapping(pos, widget.getPosition())) {
 				return false;
 			}
 		}
@@ -332,14 +332,14 @@ class CDashboardPage extends CBaseComponent {
 	 *
 	 * @returns {boolean}
 	 */
-	_isOverlappingPos(pos_1, pos_2) {
+	_isPosOverlapping(pos_1, pos_2) {
 		return (
 			pos_1.x < (pos_2.x + pos_2.width) && (pos_1.x + pos_1.width) > pos_2.x
 				&& pos_1.y < (pos_2.y + pos_2.height) && (pos_1.y + pos_1.height) > pos_2.y
 		);
 	}
 
-	_isEqualPos(pos_1, pos_2) {
+	_isPosEqual(pos_1, pos_2) {
 		return (pos_1.x === pos_2.x && pos_1.y === pos_2.y
 			&& pos_1.width === pos_2.width && pos_1.height === pos_2.height);
 	}
@@ -703,7 +703,7 @@ class CDashboardPage extends CBaseComponent {
 				continue;
 			}
 
-			if (this._isOverlappingPos(data.pos, pos)) {
+			if (this._isPosOverlapping(data.pos, pos)) {
 				return false;
 			}
 		}
@@ -867,7 +867,7 @@ class CDashboardPage extends CBaseComponent {
 										continue;
 									}
 
-									if (this._isOverlappingPos(pos, event_pos_1x1) && this._isPosFree(pos)) {
+									if (this._isPosOverlapping(pos, event_pos_1x1) && this._isPosFree(pos)) {
 										this._widget_placeholder_pos = pos;
 										break;
 									}
@@ -1020,7 +1020,7 @@ class CDashboardPage extends CBaseComponent {
 									continue;
 								}
 
-								if (this._isOverlappingPos(w_data.pos, {...data.pos, height: data.pos.height + 1})) {
+								if (this._isPosOverlapping(w_data.pos, {...data.pos, height: data.pos.height + 1})) {
 									widgets_below.push(w);
 								}
 							}
@@ -1046,7 +1046,7 @@ class CDashboardPage extends CBaseComponent {
 					continue;
 				}
 
-				if (this._isOverlappingPos(data.pos, pos)) {
+				if (this._isPosOverlapping(data.pos, pos)) {
 					const test_pos = {...data.pos, y: pos.y + pos.height};
 
 					if (!relocateWidget(w, test_pos)) {
@@ -1075,7 +1075,7 @@ class CDashboardPage extends CBaseComponent {
 					continue;
 				}
 
-				if (this._isOverlappingPos(w_data.pos, {...original_pos, height: original_pos.height + 1})) {
+				if (this._isPosOverlapping(w_data.pos, {...original_pos, height: original_pos.height + 1})) {
 					widgets_below.push(w);
 				}
 			}
@@ -1117,7 +1117,7 @@ class CDashboardPage extends CBaseComponent {
 				height: widget_pos.height
 			});
 
-			if (!this._isEqualPos(pos, drag_pos)) {
+			if (!this._isPosEqual(pos, drag_pos)) {
 				if (allocatePos(drag_widget, pos)) {
 					drag_pos = pos;
 					showWidgetHelper(drag_pos);
@@ -1174,13 +1174,13 @@ class CDashboardPage extends CBaseComponent {
 			mouseUp: (e) => {
 				if (move_animation_frame !== null) {
 					cancelAnimationFrame(move_animation_frame);
-					move_animation_frame = null;
 				}
 
 				drag_widget.setDragging(false);
 				drag_widget.setPosition(drag_pos);
 				hideWidgetHelper();
 
+				move_animation_frame = null;
 				drag_widget = null;
 				drag_pos = null;
 				drag_rel_x = null;
@@ -1197,7 +1197,14 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			mouseMove: (e) => {
-				move_animation_frame = requestAnimationFrame(() => move(e.pageX, e.pageY));
+				if (move_animation_frame !== null) {
+					cancelAnimationFrame(move_animation_frame);
+				}
+
+				move_animation_frame = requestAnimationFrame(() => {
+					move_animation_frame = null;
+					move(e.pageX, e.pageY);
+				});
 			}
 		};
 	}
@@ -1341,7 +1348,7 @@ class CDashboardPage extends CBaseComponent {
 
 				original_positions.set(w, {...w_data.pos});
 
-				if (this._isOverlappingPos(data.pos, w_data.pos)) {
+				if (this._isPosOverlapping(data.pos, w_data.pos)) {
 					overlapping_widgets.push(w);
 				}
 			}
@@ -1417,7 +1424,7 @@ class CDashboardPage extends CBaseComponent {
 					continue;
 				}
 
-				if (!this._isEqualPos(w_data.pos, w_data.original_pos)) {
+				if (!this._isPosEqual(w_data.pos, w_data.original_pos)) {
 					relocated_widgets.set(w, w_data);
 				}
 			}
@@ -1442,7 +1449,7 @@ class CDashboardPage extends CBaseComponent {
 						pos.height++;
 					}
 
-					if (!this._isEqualPos(pos, w_data.pos)) {
+					if (!this._isPosEqual(pos, w_data.pos)) {
 						if (this._isDataPosFree(pos, {except_widgets: new Set([w])})) {
 							w_data.pos = pos;
 
@@ -1455,8 +1462,8 @@ class CDashboardPage extends CBaseComponent {
 		};
 
 		const resize = (target_resize_pos) => {
-			if (this._isEqualPos(target_resize_pos, resize_pos)
-					|| this._isEqualPos(target_resize_pos, resize_pos_tested)) {
+			if (this._isPosEqual(target_resize_pos, resize_pos)
+					|| this._isPosEqual(target_resize_pos, resize_pos_tested)) {
 				return false;
 			}
 
@@ -1486,7 +1493,7 @@ class CDashboardPage extends CBaseComponent {
 							continue;
 						}
 
-						if (this._isOverlappingPos(step_resize_pos, w_data.pos)) {
+						if (this._isPosOverlapping(step_resize_pos, w_data.pos)) {
 							const run_away_spec = getRunAwaySpec(best_resize_pos, w_data.pos);
 
 							can_relocate = runAway(w, run_away_spec.axis, run_away_spec.direction);
@@ -1517,7 +1524,7 @@ class CDashboardPage extends CBaseComponent {
 				}
 			}
 
-			const can_relocate = !this._isEqualPos(best_resize_pos, resize_pos);
+			const can_relocate = !this._isPosEqual(best_resize_pos, resize_pos);
 
 			if (can_relocate) {
 				resize_pos = best_resize_pos;
@@ -1697,7 +1704,6 @@ class CDashboardPage extends CBaseComponent {
 			mouseUp: (e) => {
 				if (move_animation_frame !== null) {
 					cancelAnimationFrame(move_animation_frame);
-					move_animation_frame = null;
 				}
 
 				resize_widget.setPosition(resize_pos);
@@ -1713,6 +1719,7 @@ class CDashboardPage extends CBaseComponent {
 				widget_view_container.style.width = null;
 				widget_view_container.style.height = null;
 
+				move_animation_frame = null;
 				grid_rect = null;
 				grid_cell_width = null;
 				resize_widget = null;
@@ -1734,7 +1741,14 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			mouseMove: (e) => {
-				move_animation_frame = requestAnimationFrame(() => move(e.pageX, e.pageY));
+				if (move_animation_frame !== null) {
+					cancelAnimationFrame(move_animation_frame);
+				}
+
+				move_animation_frame = requestAnimationFrame(() => {
+					move_animation_frame = null;
+					move(e.pageX, e.pageY);
+				});
 			}
 		};
 	}

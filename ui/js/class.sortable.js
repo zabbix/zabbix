@@ -130,7 +130,7 @@ class CSortable extends CBaseComponent {
 	 * @returns {boolean}
 	 */
 	isScrollable() {
-		return !this._isEqualPos(this._getListPosMax(), 0);
+		return !this._isPosEqual(this._getListPosMax(), 0);
 	}
 
 	/**
@@ -527,7 +527,7 @@ class CSortable extends CBaseComponent {
 	 * @param {number} pos  Position in decimal pixels.
 	 */
 	_setListPos(pos) {
-		if (this._isEqualPos(pos, this._list_pos)) {
+		if (this._isPosEqual(pos, this._list_pos)) {
 			return;
 		}
 
@@ -609,7 +609,7 @@ class CSortable extends CBaseComponent {
 	 *
 	 * @returns {boolean}
 	 */
-	_isEqualPos(pos_1, pos_2) {
+	_isPosEqual(pos_1, pos_2) {
 		return (Math.abs(pos_1 - pos_2) < 0.001);
 	}
 
@@ -731,7 +731,7 @@ class CSortable extends CBaseComponent {
 					this._endDragging();
 
 					end_dragging_after_transitions = (transitions_set.size > 0
-						|| !this._isEqualPos(this._list_pos, prev_list_pos));
+						|| !this._isPosEqual(this._list_pos, prev_list_pos));
 
 					if (!end_dragging_after_transitions) {
 						this._endDraggingAfterTransitions();
