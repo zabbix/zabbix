@@ -19,8 +19,18 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 class testPageAdministrationScripts extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	private $sqlHashScripts = '';
 	private $oldHashScripts = '';
@@ -81,7 +91,8 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		$this->zbxTestClickButton('script.delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->zbxTestTextPresent('Cannot delete scripts');
+		$this->assertMessage(TEST_BAD, 'Cannot delete scripts', 'Cannot delete scripts. Script "Reboot" is used in'.
+				' action operation "Trigger action 4".');
 	}
 
 	/**
@@ -95,7 +106,8 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 		if ($script['scriptid'] === '4') {
 			$this->zbxTestCheckTitle('Configuration of scripts');
-			$this->zbxTestTextPresent('Cannot delete script');
+			$this->assertMessage(TEST_BAD, 'Cannot delete script', 'Cannot delete scripts. Script "Reboot" is used in'.
+					' action operation "Trigger action 4".');
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
 		}
 		else {
