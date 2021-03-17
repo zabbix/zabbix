@@ -25,7 +25,9 @@
 class CHostNameParser extends CParser {
 
 	private $options = [
-		'lldmacros' => false
+		'lldmacros' => false,
+		'allow_host_all' => false,
+		'allow_host_current' => false
 	];
 
 	/**
@@ -50,9 +52,7 @@ class CHostNameParser extends CParser {
 	private $lld_macro_function_parser;
 
 	public function __construct($options = []) {
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
+		$this->options = $options + $this->options;
 
 		if ($this->options['lldmacros']) {
 			$this->lld_macro_parser = new CLLDMacroParser();
@@ -91,7 +91,11 @@ class CHostNameParser extends CParser {
 			break;
 		}
 
-		if ($pos == $p) {
+		if (isset($source[$p]) && $source[$p] === '*' && $this->options['allow_host_all']) {
+			$p++;
+		}
+
+		if ($pos == $p && (!isset($source[$p]) || $source[$p] !== '/' || !$this->options['allow_host_current'])) {
 			return self::PARSE_FAIL;
 		}
 
