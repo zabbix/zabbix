@@ -1,0 +1,1573 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-03-17T13:02:39Z'
+  groups:
+    -
+      name: Templates/Power
+  templates:
+    -
+      template: 'APC UPS SNMP'
+      name: 'APC UPS SNMP'
+      description: |
+        Template Power APC UPS
+        
+        MIBs used:
+        PowerNet-MIB
+        SNMPv2-MIB
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Power
+      applications:
+        -
+          name: General
+        -
+          name: Status
+      items:
+        -
+          name: 'Battery capacity'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.1.0
+          key: 'battery.capacity[upsAdvBatteryCapacity]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: PowerNet-MIB
+            The remaining battery capacity expressed as
+             percentage of full capacity.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'External battery packs count'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.5.0
+          key: 'battery.external_packs_count[upsAdvBatteryNumOfBattPacks]'
+          history: 7d
+          description: |
+            MIB: PowerNet-MIB
+            The number of external battery packs connected to the UPS. If
+             the UPS does not use smart cells then the agent reports
+             ERROR_NO_SUCH_NAME.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'Battery last replace date'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.3.0
+          key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: PowerNet-MIB
+            The date when the UPS system's batteries were last replaced
+             in mm/dd/yy (or yyyy) format. For Smart-UPS models, this value
+             is originally set at the factory. When the UPS batteries
+             are replaced, this value should be reset by the administrator.
+             For Symmetra PX 250/500 this OID is read-only and is configurable in the local display only.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'Battery replace indicator'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.4.0
+          key: 'battery.replace_indicator[upsAdvBatteryReplaceIndicator]'
+          history: 7d
+          description: |
+            MIB: PowerNet-MIB
+            Indicates whether the UPS batteries need replacement.
+          applications:
+            -
+              name: General
+          valuemap:
+            name: 'PowerNet-MIB::upsAdvBatteryReplaceIndicator'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          triggers:
+            -
+              expression: '{last()}=2'
+              name: 'Battery needs replacement'
+              priority: HIGH
+              description: 'A battery installed has an internal error condition.'
+        -
+          name: 'Battery runtime remaining'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.3.0
+          key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: |
+            MIB: PowerNet-MIB
+            The UPS battery run time remaining before battery
+             exhaustion.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'Battery status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.1.0
+          key: 'battery.status[upsBasicBatteryStatus]'
+          history: 7d
+          description: |
+            MIB: PowerNet-MIB
+            The status of the UPS batteries. A batteryLow(3) value
+             indicates the UPS will be unable to sustain the current
+             load, and its services will be lost if power is not restored.
+             The amount of run time in reserve at the time of low battery
+             can be configured by the upsAdvConfigLowBatteryRunTime.
+             A batteryInFaultCondition(4)value indicates that a battery
+             installed has an internal error condition.
+          applications:
+            -
+              name: General
+          valuemap:
+            name: 'PowerNet-MIB::upsBasicBatteryStatus'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          triggers:
+            -
+              expression: '{last()}=4'
+              name: 'Battery has an internal error condition'
+              priority: AVERAGE
+              description: 'A battery installed has an internal error condition.'
+            -
+              expression: '{last()}=3'
+              name: 'Battery is Low'
+              priority: AVERAGE
+              description: 'The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.'
+        -
+          name: 'Battery temperature'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.2.0
+          key: 'battery.temperature[upsHighPrecBatteryTemperature]'
+          history: 7d
+          value_type: FLOAT
+          units: ℃
+          description: |
+            MIB: PowerNet-MIB
+            The current internal UPS temperature in Celsius.
+             Temperatures below zero read as 0.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          triggers:
+            -
+              expression: '{min({$TIME.PERIOD})} > {$BATTERY.TEMP.MAX.WARN}'
+              name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+              opdata: 'Current temperature: {ITEM.LASTVALUE1}'
+              priority: HIGH
+        -
+          name: 'Battery voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.4.0
+          key: 'battery.voltage[upsHighPrecBatteryActualVoltage]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PowerNet-MIB
+            The actual battery bus voltage in Volts.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 1w
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'Service state'
+          triggers:
+            -
+              expression: '{max(#3)}=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+        -
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: Status
+          triggers:
+            -
+              expression: '{min(5m)}>{$ICMP.LOSS.WARN} and {min(5m)}<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: '{APC UPS SNMP:icmpping.max(#3)}=0'
+        -
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 1w
+          value_type: FLOAT
+          units: s
+          applications:
+            -
+              name: Status
+          triggers:
+            -
+              expression: '{avg(5m)}>{$ICMP.RESPONSE_TIME.WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: '{APC UPS SNMP:icmppingloss.min(5m)}>{$ICMP.LOSS.WARN} and {APC UPS SNMP:icmppingloss.min(5m)}<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: '{APC UPS SNMP:icmpping.max(#3)}=0'
+        -
+          name: 'Input fail cause'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.2.5.0
+          key: 'input.fail[upsAdvInputLineFailCause]'
+          history: 7d
+          description: |
+            MIB: PowerNet-MIB
+            The reason for the occurrence of the last transfer to UPS
+            battery power.  The variable is set to:
+            - noTransfer(1) -- if there is no transfer yet.
+            - highLineVoltage(2) -- if the transfer to battery is caused
+            by an over voltage greater than the high transfer voltage.
+            - brownout(3) -- if the duration of the outage is greater than
+            five seconds and the line voltage is between 40% of the
+            rated output voltage and the low transfer voltage.
+            - blackout(4) -- if the duration of the outage is greater than five
+            seconds and the line voltage is between 40% of the rated
+            output voltage and ground.
+            - smallMomentarySag(5) -- if the duration of the outage is less
+            than five seconds and the line voltage is between 40% of the
+            rated output voltage and the low transfer voltage.
+            - deepMomentarySag(6) -- if the duration of the outage is less
+            than five seconds and the line voltage is between 40% of the
+            rated output voltage and ground.  The variable is set to
+            - smallMomentarySpike(7) -- if the line failure is caused by a
+            rate of change of input voltage less than ten volts per cycle.
+            - largeMomentarySpike(8) -- if the line failure is caused by
+            a rate of change of input voltage greater than ten volts per cycle.
+            - selfTest(9) -- if the UPS was commanded to do a self test.
+            - rateOfVoltageChange(10) -- if the failure is due to the rate of change of
+            the line voltage.
+          applications:
+            -
+              name: General
+          valuemap:
+            name: 'PowerNet-MIB::upsAdvInputLineFailCause'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'Input frequency'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.4.0
+          key: 'input.frequency[upsHighPrecInputFrequency]'
+          history: 7d
+          value_type: FLOAT
+          units: Hz
+          description: |
+            MIB: PowerNet-MIB
+            The current input frequency to the UPS system in Hz.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          triggers:
+            -
+              expression: '{min({$TIME.PERIOD})} > 0 and ({min({$TIME.PERIOD})} > {$UPS.INPUT_FREQ.MAX.WARN} or {max({$TIME.PERIOD})} < {$UPS.INPUT_FREQ.MIN.WARN})'
+              name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
+              opdata: 'Current frequency: {ITEM.LASTVALUE1}'
+              priority: HIGH
+        -
+          name: 'Input voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.1.0
+          key: 'input.voltage[upsHighPrecInputLineVoltage]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PowerNet-MIB
+            The current utility line voltage in VAC.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          triggers:
+            -
+              expression: '{min({$TIME.PERIOD})} > 0 and ({min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN})'
+              name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+              opdata: 'Current voltage: {ITEM.LASTVALUE1}'
+              priority: HIGH
+        -
+          name: 'Output current'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.4.0
+          key: 'output.current[upsHighPrecOutputCurrent]'
+          history: 7d
+          value_type: FLOAT
+          units: A
+          description: |
+            MIB: PowerNet-MIB
+            The current in amperes drawn by the load on the UPS.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'Output load'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.3.0
+          key: 'output.load[upsHighPrecOutputLoad]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: PowerNet-MIB
+            The current UPS load expressed as percentage
+            of rated capacity.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          triggers:
+            -
+              expression: '{min({$TIME.PERIOD})} > {$UPS.OUTPUT.MAX.WARN}'
+              name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
+              opdata: 'Current load: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'A battery installed has an internal error condition.'
+        -
+          name: 'Output status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.1.1.0
+          key: 'output.status[upsBasicOutputStatus]'
+          history: 7d
+          description: |
+            MIB: PowerNet-MIB
+            The current state of the UPS. If the UPS is unable to
+             determine the state of the UPS this variable is set
+             to unknown(1).
+            During self-test most UPSes report onBattery(3) but
+             some that support it will report onBatteryTest(15).
+             To determine self-test status across all UPSes, refer
+             to the upsBasicStateOutputState OID.
+          applications:
+            -
+              name: General
+          valuemap:
+            name: 'PowerNet-MIB::upsBasicBatteryStatus'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          triggers:
+            -
+              expression: '{last()}=16'
+              name: 'UPS is Emergency Static Bypass'
+              priority: AVERAGE
+            -
+              expression: '{last()}=10'
+              name: 'UPS is Hardware Failure Bypass'
+              priority: AVERAGE
+            -
+              expression: '{last()}=7'
+              name: 'UPS is Off'
+              priority: AVERAGE
+            -
+              expression: '{last()}=3'
+              name: 'UPS is on battery'
+              priority: AVERAGE
+            -
+              expression: '{last()}=4'
+              name: 'UPS is on Smart Boost'
+              priority: AVERAGE
+            -
+              expression: '{last()}=12'
+              name: 'UPS is On Smart Trim'
+              priority: AVERAGE
+            -
+              expression: '{last()}=8'
+              name: 'UPS is Rebooting'
+              priority: AVERAGE
+            -
+              expression: '{last()}=11'
+              name: 'UPS is Sleeping Until Power Return'
+              priority: AVERAGE
+            -
+              expression: '{last()}=6'
+              name: 'UPS is Software Bypass'
+              priority: AVERAGE
+            -
+              expression: '{last()}=9'
+              name: 'UPS is Switched Bypass'
+              priority: AVERAGE
+            -
+              expression: '{last()}=5'
+              name: 'UPS is Timed Sleeping'
+              priority: AVERAGE
+        -
+          name: 'Output voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.1.0
+          key: 'output.voltage[upsHighPrecOutputVoltage]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PowerNet-MIB
+            The output voltage of the UPS system in VAC.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'Item is used to collect all SNMP traps unmatched by other snmptrap items'
+          applications:
+            -
+              name: General
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+        -
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'system.contact[sysContact.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed
+            node, together with information on how to contact this person.  If no contact
+            information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.descr[sysDescr.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'system.location[sysLocation.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., `telephone closet,
+            3rd floor').  If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: Model
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.1.1.0
+          key: 'system.model[upsBasicIdentModel]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: PowerNet-MIB
+            The UPS model name (e.g. 'APC Smart-UPS 600').
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node.By
+            convention, this is the node's fully-qualified domain name.  If the name is unknown,
+            the value is the zero-length string.
+          inventory_link: NAME
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'system.objectid[sysObjectID.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management
+            subsystem contained in the entity.  This value is allocated within the SMI enterprises
+            subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what
+            kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was
+            assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1
+            to its `Fred Router'.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'Serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.2.3.0
+          key: 'system.sn[upsAdvIdentSerialNumber]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: PowerNet-MIB
+            An 8-character string identifying the serial number of
+             the UPS internal microprocessor.  This number is set at
+             the factory.  NOTE: This number does NOT correspond to
+             the serial number on the rear of the UPS.
+          applications:
+            -
+              name: General
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management
+            portion of the system was last re-initialized.
+          applications:
+            -
+              name: Status
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'No SNMP data collection'
+                  expression: '{APC UPS SNMP:zabbix[host,snmp,available].max({$SNMP.TIMEOUT})}=0'
+        -
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: zabbix.host.available
+          triggers:
+            -
+              expression: '{max({$SNMP.TIMEOUT})}=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: '{APC UPS SNMP:icmpping.max(#3)}=0'
+      discovery_rules:
+        -
+          name: 'External bad battery packs discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#EXTERNAL_PACKS},1.3.6.1.4.1.318.1.1.1.2.2.6]'
+          key: battery.packs.bad.discovery
+          delay: 1h
+          description: 'Discovery of the number of external defective battery packs.'
+          item_prototypes:
+            -
+              name: '{#SNMPINDEX}: External battery packs bad'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.6.0
+              key: 'battery.external_packs_bad[upsAdvBatteryNumOfBadBattPacks.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: PowerNet-MIB
+                The number of external battery packs connected to the UPS that
+                are defective. If the UPS does not use smart cells then the
+                agent reports ERROR_NO_SUCH_NAME.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+        -
+          name: 'External battery packs discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#CARTRIDGE_STATUS},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.7,{#BATTERY_PACK},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.1,{#CARTRIDGE_INDEX},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.2]'
+          key: battery.packs.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#CARTRIDGE_STATUS}'
+                value: ^$
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          item_prototypes:
+            -
+              name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery estimated replace date'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.8.{#SNMPINDEX}'
+              key: 'battery.estimated_replace_date[upsHighPrecBatteryPackCartridgeReplaceDate.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: PowerNet-MIB
+                The battery cartridge estimated battery replace date.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+            -
+              name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery pack cartridge health'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.7.{#SNMPINDEX}'
+              key: 'battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: PowerNet-MIB
+                The battery cartridge health.
+                  bit 0 Battery lifetime okay
+                  bit 1 Battery lifetime near end, order replacement cartridge
+                  bit 2 Battery lifetime exceeded, replace battery
+                  bit 3 Battery lifetime near end acknowledged, order replacement cartridge
+                  bit 4 Battery lifetime exceeded acknowledged, replace battery
+                  bit 5 Battery measured lifetime near end, order replacement cartridge
+                  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{regexp("^(0)[0|1]{15}$")}=1'
+                  name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay'
+                  opdata: 'Current bit set: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: |
+                    The battery cartridge health.
+                      bit 0 Battery lifetime okay
+                      bit 1 Battery lifetime near end, order replacement cartridge
+                      bit 2 Battery lifetime exceeded, replace battery
+                      bit 3 Battery lifetime near end acknowledged, order replacement cartridge
+                      bit 4 Battery lifetime exceeded acknowledged, replace battery
+                      bit 5 Battery measured lifetime near end, order replacement cartridge
+                      bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge
+            -
+              name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.10.{#SNMPINDEX}'
+              key: 'battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: PowerNet-MIB
+                The battery cartridge status.
+                bit 0 Disconnected
+                bit 1 Overvoltage
+                bit 2 NeedsReplacement
+                bit 3 OvertemperatureCritical
+                bit 4 Charger
+                bit 5 TemperatureSensor
+                bit 6 BusSoftStart
+                bit 7 OvertemperatureWarning
+                bit 8 GeneralError
+                bit 9 Communication
+                bit 10 DisconnectedFrame
+                bit 11 FirmwareMismatch
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{regexp("^(0{16})$")}=1'
+                  name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay'
+                  opdata: 'Current bit set: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: |
+                    The battery cartridge status:
+                    bit 0 Disconnected
+                    bit 1 Overvoltage
+                    bit 2 NeedsReplacement
+                    bit 3 OvertemperatureCritical
+                    bit 4 Charger
+                    bit 5 TemperatureSensor
+                    bit 6 BusSoftStart
+                    bit 7 OvertemperatureWarning
+                    bit 8 GeneralError
+                    bit 9 Communication
+                    bit 10 DisconnectedFrame
+                    bit 11 FirmwareMismatch
+            -
+              name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.5.{#SNMPINDEX}'
+              key: 'battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: ℃
+              description: |
+                MIB: PowerNet-MIB
+                The battery pack temperature in Celsius.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{min({$TIME.PERIOD})} > {$BATTERY.TEMP.MAX.WARN}'
+                  name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+                  opdata: 'Current temperature: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+            -
+              name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.4.{#SNMPINDEX}'
+              key: 'system.sn[upsHighPrecBatteryPackSerialNumber.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: PowerNet-MIB
+                The battery pack serial number.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+        -
+          name: 'External sensor port 1 discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#EXTERNAL_SENSOR1_NAME},1.3.6.1.4.1.318.1.1.25.1.2.1.3]'
+          key: external.sensor1.discovery
+          delay: 1h
+          description: uioSensorStatusTable
+          item_prototypes:
+            -
+              name: '{#EXTERNAL_SENSOR1_NAME}: Humidity sensor'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.7.1.1
+              key: 'external.sensor.humidity[uioSensorStatusHumidity.1.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: PowerNet-MIB
+                The sensor's current humidity reading - a relative humidity
+                 percentage. -1 indicates an invalid reading due to either a
+                 sensor that doesn't read humidity or lost communications.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+            -
+              name: '{#EXTERNAL_SENSOR1_NAME}: Sensor alarm status'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.9.1.1
+              key: 'external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: PowerNet-MIB
+                The alarm status of the sensor. Possible values:
+                uioNormal                 (1),
+                uioWarning                (2),
+                uioCritical               (3),
+                sensorStatusNotApplicable (4)
+              applications:
+                -
+                  name: General
+              valuemap:
+                name: 'PowerNet-MIB::uioSensorStatusAlarmStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{last()}=3'
+                  name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Critical'
+                  priority: HIGH
+                  description: 'The external sensor has returned a value greater than the critical threshold.'
+                -
+                  expression: '{last()}=4'
+                  name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Not Applicable'
+                  priority: INFO
+                  description: 'The external sensor does not work or is not connected.'
+                -
+                  expression: '{last()}=2'
+                  name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Warning'
+                  priority: AVERAGE
+                  description: 'The external sensor has returned a value greater than the warning threshold.'
+            -
+              name: '{#EXTERNAL_SENSOR1_NAME}: Temperature sensor'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.6.1.1
+              key: 'external.sensor.temperature[uioSensorStatusTemperatureDegC.1.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: ℃
+              description: |
+                MIB: PowerNet-MIB
+                The sensor's current temperature reading in Celsius.
+                 -1 indicates an invalid reading due to lost communications.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          overrides:
+            -
+              name: Temp
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#EXTERNAL_SENSOR1_NAME}'
+                    value: Temp
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: Humidity
+                  status: ENABLED
+                  discover: NO_DISCOVER
+        -
+          name: 'External sensor port 2 discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#EXTERNAL_SENSOR2_NAME},1.3.6.1.4.1.318.1.1.25.1.2.2.3]'
+          key: external.sensor2.discovery
+          delay: 1h
+          description: uioSensorStatusTable
+          item_prototypes:
+            -
+              name: '{#EXTERNAL_SENSOR2_NAME}: Humidity sensor'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.7.1.1
+              key: 'external.sensor.humidity[uioSensorStatusHumidity.2.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: PowerNet-MIB
+                The sensor's current humidity reading - a relative humidity
+                 percentage. -1 indicates an invalid reading due to either a
+                 sensor that doesn't read humidity or lost communications.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+            -
+              name: '{#EXTERNAL_SENSOR2_NAME}: Sensor alarm status'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.9.1.1
+              key: 'external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: PowerNet-MIB
+                The alarm status of the sensor. Possible values:
+                uioNormal                 (1),
+                uioWarning                (2),
+                uioCritical               (3),
+                sensorStatusNotApplicable (4)
+              applications:
+                -
+                  name: General
+              valuemap:
+                name: 'PowerNet-MIB::uioSensorStatusAlarmStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{last()}=3'
+                  name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Critical'
+                  priority: HIGH
+                  description: 'The external sensor has returned a value greater than the critical threshold.'
+                -
+                  expression: '{last()}=4'
+                  name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Not Applicable'
+                  priority: INFO
+                  description: 'The external sensor does not work or is not connected.'
+                -
+                  expression: '{last()}=2'
+                  name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Warning'
+                  priority: AVERAGE
+                  description: 'The external sensor has returned a value greater than the warning threshold.'
+            -
+              name: '{#EXTERNAL_SENSOR2_NAME}: Temperature sensor'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.6.1.1
+              key: 'external.sensor.temperature[uioSensorStatusTemperatureDegC.2.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: ℃
+              description: |
+                MIB: PowerNet-MIB
+                The sensor's current temperature reading in Celsius.
+                 -1 indicates an invalid reading due to lost communications.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          overrides:
+            -
+              name: Temp
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#EXTERNAL_SENSOR2_NAME}'
+                    value: Temp
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: Humidity
+                  status: ENABLED
+                  discover: NO_DISCOVER
+        -
+          name: 'Input phases discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#PHASEINDEX},1.3.6.1.4.1.318.1.1.1.9.2.3.1.2.1.1]'
+          key: input.phases.discovery
+          delay: 1h
+          description: 'The input phase identifier. OID upsPhaseInputPhaseIndex.1.1'
+          item_prototypes:
+            -
+              name: '{#PHASEINDEX}: Phase input current'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.318.1.1.1.9.2.3.1.6.1.1.{#PHASEINDEX}'
+              key: 'phase.input.current[upsPhaseInputCurrent.1.1.{#PHASEINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: A
+              description: |
+                MIB: PowerNet-MIB
+                The input current in 0.1 amperes, or -0.1 if it's
+                 unsupported by this UPS.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+            -
+              name: '{#PHASEINDEX}: Phase input voltage'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.318.1.1.1.9.2.3.1.3.1.1.{#PHASEINDEX}'
+              key: 'phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: PowerNet-MIB
+                The input voltage in VAC, or -1 if it's unsupported
+                 by this UPS.
+              applications:
+                -
+                  name: General
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN}'
+                  name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+                  opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+      macros:
+        -
+          macro: '{$BATTERY.TEMP.MAX.WARN}'
+          value: '55'
+          description: 'Maximum battery temperature for trigger expression.'
+        -
+          macro: '{$ICMP.LOSS.WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP.RESPONSE_TIME.WARN}'
+          value: '0.15'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$TIME.PERIOD}'
+          value: 15m
+          description: 'Time period for trigger expression.'
+        -
+          macro: '{$UPS.INPUT_FREQ.MAX.WARN}'
+          value: '50.3'
+          description: 'Maximum input frequency for trigger expression.'
+        -
+          macro: '{$UPS.INPUT_FREQ.MIN.WARN}'
+          value: '49.7'
+          description: 'Minimum input frequency for trigger expression.'
+        -
+          macro: '{$UPS.INPUT_VOLT.MAX.WARN}'
+          value: '243'
+          description: 'Maximum input voltage for trigger expression.'
+        -
+          macro: '{$UPS.INPUT_VOLT.MIN.WARN}'
+          value: '197'
+          description: 'Minimum input voltage for trigger expression.'
+        -
+          macro: '{$UPS.OUTPUT.MAX.WARN}'
+          value: '80'
+          description: 'Maximum output load in % for trigger expression.'
+      dashboards:
+        -
+          name: 'UPS Summary'
+          widgets:
+            -
+              type: PLAIN_TEXT
+              width: '8'
+              fields:
+                -
+                  type: INTEGER
+                  name: show_as_html
+                  value: '0'
+                -
+                  type: INTEGER
+                  name: show_lines
+                  value: '1'
+                -
+                  type: ITEM
+                  name: itemids
+                  value:
+                    key: 'system.uptime[sysUpTime.0]'
+                    host: 'APC UPS SNMP'
+            -
+              type: PLAIN_TEXT
+              x: '8'
+              width: '8'
+              fields:
+                -
+                  type: INTEGER
+                  name: show_as_html
+                  value: '0'
+                -
+                  type: INTEGER
+                  name: show_lines
+                  value: '1'
+                -
+                  type: ITEM
+                  name: itemids
+                  value:
+                    key: 'input.fail[upsAdvInputLineFailCause]'
+                    host: 'APC UPS SNMP'
+            -
+              type: PLAIN_TEXT
+              x: '16'
+              width: '8'
+              fields:
+                -
+                  type: INTEGER
+                  name: show_as_html
+                  value: '0'
+                -
+                  type: INTEGER
+                  name: show_lines
+                  value: '1'
+                -
+                  type: ITEM
+                  name: itemids
+                  value:
+                    key: 'output.status[upsBasicOutputStatus]'
+                    host: 'APC UPS SNMP'
+            -
+              type: PLAIN_TEXT
+              'y': '2'
+              width: '8'
+              fields:
+                -
+                  type: INTEGER
+                  name: show_as_html
+                  value: '0'
+                -
+                  type: INTEGER
+                  name: show_lines
+                  value: '1'
+                -
+                  type: ITEM
+                  name: itemids
+                  value:
+                    key: 'battery.status[upsBasicBatteryStatus]'
+                    host: 'APC UPS SNMP'
+            -
+              type: PLAIN_TEXT
+              x: '8'
+              'y': '2'
+              width: '8'
+              fields:
+                -
+                  type: INTEGER
+                  name: show_as_html
+                  value: '0'
+                -
+                  type: INTEGER
+                  name: show_lines
+                  value: '1'
+                -
+                  type: ITEM
+                  name: itemids
+                  value:
+                    key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
+                    host: 'APC UPS SNMP'
+            -
+              type: PLAIN_TEXT
+              x: '16'
+              'y': '2'
+              width: '8'
+              fields:
+                -
+                  type: INTEGER
+                  name: show_as_html
+                  value: '0'
+                -
+                  type: INTEGER
+                  name: show_lines
+                  value: '1'
+                -
+                  type: ITEM
+                  name: itemids
+                  value:
+                    key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
+                    host: 'APC UPS SNMP'
+            -
+              type: GRAPH_CLASSIC
+              'y': '4'
+              width: '8'
+              height: '7'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Capacity of the UPS batteries'
+                    host: 'APC UPS SNMP'
+            -
+              type: GRAPH_CLASSIC
+              x: '8'
+              'y': '4'
+              width: '8'
+              height: '7'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: Voltage
+                    host: 'APC UPS SNMP'
+            -
+              type: GRAPH_CLASSIC
+              x: '16'
+              'y': '4'
+              width: '8'
+              height: '7'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: Output
+                    host: 'APC UPS SNMP'
+  graphs:
+    -
+      name: 'Capacity of the UPS batteries'
+      type: PIE
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'APC UPS SNMP'
+            key: 'battery.capacity[upsAdvBatteryCapacity]'
+    -
+      name: Output
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'APC UPS SNMP'
+            key: 'output.current[upsHighPrecOutputCurrent]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'APC UPS SNMP'
+            key: 'output.load[upsHighPrecOutputLoad]'
+    -
+      name: Voltage
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'APC UPS SNMP'
+            key: 'input.voltage[upsHighPrecInputLineVoltage]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'APC UPS SNMP'
+            key: 'output.voltage[upsHighPrecOutputVoltage]'
+  value_maps:
+    -
+      name: 'PowerNet-MIB::uioSensorStatusAlarmStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: Normal
+        -
+          value: '2'
+          newvalue: Warning
+        -
+          value: '3'
+          newvalue: Critical
+        -
+          value: '4'
+          newvalue: 'Not applicable'
+    -
+      name: 'PowerNet-MIB::upsAdvBatteryReplaceIndicator'
+      mappings:
+        -
+          value: '1'
+          newvalue: 'no Battery Needs Replacing'
+        -
+          value: '2'
+          newvalue: 'battery Needs Replacing'
+    -
+      name: 'PowerNet-MIB::upsAdvInputLineFailCause'
+      mappings:
+        -
+          value: '1'
+          newvalue: 'no Transfer'
+        -
+          value: '2'
+          newvalue: 'High Line Voltage'
+        -
+          value: '3'
+          newvalue: Brownout
+        -
+          value: '4'
+          newvalue: Blackout
+        -
+          value: '5'
+          newvalue: 'Small Momentary Sag'
+        -
+          value: '6'
+          newvalue: 'Deep Momentary Sag'
+        -
+          value: '7'
+          newvalue: 'Small Momentary Spike'
+        -
+          value: '8'
+          newvalue: 'Large Momentary Spike'
+        -
+          value: '9'
+          newvalue: 'Self Test'
+        -
+          value: '10'
+          newvalue: 'Rate of Voltage Change'
+    -
+      name: 'PowerNet-MIB::upsBasicBatteryStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: Unknown
+        -
+          value: '2'
+          newvalue: Normal
+        -
+          value: '3'
+          newvalue: Low
+        -
+          value: '4'
+          newvalue: 'In Fault Condition'
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
+    -
+      name: zabbix.host.available
+      mappings:
+        -
+          value: '0'
+          newvalue: 'not available'
+        -
+          value: '1'
+          newvalue: available
+        -
+          value: '2'
+          newvalue: unknown
