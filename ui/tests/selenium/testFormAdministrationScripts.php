@@ -596,6 +596,69 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
+					'fields' =>  [
+						'Name' => 'Max SSH 4',
+						'Scope' => 'Manual event action',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 5',
+						'Scope' => 'Action operation',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max SSH 6',
+						'Scope' => 'Manual host action',
+						'Type' => 'SSH',
+						'Authentication method' => 'Public key',
+						'Username' => 'test',
+						'Public key file' => 'public_key_file',
+						'Private key file' => 'private_key_file',
+						'Key passphrase' => 'key_passphrase',
+						'Port' => '81',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' =>  [
@@ -613,6 +676,18 @@ class testFormAdministrationScripts extends CWebTest {
 						'Name' => 'SSH empty command',
 						'Type' => 'SSH',
 						'Commands' => ''
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/username": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'SSH empty username',
+						'Type' => 'SSH',
+						'Commands' => 'SSH empty username',
+						'Username' => ''
 					]
 				]
 			],
@@ -690,6 +765,18 @@ class testFormAdministrationScripts extends CWebTest {
 						'Name' => 'Telnet empty command',
 						'Type' => 'Telnet',
 						'Commands' => ''
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/username": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Telnet empty username',
+						'Type' => 'Telnet',
+						'Commands' => 'Telnet empty username',
+						'Username' => ''
 					]
 				]
 			]
