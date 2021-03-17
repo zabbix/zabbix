@@ -969,6 +969,7 @@ class CDashboardPage extends CBaseComponent {
 		widget_helper.classList.add('dashbrd-grid-widget-placeholder');
 		widget_helper.append(document.createElement('div'));
 
+		let move_animation_frame = null;
 		let drag_widget = null;
 		let drag_pos = null;
 		let drag_rel_x = null;
@@ -1092,6 +1093,38 @@ class CDashboardPage extends CBaseComponent {
 			return result;
 		};
 
+		const move = (x, y) => {
+			const grid_rect = this._dashboard_grid.getBoundingClientRect();
+
+			const widget_pos = drag_widget.getPosition();
+			const widget_view = drag_widget.getView();
+			const widget_view_rect = widget_view.getBoundingClientRect();
+
+			const pos_left = Math.max(0, Math.min(grid_rect.width - widget_view_rect.width, x + drag_rel_x));
+			const pos_top = Math.max(0, Math.min(grid_rect.height - widget_view_rect.height,
+				y + drag_rel_y + document.querySelector('.wrapper').scrollTop
+			));
+
+			widget_view.style.left = `${pos_left}px`;
+			widget_view.style.top = `${pos_top}px`;
+
+			const pos = getGridPos({
+				x: pos_left,
+				y: pos_top,
+				width: widget_pos.width,
+				height: widget_pos.height
+			});
+
+			if (!this._isEqualPos(pos, drag_pos)) {
+				if (allocatePos(drag_widget, pos)) {
+					drag_pos = pos;
+					showWidgetHelper(drag_pos);
+
+					this._resizeGrid(Math.min(this._max_rows, drag_pos.y + drag_pos.height + 2));
+				}
+			}
+		};
+
 		this._widget_dragging_events = {
 			mouseDown: (e) => {
 				drag_widget = null;
@@ -1133,6 +1166,11 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			mouseUp: (e) => {
+				if (move_animation_frame !== null) {
+					cancelAnimationFrame(move_animation_frame);
+					move_animation_frame = null;
+				}
+
 				drag_widget.setDragging(false);
 				drag_widget.setPosition(drag_pos);
 				hideWidgetHelper();
@@ -1153,39 +1191,7 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			mouseMove: (e) => {
-				if (drag_widget === null) {
-					return;
-				}
-
-				const grid_rect = this._dashboard_grid.getBoundingClientRect();
-
-				const widget_pos = drag_widget.getPosition();
-				const widget_view = drag_widget.getView();
-				const widget_view_rect = widget_view.getBoundingClientRect();
-
-				const pos_left = Math.max(0, Math.min(grid_rect.width - widget_view_rect.width, e.pageX + drag_rel_x));
-				const pos_top = Math.max(0, Math.min(grid_rect.height - widget_view_rect.height,
-					e.pageY + drag_rel_y + document.querySelector('.wrapper').scrollTop
-				));
-
-				widget_view.style.left = `${pos_left}px`;
-				widget_view.style.top = `${pos_top}px`;
-
-				const pos = getGridPos({
-					x: pos_left,
-					y: pos_top,
-					width: widget_pos.width,
-					height: widget_pos.height
-				});
-
-				if (!this._isEqualPos(pos, drag_pos)) {
-					if (allocatePos(drag_widget, pos)) {
-						drag_pos = pos;
-						showWidgetHelper(drag_pos);
-
-						this._resizeGrid(Math.min(this._max_rows, drag_pos.y + drag_pos.height + 2));
-					}
-				}
+				move_animation_frame = requestAnimationFrame(() => move(e.pageX, e.pageY));
 			}
 		};
 	}
@@ -1202,11 +1208,13 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_initWidgetResizing() {
+		let move_animation_frame = null;
 		let grid_rect = null;
 		let grid_cell_width = null;
 		let resize_widget = null;
 		let resize_sides = null;
 		let resize_pos = null;
+		let resize_pos_tested = null;
 		let resize_dim = null;
 		let resize_rel_x = null;
 		let resize_rel_y = null;
@@ -1247,35 +1255,34 @@ class CDashboardPage extends CBaseComponent {
 			}
 		};
 
-		const getResizePosSteps = (source_pos, target_pos) => {
-			let resize_pos_steps = [];
+		const getResizeSteps = (source_pos, target_pos) => {
+			let resize_steps = [];
 
-			const pos = {...source_pos};
+			for (const axis of ['x', 'y']) {
+				if (source_pos[axis] != target_pos[axis]) {
+					const distance = target_pos[axis] - source_pos[axis];
 
-			while (!this._isEqualPos(pos, target_pos)) {
-				if (pos.x != target_pos.x) {
-					const direction = Math.sign(target_pos.x - pos.x);
-
-					pos.x += direction;
-					pos.width -= direction;
+					resize_steps.push({
+						operations: [
+							{property: axis, direction: Math.sign(distance)},
+							{property: axes_dim[axis], direction: -Math.sign(distance)},
+						],
+						count: Math.abs(distance)
+					});
 				}
-				else if (pos.width != target_pos.width) {
-					pos.width += Math.sign(target_pos.width - pos.width);
-				}
-				else if (pos.y != target_pos.y) {
-					const direction = Math.sign(target_pos.y - pos.y);
+				else if (source_pos[axes_dim[axis]] != target_pos[axes_dim[axis]]) {
+					const distance = target_pos[axes_dim[axis]] - source_pos[axes_dim[axis]];
 
-					pos.y += direction;
-					pos.height -= direction;
+					resize_steps.push({
+						operations: [
+							{property: axes_dim[axis], direction: Math.sign(distance)}
+						],
+						count: Math.abs(distance)
+					});
 				}
-				else if (pos.height != target_pos.height) {
-					pos.height += Math.sign(target_pos.height - pos.height);
-				}
-
-				resize_pos_steps.push({...pos});
 			}
 
-			return resize_pos_steps;
+			return resize_steps;
 		};
 
 		const getRunAwaySpec = (source_pos, target_pos) => {
@@ -1396,17 +1403,25 @@ class CDashboardPage extends CBaseComponent {
 			return false;
 		};
 
-		const runback = () => {
-			let has_runback;
+		const runBack = () => {
+			const relocated_widgets = new Map();
+
+			for (const [w, w_data] of this._widgets) {
+				if (w === resize_widget) {
+					continue;
+				}
+
+				if (!this._isEqualPos(w_data.pos, w_data.original_pos)) {
+					relocated_widgets.set(w, w_data);
+				}
+			}
+
+			let has_ran_back;
 
 			do {
-				has_runback = false;
+				has_ran_back = false;
 
-				for (const [w, w_data] of this._widgets) {
-					if (w === resize_widget) {
-						continue;
-					}
-
+				for (const [w, w_data] of relocated_widgets) {
 					const pos = {...w_data.pos};
 
 					pos.x += Math.sign(w_data.original_pos.x - pos.x);
@@ -1425,70 +1440,95 @@ class CDashboardPage extends CBaseComponent {
 						if (this._isDataPosFree(pos, {except_widgets: new Set([w])})) {
 							w_data.pos = pos;
 
-							has_runback = true;
+							has_ran_back = true;
 						}
 					}
 				}
 			}
-			while (has_runback);
+			while (has_ran_back);
 		};
 
 		const resize = (target_resize_pos) => {
-			if (this._isEqualPos(target_resize_pos, resize_pos)) {
+			if (this._isEqualPos(target_resize_pos, resize_pos)
+					|| this._isEqualPos(target_resize_pos, resize_pos_tested)) {
 				return false;
 			}
 
-			const resize_widget_data = this._widgets.get(resize_widget);
+			resize_pos_tested = target_resize_pos;
 
-			resize_widget_data.resize_pos = resize_pos;
+			let best_resize_pos = resize_pos;
 
-			this._widgets.forEach((w_data, w) => {
+			for (const [w, w_data] of this._widgets) {
 				if (w !== resize_widget) {
-					w_data.resize_pos = {...w.getPosition()};
-					w_data.pos = {...w_data.resize_pos};
+					w_data.best_pos = {...w.getPosition()};
+					w_data.pos = {...w_data.best_pos};
 				}
-			});
+			}
 
-			for (const pos of getResizePosSteps(resize_pos, target_resize_pos)) {
-				let can_relocate = true;
+			for (const resize_step of getResizeSteps(resize_pos, target_resize_pos)) {
+				for (let i = 0; i < resize_step.count; i++) {
+					const step_resize_pos = {...best_resize_pos};
 
-				for (const [w, w_data] of this._widgets) {
-					if (w === resize_widget) {
-						continue;
+					for (const operation of resize_step.operations) {
+						step_resize_pos[operation.property] += operation.direction;
 					}
 
-					if (this._isOverlappingPos(pos, w_data.pos)) {
-						const run_away_spec = getRunAwaySpec(resize_widget_data.resize_pos, w_data.pos);
+					let can_relocate = true;
 
-						can_relocate = runAway(w, run_away_spec.axis, run_away_spec.direction);
+					for (const [w, w_data] of this._widgets) {
+						if (w === resize_widget) {
+							continue;
+						}
 
-						if (!can_relocate) {
-							break;
+						if (this._isOverlappingPos(step_resize_pos, w_data.pos)) {
+							const run_away_spec = getRunAwaySpec(best_resize_pos, w_data.pos);
+
+							can_relocate = runAway(w, run_away_spec.axis, run_away_spec.direction);
+
+							if (!can_relocate) {
+								break;
+							}
+						}
+					}
+
+					if (!can_relocate) {
+						for (const [w, w_data] of this._widgets) {
+							if (w !== resize_widget) {
+								w_data.pos = {...w_data.best_pos};
+							}
+						}
+
+						break;
+					}
+
+					best_resize_pos = step_resize_pos;
+
+					for (const [w, w_data] of this._widgets) {
+						if (w !== resize_widget) {
+							w_data.best_pos = {...w_data.pos};
 						}
 					}
 				}
-
-				if (!can_relocate) {
-					break;
-				}
-
-				resize_widget_data.pos = pos;
-
-				this._widgets.forEach((w_data) => w_data.resize_pos = {...w_data.pos});
 			}
 
-			const can_relocate = !this._isEqualPos(resize_widget_data.resize_pos, resize_pos);
+			const can_relocate = !this._isEqualPos(best_resize_pos, resize_pos);
 
 			if (can_relocate) {
-				resize_pos = resize_widget_data.resize_pos;
+				resize_pos = best_resize_pos;
+				resize_pos_tested = best_resize_pos;
 
-				this._widgets.forEach((w_data) => w_data.pos = w_data.resize_pos);
+				this._widgets.get(resize_widget).pos = {...best_resize_pos};
 
-				runback();
+				for (const [w, w_data] of this._widgets) {
+					if (w !== resize_widget) {
+						w_data.pos = w_data.best_pos;
+					}
+				}
+
+				runBack();
 			}
 
-			delete resize_widget_data.resize_pos;
-			delete resize_widget_data.pos;
+			delete this._widgets.get(resize_widget).pos;
 
 			for (const [w, w_data] of this._widgets) {
 				if (w === resize_widget) {
@@ -1505,11 +1545,84 @@ class CDashboardPage extends CBaseComponent {
 					}
 				}
 
-				delete w_data.resize_pos;
+				delete w_data.best_pos;
 				delete w_data.pos;
 			}
 
 			return can_relocate;
+		};
+
+		const move = (x, y) => {
+			const rel_x = x - resize_rel_x;
+			const rel_y = y - resize_rel_y + document.querySelector('.wrapper').scrollTop;
+
+			const dim = {...resize_dim};
+
+			if (resize_sides.right) {
+				dim.x = resize_dim.x;
+				dim.width = Math.max(
+					grid_cell_width,
+					Math.min(grid_rect.width - dim.x, resize_dim.width + rel_x)
+				);
+			}
+			else if (resize_sides.left) {
+				dim.x = Math.max(
+					0,
+					Math.min(
+						resize_dim.x + resize_dim.width - grid_cell_width,
+						resize_dim.x + rel_x
+					)
+				);
+				dim.width = resize_dim.width + resize_dim.x - dim.x;
+			}
+
+			if (resize_sides.bottom) {
+				dim.y = resize_dim.y;
+				dim.height = Math.max(
+					this._cell_height * this._widget_min_rows,
+					Math.min(
+						this._cell_height * this._max_rows - dim.y,
+						this._cell_height * this._widget_max_rows,
+						resize_dim.height + rel_y
+					)
+				);
+			}
+			else if (resize_sides.top) {
+				dim.y = Math.max(
+					0,
+					Math.min(
+						resize_dim.y + resize_dim.height - this._cell_height * this._widget_min_rows,
+						resize_dim.y + rel_y
+					),
+					resize_dim.y + resize_dim.height - this._cell_height * this._widget_max_rows
+				);
+				dim.height = resize_dim.height + resize_dim.y - dim.y;
+			}
+
+			const widget_view = resize_widget.getView();
+
+			widget_view.style.left = `${dim.x}px`;
+			widget_view.style.top = `${dim.y}px`;
+			widget_view.style.width = `${dim.width}px`;
+			widget_view.style.height = `${dim.height}px`;
+
+			const resize_pos_width = Math.floor((dim.width + 0.49) / grid_cell_width);
+			const resize_pos_height = Math.floor((dim.height + 0.49) / this._cell_height);
+
+			const target_resize_pos = {
+				x: resize_sides.left ? resize_pos.x + resize_pos.width - resize_pos_width : resize_pos.x,
+				y: resize_sides.top ? resize_pos.y + resize_pos.height - resize_pos_height : resize_pos.y,
+				width: resize_pos_width,
+				height: resize_pos_height
+			};
+
+			if (resize(target_resize_pos)) {
+				updateWidgetContainerPosition();
+
+				resize_widget.resize();
+
+				this._resizeGrid(Math.min(this._max_rows, resize_pos.y + resize_pos.height + 2));
+			}
 		};
 
 		this._widget_resizing_events = {
@@ -1548,6 +1661,7 @@ class CDashboardPage extends CBaseComponent {
 
 				resize_widget.setResizing(true);
 				resize_pos = resize_widget.getPosition();
+				resize_pos_tested = resize_pos;
 
 				updateWidgetContainerPosition();
 
@@ -1571,6 +1685,11 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			mouseUp: (e) => {
+				if (move_animation_frame !== null) {
+					cancelAnimationFrame(move_animation_frame);
+					move_animation_frame = null;
+				}
+
 				resize_widget.setPosition(resize_pos);
 				resize_widget.setResizing(false);
 
@@ -1589,6 +1708,7 @@ class CDashboardPage extends CBaseComponent {
 				resize_widget = null;
 				resize_sides = null;
 				resize_pos = null;
+				resize_pos_tested = null;
 				resize_dim = null;
 				resize_rel_x = null;
 				resize_rel_y = null;
@@ -1604,80 +1724,7 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			mouseMove: (e) => {
-				if (resize_widget === null) {
-					return;
-				}
-
-				const rel_x = e.pageX - resize_rel_x;
-				const rel_y = e.pageY - resize_rel_y + document.querySelector('.wrapper').scrollTop;
-
-				const dim = {...resize_dim};
-
-				if (resize_sides.right) {
-					dim.x = resize_dim.x;
-					dim.width = Math.max(
-						grid_cell_width,
-						Math.min(grid_rect.width - dim.x, resize_dim.width + rel_x)
-					);
-				}
-				else if (resize_sides.left) {
-					dim.x = Math.max(
-						0,
-						Math.min(
-							resize_dim.x + resize_dim.width - grid_cell_width,
-							resize_dim.x + rel_x
-						)
-					);
-					dim.width = resize_dim.width + resize_dim.x - dim.x;
-				}
-
-				if (resize_sides.bottom) {
-					dim.y = resize_dim.y;
-					dim.height = Math.max(
-						this._cell_height * this._widget_min_rows,
-						Math.min(
-							this._cell_height * this._max_rows - dim.y,
-							this._cell_height * this._widget_max_rows,
-							resize_dim.height + rel_y
-						)
-					);
-				}
-				else if (resize_sides.top) {
-					dim.y = Math.max(
-						0,
-						Math.min(
-							resize_dim.y + resize_dim.height - this._cell_height * this._widget_min_rows,
-							resize_dim.y + rel_y
-						),
-						resize_dim.y + resize_dim.height - this._cell_height * this._widget_max_rows
-					);
-					dim.height = resize_dim.height + resize_dim.y - dim.y;
-				}
-
-				const widget_view = resize_widget.getView();
-
-				widget_view.style.left = `${dim.x}px`;
-				widget_view.style.top = `${dim.y}px`;
-				widget_view.style.width = `${dim.width}px`;
-				widget_view.style.height = `${dim.height}px`;
-
-				const resize_pos_width = Math.floor((dim.width + 0.49) / grid_cell_width);
-				const resize_pos_height = Math.floor((dim.height + 0.49) / this._cell_height);
-
-				const target_resize_pos = {
-					x: resize_sides.left ? resize_pos.x + resize_pos.width - resize_pos_width : resize_pos.x,
-					y: resize_sides.top ? resize_pos.y + resize_pos.height - resize_pos_height : resize_pos.y,
-					width: resize_pos_width,
-					height: resize_pos_height
-				};
-
-				if (resize(target_resize_pos)) {
-					updateWidgetContainerPosition();
-
-					resize_widget.resize();
-
-					this._resizeGrid(Math.min(this._max_rows, resize_pos.y + resize_pos.height + 2));
-				}
+				move_animation_frame = requestAnimationFrame(() => move(e.pageX, e.pageY));
 			}
 		};
 	}
