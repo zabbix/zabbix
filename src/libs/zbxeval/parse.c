@@ -1114,3 +1114,14 @@ int	zbx_eval_status(const zbx_eval_context_t *ctx)
 {
 	return (NULL == ctx->expression ? FAIL : SUCCEED);
 }
+
+typedef struct
+{
+	char	*host;
+	char	*item;
+}
+zbx_eval_item_filter_t;
+
+int	zbx_eval_parse_filter(zbx_eval_context_t *ctx, zbx_eval_token_t *token)
+{
+}

@@ -1898,6 +1898,12 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	substitute_item_filter_macros(zbx_eval_context_t *ctx, zbx_eval_token_t *token,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **error)
+{
+
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: substitute_formula_macros                                        *
@@ -1930,42 +1936,38 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 
 		switch(token->type)
 		{
+			case ZBX_EVAL_TOKEN_ARG_QUERY:
+
+				break;
 			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 			case ZBX_EVAL_TOKEN_VAR_STR:
+				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+
+				if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err,
+						sizeof(err)))
+				{
+					*error = zbx_strdup(NULL, err);
+					zbx_free(value);
+					goto out;
+				}
 				break;
 			default:
 				continue;
 		}
 
-		value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
-
-		if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err, sizeof(err)))
-		{
-			*error = zbx_strdup(NULL, err);
-			zbx_free(value);
-			break;
-		}
 
 		zbx_variant_clear(&token->value);
 		zbx_variant_set_str(&token->value, value);
 	}
 
-	if (i == ctx.stack.values_num)
-	{
-		/* checked all tokens, success */
-		zbx_eval_compose_expression(&ctx, &exp);
+	zbx_eval_compose_expression(&ctx, &exp);
 
-		zbx_free(*data);
-		*data = exp;
-		ret = SUCCEED;
-	}
-	else
-	{
-		/* aborted loop because of an error */
-		zbx_free(exp);
-	}
-
+	zbx_free(*data);
+	*data = exp;
+	exp = NULL;
+clean:
+	zbx_free(exp);
 	zbx_eval_clear(&ctx);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() formula:%s", __func__, *data);

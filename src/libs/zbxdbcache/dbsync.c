@@ -1725,7 +1725,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[11], calcitem->params))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_serialized_expression(dbrow[51], calcitem->formula_bin))
+		if (FAIL == dbsync_compare_serialized_expression(dbrow[50], calcitem->formula_bin))
 			return FAIL;
 	}
 	else if (NULL != calcitem)
@@ -1900,7 +1900,7 @@ static char	**dbsync_item_preproc_row(char **row)
 			}
 		}
 
-		row[51] = encode_expression(&ctx);
+		row[50] = encode_expression(&ctx);
 		zbx_eval_clear(&ctx);
 	}
 
@@ -1951,7 +1951,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 52, dbsync_item_preproc_row);
+	dbsync_prepare(sync, 51, dbsync_item_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
