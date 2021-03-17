@@ -1994,7 +1994,7 @@ static char	*dbpatch_formula_to_expression(const char *calchost, zbx_uint64_t it
 		if (SUCCEED != dbpatch_is_time_function(ptr + pos, par_l - pos))
 		{
 			char	*arg0, *host = NULL, *key = NULL;
-			int ret;
+			int	ret;
 
 			zbx_function_param_parse(ptr + par_l + 1, &param_pos, &param_len, &sep_pos);
 
@@ -2013,7 +2013,11 @@ static char	*dbpatch_formula_to_expression(const char *calchost, zbx_uint64_t it
 			func->itemid = itemid;
 			func->name = zbx_substr(ptr, pos, par_l - 1);
 			func->flags = 0;
-			func->value_type = dbpatch_get_hostkey_valuetype((NULL == host ? calchost : host), key);
+
+			if (0 == strncmp(ptr + pos, "count", par_l - pos))
+				func->value_type = dbpatch_get_hostkey_valuetype((NULL == host ? calchost : host), key);
+			else
+				func->value_type = ITEM_VALUE_TYPE_TEXT;
 
 			func->arg0 = zbx_dsprintf(NULL, "/%s/%s", ZBX_NULL2EMPTY_STR(host), key);
 			zbx_free(host);
