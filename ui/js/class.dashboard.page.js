@@ -173,7 +173,7 @@ class CDashboardPage extends CBaseComponent {
 
 		if (this._is_edit_mode) {
 			let min_height = window.innerHeight - document.querySelector('.wrapper > footer').clientHeight
-				- this._dashboard_grid.offsetTop;
+				- this._dashboard_grid.getBoundingClientRect().top;
 
 			let element = this._dashboard_grid;
 
