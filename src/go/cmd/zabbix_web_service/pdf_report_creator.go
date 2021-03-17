@@ -22,10 +22,12 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -106,15 +108,21 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	u, err := parseUrl(req.URL)
+	if err != nil {
+		logAndWriteError(w, fmt.Sprintf("Incorrect request url: %s", err.Error()), http.StatusBadRequest)
+		return
+	}
+
 	log.Tracef(
 		"making chrome headless request with parameters url: %s, width: %s, height: %s for report request from %s",
-		req.URL, req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
+		u.String(), req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
 
 	var buf []byte
 
 	if err = chromedp.Run(ctx, chromedp.Tasks{
 		network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
-		navigateAndWaitFor(req.URL, "networkIdle"),
+		navigateAndWaitFor(u.String(), "networkIdle"),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
@@ -186,4 +194,21 @@ func waitFor(ctx context.Context, eventName string) error {
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+}
+
+func parseUrl(u string) (*url.URL, error) {
+	if u == "" {
+		return nil, errors.New("url is empty")
+	}
+
+	parsed, err := url.Parse(u)
+	if err != nil {
+		return nil, err
+	}
+
+	if parsed.Scheme == "" {
+		return nil, errors.New("url is missing scheme")
+	}
+
+	return parsed, nil
 }
