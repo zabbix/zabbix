@@ -47,7 +47,7 @@ void	zbx_eval_parse_query(const char *str, size_t len, zbx_item_query_t *query)
 	}
 
 	if (ptr != key)
-		query->host = zbx_substr(ptr, 0, key - ptr);
+		query->host = zbx_substr(ptr, 0, key - ptr - 1);
 	else
 		query->host = NULL;
 
