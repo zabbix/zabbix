@@ -39,13 +39,19 @@ if (array_key_exists('no_data', $data)) {
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.dashboard.js');
-$this->addJsFile('class.dashboard.loader.js');
 $this->addJsFile('class.dashboard.page.js');
-$this->addJsFile('class.dashboard.widget.js');
 $this->addJsFile('class.dashboard.widget.iterator.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
+$this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.clock.js');
+$this->addJsFile('class.widget.graph.js');
+$this->addJsFile('class.widget.map.js');
+$this->addJsFile('class.widget.navtree.js');
+$this->addJsFile('class.widget.problems.js');
+$this->addJsFile('class.widget.problemsbysv.js');
+$this->addJsFile('class.widget.svggraph.js');
+$this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.cclock.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.host.dashboard.view.js.php');

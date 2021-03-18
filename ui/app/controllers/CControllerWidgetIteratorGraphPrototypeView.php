@@ -267,7 +267,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 			$children[] = [
 				'widgetid' => (string) $itemid,
-				'type' => 'graph',
+				'type' => WIDGET_GRAPH,
 				'header' => $name,
 				'fields' => $child_fields,
 				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $this->getInput('view_mode'))

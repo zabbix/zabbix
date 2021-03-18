@@ -280,8 +280,7 @@ function getMenuPopupMapElementSubmap(options) {
 		submap_url;
 
 	if (typeof options.widget_uniqueid !== 'undefined') {
-		submap_url = new Curl('javascript: navigateToSubmap(' + options.sysmapid +
-			', "' + options.widget_uniqueid + '");', false);
+		submap_url = new Curl('javascript: navigateToSubmap(' + options.sysmapid + ', false);');
 	}
 	else {
 		if (!options.allowed_ui_maps) {
@@ -439,226 +438,20 @@ function getMenuPopupMapElementImage(options) {
 }
 
 /**
- * Get menu popup refresh section data.
- *
- * @param {integer}  options['widgetid']	 Widget ID.
- * @param {string}   options['widgetName']   Widget name.
- * @param {string}   options['currentRate']  Current rate value.
- * @param {bool}     options['multiplier']   Multiplier or time mode.
- * @param {array}    options['params']       Url parameters (optional).
- * @param {callback} options['callback']     Callback function on success (optional).
- * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
- *
- * @return array
- */
-function getMenuPopupRefresh(options, trigger_elmnt) {
-	var items = [],
-		params = (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
-		intervals = options.multiplier
-			? {
-				'x0.25': 'x0.25',
-				'x0.5': 'x0.5',
-				'x1': 'x1',
-				'x1.5': 'x1.5',
-				'x2': 'x2',
-				'x3': 'x3',
-				'x4': 'x4',
-				'x5': 'x5'
-			}
-			: {
-				0: t('No refresh'),
-				10: t('10 seconds'),
-				30: t('30 seconds'),
-				60: t('1 minute'),
-				120: t('2 minutes'),
-				600: t('10 minutes'),
-				900: t('15 minutes')
-			};
-
-	jQuery.each(intervals, function(value, label) {
-		var item = {
-			label: label,
-			data: {
-				value: value
-			},
-			clickCallback: function() {
-				var $obj = jQuery(this),
-					currentRate = $obj.data('value');
-
-				// it is a quick solution for slide refresh multiplier, should be replaced with slide.refresh or similar
-				if (options.multiplier) {
-					sendAjaxData('slides.php', {
-						data: jQuery.extend({}, params, {
-							widgetName: options.widgetName,
-							widgetRefreshRate: currentRate
-						}),
-						dataType: 'script',
-						success: function() {
-							// Set new refresh rate as current in slideshow controls.
-							trigger_elmnt.data('menu-popup').data.currentRate = currentRate;
-						}
-					});
-
-					jQuery('a', $obj.closest('.menu-popup')).each(function() {
-						var link = jQuery(this);
-
-						if (link.data('value') == currentRate) {
-							link
-								.addClass('selected')
-								.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
-						}
-						else {
-							link
-								.removeClass('selected')
-								.attr('aria-label', link.data('aria-label'));
-						}
-					});
-
-					$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
-				}
-				else {
-					var url = new Curl('zabbix.php');
-					url.setArgument('action', 'dashboard.widget.rfrate');
-
-					jQuery.ajax({
-						url: url.getUrl(),
-						method: 'POST',
-						dataType: 'json',
-						data: {
-							'widgetid': options.widgetid,
-							'rf_rate': currentRate
-						}
-					})
-						.then(function() {
-							jQuery('a', $obj.closest('.menu-popup')).each(function() {
-								var link = jQuery(this);
-
-								if (link.data('value') == currentRate) {
-									link
-										.addClass('selected')
-										.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
-								}
-								else {
-									link
-										.removeClass('selected')
-										.attr('aria-label', link.data('aria-label'));
-								}
-							});
-
-							// Set new refresh rate as current in widget controls.
-							trigger_elmnt.data('menu-popup').data.currentRate = currentRate;
-
-							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
-
-							ZABBIX.Dashboard.setWidgetRefreshRate(options.widgetid, parseInt(currentRate));
-						})
-						.fail(function() {
-							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
-							// TODO: gentle message about failed saving of widget refresh rate
-						});
-				}
-			}
-		};
-
-		if (value == options.currentRate) {
-			item.selected = true;
-		}
-
-		items[items.length] = item;
-	});
-
-	return [{
-		label: options.multiplier ? t('Refresh interval multiplier') : t('Refresh interval'),
-		items: items
-	}];
-}
-
-/**
  * Get menu popup widget actions data.
  *
- * @param {string}   options['currentRate']      Current rate value.
- * @param {bool}     options['multiplier']       Multiplier or time mode.
- * @param {callback} options['callback']         Callback function on success (optional).
- * @param {string}   options['widget_uniqueid']  Widget instance unique id.
- * @param {object}   trigger_elmnt               UI element which triggered opening of overlay dialogue.
+ * @param {string}   options['dashboard_page_unique_id']  Dashboard page unique_id.
+ * @param {bool}     options['unique_id']                 Widget unique_id.
  *
  * @return array
  */
-function getMenuPopupWidgetActions(options, trigger_elmnt) {
-	var dashboard_data = ZABBIX.Dashboard.getDashboardData(),
-		editMode = ZABBIX.Dashboard.isEditMode(),
-		widget = ZABBIX.Dashboard.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
-		widgetid = widget.widgetid,
-		loading = (!widget.isReady() || widget.content_body.find('.is-loading').length > 0),
-		widget_actions = [],
-		menu;
-
-	options.widgetid = widgetid;
-	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt);
-
-	// Do not show "Copy" action for host dashboards.
-	if (ZABBIX.Dashboard.getOptions()['allowed_edit']
-			&& (dashboard_data.dashboard.templateid === null || dashboard_data.dashboard.dynamic_hostid === null)) {
-		widget_actions.push({
-			label: t('S_COPY'),
-			clickCallback: function() {
-				ZABBIX.Dashboard.copyWidget(widget);
-				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			}
+function getMenuPopupWidgetActions(options) {
+	return ZABBIX.Dashboard
+		.getDashboardPage(options.dashboard_page_unique_id)
+		.getWidget(options.unique_id)
+		.getActionsMenu({
+			can_paste_widget: (ZABBIX.Dashboard.getStoredWidgetCopy() !== null)
 		});
-	}
-
-	if (editMode) {
-		widget_actions.push({
-			label: t('S_PASTE'),
-			disabled: (ZABBIX.Dashboard.getCopiedWidget() === null),
-			clickCallback: function() {
-				ZABBIX.Dashboard.pasteWidget(widget, widget.pos);
-				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			}
-		});
-
-		widget_actions.push({
-			label: t('Delete'),
-			clickCallback: function() {
-				ZABBIX.Dashboard.deleteWidget(widget);
-				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			}
-		});
-	}
-
-	if ('download' in options && !editMode) {
-		widget_actions.push({
-			label: t('Download image'),
-			disabled: loading || !options.download,
-			clickCallback: function() {
-				var svg = widget['content_body'].find('svg').first();
-
-				if (svg.length) {
-					downloadSvgImage(svg, 'graph.png');
-				}
-				else {
-					downloadPngImage(widget['content_body'].find('img').first(), 'graph.png');
-				}
-
-				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			},
-			refreshCallback: function(widget) {
-				if (widget['widgetid'] == widgetid && options.download) {
-					this.disabled = !widget.isReady();
-				}
-			}
-		});
-	}
-
-	if (widget_actions.length) {
-		menu.unshift({
-			label: t('Actions'),
-			items: widget_actions
-		});
-	}
-
-	return menu;
 }
 
 /**

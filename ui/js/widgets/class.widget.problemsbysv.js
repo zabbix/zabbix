@@ -18,15 +18,25 @@
 **/
 
 
-class CDashboardLoader {
+class CWidgetProblemsBySv extends CWidget {
 
-	constructor() {
-		this._cache = {};
+	_registerEvents() {
+		super._registerEvents();
+
+		this._events = {
+			...this._events,
+
+			acknowledgeCreated: (e, response, overlay) => {
+				refreshWidgetOnAcknowledgeCreate('problemsbysv', response, overlay);
+			}
+		}
+
+		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	getContent(key) {
-		if (this._cache[key] !== undefined) {
+	_unregisterEvents() {
+		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 
-		}
+		super._unregisterEvents();
 	}
 }

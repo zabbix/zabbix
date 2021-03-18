@@ -138,10 +138,6 @@ jQuery(function($) {
 				sections = getMenuPopupMapElementImage(data);
 				break;
 
-			case 'refresh':
-				sections = getMenuPopupRefresh(data, $obj);
-				break;
-
 			case 'trigger':
 				sections = getMenuPopupTrigger(data, $obj);
 				break;
@@ -171,7 +167,7 @@ jQuery(function($) {
 				break;
 
 			case 'widget_actions':
-				sections = getMenuPopupWidgetActions(data, $obj);
+				sections = getMenuPopupWidgetActions(data);
 				break;
 
 			default:
@@ -215,6 +211,7 @@ jQuery(function($) {
 			case 'dashboard':
 			case 'dropdown':
 			case 'submenu':
+			case 'widget_actions':
 				return false;
 
 			default:
@@ -350,9 +347,9 @@ jQuery(function($) {
 			$('#' + data.parentId).multiSelect('addData', items);
 		}
 		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
-				&& typeof addPopupValues !== 'undefined') {
+				&& typeof window.addPopupValues !== 'undefined') {
 			// execute function if they exist
-			addPopupValues(data);
+			window.addPopupValues(data);
 		}
 		else {
 			$('#' + data.parentId).val(data.values[0].name);

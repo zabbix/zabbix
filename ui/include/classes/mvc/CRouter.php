@@ -81,6 +81,8 @@ class CRouter {
 		'correlation.update'				=> ['CControllerCorrelationUpdate',					null,					null],
 		'dashboard.delete'					=> ['CControllerDashboardDelete',					null,					null],
 		'dashboard.list'					=> ['CControllerDashboardList',						'layout.htmlpage',		'monitoring.dashboard.list'],
+		'dashboard.page.properties.check'	=> ['CControllerDashboardPagePropertiesCheck',		'layout.json',			null],
+		'dashboard.page.properties.edit'	=> ['CControllerDashboardPagePropertiesEdit',		'layout.json',			'dashboard.page.properties.edit'],
 		'dashboard.properties.check'		=> ['CControllerDashboardPropertiesCheck',			'layout.json',			null],
 		'dashboard.properties.edit'			=> ['CControllerDashboardPropertiesEdit',			'layout.json',			'dashboard.properties.edit'],
 		'dashboard.share.edit'				=> ['CControllerDashboardShareEdit',				'layout.json',			'dashboard.share.edit'],

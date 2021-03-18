@@ -32,11 +32,18 @@ if (array_key_exists('error', $data)) {
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.dashboard.js');
-$this->addJsFile('class.dashboard.loader.js');
 $this->addJsFile('class.dashboard.page.js');
-$this->addJsFile('class.dashboard.widget.js');
 $this->addJsFile('class.dashboard.widget.iterator.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
+$this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.clock.js');
+$this->addJsFile('class.widget.graph.js');
+$this->addJsFile('class.widget.map.js');
+$this->addJsFile('class.widget.navtree.js');
+$this->addJsFile('class.widget.problems.js');
+$this->addJsFile('class.widget.problemsbysv.js');
+$this->addJsFile('class.widget.svggraph.js');
+$this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
@@ -45,10 +52,7 @@ $this->addJsFile('class.cverticalaccordion.js');
 $this->addJsFile('class.crangecontrol.js');
 $this->addJsFile('colorpicker.js');
 $this->addJsFile('class.csvggraph.js');
-$this->addJsFile('csvggraphwidget.js');
-$this->addJsFile('class.cclock.js');
 $this->addJsFile('class.cnavtree.js');
-$this->addJsFile('class.mapWidget.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tab-indicators.js');
@@ -100,7 +104,7 @@ $widget = (new CWidget())
 				(new CList())
 					->addItem(
 						(new CButton('dashbrd-edit', _('Edit dashboard')))
-							->setEnabled($data['dashboard']['allowed_edit'] && $data['dashboard']['editable'])
+							->setEnabled($data['dashboard']['can_edit_dashboards'] && $data['dashboard']['editable'])
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
@@ -108,7 +112,7 @@ $widget = (new CWidget())
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashbrd-actions')
 							->setTitle(_('Actions'))
-							->setEnabled($data['dashboard']['allowed_edit'])
+							->setEnabled($data['dashboard']['can_edit_dashboards'])
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
 								$data['dashboard']['editable']
@@ -162,32 +166,44 @@ if ($data['time_selector'] !== null) {
 	);
 }
 
-$widget
-	->addItem(
+$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBRD);
+
+if (count($data['dashboard']['pages']) > 1) {
+	$dashboard->addClass(ZBX_STYLE_DASHBRD_IS_MULTIPAGE);
+}
+if ($data['dashboard']['dashboardid'] === null) {
+	$dashboard->addClass(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+}
+
+if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+	$dashboard->addItem(
 		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBRD)
+			->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
 			->addItem(
 				(new CDiv())
-					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
-					->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
-					->addItem(
-						(new CDiv())
-							->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
-							->addItem([
-								(new CSimpleButton())
-									->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
-									->addClass('btn-iterator-page-previous')
-									->setEnabled(false),
-								(new CSimpleButton())
-									->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
-									->addClass('btn-iterator-page-next')
-									->setEnabled(false),
-								(new CSimpleButton('Start slideshow'))->addClass(ZBX_STYLE_BTN_ALT)
-							])
-					)
+					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+					->addItem([
+						(new CSimpleButton())
+							->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+							->addClass('btn-iterator-page-previous')
+							->setEnabled(false),
+						(new CSimpleButton())
+							->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+							->addClass('btn-iterator-page-next')
+							->setEnabled(false),
+						(new CSimpleButton('Start slideshow'))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->addClass(ZBX_STYLE_DASHBRD_TOGGLE_SLIDESHOW)
+					])
 			)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
-	)
+	);
+}
+
+$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID));
+
+$widget
+	->addItem($dashboard)
 	->show();
 
 (new CScriptTag(

@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerDashboardPropertiesCheck extends CController {
+class CControllerDashboardPagePropertiesEdit extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -27,25 +27,22 @@ class CControllerDashboardPropertiesCheck extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'template' => 'in 1',
-			'userid' => 'db users.userid',
-			'name' => 'required|db dashboard.name|not_empty',
-			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
-			'auto_start' => 'in 1'
+			'name' => 'db dashboard_page.name',
+			'dashboard_display_period' => 'required|db dashboard.display_period|in '.
+				implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'display_period' => 'db dashboard_page.display_period|in '.
+				implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS)),
+			'unique_id' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
 
-		if (!$this->hasInput('template') && !$this->hasInput('userid')) {
-			error(_s('Field "%1$s" is mandatory.', 'userid'));
-
-			$ret = false;
-		}
-
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData([
-				'main_block' => json_encode(['errors' => getMessages()->toString()])
-			]));
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -62,8 +59,22 @@ class CControllerDashboardPropertiesCheck extends CController {
 	}
 
 	protected function doAction() {
-		$data = [];
+		$data = [
+			'dashboard' => [
+				'display_period' => (int) $this->getInput('dashboard_display_period')
+			],
+			'dashboard_page' => [
+				'name' => $this->getInput('name', DB::getDefault('dashboard_page', 'name')),
+				'display_period' => (int) $this->getInput('display_period',
+					DB::getDefault('dashboard_page', 'display_period')
+				),
+				'unique_id' => $this->hasInput('unique_id') ? $this->getInput('unique_id') : null,
+			],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

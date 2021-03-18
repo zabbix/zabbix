@@ -86,7 +86,7 @@ class CControllerDashboardView extends CController {
 			return;
 		}
 
-		$dashboard['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashbrd.filter',

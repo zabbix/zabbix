@@ -27,8 +27,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$this->setType(WIDGET_GRAPH);
 		$this->setValidationRules([
 			'name' => 'string',
-			'uniqueid' => 'required|string',
-			'initial_load' => 'in 0,1',
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'fields' => 'json',
@@ -41,19 +39,16 @@ class CControllerWidgetGraphView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
 		$width = (int) $this->getInput('content_width', 100);
 		$height = (int) $this->getInput('content_height', 100);
 
-		$dataid = 'graph_'.$uniqueid;
-		$containerid = 'graph_container_'.$uniqueid;
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 		$resourceid = null;
 		$profileIdx = 'web.dashbrd.filter';
 		$profileIdx2 = $this->getInput('dashboardid', 0);
-		$unavailable_object = false;
+		$is_resource_available = true;
 		$header_label = $this->getDefaultHeader();
 
 		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $fields['graphid']) {
@@ -76,25 +71,19 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		}
 		$graph_dims['shiftYtop'] = CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;
 
-		$timeline = getTimeSelectorPeriod([
-			'profileIdx' => $profileIdx,
-			'profileIdx2' => $profileIdx2
-		]);
-
 		$time_control_data = [
-			'id' => $dataid,
-			'containerid' => $containerid,
+			'id' => '',
+			'containerid' => '',
 			'objDims' => $graph_dims,
 			'loadSBox' => 0,
 			'loadImage' => 1,
 			'reloadOnAdd' => 1
 		];
 
-		// Data for flickerscreen.
-		$fs_data = [
-			'id' => $dataid,
+		$flickerfreescreen_data = [
+			'id' => '',
 			'interval' => CWebUser::getRefresh(),
-			'timeline' => $timeline,
+			'timeline' => [],
 			'resourcetype' => $resource_type,
 			'profileIdx' => $profileIdx,
 			'profileIdx2' => $profileIdx2
@@ -128,7 +117,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$resourceid = $items ? $item['itemid'] : null;
 
 				if ($resourceid === null) {
-					$unavailable_object = true;
+					$is_resource_available = false;
 				}
 			}
 			// Find requested host and change graph details.
@@ -201,17 +190,17 @@ class CControllerWidgetGraphView extends CControllerWidget {
 						$graph['name'] = CMacrosResolverHelper::resolveGraphName($graph['name'], $new_dynamic);
 					}
 					else {
-						$unavailable_object = true;
+						$is_resource_available = false;
 					}
 				}
 				else {
-					$unavailable_object = true;
+					$is_resource_available = false;
 				}
 			}
 		}
 		else {
 			if (!$resourceid) {
-				$unavailable_object = true;
+				$is_resource_available = false;
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$items = API::Item()->get([
@@ -224,7 +213,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$item = reset($items);
 
 				if (!$item) {
-					$unavailable_object = true;
+					$is_resource_available = false;
 				}
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
@@ -238,12 +227,12 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				$graph = reset($graph);
 
 				if (!$graph) {
-					$unavailable_object = true;
+					$is_resource_available = false;
 				}
 			}
 		}
 
-		if (!$unavailable_object) {
+		if ($is_resource_available) {
 			// Build graph action and data source links.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				if (!$edit_mode) {
@@ -262,8 +251,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 
 				$graph_src
-					->setArgument('from', $timeline['from'])
-					->setArgument('to', $timeline['to']);
+					->setArgument('from', '')
+					->setArgument('to', '');
 
 				$item = CMacrosResolverHelper::resolveItemNames([$item])[0];
 
@@ -336,8 +325,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					->setArgument('width', $width)
 					->setArgument('height', $height)
 					->setArgument('legend', ($fields['show_legend'] && $graph['show_legend']) ? 1 : 0)
-					->setArgument('from', $timeline['from'])
-					->setArgument('to', $timeline['to']);
+					->setArgument('from', '')
+					->setArgument('to', '');
 			}
 
 			$graph_src
@@ -352,7 +341,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$time_control_data['src'] = $graph_src->getUrl();
 
 			if ($edit_mode || ($is_template_dashboard && !$this->hasInput('dynamic_hostid'))) {
-				$item_graph_url = null;
+				$graph_url = null;
 			}
 			else {
 				if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
@@ -380,27 +369,27 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					}
 
 					if ($resourceid !== null) {
-						$item_graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
+						$graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
 							? (new CUrl('zabbix.php'))
 								->setArgument('action', 'charts.view')
 								->setArgument('view_as', HISTORY_GRAPH)
 								->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 								->setArgument('filter_graphids', [$resourceid])
 								->setArgument('filter_set', '1')
-								->setArgument('from', $timeline['from'])
-								->setArgument('to', $timeline['to'])
+								->setArgument('from', '')
+								->setArgument('to', '')
 							: null;
 					}
 					else {
-						$item_graph_url = null;
+						$graph_url = null;
 					}
 				}
 				else {
-					$item_graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+					$graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 						? (new CUrl('history.php'))
 							->setArgument('itemids', [$resourceid])
-							->setArgument('from', $timeline['from'])
-							->setArgument('to', $timeline['to'])
+							->setArgument('from', '')
+							->setArgument('to', '')
 						: null;
 				}
 			}
@@ -408,19 +397,12 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 		$response = [
 			'name' => $this->getInput('name', $header_label),
-			'graph' => [
-				'dataid' => $dataid,
-				'containerid' => $containerid,
-				'unavailable_object' => $unavailable_object
-			],
-			'item_graph_url' => $unavailable_object ? null : $item_graph_url,
+			'is_resource_available' => $is_resource_available,
 			'widget' => [
-				'uniqueid' => $uniqueid,
-				'initial_load' => (int) $this->getInput('initial_load', 0)
+				'graph_url' => ($is_resource_available && $graph_url !== null) ? $graph_url->getUrl() : null,
+				'time_control_data' => $time_control_data,
+				'flickerfreescreen_data' => $flickerfreescreen_data
 			],
-			'time_control_data' => $time_control_data,
-			'timeline' => $timeline,
-			'fs_data' => $fs_data,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

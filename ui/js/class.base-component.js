@@ -62,8 +62,7 @@ class CBaseComponent {
 		return this;
 	}
 
-	fire(type, options = {}) {
-		this._target.dispatchEvent(new CustomEvent(type, {detail: {target: this, ...options}}));
-		return this;
+	fire(type, detail = {}, options = {}) {
+		return this._target.dispatchEvent(new CustomEvent(type, {...options, detail: {target: this, ...detail}}));
 	}
 }

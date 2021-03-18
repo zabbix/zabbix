@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -15,38 +14,29 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
-/**
- * @var CView $this
- */
+class CWidgetTrigerOver extends CWidget {
 
-$output = [
-	'body' => $data['svg']
-];
+	_registerEvents() {
+		super._registerEvents();
 
-if (!$data['preview']) {
-	$output += [
-		'header' => $data['name'],
-		'svg_options' => $data['svg_options']
-	];
+		this._events = {
+			...this._events,
 
-	if ($data['info'] !== null) {
-		$output += [
-			'info' => $data['info']
-		];
+			acknowledgeCreated: (e, response, overlay) => {
+				refreshWidgetOnAcknowledgeCreate('trigover', response, overlay);
+			}
+		}
+
+		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
+	}
+
+	_unregisterEvents() {
+		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
+
+		super._unregisterEvents();
 	}
 }
-
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
-}
-
-if (!$data['preview'] && $data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output);

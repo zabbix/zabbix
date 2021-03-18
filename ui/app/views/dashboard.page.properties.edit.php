@@ -25,81 +25,52 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->setName('dashboard_properties_form')
+	->setName('dashboard_page_properties_form')
 	->addItem(getMessages());
 
 // Submit button is needed to enable submit event on Enter on inputs.
-$form->addItem((new CInput('submit', 'dashboard_properties_submit'))->addStyle('display: none;'));
+$form->addItem((new CInput('submit', 'dashboard_page_properties_submit'))->addStyle('display: none;'));
 
 $form_list = new CFormList();
 
-$script_inline = '';
-
-if (!$data['dashboard']['template']) {
-	$owner_select = (new CMultiSelect([
-		'name' => 'userid',
-		'object_name' => 'users',
-		'data' => [$data['dashboard']['owner']],
-		'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
-		'multiple' => false,
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'users',
-				'srcfld1' => 'userid',
-				'srcfld2' => 'fullname',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'userid'
-			]
-		]
-	]))
+$form_list->addRow(new CLabel(_('Name'), 'name'),
+	(new CTextBox('name', $data['dashboard_page']['name'], false, DB::getFieldLength('dashboard_page', 'name')))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired();
-
-	$form_list->addRow((new CLabel(_('Owner'), 'userid_ms'))->setAsteriskMark(), $owner_select);
-
-	$script_inline .= $owner_select->getPostJS();
-}
-
-$form_list->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-	(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired()
 		->setAttribute('autofocus', 'autofocus')
 );
 
 $display_period_select = (new CSelect('display_period'))
-	->setValue($data['dashboard']['display_period'])
+	->setValue($data['dashboard_page']['display_period'])
 	->setFocusableElementId('display_period')
 	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+$display_period_select->addOption(
+	new CSelectOption(0, _s('Default (%1$s)', secondsToPeriod($data['dashboard']['display_period'])))
+);
 
 foreach (DASHBOARD_DISPLAY_PERIODS as $period) {
 	$display_period_select->addOption(new CSelectOption($period, secondsToPeriod($period)));
 }
 
-$form_list->addRow(new CLabel(_('Default page display period'), 'display_period'), $display_period_select);
-
-$form_list->addRow(new CLabel(_('Auto start slideshow'), 'auto_start'),
-	(new CCheckBox('auto_start'))->setChecked($data['dashboard']['auto_start'] == 1)
-);
+$form_list->addRow(new CLabel(_('Page display period'), 'display_period'), $display_period_select);
 
 $form->addItem($form_list);
 
 $output = [
-	'header' => _('Dashboard properties'),
+	'header' => _('Dashboard page properties'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => _('Apply'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'ZABBIX.Dashboard.applyProperties();'
+			'action' => 'ZABBIX.Dashboard.applyDashboardPageProperties();'
 		]
+	],
+	'data' => [
+		'unique_id' => $data['dashboard_page']['unique_id']
 	]
 ];
-
-if ($script_inline !== '') {
-	$output['script_inline'] = $script_inline;
-}
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();

@@ -18,8 +18,10 @@
 **/
 
 
-const WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK = 'iterator-previous-page-click';
-const WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK     = 'iterator-next-page-click';
+
+
+const WIDGET_ITERATOR_EVENT_PREVIOUS_PAGE_CLICK = 'iterator-previous-page-click';
+const WIDGET_ITERATOR_EVENT_NEXT_PAGE_CLICK     = 'iterator-next-page-click';
 
 class CDashboardWidgetIterator extends CDashboardWidget {
 
@@ -55,6 +57,14 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		}
 	}
 
+	deactivate() {
+		super.deactivate();
+
+		for (const child of this.children) {
+			child.deactivate();
+		}
+	}
+
 	getViewMode() {
 		return this.view_mode;
 	}
@@ -73,23 +83,6 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 
 			this.div.toggleClass(this._css_classes.hidden_header, view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
 		}
-
-		return this;
-	}
-
-	getChildren() {
-		return this.children;
-	}
-
-	setChildren(children) {
-		this.children = children;
-
-		return this;
-	}
-
-	addChild(child) {
-		this.children.push(child);
-		this.content_body.append(child.getView());
 
 		return this;
 	}
@@ -119,13 +112,23 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 
 		for (const child of this.children) {
 			if (child.div.is(':hover')) {
-
 				child_hovered = child;
 			}
 		}
 
 		if (child_hovered !== null) {
-			child_hovered.enterIteratorWidget();
+			this.enterChild(child_hovered);
+		}
+	}
+
+	/**
+	 * Focus specified child widget of iterator.
+	 */
+	enterChild(child) {
+		child.enter();
+
+		if (this.div.hasClass(this._css_classes.hidden_header)) {
+			this.div.toggleClass('iterator-double-header', child.div.position().top == 0);
 		}
 	}
 
@@ -135,7 +138,7 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 	leave() {
 		super.leave();
 
-		this.leaveIteratorWidgetsExcept();
+		this.leaveChildrenExcept();
 		this.div.removeClass('iterator-double-header');
 	}
 
@@ -144,13 +147,11 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 	 *
 	 * @param {object} except_child  Dashboard widget object.
 	 */
-	leaveIteratorWidgetsExcept(except_child = null) {
+	leaveChildrenExcept(except_child = null) {
 		for (const child of this.children) {
-			if (except_child !== null && child.uniqueid === except_child.uniqueid) {
-				continue;
+			if (child != except_child) {
+				child.div.removeClass(child.getCssClass('focus'));
 			}
-
-			child.div.removeClass(child.getCssClass('focus'));
 		}
 	}
 
@@ -197,8 +198,48 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		return this;
 	}
 
+	/**
+	 * Update ready state of the iterator.
+	 *
+	 * @returns {boolean}  True, if status was updated.
+	 */
+	updateReady() {
+		let is_ready_updated = false;
+
+		if (this.children.length == 0) {
+			// Set empty iterator to ready state.
+
+			is_ready_updated = !this._is_ready;
+			this._is_ready = true;
+		}
+
+		return is_ready_updated;
+	}
+
 	_makeView() {
 		super._makeView();
+
+		this.content_header.prepend(
+			$('<div>', {'class': 'dashbrd-grid-iterator-pager'})
+				.append($('<button>', {
+					'type': 'button',
+					'class': 'btn-iterator-page-previous',
+					'title': t('Previous page')
+				}))
+				.append($('<span>', {'class': 'dashbrd-grid-iterator-pager-info'}))
+				.append($('<button>', {
+					'type': 'button',
+					'class': 'btn-iterator-page-next',
+					'title': t('Next page')
+				}))
+		);
+
+		this.content_body.removeClass('no-padding');
+
+		this.container.append(
+			$('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
+				.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
+		);
 
 		this._addPlaceholders(this.getNumColumns() * this.getNumRows());
 		this.alignContents(this.pos);
@@ -296,22 +337,22 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 			...this._events,
 
 			previousPage: () => {
-				this.fire(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK);
+				this.fire(WIDGET_ITERATOR_EVENT_PREVIOUS_PAGE_CLICK);
 			},
 
 			nextPage: () => {
-				this.fire(WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK);
+				this.fire(WIDGET_ITERATOR_EVENT_NEXT_PAGE_CLICK);
 			}
 		}
 
-		this.$button_previous_page.on('click', this._events.previousPage);
-		this.$button_next_page.on('click', this._events.nextPage);
+//		this.$button_previous_page.on('click', this._events.previousPage);
+//		this.$button_next_page.on('click', this._events.nextPage);
 	}
 
 	_unregisterEvents() {
 		super._unregisterEvents();
 
-		this.$button_previous_page.off('click', this._events.previousPage);
-		this.$button_next_page.off('click', this._events.nextPage);
+//		this.$button_previous_page.off('click', this._events.previousPage);
+//		this.$button_next_page.off('click', this._events.nextPage);
 	}
 }

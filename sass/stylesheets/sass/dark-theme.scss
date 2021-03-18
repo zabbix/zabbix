@@ -257,7 +257,7 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
+.dashbrd.dashbrd-is-edit-mode {
 	.dashbrd-grid-widget {
 		&.ui-draggable-dragging {
 			&.dashbrd-grid-widget-hidden-header {

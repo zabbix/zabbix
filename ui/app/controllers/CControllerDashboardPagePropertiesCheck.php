@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerDashboardPropertiesCheck extends CController {
+class CControllerDashboardPagePropertiesCheck extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -27,20 +27,12 @@ class CControllerDashboardPropertiesCheck extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'template' => 'in 1',
-			'userid' => 'db users.userid',
-			'name' => 'required|db dashboard.name|not_empty',
-			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
-			'auto_start' => 'in 1'
+			'name' => 'required|db dashboard_page.name',
+			'display_period' => 'required|db dashboard_page.display_period|in '.
+				implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if (!$this->hasInput('template') && !$this->hasInput('userid')) {
-			error(_s('Field "%1$s" is mandatory.', 'userid'));
-
-			$ret = false;
-		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseData([

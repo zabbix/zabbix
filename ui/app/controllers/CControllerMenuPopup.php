@@ -450,32 +450,6 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
-	 * Prepare data for refresh menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['widgetName']
-	 * @param string $data['currentRate']
-	 * @param bool   $data['multiplier']   Multiplier or time mode.
-	 * @param array  $data['params']       (optional) URL parameters.
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataRefresh(array $data) {
-		$menu_data = [
-			'type' => 'refresh',
-			'widgetName' => $data['widgetName'],
-			'currentRate' => $data['currentRate'],
-			'multiplier' => (bool) $data['multiplier']
-		];
-
-		if (array_key_exists('params', $data)) {
-			$menu_data['params'] = $data['params'];
-		}
-
-		return $menu_data;
-	}
-
-	/**
 	 * Prepare data for trigger context menu popup.
 	 *
 	 * @param array  $data
@@ -666,57 +640,6 @@ class CControllerMenuPopup extends CController {
 		return ['type' => 'trigger_macro'];
 	}
 
-	/**
-	 * Prepare data for widget actions menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['widget_uniqueid']  Widget instance unique id.
-	 * @param string $data['currentRate']      Refresh rate for widget.
-	 * @param bool   $data['multiplier']       Multiplier or time mode.
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataWidgetActions(array $data) {
-		$menu_data = [
-			'type' => 'widget_actions',
-			'widget_uniqueid' => $data['widget_uniqueid'],
-			'currentRate' => $data['currentRate'],
-			'multiplier' => (bool) $data['multiplier']
-		];
-
-		if ($data['widgetType'] == WIDGET_SVG_GRAPH) {
-			$menu_data['download'] = true;
-		}
-
-		if (array_key_exists('params', $data)) {
-			$menu_data['params'] = $data['params'];
-		}
-
-		if ($data['widgetType'] == WIDGET_GRAPH) {
-			$options = [];
-
-			if (array_key_exists('dynamic_hostid', $data)) {
-				$options['hostids'] = $data['dynamic_hostid'];
-			}
-
-			if (array_key_exists('graphid', $data) && $data['graphid']) {
-				$menu_data['download'] = (bool) API::Graph()->get($options + [
-					'output' => ['graphid'],
-					'graphids' => $data['graphid']
-				]);
-			}
-			elseif (array_key_exists('itemid', $data) && $data['itemid']) {
-				$menu_data['download'] = (bool) API::Item()->get($options + [
-					'output' => ['itemid'],
-					'itemids' => $data['itemid'],
-					'webitems' => true
-				]);
-			}
-		}
-
-		return $menu_data;
-	}
-
 	protected function doAction() {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
@@ -741,20 +664,12 @@ class CControllerMenuPopup extends CController {
 				$menu_data = self::getMenuDataMapElement($data);
 				break;
 
-			case 'refresh':
-				$menu_data = self::getMenuDataRefresh($data);
-				break;
-
 			case 'trigger':
 				$menu_data = self::getMenuDataTrigger($data);
 				break;
 
 			case 'trigger_macro':
 				$menu_data = self::getMenuDataTriggerMacro();
-				break;
-
-			case 'widget_actions':
-				$menu_data = self::getMenuDataWidgetActions($data);
 				break;
 		}
 

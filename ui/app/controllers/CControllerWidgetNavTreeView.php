@@ -31,7 +31,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$this->setType(WIDGET_NAV_TREE);
 		$this->setValidationRules([
 			'name' => 'string',
-			'uniqueid' => 'required|string',
 			'widgetid' => 'db widget.widgetid',
 			'initial_load' => 'in 0,1',
 			'fields' => 'json'
@@ -461,6 +460,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$navtree_items_opened = [];
 		if ($widgetid) {
 			$navtree_items_opened = CProfile::findByIdxPattern('web.dashbrd.navtree-%.toggle', $widgetid);
+
 			// Keep only numerical value from idx key name.
 			foreach ($navtree_items_opened as &$item_opened) {
 				$item_opened = substr($item_opened, 20, -7);
@@ -471,7 +471,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'uniqueid' => $this->getInput('uniqueid'),
 			'navtree' => $fields['navtree'],
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,

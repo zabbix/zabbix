@@ -338,12 +338,6 @@ aside,
   position: relative; }
   .wrapper > [class^="msg-"] + [class^="msg-"] {
     margin-top: 0; }
-  .wrapper.layout-kioskmode main {
-    transition: margin-top .3s; }
-  .wrapper.layout-kioskmode.kiosk-slide-lines-1 main {
-    margin-top: 2rem; }
-  .wrapper.layout-kioskmode.kiosk-slide-lines-2 main {
-    margin-top: 4rem; }
   .wrapper > .debug-output {
     flex-shrink: 0; }
   .wrapper > output {
@@ -673,10 +667,6 @@ footer {
     .dashbrd-edit ul li .btn-dashbrd-conf {
       vertical-align: middle; }
 
-.dashbrd-navigation {
-  display: flex;
-  margin: 10px 0 8px 0; }
-
 .dashbrd-navigation-tabs {
   margin: -2px 10px -2px 0;
   overflow: hidden; }
@@ -701,6 +691,8 @@ footer {
     list-style-type: none;
     outline: none; }
     .dashbrd-navigation-tabs .csortable-item > div {
+      display: flex;
+      align-items: center;
       min-height: 22px;
       line-height: 22px;
       box-sizing: border-box;
@@ -714,6 +706,10 @@ footer {
       border: 1px solid #444444;
       border-radius: 2px;
       transition: background-color 0.3s, border-color 0.3s; }
+      .dashbrd-navigation-tabs .csortable-item > div button {
+        margin: 0 -8px 0 4px; }
+      .dashbrd-navigation-tabs .csortable-item > div:not(.selected-tab) button {
+        display: none; }
   .dashbrd-navigation-tabs .csortable > .csortable-item > div, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div:hover {
     background: #e8f5ff;
     border: 1px solid white; }
@@ -731,10 +727,28 @@ footer {
       display: none;
       margin: 0; }
 
+.dashbrd-navigation {
+  display: flex;
+  margin-top: 10px;
+  padding-bottom: 4px; }
+  .dashbrd-navigation.is-scrollable .dashbrd-navigation-controls button.dashbrd-previous-page, .dashbrd-navigation.is-scrollable .dashbrd-navigation-controls button.dashbrd-next-page {
+    display: inline-block; }
+
 .dashbrd-grid-container {
   position: relative;
-  margin: -4px;
+  margin: 0 -4px -4px -4px;
   z-index: 3; }
+
+.dashbrd:not(.dashbrd-is-multipage):not(.dashbrd-is-edit-mode) .dashbrd-navigation {
+  display: none; }
+.dashbrd.dashbrd-is-edit-mode .dashbrd-toggle-slideshow, .dashbrd:not(.dashbrd-is-multipage) .dashbrd-toggle-slideshow {
+  display: none; }
+.dashbrd.dashbrd-is-multipage .dashbrd-grid-container, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-container {
+  transition: margin-top .3s; }
+  .dashbrd.dashbrd-is-multipage .dashbrd-grid-container.reserve-header-lines-1, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-container.reserve-header-lines-1 {
+    margin-top: 2rem; }
+  .dashbrd.dashbrd-is-multipage .dashbrd-grid-container.reserve-header-lines-2, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-container.reserve-header-lines-2 {
+    margin-top: 4rem; }
 
 .dashbrd-grid-new-widget-placeholder {
   box-sizing: border-box;
@@ -1023,34 +1037,34 @@ footer {
       .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .msg-bad {
         margin: 0 10px; }
 
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-actions {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget-actions {
   opacity: 1; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode.dashbrd-positioning .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   transition: none; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-iterator.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode.dashbrd-positioning .dashbrd-grid-iterator.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   transition: none; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-widget-mask {
+.dashbrd.dashbrd-is-edit-mode.dashbrd-positioning .dashbrd-grid-widget-mask {
   display: block; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-iterator-mask {
+.dashbrd.dashbrd-is-edit-mode.dashbrd-positioning .dashbrd-grid-iterator-mask {
   display: block; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget .ui-resizable-handle {
   visibility: hidden; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.dashbrd-grid-widget-focus .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.dashbrd-grid-widget-focus .ui-resizable-handle {
   visibility: visible; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   margin-top: 0;
   height: 0;
   box-shadow: none; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging .ui-resizable-handle {
   visibility: hidden; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: .5; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging {
   z-index: 1000; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing::before, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging::before {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing::before, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging::before {
     content: '';
     display: block;
     position: absolute;
@@ -1060,32 +1074,32 @@ footer {
     bottom: .25rem;
     background-color: rgba(2, 2, 2, 0.75);
     box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-head {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-head, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-head {
     border-color: #353535; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-content, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-content {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-content, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-content {
     border-color: #353535; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .ui-resizable-handle {
   visibility: visible; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head {
   margin-top: 0;
   height: 0;
   box-shadow: none;
   opacity: 0; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .ui-resizable-handle {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .ui-resizable-handle {
   visibility: hidden; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: .5; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
   margin-top: -4rem;
   height: 4rem; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging {
   z-index: 1000; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing::before, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging::before {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing::before, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging::before {
     content: '';
     display: block;
     position: absolute;
@@ -1095,21 +1109,21 @@ footer {
     bottom: .25rem;
     background-color: rgba(2, 2, 2, 0.75);
     box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
     border-color: #353535; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head {
     border-color: #353535; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content {
     border-color: #353535; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div {
     border-color: #353535; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
     border: 1px solid #303030;
     border-top: 0; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget-placeholder {
   position: absolute;
   z-index: 999; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder > div {
+  .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget-placeholder > div {
     position: absolute;
     top: .25rem;
     left: .25rem;
@@ -3204,6 +3218,9 @@ button {
 .btn-info {
   background: #e0e0e0 url("../img/icon-sprite.svg?20200407") no-repeat -7px -403px; }
 
+.btn-dashboard-page-properties {
+  background: url("../img/icon-sprite.svg?20200407") no-repeat -318px -618px; }
+
 .btn-iterator-page-previous {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -85px -657px; }
 
@@ -3470,7 +3487,7 @@ button {
   .btn-dashbrd-normal.hidden {
     opacity: 0; }
 
-.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
+.btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   width: 24px;
   height: 24px;
   margin: 2px 2px 0 0; }
@@ -3479,13 +3496,13 @@ button {
   width: 24px;
   height: 24px; }
 
-.filter-container.tabfilter-container .icon-edit, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashbrd-conf {
+.filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashbrd-conf {
   border: 0;
   min-height: 0;
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, [disabled].btn-widget-expand, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle, [disabled].btn-dashbrd-conf, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, [disabled].btn-widget-expand:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:hover, [disabled].btn-dashbrd-conf:hover, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, [disabled].btn-widget-expand:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:focus, [disabled].btn-dashbrd-conf:focus, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, [disabled].btn-widget-expand:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:active, [disabled].btn-dashbrd-conf:active {
+  .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, [disabled].btn-widget-expand, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle, [disabled].btn-dashbrd-conf, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, [disabled].btn-widget-expand:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:hover, [disabled].btn-dashbrd-conf:hover, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, [disabled].btn-widget-expand:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:focus, [disabled].btn-dashbrd-conf:focus, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, [disabled].btn-widget-expand:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:active, [disabled].btn-dashbrd-conf:active {
     background-color: transparent;
     opacity: .25; }
 
@@ -3514,7 +3531,7 @@ z-select[disabled] button,
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
 
-.filter-container.tabfilter-container .icon-edit:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashbrd-conf:hover, .filter-container.tabfilter-container .icon-edit:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashbrd-conf:focus, .filter-container.tabfilter-container .icon-edit:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashbrd-conf:active {
+.filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashbrd-conf:hover, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashbrd-conf:focus, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashbrd-conf:active {
   background-color: transparent;
   opacity: 1; }
 
@@ -4996,10 +5013,10 @@ span.is-loading {
   cursor: move;
   cursor: grab; }
 
-.ui-draggable-dragging .drag-icon,
-.ui-draggable-dragging .dashbrd-widget-head,
-.ui-draggable-dragging .dashbrd-grid-widget-head,
-.ui-draggable-dragging .dashbrd-grid-iterator-head, .cursor-dragging {
+.ui-draggable .drag-icon,
+.ui-draggable .dashbrd-widget-head,
+.ui-draggable .dashbrd-grid-widget-head,
+.ui-draggable .dashbrd-grid-iterator-head, .cursor-dragging {
   cursor: move;
   cursor: grabbing; }
 
@@ -6237,17 +6254,17 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head {
   box-shadow: 0 -6px 8px -2px #000000; }
 
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   box-shadow: 0 -6px 8px -2px #000000; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing::before, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging::before {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-resizable-resizing::before, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget.ui-draggable-dragging::before {
   box-shadow: 0 4px 20px 2px #000000; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
   box-shadow: 0 -6px 8px -2px #000000; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing::before, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging::before {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing::before, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging::before {
   box-shadow: 0 4px 20px 2px #000000; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
   border: 0; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder > div {
+.dashbrd.dashbrd-is-edit-mode .dashbrd-grid-widget-placeholder > div {
   background-color: #1f1f1f !important; }
 
 .icon-maint {

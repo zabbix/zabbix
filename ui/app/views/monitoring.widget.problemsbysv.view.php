@@ -72,17 +72,6 @@ $output = [
 	'body' => $table->toString()
 ];
 
-if ($data['initial_load']) {
-	$output['script_inline'] =
-		'if (typeof refreshProblemsBySvWidget !== typeof(Function)) {'.
-			'function refreshProblemsBySvWidget(event, response, overlay) {'.
-				'refreshWidgetOnAcknowledgeCreate("problemsbysv", response, overlay);'.
-			'}'.
-
-			'$.subscribe("acknowledge.create", refreshProblemsBySvWidget);'.
-		'}';
-}
-
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }

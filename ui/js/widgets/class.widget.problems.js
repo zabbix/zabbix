@@ -18,22 +18,25 @@
 **/
 
 
-/**
- * Call SVG graph widget internal processes.
- *
- * @param {string} hook_name - trigger name.
- */
-function zbx_svggraph_widget_trigger(hook_name) {
-	var grid = Array.prototype.slice.call(arguments, -1),
-		grid = grid.length ? grid[0] : null;
+class CWidgetProblems extends CWidget {
 
-	switch (hook_name) {
-		case 'onResizeEnd':
-			ZABBIX.Dashboard.refreshWidget(grid.widget['uniqueid']);
-			break;
+	_registerEvents() {
+		super._registerEvents();
 
-		case 'onEditStart':
-			jQuery('svg', grid.widget['content_body']).svggraph('disableSBox');
-			break;
+		this._events = {
+			...this._events,
+
+			acknowledgeCreated: (e, response, overlay) => {
+				refreshWidgetOnAcknowledgeCreate('problems', response, overlay);
+			}
+		}
+
+		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
+	}
+
+	_unregisterEvents() {
+		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
+
+		super._unregisterEvents();
 	}
 }

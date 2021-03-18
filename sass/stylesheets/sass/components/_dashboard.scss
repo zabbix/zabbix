@@ -32,11 +32,6 @@
 	}
 }
 
-.dashbrd-navigation {
-	display: flex;
-	margin: 10px 0 8px 0;
-}
-
 .dashbrd-navigation-tabs {
 	// Compensate 2px padding of tabs.
 	margin: -2px 10px -2px 0;
@@ -77,6 +72,9 @@
 		outline: none;
 
 		& > div {
+			display: flex;
+			align-items: center;
+
 			min-height: 22px;
 			line-height: 22px;
 			box-sizing: border-box;
@@ -95,6 +93,16 @@
 
 			@if $ui-transitions {
 				transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
+			}
+
+			button {
+				margin: 0 -8px 0 4px;
+			}
+
+			&:not(.selected-tab) {
+				button {
+					display: none;
+				}
 			}
 		}
 	}
@@ -128,16 +136,65 @@
 	}
 }
 
+.dashbrd-navigation {
+	display: flex;
+	margin-top: 10px;
+	padding-bottom: 4px;
+
+	&.is-scrollable {
+		.dashbrd-navigation-controls {
+			button {
+				&.dashbrd-previous-page,
+				&.dashbrd-next-page {
+					display: inline-block;
+				}
+			}
+		}
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
 .dashbrd-grid-container {
 	position: relative;
-	margin: -4px;
+	margin: 0 -4px -4px -4px;
 
 	// For widget sliding headers to appear over the breadcrumbs.
 	z-index: 3;
+}
+
+.dashbrd {
+	&:not(.dashbrd-is-multipage):not(.dashbrd-is-edit-mode) {
+		.dashbrd-navigation {
+			display: none;
+		}
+	}
+
+	&.dashbrd-is-edit-mode,
+	&:not(.dashbrd-is-multipage) {
+		.dashbrd-toggle-slideshow {
+			display: none;
+		}
+	}
+
+	&.dashbrd-is-multipage,
+	&.dashbrd-is-edit-mode {
+		.dashbrd-grid-container {
+			&.reserve-header-lines-1 {
+				margin-top: 2rem;
+			}
+
+			&.reserve-header-lines-2 {
+				margin-top: 4rem;
+			}
+
+			@if $ui-transitions {
+				transition: margin-top .3s;
+			}
+		}
+	}
 }
 
 .dashbrd-grid-new-widget-placeholder {
@@ -599,7 +656,7 @@
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
+.dashbrd.dashbrd-is-edit-mode {
 	.dashbrd-grid-widget-actions {
 		opacity: 1;
 	}
