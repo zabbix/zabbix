@@ -26,36 +26,34 @@ class CWidgetMap extends CWidget {
 	_init() {
 		super._init();
 
-		this._filter_widget = null;
-		this._filter_widget_reference = null;
-		this._map_options = null;
+		this._map_svg = null;
 
-		this._previous_maps = new Array();
+		this._filter_widget = null;
+
+		this._previous_maps = [];
 		this._current_sysmapid = null;
 
-		this._is_map_loaded = false;
+		this._has_contents = false;
 	}
 
-	_doActivate() {
-		super._doActivate();
-	}
+	// announceWidgets(widgets) {
+	// 	super.announceWidgets(widgets);
 
-	_doDeactivate() {
-		super._doDeactivate();
-	}
+	// 	if (this._filter_widget !== null) {
+	// 		this._filter_widget.off(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+	// 	}
 
-	announceWidgets(widgets) {
-		super.announceWidgets(widgets);
+	// 	if (this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+	// 		for (const widget of widgets) {
+	// 			if (widget instanceof CWidgetNavTree
+	// 					&& widget._fields.reference === this._fields.filter_widget_reference) {
+	// 				this._filter_widget = widget;
 
-		// if (this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
-		// 	for (const widget of widgets) {
-		// 		if (widget instanceof CWidgetNavTree
-		// 				&& widget._fields.reference === this._fields.filter_widget_reference) {
-		// 			this._filter_widget = widget;
-		// 		}
-		// 	}
-		// }
-	}
+	// 				// this._filter_widget.on(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	// setConfiguration(configuration) {
 	// 	super.setConfiguration(configuration);
@@ -67,126 +65,153 @@ class CWidgetMap extends CWidget {
 	// 	this._current_sysmapid = sysmapid;
 
 	// 	if (this._state == WIDGET_STATE_ACTIVE) {
-	// 		this._startUpdating();
+	// 		// this._startUpdating();
 
 	// 		// TODO
 	// 		// ZABBIX.Dashboard.widgetDataShare(widget[0], 'current_sysmapid',
 	// 		// 	{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0}
 	// 		// );
 
-	// 		$('.menu-popup').menuPopup('close', null);
+	// 		// $('.menu-popup').menuPopup('close', null);
 	// 	}
 	// }
 
 	// navigateToSubmap(submapid, reset_previous = false) {
-	// 	if (this._current_sysmapid !== null) {
-	// 		if (reset_previous && this._previous_maps.length > 0) {
-	// 			this._previous_maps.pop();
-	// 		}
-	// 		else {
-	// 			this._previous_maps.push(this._current_sysmapid);
-	// 		}
-	// 	}
+	// 	// if (this._current_sysmapid !== null) {
+	// 	// 	if (reset_previous && this._previous_maps.length > 0) {
+	// 	// 		this._previous_maps.pop();
+	// 	// 	}
+	// 	// 	else {
+	// 	// 		this._previous_maps.push(this._current_sysmapid);
+	// 	// 	}
+	// 	// }
 
 	// 	this.navigateToMap(submapid);
 	// }
 
-	_startUpdating(delay_sec = 0) {
-		super._startUpdating(delay_sec);
+	// _getUpdateRequestData() {
+	// 	return {
+	// 		...super._getUpdateRequestData(),
+	// 		current_sysmapid: this._current_sysmapid,
+	// 		previous_maps: this._previous_maps,
+	// 		initial_load: 0
+	// 	};
+	// }
 
-		if (this._is_map_loaded) {
+	// _processUpdateResponse(response) {
+	// 	super._processUpdateResponse(response);
 
-			// const $this = $(this);
+	// 	if (response.sysmap_data !== undefined) {
+	// 		this._current_sysmapid = response.sysmap_data.current_sysmapid;
 
-			// const widget = $this.data('widget');
-			// const widget_data = $this.data('widgetData');
+	// 		const map_options = response.sysmap_data.map_options;
 
-			// if (widget._is_map_loaded && widget_data['is_refreshing'] === false) {
-			// 	widget_data['is_refreshing'] = true;
+	// 		if (map_options !== null) {
 
-			// 	const url = new Curl(widget_data['map_instance'].options.refresh);
-			// 	url.setArgument('curtime', new CDate().getTime());
-			// 	url.setArgument('uniqueid', widget.getUniqueId());
+	// 			// if (this._map_svg === null) {
+	// 			// 	this._makeSvgMap(map_options);
+	// 			// }
+	// 			// else {
+	// 			// 	this._updateSvgMap(map_options);
+	// 			// }
 
-			// 	$.ajax({
-			// 		'url': url.getUrl()
-			// 	})
-			// 		.done(function(data) {
-			// 			widget_data['is_refreshing'] = false;
-			// 			if (data.mapid > 0) {
-			// 				widget_data['map_instance'].update(data);
-			// 			}
-			// 			else {
-			// 				if (widget.getState() === WIDGET_STATE_ACTIVE) {
-			// 					widget._startUpdating();
-			// 				}
-			// 			}
-			// 		});
-			// }
+	// 			this._has_contents = true;
+	// 		}
 
-			// this._$target.zbx_mapwidget('update');
+	// 		if (response.sysmap_data.error_msg !== null) {
+	// 			// this._$content_body.append(response.sysmap_data.error_msg);
+	// 		}
+	// 	}
+	// }
 
+	// _registerEvents() {
+	// 	super._registerEvents();
 
+	// 	this._events = {
+	// 		...this._events,
 
-		}
-	}
+	// 		select: (e) => {
+	// 			if (this._current_sysmapid != e.detail.mapid) {
+	// 				this._has_contents = false;
+	// 				this._current_sysmapid = e.detail.mapid;
 
-	_processUpdateResponse(response) {
-		super._processUpdateResponse(response);
+	// 				this._startUpdating();
+	// 			}
+	// 		}
+	// 	}
+	// }
 
-		// if (response.sysmap_data !== undefined) {
-		// 	this._current_sysmapid = response.sysmap_data.current_sysmapid;
-		// 	this._filter_widget_reference = response.sysmap_data.filter_widget_reference;
-		// 	this._map_options = response.sysmap_data.map_options;
-		// 	this._is_map_loaded = true;
+	// _unregisterEvents() {
+	// 	super._unregisterEvents();
+	// }
 
-		// 	if (this._filter_widget_reference !== null) {
+	// _makeSvgMap(options) {
+	// 	options.canvas.useViewBox = true;
+	// 	options.show_timestamp = false;
+	// 	options.container = this._$content_body.get(0);
 
-		// 	}
+	// 	this._map_svg = new SVGMap(options);
+	// }
 
-		// 	if (this._map_options !== null) {
-		// 		console.log(this._map_options);
-		// 		this._$target.zbx_mapwidget(this._map_options, this);
-		// 		const widget_data = {...this._map_options};
+	// _updateSvgMap(options) {
+// const $this = $(this);
 
-		// 		this._map_options.canvas.useViewBox = true;
-		// 		this._map_options.show_timestamp = false;
-		// 		widget_data.map_instance = new SVGMap(options['map_options']);
-		// 		widget_data.is_refreshing = false;
-		// 		this._$target.data('widgetData', widget_data);
-		// 		this._$target.data('widget', this);
-		// 	}
+		// const widget = $this.data('widget');
+		// const widget_data = $this.data('widgetData');
 
-		// 	if (response.sysmap_data.error_msg !== null) {
-		// 		this._$content_body.append(response.sysmap_data.error_msg);
-		// 	}
+		// if (widget._is_map_loaded && widget_data['is_refreshing'] === false) {
+		// 	widget_data['is_refreshing'] = true;
+
+		// 	const url = new Curl(widget_data['map_instance'].options.refresh);
+		// 	url.setArgument('curtime', new CDate().getTime());
+		// 	url.setArgument('uniqueid', widget.getUniqueId());
+
+		// 	$.ajax({
+		// 		'url': url.getUrl()
+		// 	})
+		// 		.done(function(data) {
+		// 			widget_data['is_refreshing'] = false;
+		// 			if (data.mapid > 0) {
+		// 				widget_data['map_instance'].update(data);
+		// 			}
+		// 			else {
+		// 				if (widget.getState() === WIDGET_STATE_ACTIVE) {
+		// 					widget._startUpdating();
+		// 				}
+		// 			}
+		// 		});
 		// }
-	}
 
-	_registerEvents() {
-		super._registerEvents();
+		// this._$target.zbx_mapwidget('update');
 
-		// this._events = {
-		// 	...this._events,
 
-		// 	select: (e) => {
-		// 		if (this._mapid != e.detail.mapid) {
-		// 			this._current_sysmapid = e.detail.mapid;
-		// 			this._is_map_loaded = false;
-		// 		}
-		// 	}
-		// }
+// 		if (this._has_contents && !this.is_refreshing) {
+// 			this.is_refreshing = true;
 
-		// if (this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && this._filter_widget !== null) {
-		// 	this._filter_widget.on(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
-		// }
-	}
+// 			const curl = new Curl(this._map_svg.options.refresh);
+// 			curl.setArgument('curtime', new CDate().getTime());
+// console.log(curl);
+// 			// fetch(curl.getUrl(), {
+// 			// 	method: 'POST',
+// 			// 	headers: {
+// 			// 		'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+// 			// 	}
+// 			// })
+// 			// 	.then((response) => response.json())
+// 			// 	.then((response) => {
+// 			// 		if ('errors' in response) {
+// 			// 			throw {html_string: response.errors};
+// 			// 		}
 
-	_unregisterEvents() {
-		super._unregisterEvents();
+// 			// 		this._data.name = data.name;
+// 			// 		this._data.userid = this._data.templateid === null ? data.userid : null;
+// 			// 		this._data.display_period = data.display_period;
+// 			// 		this._data.auto_start = (data.auto_start === '1') ? '1' : '0';
+// 			// 	});
+// 		}
 
-		// if (this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER && this._filter_widget !== null) {
-		// 	this._filter_widget.off(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
-		// }
-	}
+
+
+
+	// }
 }

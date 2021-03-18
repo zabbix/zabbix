@@ -30,25 +30,25 @@ class CControllerWidgetMapView extends CControllerWidget {
 			'name' => 'string',
 			'initial_load' => 'in 0,1',
 			'fields' => 'json',
-			'storage' => 'array'
+			'current_sysmapid' => 'int32',
+			'previous_maps' => 'array'
 		]);
 	}
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
-		$storage = $this->getInput('storage', []);
 		$sysmap_data = null;
 		$previous_map = null;
 		$sysmapid = null;
 		$error = null;
 
 		// Get previous map.
-		if (array_key_exists('previous_maps', $storage)) {
-			$previous_map = array_filter(explode(',', $storage['previous_maps']), 'is_numeric');
+		if ($this->hasInput('previous_maps')) {
+			$previous_maps = array_filter(explode(',', $this->getInput('previous_maps')), 'is_numeric');
 
-			if ($previous_map) {
+			if ($previous_maps) {
 				$previous_map = API::Map()->get([
-					'sysmapids' => [array_pop($previous_map)],
+					'sysmapids' => [array_pop($previous_maps)],
 					'output' => ['sysmapid', 'name']
 				]);
 
@@ -56,9 +56,9 @@ class CControllerWidgetMapView extends CControllerWidget {
 			}
 		}
 
-		$sysmapid = array_key_exists('current_sysmapid', $storage)
-			? $storage['current_sysmapid']
-			: array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null;
+		$sysmapid = $this->getInput('current_sysmapid',
+			array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null
+		);
 
 		$sysmap_data = CMapHelper::get(($sysmapid === null) ? [] : [$sysmapid]);
 

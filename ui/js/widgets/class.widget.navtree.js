@@ -111,6 +111,8 @@ class CWidgetNavTree extends CWidget {
 
 				if (this._markTreeItemSelected(this._navtree_item_selected)) {
 					this._openBranch(this._navtree_item_selected);
+
+					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {mapid: this._navtree_item_selected});
 				}
 			}
 
@@ -721,22 +723,24 @@ class CWidgetNavTree extends CWidget {
 	};
 
 	_parseProblems() {
-		const empty_template = [];
-
 		if (this._severity_levels === null) {
 			return false;
 		}
 
-		for (const severity of this._severity_levels) {
+		const empty_template = [];
+
+		for (const [severity, value] of Object.entries(this._severity_levels)) {
 			empty_template[severity] = 0;
 		}
 
 		for (const [itemid, problems] of Object.entries(this._problems)) {
-			for (const [severity, value] of (problems || empty_template)) {
-				if (value) {
-					$(`.tree-item[data-id=${itemid}]`).attr(`data-problems${severity}`, value);
-				}
-			}
+			console.log('problems', problems);
+			console.log('empty_template', empty_template);
+			// for (const [severity, value] of (problems || empty_template)) {
+			// 	if (value) {
+			// 		$(`.tree-item[data-id=${itemid}]`).attr(`data-problems${severity}`, value);
+			// 	}
+			// }
 		}
 
 		for (const [severity_id, severity] of Object.entries(this._severity_levels)) {

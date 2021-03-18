@@ -643,7 +643,8 @@ class CWidget extends CBaseComponent {
 
 		new Promise((resolve) => resolve(this._promiseUpdate()))
 			.then(() => this._hidePreloader())
-			.catch(() => {
+			.catch((error) => {
+				console.error(error);
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
 				}

@@ -131,8 +131,6 @@ class CDashboardWidgetMap extends CDiv {
 		}
 
 		if ($this->sysmap_data && $this->error === null) {
-//			$this->sysmap_data['container'] = '#map_'.$this->uniqueid;
-
 			$map_data['map_options'] = $this->sysmap_data;
 		}
 		elseif ($this->error !== null && $this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
@@ -171,7 +169,6 @@ class CDashboardWidgetMap extends CDiv {
 			}
 
 			$map_div = (new CDiv((new CDiv($this->sysmap_data['aria_label']))->addClass(ZBX_STYLE_INLINE_SR_ONLY)))
-//				->setId('map_'.$this->uniqueid)
 				->addClass('sysmap-widget-container');
 
 			$this->addStyle('position:relative;');
