@@ -82,7 +82,6 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> 'CWidget',
 			WIDGET_FAV_GRAPHS			=> 'CWidget',
 			WIDGET_FAV_MAPS				=> 'CWidget',
-			WIDGET_FAV_SCREENS			=> 'CWidget',
 			WIDGET_GRAPH				=> 'CWidgetGraph',
 			WIDGET_GRAPH_PROTOTYPE		=> 'CWidget',
 			WIDGET_HOST_AVAIL			=> 'CWidget',

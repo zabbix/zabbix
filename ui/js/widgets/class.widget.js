@@ -117,7 +117,6 @@ class CWidget extends CBaseComponent {
 		this._preloader_timeout = null;
 		this._preloader_timeout_sec = 10;
 		this._show_preloader_asap = true;
-		this._storage = {};
 
 		this._resizable_handles = [];
 	}
@@ -398,10 +397,6 @@ class CWidget extends CBaseComponent {
 		this._time_period = time_period;
 	}
 
-	storeValue(key, value) {
-		this._storage[key] = value;
-	}
-
 	getPosition() {
 		return this._pos;
 	}
@@ -654,8 +649,7 @@ class CWidget extends CBaseComponent {
 
 		new Promise((resolve) => resolve(this._promiseUpdate()))
 			.then(() => this._hidePreloader())
-			.catch((error) => {
-				console.error(error);
+			.catch(() => {
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
 				}
@@ -697,7 +691,6 @@ class CWidget extends CBaseComponent {
 			view_mode: this._view_mode,
 			edit_mode: this._is_edit_mode ? 1 : 0,
 			dynamic_hostid: this.supportsDynamicHosts() ? (this._dynamic_hostid ?? undefined) : undefined,
-			storage: this._storage,
 			...this._content_size
 		};
 	}
