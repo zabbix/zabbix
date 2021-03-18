@@ -701,15 +701,29 @@ class testFormUserRoles extends CWebTest {
 
 	public function testFormUserRoles_Clone() {
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=2');
-		$this->query('button:Clone')->one()->click();
-		foreach (['Add', 'Cancel'] as $button) {
-			$this->assertTrue($this->query('button', $button)->one()->isClickable());
-		}
-		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-		$form->checkValue(['Name' => 'Admin role', 'User type' => 'Admin']);
-		$form->fill(['Name' => 'cloned']);
-		$this->query('button:Add')->one()->click();
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM role WHERE name=\'cloned\''));
+		$form = $this->query('id:userrole-form')->waitUntilReady()->asFluidForm()->one();
+		$values = $form->getFields()->asValues();
+		$role_name = $values['Name'];
+		$this->query('button:Clone')->waitUntilReady()->one()->click();
+		$this->page->waitUntilReady();
+
+		$form->invalidate();
+		$form->fill(['Name' => 'Cloned_'.$role_name]);
+		$form->submit();
+
+		$this->assertMessage(TEST_GOOD, 'User role created');
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM role WHERE name='.zbx_dbstr($role_name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM role WHERE name='.zbx_dbstr('Cloned_'.$role_name)));
+
+		$id = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr('Cloned_'.$role_name));
+		$this->page->open('zabbix.php?action=userrole.edit&roleid='.$id);
+		$cloned_values = $form->getFields()->asValues();
+		$this->assertEquals('Cloned_'.$role_name, $cloned_values['Name']);
+
+		// Field Name removed from arrays.
+		unset($cloned_values['Name']);
+		unset($values['Name']);
+		$this->assertEquals($values, $cloned_values);
 	}
 
 	public function testFormUserRoles_Delete() {
