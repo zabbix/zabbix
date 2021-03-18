@@ -30,7 +30,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 			'name' => 'string',
 			'initial_load' => 'in 0,1',
 			'fields' => 'json',
-			'current_sysmapid' => 'int32',
+			'current_sysmapid' => 'db sysmaps.sysmapid',
 			'previous_maps' => 'array'
 		]);
 	}

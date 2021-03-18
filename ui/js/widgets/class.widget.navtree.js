@@ -727,30 +727,32 @@ class CWidgetNavTree extends CWidget {
 			return false;
 		}
 
-		const empty_template = [];
+		const empty_template = {};
 
-		for (const [severity, value] of Object.entries(this._severity_levels)) {
+		for (const [severity, value] in Object.entries(this._severity_levels)) {
 			empty_template[severity] = 0;
 		}
 
 		for (const [itemid, problems] of Object.entries(this._problems)) {
-			console.log('problems', problems);
-			console.log('empty_template', empty_template);
-			// for (const [severity, value] of (problems || empty_template)) {
-			// 	if (value) {
-			// 		$(`.tree-item[data-id=${itemid}]`).attr(`data-problems${severity}`, value);
-			// 	}
-			// }
+			for (const [severity, value] of Object.entries(problems || empty_template)) {
+				if (value) {
+					this._target.querySelectorAll(`.tree-item[data-id="${itemid}"]`).forEach((item) => {
+						item.setAttribute(`data-problems${severity}`, value);
+					})
+				}
+			}
 		}
 
-		for (const [severity_id, severity] of Object.entries(this._severity_levels)) {
-			for (const problem of this._target.querySelectorAll(`[data-problems${severity_id}]`)) {
-				$('> .tree-row>.problem-icon-list', $(problem))
-					.append($('<span/>', {
-							'class': 'problem-icon-list-item ' + severity.style_class,
-							'title': severity.name
-						}).html(problem.setAttribute('data-problems' + severity_id))
-					);
+		for (const [severity, value] of Object.entries(this._severity_levels)) {
+			for (const problem of this._target.querySelectorAll(`[data-problems${severity}]`)) {
+				const indicator = document.createElement('SPAN');
+
+				indicator.classList.add('problem-icon-list-item', value.style_class);
+				indicator.setAttribute('title', value.name);
+				indicator.innerText = problem.getAttribute(`data-problems${severity}`);
+
+				problem.querySelector('.tree-row > .problem-icon-list')
+					.appendChild(indicator)
 			}
 		}
 	};
