@@ -23,8 +23,6 @@ package version
 import (
 	"fmt"
 	"strings"
-
-	"zabbix.com/pkg/tls"
 )
 
 const (
@@ -97,12 +95,6 @@ func Revision() string {
 
 func CopyrightMessage() string {
 	msg := copyrightMessage
-	tlsMsg := tls.CopyrightMessage()
-	if tlsMsg == "" {
-		msg += "\n"
-	} else {
-		msg += tlsMsg
-	}
 
 	for _, license := range extraLicenses {
 		msg += license

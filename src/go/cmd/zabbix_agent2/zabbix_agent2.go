@@ -181,7 +181,7 @@ var (
 )
 
 func main() {
-	version.Init(applicationName, copyrightMessageMQTT(), copyrightMessageModbus())
+	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
 
 	var confFlag string
 	const (
