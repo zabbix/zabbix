@@ -43,7 +43,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <status>ENABLED</status>
                <units>s</units>
-               <description>Differnce between the latest optime of the CSRS primary that the mongos has seen and cluster time.</description>
+               <description>Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.</description>
                <applications>
                   <application>
                      <name>MongoDB sharded cluster</name>
