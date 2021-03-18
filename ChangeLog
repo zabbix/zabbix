@@ -1,10 +1,16 @@
 Changes for 5.4.0beta2
 
 New features:
+.........T [ZBXNEXT-6462] added Cisco Catalyst 3750 templates (afayantsev)
+.......PS. [ZBXNEXT-6503] added protection of Zabbix Server from overloading by proxy data (dgoloscapov, wiper)
+.........T [ZBXNEXT-6450] added template NetApp AFF A700 by HTTP (mchudinov)
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 
 Bug fixes:
-A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
+.........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
+....I..... [ZBXNEXT-6474] fixed inconsistent datatypes in oracle DB upgrade patch query (talbergs)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 ........S. [ZBX-19071] fixed server crash after "Check for not supported value" preprocessing step (akozlovs)
 
 --------------------------------------------------------------------------------
@@ -133,6 +139,8 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.6rc1
 
 New features:
+.........T [ZBXNEXT-6462] added Cisco Catalyst 3750 templates (afayantsev)
+.........T [ZBXNEXT-6450] added template NetApp AFF A700 by HTTP (mchudinov)
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 .........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
 .........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
@@ -141,7 +149,9 @@ New features:
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
-A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
+.........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 ........S. [ZBX-19071] fixed server crash after "Check for not supported value" preprocessing step (akozlovs)
 .........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
@@ -582,13 +592,17 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.10rc1
 
 New features:
+.........T [ZBXNEXT-6462] added Cisco Catalyst 3750 templates (afayantsev)
+.........T [ZBXNEXT-6450] added template NetApp AFF A700 by HTTP (mchudinov)
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 .........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
 .........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
-A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
+.........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 .........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 ...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
@@ -2574,7 +2588,7 @@ Changes for 4.0.30rc1
 New features:
 
 Bug fixes:
-A......... [ZBX-19023] fixed inheritance of the permissions for new host groups (Sasha)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 
 --------------------------------------------------------------------------------
