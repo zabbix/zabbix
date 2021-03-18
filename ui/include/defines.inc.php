@@ -230,10 +230,8 @@ define('AUDIT_RESOURCE_IMAGE',				16);
 define('AUDIT_RESOURCE_VALUE_MAP',			17);
 define('AUDIT_RESOURCE_IT_SERVICE',			18);
 define('AUDIT_RESOURCE_MAP',				19);
-define('AUDIT_RESOURCE_SCREEN',				20);
 define('AUDIT_RESOURCE_SCENARIO',			22);
 define('AUDIT_RESOURCE_DISCOVERY_RULE',		23);
-define('AUDIT_RESOURCE_SLIDESHOW',			24);
 define('AUDIT_RESOURCE_SCRIPT',				25);
 define('AUDIT_RESOURCE_PROXY',				26);
 define('AUDIT_RESOURCE_MAINTENANCE',		27);
@@ -745,34 +743,12 @@ define('CONDITION_EVAL_TYPE_EXPRESSION', 	3);
 define('SCREEN_RESOURCE_GRAPH',				0);
 define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
 define('SCREEN_RESOURCE_MAP',				2);
-define('SCREEN_RESOURCE_PLAIN_TEXT',		3);
-define('SCREEN_RESOURCE_HOST_INFO',		4);
-define('SCREEN_RESOURCE_TRIGGER_INFO',		5);
-define('SCREEN_RESOURCE_SERVER_INFO',		6);
-define('SCREEN_RESOURCE_CLOCK',				7);
-define('SCREEN_RESOURCE_SCREEN',			8); // Not supported since Zabbix 4.4.
-define('SCREEN_RESOURCE_TRIGGER_OVERVIEW',	9);
-define('SCREEN_RESOURCE_DATA_OVERVIEW',		10);
-define('SCREEN_RESOURCE_URL',				11);
-define('SCREEN_RESOURCE_ACTIONS',			12);
-define('SCREEN_RESOURCE_EVENTS',			13);
-define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
-define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
-define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
-// used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
-define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
-define('SCREEN_RESOURCE_LLD_GRAPH',			20);
-// used in Monitoring > Web > Details (httpdetails.php)
 define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
-// used in Monitoring > Discovery
 define('SCREEN_RESOURCE_DISCOVERY',			22);
-// used in Monitoring > Web
 define('SCREEN_RESOURCE_HTTPTEST',			23);
-// used in Monitoring > Problems
 define('SCREEN_RESOURCE_PROBLEM',			24);
 
-define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
 define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',		2);
 define('SCREEN_SORT_TRIGGERS_TIME_ASC',				3);
@@ -793,17 +769,7 @@ define('SCREEN_MODE_EDIT',		1);
 define('SCREEN_MODE_SLIDESHOW',		2);
 define('SCREEN_MODE_JS',		3);
 
-define('SCREEN_SIMPLE_ITEM',	0);
-define('SCREEN_DYNAMIC_ITEM',	1);
-
 define('SCREEN_REFRESH_RESPONSIVENESS',	10);
-
-define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
-define('SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT', 3);
-define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
-
-define('SCREEN_MIN_SIZE', 1);
-define('SCREEN_MAX_SIZE', 100);
 
 // default, minimum and maximum number of lines for dashboard widgets
 define('ZBX_DEFAULT_WIDGET_LINES', 25);
@@ -1450,7 +1416,6 @@ define('WIDGET_DATA_OVER',			'dataover');
 define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
-define('WIDGET_FAV_SCREENS',		'favscreens');
 define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
@@ -1485,8 +1450,6 @@ define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
 define('WIDGET_SEARCH_HOSTS',			'search_hosts');
 define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
 define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
-// slideshow
-define('WIDGET_SLIDESHOW',				'hat_slides');
 
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
@@ -1635,7 +1598,6 @@ define('ZBX_STYLE_BTN_BACK_MAP', 'btn-back-map');
 define('ZBX_STYLE_BTN_BACK_MAP_CONTAINER', 'btn-back-map-container');
 define('ZBX_STYLE_BTN_BACK_MAP_CONTENT', 'btn-back-map-content');
 define('ZBX_STYLE_BTN_BACK_MAP_ICON', 'btn-back-map-icon');
-define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
 define('ZBX_STYLE_BTN_DASHBRD_NORMAL', 'btn-dashbrd-normal');
@@ -1834,7 +1796,6 @@ define('ZBX_STYLE_REMOVE_BTN', 'remove-btn');
 define('ZBX_STYLE_RIGHT', 'right');
 define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
-define('ZBX_STYLE_SCREEN_TABLE', 'screen-table');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_FORM_SEARCH', 'form-search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');

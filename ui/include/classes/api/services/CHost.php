@@ -1524,13 +1524,6 @@ class CHost extends CHostGeneral {
 			API::HttpTest()->delete($delHttptests, true);
 		}
 
-
-		// delete screen items
-		DB::delete('screens_items', [
-			'resourceid' => $hostIds,
-			'resourcetype' => SCREEN_RESOURCE_HOST_TRIGGERS
-		]);
-
 		// delete host from maps
 		if (!empty($hostIds)) {
 			DB::delete('sysmaps_elements', [

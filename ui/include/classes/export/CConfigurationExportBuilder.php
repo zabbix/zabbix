@@ -201,15 +201,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 */
-	public function buildScreens(array $screens) {
-		$this->data['screens'] = $this->formatScreens($screens);
-	}
-
-	/**
 	 * Format media types.
 	 *
 	 * @param array $schema       Tag schema from validation class.
@@ -1199,30 +1190,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 *
-	 * @return array
-	 */
-	protected function formatScreens(array $screens) {
-		$result = [];
-
-		CArrayHelper::sort($screens, ['name']);
-
-		foreach ($screens as $screen) {
-			$result[] = [
-				'name' => $screen['name'],
-				'hsize' => $screen['hsize'],
-				'vsize' => $screen['vsize'],
-				'screen_items' => $this->formatScreenItems($screen['screenitems'])
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format trigger dependencies.
 	 *
 	 * @param array $dependencies
@@ -1261,43 +1228,6 @@ class CConfigurationExportBuilder {
 			$result[] = [
 				'tag' => $tag['tag'],
 				'value' => $tag['value']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format screen items.
-	 *
-	 * @param array $screenItems
-	 *
-	 * @return array
-	 */
-	protected function formatScreenItems(array $screenItems) {
-		$result = [];
-
-		CArrayHelper::sort($screenItems, ['y', 'x']);
-
-		foreach ($screenItems as $screenItem) {
-			$result[] = [
-				'resourcetype' => $screenItem['resourcetype'],
-				'width' => $screenItem['width'],
-				'height' => $screenItem['height'],
-				'x' => $screenItem['x'],
-				'y' => $screenItem['y'],
-				'colspan' => $screenItem['colspan'],
-				'rowspan' => $screenItem['rowspan'],
-				'elements' => $screenItem['elements'],
-				'valign' => $screenItem['valign'],
-				'halign' => $screenItem['halign'],
-				'style' => $screenItem['style'],
-				'url' => $screenItem['url'],
-				'dynamic' => $screenItem['dynamic'],
-				'sort_triggers' => $screenItem['sort_triggers'],
-				'resource' => $screenItem['resourceid'],
-				'max_columns' => $screenItem['max_columns'],
-				'application' => $screenItem['application']
 			];
 		}
 

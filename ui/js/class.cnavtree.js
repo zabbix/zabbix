@@ -114,10 +114,6 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 					}
 
 				}
-
-				if (scrolled !== false && $.ui.ddmanager && !o.dropBehaviour) {
-					$.ui.ddmanager.prepareOffsets(this, event);
-				}
 			}
 
 			// Regenerate the absolute position used for position checks.
@@ -323,11 +319,6 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 			// Post events to containers.
 			this._contactContainers(event);
 
-			// Interconnect with droppables.
-			if ($.ui.ddmanager) {
-				$.ui.ddmanager.drag(this, event);
-			}
-
 			// Call callbacks.
 			this._trigger('sort', event, this._uiHash());
 
@@ -363,16 +354,6 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				this._clear(event, noPropagation);
 			}
 			else {
-				// If we are using droppables, inform the manager about the drop.
-				if ($.ui.ddmanager && !this.options.dropBehaviour) {
-					$.ui.ddmanager.drop(this, event);
-
-					var parent_id = this.placeholder.parent().closest('.tree-item').data('id'),
-						item_id = $(this.currentItem[0]).data('id');
-
-					$('[name="navtree.parent.' + item_id + '"]').val(parent_id);
-				}
-
 				if (this.options.revert) {
 					var self = this,
 						cur = self.placeholder.offset();

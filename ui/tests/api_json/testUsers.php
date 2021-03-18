@@ -1646,16 +1646,6 @@ class testUsers extends CAPITest {
 				'user' => ['14'],
 				'expected_error' => 'User "api-user-map" is map "API map" owner.'
 			],
-			// Check if deleted users have a screen.
-			[
-				'user' => ['15'],
-				'expected_error' => 'User "api-user-screen" is screen "API screen" owner.'
-			],
-			// Check if deleted users have a slide show.
-			[
-				'user' => ['16'],
-				'expected_error' => 'User "api-user-slideshow" is slide show "API slide show" owner.'
-			],
 			// Check successfully delete of user.
 			[
 				'user' => ['10'],

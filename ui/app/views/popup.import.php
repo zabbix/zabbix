@@ -38,7 +38,6 @@ $titles = [
 	'triggers' => _('Triggers'),
 	'graphs' => _('Graphs'),
 	'httptests' => _('Web scenarios'),
-	'screens' => _('Screens'),
 	'maps' => _('Maps')
 ];
 
@@ -59,15 +58,11 @@ foreach ($titles as $key => $title) {
 		$cbExist = (new CCheckBox('rules['.$key.'][updateExisting]'))
 			->setChecked($data['rules'][$key]['updateExisting']);
 
-		if ($key !== 'maps' && $key !== 'screens' && $user_type != USER_TYPE_SUPER_ADMIN
-				&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
+		if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$cbExist->setAttribute('disabled', 'disabled');
 		}
 		elseif ($key === 'maps') {
 			$cbExist->setAttribute('disabled', $data['allowed_edit_maps'] ? null : true);
-		}
-		elseif ($key === 'screens') {
-			$cbExist->setAttribute('disabled', $data['allowed_edit_screens'] ? null : true);
 		}
 
 		if ($key === 'images') {
@@ -86,15 +81,11 @@ foreach ($titles as $key => $title) {
 			->setChecked($data['rules'][$key]['createMissing']);
 	}
 
-	if ($key !== 'maps' && $key !== 'screens' && $user_type != USER_TYPE_SUPER_ADMIN
-			&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
+	if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
 		$cbMissed->setAttribute('disabled', 'disabled');
 	}
 	elseif ($key === 'maps') {
 		$cbMissed->setAttribute('disabled', $data['allowed_edit_maps'] ? null : true);
-	}
-	elseif ($key === 'screens') {
-		$cbMissed->setAttribute('disabled', $data['allowed_edit_screens'] ? null : true);
 	}
 
 	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
@@ -102,8 +93,7 @@ foreach ($titles as $key => $title) {
 			->setChecked($data['rules'][$key]['deleteMissing'])
 			->addClass('deleteMissing');
 
-		if ($key !== 'maps' && $key !== 'screens' && $user_type != USER_TYPE_SUPER_ADMIN
-				&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
+		if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$cbDeleted->setAttribute('disabled', 'disabled');
 		}
 

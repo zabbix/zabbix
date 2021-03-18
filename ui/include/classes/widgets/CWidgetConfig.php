@@ -48,7 +48,6 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> _('Discovery status'),
 			WIDGET_FAV_GRAPHS			=> _('Favourite graphs'),
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
-			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
 			WIDGET_GRAPH				=> _('Graph (classic)'),
 			WIDGET_GRAPH_PROTOTYPE		=> _('Graph prototype'),
 			WIDGET_HOST_AVAIL			=> _('Host availability'),
@@ -116,7 +115,6 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> ['width' => 6,	'height' => 3],
 			WIDGET_FAV_GRAPHS			=> ['width' => 4,	'height' => 3],
 			WIDGET_FAV_MAPS				=> ['width' => 4,	'height' => 3],
-			WIDGET_FAV_SCREENS			=> ['width' => 4,	'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 12,	'height' => 5],
 			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 16,	'height' => 5],
 			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 3],
@@ -220,7 +218,6 @@ class CWidgetConfig {
 			case WIDGET_CLOCK:
 			case WIDGET_FAV_GRAPHS:
 			case WIDGET_FAV_MAPS:
-			case WIDGET_FAV_SCREENS:
 			case WIDGET_HOST_AVAIL:
 			case WIDGET_MAP:
 			case WIDGET_NAV_TREE:

@@ -23,7 +23,7 @@ class CControllerFavouriteCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'object' =>		'fatal|required|in graphid,itemid,screenid,slideshowid,sysmapid',
+			'object' =>		'fatal|required|in graphid,itemid,sysmapid',
 			'objectid' =>	'fatal|required|id'
 		];
 
@@ -44,8 +44,6 @@ class CControllerFavouriteCreate extends CController {
 		$profile = [
 			'graphid' => 'web.favorite.graphids',
 			'itemid' => 'web.favorite.graphids',
-			'screenid' => 'web.favorite.screenids',
-			'slideshowid' => 'web.favorite.screenids',
 			'sysmapid' => 'web.favorite.sysmapids'
 		];
 

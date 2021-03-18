@@ -3244,9 +3244,6 @@ button {
     .btn-link[disabled]:hover, .interface-container .interface-row .interface-cell [disabled].interface-btn-toggle:hover {
       background-color: transparent; }
 
-.btn-conf {
-  background: #69808d url("../img/icon-sprite.svg?20200407") no-repeat -7px -187px; }
-
 .btn-kiosk {
   background: #69808d url("../img/icon-sprite.svg?20200407") no-repeat -79px -259px; }
 
@@ -3553,7 +3550,7 @@ button {
     background-color: transparent;
     opacity: .25; }
 
-.btn-conf, .btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-cal, .icon-wzrd-action, .drag-icon {
+.btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
   height: auto;
   padding: 0; }
@@ -4252,38 +4249,6 @@ z-select[disabled] button,
     float: none;
     display: inline-block;
     margin: 0 2px 0 0; }
-
-.screen-table {
-  background-color: #2b2b2b;
-  width: 100%; }
-  .screen-table td {
-    padding: 2px 3px; }
-  .screen-table .table-forms {
-    text-align: left; }
-  .screen-table .list-table {
-    border: 0; }
-    .screen-table .list-table td {
-      text-align: left;
-      padding: 6px 5px;
-      border: 0;
-      border-bottom: 1px solid #383838; }
-      .screen-table .list-table td.list-table-footer {
-        color: #737373;
-        text-align: right; }
-  .screen-table .dashbrd-widget {
-    margin: 0;
-    border: 0; }
-    .screen-table .dashbrd-widget th {
-      padding: 6px 5px; }
-  .screen-table .dashbrd-widget-head {
-    text-align: left;
-    padding: 4px 5px; }
-    .screen-table .dashbrd-widget-head li {
-      line-height: 2.9em; }
-  .screen-table .dashbrd-widget-foot {
-    margin: 0; }
-  .screen-table .nothing-to-show td {
-    text-align: center !important; }
 
 .dashed-border td {
   border: 1px dashed #383838; }
