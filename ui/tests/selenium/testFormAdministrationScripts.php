@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup scripts
@@ -28,11 +29,15 @@ class testFormAdministrationScripts extends CWebTest {
 
 	private const ID_UPDATE = 200;	// Script for Update.
 
-	private const ID_CLONE = 201; // Script for Clone.
-	private const NAME_CLONE = 'Cloned Script for Clone';
-
 	private const ID_DELETE = 202;
 	private const NAME_DELETE = 'Script for Delete';
+
+	/**
+	 * Id of scripts that created for future cloning.
+	 *
+	 * @var integer
+	 */
+	protected static $scriptids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -961,28 +966,71 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
+	 * Function used to create scripts.
+	 */
+	public function prepareScriptData() {
+		$response = CDataHelper::call('script.create', [
+			[
+				'name' => 'SSH_api_clone_1',
+				'type' => 2,
+				'username' => 'SSH_username',
+				'password' => 'SSH_password',
+				'command' => 'test'
+			],
+			[
+				'name' => 'SSH_api_clone_2',
+				'type' => 2,
+				'authtype' => '1',
+				'username' => 'SSH_username',
+				'privatekey' => 'private_key',
+				'publickey' => 'public_key',
+				'command' => 'test'
+			],
+			[
+				'name' => 'TELNET_api_clone',
+				'type' => 3,
+				'username' => 'TELNET_username',
+				'password' => 'TELNET_password',
+				'command' => 'test'
+			]
+		]);
+		$this->assertArrayHasKey('scriptids', $response);
+		self::$scriptids = $response['scriptids'];
+	}
+
+	/**
 	 * Function for checking script cloning with only changed name.
+	 *
+	 * @on-before prepareScriptData
 	 */
 	public function testFormAdministrationScripts_Clone() {
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_CLONE);
-		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
-		$values = $form->getFields()->asValues();
-		$values['Name'] = self::NAME_CLONE;
-		$this->query('button:Clone')->waitUntilReady()->one()->click();
-		$this->page->waitUntilReady();
+		// Added existing webhook to the list.
+		array_push(self::$scriptids, '201');
+		foreach (self::$scriptids as $scriptid) {
+			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
+			$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+			$values = $form->getFields()->asValues();
+			$script_name = $values['Name'];
+			$this->query('button:Clone')->waitUntilReady()->one()->click();
+			$this->page->waitUntilReady();
 
-		$form->invalidate();
-		$form->fill(['Name' => self::NAME_CLONE]);
-		$form->submit();
+			$form->invalidate();
+			$form->fill(['Name' => 'Cloned_'.$script_name]);
+			$form->submit();
 
-		$this->assertMessage(TEST_GOOD, 'Script added');
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_CLONE)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr('Script for Clone')));
+			$this->assertMessage(TEST_GOOD, 'Script added');
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr($script_name)));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name)));
 
-		$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr(self::NAME_CLONE));
-		$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
-		$cloned_values = $form->getFields()->asValues();
-		$this->assertEquals($values, $cloned_values);
+			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name));
+			$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
+			$cloned_values = $form->getFields()->asValues();
+
+			// Field Name removed from arrays.
+			unset($cloned_values['Name']);
+			unset($values['Name']);
+			$this->assertEquals($values, $cloned_values);
+		}
 	}
 
 	/**
