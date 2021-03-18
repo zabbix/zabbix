@@ -481,6 +481,17 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	save() {
+		return {
+			widgetid: this._widgetid ?? undefined,
+			pos: this._pos,
+			type: this._type,
+			name: this._name,
+			view_mode: this._view_mode,
+			fields: Object.keys(this._fields).length > 0 ? JSON.stringify(this._fields) : undefined
+		};
+	}
+
 	getDataCopy() {
 		return {
 			type: this._type,

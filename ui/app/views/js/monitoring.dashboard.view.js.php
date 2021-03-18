@@ -139,9 +139,9 @@
 				.getElementById('dashbrd-add')
 				.addEventListener('click', events.addClick);
 
-//			document
-//				.getElementById('dashbrd-save')
-//				.addEventListener('click', () => save());
+			document
+				.getElementById('dashbrd-save')
+				.addEventListener('click', () => save());
 
 			document
 				.getElementById('dashbrd-cancel')
@@ -163,53 +163,30 @@
 		const save = () => {
 			clearMessages();
 
-			ZABBIX.Dashboard.saveDashboard();
-
-			const ajax_data = {
-				dashboardid: (dashboard.dashboardid !== null) ? dashboard.dashboardid : undefined,
-				userid: dashboard.owner.id,
-				name: dashboard.name,
-				display_period: dashboard.display_period,
-				auto_start: dashboard.auto_start,
-				widgets: [],
-				sharing: dashboard.sharing
-			};
-
-			for (const widget of ZABBIX.Dashboard.getWidgets()) {
-				const ajax_widget = {};
-
-				if (widget.widgetid !== '') {
-					ajax_widget.widgetid = widget.widgetid;
-				}
-				ajax_widget.pos = widget.pos;
-				ajax_widget.type = widget.type;
-				ajax_widget.name = widget.name;
-				ajax_widget.view_mode = widget.view_mode;
-				if (Object.keys(widget.fields).length != 0) {
-					ajax_widget.fields = JSON.stringify(widget.fields);
-				}
-
-				ajax_data.widgets.push(ajax_widget);
-			}
-
 			is_busy_saving = true;
 			updateBusy();
 
-			const url = new Curl('zabbix.php');
+			const request_data = ZABBIX.Dashboard.save();
 
-			url.setArgument('action', 'dashboard.update');
+			request_data.sharing = dashboard.sharing;
 
-			$.ajax({
-				url: url.getUrl(),
-				data: ajax_data,
-				dataType: 'json',
-				method: 'POST'
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'dashboard.update');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+				},
+				body: urlEncodeData(request_data)
 			})
-				.always(() => {
-					is_busy_saving = false;
-					updateBusy();
-				})
+				.then((response) => response.json())
 				.then((response) => {
+					if ('errors' in response) {
+						throw {html_string: response.errors};
+					}
+
 					if ('redirect' in response) {
 						if ('system-message-ok' in response) {
 							postMessageOk(response['system-message-ok']);
@@ -222,6 +199,22 @@
 					else if ('errors' in response) {
 						addMessage(response.errors);
 					}
+				})
+				.catch((error) => {
+					if (typeof error === 'object' && 'html_string' in error) {
+						addMessage(error.html_string);
+					}
+					else {
+						const message = dashboard.dashboardid === null
+							? t('Failed to create dashboard')
+							: t('Failed to update dashboard');
+
+						addMessage(makeMessageBox('bad', [], message, true, false));
+					}
+				})
+				.finally(() => {
+					is_busy_saving = false;
+					updateBusy();
 				});
 		};
 
@@ -343,8 +336,8 @@
 			}
 		};
 
-//		let is_busy = false;
-//		let is_busy_saving = false;
+		let is_busy = false;
+		let is_busy_saving = false;
 
 		init();
 	}

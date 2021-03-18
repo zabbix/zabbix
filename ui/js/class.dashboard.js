@@ -134,6 +134,37 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
+	save() {
+		const data = {
+			dashboardid: this._data.dashboardid ?? undefined,
+			name: this._data.name,
+			userid: this._data.userid,
+			templateid: this._data.dashboardid ?? undefined,
+			display_period: this._data.display_period,
+			auto_start: this._data.auto_start,
+			pages: []
+		};
+
+		let dashboard_pages = [];
+
+		if (this._is_kiosk_mode) {
+			for (const dashboard_page of this._dashboard_pages.keys()) {
+				dashboard_pages.push(dashboard_page);
+			}
+		}
+		else {
+			for (const tab of this._tabs.getList().children) {
+				dashboard_pages.push(this._tabs_dashboard_pages.get(tab));
+			}
+		}
+
+		for (const dashboard_page of dashboard_pages) {
+			data.pages.push(dashboard_page.save());
+		}
+
+		return data;
+	}
+
 	getData() {
 		return this._data;
 	}
@@ -164,6 +195,21 @@ class CDashboard extends CBaseComponent {
 		for (const [name, value] of Object.entries(this._original_properties)) {
 			if (value != this._data[name]) {
 				return true;
+			}
+		}
+
+		if (!this._is_kiosk_mode) {
+			const dashboard_pages_data = Array.from(this._dashboard_pages.values());
+			const tabs = [...this._tabs.getList().children];
+
+			if (tabs.length != dashboard_pages_data.length) {
+				return true;
+			}
+
+			for (let i = 0; i < dashboard_pages_data.length; i++) {
+				if (dashboard_pages_data[i].tab !== tabs[i]) {
+					return true;
+				}
 			}
 		}
 
@@ -240,7 +286,7 @@ class CDashboard extends CBaseComponent {
 
 				const message_box = (typeof error === 'object' && 'html_string' in error)
 					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Cannot update dashboard properties.'), true, false)[0];
+					: makeMessageBox('bad', [], t('Failed to update dashboard properties.'), true, false)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})
@@ -301,7 +347,7 @@ class CDashboard extends CBaseComponent {
 
 				const message_box = (typeof error === 'object' && 'html_string' in error)
 					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Cannot update dashboard page properties.'), true, false)[0];
+					: makeMessageBox('bad', [], t('Failed to update dashboard page properties.'), true, false)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})
@@ -512,7 +558,7 @@ class CDashboard extends CBaseComponent {
 
 				const message_box = (typeof error === 'object' && 'html_string' in error)
 					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Cannot update widget properties.'), true, false)[0];
+					: makeMessageBox('bad', [], t('Failed to update widget properties.'), true, false)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			})

@@ -637,6 +637,21 @@ class CDashboardPage extends CBaseComponent {
 		});
 	}
 
+	save() {
+		const data = {
+			dashboard_pageid: this._data.dashboard_pageid ?? undefined,
+			name: this._data.name,
+			display_period: this._data.display_period,
+			widgets: []
+		};
+
+		for (const widget of this._widgets.keys()) {
+			data.widgets.push(widget.save());
+		}
+
+		return data;
+	}
+
 	addWidget({type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
 		const widget = new (eval(this._widget_defaults[type].js_class))({
 			type,
