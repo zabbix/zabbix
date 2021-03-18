@@ -722,7 +722,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	{
 		skip_old = 0;
 	}
-	else if (0 == strcmp(skip, "skip"))
+	else if (0 == request->lastlogsize && 0 == strcmp(skip, "skip"))
 	{
 		skip_old = 1;
 	}
