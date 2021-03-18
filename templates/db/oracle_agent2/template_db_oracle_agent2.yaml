@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-13T10:43:50Z'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -398,7 +398,7 @@ zabbix_export:
           master_item:
             key: 'oracle.fra.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
         -
-          name: 'Oracle: FRA, Used space in %'
+          name: 'Oracle: FRA, Usable space in %'
           type: DEPENDENT
           key: oracle.fra_usable_pct
           delay: '0'
@@ -1421,7 +1421,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DEST_NAME}''].log_sequence.first()'
+                    - '$..[''{#DEST_NAME}''].error.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1438,7 +1442,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DEST_NAME}''].log_sequence.first()'
+                    - '$..[''{#DEST_NAME}''].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1782,7 +1790,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.file_bytes.first()'
+                    - '$..[''{#TABLESPACE}''].file_bytes.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1800,7 +1808,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.free_bytes.first()'
+                    - '$..[''{#TABLESPACE}''].free_bytes.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1818,7 +1826,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.max_bytes.first()'
+                    - '$..[''{#TABLESPACE}''].max_bytes.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1837,7 +1845,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.status.first()'
+                    - '$..[''{#TABLESPACE}''].status.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               trigger_prototypes:
@@ -1871,7 +1879,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.used_bytes.first()'
+                    - '$..[''{#TABLESPACE}''].used_bytes.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
             -
@@ -1890,7 +1898,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.used_file_pct.first()'
+                    - '$..[''{#TABLESPACE}''].used_file_pct.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               trigger_prototypes:
@@ -1922,7 +1930,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..{#TABLESPACE}.used_pct_max.first()'
+                    - '$..[''{#TABLESPACE}''].used_pct_max.first()'
               master_item:
                 key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               trigger_prototypes:
@@ -2059,6 +2067,151 @@ zabbix_export:
           macro: '{$ORACLE.USER}'
           value: zabbix
           description: 'Oracle username.'
+      valuemaps:
+        -
+          name: 'Oracle Archivelog status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '1'
+              newvalue: Error
+            -
+              value: '2'
+              newvalue: Deferred
+            -
+              value: '3'
+              newvalue: Valid
+        -
+          name: 'Oracle archiver state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '1'
+              newvalue: Stopped
+            -
+              value: '2'
+              newvalue: Started
+            -
+              value: '3'
+              newvalue: Failed
+        -
+          name: 'Oracle DB open status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '1'
+              newvalue: Mounted
+            -
+              value: '2'
+              newvalue: 'Read Only'
+            -
+              value: '3'
+              newvalue: Read-Write
+            -
+              value: '4'
+              newvalue: 'Read Only with Apply'
+        -
+          name: 'Oracle DB role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '1'
+              newvalue: 'Snapshot standby'
+            -
+              value: '2'
+              newvalue: 'Logical standby'
+            -
+              value: '3'
+              newvalue: 'Physical standby'
+            -
+              value: '4'
+              newvalue: Primary
+            -
+              value: '5'
+              newvalue: 'Far sync'
+        -
+          name: 'Oracle force log status'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'No'
+            -
+              value: '1'
+              newvalue: 'Yes'
+        -
+          name: 'Oracle instance role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '1'
+              newvalue: Primary
+            -
+              value: '2'
+              newvalue: Secondary
+        -
+          name: 'Oracle instance status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '1'
+              newvalue: Started
+            -
+              value: '2'
+              newvalue: Mounted
+            -
+              value: '3'
+              newvalue: Open
+            -
+              value: '4'
+              newvalue: 'Open migrate'
+        -
+          name: 'Oracle log mode'
+          mappings:
+            -
+              value: '0'
+              newvalue: NOARCHIVELOG
+            -
+              value: '1'
+              newvalue: ARCHIVELOG
+            -
+              value: '2'
+              newvalue: MANUAL
+        -
+          name: 'Oracle tablespace status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '1'
+              newvalue: Online
+            -
+              value: '2'
+              newvalue: Offline
+            -
+              value: '3'
+              newvalue: Read-Only
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '{Oracle by Zabbix Agent 2:oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.processes_limit.last()} > {$ORACLE.PROCESSES.MAX.WARN}'
@@ -2228,148 +2381,3 @@ zabbix_export:
           item:
             host: 'Oracle by Zabbix Agent 2'
             key: oracle.sga_buffer_cache
-  value_maps:
-    -
-      name: 'Oracle Archivelog status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Unknown
-        -
-          value: '1'
-          newvalue: Error
-        -
-          value: '2'
-          newvalue: Deferred
-        -
-          value: '3'
-          newvalue: Valid
-    -
-      name: 'Oracle archiver state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Unknown
-        -
-          value: '1'
-          newvalue: Stopped
-        -
-          value: '2'
-          newvalue: Started
-        -
-          value: '3'
-          newvalue: Failed
-    -
-      name: 'Oracle DB open status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Unknown
-        -
-          value: '1'
-          newvalue: Mounted
-        -
-          value: '2'
-          newvalue: 'Read Only'
-        -
-          value: '3'
-          newvalue: Read-Write
-        -
-          value: '4'
-          newvalue: 'Read Only with Apply'
-    -
-      name: 'Oracle DB role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Unknown
-        -
-          value: '1'
-          newvalue: 'Snapshot standby'
-        -
-          value: '2'
-          newvalue: 'Logical standby'
-        -
-          value: '3'
-          newvalue: 'Physical standby'
-        -
-          value: '4'
-          newvalue: Primary
-        -
-          value: '5'
-          newvalue: 'Far sync'
-    -
-      name: 'Oracle force log status'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'No'
-        -
-          value: '1'
-          newvalue: 'Yes'
-    -
-      name: 'Oracle instance role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Unknown
-        -
-          value: '1'
-          newvalue: Primary
-        -
-          value: '2'
-          newvalue: Secondary
-    -
-      name: 'Oracle instance status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Unknown
-        -
-          value: '1'
-          newvalue: Started
-        -
-          value: '2'
-          newvalue: Mounted
-        -
-          value: '3'
-          newvalue: Open
-        -
-          value: '4'
-          newvalue: 'Open migrate'
-    -
-      name: 'Oracle log mode'
-      mappings:
-        -
-          value: '0'
-          newvalue: NOARCHIVELOG
-        -
-          value: '1'
-          newvalue: ARCHIVELOG
-        -
-          value: '2'
-          newvalue: MANUAL
-    -
-      name: 'Oracle tablespace status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Unknown
-        -
-          value: '1'
-          newvalue: Online
-        -
-          value: '2'
-          newvalue: Offline
-        -
-          value: '3'
-          newvalue: Read-Only
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

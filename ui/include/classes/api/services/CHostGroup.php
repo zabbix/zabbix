@@ -407,23 +407,40 @@ class CHostGroup extends CApiService {
 		$parent_names = [];
 
 		foreach ($groups as $group) {
-			if (($pos = strrpos($group['name'], '/')) === false) {
-				continue;
-			}
+			$name = $group['name'];
 
-			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$parent_names[$name][] = $group['groupid'];
+			}
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('hstgrp', [
+			$options = [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
-			]);
+			];
+			$result = DBselect(DB::makeSql('hstgrp', $options));
+
+			$db_parent_groups = [];
+
+			while ($row = DBfetch($result)) {
+				$db_parent_groups[$row['name']] = $row['groupid'];
+			}
 
 			$parent_groupids = [];
 
-			foreach ($db_parent_groups as $db_parent_group) {
-				$parent_groupids[$db_parent_group['groupid']] = $parent_names[$db_parent_group['name']];
+			foreach ($groups as $group) {
+				$name = $group['name'];
+
+				while (($pos = strrpos($name, '/')) !== false) {
+					$name = substr($name, 0, $pos);
+
+					if (array_key_exists($name, $db_parent_groups)) {
+						$parent_groupids[$db_parent_groups[$name]][] = $group['groupid'];
+						break;
+					}
+				}
 			}
 
 			if ($parent_groupids) {
@@ -460,23 +477,40 @@ class CHostGroup extends CApiService {
 		$parent_names = [];
 
 		foreach ($groups as $group) {
-			if (($pos = strrpos($group['name'], '/')) === false) {
-				continue;
-			}
+			$name = $group['name'];
 
-			$parent_names[substr($group['name'], 0, $pos)][] = $group['groupid'];
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$parent_names[$name][] = $group['groupid'];
+			}
 		}
 
 		if ($parent_names) {
-			$db_parent_groups = DB::select('hstgrp', [
+			$options = [
 				'output' => ['groupid', 'name'],
 				'filter' => ['name' => array_keys($parent_names)]
-			]);
+			];
+			$result = DBselect(DB::makeSql('hstgrp', $options));
+
+			$db_parent_groups = [];
+
+			while ($row = DBfetch($result)) {
+				$db_parent_groups[$row['name']] = $row['groupid'];
+			}
 
 			$parent_groupids = [];
 
-			foreach ($db_parent_groups as $db_parent_group) {
-				$parent_groupids[$db_parent_group['groupid']] = $parent_names[$db_parent_group['name']];
+			foreach ($groups as $group) {
+				$name = $group['name'];
+
+				while (($pos = strrpos($name, '/')) !== false) {
+					$name = substr($name, 0, $pos);
+
+					if (array_key_exists($name, $db_parent_groups)) {
+						$parent_groupids[$db_parent_groups[$name]][] = $group['groupid'];
+						break;
+					}
+				}
 			}
 
 			if ($parent_groupids) {

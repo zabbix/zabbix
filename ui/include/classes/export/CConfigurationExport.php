@@ -57,8 +57,7 @@ class CConfigurationExport {
 			'groups' => [],
 			'images' => [],
 			'maps' => [],
-			'mediaTypes' => [],
-			'valueMaps' => []
+			'mediaTypes' => []
 		];
 
 		$this->options = array_merge($this->options, $options);
@@ -73,8 +72,7 @@ class CConfigurationExport {
 			'graphPrototypes' => [],
 			'images' => [],
 			'maps' => [],
-			'mediaTypes' => [],
-			'valueMaps' => []
+			'mediaTypes' => []
 		];
 
 		$this->dataFields = [
@@ -176,10 +174,6 @@ class CConfigurationExport {
 				$this->builder->buildMediaTypes($schema['rules']['media_types'], $this->data['mediaTypes']);
 			}
 
-			if ($this->data['valueMaps']) {
-				$this->builder->buildValueMaps($schema['rules']['value_maps'], $this->data['valueMaps']);
-			}
-
 			return $this->writer->write($this->builder->getExport());
 		}
 		catch (CConfigurationExportException $e) {
@@ -195,11 +189,6 @@ class CConfigurationExport {
 
 		if ($options['groups']) {
 			$this->gatherGroups($options['groups']);
-		}
-
-		// Gather value maps before items if possible.
-		if ($options['valueMaps']) {
-			$this->gatherValueMaps($options['valueMaps']);
 		}
 
 		if ($options['templates']) {
@@ -272,6 +261,7 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -316,6 +306,7 @@ class CConfigurationExport {
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'hostids' => $hostIds,
 			'preservekeys' => true
 		]);
@@ -557,23 +548,9 @@ class CConfigurationExport {
 		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
-		if ($this->data['valueMaps']) {
-			/*
-			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
-			 * value map IDs that should not be selected again.
-			 */
-
-			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
-				if (array_key_exists($valuemapid, $valuemapids)) {
-					unset($valuemapids[$valuemapid]);
-				}
-			}
-		}
-
 		if ($valuemapids) {
-			$this->data['valueMaps'] += API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
-				'selectMappings' => ['value', 'newvalue'],
+			$db_valuemaps = API::ValueMap()->get([
+				'output' => ['name'],
 				'valuemapids' => array_keys($valuemapids),
 				'preservekeys' => true
 			]);
@@ -583,7 +560,7 @@ class CConfigurationExport {
 			$item['valuemap'] = [];
 
 			if ($item['valuemapid'] != 0) {
-				$item['valuemap'] = ['name' => $this->data['valueMaps'][$item['valuemapid']]['name']];
+				$item['valuemap'] = ['name' => $db_valuemaps[$item['valuemapid']]['name']];
 			}
 		}
 		unset($item);
@@ -801,23 +778,9 @@ class CConfigurationExport {
 		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
-		if ($this->data['valueMaps']) {
-			/*
-			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
-			 * value map IDs that should not be selected again.
-			 */
-
-			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
-				if (array_key_exists($valuemapid, $valuemapids)) {
-					unset($valuemapids[$valuemapid]);
-				}
-			}
-		}
-
 		if ($valuemapids) {
-			$this->data['valueMaps'] += API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
-				'selectMappings' => ['value', 'newvalue'],
+			$db_valuemaps = API::ValueMap()->get([
+				'output' => ['name'],
 				'valuemapids' => array_keys($valuemapids),
 				'preservekeys' => true
 			]);
@@ -827,7 +790,7 @@ class CConfigurationExport {
 			$item_prototype['valuemap'] = [];
 
 			if ($item_prototype['valuemapid'] != 0) {
-				$item_prototype['valuemap']['name'] = $this->data['valueMaps'][$item_prototype['valuemapid']]['name'];
+				$item_prototype['valuemap']['name'] = $db_valuemaps[$item_prototype['valuemapid']]['name'];
 			}
 
 			$items[$item_prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $item_prototype;

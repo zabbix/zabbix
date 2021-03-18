@@ -128,8 +128,9 @@ class CScreenHistory extends CScreenBase {
 		$output = [];
 
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid', 'history', 'trends'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['name'],
+			'selectValueMap' => ['mappings'],
 			'itemids' => $this->itemids,
 			'webitems' => true,
 			'preservekeys' => true
@@ -423,9 +424,7 @@ class CScreenHistory extends CScreenBase {
 						$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					}
 
-					if ($item['valuemapid']) {
-						$value = applyValueMap($value, $item['valuemapid']);
-					}
+					$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
 
 					$history_table->addRow([
 						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
@@ -509,9 +508,7 @@ class CScreenHistory extends CScreenBase {
 							$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 						}
 
-						if ($item['valuemapid']) {
-							$value = applyValueMap($value, $item['valuemapid']);
-						}
+						$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
 
 						$row[] = ($value === '') ? '' : new CPre($value);
 					}

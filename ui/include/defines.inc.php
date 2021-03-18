@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.4.0alpha2');
+define('ZABBIX_VERSION',		'5.4.0beta2');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030065);
+define('ZABBIX_DB_VERSION',		5030083);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -548,11 +548,19 @@ define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',		2);
 define('ITEM_AUTHTYPE_PASSWORD',	0);
 define('ITEM_AUTHTYPE_PUBLICKEY',	1);
 
-define('ITEM_AUTHPROTOCOL_MD5', 0);
-define('ITEM_AUTHPROTOCOL_SHA', 1);
+define('ITEM_SNMPV3_AUTHPROTOCOL_MD5',		0);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA1',		1);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA224',	2);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA256',	3);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA384',	4);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA512',	5);
 
-define('ITEM_PRIVPROTOCOL_DES', 0);
-define('ITEM_PRIVPROTOCOL_AES', 1);
+define('ITEM_SNMPV3_PRIVPROTOCOL_DES',		0);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES128',	1);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES192',	2);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES256',	3);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES192C',	4);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES256C',	5);
 
 define('ITEM_LOGTYPE_INFORMATION',		1);
 define('ITEM_LOGTYPE_WARNING',			2);
@@ -1377,6 +1385,8 @@ define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		300);
 define('ZBX_TEXTAREA_MACRO_INHERITED_WIDTH',	180);
 define('ZBX_TEXTAREA_TAG_WIDTH',				250);
 define('ZBX_TEXTAREA_TAG_VALUE_WIDTH',			300);
+define('ZBX_TEXTAREA_MAPPING_VALUE_WIDTH',		250);
+define('ZBX_TEXTAREA_MAPPING_NEWVALUE_WIDTH',	250);
 define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
 define('ZBX_TEXTAREA_FILTER_SMALL_WIDTH',		150);
 define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
@@ -1405,6 +1415,7 @@ define('ZBX_ACTION_ADD',		0);
 define('ZBX_ACTION_REPLACE',	1);
 define('ZBX_ACTION_REMOVE',		2);
 define('ZBX_ACTION_REMOVE_ALL', 3);
+define('ZBX_ACTION_RENAME',		4);
 
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
@@ -1579,6 +1590,7 @@ define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
 define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
 define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
 define('TAB_INDICATOR_PERMISSIONS', 'permissions');
+define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
@@ -1796,6 +1808,8 @@ define('ZBX_STYLE_REMOVE_BTN', 'remove-btn');
 define('ZBX_STYLE_RIGHT', 'right');
 define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
+define('ZBX_STYLE_VALUEMAP_LIST_TABLE', 'valuemap-list-table');
+define('ZBX_STYLE_VALUEMAP_CHECKBOX', 'valuemap-checkbox');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_FORM_SEARCH', 'form-search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');

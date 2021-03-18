@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:06Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -2126,6 +2126,34 @@ zabbix_export:
                   value:
                     name: 'RabbitMQ: Sockets'
                     host: 'RabbitMQ node by Zabbix agent'
+      valuemaps:
+        -
+          name: 'Alarm state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Ok
+            -
+              value: '1'
+              newvalue: Alarm
+        -
+          name: 'RabbitMQ healthcheck'
+          mappings:
+            -
+              value: '0'
+              newvalue: Failed
+            -
+              value: '1'
+              newvalue: Ok
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
       name: 'RabbitMQ: Connections'
@@ -2369,31 +2397,3 @@ zabbix_export:
           item:
             host: 'RabbitMQ node by Zabbix agent'
             key: rabbitmq.node.uptime
-  value_maps:
-    -
-      name: 'Alarm state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Ok
-        -
-          value: '1'
-          newvalue: Alarm
-    -
-      name: 'RabbitMQ healthcheck'
-      mappings:
-        -
-          value: '0'
-          newvalue: Failed
-        -
-          value: '1'
-          newvalue: Ok
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

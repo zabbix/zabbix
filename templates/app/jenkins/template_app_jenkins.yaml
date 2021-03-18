@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-22T14:58:27Z'
+  date: '2021-02-17T08:10:37Z'
   groups:
     -
       name: Templates/Applications
@@ -2273,6 +2273,43 @@ zabbix_export:
           macro: '{$JENKINS.USER}'
           value: zabbix
           description: 'Username for HTTP BASIC authentication'
+      valuemaps:
+        -
+          name: 'Computer online'
+          mappings:
+            -
+              value: '0'
+              newvalue: Online
+            -
+              value: '1'
+              newvalue: Offline
+        -
+          name: 'Computer state'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'False'
+            -
+              value: '1'
+              newvalue: 'True'
+        -
+          name: 'Jenkins healthcheck'
+          mappings:
+            -
+              value: '0'
+              newvalue: Failed
+            -
+              value: '1'
+              newvalue: Ok
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '{Jenkins by HTTP:jenkins.disk_space.last()}=0 and {Jenkins by HTTP:jenkins.disk_space.message.strlen()}>0'
@@ -2356,40 +2393,3 @@ zabbix_export:
           item:
             host: 'Jenkins by HTTP'
             key: jenkins.queue.stuck
-  value_maps:
-    -
-      name: 'Computer online'
-      mappings:
-        -
-          value: '0'
-          newvalue: Online
-        -
-          value: '1'
-          newvalue: Offline
-    -
-      name: 'Computer state'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'False'
-        -
-          value: '1'
-          newvalue: 'True'
-    -
-      name: 'Jenkins healthcheck'
-      mappings:
-        -
-          value: '0'
-          newvalue: Failed
-        -
-          value: '1'
-          newvalue: Ok
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
