@@ -39,13 +39,6 @@ class CQueryParserResult extends CParserResult {
 	public $item;
 
 	/**
-	 * Item filter string
-	 *
-	 * @var string
-	 */
-	public $item_filter;
-
-	/**
 	 * Token type.
 	 *
 	 * @var int
@@ -53,12 +46,11 @@ class CQueryParserResult extends CParserResult {
 	public $type;
 
 	public function __construct(array $data = []) {
-		$data = array_intersect_key($data, array_flip(['host', 'item', 'item_filter', 'match', 'pos', 'length']));
+		$data = array_intersect_key($data, array_flip(['host', 'item', 'match', 'pos', 'length']));
 		$data += [
 			'type' => CTriggerExprParserResult::TOKEN_TYPE_QUERY,
 			'host' => '',
 			'item' => '',
-			'item_filter' => '',
 			'match' => '',
 			'pos' => 0,
 			'length' => 0
