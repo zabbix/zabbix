@@ -326,7 +326,7 @@ class CItemKey extends CParser {
 
 			switch ($source[$pos]) {
 				case '(':
-					if ($state != self::STATE_AFTER_LOGICAL_OPERATOR) {
+					if ($state != self::STATE_AFTER_LOGICAL_OPERATOR && $state != self::STATE_AFTER_OPEN_BRACE) {
 						$this->errorPos(substr($source, $pos), 0);
 
 						return false;
@@ -352,12 +352,12 @@ class CItemKey extends CParser {
 					break;
 
 				default:
-					if ($state != self::STATE_AFTER_LOGICAL_OPERATOR
+					if (($state == self::STATE_AFTER_CLOSE_BRACE || $state == self::STATE_AFTER_CONSTANT)
 							&& $logical_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
 						$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 						$pos += $logical_parser->getLength();
 					}
-					else if ($state != self::STATE_AFTER_CONSTANT
+					else if (($state == self::STATE_AFTER_OPEN_BRACE || $state == self::STATE_AFTER_LOGICAL_OPERATOR)
 							&& $attribute_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
 						$state = self::STATE_AFTER_CONSTANT;
 						$pos += $attribute_parser->getLength();

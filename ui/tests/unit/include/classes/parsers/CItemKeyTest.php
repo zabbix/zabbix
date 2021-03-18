@@ -1345,6 +1345,81 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 	public function providerItemKeyFilter() {
 		return [
 			[
+				'key?[tag="name"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key?[tag="name"]',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[tag="name" and group="name"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key?[tag="name" and group="name"]',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[((tag="name" or group="name") and tag="name")]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key?[((tag="name" or group="name") and tag="name")]',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key[,b]?[tag="name"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key[,b]?[tag="name"]',
+					'key' => 'key',
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[,b]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'b',
+									'pos' => 2
+								]
+							]
+						]
+					]
+				],
+				['', 'b']
+			],
+
+			[
+				'key?[tag="name"] test', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => _s('incorrect syntax near "%1$s"', ' test'),
+					'match' => 'key?[tag="name"]',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+
+			[
 				'key?[(]', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -1371,6 +1446,39 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'error' => _('unexpected end of key'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[and group="name"]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'and group="name"]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[tag=onequote"]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'tag=onequote"]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[tag=unquoted]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'tag=unquoted]'),
 					'match' => '',
 					'key' => 'key',
 					'parameters' => []
@@ -1411,56 +1519,38 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				[]
 			],
 			[
-				'key?[tag="name"] test', 0,
+				'key?[group="name" or and]', 0,
 				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'error' => _s('incorrect syntax near "%1$s"', ' test'),
-					'match' => 'key?[tag="name"]',
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'and]'),
+					'match' => '',
 					'key' => 'key',
 					'parameters' => []
 				],
 				[]
 			],
 			[
-				'key?[tag="name"]', 0,
+				'key?[group="name" (or group="name")]', 0,
 				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'error' => '',
-					'match' => 'key?[tag="name"]',
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', '(or group="name")]'),
+					'match' => '',
 					'key' => 'key',
 					'parameters' => []
 				],
 				[]
 			],
 			[
-				'key[,b]?[tag="name"]', 0,
+				'key?[((tag="name" or group="name") tag="name")]', 0,
 				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'error' => '',
-					'match' => 'key[,b]?[tag="name"]',
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'tag="name")]'),
+					'match' => '',
 					'key' => 'key',
-					'parameters' => [
-						0 => [
-							'type' => CItemKey::PARAM_ARRAY,
-							'raw' => '[,b]',
-							'pos' => 3,
-							'parameters' => [
-								0 => [
-									'type' => CItemKey::PARAM_UNQUOTED,
-									'raw' => '',
-									'pos' => 1
-								],
-								1 => [
-									'type' => CItemKey::PARAM_UNQUOTED,
-									'raw' => 'b',
-									'pos' => 2
-								]
-							]
-						]
-					]
+					'parameters' => []
 				],
-				['', 'b']
-			]
+				[]
+			],
 		];
 	}
 
