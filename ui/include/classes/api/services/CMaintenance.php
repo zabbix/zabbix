@@ -782,18 +782,6 @@ class CMaintenance extends CApiService {
 			if (array_key_exists('timeperiods', $maintenance)) {
 				$this->replaceTimePeriods($db_maintenances[$maintenance['maintenanceid']], $maintenance);
 			}
-
-			add_audit_ext(
-				AUDIT_ACTION_UPDATE,
-				AUDIT_RESOURCE_MAINTENANCE,
-				$maintenance['maintenanceid'],
-				array_key_exists('name', $maintenance)
-					? $maintenance['name']
-					: $db_maintenances[$maintenance['maintenanceid']]['name'],
-				'maintenances',
-				$db_maintenances[$maintenance['maintenanceid']],
-				$maintenance
-			);
 		}
 		DB::update('maintenances', $update_maintenances);
 
@@ -859,6 +847,8 @@ class CMaintenance extends CApiService {
 		}
 
 		$this->updateTags($maintenances, $db_maintenances);
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
