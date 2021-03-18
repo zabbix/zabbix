@@ -90,6 +90,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max webhook',
 						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script',
 						'Timeout' => '60s',
@@ -150,6 +151,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max webhook 3',
 						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script',
 						'Timeout' => '60s',
@@ -404,6 +406,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max script',
 						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'Script',
 						'Execute on' => 'Zabbix server (proxy)',
 						'Commands' => 'Script command',
@@ -435,6 +438,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max script 3',
 						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'Script',
 						'Execute on' => 'Zabbix server (proxy)',
 						'Commands' => 'Script command',
@@ -475,6 +479,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max IPMI',
 						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'IPMI',
 						'Command' => 'IPMI command',
 						'Description' => 'Test description',
@@ -505,6 +510,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max IPMI 3',
 						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'IPMI',
 						'Command' => 'IPMI command',
 						'Description' => 'Test description',
@@ -545,6 +551,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max SSH',
 						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'SSH',
 						'Username' => 'test',
 						'Password' => 'test_password',
@@ -580,6 +587,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max SSH 3',
 						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'SSH',
 						'Username' => 'test',
 						'Password' => 'test_password',
@@ -599,6 +607,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max SSH 4',
 						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'SSH',
 						'Authentication method' => 'Public key',
 						'Username' => 'test',
@@ -640,6 +649,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max SSH 6',
 						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'SSH',
 						'Authentication method' => 'Public key',
 						'Username' => 'test',
@@ -697,6 +707,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max Telnet',
 						'Scope' => 'Manual host action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'Telnet',
 						'Username' => 'test',
 						'Password' => 'test_password',
@@ -732,6 +743,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Max Telnet 3',
 						'Scope' => 'Manual event action',
+						'Menu path' => 'path_1/path_2',
 						'Type' => 'Telnet',
 						'Username' => 'test',
 						'Password' => 'test_password',
