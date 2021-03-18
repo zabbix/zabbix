@@ -69,6 +69,7 @@ ROW   |53         |MySQL performance           |NULL  |1      |10317     |30    
 ROW   |54         |Network interfaces          |NULL  |1      |10188     |30            |1         |
 ROW   |55         |System performance          |NULL  |1      |10248     |30            |1         |
 ROW   |56         |Redis overview              |NULL  |1      |10310     |30            |1         |
+ROW   |57         |Zabbix server               |1     |1      |NULL      |30            |1         |
 
 TABLE |dashboard_usrgrp
 FIELDS|dashboard_usrgrpid|dashboardid|usrgrpid|permission|
@@ -126,237 +127,239 @@ ROW   |53              |53         |    |0             |0        |
 ROW   |54              |54         |    |0             |0        |
 ROW   |55              |55         |    |0             |0        |
 ROW   |56              |56         |    |0             |0        |
+ROW   |57              |57         |    |0             |0        |
 
 TABLE |widget
-FIELDS|widgetid|type          |name                             |x |y |width|height|view_mode|dashboard_pageid|
-ROW   |1       |systeminfo    |                                 |0 |0 |8    |4     |0        |1               |
-ROW   |2       |hostavail     |                                 |8 |0 |12   |2     |1        |1               |
-ROW   |3       |problemsbysv  |                                 |8 |2 |12   |2     |1        |1               |
-ROW   |4       |clock         |                                 |20|0 |4    |4     |1        |1               |
-ROW   |5       |problems      |                                 |0 |4 |20   |10    |0        |1               |
-ROW   |6       |favmaps       |                                 |20|4 |4    |5     |0        |1               |
-ROW   |7       |favgraphs     |                                 |20|9 |4    |5     |0        |1               |
-ROW   |8       |problems      |Zabbix server problems           |0 |0 |20   |4     |0        |2               |
-ROW   |9       |clock         |Local time                       |20|0 |4    |4     |1        |2               |
-ROW   |10      |svggraph      |Values processed per second      |0 |4 |8    |5     |0        |2               |
-ROW   |11      |svggraph      |Utilization of data collectors   |8 |4 |8    |5     |0        |2               |
-ROW   |12      |svggraph      |Utilization of internal processes|16|4 |8    |5     |0        |2               |
-ROW   |13      |svggraph      |Cache usage                      |0 |9 |8    |5     |0        |2               |
-ROW   |14      |svggraph      |Value cache effectiveness        |8 |9 |8    |5     |0        |2               |
-ROW   |15      |svggraph      |Queue size                       |16|9 |8    |5     |0        |2               |
-ROW   |16      |graph         |                                 |0 |0 |12   |5     |0        |3               |
-ROW   |17      |graph         |                                 |12|0 |12   |5     |0        |3               |
-ROW   |18      |graphprototype|                                 |0 |5 |12   |5     |0        |3               |
-ROW   |19      |graphprototype|                                 |12|5 |12   |5     |0        |3               |
-ROW   |20      |graph         |                                 |0 |10|12   |6     |0        |3               |
-ROW   |21      |graph         |                                 |0 |0 |12   |5     |0        |4               |
-ROW   |22      |graph         |                                 |12|0 |12   |5     |0        |4               |
-ROW   |23      |graphprototype|                                 |0 |5 |12   |5     |0        |4               |
-ROW   |24      |graphprototype|                                 |12|5 |12   |5     |0        |4               |
-ROW   |25      |graph         |                                 |0 |10|12   |5     |0        |4               |
-ROW   |31      |graph         |                                 |0 |0 |12   |5     |0        |5               |
-ROW   |32      |graph         |                                 |12|0 |12   |5     |0        |5               |
-ROW   |33      |graph         |                                 |0 |5 |12   |5     |0        |5               |
-ROW   |34      |graph         |                                 |12|5 |12   |5     |0        |5               |
-ROW   |35      |graph         |                                 |0 |10|12   |5     |0        |5               |
-ROW   |49      |graph         |                                 |0 |0 |12   |5     |0        |8               |
-ROW   |50      |graph         |                                 |12|0 |12   |5     |0        |8               |
-ROW   |51      |graph         |                                 |0 |5 |12   |5     |0        |8               |
-ROW   |52      |graph         |                                 |12|5 |12   |5     |0        |8               |
-ROW   |53      |graph         |                                 |0 |10|12   |5     |0        |8               |
-ROW   |54      |graph         |                                 |0 |0 |12   |5     |0        |9               |
-ROW   |55      |graph         |                                 |12|0 |12   |5     |0        |9               |
-ROW   |56      |graph         |                                 |0 |5 |12   |5     |0        |9               |
-ROW   |57      |graph         |                                 |12|5 |12   |5     |0        |9               |
-ROW   |58      |graph         |                                 |0 |10|12   |5     |0        |9               |
-ROW   |59      |graph         |                                 |12|10|12   |5     |0        |9               |
-ROW   |60      |graphprototype|                                 |0 |0 |24   |5     |0        |10              |
-ROW   |61      |graph         |                                 |0 |0 |12   |5     |0        |11              |
-ROW   |62      |graph         |                                 |12|0 |12   |5     |0        |11              |
-ROW   |63      |graph         |                                 |0 |5 |12   |5     |0        |11              |
-ROW   |64      |graph         |                                 |12|5 |12   |5     |0        |11              |
-ROW   |65      |graphprototype|                                 |0 |10|24   |5     |0        |11              |
-ROW   |66      |graphprototype|                                 |0 |15|24   |5     |0        |11              |
-ROW   |67      |graphprototype|                                 |0 |20|24   |5     |0        |11              |
-ROW   |68      |graphprototype|                                 |0 |25|24   |5     |0        |11              |
-ROW   |69      |graphprototype|                                 |0 |30|24   |5     |0        |11              |
-ROW   |81      |graph         |                                 |0 |0 |12   |5     |0        |12              |
-ROW   |82      |graph         |                                 |12|0 |12   |5     |0        |12              |
-ROW   |83      |graph         |                                 |0 |5 |12   |5     |0        |12              |
-ROW   |84      |graph         |                                 |12|5 |12   |5     |0        |12              |
-ROW   |85      |graph         |                                 |0 |10|12   |5     |0        |12              |
-ROW   |86      |graph         |                                 |0 |0 |12   |5     |0        |13              |
-ROW   |87      |graph         |                                 |12|0 |12   |5     |0        |13              |
-ROW   |88      |graph         |                                 |0 |5 |12   |5     |0        |13              |
-ROW   |89      |graph         |                                 |12|5 |12   |5     |0        |13              |
-ROW   |90      |graph         |                                 |0 |10|12   |5     |0        |13              |
-ROW   |91      |graph         |                                 |12|10|12   |5     |0        |13              |
-ROW   |92      |graphprototype|                                 |0 |0 |24   |5     |0        |14              |
-ROW   |93      |graph         |                                 |0 |0 |12   |5     |0        |15              |
-ROW   |94      |graph         |                                 |12|0 |12   |5     |0        |15              |
-ROW   |95      |graph         |                                 |0 |5 |12   |5     |0        |15              |
-ROW   |96      |graph         |                                 |12|5 |12   |5     |0        |15              |
-ROW   |97      |graphprototype|                                 |0 |10|24   |5     |0        |15              |
-ROW   |98      |graphprototype|                                 |0 |15|24   |5     |0        |15              |
-ROW   |99      |graphprototype|                                 |0 |20|24   |5     |0        |15              |
-ROW   |100     |graphprototype|                                 |0 |25|24   |5     |0        |15              |
-ROW   |101     |graphprototype|                                 |0 |30|24   |5     |0        |15              |
-ROW   |102     |graphprototype|                                 |0 |0 |24   |5     |0        |16              |
-ROW   |103     |graph         |                                 |0 |0 |12   |5     |0        |17              |
-ROW   |104     |graph         |                                 |12|0 |12   |5     |0        |17              |
-ROW   |105     |graph         |                                 |0 |5 |12   |5     |0        |17              |
-ROW   |106     |graph         |                                 |12|5 |12   |5     |0        |17              |
-ROW   |107     |graphprototype|                                 |0 |10|24   |5     |0        |17              |
-ROW   |108     |graphprototype|                                 |0 |15|24   |5     |0        |17              |
-ROW   |109     |graphprototype|                                 |0 |20|24   |5     |0        |17              |
-ROW   |110     |graphprototype|                                 |0 |25|24   |5     |0        |17              |
-ROW   |111     |graphprototype|                                 |0 |30|24   |5     |0        |17              |
-ROW   |112     |graphprototype|                                 |0 |0 |12   |5     |0        |18              |
-ROW   |113     |graphprototype|                                 |12|0 |12   |5     |0        |18              |
-ROW   |114     |graphprototype|                                 |0 |5 |12   |5     |0        |18              |
-ROW   |115     |graphprototype|                                 |12|5 |12   |5     |0        |18              |
-ROW   |116     |graphprototype|                                 |0 |0 |24   |5     |0        |19              |
-ROW   |125     |graphprototype|                                 |0 |0 |24   |5     |0        |21              |
-ROW   |126     |graph         |                                 |0 |0 |12   |5     |0        |22              |
-ROW   |127     |graph         |                                 |12|0 |12   |5     |0        |22              |
-ROW   |128     |graph         |                                 |0 |5 |12   |5     |0        |22              |
-ROW   |129     |graph         |                                 |12|5 |12   |5     |0        |22              |
-ROW   |130     |graphprototype|                                 |0 |10|24   |5     |0        |22              |
-ROW   |131     |graphprototype|                                 |0 |15|24   |5     |0        |22              |
-ROW   |132     |graphprototype|                                 |0 |20|24   |5     |0        |22              |
-ROW   |133     |graphprototype|                                 |0 |25|24   |5     |0        |22              |
-ROW   |134     |graph         |                                 |0 |0 |12   |5     |0        |23              |
-ROW   |135     |graph         |                                 |12|0 |12   |5     |0        |23              |
-ROW   |136     |graph         |                                 |0 |5 |12   |5     |0        |23              |
-ROW   |137     |graph         |                                 |12|5 |12   |5     |0        |23              |
-ROW   |138     |graph         |                                 |0 |10|12   |5     |0        |23              |
-ROW   |139     |graph         |                                 |12|10|12   |5     |0        |23              |
-ROW   |140     |graph         |                                 |0 |0 |12   |5     |0        |24              |
-ROW   |141     |graph         |                                 |12|0 |12   |5     |0        |24              |
-ROW   |142     |graph         |                                 |0 |5 |12   |5     |0        |24              |
-ROW   |143     |graph         |                                 |12|5 |12   |5     |0        |24              |
-ROW   |144     |graph         |                                 |0 |10|12   |5     |0        |24              |
-ROW   |145     |graph         |                                 |12|10|12   |5     |0        |24              |
-ROW   |154     |graphprototype|                                 |0 |0 |24   |5     |0        |26              |
-ROW   |155     |graphprototype|                                 |0 |0 |24   |5     |0        |27              |
-ROW   |156     |graph         |                                 |0 |0 |12   |5     |0        |28              |
-ROW   |157     |graph         |                                 |12|0 |12   |5     |0        |28              |
-ROW   |158     |graph         |                                 |0 |5 |12   |5     |0        |28              |
-ROW   |162     |graph         |                                 |0 |0 |12   |5     |0        |30              |
-ROW   |163     |graph         |                                 |12|0 |12   |5     |0        |30              |
-ROW   |164     |graph         |                                 |0 |5 |12   |5     |0        |30              |
-ROW   |165     |graph         |                                 |0 |0 |24   |5     |0        |29              |
-ROW   |166     |graphprototype|                                 |0 |5 |24   |5     |0        |29              |
-ROW   |167     |graphprototype|                                 |0 |10|24   |5     |0        |29              |
-ROW   |182     |graph         |                                 |0 |0 |12   |5     |0        |33              |
-ROW   |183     |graph         |                                 |12|0 |12   |5     |0        |33              |
-ROW   |184     |graph         |                                 |0 |5 |12   |7     |0        |33              |
-ROW   |185     |graph         |                                 |12|5 |12   |7     |0        |33              |
-ROW   |186     |graph         |                                 |0 |12|12   |5     |0        |33              |
-ROW   |187     |graph         |                                 |12|12|12   |5     |0        |33              |
-ROW   |204     |graph         |                                 |0 |0 |12   |6     |0        |36              |
-ROW   |205     |graph         |                                 |12|0 |12   |6     |0        |36              |
-ROW   |206     |graph         |                                 |0 |6 |12   |5     |0        |36              |
-ROW   |207     |graph         |                                 |12|6 |12   |5     |0        |36              |
-ROW   |208     |graph         |                                 |0 |11|12   |5     |0        |36              |
-ROW   |209     |graph         |                                 |12|11|12   |5     |0        |36              |
-ROW   |210     |graph         |                                 |0 |0 |12   |6     |0        |37              |
-ROW   |211     |graph         |                                 |12|0 |12   |6     |0        |37              |
-ROW   |212     |graph         |                                 |0 |6 |12   |5     |0        |37              |
-ROW   |213     |graph         |                                 |12|6 |12   |5     |0        |37              |
-ROW   |214     |graph         |                                 |0 |0 |12   |6     |0        |38              |
-ROW   |215     |graph         |                                 |12|0 |12   |6     |0        |38              |
-ROW   |216     |graph         |                                 |0 |6 |12   |5     |0        |38              |
-ROW   |217     |graph         |                                 |12|6 |12   |5     |0        |38              |
-ROW   |218     |graph         |                                 |0 |11|12   |5     |0        |38              |
-ROW   |219     |graph         |                                 |12|11|12   |5     |0        |38              |
-ROW   |220     |graph         |                                 |0 |0 |12   |6     |0        |39              |
-ROW   |221     |graph         |                                 |12|0 |12   |6     |0        |39              |
-ROW   |222     |graph         |                                 |0 |6 |12   |5     |0        |39              |
-ROW   |223     |graph         |                                 |12|6 |12   |5     |0        |39              |
-ROW   |224     |graphprototype|                                 |0 |0 |24   |5     |0        |40              |
-ROW   |225     |graphprototype|                                 |0 |0 |12   |5     |0        |41              |
-ROW   |226     |graphprototype|                                 |12|0 |12   |5     |0        |41              |
-ROW   |227     |graphprototype|                                 |0 |5 |12   |5     |0        |41              |
-ROW   |228     |graphprototype|                                 |12|5 |12   |5     |0        |41              |
-ROW   |229     |graphprototype|                                 |0 |0 |24   |5     |0        |42              |
-ROW   |236     |graph         |                                 |0 |0 |12   |5     |0        |32              |
-ROW   |237     |graph         |                                 |12|0 |12   |5     |0        |32              |
-ROW   |238     |graph         |                                 |0 |5 |12   |7     |0        |32              |
-ROW   |239     |graph         |                                 |12|5 |12   |7     |0        |32              |
-ROW   |240     |graph         |                                 |0 |12|12   |5     |0        |32              |
-ROW   |241     |graph         |                                 |12|12|12   |5     |0        |32              |
-ROW   |248     |graphprototype|                                 |0 |0 |24   |5     |0        |43              |
-ROW   |249     |graphprototype|                                 |0 |0 |12   |5     |0        |44              |
-ROW   |250     |graphprototype|                                 |12|0 |12   |5     |0        |44              |
-ROW   |251     |graphprototype|                                 |0 |5 |12   |5     |0        |44              |
-ROW   |252     |graphprototype|                                 |12|5 |12   |5     |0        |44              |
-ROW   |253     |graphprototype|                                 |0 |0 |24   |5     |0        |45              |
-ROW   |254     |graph         |                                 |0 |0 |24   |5     |0        |31              |
-ROW   |255     |graph         |                                 |0 |5 |24   |5     |0        |31              |
-ROW   |272     |graph         |                                 |0 |0 |12   |5     |0        |20              |
-ROW   |273     |graph         |                                 |12|0 |12   |5     |0        |20              |
-ROW   |274     |graph         |                                 |0 |5 |12   |5     |0        |20              |
-ROW   |275     |graph         |                                 |12|5 |12   |5     |0        |20              |
-ROW   |276     |graphprototype|                                 |0 |10|24   |5     |0        |20              |
-ROW   |277     |graphprototype|                                 |0 |15|24   |5     |0        |20              |
-ROW   |278     |graphprototype|                                 |0 |20|24   |5     |0        |20              |
-ROW   |279     |graphprototype|                                 |0 |25|24   |5     |0        |20              |
-ROW   |328     |graphprototype|                                 |0 |0 |12   |6     |0        |48              |
-ROW   |329     |graphprototype|                                 |12|0 |12   |6     |0        |48              |
-ROW   |330     |graphprototype|                                 |0 |6 |12   |6     |0        |48              |
-ROW   |331     |graphprototype|                                 |12|6 |12   |6     |0        |48              |
-ROW   |332     |graphprototype|                                 |0 |12|12   |6     |0        |48              |
-ROW   |333     |graphprototype|                                 |12|12|12   |6     |0        |48              |
-ROW   |334     |graphprototype|                                 |0 |18|12   |6     |0        |48              |
-ROW   |335     |graphprototype|                                 |12|18|12   |6     |0        |48              |
-ROW   |336     |graph         |                                 |0 |0 |12   |6     |0        |49              |
-ROW   |337     |graph         |                                 |12|0 |12   |6     |0        |49              |
-ROW   |338     |graph         |                                 |0 |6 |12   |6     |0        |49              |
-ROW   |339     |graph         |                                 |12|6 |12   |6     |0        |49              |
-ROW   |340     |graph         |                                 |0 |12|12   |6     |0        |49              |
-ROW   |341     |graph         |                                 |12|12|12   |6     |0        |49              |
-ROW   |342     |graph         |                                 |0 |18|12   |6     |0        |49              |
-ROW   |343     |graph         |                                 |12|18|12   |6     |0        |49              |
-ROW   |344     |graph         |                                 |0 |0 |12   |5     |0        |50              |
-ROW   |345     |graph         |                                 |12|0 |12   |5     |0        |50              |
-ROW   |346     |graph         |                                 |0 |5 |12   |5     |0        |50              |
-ROW   |347     |graph         |                                 |12|5 |12   |5     |0        |50              |
-ROW   |348     |graph         |                                 |0 |0 |12   |5     |0        |51              |
-ROW   |349     |graph         |                                 |12|0 |12   |5     |0        |51              |
-ROW   |350     |graph         |                                 |0 |5 |12   |7     |0        |51              |
-ROW   |351     |graph         |                                 |12|5 |12   |7     |0        |51              |
-ROW   |355     |graph         |                                 |0 |0 |12   |5     |0        |52              |
-ROW   |356     |graph         |                                 |12|0 |12   |5     |0        |52              |
-ROW   |357     |graph         |                                 |0 |5 |12   |5     |0        |52              |
-ROW   |364     |graph         |                                 |0 |0 |12   |5     |0        |53              |
-ROW   |365     |graph         |                                 |12|0 |12   |5     |0        |53              |
-ROW   |366     |graph         |                                 |0 |5 |12   |5     |0        |53              |
-ROW   |367     |graph         |                                 |12|5 |12   |5     |0        |53              |
-ROW   |368     |graph         |                                 |0 |10|12   |5     |0        |53              |
-ROW   |369     |graph         |                                 |12|10|12   |5     |0        |53              |
-ROW   |370     |graphprototype|                                 |0 |0 |24   |5     |0        |54              |
-ROW   |379     |graph         |                                 |0 |0 |12   |5     |0        |55              |
-ROW   |380     |graphprototype|                                 |12|0 |12   |5     |0        |55              |
-ROW   |381     |graph         |                                 |0 |5 |12   |5     |0        |55              |
-ROW   |382     |graph         |                                 |12|5 |12   |5     |0        |55              |
-ROW   |383     |graphprototype|                                 |0 |10|24   |5     |0        |55              |
-ROW   |384     |graphprototype|                                 |0 |15|24   |5     |0        |55              |
-ROW   |385     |graphprototype|                                 |0 |20|24   |5     |0        |55              |
-ROW   |386     |graphprototype|                                 |0 |25|24   |5     |0        |55              |
-ROW   |387     |graph         |                                 |0 |0 |12   |5     |0        |56              |
-ROW   |388     |graph         |                                 |12|0 |12   |5     |0        |56              |
-ROW   |389     |graph         |                                 |0 |5 |12   |5     |0        |56              |
-ROW   |390     |graph         |                                 |12|5 |12   |5     |0        |56              |
-ROW   |391     |graph         |                                 |0 |10|12   |5     |0        |56              |
-ROW   |392     |graph         |                                 |12|10|12   |5     |0        |56              |
-ROW   |393     |graph         |                                 |0 |15|12   |5     |0        |56              |
-ROW   |394     |graph         |                                 |12|15|12   |5     |0        |56              |
-ROW   |395     |graphprototype|                                 |0 |20|12   |5     |0        |56              |
-ROW   |396     |graph         |                                 |0 |0 |12   |5     |0        |7               |
-ROW   |397     |graph         |                                 |12|0 |12   |5     |0        |7               |
-ROW   |398     |graph         |                                 |0 |5 |12   |5     |0        |7               |
-ROW   |399     |graph         |                                 |12|5 |12   |5     |0        |7               |
+FIELDS|widgetid|type          |name                             |x   |y   |width|height|view_mode|dashboard_pageid|
+ROW   |1       |systeminfo    |                                 |0   |0   |8    |4     |0        |1               |
+ROW   |2       |hostavail     |                                 |8   |0   |12   |2     |1        |1               |
+ROW   |3       |problemsbysv  |                                 |8   |2   |12   |2     |1        |1               |
+ROW   |4       |clock         |                                 |20  |0   |4    |4     |1        |1               |
+ROW   |5       |problems      |                                 |0   |4   |20   |10    |0        |1               |
+ROW   |6       |favmaps       |                                 |20  |4   |4    |5     |0        |1               |
+ROW   |7       |favgraphs     |                                 |20  |9   |4    |5     |0        |1               |
+ROW   |8       |problems      |Zabbix server problems           |0   |0   |20   |4     |0        |2               |
+ROW   |9       |clock         |Local time                       |20  |0   |4    |4     |1        |2               |
+ROW   |10      |svggraph      |Values processed per second      |0   |4   |8    |5     |0        |2               |
+ROW   |11      |svggraph      |Utilization of data collectors   |8   |4   |8    |5     |0        |2               |
+ROW   |12      |svggraph      |Utilization of internal processes|16  |4   |8    |5     |0        |2               |
+ROW   |13      |svggraph      |Cache usage                      |0   |9   |8    |5     |0        |2               |
+ROW   |14      |svggraph      |Value cache effectiveness        |8   |9   |8    |5     |0        |2               |
+ROW   |15      |svggraph      |Queue size                       |16  |9   |8    |5     |0        |2               |
+ROW   |16      |graph         |                                 |0   |0   |12   |5     |0        |3               |
+ROW   |17      |graph         |                                 |12  |0   |12   |5     |0        |3               |
+ROW   |18      |graphprototype|                                 |0   |5   |12   |5     |0        |3               |
+ROW   |19      |graphprototype|                                 |12  |5   |12   |5     |0        |3               |
+ROW   |20      |graph         |                                 |0   |10  |12   |6     |0        |3               |
+ROW   |21      |graph         |                                 |0   |0   |12   |5     |0        |4               |
+ROW   |22      |graph         |                                 |12  |0   |12   |5     |0        |4               |
+ROW   |23      |graphprototype|                                 |0   |5   |12   |5     |0        |4               |
+ROW   |24      |graphprototype|                                 |12  |5   |12   |5     |0        |4               |
+ROW   |25      |graph         |                                 |0   |10  |12   |5     |0        |4               |
+ROW   |31      |graph         |                                 |0   |0   |12   |5     |0        |5               |
+ROW   |32      |graph         |                                 |12  |0   |12   |5     |0        |5               |
+ROW   |33      |graph         |                                 |0   |5   |12   |5     |0        |5               |
+ROW   |34      |graph         |                                 |12  |5   |12   |5     |0        |5               |
+ROW   |35      |graph         |                                 |0   |10  |12   |5     |0        |5               |
+ROW   |49      |graph         |                                 |0   |0   |12   |5     |0        |8               |
+ROW   |50      |graph         |                                 |12  |0   |12   |5     |0        |8               |
+ROW   |51      |graph         |                                 |0   |5   |12   |5     |0        |8               |
+ROW   |52      |graph         |                                 |12  |5   |12   |5     |0        |8               |
+ROW   |53      |graph         |                                 |0   |10  |12   |5     |0        |8               |
+ROW   |54      |graph         |                                 |0   |0   |12   |5     |0        |9               |
+ROW   |55      |graph         |                                 |12  |0   |12   |5     |0        |9               |
+ROW   |56      |graph         |                                 |0   |5   |12   |5     |0        |9               |
+ROW   |57      |graph         |                                 |12  |5   |12   |5     |0        |9               |
+ROW   |58      |graph         |                                 |0   |10  |12   |5     |0        |9               |
+ROW   |59      |graph         |                                 |12  |10  |12   |5     |0        |9               |
+ROW   |60      |graphprototype|                                 |0   |0   |24   |5     |0        |10              |
+ROW   |61      |graph         |                                 |0   |0   |12   |5     |0        |11              |
+ROW   |62      |graph         |                                 |12  |0   |12   |5     |0        |11              |
+ROW   |63      |graph         |                                 |0   |5   |12   |5     |0        |11              |
+ROW   |64      |graph         |                                 |12  |5   |12   |5     |0        |11              |
+ROW   |65      |graphprototype|                                 |0   |10  |24   |5     |0        |11              |
+ROW   |66      |graphprototype|                                 |0   |15  |24   |5     |0        |11              |
+ROW   |67      |graphprototype|                                 |0   |20  |24   |5     |0        |11              |
+ROW   |68      |graphprototype|                                 |0   |25  |24   |5     |0        |11              |
+ROW   |69      |graphprototype|                                 |0   |30  |24   |5     |0        |11              |
+ROW   |81      |graph         |                                 |0   |0   |12   |5     |0        |12              |
+ROW   |82      |graph         |                                 |12  |0   |12   |5     |0        |12              |
+ROW   |83      |graph         |                                 |0   |5   |12   |5     |0        |12              |
+ROW   |84      |graph         |                                 |12  |5   |12   |5     |0        |12              |
+ROW   |85      |graph         |                                 |0   |10  |12   |5     |0        |12              |
+ROW   |86      |graph         |                                 |0   |0   |12   |5     |0        |13              |
+ROW   |87      |graph         |                                 |12  |0   |12   |5     |0        |13              |
+ROW   |88      |graph         |                                 |0   |5   |12   |5     |0        |13              |
+ROW   |89      |graph         |                                 |12  |5   |12   |5     |0        |13              |
+ROW   |90      |graph         |                                 |0   |10  |12   |5     |0        |13              |
+ROW   |91      |graph         |                                 |12  |10  |12   |5     |0        |13              |
+ROW   |92      |graphprototype|                                 |0   |0   |24   |5     |0        |14              |
+ROW   |93      |graph         |                                 |0   |0   |12   |5     |0        |15              |
+ROW   |94      |graph         |                                 |12  |0   |12   |5     |0        |15              |
+ROW   |95      |graph         |                                 |0   |5   |12   |5     |0        |15              |
+ROW   |96      |graph         |                                 |12  |5   |12   |5     |0        |15              |
+ROW   |97      |graphprototype|                                 |0   |10  |24   |5     |0        |15              |
+ROW   |98      |graphprototype|                                 |0   |15  |24   |5     |0        |15              |
+ROW   |99      |graphprototype|                                 |0   |20  |24   |5     |0        |15              |
+ROW   |100     |graphprototype|                                 |0   |25  |24   |5     |0        |15              |
+ROW   |101     |graphprototype|                                 |0   |30  |24   |5     |0        |15              |
+ROW   |102     |graphprototype|                                 |0   |0   |24   |5     |0        |16              |
+ROW   |103     |graph         |                                 |0   |0   |12   |5     |0        |17              |
+ROW   |104     |graph         |                                 |12  |0   |12   |5     |0        |17              |
+ROW   |105     |graph         |                                 |0   |5   |12   |5     |0        |17              |
+ROW   |106     |graph         |                                 |12  |5   |12   |5     |0        |17              |
+ROW   |107     |graphprototype|                                 |0   |10  |24   |5     |0        |17              |
+ROW   |108     |graphprototype|                                 |0   |15  |24   |5     |0        |17              |
+ROW   |109     |graphprototype|                                 |0   |20  |24   |5     |0        |17              |
+ROW   |110     |graphprototype|                                 |0   |25  |24   |5     |0        |17              |
+ROW   |111     |graphprototype|                                 |0   |30  |24   |5     |0        |17              |
+ROW   |112     |graphprototype|                                 |0   |0   |12   |5     |0        |18              |
+ROW   |113     |graphprototype|                                 |12  |0   |12   |5     |0        |18              |
+ROW   |114     |graphprototype|                                 |0   |5   |12   |5     |0        |18              |
+ROW   |115     |graphprototype|                                 |12  |5   |12   |5     |0        |18              |
+ROW   |116     |graphprototype|                                 |0   |0   |24   |5     |0        |19              |
+ROW   |125     |graphprototype|                                 |0   |0   |24   |5     |0        |21              |
+ROW   |126     |graph         |                                 |0   |0   |12   |5     |0        |22              |
+ROW   |127     |graph         |                                 |12  |0   |12   |5     |0        |22              |
+ROW   |128     |graph         |                                 |0   |5   |12   |5     |0        |22              |
+ROW   |129     |graph         |                                 |12  |5   |12   |5     |0        |22              |
+ROW   |130     |graphprototype|                                 |0   |10  |24   |5     |0        |22              |
+ROW   |131     |graphprototype|                                 |0   |15  |24   |5     |0        |22              |
+ROW   |132     |graphprototype|                                 |0   |20  |24   |5     |0        |22              |
+ROW   |133     |graphprototype|                                 |0   |25  |24   |5     |0        |22              |
+ROW   |134     |graph         |                                 |0   |0   |12   |5     |0        |23              |
+ROW   |135     |graph         |                                 |12  |0   |12   |5     |0        |23              |
+ROW   |136     |graph         |                                 |0   |5   |12   |5     |0        |23              |
+ROW   |137     |graph         |                                 |12  |5   |12   |5     |0        |23              |
+ROW   |138     |graph         |                                 |0   |10  |12   |5     |0        |23              |
+ROW   |139     |graph         |                                 |12  |10  |12   |5     |0        |23              |
+ROW   |140     |graph         |                                 |0   |0   |12   |5     |0        |24              |
+ROW   |141     |graph         |                                 |12  |0   |12   |5     |0        |24              |
+ROW   |142     |graph         |                                 |0   |5   |12   |5     |0        |24              |
+ROW   |143     |graph         |                                 |12  |5   |12   |5     |0        |24              |
+ROW   |144     |graph         |                                 |0   |10  |12   |5     |0        |24              |
+ROW   |145     |graph         |                                 |12  |10  |12   |5     |0        |24              |
+ROW   |154     |graphprototype|                                 |0   |0   |24   |5     |0        |26              |
+ROW   |155     |graphprototype|                                 |0   |0   |24   |5     |0        |27              |
+ROW   |156     |graph         |                                 |0   |0   |12   |5     |0        |28              |
+ROW   |157     |graph         |                                 |12  |0   |12   |5     |0        |28              |
+ROW   |158     |graph         |                                 |0   |5   |12   |5     |0        |28              |
+ROW   |162     |graph         |                                 |0   |0   |12   |5     |0        |30              |
+ROW   |163     |graph         |                                 |12  |0   |12   |5     |0        |30              |
+ROW   |164     |graph         |                                 |0   |5   |12   |5     |0        |30              |
+ROW   |165     |graph         |                                 |0   |0   |24   |5     |0        |29              |
+ROW   |166     |graphprototype|                                 |0   |5   |24   |5     |0        |29              |
+ROW   |167     |graphprototype|                                 |0   |10  |24   |5     |0        |29              |
+ROW   |182     |graph         |                                 |0   |0   |12   |5     |0        |33              |
+ROW   |183     |graph         |                                 |12  |0   |12   |5     |0        |33              |
+ROW   |184     |graph         |                                 |0   |5   |12   |7     |0        |33              |
+ROW   |185     |graph         |                                 |12  |5   |12   |7     |0        |33              |
+ROW   |186     |graph         |                                 |0   |12  |12   |5     |0        |33              |
+ROW   |187     |graph         |                                 |12  |12  |12   |5     |0        |33              |
+ROW   |204     |graph         |                                 |0   |0   |12   |6     |0        |36              |
+ROW   |205     |graph         |                                 |12  |0   |12   |6     |0        |36              |
+ROW   |206     |graph         |                                 |0   |6   |12   |5     |0        |36              |
+ROW   |207     |graph         |                                 |12  |6   |12   |5     |0        |36              |
+ROW   |208     |graph         |                                 |0   |11  |12   |5     |0        |36              |
+ROW   |209     |graph         |                                 |12  |11  |12   |5     |0        |36              |
+ROW   |210     |graph         |                                 |0   |0   |12   |6     |0        |37              |
+ROW   |211     |graph         |                                 |12  |0   |12   |6     |0        |37              |
+ROW   |212     |graph         |                                 |0   |6   |12   |5     |0        |37              |
+ROW   |213     |graph         |                                 |12  |6   |12   |5     |0        |37              |
+ROW   |214     |graph         |                                 |0   |0   |12   |6     |0        |38              |
+ROW   |215     |graph         |                                 |12  |0   |12   |6     |0        |38              |
+ROW   |216     |graph         |                                 |0   |6   |12   |5     |0        |38              |
+ROW   |217     |graph         |                                 |12  |6   |12   |5     |0        |38              |
+ROW   |218     |graph         |                                 |0   |11  |12   |5     |0        |38              |
+ROW   |219     |graph         |                                 |12  |11  |12   |5     |0        |38              |
+ROW   |220     |graph         |                                 |0   |0   |12   |6     |0        |39              |
+ROW   |221     |graph         |                                 |12  |0   |12   |6     |0        |39              |
+ROW   |222     |graph         |                                 |0   |6   |12   |5     |0        |39              |
+ROW   |223     |graph         |                                 |12  |6   |12   |5     |0        |39              |
+ROW   |224     |graphprototype|                                 |0   |0   |24   |5     |0        |40              |
+ROW   |225     |graphprototype|                                 |0   |0   |12   |5     |0        |41              |
+ROW   |226     |graphprototype|                                 |12  |0   |12   |5     |0        |41              |
+ROW   |227     |graphprototype|                                 |0   |5   |12   |5     |0        |41              |
+ROW   |228     |graphprototype|                                 |12  |5   |12   |5     |0        |41              |
+ROW   |229     |graphprototype|                                 |0   |0   |24   |5     |0        |42              |
+ROW   |236     |graph         |                                 |0   |0   |12   |5     |0        |32              |
+ROW   |237     |graph         |                                 |12  |0   |12   |5     |0        |32              |
+ROW   |238     |graph         |                                 |0   |5   |12   |7     |0        |32              |
+ROW   |239     |graph         |                                 |12  |5   |12   |7     |0        |32              |
+ROW   |240     |graph         |                                 |0   |12  |12   |5     |0        |32              |
+ROW   |241     |graph         |                                 |12  |12  |12   |5     |0        |32              |
+ROW   |248     |graphprototype|                                 |0   |0   |24   |5     |0        |43              |
+ROW   |249     |graphprototype|                                 |0   |0   |12   |5     |0        |44              |
+ROW   |250     |graphprototype|                                 |12  |0   |12   |5     |0        |44              |
+ROW   |251     |graphprototype|                                 |0   |5   |12   |5     |0        |44              |
+ROW   |252     |graphprototype|                                 |12  |5   |12   |5     |0        |44              |
+ROW   |253     |graphprototype|                                 |0   |0   |24   |5     |0        |45              |
+ROW   |254     |graph         |                                 |0   |0   |24   |5     |0        |31              |
+ROW   |255     |graph         |                                 |0   |5   |24   |5     |0        |31              |
+ROW   |272     |graph         |                                 |0   |0   |12   |5     |0        |20              |
+ROW   |273     |graph         |                                 |12  |0   |12   |5     |0        |20              |
+ROW   |274     |graph         |                                 |0   |5   |12   |5     |0        |20              |
+ROW   |275     |graph         |                                 |12  |5   |12   |5     |0        |20              |
+ROW   |276     |graphprototype|                                 |0   |10  |24   |5     |0        |20              |
+ROW   |277     |graphprototype|                                 |0   |15  |24   |5     |0        |20              |
+ROW   |278     |graphprototype|                                 |0   |20  |24   |5     |0        |20              |
+ROW   |279     |graphprototype|                                 |0   |25  |24   |5     |0        |20              |
+ROW   |328     |graphprototype|                                 |0   |0   |12   |6     |0        |48              |
+ROW   |329     |graphprototype|                                 |12  |0   |12   |6     |0        |48              |
+ROW   |330     |graphprototype|                                 |0   |6   |12   |6     |0        |48              |
+ROW   |331     |graphprototype|                                 |12  |6   |12   |6     |0        |48              |
+ROW   |332     |graphprototype|                                 |0   |12  |12   |6     |0        |48              |
+ROW   |333     |graphprototype|                                 |12  |12  |12   |6     |0        |48              |
+ROW   |334     |graphprototype|                                 |0   |18  |12   |6     |0        |48              |
+ROW   |335     |graphprototype|                                 |12  |18  |12   |6     |0        |48              |
+ROW   |336     |graph         |                                 |0   |0   |12   |6     |0        |49              |
+ROW   |337     |graph         |                                 |12  |0   |12   |6     |0        |49              |
+ROW   |338     |graph         |                                 |0   |6   |12   |6     |0        |49              |
+ROW   |339     |graph         |                                 |12  |6   |12   |6     |0        |49              |
+ROW   |340     |graph         |                                 |0   |12  |12   |6     |0        |49              |
+ROW   |341     |graph         |                                 |12  |12  |12   |6     |0        |49              |
+ROW   |342     |graph         |                                 |0   |18  |12   |6     |0        |49              |
+ROW   |343     |graph         |                                 |12  |18  |12   |6     |0        |49              |
+ROW   |344     |graph         |                                 |0   |0   |12   |5     |0        |50              |
+ROW   |345     |graph         |                                 |12  |0   |12   |5     |0        |50              |
+ROW   |346     |graph         |                                 |0   |5   |12   |5     |0        |50              |
+ROW   |347     |graph         |                                 |12  |5   |12   |5     |0        |50              |
+ROW   |348     |graph         |                                 |0   |0   |12   |5     |0        |51              |
+ROW   |349     |graph         |                                 |12  |0   |12   |5     |0        |51              |
+ROW   |350     |graph         |                                 |0   |5   |12   |7     |0        |51              |
+ROW   |351     |graph         |                                 |12  |5   |12   |7     |0        |51              |
+ROW   |355     |graph         |                                 |0   |0   |12   |5     |0        |52              |
+ROW   |356     |graph         |                                 |12  |0   |12   |5     |0        |52              |
+ROW   |357     |graph         |                                 |0   |5   |12   |5     |0        |52              |
+ROW   |364     |graph         |                                 |0   |0   |12   |5     |0        |53              |
+ROW   |365     |graph         |                                 |12  |0   |12   |5     |0        |53              |
+ROW   |366     |graph         |                                 |0   |5   |12   |5     |0        |53              |
+ROW   |367     |graph         |                                 |12  |5   |12   |5     |0        |53              |
+ROW   |368     |graph         |                                 |0   |10  |12   |5     |0        |53              |
+ROW   |369     |graph         |                                 |12  |10  |12   |5     |0        |53              |
+ROW   |370     |graphprototype|                                 |0   |0   |24   |5     |0        |54              |
+ROW   |379     |graph         |                                 |0   |0   |12   |5     |0        |55              |
+ROW   |380     |graphprototype|                                 |12  |0   |12   |5     |0        |55              |
+ROW   |381     |graph         |                                 |0   |5   |12   |5     |0        |55              |
+ROW   |382     |graph         |                                 |12  |5   |12   |5     |0        |55              |
+ROW   |383     |graphprototype|                                 |0   |10  |24   |5     |0        |55              |
+ROW   |384     |graphprototype|                                 |0   |15  |24   |5     |0        |55              |
+ROW   |385     |graphprototype|                                 |0   |20  |24   |5     |0        |55              |
+ROW   |386     |graphprototype|                                 |0   |25  |24   |5     |0        |55              |
+ROW   |387     |graph         |                                 |0   |0   |12   |5     |0        |56              |
+ROW   |388     |graph         |                                 |12  |0   |12   |5     |0        |56              |
+ROW   |389     |graph         |                                 |0   |5   |12   |5     |0        |56              |
+ROW   |390     |graph         |                                 |12  |5   |12   |5     |0        |56              |
+ROW   |391     |graph         |                                 |0   |10  |12   |5     |0        |56              |
+ROW   |392     |graph         |                                 |12  |10  |12   |5     |0        |56              |
+ROW   |393     |graph         |                                 |0   |15  |12   |5     |0        |56              |
+ROW   |394     |graph         |                                 |12  |15  |12   |5     |0        |56              |
+ROW   |395     |graphprototype|                                 |0   |20  |12   |5     |0        |56              |
+ROW   |396     |graph         |                                 |0   |0   |12   |5     |0        |7               |
+ROW   |397     |graph         |                                 |12  |0   |12   |5     |0        |7               |
+ROW   |398     |graph         |                                 |0   |5   |12   |5     |0        |7               |
+ROW   |399     |graph         |                                 |12  |5   |12   |5     |0        |7               |
+ROW   |400     |map           |                                 |0   |0   |24   |4     |0        |57              |
 
 TABLE |widget_field
 FIELDS|widget_fieldid|widgetid|type|name                |value_int|value_str                             |value_groupid|value_hostid|value_itemid|value_graphid|value_sysmapid|
@@ -1047,4 +1050,6 @@ ROW   |1171          |398     |0   |source_type         |0        |             
 ROW   |1172          |398     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1096         |NULL          |
 ROW   |1173          |399     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
 ROW   |1174          |399     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1097         |NULL          |
+ROW   |1175          |400     |8   |sysmapid            |0        |                                      |NULL         |NULL        |NULL        |NULL         |1             |
+ROW   |1176          |400     |1   |reference           |0        |NWLRB                                 |NULL         |NULL        |NULL        |NULL         |NULL          |
 
