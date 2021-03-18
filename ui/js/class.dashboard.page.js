@@ -660,6 +660,27 @@ class CDashboardPage extends CBaseComponent {
 		return data;
 	}
 
+	getDataCopy() {
+		const data = {
+			name: this._data.name,
+			display_period: this._data.display_period,
+			widgets: [],
+			dashboard: {
+				templateid: this._dashboard.templateid
+			}
+		};
+
+		for (const widget of this._widgets.keys()) {
+			if (widget instanceof CWidgetPastePlaceholder) {
+				continue;
+			}
+
+			data.widgets.push(widget.getDataCopy({is_single_copy: false}));
+		}
+
+		return data;
+	}
+
 	_createWidget(js_class, {type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
 		return new (eval(js_class))({
 			type,

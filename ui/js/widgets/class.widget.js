@@ -469,22 +469,29 @@ class CWidget extends CBaseComponent {
 		};
 	}
 
-	getDataCopy() {
-		return {
+	getDataCopy({is_single_copy}) {
+		const data = {
 			type: this._type,
 			name: this._name,
 			view_mode: this._view_mode,
 			fields: this._fields,
 			configuration: this._configuration,
-			pos: {
-				width: this._pos.width,
-				height: this._pos.height
-			},
-			rf_rate: this._rf_rate,
-			dashboard: {
-				templateid: this._dashboard.templateid
-			}
+			pos: is_single_copy
+				? {
+					width: this._pos.width,
+					height: this._pos.height
+				}
+				: this._pos,
+			rf_rate: this._rf_rate
 		};
+
+		if (is_single_copy) {
+			data.dashboard = {
+				templateid: this._dashboard.templateid
+			};
+		}
+
+		return data;
 	}
 
 	getActionsMenu({can_paste_widget}) {

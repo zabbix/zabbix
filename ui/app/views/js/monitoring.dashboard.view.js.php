@@ -49,6 +49,7 @@
 					display_period: dashboard.display_period,
 					auto_start: dashboard.auto_start
 				},
+				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
 				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
 				cell_height: 70,
 				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
@@ -271,8 +272,10 @@
 							},
 							{
 								label: t('Paste page'),
-								clickCallback: () => ZABBIX.Dashboard.pastePage(),
-								disabled: true
+								clickCallback: () => ZABBIX.Dashboard.pasteDashboardPage(
+									ZABBIX.Dashboard.getStoredDashboardPageDataCopy()
+								),
+								disabled: (ZABBIX.Dashboard.getStoredDashboardPageDataCopy() === null)
 							}
 						]
 					}
