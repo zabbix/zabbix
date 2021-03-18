@@ -1202,7 +1202,7 @@ static void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int ext
 	char	*str  = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
 
-	dbpatch_update_function(function, "last", "", ZBX_DBPATCH_FUNCTION_UPDATE);
+	dbpatch_update_function(function, "last", "$", ZBX_DBPATCH_FUNCTION_UPDATE);
 
 	if (0 == extended)
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '(');
