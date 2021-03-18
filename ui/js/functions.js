@@ -909,7 +909,7 @@ function writeTextClipboard(text) {
 function urlEncodeData(parameters, prefix = '') {
 	const result = [];
 
-	for (const [name, value] of Object.entries(parameters)) {
+	for (let [name, value] of Object.entries(parameters)) {
 		if (value === undefined) {
 			continue;
 		}
