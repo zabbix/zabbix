@@ -264,8 +264,10 @@
 						items: [
 							{
 								label: t('Paste widget'),
-								clickCallback: () => ZABBIX.Dashboard.pasteWidget(null, null),
-								disabled: (ZABBIX.Dashboard.getStoredWidgetCopy() === null)
+								clickCallback: () => ZABBIX.Dashboard.pasteWidget(
+									ZABBIX.Dashboard.getStoredWidgetDataCopy()
+								),
+								disabled: (ZABBIX.Dashboard.getStoredWidgetDataCopy() === null)
 							},
 							{
 								label: t('Paste page'),

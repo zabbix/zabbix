@@ -412,24 +412,6 @@ class CWidget extends CBaseComponent {
 		});
 	}
 
-	/**
-	 * Enable user functional interaction with widget.
-	 */
-	enableControls() {
-		this._$content_header
-			.find('button')
-			.prop('disabled', false);
-	}
-
-	/**
-	 * Disable user functional interaction with widget.
-	 */
-	disableControls() {
-		this._$content_header
-			.find('button')
-			.prop('disabled', true);
-	}
-
 	updateProperties({name, view_mode, fields, configuration}) {
 		if (name !== undefined) {
 			this._setName(name);
@@ -555,7 +537,7 @@ class CWidget extends CBaseComponent {
 			for (const [rf_rate, label] of Object.entries(rf_rates)) {
 				refresh_interval_section.items.push({
 					label: label,
-					selected: (rf_rate == this._rf_rate),
+					selected: rf_rate == this._rf_rate,
 					clickCallback: () => {
 						this._setRfRate(rf_rate);
 
@@ -908,15 +890,6 @@ class CWidget extends CBaseComponent {
 				if (!is_mousemove_required) {
 					this.fire(WIDGET_EVENT_LEAVE);
 				}
-			},
-
-			loadImage: () => {
-				// Call refreshCallback handler for expanded popup menu items.
-				const $menu_popup = this._$target.find('[data-expanded="true"][data-menu-popup]');
-
-				if ($menu_popup.length) {
-					$menu_popup.menuPopup('refresh', this);
-				}
 			}
 		};
 
@@ -931,12 +904,9 @@ class CWidget extends CBaseComponent {
 			.on('focusout', this._events.focusout)
 			.on('mouseenter mousemove', this._events.enter);
 
-		this._$content_body
-			.on('mouseenter mousemove', this._events.enter);
+		this._$content_body.on('mouseenter mousemove', this._events.enter);
 
-		this._$target
-			.on('mouseleave', this._events.leave)
-			.on('load.image', this._events.loadImage);
+		this._$target.on('mouseleave', this._events.leave);
 	}
 
 	_unregisterEvents() {
@@ -951,12 +921,9 @@ class CWidget extends CBaseComponent {
 			.off('focusout', this._events.focusout)
 			.off('mouseenter mousemove', this._events.enter);
 
-		this._$content_body
-			.off('mouseenter mousemove', this._events.enter);
+		this._$content_body.off('mouseenter mousemove', this._events.enter);
 
-		this._$target
-			.off('mouseleave', this._events.leave)
-			.off('load.image', this._events.loadImage);
+		this._$target.off('mouseleave', this._events.leave);
 
 		delete this._events;
 	}

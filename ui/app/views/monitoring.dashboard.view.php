@@ -40,6 +40,7 @@ $this->addJsFile('class.widget.clock.js');
 $this->addJsFile('class.widget.graph.js');
 $this->addJsFile('class.widget.map.js');
 $this->addJsFile('class.widget.navtree.js');
+$this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.widget.problems.js');
 $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');

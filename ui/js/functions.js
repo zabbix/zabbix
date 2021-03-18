@@ -939,15 +939,32 @@ function getFormFields(form) {
 	const fields = {};
 
 	for (let [key, value] of new FormData(form)) {
-		if (key.substr(-2) === '[]') {
-			key = key.substr(0, key.length - 2);
-			if (!(key in fields)) {
-				fields[key] = [];
+		const key_parts = [...key.matchAll(/[^\[\]]*[^\[\]]|\[\]/g)];
+
+		let key_fields = fields;
+
+		for (let i = 0; i < key_parts.length; i++) {
+			const key_part = key_parts[i][0];
+
+			if (i < key_parts.length - 1 && key_parts[i + 1][0] === '[]') {
+				if (!(key_part in key_fields)) {
+					key_fields[key_part] = [];
+				}
+
+				key_fields[key_part].push(value);
+
+				break;
 			}
-			fields[key].push(value);
-		}
-		else {
-			fields[key] = value;
+
+			if (i == key_parts.length - 1) {
+				key_fields[key_part] = value;
+			}
+			else {
+				if (!(key_part in key_fields)) {
+					key_fields[key_part] = {};
+				}
+				key_fields = key_fields[key_part];
+			}
 		}
 	}
 

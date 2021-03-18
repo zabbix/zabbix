@@ -450,7 +450,7 @@ function getMenuPopupWidgetActions(options) {
 		.getDashboardPage(options.dashboard_page_unique_id)
 		.getWidget(options.unique_id)
 		.getActionsMenu({
-			can_paste_widget: (ZABBIX.Dashboard.getStoredWidgetCopy() !== null)
+			can_paste_widget: (ZABBIX.Dashboard.getStoredWidgetDataCopy() !== null)
 		});
 }
 
@@ -1089,7 +1089,9 @@ jQuery(function($) {
 					 * Please note that click event is also triggered by hitting spacebar on the keyboard,
 					 * in which case the number of mouse clicks (stored in event.originalEvent.detail) will be zero.
 					 */
-					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
+					of: (['click', 'mouseup', 'mousedown'].includes(event.type) && event.originalEvent.detail)
+						? event
+						: event.target,
 					my: 'left top',
 					at: 'left bottom'
 				}

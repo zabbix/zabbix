@@ -58,6 +58,7 @@ $availableJScripts = [
 	'class.widget.graph.js' => 'widgets/',
 	'class.widget.map.js' => 'widgets/',
 	'class.widget.navtree.js' => 'widgets/',
+	'class.widget.paste-placeholder.js' => 'widgets/',
 	'class.widget.problems.js' => 'widgets/',
 	'class.widget.problemsbysv.js' => 'widgets/',
 	'class.widget.svggraph.js' => 'widgets/',

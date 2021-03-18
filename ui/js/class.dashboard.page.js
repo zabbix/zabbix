@@ -25,8 +25,11 @@ const DASHBOARD_PAGE_STATE_DESTROYED = 'destroyed';
 
 const DASHBOARD_PAGE_EVENT_EDIT = 'edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_ADD = 'widget-add';
+const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'widget-delete';
+const DASHBOARD_PAGE_EVENT_WIDGET_POSITION = 'widget-position';
 const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'widget-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'widget-copy';
+const DASHBOARD_PAGE_EVENT_WIDGET_PASTE = 'widget-paste';
 const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'announce-widgets';
 const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'reserve-header-lines';
 
@@ -140,26 +143,27 @@ class CDashboardPage extends CBaseComponent {
 			widgetCopy: (e) => {
 				const widget = e.detail.target;
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_COPY, {data: widget.getDataCopy()});
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_COPY, {widget});
 			},
 
 			widgetPaste: (e) => {
 				const widget = e.detail.target;
 
-//				if (!widget.isEntered() || this._isInteracting()) {
-//					return;
-//				}
-
-//				widget.leave();
-//				this._reserveHeaderLines();
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, {widget});
 			},
 
 			widgetDelete: (e) => {
 				const widget = e.detail.target;
 
 				this.deleteWidget(widget);
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DELETE);
 			}
 		};
+	}
+
+	getWidgets() {
+		return [...this._widgets.keys()];
 	}
 
 	getName() {
@@ -646,14 +650,18 @@ class CDashboardPage extends CBaseComponent {
 		};
 
 		for (const widget of this._widgets.keys()) {
+			if (widget instanceof CWidgetPastePlaceholder) {
+				continue;
+			}
+
 			data.widgets.push(widget.save());
 		}
 
 		return data;
 	}
 
-	addWidget({type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
-		const widget = new (eval(this._widget_defaults[type].js_class))({
+	_createWidget(js_class, {type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
+		return new (eval(js_class))({
 			type,
 			name,
 			view_mode,
@@ -681,7 +689,55 @@ class CDashboardPage extends CBaseComponent {
 			dynamic_hostid: this._dynamic_hostid,
 			unique_id
 		});
+	}
 
+	_createPastePlaceholderWidget({type, name, view_mode, pos, unique_id}) {
+		return this._createWidget('CWidgetPastePlaceholder', {
+			type,
+			name,
+			view_mode,
+			fields: {},
+			configuration: {},
+			widgetid: null,
+			pos,
+			is_new: false,
+			rf_rate: 0,
+			unique_id
+		});
+	}
+
+	addWidget({type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
+		const widget = this._createWidget(this._widget_defaults[type].js_class, {
+			type,
+			name,
+			view_mode,
+			fields,
+			configuration,
+			widgetid,
+			pos,
+			is_new,
+			rf_rate,
+			unique_id
+		});
+
+		this._doAddWidget(widget);
+
+		if (widgetid === null) {
+			this._is_unsaved = true;
+		}
+
+		return widget;
+	}
+
+	addPastePlaceholderWidget({type, name, view_mode, pos, unique_id}) {
+		const paste_placeholder_widget = this._createPastePlaceholderWidget({type, name, view_mode, pos, unique_id});
+
+		this._doAddWidget(paste_placeholder_widget);
+
+		return paste_placeholder_widget;
+	}
+
+	_doAddWidget(widget) {
 		this._widgets.set(widget, {});
 
 		this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
@@ -694,12 +750,6 @@ class CDashboardPage extends CBaseComponent {
 			this._dashboard_grid.appendChild(widget.getView());
 			this._activateWidget(widget);
 		}
-
-		if (widgetid === null) {
-			this._is_unsaved = true;
-		}
-
-		return widget;
 	}
 
 	deleteWidget(widget, {is_batch_mode = false} = {}) {
@@ -759,6 +809,7 @@ class CDashboardPage extends CBaseComponent {
 		this._widget_placeholder = new CDashboardWidgetPlaceholder(this._cell_width, this._cell_height);
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
+		this._widget_placeholder_is_active = false;
 
 		this._dashboard_grid.appendChild(this._widget_placeholder.getNode());
 
@@ -795,6 +846,8 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			mouseUp: (e) => {
+				this._deactivateWidgetPlaceholder({do_hide: false});
+
 				const new_widget_pos = {...this._widget_placeholder_pos};
 
 				if (new_widget_pos.width == 2 && new_widget_pos.height == this._widget_min_rows) {
@@ -802,11 +855,7 @@ class CDashboardPage extends CBaseComponent {
 					delete new_widget_pos.height;
 				}
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_ADD, {new_widget_pos});
-
-				document.removeEventListener('mouseup', this._widget_placeholder_events.mouseUp);
-				document.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
-				this._dashboard_grid.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_ADD, {new_widget_pos, event: e});
 			},
 
 			mouseMove: (e) => {
@@ -969,10 +1018,12 @@ class CDashboardPage extends CBaseComponent {
 
 		document.querySelector('.wrapper').addEventListener('scroll', this._widget_placeholder_events.scroll);
 
+		this._widget_placeholder_is_active = true;
+
 		this.resetWidgetPlaceholder();
 	}
 
-	_deactivateWidgetPlaceholder() {
+	_deactivateWidgetPlaceholder({do_hide = true} = {}) {
 		this._widget_placeholder.off('mousedown', this._widget_placeholder_events.mouseDown);
 
 		this._dashboard_grid.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
@@ -983,10 +1034,18 @@ class CDashboardPage extends CBaseComponent {
 		document.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
 		document.removeEventListener('mouseup', this._widget_placeholder_events.mouseUp);
 
-		this._widget_placeholder.hide();
+		if (do_hide) {
+			this._widget_placeholder.hide();
+		}
+
+		this._widget_placeholder_is_active = false;
 	}
 
 	resetWidgetPlaceholder() {
+		if (!this._widget_placeholder_is_active) {
+			this._activateWidgetPlaceholder();
+		}
+
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
 
@@ -1213,6 +1272,8 @@ class CDashboardPage extends CBaseComponent {
 				document.addEventListener('mousemove', this._widget_dragging_events.mouseMove);
 
 				this._is_unsaved = true;
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
 
 				e.preventDefault();
 			},
@@ -1745,6 +1806,8 @@ class CDashboardPage extends CBaseComponent {
 				document.addEventListener('mousemove', this._widget_resizing_events.mouseMove);
 
 				this._is_unsaved = true;
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
 
 				e.preventDefault();
 			},

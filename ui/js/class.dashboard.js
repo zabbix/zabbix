@@ -108,6 +108,9 @@ class CDashboard extends CBaseComponent {
 
 		this._new_widget_dashboard_page = null;
 		this._new_widget_pos = null;
+		this._new_widget_pos_reserved = null;
+
+		this._exhausted_message_box = null;
 
 		this._reserve_header_lines_timeout_id = null;
 		this._is_edit_widget_properties_cancel_subscribed = false;
@@ -116,6 +119,23 @@ class CDashboard extends CBaseComponent {
 
 		if (!this._is_kiosk_mode) {
 			this._initTabs();
+		}
+	}
+
+	_warnDashboardExhausted() {
+		if (this._exhausted_message_box === null) {
+			this._exhausted_message_box = makeMessageBox(
+				'warning', [], t('Cannot add widget: not enough free space on the dashboard.'), true, false
+			);
+
+			addMessage(this._exhausted_message_box);
+		}
+	}
+
+	_clearDashboardExhausted() {
+		if (this._exhausted_message_box !== null) {
+			this._exhausted_message_box.remove();
+			this._exhausted_message_box = null;
 		}
 	}
 
@@ -132,6 +152,10 @@ class CDashboard extends CBaseComponent {
 		if (this._is_edit_mode) {
 			this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
 		}
+	}
+
+	getDashboardPages() {
+		return [...this._dashboard_pages.keys()];
 	}
 
 	save() {
@@ -407,6 +431,7 @@ class CDashboard extends CBaseComponent {
 		}, 'widget_properties', document.activeElement);
 
 		overlay.xhr.then(() => {
+			const form = overlay.$dialogue.$body[0].querySelector('form');
 			const original_properties = overlay.data.original_properties;
 			const dialogue_stick_to_top = this._widget_defaults[original_properties.type].dialogue_stick_to_top;
 
@@ -417,24 +442,32 @@ class CDashboard extends CBaseComponent {
 
 			if (original_properties.unique_id === null) {
 				this._new_widget_dashboard_page = this._selected_dashboard_page;
+				this._new_widget_pos = new_widget_pos;
 
 				const default_widget_size = this._widget_defaults[original_properties.type].size;
 
-				if (new_widget_pos === null) {
-					this._new_widget_pos = this._new_widget_dashboard_page.findFreePos(default_widget_size);
+				if (this._new_widget_pos === null) {
+					this._new_widget_pos_reserved = this._new_widget_dashboard_page.findFreePos(default_widget_size);
 				}
 				else {
-					this._new_widget_pos = this._new_widget_dashboard_page.accommodatePos({
+					this._new_widget_pos_reserved = this._new_widget_dashboard_page.accommodatePos({
 						...default_widget_size,
-						...new_widget_pos
+						...this._new_widget_pos
 					});
 				}
 
-				if (this._new_widget_pos === null) {
-					overlay.$dialogue.$body.find('.msg-warning').remove();
-					overlay.$dialogue.$body.prepend(makeMessageBox(
-						'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, false
-					));
+				if (this._new_widget_pos_reserved === null) {
+					for (const el of form.parentNode.children) {
+						if (el.matches('.msg-warning')) {
+							el.parentNode.removeChild(el);
+						}
+					}
+
+					const message_box = makeMessageBox('warning',
+						t('Cannot add widget: not enough free space on the dashboard.'), null, false
+					)[0];
+
+					form.parentNode.insertBefore(message_box, form);
 
 					overlay.$btn_submit[0].disabled = true;
 				}
@@ -478,7 +511,7 @@ class CDashboard extends CBaseComponent {
 			properties.fields = JSON.stringify(fields);
 		}
 
-		this.editWidgetProperties(properties);
+		this.editWidgetProperties(properties, {new_widget_pos: this._new_widget_pos});
 	}
 
 	applyWidgetProperties() {
@@ -526,7 +559,7 @@ class CDashboard extends CBaseComponent {
 					fields,
 					configuration,
 					widgetid: null,
-					pos: widget === null ? this._new_widget_pos : widget.getPosition(),
+					pos: widget === null ? this._new_widget_pos_reserved : widget.getPosition(),
 					is_new: widget === null,
 					rf_rate: 0,
 					unique_id: this._createUniqueId()
@@ -539,6 +572,7 @@ class CDashboard extends CBaseComponent {
 							this._new_widget_dashboard_page.resetWidgetPlaceholder();
 							this._new_widget_dashboard_page = null;
 							this._new_widget_pos = null;
+							this._new_widget_pos_reserved = null;
 						});
 				}
 				else {
@@ -710,8 +744,11 @@ class CDashboard extends CBaseComponent {
 		dashboard_page
 			.on(DASHBOARD_PAGE_EVENT_EDIT, this._events.dashboardPageEdit)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_ADD, this._events.dashboardPageWidgetAdd)
+			.on(DASHBOARD_PAGE_EVENT_WIDGET_DELETE, this._events.dashboardPageWidgetDelete)
+			.on(DASHBOARD_PAGE_EVENT_WIDGET_POSITION, this._events.dashboardPageWidgetPosition)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
+			.on(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste)
 			.on(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets)
 			.on(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.dashboardPageReserveHeaderLines);
 	}
@@ -721,8 +758,10 @@ class CDashboard extends CBaseComponent {
 		dashboard_page
 			.off(DASHBOARD_PAGE_EVENT_EDIT, this._events.dashboardPageEdit)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_ADD, this._events.dashboardPageWidgetAdd)
+			.off(DASHBOARD_PAGE_EVENT_WIDGET_DELETE, this._events.dashboardPageWidgetDelete)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
+			.off(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste)
 			.off(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets)
 			.off(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.dashboardPageReserveHeaderLines);
 	}
@@ -878,14 +917,14 @@ class CDashboard extends CBaseComponent {
 		return 'U' + (this._uniqid_index++).toString(36).toUpperCase().padStart(6, '0');
 	}
 
-	storeWidgetCopy(data) {
+	storeWidgetDataCopy(data) {
 		localStorage.setItem('dashboard.clipboard', JSON.stringify({
 			type: DASHBOARD_CLIPBOARD_TYPE_WIDGET,
 			data: data
 		}));
 	}
 
-	getStoredWidgetCopy() {
+	getStoredWidgetDataCopy() {
 		let clipboard = localStorage.getItem('dashboard.clipboard');
 
 		if (clipboard === null) {
@@ -899,6 +938,123 @@ class CDashboard extends CBaseComponent {
 		}
 
 		return (clipboard.data.dashboard.templateid === this._data.templateid) ? clipboard.data : null;
+	}
+
+	pasteWidget(new_widget_data, {widget = null, new_widget_pos = null} = {}) {
+		const dashboard_page = this._selected_dashboard_page;
+
+		if (widget !== null) {
+			new_widget_pos = widget.getPosition();
+		}
+		else if (new_widget_pos !== null) {
+			new_widget_pos = dashboard_page.accommodatePos({
+				...new_widget_data.pos,
+				...new_widget_pos
+			});
+		}
+		else {
+			new_widget_pos = dashboard_page.findFreePos(new_widget_data.pos);
+		}
+
+		if (new_widget_pos === null) {
+			this._warnDashboardExhausted();
+
+			return;
+		}
+
+		if ('reference' in new_widget_data.fields) {
+			let used_references = [];
+
+			for (const dashboard_page of this._dashboard_pages.keys()) {
+				for (const w of dashboard_page.getWidgets()) {
+					const fields = w.getFields();
+
+					if ('reference' in fields) {
+						used_references.push(fields.reference);
+					}
+				}
+			}
+
+			do {
+				new_widget_data.fields.reference = '';
+
+				for (let i = 0; i < 5; i++) {
+					new_widget_data.fields.reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+				}
+			}
+			while (used_references.indexOf(new_widget_data.fields.reference) != -1);
+		}
+
+		let paste_placeholder_widget;
+
+		dashboard_page.promiseScrollIntoView(new_widget_pos)
+			.then(() => {
+				if (widget !== null) {
+					dashboard_page.deleteWidget(widget, {is_batch_mode: true});
+				}
+
+				paste_placeholder_widget = dashboard_page.addPastePlaceholderWidget({
+					type: new_widget_data.type,
+					name: new_widget_data.name,
+					view_mode: new_widget_data.view_mode,
+					pos: new_widget_pos,
+					unique_id: this._createUniqueId()
+				});
+
+				dashboard_page.resetWidgetPlaceholder();
+
+				return this._promiseDashboardWidgetsSanitize([new_widget_data]);
+			})
+			.then((response) => {
+				dashboard_page.replaceWidget(paste_placeholder_widget, {
+					...new_widget_data,
+					fields: response.widgets[0].fields,
+					widgetid: null,
+					pos: new_widget_pos,
+					is_new: true,
+					unique_id: this._createUniqueId()
+				});
+			})
+			.catch((error) => {
+				console.log(error);
+				clearMessages();
+
+				addMessage((typeof error === 'object' && 'html_string' in error)
+					? error.html_string
+					: makeMessageBox('bad', [], t('Failed to paste widget.'), true, false)
+				);
+			});
+	}
+
+	_promiseDashboardWidgetsSanitize(widgets_data) {
+		let request_widgets_data = [];
+
+		for (const widget_data of widgets_data) {
+			request_widgets_data.push({
+				type: widget_data.type,
+				fields: JSON.stringify(widget_data.fields)
+			});
+		}
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'dashboard.widgets.sanitize');
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: urlEncodeData({widgets: request_widgets_data})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('errors' in response) {
+					throw {html_string: response.errors};
+				}
+
+				return response;
+			});
 	}
 
 	_resize() {
@@ -954,10 +1110,13 @@ class CDashboard extends CBaseComponent {
 		let window_resize_timeout_id = null;
 
 		this._events = {
-			editWidgetPropertiesCancel: () => {
-				this._cancelEditingWidgetProperties();
-				this._is_edit_widget_properties_cancel_subscribed = false;
-				$.unsubscribe('overlay.close', this._events.editWidgetPropertiesCancel);
+			editWidgetPropertiesCancel: (e, data) => {
+				if (data.dialogueid === 'widget_properties') {
+					this._cancelEditingWidgetProperties();
+
+					$.unsubscribe('overlay.close', this._events.editWidgetPropertiesCancel);
+					this._is_edit_widget_properties_cancel_subscribed = false;
+				}
 			},
 
 			dashboardPageEdit: (e) => {
@@ -965,7 +1124,57 @@ class CDashboard extends CBaseComponent {
 			},
 
 			dashboardPageWidgetAdd: (e) => {
-				this.editWidgetProperties({}, {new_widget_pos: e.detail.new_widget_pos});
+				const new_widget_data = this.getStoredWidgetDataCopy();
+				const new_widget_pos = e.detail.new_widget_pos;
+
+				if (new_widget_data !== null) {
+					const dashboard_page = this._selected_dashboard_page;
+
+					let menu_was_cancelled = true;
+
+					const menu = [
+						{
+							label: t('Actions'),
+							items: [
+								{
+									label: t('Add widget'),
+									clickCallback: () => {
+										this.editWidgetProperties({}, {new_widget_pos});
+										menu_was_cancelled = false;
+									}
+								},
+								{
+									label: t('Paste widget'),
+									clickCallback: () => {
+										this.pasteWidget(new_widget_data, {new_widget_pos});
+										menu_was_cancelled = false;
+									}
+								}
+							]
+						}
+					];
+
+					const original_event = e.detail.event;
+
+					jQuery(original_event.target).menuPopup(menu, new jQuery.Event(original_event), {
+						closeCallback: () => {
+							if (menu_was_cancelled) {
+								dashboard_page.resetWidgetPlaceholder();
+							}
+						}
+					});
+				}
+				else {
+					this.editWidgetProperties({}, {new_widget_pos});
+				}
+			},
+
+			dashboardPageWidgetDelete: () => {
+				this._clearDashboardExhausted();
+			},
+
+			dashboardPageWidgetPosition: () => {
+				this._clearDashboardExhausted();
 			},
 
 			dashboardPageWidgetEdit: (e) => {
@@ -983,7 +1192,15 @@ class CDashboard extends CBaseComponent {
 			},
 
 			dashboardPageWidgetCopy: (e) => {
-				this.storeWidgetCopy(e.detail.data);
+				const widget = e.detail.widget;
+
+				this.storeWidgetDataCopy(widget.getDataCopy());
+			},
+
+			dashboardPageWidgetPaste: (e) => {
+				const widget = e.detail.widget;
+
+				this.pasteWidget(this.getStoredWidgetDataCopy(), {widget});
 			},
 
 			dashboardPageAnnounceWidgets: () => {
@@ -1153,7 +1370,6 @@ class CDashboard extends CBaseComponent {
 		this._buttons.next_page.addEventListener('click', events.nextPageClick);
 	}
 
-
 	// =================================================================================================================
 	// =================================================================================================================
 	// =================================================================================================================
@@ -1232,9 +1448,6 @@ class CDashboard extends CBaseComponent {
 		return this.getSelectedPage().copyWidget(widget);
 	}
 
-	pasteWidget(widget, pos) {
-		return this.getSelectedPage().pasteWidget(widget, pos);
-	}
 
 	deleteWidget(widget) {
 		return this.getSelectedPage().deleteWidget(widget);
