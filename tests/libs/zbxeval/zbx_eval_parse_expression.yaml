@@ -1353,7 +1353,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '#1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
   result: SUCCEED
 ---
@@ -1364,7 +1364,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '#5', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
@@ -1377,7 +1377,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '#5', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
@@ -1446,7 +1446,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#1:now-1h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '#1:now-1h', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
   result: SUCCEED
 ...

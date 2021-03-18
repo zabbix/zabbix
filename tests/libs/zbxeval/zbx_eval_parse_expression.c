@@ -62,7 +62,6 @@ static const char	*mock_token_type2str(zbx_uint32_t type)
 		ZBX_MOCK_TOKEN_CASE(ARG_TIME)
 		ZBX_MOCK_TOKEN_CASE(ARG_NULL)
 		ZBX_MOCK_TOKEN_CASE(ARG_RAW)
-		ZBX_MOCK_TOKEN_CASE(ARG_HNUM)
 	}
 
 	fail_msg("unknown token type: %d", type);
@@ -105,7 +104,6 @@ static zbx_uint32_t	mock_token_str2type(const char *str)
 	ZBX_MOCK_TOKEN_IF(ARG_TIME)
 	ZBX_MOCK_TOKEN_IF(ARG_NULL)
 	ZBX_MOCK_TOKEN_IF(ARG_RAW)
-	ZBX_MOCK_TOKEN_IF(ARG_HNUM)
 
 	fail_msg("unknown token type %s", str);
 	return 0;
