@@ -426,7 +426,7 @@ class CMaintenance extends CApiService {
 				'maintenanceid' => $maintenanceids[$mnum]
 			];
 		}
-		DB::insert('maintenances_windows', $insertWindows);
+		DB::insertBatch('maintenances_windows', $insertWindows);
 
 		$insertHosts = [];
 		$insertGroups = [];
@@ -462,8 +462,8 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
-		DB::insert('maintenances_hosts', $insertHosts);
-		DB::insert('maintenances_groups', $insertGroups);
+		DB::insertBatch('maintenances_hosts', $insertHosts);
+		DB::insertBatch('maintenances_groups', $insertGroups);
 
 		if ($ins_tags) {
 			DB::insert('maintenance_tag', $ins_tags);
