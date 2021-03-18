@@ -601,17 +601,15 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$options = [
+		$db_templates = $this->get([
+			'output' => ['templateid', 'name'],
 			'templateids' => $templateids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		];
-		$delTemplates = $this->get($options);
-		foreach ($templateids as $templateid) {
-			if (!isset($delTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		]);
+
+		if (array_diff_key(array_flip($templateids), $db_templates)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		API::Template()->unlink($templateids, null, true);
@@ -791,10 +789,11 @@ class CTemplate extends CHostGeneral {
 		DB::delete('hosts', ['hostid' => $templateids]);
 
 		// TODO: remove info from API
-		foreach ($delTemplates as $template) {
-			info(_s('Deleted: Template "%1$s".', $template['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', null, null);
+		foreach ($db_templates as $db_template) {
+			info(_s('Deleted: Template "%1$s".', $db_template['name']));
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
 	}
