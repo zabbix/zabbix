@@ -1833,6 +1833,10 @@ static int	DBpatch_5030057(void)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"delete from functions where functionid=" ZBX_FS_UI64 ";\n",
 							func->functionid);
+
+					if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+						break;
+
 					continue;
 				}
 
@@ -1856,9 +1860,12 @@ static int	DBpatch_5030057(void)
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where functionid=" ZBX_FS_UI64
 						";\n", func->functionid);
+
+				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					break;
 			}
 
-			if (0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE))
+			if (SUCCEED == ret && 0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE))
 			{
 				delim = ' ';
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set");
@@ -1889,9 +1896,11 @@ static int	DBpatch_5030057(void)
 		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
 		dbpatch_trigger_clear(&trigger);
 
-		if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != ret)
 			break;
 
+		if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			break;
 	}
 
 	DBfree_result(result);
