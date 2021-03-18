@@ -264,15 +264,6 @@ class testJSONRPC extends CAPITest {
 				']',
 				'result' => ''
 			],
-			// rpc call with extra parameters (deprecated, will be unsupported since version 5.4)
-			[
-				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}, "id": 1, "foo": "bar"}',
-				'result' => [
-					'jsonrpc' => '2.0',
-					'result' => ZABBIX_API_VERSION,
-					'id' => 1
-				]
-			],
 			// rpc call batch
 			[
 				'request' => '['.

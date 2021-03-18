@@ -91,10 +91,6 @@ class CJsonRpc {
 	}
 
 	public function validate(&$call) {
-		if (is_array($call)) {
-			$call = array_intersect_key($call, array_flip(['jsonrpc', 'method', 'params', 'auth', 'id']));
-		}
-
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'jsonrpc' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => self::VERSION],
 			'method' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
