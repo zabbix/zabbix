@@ -514,8 +514,6 @@ var timeControl = {
 	refreshPage: true,
 
 	addObject: function(id, time, objData) {
-		console.log(['timeControl::addObject', id, time, objData]);
-
 		if (typeof this.objectList[id] !== 'undefined' && objData['reloadOnAdd'] !== 1) {
 			// Do not reload object twice if not asked to.
 			return;
