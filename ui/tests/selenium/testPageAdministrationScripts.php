@@ -91,8 +91,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		$this->zbxTestClickButton('script.delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->assertMessage(TEST_BAD, 'Cannot delete scripts', 'Cannot delete scripts. Script "Reboot" is used in'.
-				' action operation "Trigger action 4".');
+		$this->assertMessage(TEST_BAD, 'Cannot delete scripts');
 	}
 
 	/**
@@ -106,8 +105,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 		if ($script['scriptid'] === '4') {
 			$this->zbxTestCheckTitle('Configuration of scripts');
-			$this->assertMessage(TEST_BAD, 'Cannot delete script', 'Cannot delete scripts. Script "Reboot" is used in'.
-					' action operation "Trigger action 4".');
+			$this->assertMessage(TEST_BAD, 'Cannot delete script');
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
 		}
 		else {
