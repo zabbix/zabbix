@@ -169,7 +169,7 @@ void	zbx_mock_test_entry(void **state)
 	mock_eval_read_values(&ctx, "in.replace");
 	mock_read_callbacks("in.callbacks");
 
-	returned_ret = zbx_eval_execute_ext(&ctx, NULL, callback_cb, NULL, &value, &error);
+	returned_ret = zbx_eval_execute_ext(&ctx, NULL, callback_cb, NULL, NULL, &value, &error);
 
 	if (SUCCEED != returned_ret)
 		printf("ERROR: %s\n", error);

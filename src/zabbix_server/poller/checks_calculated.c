@@ -348,7 +348,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	calc_eval_init(&eval, dc_item, &ctx);
 	zbx_timespec(&ts);
 
-	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, calcitem_eval, (void *)&eval, &value, &error))
+	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, NULL, calcitem_eval, (void *)&eval, &value, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() error:%s", __func__, error);
 		SET_MSG_RESULT(result, error);
