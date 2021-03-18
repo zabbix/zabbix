@@ -1220,7 +1220,7 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 		if (0 == (ctx->rules & ZBX_EVAL_PROCESS_ERROR))
 			return FAIL;
 
-		zbx_variant_set_error(output, *error);
+		zbx_variant_set_error(&value, *error);
 		*error = NULL;
 	}
 

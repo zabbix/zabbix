@@ -544,23 +544,23 @@ static int	eval_parse_time_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_t
  ******************************************************************************/
 static int	eval_parse_hnum_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
-	const char	*ptr;
+	const char	*ptr = ctx->expression + pos;
 
-	for (ptr = ctx->expression + pos + 1; 0 != isdigit((unsigned char)*ptr); ptr++)
-		;
-
-	if (ptr == ctx->expression + pos)
+	for (;0 != *ptr; ptr++)
 	{
-		*error = zbx_dsprintf(*error, "invalid history number argument at \"%s\"", ctx->expression + pos);
-		return FAIL;
+		if (',' == *ptr || ')' == *ptr || SUCCEED == is_whitespace(*ptr))
+		{
+			token->type = ZBX_EVAL_TOKEN_ARG_HNUM;
+			token->loc.l = pos;
+			token->loc.r = ptr - ctx->expression - 1;
+			zbx_variant_set_none(&token->value);
+
+			return SUCCEED;
+		}
 	}
 
-	token->type = ZBX_EVAL_TOKEN_ARG_HNUM;
-	token->loc.l = pos;
-	token->loc.r = ptr - ctx->expression - 1;
-	zbx_variant_set_none(&token->value);
-
-	return SUCCEED;
+	*error = zbx_dsprintf(*error, "unterminated function at \"%s\"", ctx->expression + pos);
+	return FAIL;
 }
 
 /******************************************************************************

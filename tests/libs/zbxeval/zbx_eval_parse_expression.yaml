@@ -1438,6 +1438,17 @@ out:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '-1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   result: SUCCEED
+---
+test case: Succeed 'last(/host/key,#1:now-1h)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'last(/host/key,#1:now-1h)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_HNUM, token: '#1:now-1h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
+  result: SUCCEED
 ...
 
 
