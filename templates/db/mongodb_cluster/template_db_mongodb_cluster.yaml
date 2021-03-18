@@ -35,7 +35,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: s
-          description: 'Differnce between the latest optime of the CSRS primary that the mongos has seen and cluster time.'
+          description: 'Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.'
           applications:
             -
               name: 'MongoDB sharded cluster'
