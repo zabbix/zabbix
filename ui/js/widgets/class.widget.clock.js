@@ -25,7 +25,7 @@ class CWidgetClock extends CWidget {
 
 		this._time = null;
 		this._time_zone_offset = null;
-		this._is_clock_loaded = false;
+		this._has_contents = false;
 		this._interval_id = null;
 	}
 
@@ -49,19 +49,19 @@ class CWidgetClock extends CWidget {
 		if (response.clock_data !== undefined) {
 			this._time = response.clock_data.time;
 			this._time_zone_offset = response.clock_data.time_zone_offset;
-			this._is_clock_loaded = true;
+			this._has_contents = true;
 
 			this._startClock();
 		}
 		else {
 			this._time = null;
 			this._time_zone_offset = null;
-			this._is_clock_loaded = false;
+			this._has_contents = false;
 		}
 	}
 
 	_startClock() {
-		if (this._is_clock_loaded) {
+		if (this._has_contents) {
 			this._interval_id = setInterval(() => this._clockHandsRotate(), 1000);
 			this._clockHandsRotate();
 		}

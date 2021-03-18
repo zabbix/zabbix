@@ -35,6 +35,7 @@ class CWidgetMap extends CWidget {
 		this._initial_load = 1;
 
 		this._has_contents = false;
+		this._is_refreshing = false;
 	}
 
 	_doDestroy() {
@@ -64,23 +65,12 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
-	setConfiguration(configuration) {
-		super.setConfiguration(configuration);
-
-		this._current_sysmapid = this._fields.sysmapid;
-	}
-
 	_getUpdateRequestData() {
-		const request_data = super._getUpdateRequestData();
-
-		if (this._current_sysmapid !== null) {
-			request_data.current_sysmapid = this._current_sysmapid;
-		}
-
 		return {
-			...request_data,
+			...super._getUpdateRequestData(),
+			current_sysmapid: this._current_sysmapid ?? undefined,
 			previous_maps: this._previous_maps,
-			initial_load: this._initial_load
+			initial_load: 1
 		};
 	}
 
@@ -88,26 +78,30 @@ class CWidgetMap extends CWidget {
 		super._processUpdateResponse(response);
 
 		if (response.sysmap_data !== undefined) {
-			this._current_sysmapid = response.sysmap_data.current_sysmapid;
-			this._initial_load = response.sysmap_data.initial_load;
-
-			const map_options = response.sysmap_data.map_options;
-
-			if (map_options !== null) {
-
-				// if (this._map_svg === null) {
-				// 	this._makeSvgMap(map_options);
-				// }
-				// else {
-				// 	this._updateSvgMap(map_options);
-				// }
-
-				this._has_contents = true;
+			if (response.sysmap_data.current_sysmapid !== this._current_sysmapid) {
+				this._startUpdating();
 			}
+			else {
+				this._current_sysmapid = response.sysmap_data.current_sysmapid;
+				this._initial_load = response.sysmap_data.initial_load;
 
-			if (response.sysmap_data.error_msg !== null) {
-				this._$content_body.append(response.sysmap_data.error_msg);
+				const map_options = response.sysmap_data.map_options;
+
+				if (map_options !== null) {
+					this._makeSvgMap(map_options);
+
+					this._has_contents = true;
+				}
+
+				if (response.sysmap_data.error_msg !== null) {
+					this._$content_body.append(response.sysmap_data.error_msg);
+				}
 			}
+		}
+		else {
+			this._map_svg = null;
+			this._initial_load = 1;
+			this._has_contents = false;
 		}
 	}
 
@@ -119,10 +113,7 @@ class CWidgetMap extends CWidget {
 
 			select: (e) => {
 				if (this._current_sysmapid != e.detail.mapid) {
-					this._has_contents = false;
-					this._current_sysmapid = e.detail.mapid;
-
-					this._startUpdating();
+					this.navigateToMap(e.detail.mapid);
 				}
 			}
 		}
@@ -132,26 +123,26 @@ class CWidgetMap extends CWidget {
 		this._current_sysmapid = sysmapid;
 
 		if (this._state == WIDGET_STATE_ACTIVE) {
-			// this._startUpdating();
+			this._startUpdating();
 
 			// TODO
 			// ZABBIX.Dashboard.widgetDataShare(widget[0], 'current_sysmapid',
 			// 	{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0}
 			// );
 
-			// $('.menu-popup').menuPopup('close', null);
+			$('.menu-popup').menuPopup('close', null);
 		}
 	}
 
 	navigateToSubmap(submapid, reset_previous = false) {
-		// if (this._current_sysmapid !== null) {
-		// 	if (reset_previous && this._previous_maps.length > 0) {
-		// 		this._previous_maps.pop();
-		// 	}
-		// 	else {
-		// 		this._previous_maps.push(this._current_sysmapid);
-		// 	}
-		// }
+		if (this._current_sysmapid !== null) {
+			if (reset_previous && this._previous_maps.length > 0) {
+				this._previous_maps.pop();
+			}
+			else {
+				this._previous_maps.push(this._current_sysmapid);
+			}
+		}
 
 		this.navigateToMap(submapid);
 	}
@@ -159,69 +150,38 @@ class CWidgetMap extends CWidget {
 	_makeSvgMap(options) {
 		options.canvas.useViewBox = true;
 		options.show_timestamp = false;
-		options.container = this._$content_body.get(0);
+		options.container = this._target.querySelector('.sysmap-widget-container');
 
 		this._map_svg = new SVGMap(options);
 	}
 
-	_updateSvgMap(options) {
+	_updateSvgMap() {
+		if (this._has_contents && !this._is_refreshing) {
+			this._is_refreshing = true;
 
-		const widget = $this.data('widget');
-		const widget_data = $this.data('widgetData');
+			const curl = new Curl(this._map_svg.options.refresh);
+			curl.setArgument('curtime', new CDate().getTime());
+			curl.setArgument('initial_load', 0);
 
-		// if (widget._is_map_loaded && widget_data['is_refreshing'] === false) {
-		// 	widget_data['is_refreshing'] = true;
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+				}
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					this._is_refreshing = false;
 
-		// 	const url = new Curl(widget_data['map_instance'].options.refresh);
-		// 	url.setArgument('curtime', new CDate().getTime());
-		// 	url.setArgument('uniqueid', widget.getUniqueId());
-
-		// 	$.ajax({
-		// 		'url': url.getUrl()
-		// 	})
-		// 		.done(function(data) {
-		// 			widget_data['is_refreshing'] = false;
-		// 			if (data.mapid > 0) {
-		// 				widget_data['map_instance'].update(data);
-		// 			}
-		// 			else {
-		// 				if (widget.getState() === WIDGET_STATE_ACTIVE) {
-		// 					widget._startUpdating();
-		// 				}
-		// 			}
-		// 		});
-		// }
-
-		// this._$target.zbx_mapwidget('update');
-
-
-		if (this._has_contents && !this.is_refreshing) {
-			this.is_refreshing = true;
-
-			// const curl = new Curl(this._map_svg.options.refresh);
-			// curl.setArgument('curtime', new CDate().getTime());
-console.log(curl);
-			// fetch(curl.getUrl(), {
-			// 	method: 'POST',
-			// 	headers: {
-			// 		'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			// 	}
-			// })
-			// 	.then((response) => response.json())
-			// 	.then((response) => {
-			// 		if ('errors' in response) {
-			// 			throw {html_string: response.errors};
-			// 		}
-
-			// 		this._data.name = data.name;
-			// 		this._data.userid = this._data.templateid === null ? data.userid : null;
-			// 		this._data.display_period = data.display_period;
-			// 		this._data.auto_start = (data.auto_start === '1') ? '1' : '0';
-			// 	});
+					if (response.mapid > 0) {
+						this._map_svg.update(response);
+					}
+					else {
+						if (this._state === WIDGET_STATE_ACTIVE) {
+							this._startUpdating();
+						}
+					}
+				});
 		}
-
-
-
-
 	}
 }
