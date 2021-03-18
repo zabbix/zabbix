@@ -950,7 +950,6 @@ static int	DBpatch_5030056(void)
 
 	return SUCCEED;
 }
-#endif
 
 static int	DBpatch_5030057(void)
 {
