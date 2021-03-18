@@ -112,7 +112,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestCheckTitle('Configuration of scripts');
-			$this->zbxTestTextPresent('Script deleted');
+			$this->assertMessage(TEST_GOOD, 'Script deleted');
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
 		}
 	}

@@ -45,9 +45,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
+		return [CMessageBehavior::class];
 	}
 
 	/**
@@ -973,9 +971,11 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				'name' => 'SSH_api_clone_1',
 				'type' => 2,
+				'scope' => 1,
 				'username' => 'SSH_username',
 				'password' => 'SSH_password',
-				'command' => 'test'
+				'command' => 'test',
+				'port' => '80'
 			],
 			[
 				'name' => 'SSH_api_clone_2',
@@ -1025,6 +1025,7 @@ class testFormAdministrationScripts extends CWebTest {
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name));
 			$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
 			$cloned_values = $form->getFields()->asValues();
+			$this->assertEquals('Cloned_'.$script_name, $cloned_values['Name']);
 
 			// Field Name removed from arrays.
 			unset($cloned_values['Name']);
