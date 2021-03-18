@@ -58,7 +58,11 @@ class CFluidFormElement extends CFormElement {
 			return $element;
 		}
 
-		return null;
+		if (!$element->isValid()) {
+			$element = $label->query('xpath:./../../'.self::TABLE_FORM_FIELD)->one(false);
+		}
+
+		return $element;
 	}
 
 	/**
