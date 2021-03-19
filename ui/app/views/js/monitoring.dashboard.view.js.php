@@ -152,11 +152,8 @@
 				}
 			);
 
-//			$.subscribe('dashboard.grid.busy', (e, data) => {
-//				is_busy = data.state;
-//				updateBusy();
-//			});
-
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_BUSY, events.busy);
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_IDLE, events.idle);
 
 			enableNavigationWarning();
 		};
@@ -338,6 +335,20 @@
 
 				document.getElementById('<?= ZBX_STYLE_PAGE_TITLE ?>').textContent = dashboard_data.name;
 				document.getElementById('dashboard-direct-link').textContent = dashboard_data.name;
+			},
+
+			busy: () => {
+				console.log('busy');
+
+				is_busy = true;
+				updateBusy();
+			},
+
+			idle: () => {
+				console.log('idle');
+
+				is_busy = false;
+				updateBusy();
 			}
 		};
 

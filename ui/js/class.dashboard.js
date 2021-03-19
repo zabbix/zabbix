@@ -30,6 +30,8 @@ const DASHBOARD_STATE_ACTIVE = 'active';
 const DASHBOARD_CLIPBOARD_TYPE_WIDGET = 'widget';
 const DASHBOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE = 'dashboard-page';
 
+const DASHBOARD_EVENT_BUSY = 'busy';
+const DASHBOARD_EVENT_IDLE = 'idle';
 const DASHBOARD_EVENT_EDIT = 'edit';
 const DASHBOARD_EVENT_APPLY_PROPERTIES = 'apply-properties';
 
@@ -96,6 +98,8 @@ class CDashboard extends CBaseComponent {
 	_init() {
 		this._dashboard_pages = new Map();
 		this._selected_dashboard_page = null;
+
+		this._busy_conditions = new Set();
 
 		this._original_properties = {
 			name: this._data.name,
@@ -288,6 +292,26 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
+	_createBusyCondition() {
+		if (this._busy_conditions.size == 0) {
+			this.fire(DASHBOARD_EVENT_BUSY);
+		}
+
+		const busy_condition = {};
+
+		this._busy_conditions.add(busy_condition);
+
+		return busy_condition;
+	}
+
+	_deleteBusyCondition(busy_condition) {
+		this._busy_conditions.delete(busy_condition);
+
+		if (this._busy_conditions.size == 0) {
+			this.fire(DASHBOARD_EVENT_IDLE);
+		}
+	}
+
 	editProperties() {
 		const properties = {
 			template: this._data.templateid !== null ? 1 : undefined,
@@ -307,7 +331,9 @@ class CDashboard extends CBaseComponent {
 
 		overlay.setLoading();
 
-		return new Promise((resolve) => resolve(ZABBIX.Dashboard.promiseApplyProperties(properties)))
+		const busy_condition = this._createBusyCondition();
+
+		return new Promise((resolve) => resolve(ZABBIX.Dashboard._promiseApplyProperties(properties)))
 			.then(() => {
 				overlayDialogueDestroy(overlay.dialogueid);
 
@@ -326,10 +352,13 @@ class CDashboard extends CBaseComponent {
 
 				form.parentNode.insertBefore(message_box, form);
 			})
-			.finally(() => overlay.unsetLoading());
+			.finally(() => {
+				overlay.unsetLoading();
+				this._deleteBusyCondition(busy_condition);
+			});
 	}
 
-	promiseApplyProperties(properties) {
+	_promiseApplyProperties(properties) {
 		properties.name = properties.name.trim();
 
 		const curl = new Curl('zabbix.php', false);
@@ -369,8 +398,10 @@ class CDashboard extends CBaseComponent {
 
 		overlay.setLoading();
 
+		const busy_condition = this._createBusyCondition();
+
 		return Promise.resolve()
-			.then(() => ZABBIX.Dashboard.promiseApplyDashboardPageProperties(properties, overlay.data))
+			.then(() => ZABBIX.Dashboard._promiseApplyDashboardPageProperties(properties, overlay.data))
 			.then(() => {
 				overlayDialogueDestroy(overlay.dialogueid);
 			})
@@ -387,10 +418,13 @@ class CDashboard extends CBaseComponent {
 
 				form.parentNode.insertBefore(message_box, form);
 			})
-			.finally(() => overlay.unsetLoading());
+			.finally(() => {
+				overlay.unsetLoading();
+				this._deleteBusyCondition(busy_condition);
+			});
 	}
 
-	promiseApplyDashboardPageProperties(properties, data) {
+	_promiseApplyDashboardPageProperties(properties, data) {
 		const overlay = overlays_stack.getById('dashboard_page_properties');
 
 		properties.name = properties.name.trim();
@@ -555,6 +589,8 @@ class CDashboard extends CBaseComponent {
 			? dashboard_page.getWidget(overlay.data.original_properties.unique_id)
 			: null;
 
+		const busy_condition = this._createBusyCondition();
+
 		return Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
 			.then(() => this._promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}))
@@ -617,7 +653,10 @@ class CDashboard extends CBaseComponent {
 
 				form.parentNode.insertBefore(message_box, form);
 			})
-			.finally(() => overlay.unsetLoading());
+			.finally(() => {
+				overlay.unsetLoading();
+				this._deleteBusyCondition(busy_condition);
+			});
 	}
 
 	_cancelEditingWidgetProperties() {
@@ -995,6 +1034,8 @@ class CDashboard extends CBaseComponent {
 			unique_id: this._createUniqueId()
 		});
 
+		const busy_condition = this._createBusyCondition();
+
 		dashboard_page.promiseScrollIntoView(new_widget_pos)
 			.then(() => {
 				dashboard_page.resetWidgetPlaceholder();
@@ -1026,7 +1067,8 @@ class CDashboard extends CBaseComponent {
 					? error.html_string
 					: makeMessageBox('bad', [], t('Failed to paste widget.'), true, false)
 				);
-			});
+			})
+			.finally(() => this._deleteBusyCondition(busy_condition));
 	}
 
 	_getNewWidgetFieldReference() {
@@ -1086,6 +1128,8 @@ class CDashboard extends CBaseComponent {
 			return;
 		}
 
+		const busy_condition = this._createBusyCondition();
+
 		return Promise.resolve()
 			.then(() => this._promiseDashboardWidgetsSanitize(new_dashboard_page_data.widgets))
 			.then((response) => {
@@ -1117,7 +1161,8 @@ class CDashboard extends CBaseComponent {
 					? error.html_string
 					: makeMessageBox('bad', [], t('Failed to paste dashboard page.'), true, false)
 				);
-			});
+			})
+			.finally(() => this._deleteBusyCondition(busy_condition))
 	}
 
 	_promiseDashboardWidgetsSanitize(widgets_data) {

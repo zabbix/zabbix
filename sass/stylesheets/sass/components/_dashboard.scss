@@ -206,6 +206,7 @@
 	z-index: 999;
 	color: $font-alt-color;
 	cursor: pointer;
+	user-select: none;
 
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
