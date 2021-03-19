@@ -194,7 +194,7 @@ class CFunctionValidator extends CValidator {
 			'logeventid' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
-					['type' => 'str', 'mandat' => 0x01]
+					['type' => 'str', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_log
 			],
