@@ -369,10 +369,19 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 			case ZBX_VARIANT_STR:
 				SET_TEXT_RESULT(result, value.data.str);
 				break;
+			default:
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "unsupported calculated value result \"%s\""
+						" of type \"%s\"", zbx_variant_value_desc(&value),
+						zbx_variant_type_desc(&value)));
+				zbx_variant_clear(&value);
+				break;
 		}
 
-		zbx_variant_set_none(&value);
-		ret = SUCCEED;
+		if (ZBX_VARIANT_NONE != value.type)
+		{
+			zbx_variant_set_none(&value);
+			ret = SUCCEED;
+		}
 	}
 
 	calc_eval_clear(&eval);
