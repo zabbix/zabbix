@@ -118,6 +118,10 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			widgetEnter: (e) => {
+				if (this._is_edit_mode && this._isWidgetPlaceholderResizing()) {
+					return;
+				}
+
 				const widget = e.detail.target;
 
 				if (widget.isEntered() || this._isInteracting()) {
@@ -927,8 +931,13 @@ class CDashboardPage extends CBaseComponent {
 					.showAtPosition(this._widget_placeholder_pos);
 			}
 			else {
-				if (this._widget_placeholder_pos !== null
-						&& this._widget_placeholder.getNode().contains(e.target)) {
+				if (this._widget_placeholder_pos !== null && this._widget_placeholder.getNode().contains(e.target)) {
+					return;
+				}
+
+				if (e.target !== this._dashboard_grid) {
+					this._widget_placeholder.hide();
+
 					return;
 				}
 
@@ -1083,6 +1092,10 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		this._widget_placeholder_is_active = false;
+	}
+
+	_isWidgetPlaceholderResizing() {
+		return this._widget_placeholder_clicked_pos !== null;
 	}
 
 	resetWidgetPlaceholder() {
