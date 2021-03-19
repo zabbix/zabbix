@@ -249,7 +249,14 @@ jQuery(function($) {
 						? event
 						: event.target,
 					my: 'left top',
-					at: 'left bottom'
+					at: 'left bottom',
+					using: function(pos, data) {
+						const max_left =
+							document.querySelector('.wrapper').clientWidth - (data.horizontal ? data.element.width : 0);
+
+						pos.left = Math.max(0, Math.min(max_left, pos.left));
+						$(this).css(pos);
+					}
 				};
 		}
 	}
