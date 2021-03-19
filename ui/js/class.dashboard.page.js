@@ -190,7 +190,7 @@ class CDashboardPage extends CBaseComponent {
 			this._grid_min_rows = min_rows;
 		}
 
-		let num_rows = this._getNumRows();
+		let num_rows = this._getNumRows() + 1;
 
 		if (this._grid_min_rows !== null) {
 			num_rows = Math.max(num_rows, this._grid_min_rows);
@@ -583,11 +583,6 @@ class CDashboardPage extends CBaseComponent {
 		return num_rows;
 	}
 
-	/**
-	 * @param {object} pos
-	 *
-	 * @returns {Promise}
-	 */
 	promiseScrollIntoView(pos) {
 		const wrapper = document.querySelector('.wrapper');
 		const wrapper_offset_top = wrapper.scrollTop + this._dashboard_grid.getBoundingClientRect().y;
@@ -600,7 +595,11 @@ class CDashboardPage extends CBaseComponent {
 		const wrapper_scroll_top_min = Math.max(0, pos_top + Math.min(0, pos_height - wrapper.clientHeight));
 		const wrapper_scroll_top_max = pos_top;
 
-		this._resizeGrid(pos.y + pos.height);
+		const grid_min_rows = pos.y + pos.height;
+
+		if (grid_min_rows > this._grid_min_rows) {
+			this._resizeGrid(grid_min_rows);
+		}
 
 		return new Promise((resolve) => {
 			let scroll_to = null;
