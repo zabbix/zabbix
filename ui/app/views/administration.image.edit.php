@@ -79,7 +79,8 @@ if ($data['imageid'] != 0) {
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'image.delete')
 					->setArgument('imageid', $data['imageid'])
-					->setArgument('imagetype', $data['imagetype']),
+					->setArgument('imagetype', $data['imagetype'])
+					->setArgumentSID(),
 				_('Delete selected image?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
