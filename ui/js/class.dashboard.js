@@ -414,6 +414,11 @@ class CDashboard extends CBaseComponent {
 
 				if (data.unique_id !== null) {
 					const dashboard_page = this.getDashboardPage(data.unique_id);
+
+					if (dashboard_page === null) {
+						return;
+					}
+
 					const dashboard_page_name = dashboard_page.getName();
 
 					dashboard_page.setName(properties.name);
@@ -561,7 +566,7 @@ class CDashboard extends CBaseComponent {
 				if (widget !== null && widget.getType() === type) {
 					widget.updateProperties({name, view_mode, fields, configuration});
 
-					return Promise.resolve();
+					return resolve();
 				}
 
 				const widget_data = {
@@ -578,7 +583,7 @@ class CDashboard extends CBaseComponent {
 				};
 
 				if (widget === null) {
-					this._new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
+					return this._new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
 							this._new_widget_dashboard_page.addWidget(widget_data);
 							this._new_widget_dashboard_page.resetWidgetPlaceholder();
@@ -588,7 +593,11 @@ class CDashboard extends CBaseComponent {
 						});
 				}
 				else {
-					dashboard_page.promiseScrollIntoView(widget_data.pos)
+					if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_DESTROYED) {
+						return resolve();
+					}
+
+					return dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
 							dashboard_page.replaceWidget(widget, widget_data);
 							dashboard_page.resetWidgetPlaceholder();
@@ -1018,6 +1027,10 @@ class CDashboard extends CBaseComponent {
 				return this._promiseDashboardWidgetsSanitize([new_widget_data]);
 			})
 			.then((response) => {
+				if (dashboard_page.getState () === DASHBOARD_PAGE_STATE_DESTROYED) {
+					return;
+				}
+
 				dashboard_page.replaceWidget(paste_placeholder_widget, {
 					...new_widget_data,
 					fields: response.widgets[0].fields,
@@ -1069,6 +1082,12 @@ class CDashboard extends CBaseComponent {
 
 		return new Promise((resolve) => resolve(this._promiseDashboardWidgetsSanitize(new_dashboard_page_data.widgets)))
 			.then((response) => {
+				if (this._dashboard_pages.size >= this._max_dashboard_pages) {
+					this._warnDashboardExhausted();
+
+					return resolve();
+				}
+
 				const widgets = new_dashboard_page_data.widgets;
 
 				for (let i = 0; i < response.widgets.length; i++) {
