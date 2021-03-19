@@ -163,10 +163,6 @@ class C52TriggerExpressionConverter extends CConverter {
 				$new_expression = sprintf('abs(last(%1$s,1)-last(%1$s,2))', $query);
 				break;
 
-			case 'change':
-				$new_expression = sprintf('(last(%1$s,1)-last(%1$s,2))', $query);
-				break;
-
 			case 'delta':
 				$params = self::convertParameters($fn['functionParams'], $fn['functionName']);
 				$params = self::paramsToString($params);

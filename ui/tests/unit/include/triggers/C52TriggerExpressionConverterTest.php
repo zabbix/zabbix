@@ -58,7 +58,7 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{Trapper:trap[1].change()} = 10',
-				'(last(/Trapper/trap[1],1)-last(/Trapper/trap[1],2)) = 10'
+				'change(/Trapper/trap[1]) = 10'
 			],
 			[
 				'{Trapper:trap[1].date()} > 0'.
@@ -301,8 +301,8 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' or {Trapper:trap[2].change()} = 100'.
 				' or {Trapper:trap[3].str(error)} <> 0',
 
-				'(last(/Trapper/trap[1],1)-last(/Trapper/trap[1],2)) = 10'.
-				' or (last(/Trapper/trap[2],1)-last(/Trapper/trap[2],2)) = 100'.
+				'change(/Trapper/trap[1]) = 10'.
+				' or change(/Trapper/trap[2]) = 100'.
 				' or find(/Trapper/trap[3],,"like","error") <> 0'
 			],
 			[

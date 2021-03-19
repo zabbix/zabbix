@@ -140,6 +140,12 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $value_types_all
 			],
+			'change' => [
+				'args' => [
+					['type' => 'query', 'mandat' => 0x01]
+				],
+				'value_types' => $value_types_all
+			],
 			'date' => [
 				'args' => $args_ignored,
 				'value_types' => $value_types_all
