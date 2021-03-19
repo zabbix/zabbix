@@ -38,28 +38,28 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->checkLastSelectedWidgetType();
 
 		// Opening edit widget form.
-		$form = $dashboard->getWidget('System information')->edit();
-		$this->assertEquals('System information', $form->getField('Type')->getValue());
-		$form->submit();
+		$form_system_info = $dashboard->getWidget('System information')->edit();
+		$this->assertEquals('System information', $form_system_info->getField('Type')->getValue());
+		$form_system_info->submit();
 		// Check that widget type isn't changed in frontend and in DB.
 		$this->checkLastSelectedWidgetType();
 
 		// Making changes in widget form that are not "Widget type".
-		$form = $dashboard->getWidget('Problems')->edit();
-		$this->assertEquals('Problems', $form->getField('Type')->getValue());
+		$form_problems = $dashboard->getWidget('Problems')->edit();
+		$this->assertEquals('Problems', $form_problems->getField('Type')->getValue());
 		$data =[
 			'Name' => 'check widget type',
 			'Refresh interval' => 'No refresh',
 			'Show' => 'Recent problems',
 			'Show tags' => 'None'
 		];
-		$form->fill($data);
-		$form->submit();
+		$form_problems->fill($data);
+		$form_problems->submit();
 		$this->checkLastSelectedWidgetType();
 
 		// Add widget with current default type "Action log".
-		$form = $dashboard->addWidget()->asForm();
-		$form->submit();
+		$form_default = $dashboard->addWidget()->asForm();
+		$form_default->submit();
 		// Check if widget was added.
 		$dashboard->getWidget('Action log');
 		$this->checkLastSelectedWidgetType();
