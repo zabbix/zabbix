@@ -653,11 +653,12 @@ class CFunctionValidator extends CValidator {
 		if ($relative_time_parser->parse($param) == CParser::PARSE_SUCCESS) {
 			$tokens = $relative_time_parser->getTokens();
 
-			$offset_token = reset(array_filter($tokens, function ($token) {
+			$offset_tokens = array_filter($tokens, function ($token) {
 				return ($token['type'] ==  CRelativeTimeParser::ZBX_TOKEN_OFFSET);
-			}));
+			});
 
-			if ($offset_token && $offset_token['sign'] === '-' && (int) $offset_token['value'] > 0) {
+			if (($offset_token = reset($offset_tokens)) !== false
+					&& $offset_token['sign'] === '-' && (int) $offset_token['value'] > 0) {
 				return true;
 			}
 		}
