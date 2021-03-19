@@ -1995,8 +1995,11 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.30rc1
 
 New features:
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
 
 Bug fixes:
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
 A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 
