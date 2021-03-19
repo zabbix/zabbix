@@ -151,7 +151,9 @@ class CScreenProblem extends CScreenBase {
 	 * @return array
 	 */
 	public static function getData(array $filter, $resolve_comments = false, $resolve_urls = false) {
-		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
+		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids']
+			? getSubGroups($filter['groupids'])
+			: null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
@@ -159,6 +161,8 @@ class CScreenProblem extends CScreenBase {
 			: null;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
+
 			if ($filter_hostids === null) {
 				// get all groups if no selected groups defined
 				if ($filter_groupids === null) {
@@ -169,7 +173,7 @@ class CScreenProblem extends CScreenBase {
 					]));
 				}
 
-				$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
+				$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
 
 				// get available hosts
 				$filter_hostids = array_keys(API::Host()->get([
@@ -181,7 +185,7 @@ class CScreenProblem extends CScreenBase {
 
 			$exclude_hostids = array_keys(API::Host()->get([
 				'output' => [],
-				'groupids' => $filter['exclude_groupids'],
+				'groupids' => $exclude_groupids,
 				'preservekeys' => true
 			]));
 
