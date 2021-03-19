@@ -469,7 +469,7 @@ class CFunctionValidator extends CValidator {
 		$time_shift = $param[1];
 
 		$is_sec_num_valid = ((!($mandat & 0x01) && $sec_num === '') || $this->validateSecNum($sec_num));
-		$is_time_shift_valid = (!($mandat & 0x02) || $this->validatePeriodShift($time_shift));
+		$is_time_shift_valid = ((!($mandat & 0x02) && $time_shift === '') || $this->validatePeriodShift($time_shift));
 
 		return ($is_sec_num_valid && $is_time_shift_valid);
 	}
@@ -641,8 +641,7 @@ class CFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain time range value with precision and multiple of an hour.
-	 * Examples: now/h, now/w, now/M, now/y
+	 * Validate trigger function parameter which must contain time range value with precision.
 	 *
 	 * @param string $param
 	 *
@@ -654,17 +653,12 @@ class CFunctionValidator extends CValidator {
 		if ($relative_time_parser->parse($param) == CParser::PARSE_SUCCESS) {
 			$tokens = $relative_time_parser->getTokens();
 
-			foreach ($tokens as $token) {
-				if ($token['type'] === CRelativeTimeParser::ZBX_TOKEN_PRECISION && $token['suffix'] === 'm') {
-					return false;
-				}
-			}
+			$offset_token = reset(array_filter($tokens, function ($token) {
+				return ($token['type'] ==  CRelativeTimeParser::ZBX_TOKEN_OFFSET);
+			}));
 
-			foreach ($tokens as $token) {
-				if ($token['type'] === CRelativeTimeParser::ZBX_TOKEN_PRECISION
-						&& $relative_time_parser->getDateTime(true)->getTimestamp() % SEC_PER_HOUR === 0) {
-					return true;
-				}
+			if ($offset_token && $offset_token['sign'] === '-' && (int) $offset_token['value'] > 0) {
+				return true;
 			}
 		}
 
