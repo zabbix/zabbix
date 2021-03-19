@@ -338,15 +338,11 @@
 			},
 
 			busy: () => {
-				console.log('busy');
-
 				is_busy = true;
 				updateBusy();
 			},
 
 			idle: () => {
-				console.log('idle');
-
 				is_busy = false;
 				updateBusy();
 			}
