@@ -369,7 +369,7 @@ class CDashboard extends CBaseComponent {
 
 		overlay.setLoading();
 
-		return new Promise((resolve) => resolve())
+		return Promise.resolve()
 			.then(() => ZABBIX.Dashboard.promiseApplyDashboardPageProperties(properties, overlay.data))
 			.then(() => {
 				overlayDialogueDestroy(overlay.dialogueid);
@@ -555,7 +555,7 @@ class CDashboard extends CBaseComponent {
 			? dashboard_page.getWidget(overlay.data.original_properties.unique_id)
 			: null;
 
-		return new Promise((resolve) => resolve())
+		return Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
 			.then(() => this._promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}))
 			.then((configuration) => {
@@ -566,7 +566,7 @@ class CDashboard extends CBaseComponent {
 				if (widget !== null && widget.getType() === type) {
 					widget.updateProperties({name, view_mode, fields, configuration});
 
-					return resolve();
+					return;
 				}
 
 				const widget_data = {
@@ -583,7 +583,7 @@ class CDashboard extends CBaseComponent {
 				};
 
 				if (widget === null) {
-					return this._new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
+					this._new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
 							this._new_widget_dashboard_page.addWidget(widget_data);
 							this._new_widget_dashboard_page.resetWidgetPlaceholder();
@@ -594,10 +594,10 @@ class CDashboard extends CBaseComponent {
 				}
 				else {
 					if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_DESTROYED) {
-						return resolve();
+						return;
 					}
 
-					return dashboard_page.promiseScrollIntoView(widget_data.pos)
+					dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
 							dashboard_page.replaceWidget(widget, widget_data);
 							dashboard_page.resetWidgetPlaceholder();
@@ -983,52 +983,31 @@ class CDashboard extends CBaseComponent {
 			return;
 		}
 
-		if ('reference' in new_widget_data.fields) {
-			let used_references = [];
-
-			for (const dashboard_page of this._dashboard_pages.keys()) {
-				for (const w of dashboard_page.getWidgets()) {
-					const fields = w.getFields();
-
-					if ('reference' in fields) {
-						used_references.push(fields.reference);
-					}
-				}
-			}
-
-			do {
-				new_widget_data.fields.reference = '';
-
-				for (let i = 0; i < 5; i++) {
-					new_widget_data.fields.reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
-				}
-			}
-			while (used_references.indexOf(new_widget_data.fields.reference) != -1);
+		if (widget !== null) {
+			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
 
-		let paste_placeholder_widget;
+		const paste_placeholder_widget = dashboard_page.addPastePlaceholderWidget({
+			type: new_widget_data.type,
+			name: new_widget_data.name,
+			view_mode: new_widget_data.view_mode,
+			pos: new_widget_pos,
+			unique_id: this._createUniqueId()
+		});
 
 		dashboard_page.promiseScrollIntoView(new_widget_pos)
 			.then(() => {
-				if (widget !== null) {
-					dashboard_page.deleteWidget(widget, {is_batch_mode: true});
-				}
-
-				paste_placeholder_widget = dashboard_page.addPastePlaceholderWidget({
-					type: new_widget_data.type,
-					name: new_widget_data.name,
-					view_mode: new_widget_data.view_mode,
-					pos: new_widget_pos,
-					unique_id: this._createUniqueId()
-				});
-
 				dashboard_page.resetWidgetPlaceholder();
 
 				return this._promiseDashboardWidgetsSanitize([new_widget_data]);
 			})
 			.then((response) => {
-				if (dashboard_page.getState () === DASHBOARD_PAGE_STATE_DESTROYED) {
+				if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_DESTROYED) {
 					return;
+				}
+
+				if ('reference' in new_widget_data.fields) {
+					new_widget_data.fields.reference = this._getNewWidgetFieldReference();
 				}
 
 				dashboard_page.replaceWidget(paste_placeholder_widget, {
@@ -1048,6 +1027,33 @@ class CDashboard extends CBaseComponent {
 					: makeMessageBox('bad', [], t('Failed to paste widget.'), true, false)
 				);
 			});
+	}
+
+	_getNewWidgetFieldReference() {
+		let used_references = [];
+
+		for (const dashboard_page of this._dashboard_pages.keys()) {
+			for (const w of dashboard_page.getWidgets()) {
+				const fields = w.getFields();
+
+				if ('reference' in fields) {
+					used_references.push(fields.reference);
+				}
+			}
+		}
+
+		let reference;
+
+		do {
+			reference = '';
+
+			for (let i = 0; i < 5; i++) {
+				reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+			}
+		}
+		while (used_references.indexOf(reference) != -1);
+
+		return reference;
 	}
 
 	storeDashboardPageDataCopy(data) {
@@ -1080,12 +1086,13 @@ class CDashboard extends CBaseComponent {
 			return;
 		}
 
-		return new Promise((resolve) => resolve(this._promiseDashboardWidgetsSanitize(new_dashboard_page_data.widgets)))
+		return Promise.resolve()
+			.then(() => this._promiseDashboardWidgetsSanitize(new_dashboard_page_data.widgets))
 			.then((response) => {
 				if (this._dashboard_pages.size >= this._max_dashboard_pages) {
 					this._warnDashboardExhausted();
 
-					return resolve();
+					return;
 				}
 
 				const widgets = new_dashboard_page_data.widgets;

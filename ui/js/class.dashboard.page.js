@@ -241,14 +241,14 @@ class CDashboardPage extends CBaseComponent {
 			for (x = 0; x <= max_column && !found; x++) {
 				pos.x = x;
 				pos.y = y;
-				found = this._isPosFree(pos);
+				found = this.isPosFree(pos);
 			}
 		}
 
 		return pos;
 	}
 
-	_isPosFree(pos) {
+	isPosFree(pos) {
 		for (const widget of this._widgets.keys()) {
 			if (this._isPosOverlapping(pos, widget.getPosition())) {
 				return false;
@@ -304,7 +304,7 @@ class CDashboardPage extends CBaseComponent {
 
 		if (reverse) {
 			for (let x = pos.x + pos.width - 1, width = 1; x >= pos.x; x--, width++) {
-				if (!this._isPosFree({...max_pos, x, width})) {
+				if (!this.isPosFree({...max_pos, x, width})) {
 					break;
 				}
 
@@ -314,7 +314,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 		else {
 			for (let width = 1; width <= pos.width; width++) {
-				if (!this._isPosFree({...max_pos, width})) {
+				if (!this.isPosFree({...max_pos, width})) {
 					break;
 				}
 
@@ -330,7 +330,7 @@ class CDashboardPage extends CBaseComponent {
 
 		if (reverse) {
 			for (let y = pos.y + pos.height - 1, height = 1; y >= pos.y; y--, height++) {
-				if (!this._isPosFree({...max_pos, y, height})) {
+				if (!this.isPosFree({...max_pos, y, height})) {
 					break;
 				}
 
@@ -340,7 +340,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 		else {
 			for (let height = this._widget_min_rows; height <= pos.height; height++) {
-				if (!this._isPosFree({...max_pos, height})) {
+				if (!this.isPosFree({...max_pos, height})) {
 					break;
 				}
 
@@ -612,7 +612,7 @@ class CDashboardPage extends CBaseComponent {
 				scroll_to = wrapper_scroll_top_max;
 			}
 			else {
-				return resolve();
+				resolve();
 			}
 
 			const start_scroll = wrapper.scrollTop;
@@ -633,7 +633,7 @@ class CDashboardPage extends CBaseComponent {
 				else {
 					wrapper.scrollTop = scroll_to;
 
-					return resolve();
+					resolve();
 				}
 			};
 
@@ -650,11 +650,9 @@ class CDashboardPage extends CBaseComponent {
 		};
 
 		for (const widget of this._widgets.keys()) {
-			if (widget instanceof CWidgetPastePlaceholder) {
-				continue;
+			if (!this._isHelperWidget(widget)) {
+				data.widgets.push(widget.save());
 			}
-
-			data.widgets.push(widget.save());
 		}
 
 		return data;
@@ -671,11 +669,9 @@ class CDashboardPage extends CBaseComponent {
 		};
 
 		for (const widget of this._widgets.keys()) {
-			if (widget instanceof CWidgetPastePlaceholder) {
-				continue;
+			if (!this._isHelperWidget(widget)) {
+				data.widgets.push(widget.getDataCopy({is_single_copy: false}));
 			}
-
-			data.widgets.push(widget.getDataCopy({is_single_copy: false}));
 		}
 
 		return data;
@@ -727,6 +723,10 @@ class CDashboardPage extends CBaseComponent {
 		});
 	}
 
+	_isHelperWidget(widget) {
+		return widget instanceof CWidgetPastePlaceholder;
+	}
+
 	addWidget({type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
 		const widget = this._createWidget(this._widget_defaults[type].js_class, {
 			type,
@@ -761,7 +761,9 @@ class CDashboardPage extends CBaseComponent {
 	_doAddWidget(widget) {
 		this._widgets.set(widget, {});
 
-		this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+		if (!this._isHelperWidget(widget)) {
+			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+		}
 
 		if (this._state !== DASHBOARD_PAGE_STATE_INITIAL) {
 			widget.start();
@@ -786,7 +788,10 @@ class CDashboardPage extends CBaseComponent {
 		this._widgets.delete(widget);
 
 		if (!is_batch_mode) {
-			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+			if (!this._isHelperWidget(widget)) {
+				this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
+			}
+
 			this._resizeGrid();
 		}
 
@@ -932,7 +937,7 @@ class CDashboardPage extends CBaseComponent {
 
 				const event_pos_1x1 = getGridEventPos(e, {width: 1, height: 1});
 
-				if (this._isPosFree(event_pos_1x1)) {
+				if (this.isPosFree(event_pos_1x1)) {
 					let event_pos = getGridEventPos(e, {width: 2, height: this._widget_min_rows});
 
 					for (const width of [2, 1]) {
@@ -950,7 +955,7 @@ class CDashboardPage extends CBaseComponent {
 									continue;
 								}
 
-								if (this._isPosOverlapping(pos, event_pos_1x1) && this._isPosFree(pos)) {
+								if (this._isPosOverlapping(pos, event_pos_1x1) && this.isPosFree(pos)) {
 									this._widget_placeholder_pos = pos;
 									break;
 								}
