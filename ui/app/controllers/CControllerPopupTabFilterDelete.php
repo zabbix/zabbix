@@ -24,10 +24,6 @@
  */
 class CControllerPopupTabFilterDelete extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$rules = [
 			'idx' =>	'string|required',

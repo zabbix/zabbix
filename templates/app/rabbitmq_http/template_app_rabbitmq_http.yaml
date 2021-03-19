@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:07Z'
+  date: '2021-03-09T06:34:53Z'
   groups:
     -
       name: Templates/Applications
@@ -852,6 +852,70 @@ zabbix_export:
             -
               lld_macro: '{#VHOST}'
               path: $.vhost
+        -
+          name: 'Health Check 3.8.10+ discovery'
+          type: DEPENDENT
+          key: rabbitmq.healthcheck.v3810.discovery
+          delay: '0'
+          description: 'Version 3.8.10+ specific metrics'
+          item_prototypes:
+            -
+              name: 'RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}'
+              type: HTTP_AGENT
+              key: 'rabbitmq.healthcheck.alarms[{#SINGLETON}]'
+              history: 7d
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: 'Responds a 200 OK if there are no alarms in effect in the cluster, otherwise responds with a 503 Service Unavailable.'
+              applications:
+                -
+                  name: RabbitMQ
+              valuemap:
+                name: 'RabbitMQ healthcheck'
+              preprocessing:
+                -
+                  type: REGEX
+                  parameters:
+                    - HTTP\/1\.1\b\s(\d+)
+                    - \1
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch(value){ 
+                      case '200': return 1 
+                      case '503': return 0 
+                      default: 2}
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/alarms'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'RabbitMQ: There are active alarms in the cluster'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+          master_item:
+            key: rabbitmq.get_overview
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.management_version
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
+                                       parseInt(value.split('.')[1]) * 100 +
+                                       parseInt(value.split('.')[2]) 
+                  return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
       macros:
         -
           macro: '{$RABBITMQ.API.PASSWORD}'
@@ -1074,39 +1138,6 @@ zabbix_export:
             -
               name: 'Zabbix raw items'
           url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/queues'
-        -
-          name: 'RabbitMQ: Healthcheck'
-          type: HTTP_AGENT
-          key: rabbitmq.healthcheck
-          history: 7h
-          authtype: BASIC
-          username: '{$RABBITMQ.API.USER}'
-          password: '{$RABBITMQ.API.PASSWORD}'
-          description: 'Runs basic healthchecks in the current node. Checks that the rabbit application is running, channels and queues can be listed successfully, and that no alarms are in effect.'
-          applications:
-            -
-              name: RabbitMQ
-          valuemap:
-            name: 'RabbitMQ healthcheck'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.status
-            -
-              type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '0'
-          url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/healthchecks/node'
-          triggers:
-            -
-              expression: '{last()}=0'
-              name: 'RabbitMQ: Node healthcheck failed'
-              opdata: 'Current state: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: 'https://www.rabbitmq.com/monitoring.html#health-checks'
         -
           name: 'RabbitMQ: Free disk space'
           type: DEPENDENT
@@ -1453,6 +1484,293 @@ zabbix_export:
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
       discovery_rules:
+        -
+          name: 'Health Check 3.8.9- discovery'
+          type: DEPENDENT
+          key: rabbitmq.healthcheck.v389.discovery
+          delay: '0'
+          description: 'Specific metrics up to and including version 3.8.4'
+          item_prototypes:
+            -
+              name: 'RabbitMQ: Healthcheck{#SINGLETON}'
+              type: HTTP_AGENT
+              key: 'rabbitmq.healthcheck[{#SINGLETON}]'
+              history: 7h
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: 'Runs basic healthchecks in the current node. Checks that the rabbit application is running, channels and queues can be listed successfully, and that no alarms are in effect.'
+              applications:
+                -
+                  name: RabbitMQ
+              valuemap:
+                name: 'RabbitMQ healthcheck'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.status
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/healthchecks/node'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'RabbitMQ: Node healthcheck failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'https://www.rabbitmq.com/monitoring.html#health-checks'
+          master_item:
+            key: rabbitmq.get_node_overview
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.management_version
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
+                                       parseInt(value.split('.')[1]) * 100 +
+                                       parseInt(value.split('.')[2]) 
+                  return JSON.stringify(rabbit_version < 30810 ? [{'{#SINGLETON}': ''}] : []);
+        -
+          name: 'Health Check 3.8.10+ discovery'
+          type: DEPENDENT
+          key: rabbitmq.healthcheck.v3810.discovery
+          delay: '0'
+          description: 'Version 3.8.10+ specific metrics'
+          item_prototypes:
+            -
+              name: 'RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON}'
+              type: HTTP_AGENT
+              key: 'rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}]'
+              history: 7d
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: 'Checks the expiration date on the certificates for every listener configured to use TLS. Responds a 200 OK if all certificates are valid (have not expired), otherwise responds with a 503 Service Unavailable.'
+              applications:
+                -
+                  name: RabbitMQ
+              valuemap:
+                name: 'RabbitMQ healthcheck'
+              preprocessing:
+                -
+                  type: REGEX
+                  parameters:
+                    - HTTP\/1\.1\b\s(\d+)
+                    - \1
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch(value){ 
+                      case '200': return 1 
+                      case '503': return 0 
+                      default: 2}
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'RabbitMQ: There are valid TLS certificates expiring in the next month'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+            -
+              name: 'RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON}'
+              type: HTTP_AGENT
+              key: 'rabbitmq.healthcheck.local_alarms[{#SINGLETON}]'
+              history: 7d
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: 'Responds a 200 OK if there are no local alarms in effect on the target node, otherwise responds with a 503 Service Unavailable.'
+              applications:
+                -
+                  name: RabbitMQ
+              valuemap:
+                name: 'RabbitMQ healthcheck'
+              preprocessing:
+                -
+                  type: REGEX
+                  parameters:
+                    - HTTP\/1\.1\b\s(\d+)
+                    - \1
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch(value){ 
+                      case '200': return 1 
+                      case '503': return 0 
+                      default: 2}
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'RabbitMQ: There are active alarms in the node'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+            -
+              name: 'RabbitMQ: Healthcheck: classic mirrored queues without synchronised mirrors online{#SINGLETON}'
+              type: HTTP_AGENT
+              key: 'rabbitmq.healthcheck.mirror_sync[{#SINGLETON}]'
+              history: 7d
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: 'Checks if there are classic mirrored queues without synchronised mirrors online (queues that would potentially lose data if the target node is shut down). Responds a 200 OK if there are no such classic mirrored queues, otherwise responds with a 503 Service Unavailable.'
+              applications:
+                -
+                  name: RabbitMQ
+              valuemap:
+                name: 'RabbitMQ healthcheck'
+              preprocessing:
+                -
+                  type: REGEX
+                  parameters:
+                    - HTTP\/1\.1\b\s(\d+)
+                    - \1
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch(value){ 
+                      case '200': return 1 
+                      case '503': return 0 
+                      default: 2}
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'RabbitMQ: There are queues that could potentially lose data if the this node goes offline.'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+            -
+              name: 'RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON}'
+              type: HTTP_AGENT
+              key: 'rabbitmq.healthcheck.quorum[{#SINGLETON}]'
+              history: 7d
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: 'Checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). Responds a 200 OK if there are no such quorum queues, otherwise responds with a 503 Service Unavailable.'
+              applications:
+                -
+                  name: RabbitMQ
+              valuemap:
+                name: 'RabbitMQ healthcheck'
+              preprocessing:
+                -
+                  type: REGEX
+                  parameters:
+                    - HTTP\/1\.1\b\s(\d+)
+                    - \1
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch(value){ 
+                      case '200': return 1 
+                      case '503': return 0 
+                      default: 2}
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down.'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+            -
+              name: 'RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON}'
+              type: HTTP_AGENT
+              key: 'rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}]'
+              history: 7d
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: 'Responds a 200 OK if all virtual hosts and running on the target node, otherwise responds with a 503 Service Unavailable.'
+              applications:
+                -
+                  name: RabbitMQ
+              valuemap:
+                name: 'RabbitMQ healthcheck'
+              preprocessing:
+                -
+                  type: REGEX
+                  parameters:
+                    - HTTP\/1\.1\b\s(\d+)
+                    - \1
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch(value){ 
+                      case '200': return 1 
+                      case '503': return 0 
+                      default: 2}
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'RabbitMQ: There are not running virtual hosts'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+          master_item:
+            key: rabbitmq.get_node_overview
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.management_version
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
+                                       parseInt(value.split('.')[1]) * 100 +
+                                       parseInt(value.split('.')[2]) 
+                  return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           name: 'Queues discovery'
           type: DEPENDENT
@@ -1922,14 +2240,14 @@ zabbix_export:
             key: rabbitmq.get_queues
           lld_macro_paths:
             -
-              lld_macro: '{#NODE}'
-              path: $.node
-            -
               lld_macro: '{#QUEUE}'
               path: $.name
             -
               lld_macro: '{#VHOST}'
               path: $.vhost
+            -
+              lld_macro: '{#NODE}'
+              path: $.node
       macros:
         -
           macro: '{$RABBITMQ.API.PASSWORD}'
@@ -2256,13 +2574,6 @@ zabbix_export:
           item:
             host: 'RabbitMQ node by HTTP'
             key: rabbitmq.node.running
-        -
-          sortorder: '1'
-          drawtype: BOLD_LINE
-          color: 2774A4
-          item:
-            host: 'RabbitMQ node by HTTP'
-            key: rabbitmq.healthcheck
     -
       name: 'RabbitMQ: Queues'
       graph_items:
@@ -2314,6 +2625,9 @@ zabbix_export:
         -
           value: '1'
           newvalue: Ok
+        -
+          value: '2'
+          newvalue: Error
     -
       name: 'Service state'
       mappings:

@@ -110,7 +110,9 @@ if ($data['valuemapid'] != 0) {
 		new CSubmit('update', _('Update')),
 		[
 			(new CSimpleButton(_('Clone')))->setId('clone'),
-			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+			(new CRedirectButton(_('Delete'),
+				(new CUrl('zabbix.php'))
+					->setArgumentSID()
 					->setArgument('action', 'valuemap.delete')
 					->setArgument('valuemapids', (array) $data['valuemapid']),
 				$confirm_message

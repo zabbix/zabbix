@@ -186,6 +186,12 @@ class CApiInputValidator {
 
 			case API_EVENT_NAME:
 				return self::validateEventName($rule, $data, $path, $error);
+
+			case API_JSONRPC_PARAMS:
+				return self::validateJsonRpcParams($rule, $data, $path, $error);
+
+			case API_JSONRPC_ID:
+				return self::validateJsonRpcId($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -239,6 +245,8 @@ class CApiInputValidator {
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
 			case API_EVENT_NAME:
+			case API_JSONRPC_PARAMS:
+			case API_JSONRPC_ID:
 				return true;
 
 			case API_OBJECT:
@@ -2044,5 +2052,45 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * JSON RPC parameters validator. Parameters MUST contain an array or object value.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateJsonRpcParams($rule, &$data, $path, &$error) {
+		if (is_array($data)) {
+			return true;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or object is expected'));
+
+		return false;
+	}
+
+	/**
+	 * JSON RPC identifier validator. This identifier MUST contain a String, Number, or NULL value.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateJsonRpcId($rule, &$data, $path, &$error) {
+		if (is_string($data) || is_int($data) || is_float($data) || $data === null) {
+			return true;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a string, number or null value is expected'));
+
+		return false;
 	}
 }

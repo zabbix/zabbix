@@ -45,6 +45,7 @@ jQuery(function($) {
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
+	endpoint.addSID();
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 
 	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout' +
