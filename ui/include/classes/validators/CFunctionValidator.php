@@ -613,7 +613,13 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateStringFunction(string $param): bool {
-		return ($this->isMacro($param) || preg_match('/^(iregexp|regexp|like)$/', $param));
+		if ($this->isMacro($param)) {
+			return true;
+		}
+		else {
+			$param = (substr($param, 0, 1) === '"' && substr($param, -1) === '"') ? substr($param, 1, -1) : $param;
+			return in_array($param, ['iregexp', 'regexp', 'like']);
+		}
 	}
 
 	/**
