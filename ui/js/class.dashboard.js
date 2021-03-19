@@ -1241,9 +1241,12 @@ class CDashboard extends CBaseComponent {
 						}
 					];
 
-					const original_event = e.detail.event;
+					const placeholder = e.detail.placeholder;
+					const placeholder_event = new jQuery.Event(e.detail.mouse_event);
 
-					jQuery(original_event.target).menuPopup(menu, new jQuery.Event(original_event), {
+					placeholder_event.target = placeholder;
+
+					jQuery(placeholder).menuPopup(menu, placeholder_event, {
 						closeCallback: () => {
 							if (menu_was_cancelled) {
 								dashboard_page.resetWidgetPlaceholder();

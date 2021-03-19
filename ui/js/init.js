@@ -250,12 +250,15 @@ jQuery(function($) {
 						: event.target,
 					my: 'left top',
 					at: 'left bottom',
-					using: function(pos, data) {
-						const max_left =
-							document.querySelector('.wrapper').clientWidth - (data.horizontal ? data.element.width : 0);
+					using: (pos, data) => {
+						let max_left = data.horizontal === 'left'
+							? document.querySelector('.wrapper').clientWidth
+							: document.querySelector('.wrapper').clientWidth - data.element.width;
 
 						pos.left = Math.max(0, Math.min(max_left, pos.left));
-						$(this).css(pos);
+
+						data.element.element[0].style.top = `${pos.top}px`;
+						data.element.element[0].style.left = `${pos.left}px`;
 					}
 				};
 		}

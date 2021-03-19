@@ -452,9 +452,9 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		if (this._is_edit_mode) {
-			this._activateWidgetPlaceholder();
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();
+			this.resetWidgetPlaceholder();
 		}
 
 		this._resizeGrid();
@@ -545,9 +545,9 @@ class CDashboardPage extends CBaseComponent {
 		this._initWidgetResizing();
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
-			this._activateWidgetPlaceholder();
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();
+			this.resetWidgetPlaceholder();
 		}
 	}
 
@@ -831,6 +831,7 @@ class CDashboardPage extends CBaseComponent {
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
 		this._widget_placeholder_is_active = false;
+		this._widget_placeholder_move_animation_frame = null;
 
 		this._dashboard_grid.appendChild(this._widget_placeholder.getNode());
 
@@ -844,6 +845,144 @@ class CDashboardPage extends CBaseComponent {
 				y: Math.max(0, Math.min(this._max_rows - height, y)),
 				width: width,
 				height: height
+			}
+		};
+
+		const move = (e) => {
+			if (this._widget_placeholder_clicked_pos !== null) {
+				let event_pos = getGridEventPos(e, {width: 1, height: 1});
+				let reverse_x = false;
+				let reverse_y = false;
+
+				const delta_x = event_pos.x - this._widget_placeholder_clicked_pos.x;
+
+				this._widget_placeholder_pos = {};
+
+				if (this._widget_placeholder_clicked_pos.width == 2) {
+					if (delta_x <= 0) {
+						this._widget_placeholder_clicked_pos.width = 1;
+					}
+					else if (delta_x >= 1) {
+						this._widget_placeholder_clicked_pos.x++;
+						this._widget_placeholder_clicked_pos.width = 1;
+					}
+				}
+
+				if (delta_x > 0) {
+					this._widget_placeholder_pos.x = this._widget_placeholder_clicked_pos.x;
+					this._widget_placeholder_pos.width = Math.max(
+						this._widget_placeholder_clicked_pos.width,
+						event_pos.x - this._widget_placeholder_clicked_pos.x + 1
+					);
+				}
+				else {
+					this._widget_placeholder_pos.x = event_pos.x;
+					this._widget_placeholder_pos.width = this._widget_placeholder_clicked_pos.x
+						- event_pos.x + this._widget_placeholder_clicked_pos.width;
+					reverse_x = true;
+				}
+
+				if (event_pos.y >= this._widget_placeholder_clicked_pos.y) {
+					this._widget_placeholder_pos.y = this._widget_placeholder_clicked_pos.y;
+					this._widget_placeholder_pos.height = Math.max(
+						this._widget_placeholder_clicked_pos.height,
+						event_pos.y - this._widget_placeholder_clicked_pos.y + 1
+					);
+					this._widget_placeholder_pos.height = Math.min(this._widget_max_rows,
+						this._widget_placeholder_pos.height
+					);
+				}
+				else {
+					this._widget_placeholder_pos.y = event_pos.y;
+					this._widget_placeholder_pos.height = this._widget_placeholder_clicked_pos.y
+						- event_pos.y + this._widget_placeholder_clicked_pos.height;
+					reverse_y = true;
+
+					const delta_y = this._widget_placeholder_pos.height - this._widget_max_rows;
+
+					if (delta_y > 0) {
+						this._widget_placeholder_pos.y += delta_y;
+						this._widget_placeholder_pos.height -= delta_y;
+					}
+				}
+
+				this._widget_placeholder_pos = this.accommodatePos(
+					this._widget_placeholder_pos, {reverse_x, reverse_y}
+				);
+
+				const grid_min_rows = Math.min(this._max_rows,
+					this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
+				);
+
+				if (grid_min_rows > this._grid_min_rows) {
+					this._resizeGrid(grid_min_rows);
+				}
+
+				this._widget_placeholder
+					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
+					.showAtPosition(this._widget_placeholder_pos);
+			}
+			else {
+				if (this._widget_placeholder_pos !== null
+						&& this._widget_placeholder.getNode().contains(e.target)) {
+					return;
+				}
+
+				this._widget_placeholder_pos = null;
+
+				const event_pos_1x1 = getGridEventPos(e, {width: 1, height: 1});
+
+				if (this._isPosFree(event_pos_1x1)) {
+					let event_pos = getGridEventPos(e, {width: 2, height: this._widget_min_rows});
+
+					for (const width of [2, 1]) {
+						for (const offset_y of [0, -1, 1]) {
+							for (const offset_x of [0, -1, 1]) {
+								const pos = {
+									x: event_pos.x + offset_x,
+									y: event_pos.y + offset_y,
+									width: width,
+									height: this._widget_min_rows
+								};
+
+								if (pos.x < 0 || pos.x + pos.width > this._max_columns
+										|| pos.y < 0 || pos.y + pos.height > this._max_rows) {
+									continue;
+								}
+
+								if (this._isPosOverlapping(pos, event_pos_1x1) && this._isPosFree(pos)) {
+									this._widget_placeholder_pos = pos;
+									break;
+								}
+							}
+
+							if (this._widget_placeholder_pos !== null) {
+								break;
+							}
+						}
+
+						if (this._widget_placeholder_pos !== null) {
+							break;
+						}
+					}
+				}
+
+				if (this._widget_placeholder_pos !== null) {
+					const grid_min_rows = Math.min(this._max_rows,
+						this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
+					);
+
+					if (grid_min_rows > this._grid_min_rows) {
+						this._resizeGrid(grid_min_rows);
+					}
+
+					this._widget_placeholder
+						.setState(WIDGET_PLACEHOLDER_STATE_POSITIONING)
+						.showAtPosition(this._widget_placeholder_pos);
+				}
+				else {
+					this._widget_placeholder.hide();
+				}
 			}
 		};
 
@@ -876,145 +1015,22 @@ class CDashboardPage extends CBaseComponent {
 					delete new_widget_pos.height;
 				}
 
-				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_ADD, {new_widget_pos, event: e});
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_ADD, {
+					placeholder: this._widget_placeholder.getNode(),
+					new_widget_pos,
+					mouse_event: e
+				});
 			},
 
 			mouseMove: (e) => {
-				if (this._widget_placeholder_clicked_pos !== null) {
-					let event_pos = getGridEventPos(e, {width: 1, height: 1});
-					let reverse_x = false;
-					let reverse_y = false;
-
-					const delta_x = event_pos.x - this._widget_placeholder_clicked_pos.x;
-
-					this._widget_placeholder_pos = {};
-
-					if (this._widget_placeholder_clicked_pos.width == 2) {
-						if (delta_x <= 0) {
-							this._widget_placeholder_clicked_pos.width = 1;
-						}
-						else if (delta_x >= 1) {
-							this._widget_placeholder_clicked_pos.x++;
-							this._widget_placeholder_clicked_pos.width = 1;
-						}
-					}
-
-					if (delta_x > 0) {
-						this._widget_placeholder_pos.x = this._widget_placeholder_clicked_pos.x;
-						this._widget_placeholder_pos.width = Math.max(
-							this._widget_placeholder_clicked_pos.width,
-							event_pos.x - this._widget_placeholder_clicked_pos.x + 1
-						);
-					}
-					else {
-						this._widget_placeholder_pos.x = event_pos.x;
-						this._widget_placeholder_pos.width = this._widget_placeholder_clicked_pos.x
-							- event_pos.x + this._widget_placeholder_clicked_pos.width;
-						reverse_x = true;
-					}
-
-					if (event_pos.y >= this._widget_placeholder_clicked_pos.y) {
-						this._widget_placeholder_pos.y = this._widget_placeholder_clicked_pos.y;
-						this._widget_placeholder_pos.height = Math.max(
-							this._widget_placeholder_clicked_pos.height,
-							event_pos.y - this._widget_placeholder_clicked_pos.y + 1
-						);
-						this._widget_placeholder_pos.height = Math.min(this._widget_max_rows,
-							this._widget_placeholder_pos.height
-						);
-					}
-					else {
-						this._widget_placeholder_pos.y = event_pos.y;
-						this._widget_placeholder_pos.height = this._widget_placeholder_clicked_pos.y
-							- event_pos.y + this._widget_placeholder_clicked_pos.height;
-						reverse_y = true;
-
-						const delta_y = this._widget_placeholder_pos.height - this._widget_max_rows;
-
-						if (delta_y > 0) {
-							this._widget_placeholder_pos.y += delta_y;
-							this._widget_placeholder_pos.height -= delta_y;
-						}
-					}
-
-					this._widget_placeholder_pos = this.accommodatePos(
-						this._widget_placeholder_pos, {reverse_x, reverse_y}
-					);
-
-					const grid_min_rows = Math.min(this._max_rows,
-						this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
-					);
-
-					if (grid_min_rows > this._grid_min_rows) {
-						this._resizeGrid(grid_min_rows);
-					}
-
-					this._widget_placeholder
-						.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
-						.showAtPosition(this._widget_placeholder_pos);
+				if (this._widget_placeholder_move_animation_frame !== null) {
+					cancelAnimationFrame(this._widget_placeholder_move_animation_frame);
 				}
-				else {
-					if (this._widget_placeholder_pos !== null
-							&& this._widget_placeholder.getNode().contains(e.target)) {
-						return;
-					}
 
-					this._widget_placeholder_pos = null;
-
-					const event_pos_1x1 = getGridEventPos(e, {width: 1, height: 1});
-
-					if (this._isPosFree(event_pos_1x1)) {
-						let event_pos = getGridEventPos(e, {width: 2, height: this._widget_min_rows});
-
-						for (const width of [2, 1]) {
-							for (const offset_y of [0, -1, 1]) {
-								for (const offset_x of [0, -1, 1]) {
-									const pos = {
-										x: event_pos.x + offset_x,
-										y: event_pos.y + offset_y,
-										width: width,
-										height: this._widget_min_rows
-									};
-
-									if (pos.x < 0 || pos.x + pos.width > this._max_columns
-											|| pos.y < 0 || pos.y + pos.height > this._max_rows) {
-										continue;
-									}
-
-									if (this._isPosOverlapping(pos, event_pos_1x1) && this._isPosFree(pos)) {
-										this._widget_placeholder_pos = pos;
-										break;
-									}
-								}
-
-								if (this._widget_placeholder_pos !== null) {
-									break;
-								}
-							}
-
-							if (this._widget_placeholder_pos !== null) {
-								break;
-							}
-						}
-					}
-
-					if (this._widget_placeholder_pos !== null) {
-						const grid_min_rows = Math.min(this._max_rows,
-							this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
-						);
-
-						if (grid_min_rows > this._grid_min_rows) {
-							this._resizeGrid(grid_min_rows);
-						}
-
-						this._widget_placeholder
-							.setState(WIDGET_PLACEHOLDER_STATE_POSITIONING)
-							.showAtPosition(this._widget_placeholder_pos);
-					}
-					else {
-						this._widget_placeholder.hide();
-					}
-				}
+				this._widget_placeholder_move_animation_frame = requestAnimationFrame(() => {
+					this._widget_placeholder_move_animation_frame = null;
+					move(e);
+				});
 			},
 
 			mouseLeave: (e) => {
@@ -1040,11 +1056,14 @@ class CDashboardPage extends CBaseComponent {
 		document.querySelector('.wrapper').addEventListener('scroll', this._widget_placeholder_events.scroll);
 
 		this._widget_placeholder_is_active = true;
-
-		this.resetWidgetPlaceholder();
 	}
 
 	_deactivateWidgetPlaceholder({do_hide = true} = {}) {
+		if (this._widget_placeholder_move_animation_frame !== null) {
+			cancelAnimationFrame(this._widget_placeholder_move_animation_frame);
+			this._widget_placeholder_move_animation_frame = null;
+		}
+
 		this._widget_placeholder.off('mousedown', this._widget_placeholder_events.mouseDown);
 
 		this._dashboard_grid.removeEventListener('mousemove', this._widget_placeholder_events.mouseMove);
@@ -1321,7 +1340,7 @@ class CDashboardPage extends CBaseComponent {
 				document.removeEventListener('mouseup', this._widget_dragging_events.mouseUp);
 				document.removeEventListener('mousemove', this._widget_dragging_events.mouseMove);
 
-				this._activateWidgetPlaceholder();
+				this.resetWidgetPlaceholder();
 			},
 
 			mouseMove: (e) => {
@@ -1869,7 +1888,7 @@ class CDashboardPage extends CBaseComponent {
 				document.removeEventListener('mouseup', this._widget_resizing_events.mouseUp);
 				document.removeEventListener('mousemove', this._widget_resizing_events.mouseMove);
 
-				this._activateWidgetPlaceholder();
+				this.resetWidgetPlaceholder();
 			},
 
 			mouseMove: (e) => {
