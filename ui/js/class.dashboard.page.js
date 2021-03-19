@@ -241,14 +241,14 @@ class CDashboardPage extends CBaseComponent {
 			for (x = 0; x <= max_column && !found; x++) {
 				pos.x = x;
 				pos.y = y;
-				found = this.isPosFree(pos);
+				found = this._isPosFree(pos);
 			}
 		}
 
 		return pos;
 	}
 
-	isPosFree(pos) {
+	_isPosFree(pos) {
 		for (const widget of this._widgets.keys()) {
 			if (this._isPosOverlapping(pos, widget.getPosition())) {
 				return false;
@@ -304,7 +304,7 @@ class CDashboardPage extends CBaseComponent {
 
 		if (reverse) {
 			for (let x = pos.x + pos.width - 1, width = 1; x >= pos.x; x--, width++) {
-				if (!this.isPosFree({...max_pos, x, width})) {
+				if (!this._isPosFree({...max_pos, x, width})) {
 					break;
 				}
 
@@ -314,7 +314,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 		else {
 			for (let width = 1; width <= pos.width; width++) {
-				if (!this.isPosFree({...max_pos, width})) {
+				if (!this._isPosFree({...max_pos, width})) {
 					break;
 				}
 
@@ -330,7 +330,7 @@ class CDashboardPage extends CBaseComponent {
 
 		if (reverse) {
 			for (let y = pos.y + pos.height - 1, height = 1; y >= pos.y; y--, height++) {
-				if (!this.isPosFree({...max_pos, y, height})) {
+				if (!this._isPosFree({...max_pos, y, height})) {
 					break;
 				}
 
@@ -340,7 +340,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 		else {
 			for (let height = this._widget_min_rows; height <= pos.height; height++) {
-				if (!this.isPosFree({...max_pos, height})) {
+				if (!this._isPosFree({...max_pos, height})) {
 					break;
 				}
 
@@ -937,7 +937,7 @@ class CDashboardPage extends CBaseComponent {
 
 				const event_pos_1x1 = getGridEventPos(e, {width: 1, height: 1});
 
-				if (this.isPosFree(event_pos_1x1)) {
+				if (this._isPosFree(event_pos_1x1)) {
 					let event_pos = getGridEventPos(e, {width: 2, height: this._widget_min_rows});
 
 					for (const width of [2, 1]) {
@@ -955,7 +955,7 @@ class CDashboardPage extends CBaseComponent {
 									continue;
 								}
 
-								if (this._isPosOverlapping(pos, event_pos_1x1) && this.isPosFree(pos)) {
+								if (this._isPosOverlapping(pos, event_pos_1x1) && this._isPosFree(pos)) {
 									this._widget_placeholder_pos = pos;
 									break;
 								}
