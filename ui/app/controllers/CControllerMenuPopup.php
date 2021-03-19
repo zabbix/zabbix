@@ -319,13 +319,13 @@ class CControllerMenuPopup extends CController {
 	/**
 	 * Prepare data for map element context menu popup.
 	 *
-	 * @param array  $data
-	 * @param string $data['sysmapid']
-	 * @param string $data['selementid']
-	 * @param array  $data['options']        (optional)
-	 * @param int    $data['severity_min']   (optional)
-	 * @param string $data['widget_uniqueid] (optional)
-	 * @param string $data['hostid']         (optional)
+	 * @param array   $data
+	 * @param string  $data['sysmapid']
+	 * @param string  $data['selementid']
+	 * @param array   $data['options']       (optional)
+	 * @param int     $data['severity_min']  (optional)
+	 * @param int     $data['unique_id']     (optional)
+	 * @param string  $data['hostid']        (optional)
 	 *
 	 * @return mixed
 	 */
@@ -369,9 +369,10 @@ class CControllerMenuPopup extends CController {
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severity_min'] = $data['severity_min'];
 						}
-						if (array_key_exists('widget_uniqueid', $data)) {
-							$menu_data['widget_uniqueid'] = $data['widget_uniqueid'];
+						if (array_key_exists('unique_id', $data)) {
+							$menu_data['unique_id'] = $data['unique_id'];
 						}
+
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}

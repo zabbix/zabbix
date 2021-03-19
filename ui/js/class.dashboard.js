@@ -1515,13 +1515,8 @@ class CDashboard extends CBaseComponent {
 	// =================================================================================================================
 	// TODO: Temporary solution.
 
-	getSelectedPage() {
-//		return this._tabs_data.get(this._selected_tab).page;
-	}
-
-
-	getDashboardData() {
-		return this.getSelectedPage().getDashboardData();
+	getSelectedDashboardPage() {
+		return this._selected_dashboard_page;
 	}
 
 	getWidgets() {

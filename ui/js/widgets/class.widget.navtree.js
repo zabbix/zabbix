@@ -27,6 +27,7 @@ class CWidgetNavTree extends CWidget {
 
 		this._severity_levels = null;
 		this._navtree = [];
+		this._maps = [];
 		this._navtree_items_opened = [];
 		this._navtree_item_selected = null;
 		this._maps_accessible = null;
@@ -53,6 +54,18 @@ class CWidgetNavTree extends CWidget {
 
 		if (this._has_contents) {
 			this._unregisterContentEvents();
+		}
+	}
+
+	announceWidgets(widgets) {
+		super.announceWidgets(widgets);
+		this._unregisterContentEvents();
+
+		for (const widget of widgets) {
+			if (widget instanceof CWidgetMap
+					&& this._fields.reference === widget._fields.filter_widget_reference) {
+				this._maps.push(widget);
+			}
 		}
 	}
 
@@ -111,8 +124,10 @@ class CWidgetNavTree extends CWidget {
 
 				if (this._markTreeItemSelected(this._navtree_item_selected)) {
 					this._openBranch(this._navtree_item_selected);
-
-					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {mapid: this._navtree_item_selected});
+					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {
+						sysmapid: $(`.tree-item[data-id=${this._navtree_item_selected}]`).data('sysmapid'),
+						itemid: this._navtree_item_selected
+					});
 				}
 			}
 
@@ -120,7 +135,7 @@ class CWidgetNavTree extends CWidget {
 				this._registerContentEvents();
 			}
 
-			this._has_contents = false;
+			this._has_contents = true;
 		}
 	}
 
@@ -133,12 +148,13 @@ class CWidgetNavTree extends CWidget {
 			select: (e) => {
 				const link = e.target;
 
+				const sysmapid = link.getAttribute('data-sysmapid');
 				const itemid = link.closest('.tree-item').getAttribute('data-id');
 
 				if (this._markTreeItemSelected(itemid)) {
-					updateUserProfile('web.dashbrd.navtree.item.selected', itemid, [this._widgetid]);
+					updateUserProfile('web.dashbrd.navtree.item.selected', sysmapid, [this._widgetid]);
 
-					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {mapid: itemid});
+					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid});
 				}
 
 				e.preventDefault();
@@ -227,7 +243,11 @@ class CWidgetNavTree extends CWidget {
 
 			copy: () => {
 				this._updateWidgetFields();
-			}
+			},
+
+			selectItem: (e) => {
+				console.log(e);
+			},
 		}
 
 		this.on(WIDGET_EVENT_COPY, this._events.copy);
@@ -261,6 +281,10 @@ class CWidgetNavTree extends CWidget {
 			for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
 				link.addEventListener('click', this._events.select);
 			}
+
+			for (const widget of this._maps) {
+				widget.on(WIDGET_SYSMAP_EVENT_SELECT, this._events.selectItem);
+			}
 		}
 	}
 
@@ -285,6 +309,10 @@ class CWidgetNavTree extends CWidget {
 		else {
 			for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
 				link.removeEventListener('click', this._events.select);
+			}
+
+			for (const widget of this._maps) {
+				widget.off(WIDGET_SYSMAP_EVENT_SELECT, this._events.selectItem);
 			}
 		}
 	}

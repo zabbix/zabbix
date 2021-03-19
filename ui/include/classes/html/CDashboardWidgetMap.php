@@ -161,8 +161,8 @@ class CDashboardWidgetMap extends CDiv {
 									->addClass(ZBX_STYLE_BTN_BACK_MAP_CONTENT)
 									->addItem(_s('Go back to %1$s', $this->previous_map['name']))
 								),
-								'javascript: navigateToSubmap('.$this->previous_map['sysmapid'].', true);'
-						))
+								'#'
+						))->setAttribute('data-previous-map', $this->previous_map['sysmapid'])
 					);
 
 				$this->addItem($go_back_div);

@@ -267,40 +267,46 @@ function getMenuPopupHost(options, trigger_elmnt) {
  * Get menu popup submap map element section data.
  *
  * @param {array}  options['sysmapid']
- * @param {int}    options['severity_min']     (optional)
- * @param {int}    options['widget_uniqueid']  (optional)
- * @param {array}  options['urls']             (optional)
+ * @param {int}    options['severity_min']    (optional)
+ * @param {int}    options['is_widget']       (optional)
+ * @param {array}  options['urls']            (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
  *
  * @return array
  */
 function getMenuPopupMapElementSubmap(options) {
-	var sections = [],
-		submap_url;
+	const sections = [];
+	const item = {label: t('Submap')};
 
-	if (typeof options.widget_uniqueid !== 'undefined') {
-		submap_url = new Curl('javascript: navigateToSubmap(' + options.sysmapid + ', false);');
+	if (options.unique_id !== undefined) {
+		item.clickCallback = ()=> {
+			ZABBIX.Dashboard.getDashboardPages().forEach((page) => {
+				const widget = page.getWidget(options.unique_id);
+
+				if (widget !== null) {
+					widget.navigateToSubmap(options.sysmapid);
+				}
+			});
+		};
 	}
 	else {
 		if (!options.allowed_ui_maps) {
 			return [];
 		}
 
-		submap_url = new Curl('zabbix.php', false);
+		const submap_url = new Curl('zabbix.php', false);
 		submap_url.setArgument('action', 'map.view');
 		submap_url.setArgument('sysmapid', options.sysmapid);
 		if (typeof options.severity_min !== 'undefined') {
 			submap_url.setArgument('severity_min', options.severity_min);
 		}
+		item.url = submap_url.getUrl();
 	}
 
 	sections.push({
 		label: t('Go to'),
-		items: [{
-			label: t('Submap'),
-			url: submap_url.getUrl()
-		}]
+		items: [item]
 	});
 
 	// urls

@@ -21,6 +21,9 @@
 const WIDGET_SYSMAP_SOURCETYPE_MAP = 1;
 const WIDGET_SYSMAP_SOURCETYPE_FILTER = 2;
 
+const WIDGET_SYSMAP_EVENT_READY = 'ready';
+const WIDGET_SYSMAP_EVENT_SELECT = 'select';
+
 class CWidgetMap extends CWidget {
 
 	_init() {
@@ -32,10 +35,9 @@ class CWidgetMap extends CWidget {
 
 		this._previous_maps = [];
 		this._current_sysmapid = null;
-		this._initial_load = 1;
+		this._initial_load = true;
 
 		this._has_contents = false;
-		this._is_refreshing = false;
 	}
 
 	_doDestroy() {
@@ -65,43 +67,73 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
+	_promiseUpdate() {
+		if (!this._has_contents) {
+			return super._promiseUpdate();
+		}
+		else {
+			const curl = new Curl(this._map_svg.options.refresh);
+			return fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+				},
+				body: urlEncodeData({
+					'curtime': new CDate().getTime(),
+					'initial_load': 0
+				})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if (response.mapid > 0) {
+						this._map_svg.update(response);
+					}
+					else {
+						this._restartUpdating();
+					}
+				});
+		}
+	}
+
 	_getUpdateRequestData() {
 		return {
 			...super._getUpdateRequestData(),
 			current_sysmapid: this._current_sysmapid ?? undefined,
 			previous_maps: this._previous_maps,
-			initial_load: 1
+			unique_id: this._unique_id,
+			initial_load: this._initial_load ? 1 : 0
 		};
 	}
 
 	_processUpdateResponse(response) {
+		if (this._has_contents) {
+			this._unregisterContentEvents();
+
+			this._has_contents = false;
+		}
+
 		super._processUpdateResponse(response);
 
 		if (response.sysmap_data !== undefined) {
-			if (response.sysmap_data.current_sysmapid !== this._current_sysmapid) {
-				this._startUpdating();
-			}
-			else {
-				this._current_sysmapid = response.sysmap_data.current_sysmapid;
-				this._initial_load = response.sysmap_data.initial_load;
+			this._current_sysmapid = response.sysmap_data.current_sysmapid;
+			this._initial_load = false;
 
-				const map_options = response.sysmap_data.map_options;
+			const map_options = response.sysmap_data.map_options;
 
-				if (map_options !== null) {
-					this._makeSvgMap(map_options);
+			if (map_options !== null) {
+				this._makeSvgMap(map_options);
 
-					this._has_contents = true;
+				if (this._state === WIDGET_STATE_ACTIVE) {
+					this._registerContentsEvents();
 				}
 
-				if (response.sysmap_data.error_msg !== null) {
-					this._$content_body.append(response.sysmap_data.error_msg);
-				}
+				this._has_contents = true;
 			}
-		}
-		else {
-			this._map_svg = null;
-			this._initial_load = 1;
-			this._has_contents = false;
+
+
+			if (response.sysmap_data.error_msg !== null) {
+				this._$content_body.append(response.sysmap_data.error_msg);
+			}
 		}
 	}
 
@@ -111,40 +143,41 @@ class CWidgetMap extends CWidget {
 		this._events = {
 			...this._events,
 
+			back: (e) => {
+				this.navigateToSubmap(e.target.getAttribute('data-previous-map'), true);
+			},
+
 			select: (e) => {
-				if (this._current_sysmapid != e.detail.mapid) {
-					this.navigateToMap(e.detail.mapid);
+				if (this._current_sysmapid != e.detail.sysmapid) {
+					this._previous_maps = [];
+					this.navigateToMap(e.detail.sysmapid);
 				}
 			}
 		}
 	}
 
-	navigateToMap(sysmapid) {
-		this._current_sysmapid = sysmapid;
-
-		if (this._state == WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-
-			// TODO
-			// ZABBIX.Dashboard.widgetDataShare(widget[0], 'current_sysmapid',
-			// 	{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0}
-			// );
-
-			$('.menu-popup').menuPopup('close', null);
-		}
+	_registerContentsEvents() {
+		this._target.querySelectorAll('[data-previous-map]').forEach((link) => {
+			link.addEventListener('click', this._events.back);
+		});
 	}
 
-	navigateToSubmap(submapid, reset_previous = false) {
-		if (this._current_sysmapid !== null) {
-			if (reset_previous && this._previous_maps.length > 0) {
-				this._previous_maps.pop();
-			}
-			else {
-				this._previous_maps.push(this._current_sysmapid);
-			}
+	_unregisterContentEvents() {
+		this._target.querySelectorAll('[data-previous-map]').forEach((link) => {
+			link.removeEventListener('click', this._events.back);
+		});
+	}
+
+	_restartUpdating() {
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._unregisterContentEvents();
 		}
 
-		this.navigateToMap(submapid);
+		this._has_contents = false;
+		this._map_svg = null;
+		this._initial_load = 1;
+
+		this._startUpdating();
 	}
 
 	_makeSvgMap(options) {
@@ -155,33 +188,26 @@ class CWidgetMap extends CWidget {
 		this._map_svg = new SVGMap(options);
 	}
 
-	_updateSvgMap() {
-		if (this._has_contents && !this._is_refreshing) {
-			this._is_refreshing = true;
+	navigateToMap(sysmapid) {
+		this._current_sysmapid = sysmapid;
 
-			const curl = new Curl(this._map_svg.options.refresh);
-			curl.setArgument('curtime', new CDate().getTime());
-			curl.setArgument('initial_load', 0);
+		$('.menu-popup').menuPopup('close', null);
 
-			fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-				}
-			})
-				.then((response) => response.json())
-				.then((response) => {
-					this._is_refreshing = false;
-
-					if (response.mapid > 0) {
-						this._map_svg.update(response);
-					}
-					else {
-						if (this._state === WIDGET_STATE_ACTIVE) {
-							this._startUpdating();
-						}
-					}
-				});
+		if (this._state == WIDGET_STATE_ACTIVE) {
+			this._restartUpdating();
 		}
+	}
+
+	navigateToSubmap(sysmapid, reset_previous = false) {
+		console.log('navigateToSubmap', sysmapid);
+
+		if (reset_previous && this._previous_maps.length > 0) {
+			sysmapid = this._previous_maps.pop();
+		}
+		else {
+			this._previous_maps.push(this._current_sysmapid);
+		}
+
+		this.navigateToMap(sysmapid);
 	}
 }

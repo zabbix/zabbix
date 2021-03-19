@@ -95,7 +95,8 @@ class CMenuPopupHelper {
 				'sysmapid' => $sysmapid,
 				'selementid' => $selement['selementid_orig'],
 				'elementtype' => $selement['elementtype'],
-				'urls' => $selement['urls']
+				'urls' => $selement['urls'],
+				'unique_id' => $selement['unique_id']
 			]
 		];
 

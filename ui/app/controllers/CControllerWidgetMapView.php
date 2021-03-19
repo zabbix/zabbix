@@ -31,6 +31,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 			'initial_load' => 'in 0,1',
 			'fields' => 'json',
 			'current_sysmapid' => 'db sysmaps.sysmapid',
+			'unique_id' => 'string',
 			'previous_maps' => 'array'
 		]);
 	}
@@ -44,7 +45,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 
 		// Get previous map.
 		if ($this->hasInput('previous_maps')) {
-			$previous_maps = array_filter(explode(',', $this->getInput('previous_maps')), 'is_numeric');
+			$previous_maps = array_filter($this->getInput('previous_maps'), 'is_numeric');
 
 			if ($previous_maps) {
 				$previous_map = API::Map()->get([
@@ -63,7 +64,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 			$sysmapid =  $fields['sysmapid'];
 		}
 
-		$sysmap_data = CMapHelper::get(($sysmapid == null) ? [] : [$sysmapid]);
+		$sysmap_data = CMapHelper::get(($sysmapid == null) ? [] : [$sysmapid], ['unique_id' => $this->getInput('unique_id')]);
 
 		if ($sysmapid === null || $sysmap_data['id'] < 0) {
 			$error = _('No permissions to referred object or it does not exist!');
