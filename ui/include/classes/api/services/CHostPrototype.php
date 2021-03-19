@@ -344,8 +344,9 @@ class CHostPrototype extends CHostBase {
 		$groupPrototypes = [];
 		$hostPrototypeDiscoveryRules = [];
 		$hostPrototypeInventory = [];
-		foreach ($hostPrototypes as $key => $hostPrototype) {
-			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
+		$hosts_tags = [];
+		foreach ($hostPrototypes as $key => &$hostPrototype) {
+			$hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
 			// save group prototypes
 			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
@@ -367,7 +368,15 @@ class CHostPrototype extends CHostBase {
 					'inventory_mode' => $hostPrototype['inventory_mode']
 				];
 			}
+
+			// tags
+			if (array_key_exists('tags', $hostPrototype)) {
+				foreach (zbx_toArray($hostPrototype['tags']) as $tag) {
+					$hosts_tags[] = ['hostid' => $hostPrototype['hostid']] + $tag;
+				}
+			}
 		}
+		unset($hostPrototype);
 
 		// save group prototypes
 		$groupPrototypes = DB::save('group_prototype', $groupPrototypes);
@@ -387,14 +396,17 @@ class CHostPrototype extends CHostBase {
 		// save inventory
 		DB::insertBatch('host_inventory', $hostPrototypeInventory, false);
 
+		// save tags
+		if ($hosts_tags) {
+			DB::insert('host_tag', $hosts_tags);
+		}
+
 		// link templates
 		foreach ($hostPrototypes as $hostPrototype) {
 			if (isset($hostPrototype['templates']) && $hostPrototype['templates']) {
 				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), [$hostPrototype['hostid']]);
 			}
 		}
-
-		$this->createTags(array_column($hostPrototypes, 'tags', 'hostid'));
 
 		return $hostPrototypes;
 	}
