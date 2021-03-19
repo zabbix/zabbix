@@ -444,23 +444,6 @@ function getMenuPopupMapElementImage(options) {
 }
 
 /**
- * Get menu popup widget actions data.
- *
- * @param {string}   options['dashboard_page_unique_id']  Dashboard page unique_id.
- * @param {bool}     options['unique_id']                 Widget unique_id.
- *
- * @return array
- */
-function getMenuPopupWidgetActions(options) {
-	return ZABBIX.Dashboard
-		.getDashboardPage(options.dashboard_page_unique_id)
-		.getWidget(options.unique_id)
-		.getActionsMenu({
-			can_paste_widget: (ZABBIX.Dashboard.getStoredWidgetDataCopy() !== null)
-		});
-}
-
-/**
  * Get menu popup trigger section data.
  *
  * @param {string} options['dashboardid']

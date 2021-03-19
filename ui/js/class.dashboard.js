@@ -806,6 +806,7 @@ class CDashboard extends CBaseComponent {
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_ADD, this._events.dashboardPageWidgetAdd)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_DELETE, this._events.dashboardPageWidgetDelete)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_POSITION, this._events.dashboardPageWidgetPosition)
+			.on(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, this._events.dashboardPageWidgetActions)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste)
@@ -819,6 +820,8 @@ class CDashboard extends CBaseComponent {
 			.off(DASHBOARD_PAGE_EVENT_EDIT, this._events.dashboardPageEdit)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_ADD, this._events.dashboardPageWidgetAdd)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_DELETE, this._events.dashboardPageWidgetDelete)
+			.off(DASHBOARD_PAGE_EVENT_WIDGET_POSITION, this._events.dashboardPageWidgetPosition)
+			.off(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, this._events.dashboardPageWidgetActions)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste)
@@ -1315,6 +1318,14 @@ class CDashboard extends CBaseComponent {
 
 			dashboardPageWidgetPosition: () => {
 				this._clearWarnings();
+			},
+
+			dashboardPageWidgetActions: (e) => {
+				const menu = e.detail.widget.getActionsMenu({
+					can_paste_widget: ZABBIX.Dashboard.getStoredWidgetDataCopy() !== null
+				});
+
+				jQuery(e.detail.mouse_event.target).menuPopup(menu, new jQuery.Event(e.detail.mouse_event));
 			},
 
 			dashboardPageWidgetEdit: (e) => {

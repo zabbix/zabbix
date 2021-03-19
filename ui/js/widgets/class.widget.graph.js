@@ -115,7 +115,7 @@ class CWidgetGraph extends CWidget {
 
 			this._graph_url = response.async_data.graph_url;
 
-			this._flickerfreescreen = this._$content_body[0].querySelector('.flickerfreescreen');
+			this._flickerfreescreen = this._content_body.querySelector('.flickerfreescreen');
 			this._flickerfreescreen.id = 'flickerfreescreen_graph_' + this._unique_id;
 
 			this._flickerfreescreen_container = this._flickerfreescreen.querySelector('.dashbrd-widget-graph-link');
@@ -179,7 +179,7 @@ class CWidgetGraph extends CWidget {
 	}
 
 	_getGraphSize() {
-		const content = this._$content_body[0];
+		const content = this._content_body;
 		const style = getComputedStyle(content);
 
 		return {

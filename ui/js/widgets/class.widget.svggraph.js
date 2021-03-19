@@ -83,7 +83,7 @@ class CWidgetSvgGraph extends CWidget {
 
 	_initGraph(options) {
 		this._svg_options = options;
-		this._$svg = $('svg', this._$content_body);
+		this._$svg = $('svg', this._content_body);
 		this._$svg.svggraph(this);
 		this._activateGraph();
 	}

@@ -21,6 +21,7 @@ const ZBX_WIDGET_VIEW_MODE_NORMAL = 0;
 const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
 
 const WIDGET_EVENT_EDIT = 'edit';
+const WIDGET_EVENT_ACTIONS = 'actions';
 const WIDGET_EVENT_ENTER = 'enter';
 const WIDGET_EVENT_LEAVE = 'leave';
 const WIDGET_EVENT_BEFORE_UPDATE = 'before-update';
@@ -60,8 +61,6 @@ class CWidget extends CBaseComponent {
 		unique_id
 	}) {
 		super(document.createElement('div'));
-
-		this._$target = $(this._target);
 
 		this._type = type;
 		this._name = name;
@@ -191,7 +190,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	isEntered() {
-		return this._$target.hasClass(this._css_classes.focus);
+		return this._target.classList.contains(this._css_classes.focus);
 	}
 
 	/**
@@ -202,7 +201,7 @@ class CWidget extends CBaseComponent {
 			this._addResizeHandles();
 		}
 
-		this._$target.addClass(this._css_classes.focus);
+		this._target.classList.add(this._css_classes.focus);
 	}
 
 	/**
@@ -213,11 +212,11 @@ class CWidget extends CBaseComponent {
 			this._removeResizeHandles();
 		}
 
-		if (this._$content_header.has(document.activeElement).length != 0) {
+		if (this._content_header.contains(document.activeElement)) {
 			document.activeElement.blur();
 		}
 
-		this._$target.removeClass(this._css_classes.focus);
+		this._target.classList.remove(this._css_classes.focus);
 	}
 
 	getNumHeaderLines() {
@@ -231,7 +230,7 @@ class CWidget extends CBaseComponent {
 		this._name = name;
 
 		if (this._state !== WIDGET_STATE_INITIAL) {
-			this._$content_header.find('h4').text(name);
+			this._content_header.querySelector('h4').textContent = name;
 		}
 	}
 
@@ -243,7 +242,7 @@ class CWidget extends CBaseComponent {
 		this._configuration = configuration;
 
 		if (this._state !== WIDGET_STATE_INITIAL) {
-			this._$content_body.toggleClass('no-padding', !this._configuration.padding);
+			this._content_body.classList.toggle('no-padding', !this._configuration.padding);
 		}
 	}
 
@@ -268,7 +267,7 @@ class CWidget extends CBaseComponent {
 
 	isInteracting() {
 		return (this._isResizing() || this._isDragging()
-			|| this._$target.find('[data-expanded="true"], [aria-expanded="true"]').length > 0
+			|| this._target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0
 		);
 	}
 
@@ -308,7 +307,7 @@ class CWidget extends CBaseComponent {
 	_setViewMode(view_mode) {
 		if (this._view_mode !== view_mode) {
 			this._view_mode = view_mode;
-			this._$target.toggleClass(this._css_classes.hidden_header,
+			this._target.classList.toggle(this._css_classes.hidden_header,
 				this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
 			);
 		}
@@ -404,12 +403,10 @@ class CWidget extends CBaseComponent {
 	setPosition(pos) {
 		this._pos = pos;
 
-		this._$target.css({
-			left: `${this._cell_width * this._pos.x}%`,
-			top: `${this._cell_height * this._pos.y}px`,
-			width: `${this._cell_width * this._pos.width}%`,
-			height: `${this._cell_height * this._pos.height}px`
-		});
+		this._target.style.left = `${this._cell_width * this._pos.x}%`;
+		this._target.style.top = `${this._cell_height * this._pos.y}px`;
+		this._target.style.width = `${this._cell_width * this._pos.width}%`;
+		this._target.style.height = `${this._cell_height * this._pos.height}px`;
 	}
 
 	updateProperties({name, view_mode, fields, configuration}) {
@@ -638,7 +635,9 @@ class CWidget extends CBaseComponent {
 
 		new Promise((resolve) => resolve(this._promiseUpdate()))
 			.then(() => this._hidePreloader())
-			.catch(() => {
+			.catch((error) => {
+				console.log('Could not update widget:', error);
+
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
 				}
@@ -695,25 +694,40 @@ class CWidget extends CBaseComponent {
 	}
 
 	_getContentSize() {
-		return {
-			content_width: Math.floor(this._$content_body.width()),
-			content_height: Math.floor(this._$content_body.height())
-		};
+		const computed_style = getComputedStyle(this._content_body);
+
+		const content_width = parseInt(
+			parseFloat(computed_style.getPropertyValue('width'))
+				- parseFloat(computed_style.getPropertyValue('padding-left'))
+				- parseFloat(computed_style.getPropertyValue('padding-right'))
+				- parseFloat(computed_style.getPropertyValue('border-left-width'))
+				- parseFloat(computed_style.getPropertyValue('border-right-width'))
+		);
+
+		const content_height = parseInt(
+			parseFloat(computed_style.getPropertyValue('height'))
+				- parseFloat(computed_style.getPropertyValue('padding-top'))
+				- parseFloat(computed_style.getPropertyValue('padding-bottom'))
+				- parseFloat(computed_style.getPropertyValue('border-top-width'))
+				- parseFloat(computed_style.getPropertyValue('border-bottom-width'))
+		);
+
+		return {content_width, content_height};
 	}
 
 	_setContents({name, body, messages, info, debug}) {
 		this._setName(name);
 
-		this._$content_body.empty();
+		this._content_body.innerHTML = '';
 
 		if (messages !== undefined) {
-			this._$content_body.append(messages);
+			this._content_body.insertAdjacentHTML('beforeend', messages);
 		}
 
-		this._$content_body.append(body);
+		this._content_body.insertAdjacentHTML('beforeend', body);
 
 		if (debug !== undefined) {
-			this._$content_body.append(debug);
+			this._content_body.insertAdjacentHTML('beforeend', debug);
 		}
 
 		this._removeInfoButtons();
@@ -724,33 +738,36 @@ class CWidget extends CBaseComponent {
 	}
 
 	_addInfoButtons(buttons) {
-		let html_buttons = [];
+		buttons.reverse();
 
 		for (const button of buttons) {
-			html_buttons.push(
-				$('<li>', {'class': 'widget-info-button'})
-					.append(
-						$('<button>', {
-							'type': 'button',
-							'class': button.icon,
-							'data-hintbox': 1,
-							'data-hintbox-static': 1
-						})
-					)
-					.append(
-						$('<div>', {
-							'class': 'hint-box',
-							'html': button.hint
-						}).hide()
-					)
-			);
-		}
+			const li = document.createElement('li');
 
-		this._$actions.prepend(html_buttons);
+			li.classList.add('widget-info-button');
+
+			const li_button = document.createElement('button');
+
+			li_button.type = 'button';
+			li_button.setAttribute('data-hintbox', '1');
+			li_button.setAttribute('data-hintbox-static', '1');
+			li_button.classList.add(button.icon);
+			li.appendChild(li_button);
+
+			const li_div = document.createElement('div');
+
+			li_div.innerHTML = button.hint;
+			li_div.classList.add('hint-box');
+			li_div.style.display = 'none';
+			li.appendChild(li_div);
+
+			this._actions.prepend(li);
+		}
 	}
 
 	_removeInfoButtons() {
-		this._$actions.find('.widget-info-button').remove();
+		for (const li of this._actions.querySelectorAll('.widget-info-button')) {
+			li.remove();
+		}
 	}
 
 	_showPreloader() {
@@ -759,9 +776,7 @@ class CWidget extends CBaseComponent {
 			this._preloader_timeout = null;
 		}
 
-		this._$target
-			.find(`.${this._css_classes.content}`)
-			.addClass('is-loading');
+		this._content_body.classList.add('is-loading');
 	}
 
 	_hidePreloader() {
@@ -770,9 +785,7 @@ class CWidget extends CBaseComponent {
 			this._preloader_timeout = null;
 		}
 
-		this._$target
-			.find(`.${this._css_classes.content}`)
-			.removeClass('is-loading');
+		this._content_body.classList.remove('is-loading');
 	}
 
 	_schedulePreloader(delay_sec = this._preloader_timeout_sec) {
@@ -780,10 +793,7 @@ class CWidget extends CBaseComponent {
 			return;
 		}
 
-		const is_showing_preloader =
-			this._$target
-				.find(`.${this._css_classes.content}`)
-				.hasClass('is-loading');
+		const is_showing_preloader = this._content_body.classList.contains('is-loading');
 
 		if (is_showing_preloader) {
 			return;
@@ -796,70 +806,68 @@ class CWidget extends CBaseComponent {
 	}
 
 	_makeView() {
-		this._$content_header =
-			$('<div>', {'class': this._css_classes.head})
-				.append($('<h4>').text((this._name !== '') ? this._name : this._defaults.name));
+		this._container = document.createElement('div');
+		this._container.classList.add(this._css_classes.container);
+
+		this._content_header = document.createElement('div');
+		this._content_header.classList.add(this._css_classes.head);
+
+		const content_header_text = document.createElement('h4');
+
+		content_header_text.textContent = this._name !== '' ? this._name : this._defaults.name;
+		this._content_header.appendChild(content_header_text);
 
 		if (this._parent === null) {
-			this._$actions = $('<ul>', {'class': this._css_classes.actions});
+			this._actions = document.createElement('ul');
+			this._actions.classList.add(this._css_classes.actions);
 
 			if (this._is_editable) {
-				this._$button_edit = $('<button>', {
-					'type': 'button',
-					'class': 'btn-widget-edit',
-					'title': t('Edit')
-				});
+				this._button_edit = document.createElement('button');
+				this._button_edit.type = 'button';
+				this._button_edit.title = t('Edit')
+				this._button_edit.classList.add('btn-widget-edit');
 
-				this._$actions.append($('<li>').append(this._$button_edit));
+				const li = document.createElement('li');
+
+				li.appendChild(this._button_edit);
+				this._actions.appendChild(li);
 			}
 
-			this._$button_actions = $('<button>', {
-				'type': 'button',
-				'class': 'btn-widget-action',
-				'title': t('Actions'),
-				'data-menu-popup': JSON.stringify({
-					type: 'widget_actions',
-					data: {
-						unique_id: this._unique_id,
-						dashboard_page_unique_id: this._dashboard_page.unique_id
-					}
-				}),
-				'attr': {
-					'aria-expanded': false,
-					'aria-haspopup': true
-				}
-			});
+			this._button_actions = document.createElement('button');
+			this._button_actions.type = 'button';
+			this._button_actions.title = t('Actions');
+			this._button_actions.setAttribute('aria-expanded', 'false');
+			this._button_actions.setAttribute('aria-haspopup', 'true');
+			this._button_actions.classList.add('btn-widget-action');
 
-			this._$actions.append($('<li>').append(this._$button_actions));
+			const li = document.createElement('li');
 
-			this._$content_header.append(this._$actions);
+			li.appendChild(this._button_actions);
+			this._actions.appendChild(li);
+
+			this._content_header.append(this._actions);
 		}
 
-		this._$content_body =
-			$('<div>', {'class': this._css_classes.content})
-				.toggleClass('no-padding', !this._configuration.padding);
+		this._container.appendChild(this._content_header);
 
-		this._$container =
-			$('<div>', {'class': this._css_classes.container})
-				.append(this._$content_header)
-				.append(this._$content_body);
+		this._content_body = document.createElement('div');
+		this._content_body.classList.add(this._css_classes.content);
+		this._content_body.classList.toggle('no-padding', !this._configuration.padding);
 
-		// Used for disabling widget interactivity in edit mode while resizing.
-		this._$mask = $('<div>', {'class': this._css_classes.mask});
+		this._container.appendChild(this._content_body);
 
-		this._$target
-			.append(this._$container, this._$mask)
-			.addClass(this._css_classes.root)
-			.toggleClass('ui-draggable', this._is_edit_mode)
-			.toggleClass('ui-resizable', this._is_edit_mode)
-			.toggleClass(this._css_classes.hidden_header, this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
-			.toggleClass('new-widget', this._is_new);
+		this._target.appendChild(this._container);
+		this._target.classList.add(this._css_classes.root);
+		this._target.classList.toggle('ui-draggable', this._is_edit_mode);
+		this._target.classList.toggle('ui-resizable', this._is_edit_mode);
+		this._target.classList.toggle(this._css_classes.hidden_header,
+			this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+		);
+		this._target.classList.toggle('new-widget', this._is_new);
 
 		if (this._parent === null) {
-			this._$target.css({
-				minWidth: `${this._cell_width}%`,
-				minHeight: `${this._cell_height}px`
-			});
+			this._target.style.minWidth = `${this._cell_width}%`;
+			this._target.style.minHeight = `${this._cell_height}px`;
 		}
 	}
 
@@ -867,70 +875,62 @@ class CWidget extends CBaseComponent {
 		let is_mousemove_required = false;
 
 		this._events = {
+			actions: (e) => {
+				this.fire(WIDGET_EVENT_ACTIONS, {mouse_event: e});
+			},
+
 			edit: () => {
 				this.fire(WIDGET_EVENT_EDIT);
 			},
 
 			focusin: () => {
-				// Skip mouse events caused by animations which were caused by focus change.
-				is_mousemove_required = true;
-
 				this.fire(WIDGET_EVENT_ENTER);
 			},
 
 			focusout: (e) => {
-				// Skip mouse events caused by animations which were caused by focus change.
-				is_mousemove_required = true;
-
-				if (!this._$content_header.has(e.relatedTarget).length) {
+				if (!this._content_header.contains(e.relatedTarget)) {
 					this.fire(WIDGET_EVENT_LEAVE);
 				}
 			},
 
 			enter: (e) => {
-				is_mousemove_required = false;
-
 				this.fire(WIDGET_EVENT_ENTER);
 			},
 
 			leave: () => {
-				if (!is_mousemove_required) {
-					this.fire(WIDGET_EVENT_LEAVE);
-				}
+				this.fire(WIDGET_EVENT_LEAVE);
 			}
 		};
 
+		this._button_actions.addEventListener('click', this._events.actions);
+
 		if (this._parent === null) {
 			if (this._is_editable) {
-				this._$button_edit.on('click', this._events.edit);
+				this._button_edit.addEventListener('click', this._events.edit);
 			}
 		}
 
-		this._$content_header
-			.on('focusin', this._events.focusin)
-			.on('focusout', this._events.focusout)
-			.on('mouseenter mousemove', this._events.enter);
-
-		this._$content_body.on('mouseenter mousemove', this._events.enter);
-
-		this._$target.on('mouseleave', this._events.leave);
+		this._content_header.addEventListener('focusin', this._events.focusin);
+		this._content_header.addEventListener('focusout', this._events.focusout);
+		this._content_header.addEventListener('mousemove', this._events.enter);
+		this._content_body.addEventListener('mousemove', this._events.enter);
+		this._target.addEventListener('mouseleave', this._events.leave);
 	}
 
 	_unregisterEvents() {
+		this._button_actions.removeEventListener('click', this._events.actions);
+
 		if (this._parent === null) {
 			if (this._is_editable) {
-				this._$button_edit.off('click', this._events.edit);
+				this._button_edit.removeEventListener('click', this._events.edit);
 			}
 		}
 
-		this._$content_header
-			.off('focusin', this._events.focusin)
-			.off('focusout', this._events.focusout)
-			.off('mouseenter mousemove', this._events.enter);
-
-		this._$content_body.off('mouseenter mousemove', this._events.enter);
-
-		this._$target.off('mouseleave', this._events.leave);
+		this._content_header.removeEventListener('focusin', this._events.focusin);
+		this._content_header.removeEventListener('focusout', this._events.focusout);
+		this._content_header.removeEventListener('mousemove', this._events.enter);
+		this._content_body.removeEventListener('mousemove', this._events.enter);
+		this._target.removeEventListener('mouseleave', this._events.leave);
 
 		delete this._events;
 	}

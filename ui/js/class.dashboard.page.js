@@ -28,6 +28,7 @@ const DASHBOARD_PAGE_EVENT_WIDGET_ADD = 'widget-add';
 const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'widget-delete';
 const DASHBOARD_PAGE_EVENT_WIDGET_POSITION = 'widget-position';
 const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'widget-edit';
+const DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS = 'widget-actions';
 const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'widget-copy';
 const DASHBOARD_PAGE_EVENT_WIDGET_PASTE = 'widget-paste';
 const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'announce-widgets';
@@ -106,6 +107,15 @@ class CDashboardPage extends CBaseComponent {
 
 	_registerEvents() {
 		this._events = {
+			widgetActions: (e) => {
+				const widget = e.detail.target;
+
+				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, {
+					widget,
+					mouse_event: e.detail.mouse_event
+				});
+			},
+
 			widgetEdit: (e) => {
 				const widget = e.detail.target;
 
@@ -118,8 +128,13 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			widgetEnter: (e) => {
-				if (this._is_edit_mode && this._isWidgetPlaceholderResizing()) {
-					return;
+				if (this._is_edit_mode) {
+					if (this._isWidgetPlaceholderResizing()) {
+						return;
+					}
+					else {
+						this.resetWidgetPlaceholder();
+					}
 				}
 
 				const widget = e.detail.target;
@@ -129,7 +144,7 @@ class CDashboardPage extends CBaseComponent {
 				}
 
 				widget.enter();
-				this.leaveWidgetsExcept(widget);
+				this._leaveWidgets({except_widget: widget});
 				this._reserveHeaderLines();
 			},
 
@@ -199,6 +214,8 @@ class CDashboardPage extends CBaseComponent {
 		if (this._grid_min_rows !== null) {
 			num_rows = Math.max(num_rows, this._grid_min_rows);
 		}
+
+		num_rows = Math.min(this._max_rows, this._getNumRows() + 1);
 
 		let height = this._cell_height * num_rows;
 
@@ -421,7 +438,7 @@ class CDashboardPage extends CBaseComponent {
 		this.fire(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, {num_header_lines: num_header_lines});
 	}
 
-	leaveWidgetsExcept(except_widget = null) {
+	_leaveWidgets({except_widget = null} = {}) {
 		for (const widget of this._widgets.keys()) {
 			if (widget !== except_widget) {
 				widget.leave();
@@ -450,6 +467,8 @@ class CDashboardPage extends CBaseComponent {
 	activate() {
 		this._state = DASHBOARD_PAGE_STATE_ACTIVE;
 
+		this._resizeGrid();
+
 		for (const widget of this._widgets.keys()) {
 			this._dashboard_grid.appendChild(widget.getView());
 			this._activateWidget(widget);
@@ -460,13 +479,12 @@ class CDashboardPage extends CBaseComponent {
 			this._activateWidgetResizing();
 			this.resetWidgetPlaceholder();
 		}
-
-		this._resizeGrid();
 	}
 
 	_activateWidget(widget) {
 		widget.activate();
 		widget
+			.on(WIDGET_EVENT_ACTIONS, this._events.widgetActions)
 			.on(WIDGET_EVENT_EDIT, this._events.widgetEdit)
 			.on(WIDGET_EVENT_ENTER, this._events.widgetEnter)
 			.on(WIDGET_EVENT_LEAVE, this._events.widgetLeave)
@@ -493,6 +511,7 @@ class CDashboardPage extends CBaseComponent {
 	_deactivateWidget(widget) {
 		widget.deactivate();
 		widget
+			.off(WIDGET_EVENT_ACTIONS, this._events.widgetActions)
 			.off(WIDGET_EVENT_EDIT, this._events.widgetEdit)
 			.off(WIDGET_EVENT_ENTER, this._events.widgetEnter)
 			.off(WIDGET_EVENT_LEAVE, this._events.widgetLeave)
@@ -518,6 +537,10 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	resize() {
+		if (this._state !== DASHBOARD_PAGE_STATE_ACTIVE) {
+			return;
+		}
+
 		if (this._is_edit_mode) {
 			this._widget_placeholder.resize();
 		}
@@ -992,6 +1015,8 @@ class CDashboardPage extends CBaseComponent {
 					this._widget_placeholder
 						.setState(WIDGET_PLACEHOLDER_STATE_POSITIONING)
 						.showAtPosition(this._widget_placeholder_pos);
+
+					this._leaveWidgets();
 				}
 				else {
 					this._widget_placeholder.hide();

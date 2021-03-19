@@ -27,8 +27,12 @@ class CWidgetPastePlaceholder extends CWidget {
 	_doStart() {
 		super._doStart();
 
-		for (const button of this._$content_header[0].querySelectorAll('button')) {
+		for (const button of this._content_header.querySelectorAll('button')) {
 			button.disabled = true;
 		}
+	}
+
+	_promiseUpdate() {
+		return Promise.resolve();
 	}
 }
