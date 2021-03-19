@@ -20675,12 +20675,15 @@ msgstr "item mẫu"
 msgid "key is empty"
 msgstr "Không có key"
 
-#: app/views/popup.maintenance.period.php:128
 #: include/classes/graphdraw/CLineGraphDraw.php:1377
 #: include/classes/graphdraw/CPieGraphDraw.php:296 include/graphs.inc.php:88
-#: include/maintenances.inc.php:109
 #: include/views/js/configuration.graph.edit.js.php:215
 #: include/views/js/configuration.graph.edit.js.php:282
+msgid "last"
+msgstr "Cuối cùng"
+
+#: app/views/popup.maintenance.period.php:128 include/maintenances.inc.php:109
+msgctxt "week of month"
 msgid "last"
 msgstr "Cuối cùng"
 
