@@ -363,8 +363,8 @@ class CDashboardHelper {
 		foreach ($dashboard_pages as $dashboard_page_index => &$dashboard_page) {
 			$dashboard_page_errors = [];
 
-			foreach (['name', 'display_period', 'widgets'] as $field) {
-				if (!array_key_exists('name', $dashboard_page)) {
+			foreach (['name', 'display_period'] as $field) {
+				if (!array_key_exists($field, $dashboard_page)) {
 					$dashboard_page_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'pages['.$dashboard_page_index.']',
 						_s('the parameter "%1$s" is missing', $field)
 					);
@@ -375,6 +375,10 @@ class CDashboardHelper {
 				$errors = array_merge($errors, $dashboard_page_errors);
 
 				break;
+			}
+
+			if (!array_key_exists('widgets', $dashboard_page)) {
+				$dashboard_page['widgets'] = [];
 			}
 
 			foreach ($dashboard_page['widgets'] as $widget_index => &$widget) {
