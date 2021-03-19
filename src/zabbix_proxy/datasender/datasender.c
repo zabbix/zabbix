@@ -99,7 +99,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 	char			*error = NULL;
 	zbx_vector_ptr_t	tasks;
 
-	zabbix_log(3, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*more = ZBX_PROXY_DATA_DONE;
 	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
@@ -181,8 +181,11 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		if (SUCCEED != upload_state)
 		{
 			*more = ZBX_PROXY_DATA_DONE;
-			zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy data to server at \"%s\": %s",
-					sock.peer, error);
+			if (ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy data to server at \"%s\": %s",
+						sock.peer, error);
+			}
 			zbx_free(error);
 		}
 		else

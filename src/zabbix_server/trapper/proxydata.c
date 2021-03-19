@@ -103,7 +103,7 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
  ******************************************************************************/
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	int			ret = FAIL, upload_status = 0, status, version;
+	int			ret = FAIL, upload_status = 0, status, version, responded = 0;
 	char			*error = NULL;
 	DC_PROXY		proxy;
 
@@ -130,33 +130,33 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	if (FAIL == zbx_hc_check_proxy(proxy.hostid))
+	if (FAIL == (ret = zbx_hc_check_proxy(proxy.hostid)))
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
-		goto send_response;
 	}
 	else
+	{
 		upload_status = ZBX_PROXY_UPLOAD_ENABLED;
 
-	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
-				proxy.host, sock->peer, error);
-		status = FAIL;
-		goto out;
+		if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
+					proxy.host, sock->peer, error);
+			goto out;
+		}
 	}
 
-send_response:
 	if (!ZBX_IS_RUNNING())
 	{
 		error = zbx_strdup(error, "Zabbix server shutdown in progress");
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from active proxy at \"%s\": %s",
 				sock->peer, error);
-		ret = status = FAIL;
+		ret = FAIL;
 		goto out;
 	}
-	else
-		zbx_send_proxy_data_response(&proxy, sock, error, upload_status);
+
+	zbx_send_proxy_data_response(&proxy, sock, error, upload_status);
+	responded = 1;
 
 out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */
@@ -166,14 +166,14 @@ out:
 				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), 0);
 	}
 
-	if (FAIL == ret)
+	if (0 == responded)
 	{
 		int	flags = ZBX_TCP_PROTOCOL;
 
 		if (0 != (sock->protocol & ZBX_TCP_COMPRESS))
 			flags |= ZBX_TCP_COMPRESS;
 
-		zbx_send_response_ext(sock, status, error, NULL, flags, CONFIG_TIMEOUT);
+		zbx_send_response_ext(sock, ret, error, NULL, flags, CONFIG_TIMEOUT);
 	}
 
 	zbx_free(error);
