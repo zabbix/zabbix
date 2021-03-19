@@ -1022,6 +1022,8 @@ class CDashboard extends CBaseComponent {
 			return;
 		}
 
+		dashboard_page.resetWidgetPlaceholder();
+
 		if (widget !== null) {
 			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
@@ -1037,11 +1039,7 @@ class CDashboard extends CBaseComponent {
 		const busy_condition = this._createBusyCondition();
 
 		dashboard_page.promiseScrollIntoView(new_widget_pos)
-			.then(() => {
-				dashboard_page.resetWidgetPlaceholder();
-
-				return this._promiseDashboardWidgetsSanitize([new_widget_data]);
-			})
+			.then(() => this._promiseDashboardWidgetsSanitize([new_widget_data]))
 			.then((response) => {
 				if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_DESTROYED) {
 					return;
