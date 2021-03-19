@@ -168,12 +168,13 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['show_opdata']           (optional)
 	 * @param array  $config
 	 * @param int    $config['search_limit']
+	 * @param bool   $resolve_comments
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, array $config) {
+	public static function getData(array $filter, array $config, bool $resolve_comments = false) {
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
@@ -340,10 +341,16 @@ class CScreenProblem extends CScreenBase {
 							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
 					}
 
+					if ($resolve_comments || $show_opdata || $details) {
+						$options['output'][] = 'expression';
+					}
+
 					if ($show_opdata || $details) {
-						$options['output'] = array_merge($options['output'],
-							['expression', 'recovery_mode', 'recovery_expression']
-						);
+						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
+					}
+
+					if ($resolve_comments) {
+						$options['output'][] = 'comments';
 					}
 
 					$data['triggers'] += API::Trigger()->get($options);
@@ -558,12 +565,13 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['details']
 	 * @param int   $filter['show']
 	 * @param int   $filter['show_opdata']
+	 * @param bool  $resolve_comments
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter) {
+	public static function makeData(array $data, array $filter, bool $resolve_comments = false) {
 		// unset unused triggers
 		$triggerids = [];
 
@@ -605,6 +613,28 @@ class CScreenProblem extends CScreenBase {
 				}
 				unset($trigger);
 			}
+		}
+
+		if ($resolve_comments) {
+			foreach ($data['problems'] as &$problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
+				$problem['comments'] = CMacrosResolverHelper::resolveTriggerDescription(
+					[
+						'triggerid' => $problem['objectid'],
+						'expression' => $trigger['expression'],
+						'comments' => $trigger['comments'],
+						'clock' => $problem['clock'],
+						'ns' => $problem['ns']
+					],
+					['events' => true]
+				);
+			}
+			unset($problem);
+
+			foreach ($data['triggers'] as &$trigger) {
+				unset($trigger['comments']);
+			}
+			unset($trigger);
 		}
 
 		// get additional data
