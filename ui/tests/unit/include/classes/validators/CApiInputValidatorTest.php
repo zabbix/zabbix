@@ -3162,6 +3162,78 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'',
 				'/1/expression',
 				''
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				[],
+				'/params',
+				[]
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				1,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				true,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'23',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				null,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				[],
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'id',
+				'/id',
+				'id'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				1,
+				'/id',
+				1
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				true,
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'23',
+				'/id',
+				'23'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				null,
+				'/id',
+				null
 			]
 		];
 	}

@@ -1,0 +1,2026 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-03-17T12:47:57Z</date>
+   <groups>
+      <group>
+         <name>Templates/Power</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Power APC UPS SNMP</template>
+         <name>Template Power APC UPS SNMP</name>
+         <description>Template Power APC UPS&#13;
+&#13;
+MIBs used:&#13;
+PowerNet-MIB&#13;
+SNMPv2-MIB&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Power</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>General</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Battery capacity</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.1.0</snmp_oid>
+               <key>battery.capacity[upsAdvBatteryCapacity]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>MIB: PowerNet-MIB&#13;
+The remaining battery capacity expressed as&#13;
+ percentage of full capacity.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>External battery packs count</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.5.0</snmp_oid>
+               <key>battery.external_packs_count[upsAdvBatteryNumOfBattPacks]</key>
+               <history>7d</history>
+               <description>MIB: PowerNet-MIB&#13;
+The number of external battery packs connected to the UPS. If&#13;
+ the UPS does not use smart cells then the agent reports&#13;
+ ERROR_NO_SUCH_NAME.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Battery last replace date</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.1.3.0</snmp_oid>
+               <key>battery.last_replace_date[upsBasicBatteryLastReplaceDate]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: PowerNet-MIB&#13;
+The date when the UPS system's batteries were last replaced&#13;
+ in mm/dd/yy (or yyyy) format. For Smart-UPS models, this value&#13;
+ is originally set at the factory. When the UPS batteries&#13;
+ are replaced, this value should be reset by the administrator.&#13;
+ For Symmetra PX 250/500 this OID is read-only and is configurable in the local display only.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Battery replace indicator</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.4.0</snmp_oid>
+               <key>battery.replace_indicator[upsAdvBatteryReplaceIndicator]</key>
+               <history>7d</history>
+               <description>MIB: PowerNet-MIB&#13;
+Indicates whether the UPS batteries need replacement.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>PowerNet-MIB::upsAdvBatteryReplaceIndicator</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=2</expression>
+                     <name>Battery needs replacement</name>
+                     <priority>HIGH</priority>
+                     <description>A battery installed has an internal error condition.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Battery runtime remaining</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.3.0</snmp_oid>
+               <key>battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>MIB: PowerNet-MIB&#13;
+The UPS battery run time remaining before battery&#13;
+ exhaustion.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Battery status</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.1.1.0</snmp_oid>
+               <key>battery.status[upsBasicBatteryStatus]</key>
+               <history>7d</history>
+               <description>MIB: PowerNet-MIB&#13;
+The status of the UPS batteries. A batteryLow(3) value&#13;
+ indicates the UPS will be unable to sustain the current&#13;
+ load, and its services will be lost if power is not restored.&#13;
+ The amount of run time in reserve at the time of low battery&#13;
+ can be configured by the upsAdvConfigLowBatteryRunTime.&#13;
+ A batteryInFaultCondition(4)value indicates that a battery&#13;
+ installed has an internal error condition.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>PowerNet-MIB::upsBasicBatteryStatus</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=4</expression>
+                     <name>Battery has an internal error condition</name>
+                     <priority>AVERAGE</priority>
+                     <description>A battery installed has an internal error condition.</description>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=3</expression>
+                     <name>Battery is Low</name>
+                     <priority>AVERAGE</priority>
+                     <description>The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Battery temperature</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.2.0</snmp_oid>
+               <key>battery.temperature[upsHighPrecBatteryTemperature]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>℃</units>
+               <description>MIB: PowerNet-MIB&#13;
+The current internal UPS temperature in Celsius.&#13;
+ Temperatures below zero read as 0.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{min({$TIME.PERIOD})} &gt; {$BATTERY.TEMP.MAX.WARN}</expression>
+                     <name>Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})</name>
+                     <opdata>Current temperature: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Battery voltage</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.4.0</snmp_oid>
+               <key>battery.voltage[upsHighPrecBatteryActualVoltage]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>V</units>
+               <description>MIB: PowerNet-MIB&#13;
+The actual battery bus voltage in Volts.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>ICMP ping</name>
+               <type>SIMPLE</type>
+               <key>icmpping</key>
+               <history>1w</history>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <triggers>
+                  <trigger>
+                     <expression>{max(#3)}=0</expression>
+                     <name>Unavailable by ICMP ping</name>
+                     <priority>HIGH</priority>
+                     <description>Last three attempts returned timeout.  Please check device connectivity.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>ICMP loss</name>
+               <type>SIMPLE</type>
+               <key>icmppingloss</key>
+               <history>1w</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$ICMP.LOSS.WARN} and {min(5m)}&lt;100</expression>
+                     <name>High ICMP ping loss</name>
+                     <opdata>Loss: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <dependencies>
+                        <dependency>
+                           <name>Unavailable by ICMP ping</name>
+                           <expression>{Template Power APC UPS SNMP:icmpping.max(#3)}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>ICMP response time</name>
+               <type>SIMPLE</type>
+               <key>icmppingsec</key>
+               <history>1w</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{avg(5m)}&gt;{$ICMP.RESPONSE_TIME.WARN}</expression>
+                     <name>High ICMP ping response time</name>
+                     <opdata>Value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <dependencies>
+                        <dependency>
+                           <name>High ICMP ping loss</name>
+                           <expression>{Template Power APC UPS SNMP:icmppingloss.min(5m)}&gt;{$ICMP.LOSS.WARN} and {Template Power APC UPS SNMP:icmppingloss.min(5m)}&lt;100</expression>
+                        </dependency>
+                        <dependency>
+                           <name>Unavailable by ICMP ping</name>
+                           <expression>{Template Power APC UPS SNMP:icmpping.max(#3)}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Input fail cause</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.3.2.5.0</snmp_oid>
+               <key>input.fail[upsAdvInputLineFailCause]</key>
+               <history>7d</history>
+               <description>MIB: PowerNet-MIB&#13;
+The reason for the occurrence of the last transfer to UPS&#13;
+battery power.  The variable is set to:&#13;
+- noTransfer(1) -- if there is no transfer yet.&#13;
+- highLineVoltage(2) -- if the transfer to battery is caused&#13;
+by an over voltage greater than the high transfer voltage.&#13;
+- brownout(3) -- if the duration of the outage is greater than&#13;
+five seconds and the line voltage is between 40% of the&#13;
+rated output voltage and the low transfer voltage.&#13;
+- blackout(4) -- if the duration of the outage is greater than five&#13;
+seconds and the line voltage is between 40% of the rated&#13;
+output voltage and ground.&#13;
+- smallMomentarySag(5) -- if the duration of the outage is less&#13;
+than five seconds and the line voltage is between 40% of the&#13;
+rated output voltage and the low transfer voltage.&#13;
+- deepMomentarySag(6) -- if the duration of the outage is less&#13;
+than five seconds and the line voltage is between 40% of the&#13;
+rated output voltage and ground.  The variable is set to&#13;
+- smallMomentarySpike(7) -- if the line failure is caused by a&#13;
+rate of change of input voltage less than ten volts per cycle.&#13;
+- largeMomentarySpike(8) -- if the line failure is caused by&#13;
+a rate of change of input voltage greater than ten volts per cycle.&#13;
+- selfTest(9) -- if the UPS was commanded to do a self test.&#13;
+- rateOfVoltageChange(10) -- if the failure is due to the rate of change of&#13;
+the line voltage.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>PowerNet-MIB::upsAdvInputLineFailCause</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Input frequency</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.3.3.4.0</snmp_oid>
+               <key>input.frequency[upsHighPrecInputFrequency]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Hz</units>
+               <description>MIB: PowerNet-MIB&#13;
+The current input frequency to the UPS system in Hz.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{min({$TIME.PERIOD})} &gt; 0 and ({min({$TIME.PERIOD})} &gt; {$UPS.INPUT_FREQ.MAX.WARN} or {max({$TIME.PERIOD})} &lt; {$UPS.INPUT_FREQ.MIN.WARN})</expression>
+                     <name>Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})</name>
+                     <opdata>Current frequency: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Input voltage</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.3.3.1.0</snmp_oid>
+               <key>input.voltage[upsHighPrecInputLineVoltage]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>V</units>
+               <description>MIB: PowerNet-MIB&#13;
+The current utility line voltage in VAC.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{min({$TIME.PERIOD})} &gt; 0 and ({min({$TIME.PERIOD})} &gt; {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} &lt; {$UPS.INPUT_VOLT.MIN.WARN})</expression>
+                     <name>Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})</name>
+                     <opdata>Current voltage: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Output current</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.4.3.4.0</snmp_oid>
+               <key>output.current[upsHighPrecOutputCurrent]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>A</units>
+               <description>MIB: PowerNet-MIB&#13;
+The current in amperes drawn by the load on the UPS.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Output load</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.4.3.3.0</snmp_oid>
+               <key>output.load[upsHighPrecOutputLoad]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>MIB: PowerNet-MIB&#13;
+The current UPS load expressed as percentage&#13;
+of rated capacity.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{min({$TIME.PERIOD})} &gt; {$UPS.OUTPUT.MAX.WARN}</expression>
+                     <name>Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})</name>
+                     <opdata>Current load: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                     <description>A battery installed has an internal error condition.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Output status</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.4.1.1.0</snmp_oid>
+               <key>output.status[upsBasicOutputStatus]</key>
+               <history>7d</history>
+               <description>MIB: PowerNet-MIB&#13;
+The current state of the UPS. If the UPS is unable to&#13;
+ determine the state of the UPS this variable is set&#13;
+ to unknown(1).&#13;
+During self-test most UPSes report onBattery(3) but&#13;
+ some that support it will report onBatteryTest(15).&#13;
+ To determine self-test status across all UPSes, refer&#13;
+ to the upsBasicStateOutputState OID.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>PowerNet-MIB::upsBasicBatteryStatus</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=5</expression>
+                     <name>UPS is Timed Sleeping</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=9</expression>
+                     <name>UPS is Switched Bypass</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=6</expression>
+                     <name>UPS is Software Bypass</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=11</expression>
+                     <name>UPS is Sleeping Until Power Return</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=8</expression>
+                     <name>UPS is Rebooting</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=12</expression>
+                     <name>UPS is On Smart Trim</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=4</expression>
+                     <name>UPS is on Smart Boost</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=3</expression>
+                     <name>UPS is on battery</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=7</expression>
+                     <name>UPS is Off</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=16</expression>
+                     <name>UPS is Emergency Static Bypass</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}=10</expression>
+                     <name>UPS is Hardware Failure Bypass</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Output voltage</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.4.3.1.0</snmp_oid>
+               <key>output.voltage[upsHighPrecOutputVoltage]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>V</units>
+               <description>MIB: PowerNet-MIB&#13;
+The output voltage of the UPS system in VAC.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>SNMP traps (fallback)</name>
+               <type>SNMP_TRAP</type>
+               <key>snmptrap.fallback</key>
+               <history>2w</history>
+               <trends>0</trends>
+               <value_type>LOG</value_type>
+               <description>Item is used to collect all SNMP traps unmatched by other snmptrap items</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <logtimefmt>hh:mm:sszyyyy/MM/dd</logtimefmt>
+            </item>
+            <item>
+               <name>System contact details</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.2.1.1.4.0</snmp_oid>
+               <key>system.contact[sysContact.0]</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: SNMPv2-MIB&#13;
+The textual identification of the contact person for this managed&#13;
+node, together with information on how to contact this person.  If no contact&#13;
+information is known, the value is the zero-length string.</description>
+               <inventory_link>CONTACT</inventory_link>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>System description</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
+               <key>system.descr[sysDescr.0]</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: SNMPv2-MIB&#13;
+A textual description of the entity. This value should&#13;
+include the full name and version identification of the system's hardware type, software operating-system, and&#13;
+networking software.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>System location</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.2.1.1.6.0</snmp_oid>
+               <key>system.location[sysLocation.0]</key>
+               <delay>15m</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: SNMPv2-MIB&#13;
+The physical location of this node (e.g., `telephone closet,&#13;
+3rd floor').  If the location is unknown, the value is the zero-length string.</description>
+               <inventory_link>LOCATION</inventory_link>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Model</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.1.1.1.0</snmp_oid>
+               <key>system.model[upsBasicIdentModel]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: PowerNet-MIB&#13;
+The UPS model name (e.g. 'APC Smart-UPS 600').</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>System name</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.2.1.1.5.0</snmp_oid>
+               <key>system.name</key>
+               <delay>15m</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: SNMPv2-MIB&#13;
+An administratively-assigned name for this managed node.By&#13;
+convention, this is the node's fully-qualified domain name.  If the name is unknown,&#13;
+the value is the zero-length string.</description>
+               <inventory_link>NAME</inventory_link>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>System name has changed (new name: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>System name has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>System object ID</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.2.1.1.2.0</snmp_oid>
+               <key>system.objectid[sysObjectID.0]</key>
+               <delay>15m</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: SNMPv2-MIB&#13;
+The vendor's authoritative identification of the network management&#13;
+subsystem contained in the entity.  This value is allocated within the SMI enterprises&#13;
+subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what&#13;
+kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was&#13;
+assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1&#13;
+to its `Fred Router'.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Serial number</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.1.2.3.0</snmp_oid>
+               <key>system.sn[upsAdvIdentSerialNumber]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: PowerNet-MIB&#13;
+An 8-character string identifying the serial number of&#13;
+ the UPS internal microprocessor.  This number is set at&#13;
+ the factory.  NOTE: This number does NOT correspond to&#13;
+ the serial number on the rear of the UPS.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Uptime</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.2.1.1.3.0</snmp_oid>
+               <key>system.uptime[sysUpTime.0]</key>
+               <delay>30s</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <units>uptime</units>
+               <description>MIB: SNMPv2-MIB&#13;
+The time (in hundredths of a second) since the network management&#13;
+portion of the system was last re-initialized.</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>{HOST.NAME} has been restarted (uptime &lt; 10m)</name>
+                     <priority>WARNING</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>No SNMP data collection</name>
+                           <expression>{Template Power APC UPS SNMP:zabbix[host,snmp,available].max({$SNMP.TIMEOUT})}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>SNMP agent availability</name>
+               <type>INTERNAL</type>
+               <key>zabbix[host,snmp,available]</key>
+               <history>7d</history>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>zabbix.host.available</name>
+               </valuemap>
+               <triggers>
+                  <trigger>
+                     <expression>{max({$SNMP.TIMEOUT})}=0</expression>
+                     <name>No SNMP data collection</name>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <description>SNMP is not available for polling. Please check device connectivity and SNMP settings.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>Unavailable by ICMP ping</name>
+                           <expression>{Template Power APC UPS SNMP:icmpping.max(#3)}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>External bad battery packs discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#EXTERNAL_PACKS},1.3.6.1.4.1.318.1.1.1.2.2.6]</snmp_oid>
+               <key>battery.packs.bad.discovery</key>
+               <delay>1h</delay>
+               <description>Discovery of the number of external defective battery packs.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SNMPINDEX}: External battery packs bad</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.6.0</snmp_oid>
+                     <key>battery.external_packs_bad[upsAdvBatteryNumOfBadBattPacks.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <description>MIB: PowerNet-MIB&#13;
+The number of external battery packs connected to the UPS that&#13;
+are defective. If the UPS does not use smart cells then the&#13;
+agent reports ERROR_NO_SUCH_NAME.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>External battery packs discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#CARTRIDGE_STATUS},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.7,{#BATTERY_PACK},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.1,{#CARTRIDGE_INDEX},1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.2]</snmp_oid>
+               <key>battery.packs.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#CARTRIDGE_STATUS}</macro>
+                        <value>^$</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery estimated replace date</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>battery.estimated_replace_date[upsHighPrecBatteryPackCartridgeReplaceDate.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: PowerNet-MIB&#13;
+The battery cartridge estimated battery replace date.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery pack cartridge health</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: PowerNet-MIB&#13;
+The battery cartridge health.&#13;
+  bit 0 Battery lifetime okay&#13;
+  bit 1 Battery lifetime near end, order replacement cartridge&#13;
+  bit 2 Battery lifetime exceeded, replace battery&#13;
+  bit 3 Battery lifetime near end acknowledged, order replacement cartridge&#13;
+  bit 4 Battery lifetime exceeded acknowledged, replace battery&#13;
+  bit 5 Battery measured lifetime near end, order replacement cartridge&#13;
+  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{regexp("^(0)[0|1]{15}$")}=1</expression>
+                           <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay</name>
+                           <opdata>Current bit set: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>The battery cartridge health.&#13;
+  bit 0 Battery lifetime okay&#13;
+  bit 1 Battery lifetime near end, order replacement cartridge&#13;
+  bit 2 Battery lifetime exceeded, replace battery&#13;
+  bit 3 Battery lifetime near end acknowledged, order replacement cartridge&#13;
+  bit 4 Battery lifetime exceeded acknowledged, replace battery&#13;
+  bit 5 Battery measured lifetime near end, order replacement cartridge&#13;
+  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.10.{#SNMPINDEX}</snmp_oid>
+                     <key>battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: PowerNet-MIB&#13;
+The battery cartridge status.&#13;
+bit 0 Disconnected&#13;
+bit 1 Overvoltage&#13;
+bit 2 NeedsReplacement&#13;
+bit 3 OvertemperatureCritical&#13;
+bit 4 Charger&#13;
+bit 5 TemperatureSensor&#13;
+bit 6 BusSoftStart&#13;
+bit 7 OvertemperatureWarning&#13;
+bit 8 GeneralError&#13;
+bit 9 Communication&#13;
+bit 10 DisconnectedFrame&#13;
+bit 11 FirmwareMismatch</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{regexp("^(0{16})$")}=1</expression>
+                           <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay</name>
+                           <opdata>Current bit set: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>The battery cartridge status:&#13;
+bit 0 Disconnected&#13;
+bit 1 Overvoltage&#13;
+bit 2 NeedsReplacement&#13;
+bit 3 OvertemperatureCritical&#13;
+bit 4 Charger&#13;
+bit 5 TemperatureSensor&#13;
+bit 6 BusSoftStart&#13;
+bit 7 OvertemperatureWarning&#13;
+bit 8 GeneralError&#13;
+bit 9 Communication&#13;
+bit 10 DisconnectedFrame&#13;
+bit 11 FirmwareMismatch</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery temperature</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>℃</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The battery pack temperature in Celsius.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min({$TIME.PERIOD})} &gt; {$BATTERY.TEMP.MAX.WARN}</expression>
+                           <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})</name>
+                           <opdata>Current temperature: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Serial number</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>system.sn[upsHighPrecBatteryPackSerialNumber.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: PowerNet-MIB&#13;
+The battery pack serial number.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>External sensor port 1 discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#EXTERNAL_SENSOR1_NAME},1.3.6.1.4.1.318.1.1.25.1.2.1.3]</snmp_oid>
+               <key>external.sensor1.discovery</key>
+               <delay>1h</delay>
+               <description>uioSensorStatusTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#EXTERNAL_SENSOR1_NAME}: Humidity sensor</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.1.7.1.1</snmp_oid>
+                     <key>external.sensor.humidity[uioSensorStatusHumidity.1.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The sensor's current humidity reading - a relative humidity&#13;
+ percentage. -1 indicates an invalid reading due to either a&#13;
+ sensor that doesn't read humidity or lost communications.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#EXTERNAL_SENSOR1_NAME}: Sensor alarm status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.1.9.1.1</snmp_oid>
+                     <key>external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <description>MIB: PowerNet-MIB&#13;
+The alarm status of the sensor. Possible values:&#13;
+uioNormal                 (1),&#13;
+uioWarning                (2),&#13;
+uioCritical               (3),&#13;
+sensorStatusNotApplicable (4)</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>PowerNet-MIB::uioSensorStatusAlarmStatus</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=4</expression>
+                           <name>{#EXTERNAL_SENSOR1_NAME}: Sensor has status Not Applicable</name>
+                           <priority>INFO</priority>
+                           <description>The external sensor does not work or is not connected.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=2</expression>
+                           <name>{#EXTERNAL_SENSOR1_NAME}: Sensor has status Warning</name>
+                           <priority>AVERAGE</priority>
+                           <description>The external sensor has returned a value greater than the warning threshold.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=3</expression>
+                           <name>{#EXTERNAL_SENSOR1_NAME}: Sensor has status Critical</name>
+                           <priority>HIGH</priority>
+                           <description>The external sensor has returned a value greater than the critical threshold.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#EXTERNAL_SENSOR1_NAME}: Temperature sensor</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.1.6.1.1</snmp_oid>
+                     <key>external.sensor.temperature[uioSensorStatusTemperatureDegC.1.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>℃</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The sensor's current temperature reading in Celsius.&#13;
+ -1 indicates an invalid reading due to lost communications.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <overrides>
+                  <override>
+                     <name>Temp</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#EXTERNAL_SENSOR1_NAME}</macro>
+                              <value>Temp</value>
+                              <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>Humidity</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
+            </discovery_rule>
+            <discovery_rule>
+               <name>External sensor port 2 discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#EXTERNAL_SENSOR2_NAME},1.3.6.1.4.1.318.1.1.25.1.2.2.3]</snmp_oid>
+               <key>external.sensor2.discovery</key>
+               <delay>1h</delay>
+               <description>uioSensorStatusTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#EXTERNAL_SENSOR2_NAME}: Humidity sensor</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.2.7.1.1</snmp_oid>
+                     <key>external.sensor.humidity[uioSensorStatusHumidity.2.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The sensor's current humidity reading - a relative humidity&#13;
+ percentage. -1 indicates an invalid reading due to either a&#13;
+ sensor that doesn't read humidity or lost communications.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#EXTERNAL_SENSOR2_NAME}: Sensor alarm status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.2.9.1.1</snmp_oid>
+                     <key>external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <description>MIB: PowerNet-MIB&#13;
+The alarm status of the sensor. Possible values:&#13;
+uioNormal                 (1),&#13;
+uioWarning                (2),&#13;
+uioCritical               (3),&#13;
+sensorStatusNotApplicable (4)</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>PowerNet-MIB::uioSensorStatusAlarmStatus</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=4</expression>
+                           <name>{#EXTERNAL_SENSOR2_NAME}: Sensor has status Not Applicable</name>
+                           <priority>INFO</priority>
+                           <description>The external sensor does not work or is not connected.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=2</expression>
+                           <name>{#EXTERNAL_SENSOR2_NAME}: Sensor has status Warning</name>
+                           <priority>AVERAGE</priority>
+                           <description>The external sensor has returned a value greater than the warning threshold.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=3</expression>
+                           <name>{#EXTERNAL_SENSOR2_NAME}: Sensor has status Critical</name>
+                           <priority>HIGH</priority>
+                           <description>The external sensor has returned a value greater than the critical threshold.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#EXTERNAL_SENSOR2_NAME}: Temperature sensor</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.2.6.1.1</snmp_oid>
+                     <key>external.sensor.temperature[uioSensorStatusTemperatureDegC.2.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>℃</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The sensor's current temperature reading in Celsius.&#13;
+ -1 indicates an invalid reading due to lost communications.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <overrides>
+                  <override>
+                     <name>Temp</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#EXTERNAL_SENSOR2_NAME}</macro>
+                              <value>Temp</value>
+                              <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>Humidity</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Input phases discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#PHASEINDEX},1.3.6.1.4.1.318.1.1.1.9.2.3.1.2.1.1]</snmp_oid>
+               <key>input.phases.discovery</key>
+               <delay>1h</delay>
+               <description>The input phase identifier. OID upsPhaseInputPhaseIndex.1.1</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#PHASEINDEX}: Phase input current</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.2.3.1.6.1.1.{#PHASEINDEX}</snmp_oid>
+                     <key>phase.input.current[upsPhaseInputCurrent.1.1.{#PHASEINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>A</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The input current in 0.1 amperes, or -0.1 if it's&#13;
+ unsupported by this UPS.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#PHASEINDEX}: Phase input voltage</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.2.3.1.3.1.1.{#PHASEINDEX}</snmp_oid>
+                     <key>phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>V</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The input voltage in VAC, or -1 if it's unsupported&#13;
+ by this UPS.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min({$TIME.PERIOD})} &gt; {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} &lt; {$UPS.INPUT_VOLT.MIN.WARN}</expression>
+                           <name>{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})</name>
+                           <opdata>Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$BATTERY.TEMP.MAX.WARN}</macro>
+               <value>55</value>
+               <description>Maximum battery temperature for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ICMP.LOSS.WARN}</macro>
+               <value>20</value>
+            </macro>
+            <macro>
+               <macro>{$ICMP.RESPONSE_TIME.WARN}</macro>
+               <value>0.15</value>
+            </macro>
+            <macro>
+               <macro>{$SNMP.TIMEOUT}</macro>
+               <value>5m</value>
+               <description>The time interval for SNMP agent availability trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$TIME.PERIOD}</macro>
+               <value>15m</value>
+               <description>Time period for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$UPS.INPUT_FREQ.MAX.WARN}</macro>
+               <value>50.3</value>
+               <description>Maximum input frequency for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$UPS.INPUT_FREQ.MIN.WARN}</macro>
+               <value>49.7</value>
+               <description>Minimum input frequency for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$UPS.INPUT_VOLT.MAX.WARN}</macro>
+               <value>243</value>
+               <description>Maximum input voltage for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$UPS.INPUT_VOLT.MIN.WARN}</macro>
+               <value>197</value>
+               <description>Minimum input voltage for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$UPS.OUTPUT.MAX.WARN}</macro>
+               <value>80</value>
+               <description>Maximum output load in % for trigger expression.</description>
+            </macro>
+         </macros>
+         <screens>
+            <screen>
+               <name>UPS Summary</name>
+               <hsize>3</hsize>
+               <vsize>4</vsize>
+               <screen_items>
+                  <screen_item>
+                     <resourcetype>3</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <key>system.uptime[sysUpTime.0]</key>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>0</x>
+                     <y>0</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>1</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>3</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <key>input.fail[upsAdvInputLineFailCause]</key>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>1</x>
+                     <y>0</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>1</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>3</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <key>output.status[upsBasicOutputStatus]</key>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>2</x>
+                     <y>0</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>1</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>3</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <key>battery.status[upsBasicBatteryStatus]</key>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>0</x>
+                     <y>1</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>1</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>3</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <key>battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]</key>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>1</x>
+                     <y>1</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>1</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>3</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <key>battery.last_replace_date[upsBasicBatteryLastReplaceDate]</key>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>2</x>
+                     <y>1</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>1</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>0</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>Capacity of the UPS batteries</name>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>300</width>
+                     <height>300</height>
+                     <x>0</x>
+                     <y>2</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>0</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>Voltage</name>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>400</width>
+                     <height>100</height>
+                     <x>1</x>
+                     <y>2</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>0</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>Output</name>
+                        <host>Template Power APC UPS SNMP</host>
+                     </resource>
+                     <width>400</width>
+                     <height>100</height>
+                     <x>2</x>
+                     <y>2</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+               </screen_items>
+            </screen>
+         </screens>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>Capacity of the UPS batteries</name>
+         <type>PIE</type>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template Power APC UPS SNMP</host>
+                  <key>battery.capacity[upsAdvBatteryCapacity]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Output</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template Power APC UPS SNMP</host>
+                  <key>output.current[upsHighPrecOutputCurrent]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template Power APC UPS SNMP</host>
+                  <key>output.load[upsHighPrecOutputLoad]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Voltage</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template Power APC UPS SNMP</host>
+                  <key>input.voltage[upsHighPrecInputLineVoltage]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template Power APC UPS SNMP</host>
+                  <key>output.voltage[upsHighPrecOutputVoltage]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>PowerNet-MIB::uioSensorStatusAlarmStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Warning</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Critical</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Not applicable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>PowerNet-MIB::upsAdvBatteryReplaceIndicator</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>no Battery Needs Replacing</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>battery Needs Replacing</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>PowerNet-MIB::upsAdvInputLineFailCause</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>no Transfer</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>High Line Voltage</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Brownout</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Blackout</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Small Momentary Sag</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Deep Momentary Sag</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Small Momentary Spike</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>Large Momentary Spike</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>Self Test</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>Rate of Voltage Change</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>PowerNet-MIB::upsBasicBatteryStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Low</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>In Fault Condition</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>PowerNet-MIB::upsBasicOutputStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Online</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>On Battery</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>On Smart Boost</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Timed Sleeping</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Software Bypass</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Off</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>Rebooting</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>Switched Bypass</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>Hardware Failure Bypass</newvalue>
+            </mapping>
+            <mapping>
+               <value>11</value>
+               <newvalue>Sleeping Until Power Return</newvalue>
+            </mapping>
+            <mapping>
+               <value>12</value>
+               <newvalue>On Smart Trim</newvalue>
+            </mapping>
+            <mapping>
+               <value>13</value>
+               <newvalue>Eco Mode</newvalue>
+            </mapping>
+            <mapping>
+               <value>14</value>
+               <newvalue>Hot Standby</newvalue>
+            </mapping>
+            <mapping>
+               <value>15</value>
+               <newvalue>On Battery Test</newvalue>
+            </mapping>
+            <mapping>
+               <value>16</value>
+               <newvalue>Emergency Static Bypass</newvalue>
+            </mapping>
+            <mapping>
+               <value>17</value>
+               <newvalue>Static Bypass Standby</newvalue>
+            </mapping>
+            <mapping>
+               <value>18</value>
+               <newvalue>Power Saving Mode</newvalue>
+            </mapping>
+            <mapping>
+               <value>19</value>
+               <newvalue>Spot Mode</newvalue>
+            </mapping>
+            <mapping>
+               <value>20</value>
+               <newvalue>E-Conversion</newvalue>
+            </mapping>
+            <mapping>
+               <value>21</value>
+               <newvalue>Charger Spotmode</newvalue>
+            </mapping>
+            <mapping>
+               <value>22</value>
+               <newvalue>Inverter Spotmode</newvalue>
+            </mapping>
+            <mapping>
+               <value>23</value>
+               <newvalue>Active Load</newvalue>
+            </mapping>
+            <mapping>
+               <value>24</value>
+               <newvalue>Battery Discharge Spotmode</newvalue>
+            </mapping>
+            <mapping>
+               <value>25</value>
+               <newvalue>Inverter Standby</newvalue>
+            </mapping>
+            <mapping>
+               <value>26</value>
+               <newvalue>Charger Only</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>zabbix.host.available</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>not available</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>available</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>
