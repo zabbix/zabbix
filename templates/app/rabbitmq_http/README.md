@@ -13,7 +13,7 @@ Template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ management
 
 This template was tested on:
 
-- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18
+- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.8.5, 3.8.12
 
 ## Setup
 
@@ -58,6 +58,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
+|Health Check 3.8.10+ discovery |<p>Version 3.8.10+ specific metrics</p> |DEPENDENT |rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |Exchanges discovery |<p>Individual exchange metrics</p> |DEPENDENT |rabbitmq.exchanges.discovery<p>**Filter**:</p>AND <p>- A: {#EXCHANGE} MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}`</p><p>- B: {#EXCHANGE} NOT_MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}`</p> |
 
 ## Items collected
@@ -88,6 +89,7 @@ There are no template links in this template.
 |RabbitMQ |RabbitMQ: Messages returned unroutable per second |<p>Rate of messages returned to publisher as unroutable per second</p> |DEPENDENT |rabbitmq.overview.messages.return_unroutable.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.return_unroutable_details.rate`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |RabbitMQ |RabbitMQ: Messages returned redeliver |<p>Count of subset of messages in deliver_get which had the redelivered flag set</p> |DEPENDENT |rabbitmq.overview.messages.redeliver<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.redeliver`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |RabbitMQ |RabbitMQ: Messages returned redeliver per second |<p>Rate of subset of messages in deliver_get which had the redelivered flag set per second</p> |DEPENDENT |rabbitmq.overview.messages.redeliver.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.redeliver_details.rate`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|RabbitMQ |RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON} |<p>Responds a 200 OK if there are no alarms in effect in the cluster, otherwise responds with a 503 Service Unavailable.</p> |HTTP_AGENT |rabbitmq.healthcheck.alarms[{#SINGLETON}]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |RabbitMQ |RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages acknowledged |<p>Number of messages delivered to clients and acknowledged</p> |DEPENDENT |rabbitmq.exchange.messages.ack["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.ack.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |RabbitMQ |RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages acknowledged per second |<p>Rate of messages delivered to clients and acknowledged per second</p> |DEPENDENT |rabbitmq.exchange.messages.ack.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.ack_details.rate.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |RabbitMQ |RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages confirmed |<p>Count of messages confirmed</p> |DEPENDENT |rabbitmq.exchange.messages.confirm["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.confirm.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
@@ -111,6 +113,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|RabbitMQ: There are active alarms in the cluster |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.alarms[{#SINGLETON}].last()}=503` |AVERAGE | |
 |RabbitMQ: Failed to fetch overview data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:rabbitmq.get_overview.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
@@ -133,7 +136,7 @@ Template `RabbitMQ Node` — (Zabbix version >= 4.2) collects metrics by pollin
 
 This template was tested on:
 
-- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18
+- RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.8.5, 3.8.12
 
 ## Setup
 
@@ -179,13 +182,14 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
+|Health Check 3.8.10+ discovery |<p>Version 3.8.10+ specific metrics</p> |DEPENDENT |rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Health Check 3.8.9- discovery |<p>Specific metrics up to and including version 3.8.4</p> |DEPENDENT |rabbitmq.healthcheck.v389.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |Queues discovery |<p>Individual queue metrics</p> |DEPENDENT |rabbitmq.queues.discovery<p>**Filter**:</p>AND <p>- A: {#QUEUE} MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}`</p><p>- B: {#QUEUE} NOT_MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}`</p><p>- C: {#NODE} MATCHES_REGEX `{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|RabbitMQ |RabbitMQ: Healthcheck |<p>Runs basic healthchecks in the current node. Checks that the rabbit application is running, channels and queues can be listed successfully, and that no alarms are in effect.</p> |HTTP_AGENT |rabbitmq.healthcheck<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- BOOL_TO_DECIMAL |
 |RabbitMQ |RabbitMQ: Management plugin version |<p>Version of the management plugin in use</p> |DEPENDENT |rabbitmq.node.overview.management_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |RabbitMQ |RabbitMQ: RabbitMQ version |<p>Version of RabbitMQ on the node which processed this request</p> |DEPENDENT |rabbitmq.node.overview.rabbitmq_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.rabbitmq_version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |RabbitMQ |RabbitMQ: Used file descriptors |<p>Used file descriptors</p> |DEPENDENT |rabbitmq.node.fd_used<p>**Preprocessing**:</p><p>- JSONPATH: `$.fd_used`</p> |
@@ -203,6 +207,12 @@ There are no template links in this template.
 |RabbitMQ |RabbitMQ: Uptime |<p>Uptime in milliseconds</p> |DEPENDENT |rabbitmq.node.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.uptime`</p><p>- MULTIPLIER: `0.001`</p> |
 |RabbitMQ |RabbitMQ: Service ping |<p>-</p> |SIMPLE |net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |RabbitMQ |RabbitMQ: Service response time |<p>-</p> |SIMPLE |net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"] |
+|RabbitMQ |RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON} |<p>Responds a 200 OK if there are no local alarms in effect on the target node, otherwise responds with a 503 Service Unavailable.</p> |HTTP_AGENT |rabbitmq.healthcheck.local_alarms[{#SINGLETON}]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|RabbitMQ |RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON} |<p>Checks the expiration date on the certificates for every listener configured to use TLS. Responds a 200 OK if all certificates are valid (have not expired), otherwise responds with a 503 Service Unavailable.</p> |HTTP_AGENT |rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|RabbitMQ |RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON} |<p>Responds a 200 OK if all virtual hosts and running on the target node, otherwise responds with a 503 Service Unavailable.</p> |HTTP_AGENT |rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|RabbitMQ |RabbitMQ: Healthcheck: classic mirrored queues without synchronised mirrors online{#SINGLETON} |<p>Checks if there are classic mirrored queues without synchronised mirrors online (queues that would potentially lose data if the target node is shut down). Responds a 200 OK if there are no such classic mirrored queues, otherwise responds with a 503 Service Unavailable.</p> |HTTP_AGENT |rabbitmq.healthcheck.mirror_sync[{#SINGLETON}]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|RabbitMQ |RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON} |<p>Checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). Responds a 200 OK if there are no such quorum queues, otherwise responds with a 503 Service Unavailable.</p> |HTTP_AGENT |rabbitmq.healthcheck.quorum[{#SINGLETON}]<p>**Preprocessing**:</p><p>- REGEX: `HTTP\/1\.1\b\s(\d+) \1`</p><p>- JAVASCRIPT: `switch(value){  case '200': return 1  case '503': return 0  default: 2}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|RabbitMQ |RabbitMQ: Healthcheck{#SINGLETON} |<p>Runs basic healthchecks in the current node. Checks that the rabbit application is running, channels and queues can be listed successfully, and that no alarms are in effect.</p> |HTTP_AGENT |rabbitmq.healthcheck[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- BOOL_TO_DECIMAL |
 |RabbitMQ |RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages |<p>Count of the total messages in the queue</p> |DEPENDENT |rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages.first()`</p> |
 |RabbitMQ |RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages per second |<p>Count per second of the total messages in the queue</p> |DEPENDENT |rabbitmq.queue.messages.rate["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_details.rate.first()`</p> |
 |RabbitMQ |RabbitMQ: Queue {#VHOST}/{#QUEUE}: Consumers |<p>Number of consumers</p> |DEPENDENT |rabbitmq.queue.consumers["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].consumers.first()`</p> |
@@ -229,7 +239,6 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|RabbitMQ: Node healthcheck failed |<p>https://www.rabbitmq.com/monitoring.html#health-checks</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.last()}=0` |AVERAGE | |
 |RabbitMQ: Version has changed (new version: {ITEM.VALUE}) |<p>RabbitMQ version has changed. Ack to close.</p> |`{TEMPLATE_NAME:rabbitmq.node.overview.rabbitmq_version.diff()}=1 and {TEMPLATE_NAME:rabbitmq.node.overview.rabbitmq_version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |RabbitMQ: Number of network partitions is too high (more than 0 for 5m) |<p>https://www.rabbitmq.com/partitions.html#detecting</p> |`{TEMPLATE_NAME:rabbitmq.node.partitions.min(5m)}>0` |WARNING | |
 |RabbitMQ: Node is not running |<p>RabbitMQ node is not running</p> |`{TEMPLATE_NAME:rabbitmq.node.running.max(5m)}=0` |AVERAGE |<p>**Depends on**:</p><p>- RabbitMQ: Service is down</p> |
@@ -238,6 +247,12 @@ There are no template links in this template.
 |RabbitMQ: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:rabbitmq.node.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |RabbitMQ: Service is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m) |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].min(5m)}>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Service is down</p> |
+|RabbitMQ: There are active alarms in the node |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.local_alarms[{#SINGLETON}].last()}=503` |AVERAGE | |
+|RabbitMQ: There are valid TLS certificates expiring in the next month |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}].last()}=503` |AVERAGE | |
+|RabbitMQ: There are not running virtual hosts |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}].last()}=503` |AVERAGE | |
+|RabbitMQ: There are queues that could potentially lose data if the this node goes offline. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.mirror_sync[{#SINGLETON}].last()}=503` |AVERAGE | |
+|RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.quorum[{#SINGLETON}].last()}=503` |AVERAGE | |
+|RabbitMQ: Node healthcheck failed |<p>https://www.rabbitmq.com/monitoring.html#health-checks</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck[{#SINGLETON}].last()}=0` |AVERAGE | |
 |RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m) |<p>-</p> |`{TEMPLATE_NAME:rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"].min(5m)}>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}` |WARNING | |
 |RabbitMQ: Failed to fetch nodes data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:rabbitmq.get_nodes.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Service is down</p> |
 
