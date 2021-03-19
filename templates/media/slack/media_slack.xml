@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-03-09T02:19:11Z</date>
+    <date>2021-03-19T09:00:23Z</date>
     <media_types>
         <media_type>
             <name>Slack</name>
@@ -180,7 +180,7 @@ function getPermalink(channelId, messageTimestamp) {&#13;
         )&#13;
     ));&#13;
 &#13;
-    if (req.Status() != 200 &amp;&amp; !resp.ok) {&#13;
+    if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
         throw 'message was created, but getting message link was failed with reason &quot;' + resp.error + '&quot;';&#13;
     }&#13;
 &#13;
@@ -222,7 +222,7 @@ function handlerAlarm(params) {&#13;
 &#13;
         var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
 &#13;
-        if (req.Status() != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
@@ -244,7 +244,7 @@ function handlerAlarm(params) {&#13;
         ];&#13;
 &#13;
         resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
-        if (req.Status() != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
@@ -263,7 +263,7 @@ function handlerAlarm(params) {&#13;
         ];&#13;
 &#13;
         resp = JSON.parse(req.Post(Slack.chatUpdate, JSON.stringify(fields)));&#13;
-        if (req.Status() != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
     }&#13;
@@ -287,7 +287,7 @@ function handlerEvent(params) {&#13;
 &#13;
         var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
 &#13;
-        if (req.Status() != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
@@ -308,7 +308,7 @@ function handlerEvent(params) {&#13;
 &#13;
         resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
 &#13;
-        if (req.Status() != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
 &#13;
@@ -325,7 +325,7 @@ function handlerEvent(params) {&#13;
 &#13;
         resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));&#13;
 &#13;
-        if (req.Status() != 200 &amp;&amp; !resp.ok) {&#13;
+        if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
             throw resp.error;&#13;
         }&#13;
     }&#13;
