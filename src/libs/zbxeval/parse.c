@@ -1075,6 +1075,3 @@ int	zbx_eval_status(const zbx_eval_context_t *ctx)
 {
 	return (NULL == ctx->expression ? FAIL : SUCCEED);
 }
-
-
-
