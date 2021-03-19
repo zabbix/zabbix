@@ -174,10 +174,11 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			// Special processing for calculated item formula.
 			if ($field === 'params_f') {
 				$expression_data = new CTriggerExpression(['calculated' => true, 'lldmacros' => $support_lldmacros]);
+				$result = $expression_data->parse($inputs[$field]);
 
-				if (($result = $expression_data->parse($inputs[$field])) !== false) {
+				if ($result instanceof CTriggerExprParserResult) {
 					foreach ($result->getTokens() as $token) {
-						switch ($token['type']) {
+						switch ($token->type) {
 							case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
 								$texts_support_user_macros[] = $token['value'];
 								break;
