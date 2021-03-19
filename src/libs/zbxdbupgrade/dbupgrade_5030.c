@@ -1145,18 +1145,10 @@ static void	dbpatch_update_trigger(zbx_dbpatch_trigger_t *trigger, zbx_uint64_t 
 	}
 }
 
-static void	dbpatch_update_func_change(zbx_dbpatch_function_t *function, const char *prefix, const char *suffix,
-		char **replace, zbx_vector_ptr_t *functions)
+static void	dbpatch_update_func_abschange(zbx_dbpatch_function_t *function, char **replace)
 {
-	zbx_uint64_t	functionid2;
-
-	dbpatch_update_function(function, "last", "#2", ZBX_DBPATCH_FUNCTION_UPDATE);
-
-	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
-	dbpatch_add_function(function, functionid2, "last", "#1", ZBX_DBPATCH_FUNCTION_CREATE, functions);
-
-	*replace = zbx_dsprintf(NULL, "%s{" ZBX_FS_UI64 "},{" ZBX_FS_UI64 "}%s", prefix, function->functionid,
-			functionid2, suffix);
+	dbpatch_update_function(function, "change", NULL, ZBX_DBPATCH_FUNCTION_UPDATE_NAME);
+	*replace = zbx_dsprintf(NULL, "abs({" ZBX_FS_UI64 "})", function->functionid);
 }
 
 static void	dbpatch_update_func_delta(zbx_dbpatch_function_t *function, const char *parameter, char **replace,
@@ -1210,7 +1202,7 @@ static void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int ext
 	char	*str  = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
 
-	dbpatch_update_function(function, "last", "", ZBX_DBPATCH_FUNCTION_UPDATE);
+	dbpatch_update_function(function, "last", "$", ZBX_DBPATCH_FUNCTION_UPDATE);
 
 	if (0 == extended)
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '(');
@@ -1245,8 +1237,17 @@ static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_
 	{
 		zbx_function_param_parse(ptr, &pos, &len, &sep);
 
-		loc.l = ptr - parameter + (0 < len ? pos : eol - (ptr - parameter));
-		loc.r = loc.l + len - 1;
+		if (0 < len)
+		{
+			loc.l = ptr - parameter + pos;
+			loc.r = loc.l + len - 1;
+		}
+		else
+		{
+			loc.l = ptr - parameter + eol - (ptr - parameter);
+			loc.r = loc.l;
+		}
+
 		zbx_vector_loc_append_ptr(params, &loc);
 	}
 
@@ -1477,10 +1478,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 
 	if (0 == strcmp(function->name, "abschange"))
 	{
-		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
-			dbpatch_update_func_change(function, "abs(change(", "))", replace, functions);
-		else
-			dbpatch_update_func_diff(function, replace, functions);
+		dbpatch_update_func_abschange(function, replace);
 	}
 	else if (0 == strcmp(function->name, "avg") || 0 == strcmp(function->name, "max") ||
 			0 == strcmp(function->name, "min") || 0 == strcmp(function->name, "sum"))
@@ -1489,13 +1487,6 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 				ZBX_DBPATCH_ARG_HIST, 0, 1,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
-	}
-	else if (0 == strcmp(function->name, "change"))
-	{
-		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
-			dbpatch_update_func_change(function, "change(", ")", replace, functions);
-		else
-			dbpatch_update_func_diff(function, replace, functions);
 	}
 	else if (0 == strcmp(function->name, "delta"))
 	{
@@ -1842,6 +1833,10 @@ static int	DBpatch_5030057(void)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"delete from functions where functionid=" ZBX_FS_UI64 ";\n",
 							func->functionid);
+
+					if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+						break;
+
 					continue;
 				}
 
@@ -1865,9 +1860,12 @@ static int	DBpatch_5030057(void)
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where functionid=" ZBX_FS_UI64
 						";\n", func->functionid);
+
+				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					break;
 			}
 
-			if (0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE))
+			if (SUCCEED == ret && 0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE))
 			{
 				delim = ' ';
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set");
@@ -1898,9 +1896,11 @@ static int	DBpatch_5030057(void)
 		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
 		dbpatch_trigger_clear(&trigger);
 
-		if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != ret)
 			break;
 
+		if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			break;
 	}
 
 	DBfree_result(result);

@@ -284,6 +284,12 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	if (ZBX_VARIANT_NONE == token->value.type)
 		return;
 
+	if (ZBX_VARIANT_ERR == token->value.type)
+	{
+		zbx_snprintf_alloc(str, str_alloc, str_offset, "ERROR(%s)", token->value.data.err);
+		return;
+	}
+
 	switch (token->type)
 	{
 		case ZBX_EVAL_TOKEN_FUNCTIONID:

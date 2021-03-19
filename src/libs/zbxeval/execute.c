@@ -1189,73 +1189,6 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_change                                     *
- *                                                                            *
- * Purpose: evaluate change() function                                        *
- *                                                                            *
- * Parameters: ctx    - [IN] the evaluation context                           *
- *             token  - [IN] the function token                               *
- *             output - [IN/OUT] the output value stack                       *
- *             error  - [OUT] the error message in the case of failure        *
- *                                                                            *
- * Return value: SUCCEED - function evaluation succeeded                      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	eval_execute_function_change(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		zbx_vector_var_t *output, char **error)
-{
-	int		ret;
-	zbx_variant_t	value, left, right;
-
-	if (2 != token->opt)
-	{
-		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
-			ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
-		return ret;
-
-	zbx_variant_copy(&left, &output->values[output->values_num - 2]);
-	zbx_variant_copy(&right, &output->values[output->values_num - 1]);
-
-	if (ZBX_VARIANT_STR == left.type)
-		zbx_variant_convert(&left, ZBX_VARIANT_UI64);
-	if (ZBX_VARIANT_STR == right.type)
-		zbx_variant_convert(&right, ZBX_VARIANT_UI64);
-
-	if (ZBX_VARIANT_UI64 == left.type && ZBX_VARIANT_UI64 == right.type)
-	{
-		if (left.data.ui64 < right.data.ui64)
-			zbx_variant_set_dbl(&value, right.data.ui64 - left.data.ui64);
-		else
-			zbx_variant_set_dbl(&value, -(double)(left.data.ui64 - right.data.ui64));
-	}
-	else
-	{
-		if (FAIL == eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &left, error) ||
-				FAIL == eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &right, error))
-		{
-			ret = FAIL;
-			goto out;
-		}
-
-		zbx_variant_set_dbl(&value, right.data.dbl - left.data.dbl);
-	}
-
-	eval_function_return(token->opt, &value, output);
-	ret = SUCCEED;
-out:
-	zbx_variant_clear(&left);
-	zbx_variant_clear(&right);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: eval_execute_cb_function                                         *
  *                                                                            *
  * Purpose: evaluate function by calling custom callback (if configured)      *
@@ -1348,8 +1281,6 @@ static int	eval_execute_function(const zbx_eval_context_t *ctx, const zbx_eval_t
 		return eval_execute_function_dayofweek(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "dayofmonth", ZBX_CONST_STRLEN("dayofmonth")))
 		return eval_execute_function_dayofmonth(ctx, token, output, error);
-	if (SUCCEED == eval_compare_token(ctx, &token->loc, "change", ZBX_CONST_STRLEN("change")))
-		return eval_execute_function_change(ctx, token, output, error);
 
 	if (FAIL == eval_execute_cb_function(ctx, token, output, &errmsg))
 	{

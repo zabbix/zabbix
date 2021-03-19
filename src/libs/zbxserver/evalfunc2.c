@@ -1619,6 +1619,76 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_CHANGE                                                  *
+ *                                                                            *
+ * Purpose: evaluate function 'change' for the item                           *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameter - number of seconds                                  *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_CHANGE(zbx_variant_t *value, DC_ITEM *item, const zbx_timespec_t *ts, char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+	double				result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != zbx_vc_get_values(item->itemid, item->value_type, &values, 0, 2, ts) ||
+			2 > values.values_num)
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
+
+	switch (item->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			result = values.values[0].value.dbl - values.values[1].value.dbl;
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			/* to avoid overflow */
+			if (values.values[0].value.ui64 >= values.values[1].value.ui64)
+				result = values.values[0].value.ui64 - values.values[1].value.ui64;
+			else
+				result = -(double)(values.values[1].value.ui64 - values.values[0].value.ui64);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			if (0 == strcmp(values.values[0].value.log->value, values.values[1].value.log->value))
+				result = 0;
+			else
+				result = 1;
+			break;
+
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			if (0 == strcmp(values.values[0].value.str, values.values[1].value.str))
+				result = 0;
+			else
+				result = 1;
+			break;
+		default:
+			*error = zbx_strdup(*error, "invalid value type");
+			goto out;
+	}
+
+	zbx_variant_set_dbl(value, result);
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -2218,6 +2288,10 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	else if (0 == strcmp(function, "nodata"))
 	{
 		ret = evaluate_NODATA(value, item, parameter, error);
+	}
+	else if (0 == strcmp(function, "change"))
+	{
+		ret = evaluate_CHANGE(value, item, ts, error);
 	}
 	else if (0 == strcmp(function, "find"))
 	{
