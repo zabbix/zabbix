@@ -156,7 +156,9 @@ class CControllerHintBox extends CController {
 		}
 
 		$trigger = reset($triggers);
-		$trigger['url'] = CMacrosResolverHelper::resolveTriggerUrl($trigger, $url) ? $url : '';
+		$trigger['url'] = CMacrosResolverHelper::resolveTriggerUrl($trigger + ['eventid' => $data['eventid_till']],
+			$url
+		) ? $url : '';
 
 		$options = [
 			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'acknowledged'],
