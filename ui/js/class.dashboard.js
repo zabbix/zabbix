@@ -1247,7 +1247,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_registerEvents() {
-		let window_resize_timeout_id = null;
+		let grid_container_resize_timeout_id = null;
 
 		this._events = {
 			editWidgetPropertiesCancel: (e, data) => {
@@ -1375,13 +1375,13 @@ class CDashboard extends CBaseComponent {
 				}
 			},
 
-			windowResize: () => {
-				if (window_resize_timeout_id != null) {
-					clearTimeout(window_resize_timeout_id);
+			gridContainerResize: () => {
+				if (grid_container_resize_timeout_id != null) {
+					clearTimeout(grid_container_resize_timeout_id);
 				}
 
-				window_resize_timeout_id = setTimeout(() => {
-					window_resize_timeout_id = null;
+				grid_container_resize_timeout_id = setTimeout(() => {
+					grid_container_resize_timeout_id = null;
 					this._resize();
 				}, 200);
 			}
@@ -1391,7 +1391,7 @@ class CDashboard extends CBaseComponent {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
 		}
 
-		window.addEventListener('resize', this._events.windowResize);
+		new ResizeObserver(this._events.gridContainerResize).observe(this._containers.grid);
 	}
 
 	_initTabs() {

@@ -95,6 +95,7 @@ class CDashboardPage extends CBaseComponent {
 		};
 
 		this._grid_min_rows = 0;
+		this._grid_pad_rows = 2;
 
 		this._is_unsaved = false;
 
@@ -205,17 +206,18 @@ class CDashboardPage extends CBaseComponent {
 	 * @param {int|null}  min_rows  Min number of rows or null not to update the current one.
 	 */
 	_resizeGrid(min_rows = null) {
-		if (min_rows !== null) {
-			this._grid_min_rows = min_rows;
+		if (min_rows === 0) {
+			this._grid_min_rows = null;
+		}
+		else if (min_rows !== null) {
+			this._grid_min_rows = Math.max(this._grid_min_rows, min_rows);
 		}
 
-		let num_rows = this._getNumRows() + 1;
+		let num_rows = this._getNumRows();
 
 		if (this._grid_min_rows !== null) {
 			num_rows = Math.max(num_rows, this._grid_min_rows);
 		}
-
-		num_rows = Math.min(this._max_rows, this._getNumRows() + 1);
 
 		let height = this._cell_height * num_rows;
 
@@ -622,11 +624,7 @@ class CDashboardPage extends CBaseComponent {
 		const wrapper_scroll_top_min = Math.max(0, pos_top + Math.min(0, pos_height - wrapper.clientHeight));
 		const wrapper_scroll_top_max = pos_top;
 
-		const grid_min_rows = pos.y + pos.height;
-
-		if (grid_min_rows > this._grid_min_rows) {
-			this._resizeGrid(grid_min_rows);
-		}
+		this._resizeGrid(pos.y + pos.height + this._grid_pad_rows);
 
 		return new Promise((resolve) => {
 			let scroll_to = null;
@@ -941,13 +939,9 @@ class CDashboardPage extends CBaseComponent {
 					this._widget_placeholder_pos, {reverse_x, reverse_y}
 				);
 
-				const grid_min_rows = Math.min(this._max_rows,
-					this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
+				this._resizeGrid(this._widget_placeholder_pos.y + this._widget_placeholder_pos.height
+					+ this._grid_pad_rows
 				);
-
-				if (grid_min_rows > this._grid_min_rows) {
-					this._resizeGrid(grid_min_rows);
-				}
 
 				this._widget_placeholder
 					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
@@ -1004,13 +998,9 @@ class CDashboardPage extends CBaseComponent {
 				}
 
 				if (this._widget_placeholder_pos !== null) {
-					const grid_min_rows = Math.min(this._max_rows,
-						this._widget_placeholder_pos.y + this._widget_placeholder_pos.height + 2
+					this._resizeGrid(this._widget_placeholder_pos.y + this._widget_placeholder_pos.height
+						+ this._grid_pad_rows
 					);
-
-					if (grid_min_rows > this._grid_min_rows) {
-						this._resizeGrid(grid_min_rows);
-					}
 
 					this._widget_placeholder
 						.setState(WIDGET_PLACEHOLDER_STATE_POSITIONING)
@@ -1307,11 +1297,7 @@ class CDashboardPage extends CBaseComponent {
 					drag_pos = pos;
 					showWidgetHelper(drag_pos);
 
-					const grid_min_rows = Math.min(this._max_rows, drag_pos.y + drag_pos.height + 2);
-
-					if (grid_min_rows > this._grid_min_rows) {
-						this._resizeGrid(grid_min_rows);
-					}
+					this._resizeGrid(drag_pos.y + drag_pos.height + this._grid_pad_rows);
 				}
 			}
 		};
@@ -1823,11 +1809,7 @@ class CDashboardPage extends CBaseComponent {
 
 				resize_widget.resize();
 
-				const grid_min_rows = Math.min(this._max_rows, resize_pos.y + resize_pos.height + 2);
-
-				if (grid_min_rows > this._grid_min_rows) {
-					this._resizeGrid(grid_min_rows);
-				}
+				this._resizeGrid(resize_pos.y + resize_pos.height + this._grid_pad_rows);
 			}
 		};
 
