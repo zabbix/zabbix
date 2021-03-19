@@ -507,11 +507,11 @@ class CFunctionValidator extends CValidator {
 			}
 		}
 
-		if (($mandat & 0x02) && !$this->validatePeriodShift($period_shift)) {
+		if (($mandat & 0x02) && !$this->validateTrendPeriods($period, $period_shift)) {
 			return $this->isMacro($period_shift);
 		}
 
-		return $this->validateTrendPeriods($period, $period_shift);
+		return true;
 	}
 
 	/**
