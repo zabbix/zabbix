@@ -264,6 +264,19 @@ class testJSONRPC extends CAPITest {
 				']',
 				'result' => ''
 			],
+			// rpc call with unsupported parameter
+			[
+				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}, "id": 1, "foo": "bar"}',
+				'result' => [
+					'jsonrpc' => '2.0',
+					'error' =>[
+						'code' => -32600,
+						'message' => 'Invalid Request.',
+						'data' => 'Invalid parameter "/": unexpected parameter "foo".'
+					],
+					'id' => 1
+				]
+			],
 			// rpc call batch
 			[
 				'request' => '['.
