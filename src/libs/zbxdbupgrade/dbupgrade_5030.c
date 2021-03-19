@@ -1890,6 +1890,9 @@ static int	DBpatch_5030057(void)
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64
 						";\n", trigger.triggerid);
+
+				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					break;
 			}
 		}
 
@@ -1897,9 +1900,6 @@ static int	DBpatch_5030057(void)
 		dbpatch_trigger_clear(&trigger);
 
 		if (SUCCEED != ret)
-			break;
-
-		if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			break;
 	}
 
