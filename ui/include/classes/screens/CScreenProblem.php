@@ -143,14 +143,12 @@ class CScreenProblem extends CScreenBase {
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['show_suppressed']       (optional)
 	 * @param int    $filter['show_opdata']           (optional)
-	 * @param bool   $resolve_comments
-	 * @param bool   $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, $resolve_comments = false, $resolve_urls = false) {
+	public static function getData(array $filter) {
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
@@ -317,20 +315,10 @@ class CScreenProblem extends CScreenBase {
 							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
 					}
 
-					if ($resolve_comments || $resolve_urls || $show_opdata || $details) {
-						$options['output'][] = 'expression';
-					}
-
 					if ($show_opdata || $details) {
-						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
-					}
-
-					if ($resolve_comments) {
-						$options['output'][] = 'comments';
-					}
-
-					if ($resolve_urls) {
-						$options['output'][] = 'url';
+						$options['output'] = array_merge($options['output'],
+							['expression', 'recovery_mode', 'recovery_expression']
+						);
 					}
 
 					$data['triggers'] += API::Trigger()->get($options);
@@ -547,14 +535,12 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['details']
 	 * @param int   $filter['show']
 	 * @param int   $filter['show_opdata']
-	 * @param bool  $resolve_comments
-	 * @param bool  $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter, $resolve_comments = false, $resolve_urls = false) {
+	public static function makeData(array $data, array $filter) {
 		// unset unused triggers
 		$triggerids = [];
 
@@ -596,37 +582,6 @@ class CScreenProblem extends CScreenBase {
 				}
 				unset($trigger);
 			}
-		}
-
-		if ($resolve_comments) {
-			foreach ($data['problems'] as &$problem) {
-				$trigger = $data['triggers'][$problem['objectid']];
-				$problem['comments'] = CMacrosResolverHelper::resolveTriggerDescription(
-					[
-						'triggerid' => $problem['objectid'],
-						'expression' => $trigger['expression'],
-						'comments' => $trigger['comments'],
-						'clock' => $problem['clock'],
-						'ns' => $problem['ns']
-					],
-					['events' => true]
-				);
-			}
-			unset($problem);
-
-			foreach ($data['triggers'] as &$trigger) {
-				unset($trigger['comments']);
-			}
-			unset($trigger);
-		}
-
-		if ($resolve_urls) {
-			foreach ($data['problems'] as &$problem) {
-				$trigger = $data['triggers'][$problem['objectid']];
-				$trigger['eventid'] = $problem['eventid'];
-				$problem['url'] = CMacrosResolverHelper::resolveTriggerUrl($trigger, $url) ? $url : '';
-			}
-			unset($problem);
 		}
 
 		// get additional data
