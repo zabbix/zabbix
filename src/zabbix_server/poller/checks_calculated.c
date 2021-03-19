@@ -45,16 +45,16 @@ zbx_calc_eval_t;
  * Return value: The allocated item reference or NULL in the case of error.   *
  *                                                                            *
  ******************************************************************************/
-static zbx_item_query_t	*calcitem_parse_item_query(const char *query)
+static zbx_item_query_t	*calcitem_parse_item_query(const char *filter)
 {
-	zbx_item_query_t	*ref;
+	zbx_item_query_t	*query;
 
-	ref = (zbx_item_query_t *)zbx_malloc(NULL, sizeof(zbx_item_query_t));
-	memset(ref, 0, sizeof(zbx_item_query_t));
+	query = (zbx_item_query_t *)zbx_malloc(NULL, sizeof(zbx_item_query_t));
+	memset(query, 0, sizeof(zbx_item_query_t));
 
-	zbx_eval_parse_query(query, strlen(query), ref);
+	zbx_eval_parse_query(filter, strlen(filter), query);
 
-	return ref;
+	return query;
 }
 
 /******************************************************************************
@@ -257,7 +257,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: calcitem_eval                                                    *
+ * Function: calcitem_eval_history                                            *
  *                                                                            *
  * Purpose: evaluate historical function                                      *
  *                                                                            *
@@ -274,7 +274,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	calcitem_eval(const char *name, size_t len, int args_num, const zbx_variant_t *args,
+static int	calcitem_eval_history(const char *name, size_t len, int args_num, const zbx_variant_t *args,
 		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	int			ret = FAIL;
@@ -314,6 +314,65 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: calcitem_eval_common                                             *
+ *                                                                            *
+ * Purpose: evaluate common function                                          *
+ *                                                                            *
+ * Parameters: name     - [IN] the function name (not zero terminated)        *
+ *             len      - [IN] the function name length                       *
+ *             args_num - [IN] the number of function arguments               *
+ *             args     - [IN] an array of the function arguments.            *
+ *             data     - [IN] the caller data used for function evaluation   *
+ *             ts       - [IN] the function execution time                    *
+ *             value    - [OUT] the function return value                     *
+ *             error    - [OUT] the error message if function failed          *
+ *                                                                            *
+ * Return value: SUCCEED - the function was executed successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: There are no custom common functions for calculated items, but   *
+ *           it's used to check for /host/key query quoting errors instead.   *
+ *                                                                            *
+ ******************************************************************************/
+static int	calcitem_eval_common(const char *name, size_t len, int args_num, const zbx_variant_t *args,
+		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+{
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(ts);
+	ZBX_UNUSED(value);
+
+	if (SUCCEED != zbx_is_trigger_function(name, len))
+	{
+		*error = zbx_strdup(NULL, "Cannot evaluate formula: unsupported function");
+		return FAIL;
+	}
+
+	if (0 == args_num)
+	{
+		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid number of arguments");
+		return FAIL;
+	}
+
+	if (ZBX_VARIANT_STR == args[0].type)
+	{
+		zbx_item_query_t	query;
+
+		zbx_eval_parse_query(args[0].data.str, strlen(args[0].data.str), &query);
+
+		if (ZBX_ITEM_QUERY_UNKNOWN != query.type)
+		{
+			zbx_eval_clear_query(&query);
+			*error = zbx_strdup(NULL, "Cannot evaluate function: quoted item query argument");
+			return FAIL;
+		}
+	}
+
+	*error = zbx_strdup(NULL, "Cannot evaluate function: invalid first argument");
+	return FAIL;
+}
+
 int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 {
 	int			ret = NOTSUPPORTED;
@@ -348,7 +407,8 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	calc_eval_init(&eval, dc_item, &ctx);
 	zbx_timespec(&ts);
 
-	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, NULL, calcitem_eval, (void *)&eval, &value, &error))
+	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, calcitem_eval_common, calcitem_eval_history, (void *)&eval,
+			&value, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() error:%s", __func__, error);
 		SET_MSG_RESULT(result, error);

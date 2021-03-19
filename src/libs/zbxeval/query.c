@@ -62,8 +62,8 @@ void	zbx_eval_parse_query(const char *str, size_t len, zbx_item_query_t *query)
  * Purpose: frees resources allocated by item reference                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eval_clear_query(zbx_item_query_t *ref)
+void	zbx_eval_clear_query(zbx_item_query_t *query)
 {
-	zbx_free(ref->host);
-	zbx_free(ref->key);
+	zbx_free(query->host);
+	zbx_free(query->key);
 }
