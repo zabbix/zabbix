@@ -52,6 +52,13 @@ class CFunctionValidator extends CValidator {
 	 */
 	private $lldmacros = true;
 
+	/**
+	 * Calculated item formula validation.
+	 *
+	 * @var bool
+	 */
+	private $calculated = false;
+
 	public function __construct(array $options = []) {
 		/*
 		 * CValidator is an abstract class, so no specific functionality should be bound to it. Thus putting
@@ -62,6 +69,10 @@ class CFunctionValidator extends CValidator {
 		if (array_key_exists('lldmacros', $options)) {
 			$this->lldmacros = $options['lldmacros'];
 			unset($options['lldmacros']);
+		}
+		if (array_key_exists('calculated', $options)) {
+			$this->calculated = (bool) $options['calculated'];
+			unset($options['calculated']);
 		}
 		parent::__construct($options);
 
@@ -448,7 +459,7 @@ class CFunctionValidator extends CValidator {
 			return true;
 		}
 
-		$parser = new CQueryParser();
+		$parser = new CQueryParser(['calculated' => $this->calculated]);
 		return ($parser->parse($param) === CParser::PARSE_SUCCESS);
 	}
 

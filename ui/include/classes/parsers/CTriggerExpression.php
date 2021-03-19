@@ -220,6 +220,7 @@ class CTriggerExpression {
 			$this->host_macro_parser = new CSetParser($this->options['host_macro']);
 		}
 		$this->function_parser = new CFunctionParser([
+			'calculated' => $this->options['calculated'],
 			'collapsed_expression' => $this->options['collapsed_expression']
 		]);
 		$this->lld_macro_parser = new CLLDMacroParser();
