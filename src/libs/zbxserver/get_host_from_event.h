@@ -17,17 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_GET_HOST_FROM_EVENT_H
+#define ZABBIX_GET_HOST_FROM_EVENT_H
 
-#ifndef ZABBIX_NODECOMMAND_H
-#define ZABBIX_NODECOMMAND_H
-
-#include "comms.h"
-#include "zbxjson.h"
-
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
-extern char	*CONFIG_SOURCE_IP;
-
-int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp);
+int	get_host_from_event(const DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len);
 
 #endif

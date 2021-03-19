@@ -17,17 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ZABBIX_USERS_H_
+#define ZABBIX_ZABBIX_USERS_H_
 
-#ifndef ZABBIX_NODECOMMAND_H
-#define ZABBIX_NODECOMMAND_H
+int	check_perm2system(zbx_uint64_t userid);
+char	*get_user_timezone(zbx_uint64_t userid);
 
-#include "comms.h"
-#include "zbxjson.h"
-
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
-extern char	*CONFIG_SOURCE_IP;
-
-int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp);
-
-#endif
+#endif /* ZABBIX_ZABBIX_USERS_H_ */
