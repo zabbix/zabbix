@@ -1195,7 +1195,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 			elseif ($token->type == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
-				$expression[] = CTriggerExpression::quoteString($token->match, false, true);
+				$expression[] = CTriggerExpression::quoteString($token->data['string'], false, true);
 			}
 			else {
 				$expression[] = $token->match;
