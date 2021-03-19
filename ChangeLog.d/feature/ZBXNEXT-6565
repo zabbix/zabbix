@@ -1,1 +1,0 @@
-A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
