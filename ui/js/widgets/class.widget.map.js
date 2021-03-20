@@ -148,7 +148,7 @@ class CWidgetMap extends CWidget {
 			select: (e) => {
 				if (this._current_sysmapid != e.detail.sysmapid) {
 					this._previous_maps = [];
-					this.navigateToMap(e.detail.sysmapid);
+					this._navigateToMap(e.detail.sysmapid);
 				}
 			}
 		}
@@ -186,7 +186,7 @@ class CWidgetMap extends CWidget {
 		this._map_svg = new SVGMap(options);
 	}
 
-	navigateToMap(sysmapid) {
+	_navigateToMap(sysmapid) {
 		this._current_sysmapid = sysmapid;
 
 		jQuery('.menu-popup').menuPopup('close', null);
@@ -196,16 +196,16 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
-	navigateToSubmap(sysmapid, reset_previous = false) {
-		if (reset_previous && this._previous_maps.length > 0) {
+	navigateToSubmap(sysmapid, back = false) {
+		if (back && this._previous_maps.length > 0) {
 			sysmapid = this._previous_maps.pop();
 		}
 		else {
 			this._previous_maps.push(this._current_sysmapid);
 		}
 
-		this.navigateToMap(sysmapid);
+		this._navigateToMap(sysmapid);
 
-		this.fire(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, {sysmapid, previous_maps: this._previous_maps});
+		this.fire(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, {sysmapid, back});
 	}
 }

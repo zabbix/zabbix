@@ -238,8 +238,20 @@ class CWidgetNavTree extends CWidget {
 				e.preventDefault();
 			},
 
-			selectItem: (e) => {
-				console.log(e);
+			selectSubmap: (e) => {
+				if (e.detail.back) {
+					this._markTreeItemSelected(this._navtree[this._navtree_item_selected].parent);
+				}
+				else {
+					for (const [itemid, item] of Object.entries(this._navtree)) {
+						if (item.sysmapid == e.detail.sysmapid && item.parent == this._navtree_item_selected) {
+							if (this._markTreeItemSelected(itemid)) {
+								this._openBranch(this._navtree_item_selected);
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -276,7 +288,7 @@ class CWidgetNavTree extends CWidget {
 			}
 
 			for (const widget of this._maps) {
-				widget.on(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectItem);
+				widget.on(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
 			}
 		}
 	}
@@ -305,7 +317,7 @@ class CWidgetNavTree extends CWidget {
 			}
 
 			for (const widget of this._maps) {
-				widget.off(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectItem);
+				widget.off(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
 			}
 		}
 	}
@@ -681,6 +693,8 @@ class CWidgetNavTree extends CWidget {
 		if (selected_item === null) {
 			return false;
 		}
+
+		this._navtree_item_selected = itemid;
 
 		let step_in_path = selected_item.closest('.tree-item');
 
