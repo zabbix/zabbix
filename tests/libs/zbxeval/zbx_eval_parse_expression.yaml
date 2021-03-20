@@ -1247,14 +1247,14 @@ in:
   expression: '1w + 2d + 3h + 4m + 5s '
 out:
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '1w', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '2d', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1w', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2d', opt: 1}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '3h', opt: 2}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3h', opt: 2}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '4m', opt: 3}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4m', opt: 3}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '5s', opt: 4}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '5s', opt: 4}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
   result: SUCCEED
 ---
@@ -1264,11 +1264,11 @@ in:
   expression: 'min(1w, 2d, 3h, 4m, 5s)'
 out:
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '1w', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '2d', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '3h', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '4m', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '5s', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1w', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2d', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '5s', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 5}
   result: SUCCEED
 ---
@@ -1303,8 +1303,8 @@ in:
   expression: '1m=60s'
 out:
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '1m', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '60s', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '60s', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   result: SUCCEED
 ---

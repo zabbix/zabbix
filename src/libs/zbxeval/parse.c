@@ -318,19 +318,7 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 	len += offset;
 
-	switch (ctx->expression[pos + len - 1])
-	{
-		case 's':
-		case 'm':
-		case 'h':
-		case 'd':
-		case 'w':
-			token->type = ZBX_EVAL_TOKEN_VAR_TIME;
-			break;
-		default:
-			token->type = ZBX_EVAL_TOKEN_VAR_NUM;
-			break;
-	}
+	token->type = ZBX_EVAL_TOKEN_VAR_NUM;
 
 	tmp = strtod(ctx->expression + pos, &end) * suffix2factor(ctx->expression[pos + len - 1]);
 	if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
