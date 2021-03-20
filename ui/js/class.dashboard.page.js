@@ -1075,6 +1075,10 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_blockWidgetInteraction() {
+		if (this._dashboard_grid.querySelector('.dashbrd-grid-widget-blocker') !== null) {
+			return;
+		}
+
 		const widget_blocker = document.createElement('div');
 
 		widget_blocker.classList.add('dashbrd-grid-widget-blocker');
@@ -1082,7 +1086,11 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_unblockWidgetInteraction() {
-		this._dashboard_grid.querySelector('.dashbrd-grid-widget-blocker').remove();
+		const widget_blocker = this._dashboard_grid.querySelector('.dashbrd-grid-widget-blocker');
+
+		if (widget_blocker !== null) {
+			widget_blocker.remove();
+		}
 	}
 
 	_activateWidgetPlaceholder() {
