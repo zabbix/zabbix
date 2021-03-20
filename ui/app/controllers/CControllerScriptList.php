@@ -33,7 +33,7 @@ class CControllerScriptList extends CController {
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'filter_scope' =>	'in '.implode(',', [-1, ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
+			'filter_scope' =>	'in '.implode(',', [-1, ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])
 		];
 
 		$ret = $this->validateInput($fields);
