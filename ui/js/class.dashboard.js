@@ -1048,10 +1048,6 @@ class CDashboard extends CBaseComponent {
 					return;
 				}
 
-				if ('reference' in new_widget_data.fields) {
-					new_widget_data.fields.reference = this._getNewWidgetFieldReference();
-				}
-
 				dashboard_page.replaceWidget(paste_placeholder_widget, {
 					...new_widget_data,
 					fields: response.widgets[0].fields,
@@ -1070,33 +1066,6 @@ class CDashboard extends CBaseComponent {
 				);
 			})
 			.finally(() => this._deleteBusyCondition(busy_condition));
-	}
-
-	_getNewWidgetFieldReference() {
-		let used_references = [];
-
-		for (const dashboard_page of this._dashboard_pages.keys()) {
-			for (const w of dashboard_page.getWidgets()) {
-				const fields = w.getFields();
-
-				if ('reference' in fields) {
-					used_references.push(fields.reference);
-				}
-			}
-		}
-
-		let reference;
-
-		do {
-			reference = '';
-
-			for (let i = 0; i < 5; i++) {
-				reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
-			}
-		}
-		while (used_references.indexOf(reference) != -1);
-
-		return reference;
 	}
 
 	storeDashboardPageDataCopy(data) {

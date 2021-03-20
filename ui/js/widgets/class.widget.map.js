@@ -50,6 +50,8 @@ class CWidgetMap extends CWidget {
 	announceWidgets(widgets) {
 		super.announceWidgets(widgets);
 
+		const used_references = [];
+
 		if (this._filter_widget !== null) {
 			this._filter_widget.off(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
 		}
@@ -62,7 +64,26 @@ class CWidgetMap extends CWidget {
 
 					this._filter_widget.on(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
 				}
+
+				if ('reference' in widget._fields) {
+					used_references.push(widget._fields.reference);
+				}
 			}
+		}
+
+		if (this._widgetid === null) {
+			let reference;
+
+			do {
+				reference = '';
+
+				for (let i = 0; i < 5; i++) {
+					reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+				}
+			}
+			while (used_references.includes(reference));
+
+			this._fields.reference = reference;
 		}
 	}
 

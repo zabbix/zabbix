@@ -61,11 +61,32 @@ class CWidgetNavTree extends CWidget {
 		super.announceWidgets(widgets);
 		this._unregisterContentEvents();
 
+		const used_references = [];
+
 		for (const widget of widgets) {
 			if (widget instanceof CWidgetMap
 					&& this._fields.reference === widget._fields.filter_widget_reference) {
 				this._maps.push(widget);
+
+				if ('reference' in widget._fields) {
+					used_references.push(widget._fields.reference);
+				}
 			}
+		}
+
+		if (this._widgetid === null) {
+			let reference;
+
+			do {
+				reference = '';
+
+				for (let i = 0; i < 5; i++) {
+					reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+				}
+			}
+			while (used_references.includes(reference));
+
+			this._fields.reference = reference;
 		}
 	}
 
