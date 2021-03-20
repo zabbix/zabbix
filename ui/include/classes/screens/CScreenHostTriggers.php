@@ -184,7 +184,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'sort_order' => ZBX_SORT_DOWN
 		];
 
-		$data = CScreenProblem::getData($filter, true, true);
+		$data = CScreenProblem::getData($filter);
 
 		$header = [
 			'hostname' => _('Host'),
@@ -209,7 +209,7 @@ class CScreenHostTriggers extends CScreenBase {
 		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown', min($filter['limit'], count($data['problems'])), (count($data['problems']) > $search_limit) ? '+' : '', min($search_limit, count($data['problems'])));
 		$data['problems'] = array_slice($data['problems'], 0, $filter['limit'], true);
-		$data = CScreenProblem::makeData($data, $filter, true, true);
+		$data = CScreenProblem::makeData($data, $filter);
 
 		$hostids = [];
 		foreach ($data['triggers'] as $trigger) {
@@ -302,12 +302,7 @@ class CScreenHostTriggers extends CScreenBase {
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist(
-							['comments' => $problem['comments'], 'url' => $problem['url'],
-								'triggerid' => $trigger['triggerid']],
-							$problem['eventid'],
-							$allowed
-						))
+						->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $problem['eventid']))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,
 				zbx_date2age($problem['clock']),
