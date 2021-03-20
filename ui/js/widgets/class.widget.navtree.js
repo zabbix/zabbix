@@ -111,7 +111,7 @@ class CWidgetNavTree extends CWidget {
 				if (this._navtree_item_selected === null
 						|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')
 				) {
-					this._navtree_item_selected = jQuery('.tree-item:visible', this._$target)
+					this._navtree_item_selected = jQuery('.tree-item:visible', jQuery(this._target))
 						.not('[data-sysmapid="0"]')
 						.first()
 						.data('id');
@@ -644,7 +644,7 @@ class CWidgetNavTree extends CWidget {
 
 	_setTreeHandlers() {
 		// Add .is-parent class for branches with sub-items.
-		jQuery('.tree-list', this._$target).not('.ui-sortable, .root').each(function() {
+		jQuery('.tree-list', jQuery(this._target)).not('.ui-sortable, .root').each(function() {
 			if (jQuery('>li', jQuery(this)).not('.inaccessible').length) {
 				jQuery(this).closest('.tree-item').addClass('is-parent');
 			}
@@ -654,11 +654,11 @@ class CWidgetNavTree extends CWidget {
 		});
 
 		// Set [data-depth] for list and each sublist.
-		jQuery('.tree-list', this._$target).each(function() {
+		jQuery('.tree-list', jQuery(this._target)).each(function() {
 			jQuery(this).attr('data-depth', jQuery(this).parents('.tree-list').length);
 		}).not('.root').promise().done(function() {
 			// Show/hide 'add new items' buttons.
-			jQuery('.tree-list', this._$target).filter(function() {
+			jQuery('.tree-list', jQuery(this._target)).filter(function() {
 				return jQuery(this).attr('data-depth') >= this._max_depth;
 			}).each(function() {
 				jQuery('.js-button-add-maps', jQuery(this)).css('visibility', 'hidden');
@@ -666,7 +666,7 @@ class CWidgetNavTree extends CWidget {
 			});
 
 			// Show/hide buttons in deepest levels.
-			jQuery('.tree-list', this._$target).filter(function() {
+			jQuery('.tree-list', jQuery(this._target)).filter(function() {
 				return this._max_depth > jQuery(this).attr('data-depth');
 			}).each(function() {
 				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-maps', jQuery(this)).css('visibility', 'visible');
@@ -675,7 +675,7 @@ class CWidgetNavTree extends CWidget {
 		});
 
 		// Change arrow style.
-		jQuery('.is-parent', this._$target).each(function() {
+		jQuery('.is-parent', jQuery(this._target)).each(function() {
 			const $arrow = jQuery('> .tree-row > .content > .arrow > .treeview > span', jQuery(this));
 
 			if (jQuery(this).hasClass('opened')) {
@@ -742,7 +742,7 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	_makeSortable() {
-		jQuery('.root-item > .tree-list', this._$target)
+		jQuery('.root-item > .tree-list', jQuery(this._target))
 			.sortable_tree({
 				max_depth: this._max_depth,
 				stop: () => {
@@ -852,7 +852,7 @@ class CWidgetNavTree extends CWidget {
 										else {
 											this._unregisterContentEvents();
 											if (item_edit) {
-												const $row = jQuery(`[data-id="${id}"]`, this._$target);
+												const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
 
 												jQuery(`[name="navtree.name.${id}"]`, $row).val(resp.name);
 												jQuery(`[name="navtree.sysmapid.${id}"]`, $row)
