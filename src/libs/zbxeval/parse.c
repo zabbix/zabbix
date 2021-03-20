@@ -462,14 +462,14 @@ static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_
 				ptr++;
 	}
 
-	if (ptr == ctx->expression + pos + 1)
-	{
-		*error = zbx_dsprintf(*error, "invalid host name in query starting at \"%s\"", ctx->expression + pos);
-		return FAIL;
-	}
-
 	if ('/' != *ptr)
 	{
+		if (ptr == ctx->expression + pos + 1)
+		{
+			*error = zbx_dsprintf(*error, "invalid host name in query starting at \"%s\"", ctx->expression + pos);
+			return FAIL;
+		}
+
 		*error = zbx_dsprintf(*error, "missing item key in query starting at \"%s\"", ctx->expression + pos);
 		return FAIL;
 	}
