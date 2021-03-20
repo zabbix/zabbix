@@ -37,8 +37,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
-			'groupids' => getSubGroups($fields['groupids']),
-			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
+			'groupids' => $fields['groupids'],
+			'exclude_groupids' => $fields['exclude_groupids'],
 			'hostids' => $fields['hostids'],
 			'name' => $fields['problem'],
 			'severities' => $fields['severities'],

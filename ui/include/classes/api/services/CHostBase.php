@@ -372,28 +372,6 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Creates new tags.
-	 *
-	 * @param array  $create_tags
-	 * @param int    $create_tags[<hostid>]
-	 * @param string $create_tags[<hostid>][]['tag']
-	 * @param string $create_tags[<hostid>][]['value']
-	 */
-	protected function createTags(array $create_tags): void {
-		$create = [];
-
-		foreach ($create_tags as $hostid => $tags) {
-			foreach ($tags as $tag) {
-				$create[] = ['hostid' => $hostid] + $tag;
-			}
-		}
-
-		if ($create) {
-			DB::insert('host_tag', $create);
-		}
-	}
-
-	/**
 	 * Updates tags by deleting existing tags if they are not among the input tags, and adding missing ones.
 	 *
 	 * @param array  $host_tags

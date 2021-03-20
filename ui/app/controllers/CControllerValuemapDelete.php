@@ -21,10 +21,6 @@
 
 class CControllerValuemapDelete extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'valuemapids' => 'required | array_db valuemaps.valuemapid'
