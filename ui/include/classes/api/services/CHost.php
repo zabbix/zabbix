@@ -1541,11 +1541,8 @@ class CHost extends CHostGeneral {
 			'operationid' => $delOperationids
 		]);
 
-		$hosts = API::Host()->get([
-			'output' => [
-				'hostid',
-				'name'
-			],
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
 			'hostids' => $hostIds,
 			'nopermissions' => true
 		]);
@@ -1560,13 +1557,14 @@ class CHost extends CHostGeneral {
 		DB::delete('hosts', ['hostid' => $hostIds]);
 
 		// TODO: remove info from API
-		foreach ($hosts as $host) {
-			info(_s('Deleted: Host "%1$s".', $host['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
+		foreach ($db_hosts as $db_host) {
+			info(_s('Deleted: Host "%1$s".', $db_host['name']));
 		}
 
 		// remove Monitoring > Latest data toggle profile values related to given hosts
 		DB::delete('profiles', ['idx' => 'web.latest.toggle_other', 'idx2' => $hostIds]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $db_hosts);
 
 		return ['hostids' => $hostIds];
 	}
