@@ -332,36 +332,36 @@ class CTemplate extends CHostGeneral {
 		$templateids = DB::insert('hosts', $ins_templates);
 
 		foreach ($templates as $index => &$template) {
-			$template['hostid'] = $templateids[$index];
+			$template['templateid'] = $templateids[$index];
 
 			foreach (zbx_toArray($template['groups']) as $group) {
 				$hosts_groups[] = [
-					'hostid' => $template['hostid'],
+					'hostid' => $template['templateid'],
 					'groupid' => $group['groupid']
 				];
 			}
 
 			if (array_key_exists('tags', $template)) {
 				foreach (zbx_toArray($template['tags']) as $tag) {
-					$hosts_tags[] = ['hostid' => $template['hostid']] + $tag;
+					$hosts_tags[] = ['hostid' => $template['templateid']] + $tag;
 				}
 			}
 
 			if (array_key_exists('macros', $template)) {
 				foreach (zbx_toArray($template['macros']) as $macro) {
-					$hosts_macros[] = ['hostid' => $template['hostid']] + $macro;
+					$hosts_macros[] = ['hostid' => $template['templateid']] + $macro;
 				}
 			}
 
 			if (array_key_exists('templates', $template)) {
 				foreach (zbx_toArray($template['templates']) as $link_template) {
-					$templates_hostids[$link_template['templateid']][] = $template['hostid'];
+					$templates_hostids[$link_template['templateid']][] = $template['templateid'];
 				}
 			}
 
 			if (array_key_exists('hosts', $template)) {
 				foreach (zbx_toArray($template['hosts']) as $host) {
-					$templates_hostids[$template['hostid']][] = $host['hostid'];
+					$templates_hostids[$template['templateid']][] = $host['hostid'];
 					$hostids[$host['hostid']] = true;
 				}
 			}
@@ -400,7 +400,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templates);
 
-		return ['templateids' => array_column($templates, 'hostid')];
+		return ['templateids' => array_column($templates, 'templateid')];
 	}
 
 	/**
@@ -626,17 +626,15 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$options = [
+		$db_templates = $this->get([
+			'output' => ['templateid', 'name'],
 			'templateids' => $templateids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		];
-		$delTemplates = $this->get($options);
-		foreach ($templateids as $templateid) {
-			if (!isset($delTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		]);
+
+		if (array_diff_key(array_flip($templateids), $db_templates)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		API::Template()->unlink($templateids, null, true);
@@ -816,10 +814,11 @@ class CTemplate extends CHostGeneral {
 		DB::delete('hosts', ['hostid' => $templateids]);
 
 		// TODO: remove info from API
-		foreach ($delTemplates as $template) {
-			info(_s('Deleted: Template "%1$s".', $template['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['templateid'], $template['host'], 'hosts', null, null);
+		foreach ($db_templates as $db_template) {
+			info(_s('Deleted: Template "%1$s".', $db_template['name']));
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
 	}
