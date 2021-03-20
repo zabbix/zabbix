@@ -169,7 +169,6 @@ typedef int (*zbx_macro_resolve_func_t)(const char *str, size_t length, zbx_uint
 		int hostids_num, char **value, char **error);
 
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
-zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_uint64_t rules, char **error);
 void	zbx_eval_init(zbx_eval_context_t *ctx);
 void	zbx_eval_clear(zbx_eval_context_t *ctx);
 int	zbx_eval_status(const zbx_eval_context_t *ctx);

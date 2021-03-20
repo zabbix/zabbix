@@ -1002,30 +1002,6 @@ int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, z
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_parse_expression                                        *
- *                                                                            *
- * Purpose: parse expression into tokens in postfix notation order            *
- *                                                                            *
- * Parameters: expression - [IN] the expression to parse                      *
- *             rules      - [IN] the parsing rules                            *
- *             error      - [OUT] the error message in the case of failure    *
- *                                                                            *
- * Return value: The evaluation context or NULL in the case of error.         *
- *                                                                            *
- ******************************************************************************/
-zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_uint64_t rules, char **error)
-{
-	zbx_eval_context_t	*ctx;
-
-	ctx = (zbx_eval_context_t *)zbx_malloc(NULL, sizeof(zbx_eval_context_t));
-	if (SUCCEED != zbx_eval_parse_expression(ctx, expression, rules, error))
-		zbx_free(ctx);
-
-	return ctx;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_eval_init                                                    *
  *                                                                            *
  * Purpose: initialize context so it can be cleared without parsing           *
