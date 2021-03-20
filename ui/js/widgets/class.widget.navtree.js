@@ -80,11 +80,6 @@ class CWidgetNavTree extends CWidget {
 		this._registerContentEvents();
 	}
 
-	updateProperties({name, view_mode, fields, configuration}) {
-		this._updateWidgetFields();
-		super.updateProperties({name, view_mode, fields, configuration});
-	}
-
 	_processUpdateResponse(response) {
 		if (this._has_contents) {
 			this._unregisterContentEvents();
@@ -145,25 +140,8 @@ class CWidgetNavTree extends CWidget {
 		this._events = {
 			...this._events,
 
-			select: (e) => {
-				const link = e.target;
-
-				const sysmapid = link.getAttribute('data-sysmapid');
-				const itemid = link.closest('.tree-item').getAttribute('data-id');
-
-				if (this._markTreeItemSelected(itemid)) {
-					updateUserProfile('web.dashbrd.navtree.item.selected', sysmapid, [this._widgetid]);
-
-					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid});
-				}
-
-				e.preventDefault();
-			},
-
 			addChild: (e) => {
 				const button = e.target;
-
-				this._unregisterContentEvents();
 
 				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
 				const parent = button.getAttribute('data-id');
@@ -171,14 +149,10 @@ class CWidgetNavTree extends CWidget {
 				if (depth <= this._max_depth) {
 					this._itemEditDialog(0, parent, depth + 1, button);
 				}
-
-				this._registerContentEvents();
 			},
 
 			addMaps: (e) => {
 				const button = e.target;
-
-				this._unregisterContentEvents();
 
 				const id = button.getAttribute('data-id');
 
@@ -209,8 +183,6 @@ class CWidgetNavTree extends CWidget {
 						window.addPopupValues = old_addPopupValues;
 						delete window.old_addPopupValues;
 					}
-
-					this._registerContentEvents();
 				};
 
 				return PopUp('popup.generic', {
@@ -219,6 +191,13 @@ class CWidgetNavTree extends CWidget {
 					srcfld2: 'name',
 					multiselect: '1'
 				}, null, e.target);
+			},
+
+			copy: () => {
+				this._unregisterContentEvents();
+				this._setTreeHandlers();
+				this._updateWidgetFields();
+				this._registerContentEvents();
 			},
 
 			edit: (e) => {
@@ -236,18 +215,32 @@ class CWidgetNavTree extends CWidget {
 
 				this._unregisterContentEvents();
 
-				this._removeTreeItem(button.getAttribute('data-id'));
+				this._target.querySelector(`[data-id="${button.getAttribute('data-id')}"]`).remove();
+				this._setTreeHandlers();
+
+				this._updateWidgetFields();
 
 				this._registerContentEvents();
 			},
 
-			copy: () => {
-				this._updateWidgetFields();
+			select: (e) => {
+				const link = e.target;
+
+				const sysmapid = link.getAttribute('data-sysmapid');
+				const itemid = link.closest('.tree-item').getAttribute('data-id');
+
+				if (this._markTreeItemSelected(itemid)) {
+					updateUserProfile('web.dashbrd.navtree.item.selected', sysmapid, [this._widgetid]);
+
+					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid});
+				}
+
+				e.preventDefault();
 			},
 
 			selectItem: (e) => {
 				console.log(e);
-			},
+			}
 		}
 
 		this.on(WIDGET_EVENT_COPY, this._events.copy);
@@ -283,7 +276,7 @@ class CWidgetNavTree extends CWidget {
 			}
 
 			for (const widget of this._maps) {
-				widget.on(WIDGET_SYSMAP_EVENT_SELECT, this._events.selectItem);
+				widget.on(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectItem);
 			}
 		}
 	}
@@ -312,7 +305,7 @@ class CWidgetNavTree extends CWidget {
 			}
 
 			for (const widget of this._maps) {
-				widget.off(WIDGET_SYSMAP_EVENT_SELECT, this._events.selectItem);
+				widget.off(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectItem);
 			}
 		}
 	}
@@ -637,11 +630,6 @@ class CWidgetNavTree extends CWidget {
 		}
 	}
 
-	_removeTreeItem(id) {
-		this._target.querySelector(`[data-id="${id}"]`).remove();
-		this._setTreeHandlers();
-	};
-
 	_setTreeHandlers() {
 		// Add .is-parent class for branches with sub-items.
 		$('.tree-list', this._$target).not('.ui-sortable, .root').each(function() {
@@ -745,6 +733,7 @@ class CWidgetNavTree extends CWidget {
 				max_depth: this._max_depth,
 				stop: () => {
 					this._setTreeHandlers();
+					this._updateWidgetFields();
 				}
 			})
 			.disableSelection();
@@ -847,6 +836,7 @@ class CWidgetNavTree extends CWidget {
 											return false;
 										}
 										else {
+											this._unregisterContentEvents();
 											if (item_edit) {
 												const $row = $(`[data-id="${id}"]`, this._$target);
 
@@ -908,7 +898,9 @@ class CWidgetNavTree extends CWidget {
 											add_child_level(resp['sysmapid'], id, depth + 1);
 
 											overlayDialogueDestroy(overlay.dialogueid);
+											this._updateWidgetFields();
 											this._setTreeHandlers();
+											this._registerContentEvents();
 										}
 									}
 								});
@@ -930,7 +922,7 @@ class CWidgetNavTree extends CWidget {
 	};
 
 	_updateWidgetFields() {
-		const prefix = `${widget.getUniqueId()}_`;
+		const prefix = `${this.getUniqueId()}_`;
 
 		if (!this._is_edit_mode) {
 			return false;

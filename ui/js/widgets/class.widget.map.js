@@ -21,8 +21,7 @@
 const WIDGET_SYSMAP_SOURCETYPE_MAP = 1;
 const WIDGET_SYSMAP_SOURCETYPE_FILTER = 2;
 
-const WIDGET_SYSMAP_EVENT_READY = 'ready';
-const WIDGET_SYSMAP_EVENT_SELECT = 'select';
+const WIDGET_SYSMAP_EVENT_SUBMAP_SELECT = 'submap-select';
 
 class CWidgetMap extends CWidget {
 
@@ -199,8 +198,6 @@ class CWidgetMap extends CWidget {
 	}
 
 	navigateToSubmap(sysmapid, reset_previous = false) {
-		console.log('navigateToSubmap', sysmapid);
-
 		if (reset_previous && this._previous_maps.length > 0) {
 			sysmapid = this._previous_maps.pop();
 		}
@@ -209,5 +206,7 @@ class CWidgetMap extends CWidget {
 		}
 
 		this.navigateToMap(sysmapid);
+
+		this.fire(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, {sysmapid, previous_maps: this._previous_maps});
 	}
 }
