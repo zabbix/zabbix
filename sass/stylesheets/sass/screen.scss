@@ -5617,7 +5617,8 @@ span {
 	}
 }
 
-.menu-popup-preloader {
+.menu-popup-preloader,
+.hintbox-preloader {
 	background: $preloader-bg-color;
 	border: 1px solid $action-border-color;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
@@ -5631,6 +5632,10 @@ span {
 	&::before {
 		background: $preloader-bg-color;
 	}
+}
+
+.hintbox-preloader {
+	position: absolute;
 }
 
 $browser-logos: (
