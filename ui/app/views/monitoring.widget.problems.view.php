@@ -278,16 +278,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata : null,
 		(new CCol(
 			(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
-				->setHint(
-					make_popup_eventlist([
-							'comments' => $problem['comments'],
-							'url' => $problem['url'],
-							'triggerid' => $trigger['triggerid']
-						],
-						$eventid, $allowed, $show_timeline, $data['fields']['show_tags'], $data['fields']['tags'],
-						$data['fields']['tag_name_format'], $data['fields']['tag_priority']
-					)
-				)
+				->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $eventid, $show_timeline,
+					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
+					$data['fields']['tag_priority']
+				))
 		))->addClass(ZBX_STYLE_NOWRAP),
 		$problem_update_link,
 		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
