@@ -129,9 +129,8 @@ class CWidgetMap extends CWidget {
 				this._has_contents = true;
 			}
 
-
 			if (response.sysmap_data.error_msg !== null) {
-				this._$content_body.append(response.sysmap_data.error_msg);
+				jQuery(this._content_body).append(response.sysmap_data.error_msg);
 			}
 		}
 	}
@@ -190,7 +189,7 @@ class CWidgetMap extends CWidget {
 	navigateToMap(sysmapid) {
 		this._current_sysmapid = sysmapid;
 
-		$('.menu-popup').menuPopup('close', null);
+		jQuery('.menu-popup').menuPopup('close', null);
 
 		if (this._state == WIDGET_STATE_ACTIVE) {
 			this._restartUpdating();

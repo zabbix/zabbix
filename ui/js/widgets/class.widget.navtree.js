@@ -109,9 +109,9 @@ class CWidgetNavTree extends CWidget {
 				this._parseProblems();
 
 				if (this._navtree_item_selected === null
-						|| !$(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')
+						|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')
 				) {
-					this._navtree_item_selected = $('.tree-item:visible', this._$target)
+					this._navtree_item_selected = jQuery('.tree-item:visible', this._$target)
 						.not('[data-sysmapid="0"]')
 						.first()
 						.data('id');
@@ -120,7 +120,7 @@ class CWidgetNavTree extends CWidget {
 				if (this._markTreeItemSelected(this._navtree_item_selected)) {
 					this._openBranch(this._navtree_item_selected);
 					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {
-						sysmapid: $(`.tree-item[data-id=${this._navtree_item_selected}]`).data('sysmapid'),
+						sysmapid: jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).data('sysmapid'),
 						itemid: this._navtree_item_selected
 					});
 				}
@@ -230,7 +230,7 @@ class CWidgetNavTree extends CWidget {
 				const itemid = link.closest('.tree-item').getAttribute('data-id');
 
 				if (this._markTreeItemSelected(itemid)) {
-					updateUserProfile('web.dashbrd.navtree.item.selected', sysmapid, [this._widgetid]);
+					updateUserProfile('web.dashbrd.navtree.item.selected', itemid, [this._widgetid]);
 
 					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid});
 				}
@@ -632,41 +632,41 @@ class CWidgetNavTree extends CWidget {
 
 	_setTreeHandlers() {
 		// Add .is-parent class for branches with sub-items.
-		$('.tree-list', this._$target).not('.ui-sortable, .root').each(function() {
-			if ($('>li', $(this)).not('.inaccessible').length) {
-				$(this).closest('.tree-item').addClass('is-parent');
+		jQuery('.tree-list', this._$target).not('.ui-sortable, .root').each(function() {
+			if (jQuery('>li', jQuery(this)).not('.inaccessible').length) {
+				jQuery(this).closest('.tree-item').addClass('is-parent');
 			}
 			else {
-				$(this).closest('.tree-item').removeClass('is-parent');
+				jQuery(this).closest('.tree-item').removeClass('is-parent');
 			}
 		});
 
 		// Set [data-depth] for list and each sublist.
-		$('.tree-list', this._$target).each(function() {
-			$(this).attr('data-depth', $(this).parents('.tree-list').length);
+		jQuery('.tree-list', this._$target).each(function() {
+			jQuery(this).attr('data-depth', jQuery(this).parents('.tree-list').length);
 		}).not('.root').promise().done(function() {
 			// Show/hide 'add new items' buttons.
-			$('.tree-list', this._$target).filter(function() {
-				return $(this).attr('data-depth') >= this._max_depth;
+			jQuery('.tree-list', this._$target).filter(function() {
+				return jQuery(this).attr('data-depth') >= this._max_depth;
 			}).each(function() {
-				$('.js-button-add-maps', $(this)).css('visibility', 'hidden');
-				$('.js-button-add-child', $(this)).css('visibility', 'hidden');
+				jQuery('.js-button-add-maps', jQuery(this)).css('visibility', 'hidden');
+				jQuery('.js-button-add-child', jQuery(this)).css('visibility', 'hidden');
 			});
 
 			// Show/hide buttons in deepest levels.
-			$('.tree-list', this._$target).filter(function() {
-				return this._max_depth > $(this).attr('data-depth');
+			jQuery('.tree-list', this._$target).filter(function() {
+				return this._max_depth > jQuery(this).attr('data-depth');
 			}).each(function() {
-				$('> .tree-item > .tree-row > .tools > .js-button-add-maps', $(this)).css('visibility', 'visible');
-				$('> .tree-item > .tree-row > .tools > .js-button-add-child', $(this)).css('visibility', 'visible');
+				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-maps', jQuery(this)).css('visibility', 'visible');
+				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-child', jQuery(this)).css('visibility', 'visible');
 			});
 		});
 
 		// Change arrow style.
-		$('.is-parent', this._$target).each(function() {
-			const $arrow = $('> .tree-row > .content > .arrow > .treeview > span', $(this));
+		jQuery('.is-parent', this._$target).each(function() {
+			const $arrow = jQuery('> .tree-row > .content > .arrow > .treeview > span', jQuery(this));
 
-			if ($(this).hasClass('opened')) {
+			if (jQuery(this).hasClass('opened')) {
 				$arrow.removeClass('arrow-right').addClass('arrow-down');
 			}
 			else {
@@ -697,17 +697,17 @@ class CWidgetNavTree extends CWidget {
 	};
 
 	_openBranch(itemid) {
-		if (!$(`.tree-item[data-id=${itemid}]`).is(':visible')) {
+		if (!jQuery(`.tree-item[data-id=${itemid}]`).is(':visible')) {
 			const selector = '> .tree-row > .content > .arrow > .treeview > span';
 
-			let branch_to_open = $(`.tree-item[data-id=${itemid}]`).closest('.tree-list').not('.root');
+			let branch_to_open = jQuery(`.tree-item[data-id=${itemid}]`).closest('.tree-list').not('.root');
 
 			while (branch_to_open.length) {
 				branch_to_open.closest('.tree-item.is-parent')
 					.removeClass('closed')
 					.addClass('opened');
 
-				$(selector, branch_to_open.closest('.tree-item.is-parent'))
+				jQuery(selector, branch_to_open.closest('.tree-item.is-parent'))
 					.removeClass('arrow-right')
 					.addClass('arrow-down');
 
@@ -720,7 +720,7 @@ class CWidgetNavTree extends CWidget {
 	_getNextId() {
 		this._last_id++;
 
-		while ($(`[name="navtree.name.${this._last_id}"]`).length) {
+		while (jQuery(`[name="navtree.name.${this._last_id}"]`).length) {
 			this._last_id++;
 		}
 
@@ -728,7 +728,7 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	_makeSortable() {
-		$('.root-item > .tree-list', this._$target)
+		jQuery('.root-item > .tree-list', this._$target)
 			.sortable_tree({
 				max_depth: this._max_depth,
 				stop: () => {
@@ -838,15 +838,15 @@ class CWidgetNavTree extends CWidget {
 										else {
 											this._unregisterContentEvents();
 											if (item_edit) {
-												const $row = $(`[data-id="${id}"]`, this._$target);
+												const $row = jQuery(`[data-id="${id}"]`, this._$target);
 
-												$(`[name="navtree.name.${id}"]`, $row).val(resp.name);
-												$(`[name="navtree.sysmapid.${id}"]`, $row)
+												jQuery(`[name="navtree.name.${id}"]`, $row).val(resp.name);
+												jQuery(`[name="navtree.sysmapid.${id}"]`, $row)
 													.val(resp['sysmapid']);
-												$('> .tree-row > .content > .item-name', $row)
+												jQuery('> .tree-row > .content > .item-name', $row)
 													.empty()
 													.attr('title', resp['name'])
-													.append($('<span/>').text(resp.name));
+													.append(jQuery('<span/>').text(resp.name));
 												$row.toggleClass('no-map', resp.sysmapid == 0);
 											}
 											else {
@@ -934,7 +934,7 @@ class CWidgetNavTree extends CWidget {
 			}
 		}
 
-		$('input[name^="navtree.name."]', this._$content_body).each((index, field) => {
+		jQuery('input[name^="navtree.name."]', jQuery(this._content_body)).each((index, field) => {
 			const id = field.getAttribute('name').substr(13);
 
 			if (id) {
