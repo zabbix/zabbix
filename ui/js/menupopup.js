@@ -1120,6 +1120,7 @@ jQuery(function($) {
 
 			$menu_popup.data('menu_popup', options);
 
+			$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}));
 			$('.wrapper').append($menu_popup);
 
 			// Position the menu (before hiding).
@@ -1165,6 +1166,7 @@ jQuery(function($) {
 					$(overlay['element']).attr({'aria-expanded': 'false'});
 				}
 
+				menu_popup.prev().remove();
 				menu_popup.remove();
 
 				// Call menu close callback function.

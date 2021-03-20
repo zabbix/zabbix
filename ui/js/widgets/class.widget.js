@@ -193,9 +193,6 @@ class CWidget extends CBaseComponent {
 		return this._target.classList.contains(this._css_classes.focus);
 	}
 
-	/**
-	 * Focus specified top-level widget.
-	 */
 	enter() {
 		if (this._is_edit_mode) {
 			this._addResizeHandles();
@@ -204,9 +201,6 @@ class CWidget extends CBaseComponent {
 		this._target.classList.add(this._css_classes.focus);
 	}
 
-	/**
-	 * Blur specified top-level widget.
-	 */
 	leave() {
 		if (this._is_edit_mode) {
 			this._removeResizeHandles();
@@ -620,7 +614,6 @@ class CWidget extends CBaseComponent {
 
 		this.fire(WIDGET_EVENT_BEFORE_UPDATE);
 
-		// Save the content size upon updating.
 		this._content_size = this._getContentSize();
 
 		this._update_abort_controller = new AbortController();

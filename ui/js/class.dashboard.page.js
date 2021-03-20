@@ -130,12 +130,7 @@ class CDashboardPage extends CBaseComponent {
 
 			widgetEnter: (e) => {
 				if (this._is_edit_mode) {
-					if (this._isWidgetPlaceholderResizing()) {
-						return;
-					}
-					else {
-						this.resetWidgetPlaceholder();
-					}
+					this.resetWidgetPlaceholder();
 				}
 
 				const widget = e.detail.target;
@@ -1020,13 +1015,15 @@ class CDashboardPage extends CBaseComponent {
 					return;
 				}
 
+				e.preventDefault();
+
+				this._blockWidgetInteraction();
+
 				this._widget_placeholder_clicked_pos = this._widget_placeholder_pos;
 
 				this._widget_placeholder
 					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
 					.showAtPosition(this._widget_placeholder_clicked_pos);
-
-				e.preventDefault();
 
 				document.addEventListener('mouseup', this._widget_placeholder_events.mouseUp);
 				document.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
@@ -1035,6 +1032,8 @@ class CDashboardPage extends CBaseComponent {
 
 			mouseUp: (e) => {
 				this._deactivateWidgetPlaceholder({do_hide: false});
+
+				this._unblockWidgetInteraction();
 
 				const new_widget_pos = {...this._widget_placeholder_pos};
 
@@ -1073,6 +1072,17 @@ class CDashboardPage extends CBaseComponent {
 				}
 			}
 		}
+	}
+
+	_blockWidgetInteraction() {
+		const widget_blocker = document.createElement('div');
+
+		widget_blocker.classList.add('dashbrd-grid-widget-blocker');
+		this._dashboard_grid.prepend(widget_blocker);
+	}
+
+	_unblockWidgetInteraction() {
+		this._dashboard_grid.querySelector('.dashbrd-grid-widget-blocker').remove();
 	}
 
 	_activateWidgetPlaceholder() {
@@ -1320,6 +1330,8 @@ class CDashboardPage extends CBaseComponent {
 					return;
 				}
 
+				e.preventDefault();
+
 				this._deactivateWidgetPlaceholder();
 
 				for (const [widget, data] of this._widgets) {
@@ -1342,8 +1354,6 @@ class CDashboardPage extends CBaseComponent {
 				this._is_unsaved = true;
 
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
-
-				e.preventDefault();
 			},
 
 			mouseUp: (e) => {
@@ -1838,6 +1848,8 @@ class CDashboardPage extends CBaseComponent {
 					return;
 				}
 
+				e.preventDefault();
+
 				this._deactivateWidgetPlaceholder();
 
 				for (const [widget, data] of this._widgets) {
@@ -1872,8 +1884,6 @@ class CDashboardPage extends CBaseComponent {
 				this._is_unsaved = true;
 
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
-
-				e.preventDefault();
 			},
 
 			mouseUp: (e) => {

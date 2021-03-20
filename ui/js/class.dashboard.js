@@ -1233,7 +1233,7 @@ class CDashboard extends CBaseComponent {
 				if (num_lines > 0) {
 					this._containers.grid.classList.add(`reserve-header-lines-${num_lines}`);
 				}
-			}, 2000);
+			}, 5000);
 		}
 	}
 
