@@ -134,7 +134,10 @@ function makeEventList(array $data): CDiv {
 			$cell_r_clock = ($problem['r_clock'] >= $today)
 				? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
 				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
-			$cell_r_clock = (new CCol(new CLink($cell_r_clock, $url_details)))
+			$cell_r_clock = (new CCol(($url_details !== null)
+				? new CLink($cell_r_clock, $url_details)
+				: $cell_r_clock
+			))
 				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_RIGHT);
 		}
