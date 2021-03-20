@@ -690,19 +690,15 @@ class CWidget extends CBaseComponent {
 		const computed_style = getComputedStyle(this._content_body);
 
 		const content_width = parseInt(
-			parseFloat(computed_style.getPropertyValue('width'))
-				- parseFloat(computed_style.getPropertyValue('padding-left'))
-				- parseFloat(computed_style.getPropertyValue('padding-right'))
-				- parseFloat(computed_style.getPropertyValue('border-left-width'))
-				- parseFloat(computed_style.getPropertyValue('border-right-width'))
+			parseFloat(computed_style.width)
+				- parseFloat(computed_style.paddingLeft) - parseFloat(computed_style.paddingRight)
+				- parseFloat(computed_style.borderLeftWidth) - parseFloat(computed_style.borderRightWidth)
 		);
 
 		const content_height = parseInt(
-			parseFloat(computed_style.getPropertyValue('height'))
-				- parseFloat(computed_style.getPropertyValue('padding-top'))
-				- parseFloat(computed_style.getPropertyValue('padding-bottom'))
-				- parseFloat(computed_style.getPropertyValue('border-top-width'))
-				- parseFloat(computed_style.getPropertyValue('border-bottom-width'))
+			parseFloat(computed_style.height)
+				- parseFloat(computed_style.paddingTop) - parseFloat(computed_style.paddingBottom)
+				- parseFloat(computed_style.borderTopWidth) - parseFloat(computed_style.borderBottomWidth)
 		);
 
 		return {content_width, content_height};

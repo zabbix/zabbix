@@ -201,6 +201,7 @@ class CDashboardPage extends CBaseComponent {
 	 * @param {int|null}  min_rows  Min number of rows or null not to update the current one.
 	 */
 	_resizeGrid(min_rows = null) {
+		console.log('resoze');
 		if (min_rows === 0) {
 			this._grid_min_rows = null;
 		}
@@ -218,12 +219,12 @@ class CDashboardPage extends CBaseComponent {
 
 		if (this._is_edit_mode) {
 			let min_height = window.innerHeight - document.querySelector('.wrapper > footer').clientHeight
-				- this._dashboard_grid.getBoundingClientRect().top;
+				- this._dashboard_grid.getBoundingClientRect().y;
 
 			let element = this._dashboard_grid;
 
 			do {
-				min_height -= parseFloat(getComputedStyle(element).getPropertyValue('padding-bottom'));
+				min_height -= parseFloat(getComputedStyle(element).paddingBottom);
 				element = element.parentElement;
 			}
 			while (!element.classList.contains('wrapper'));
@@ -631,7 +632,7 @@ class CDashboardPage extends CBaseComponent {
 				scroll_to = wrapper_scroll_top_max;
 			}
 			else {
-				resolve();
+				return resolve();
 			}
 
 			const start_scroll = wrapper.scrollTop;
@@ -789,6 +790,8 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
+			this._resizeGrid(widget.getPosition());
+
 			this._dashboard_grid.appendChild(widget.getView());
 			this._activateWidget(widget);
 		}
@@ -1352,8 +1355,8 @@ class CDashboardPage extends CBaseComponent {
 				const widget_view = drag_widget.getView();
 				const widget_view_computed_style = getComputedStyle(widget_view);
 
-				drag_rel_x = parseFloat(widget_view_computed_style.getPropertyValue('left')) - e.pageX;
-				drag_rel_y = parseFloat(widget_view_computed_style.getPropertyValue('top')) - e.pageY
+				drag_rel_x = parseFloat(widget_view_computed_style.left) - e.pageX;
+				drag_rel_y = parseFloat(widget_view_computed_style.top) - e.pageY
 					- document.querySelector('.wrapper').scrollTop;
 
 				document.addEventListener('mouseup', this._widget_dragging_events.mouseUp, {passive: false});
@@ -1880,10 +1883,10 @@ class CDashboardPage extends CBaseComponent {
 				resize_rel_y = e.pageY + document.querySelector('.wrapper').scrollTop;
 
 				resize_dim = {
-					x: parseFloat(widget_view_computed_style.getPropertyValue('left')),
-					y: parseFloat(widget_view_computed_style.getPropertyValue('top')),
-					width: parseFloat(widget_view_computed_style.getPropertyValue('width')),
-					height: parseFloat(widget_view_computed_style.getPropertyValue('height'))
+					x: parseFloat(widget_view_computed_style.left),
+					y: parseFloat(widget_view_computed_style.top),
+					width: parseFloat(widget_view_computed_style.width),
+					height: parseFloat(widget_view_computed_style.height)
 				};
 
 				document.addEventListener('mouseup', this._widget_resizing_events.mouseUp, {passive: false});
