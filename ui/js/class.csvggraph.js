@@ -67,8 +67,11 @@ jQuery(function ($) {
 	function dropDocumentListeners(e, graph) {
 		let widgets_boxing = 0; // Number of widgets with active SBox.
 		ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
-			if (widget.getType() === 'svggraph' && widget._svg !== null && jQuery(widget._svg).data('options').boxing) {
-				widgets_boxing++;
+			if (widget.getType() === 'svggraph' && widget._svg !== null) {
+				const options = jQuery(widget._svg).data('options');
+				if (options !== undefined && options.boxing) {
+					widgets_boxing++;
+				}
 			}
 		});
 
