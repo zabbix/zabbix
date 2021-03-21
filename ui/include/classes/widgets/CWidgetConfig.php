@@ -83,7 +83,7 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> 'CWidget',
 			WIDGET_FAV_MAPS				=> 'CWidget',
 			WIDGET_GRAPH				=> 'CWidgetGraph',
-			WIDGET_GRAPH_PROTOTYPE		=> 'CWidget',
+			WIDGET_GRAPH_PROTOTYPE		=> 'CWidgetGraphPrototype',
 			WIDGET_HOST_AVAIL			=> 'CWidget',
 			WIDGET_MAP					=> 'CWidgetMap',
 			WIDGET_NAV_TREE				=> 'CWidgetNavTree',
@@ -148,7 +148,7 @@ class CWidgetConfig {
 
 		foreach (self::getKnownWidgetTypes($context) as $type => $name) {
 			$ret[$type] = [
-				'header' => $name,
+				'name' => $name,
 				'size' => $dimensions[$type],
 				'js_class' => $type_js_clases[$type],
 				'iterator' => self::isIterator($type),

@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -15,26 +14,13 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
-/**
- * @var CView $this
- */
+class CWidgetGraphPrototype extends CWidgetIterator {
 
-$output = [
-	'name' => $data['name'],
-	'body' => make_status_of_zbx()->toString()
-];
-
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+	_updateWidget(widget) {
+		widget.resize();
+	}
 }
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output);

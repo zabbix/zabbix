@@ -33,11 +33,12 @@ $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
-$this->addJsFile('class.dashboard.widget.iterator.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.clock.js');
 $this->addJsFile('class.widget.graph.js');
+$this->addJsFile('class.widget.graph-prototype.js');
 $this->addJsFile('class.widget.map.js');
 $this->addJsFile('class.widget.navtree.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
@@ -127,7 +128,9 @@ $widget = (new CWidget())
 						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
 						(new CList())
 							->addClass(ZBX_STYLE_BTN_SPLIT)
-							->addItem((new CButton('dashbrd-add-widget', _('Add')))->addClass(ZBX_STYLE_BTN_ALT))
+							->addItem((new CButton('dashbrd-add-widget',
+								[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
+							))->addClass(ZBX_STYLE_BTN_ALT))
 							->addItem(
 								(new CButton('dashbrd-add', '&#8203;'))
 									->addClass(ZBX_STYLE_BTN_ALT)

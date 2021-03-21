@@ -24,7 +24,7 @@
  */
 
 $output = [
-	'header' => $data['name']
+	'name' => $data['name']
 ];
 
 if ($data['is_resource_available']) {

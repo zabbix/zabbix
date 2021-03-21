@@ -232,7 +232,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 
 		// Pass results to view.
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'filter' => [
 				'hostids' => $fields['hostids'],
 				'problem' => $fields['problem'],

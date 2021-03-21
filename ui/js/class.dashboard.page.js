@@ -100,13 +100,15 @@ class CDashboardPage extends CBaseComponent {
 		this._is_unsaved = false;
 
 		if (this._is_edit_mode) {
-			this._initWidgetPlaceholder();
 			this._initWidgetDragging();
 			this._initWidgetResizing();
+			this._initWidgetPlaceholder();
 		}
 	}
 
 	_registerEvents() {
+		let last_num_reserved_header_lines = 0;
+
 		this._events = {
 			widgetActions: (e) => {
 				const widget = e.detail.target;
@@ -135,24 +137,34 @@ class CDashboardPage extends CBaseComponent {
 
 				const widget = e.detail.target;
 
-				if (widget.isEntered() || this._isInteracting()) {
-					return;
+				if (!widget.isEntered()) {
+					widget.enter();
+					this._leaveWidgets({except_widget: widget});
 				}
 
-				widget.enter();
-				this._leaveWidgets({except_widget: widget});
-				this._reserveHeaderLines();
+				if (widget.getPosition().y == 0) {
+					const num_lines = widget.getNumHeaderLines();
+
+					if (num_lines != last_num_reserved_header_lines) {
+						last_num_reserved_header_lines = num_lines;
+
+						this.fire(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, {num_lines});
+					}
+				}
 			},
 
 			widgetLeave: (e) => {
 				const widget = e.detail.target;
 
-				if (!widget.isEntered() || this._isInteracting()) {
-					return;
+				if (widget.isEntered()) {
+					widget.leave();
 				}
 
-				widget.leave();
-				this._reserveHeaderLines();
+				if (last_num_reserved_header_lines > 0) {
+					last_num_reserved_header_lines = 0;
+
+					this.fire(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, {num_lines: 0});
+				}
 			},
 
 			widgetCopy: (e) => {
@@ -201,7 +213,6 @@ class CDashboardPage extends CBaseComponent {
 	 * @param {int|null}  min_rows  Min number of rows or null not to update the current one.
 	 */
 	_resizeGrid(min_rows = null) {
-		console.log('resoze');
 		if (min_rows === 0) {
 			this._grid_min_rows = null;
 		}
@@ -386,8 +397,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_isPosEqual(pos_1, pos_2) {
-		return (pos_1.x === pos_2.x && pos_1.y === pos_2.y
-			&& pos_1.width === pos_2.width && pos_1.height === pos_2.height);
+		return (pos_1.x == pos_2.x && pos_1.y == pos_2.y && pos_1.width == pos_2.width && pos_1.height == pos_2.height);
 	}
 
 	getWidget(unique_id) {
@@ -418,40 +428,12 @@ class CDashboardPage extends CBaseComponent {
 		return false;
 	}
 
-	_reserveHeaderLines() {
-		let num_header_lines = 0;
-
-		for (const widget of this._widgets.keys()) {
-			if (!widget.isEntered()) {
-				continue;
-			}
-
-			if (widget.getPosition().y != 0) {
-				break;
-			}
-
-			num_header_lines = widget.getNumHeaderLines();
-		}
-
-		this.fire(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, {num_header_lines: num_header_lines});
-	}
-
 	_leaveWidgets({except_widget = null} = {}) {
 		for (const widget of this._widgets.keys()) {
 			if (widget !== except_widget) {
 				widget.leave();
 			}
 		}
-	}
-
-	_isInteracting() {
-		for (const widget of this._widgets.keys()) {
-			if (widget.isInteracting()) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	start() {
@@ -539,6 +521,8 @@ class CDashboardPage extends CBaseComponent {
 			return;
 		}
 
+		this._resizeGrid();
+
 		if (this._is_edit_mode) {
 			this._widget_placeholder.resize();
 		}
@@ -546,8 +530,6 @@ class CDashboardPage extends CBaseComponent {
 		for (const widget of this._widgets.keys()) {
 			widget.resize();
 		}
-
-		this._resizeGrid();
 	}
 
 	getState() {
@@ -565,11 +547,13 @@ class CDashboardPage extends CBaseComponent {
 			widget.setEditMode();
 		}
 
-		this._initWidgetPlaceholder();
 		this._initWidgetDragging();
 		this._initWidgetResizing();
+		this._initWidgetPlaceholder();
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
+			this._resizeGrid();
+
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();
 			this.resetWidgetPlaceholder();
@@ -705,7 +689,6 @@ class CDashboardPage extends CBaseComponent {
 			fields,
 			configuration,
 			defaults: this._widget_defaults[type],
-			parent: null,
 			widgetid,
 			pos,
 			is_new,
@@ -1316,6 +1299,8 @@ class CDashboardPage extends CBaseComponent {
 			if (!this._isPosEqual(pos, drag_pos)) {
 				if (allocatePos(drag_widget, pos)) {
 					drag_pos = pos;
+
+					drag_widget.setPosition(drag_pos, {is_managed: true});
 					showWidgetHelper(drag_pos);
 
 					this._resizeGrid(drag_pos.y + drag_pos.height + this._grid_pad_rows);
@@ -1343,6 +1328,7 @@ class CDashboardPage extends CBaseComponent {
 
 				e.preventDefault();
 
+				this._blockWidgetInteraction();
 				this._deactivateWidgetPlaceholder();
 
 				for (const [widget, data] of this._widgets) {
@@ -1389,6 +1375,7 @@ class CDashboardPage extends CBaseComponent {
 				document.removeEventListener('mouseup', this._widget_dragging_events.mouseUp);
 				document.removeEventListener('mousemove', this._widget_dragging_events.mouseMove);
 
+				this._unblockWidgetInteraction();
 				this.resetWidgetPlaceholder();
 			},
 
@@ -1808,13 +1795,6 @@ class CDashboardPage extends CBaseComponent {
 				dim.height = resize_dim.height + resize_dim.y - dim.y;
 			}
 
-			const widget_view = resize_widget.getView();
-
-			widget_view.style.left = `${dim.x}px`;
-			widget_view.style.top = `${dim.y}px`;
-			widget_view.style.width = `${dim.width}px`;
-			widget_view.style.height = `${dim.height}px`;
-
 			const resize_pos_width = Math.floor((dim.width + 0.49) / grid_cell_width);
 			const resize_pos_height = Math.floor((dim.height + 0.49) / this._cell_height);
 
@@ -1828,10 +1808,18 @@ class CDashboardPage extends CBaseComponent {
 			if (resize(target_resize_pos)) {
 				updateWidgetContainerPosition();
 
+				resize_widget.setPosition(resize_pos, {is_managed: true});
 				resize_widget.resize();
 
 				this._resizeGrid(resize_pos.y + resize_pos.height + this._grid_pad_rows);
 			}
+
+			const widget_view = resize_widget.getView();
+
+			widget_view.style.left = `${dim.x}px`;
+			widget_view.style.top = `${dim.y}px`;
+			widget_view.style.width = `${dim.width}px`;
+			widget_view.style.height = `${dim.height}px`;
 		};
 
 		this._widget_resizing_events = {
@@ -1861,6 +1849,7 @@ class CDashboardPage extends CBaseComponent {
 
 				e.preventDefault();
 
+				this._blockWidgetInteraction();
 				this._deactivateWidgetPlaceholder();
 
 				for (const [widget, data] of this._widgets) {
@@ -1902,8 +1891,8 @@ class CDashboardPage extends CBaseComponent {
 					cancelAnimationFrame(move_animation_frame);
 				}
 
-				resize_widget.setPosition(resize_pos);
 				resize_widget.setResizing(false);
+				resize_widget.setPosition(resize_pos);
 
 				const widget_view = resize_widget.getView();
 				const widget_view_container = widget_view.querySelector(`.${resize_widget.getCssClass('container')}`);
@@ -1933,6 +1922,7 @@ class CDashboardPage extends CBaseComponent {
 				document.removeEventListener('mouseup', this._widget_resizing_events.mouseUp);
 				document.removeEventListener('mousemove', this._widget_resizing_events.mouseMove);
 
+				this._unblockWidgetInteraction();
 				this.resetWidgetPlaceholder();
 			},
 

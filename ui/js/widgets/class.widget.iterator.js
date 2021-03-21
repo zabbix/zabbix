@@ -18,314 +18,459 @@
 **/
 
 
-//const WIDGET_ITERATOR_EVENT_PREVIOUS_PAGE_CLICK = 'iterator-previous-page-click';
-//const WIDGET_ITERATOR_EVENT_NEXT_PAGE_CLICK     = 'iterator-next-page-click';
+class CWidgetIterator extends CWidget {
 
-class CDashboardWidgetIterator extends CDashboardWidget {
+	_init() {
+		super._init();
 
-	constructor(config) {
-		super({
-			...config,
-			is_iterator: true,
-			css_classes: {
-				actions: 'dashbrd-grid-iterator-actions',
-				container: 'dashbrd-grid-iterator-container',
-				content: 'dashbrd-grid-iterator-content',
-				focus: 'dashbrd-grid-iterator-focus',
-				head: 'dashbrd-grid-iterator-head',
-				hidden_header: 'dashbrd-grid-iterator-hidden-header',
-				mask: 'dashbrd-grid-iterator-mask',
-				root: 'dashbrd-grid-iterator',
-			}
+		this._css_classes = {
+			...this._css_classes,
+			actions: 'dashbrd-grid-iterator-actions',
+			container: 'dashbrd-grid-iterator-container',
+			content: 'dashbrd-grid-iterator-content',
+			focus: 'dashbrd-grid-iterator-focus',
+			head: 'dashbrd-grid-iterator-head',
+			hidden_header: 'dashbrd-grid-iterator-hidden-header',
+			mask: 'dashbrd-grid-iterator-mask',
+			root: 'dashbrd-grid-iterator'
+		};
+
+		this._widgets = new Map();
+		this._placeholders = [];
+
+		this._grid_pos = [];
+
+		this._page = 1;
+		this._num_pages = 1;
+
+		this._widget_min_rows = 2;
+	}
+
+	_getUpdateRequestData() {
+		const request_data = super._getUpdateRequestData();
+
+		request_data.page = this._page;
+
+		return request_data;
+	}
+
+	_calculateGridPositions() {
+		this._grid_pos = [];
+
+		const num_columns = this._getColumnsField();
+		const num_rows = this._getRowsField();
+
+		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
+			const cell_column = index % num_columns;
+			const cell_row = Math.floor(index / num_columns);
+			const cell_width_min = Math.floor(this._pos.width / num_columns);
+			const cell_height_min = Math.floor(this._pos.height / num_rows);
+
+			const num_enlarged_columns = this._pos.width - cell_width_min * num_columns;
+			const num_enlarged_rows = this._pos.height - cell_height_min * num_rows;
+
+			this._grid_pos.push({
+				x: cell_column * cell_width_min + Math.min(cell_column, num_enlarged_columns),
+				y: cell_row * cell_height_min + Math.min(cell_row, num_enlarged_rows),
+				width: cell_width_min + (cell_column < num_enlarged_columns ? 1 : 0),
+				height: cell_height_min + (cell_row < num_enlarged_rows ? 1 : 0)
+			});
+		}
+	}
+
+	_createUniqueId() {
+		let unique_ids = [];
+
+		for (const widget of this._widgets.values()) {
+			unique_ids.push(widget.getUniqueId());
+		}
+
+		let index = 0;
+
+		while (unique_ids.includes(`${this._unique_id}-${index}`)) {
+			index++;
+		}
+
+		return `${this._unique_id}-${index}`;
+	}
+
+	_setViewMode(view_mode) {
+		super._setViewMode(view_mode);
+
+		for (const widget of this._widgets.values()) {
+			widget._setViewMode(view_mode);
+		}
+	}
+
+	_createWidget(data) {
+		return new (eval(data.defaults.js_class))({
+			type: data.type,
+			name: data.name,
+			view_mode: this._view_mode,
+			fields: data.fields,
+			configuration: data.configuration,
+			defaults: data.defaults,
+			widgetid: data.widgetid,
+			is_new: false,
+			rf_rate: 0,
+			dashboard: this._dashboard,
+			dashboard_page: this._dashboard_page,
+			cell_width: this._cell_width,
+			cell_height: this._cell_height,
+			is_editable: false,
+			is_edit_mode: false,
+			can_edit_dashboards: this._can_edit_dashboards,
+			time_period: this._time_period,
+			dynamic_hostid: this._dynamic_hostid,
+			unique_id: this._createUniqueId()
 		});
-
-		this.page = 1;
-		this.page_count = 1;
-		this.children = [];
-		this.update_pending = false;
-
-		this._min_rows = config.min_rows;
 	}
 
-	activate() {
-		super.activate();
-
-		for (const child of this.children) {
-			child.activate();
-		}
+	_truncateWidget(widget) {
+		widget._actions.style.display = 'none';
 	}
 
-	deactivate() {
-		super.deactivate();
+	_doActivate() {
+		super._doActivate();
 
-		for (const child of this.children) {
-			child.deactivate();
-		}
-	}
-
-	getViewMode() {
-		return this.view_mode;
-	}
-
-	setViewMode(view_mode) {
-		if (this.view_mode !== view_mode) {
-			this.view_mode = view_mode;
-
-			if (view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL) {
-				this.div.removeClass('iterator-double-header');
-			}
-
-			for (const child of this.children) {
-				child.setViewMode(view_mode);
-			}
-
-			this.div.toggleClass(this._css_classes.hidden_header, view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
-		}
-
-		return this;
-	}
-
-	/**
-	 * Clear and reset the state of the iterator.
-	 */
-	clear() {
-		for (const child of this.children) {
-			this._removeWidget(child);
-		}
-
-		this.content_body.empty();
-		this.children = [];
-
-		this.div.removeClass('iterator-alt-content');
-	}
-
-	/**
-	 * Focus specified top-level iterator.
-	 */
-	enter() {
-		this.div.addClass(this._css_classes.focus);
-
-		/** @type  {CDashboardWidget}  */
-		let child_hovered = null;
-
-		for (const child of this.children) {
-			if (child.div.is(':hover')) {
-				child_hovered = child;
-			}
-		}
-
-		if (child_hovered !== null) {
-			this.enterChild(child_hovered);
-		}
-	}
-
-	/**
-	 * Focus specified child widget of iterator.
-	 */
-	enterChild(child) {
-		child.enter();
-
-		if (this.div.hasClass(this._css_classes.hidden_header)) {
-			this.div.toggleClass('iterator-double-header', child.div.position().top == 0);
-		}
-	}
-
-	/**
-	 * Blur specified top-level iterator.
-	 */
-	leave() {
-		super.leave();
-
-		this.leaveChildrenExcept();
-		this.div.removeClass('iterator-double-header');
-	}
-
-	/**
-	 * Blur all child widgets of iterator, except the specified one.
-	 *
-	 * @param {object} except_child  Dashboard widget object.
-	 */
-	leaveChildrenExcept(except_child = null) {
-		for (const child of this.children) {
-			if (child != except_child) {
-				child.div.removeClass(child.getCssClass('focus'));
+		if (this._hasContents()) {
+			for (const widget of this._widgets.values()) {
+				this._activateWidget(widget);
 			}
 		}
 	}
 
-	getNumColumns() {
-		return this.fields['columns'] ? this.fields['columns'] : 2;
-	}
-
-	getNumRows() {
-		return this.fields['rows'] ? this.fields['rows'] : 1;
-	}
-
-	isTooSmall(pos) {
-		return pos.width < this.getNumColumns()
-			|| pos.height < this.getNumRows() * this._min_rows;
-	}
-
-	getTooSmallState() {
-		return this.div.hasClass('iterator-too-small');
-	}
-
-	setTooSmallState(enabled) {
-		this.div.toggleClass('iterator-too-small', enabled);
-
-		return this;
-	}
-
-	updatePager(page = this.page, page_count = this.page_count) {
-		this.page = page;
-		this.page_count = page_count;
-
-		$('.dashbrd-grid-iterator-pager-info', this.content_header)
-			.text(`${this.page} / ${this.page_count}`);
-
-		this.content_header.addClass('pager-visible');
-
-		const too_narrow = this.content_header.width() <
-			$('.dashbrd-grid-iterator-pager', this.content_header).outerWidth(true)
-			+ $('.dashbrd-grid-iterator-actions', this.content_header).outerWidth(true);
-
-		const is_pager_visible = this.page_count > 1 && !too_narrow && !this.getTooSmallState();
-
-		this.content_header.toggleClass('pager-visible', is_pager_visible);
-
-		return this;
-	}
-
-	/**
-	 * Update ready state of the iterator.
-	 *
-	 * @returns {boolean}  True, if status was updated.
-	 */
-	updateReady() {
-		let is_ready_updated = false;
-
-		if (this.children.length == 0) {
-			// Set empty iterator to ready state.
-
-			is_ready_updated = !this._is_ready;
-			this._is_ready = true;
+	_doDeactivate() {
+		if (this._hasContents()) {
+			for (const widget of this._widgets.values()) {
+				this._deactivateWidget(widget);
+			}
 		}
 
-		return is_ready_updated;
+		super._doDeactivate();
+	}
+
+	_activateWidget(widget) {
+		widget.activate();
+		widget
+			.on(WIDGET_EVENT_ENTER, this._events.widgetEnter)
+			.on(WIDGET_EVENT_LEAVE, this._events.widgetLeave);
+	}
+
+	_deactivateWidget(widget) {
+		widget.deactivate();
+		widget
+			.off(WIDGET_EVENT_ENTER, this._events.widgetEnter)
+			.off(WIDGET_EVENT_LEAVE, this._events.widgetLeave);
+	}
+
+	_addWidget(data) {
+		const widget = this._createWidget(data);
+
+		widget.start();
+
+		this._content_body.append(widget.getView());
+
+		this._truncateWidget(widget);
+
+		this._widgets.set(data.widgetid, widget);
+
+		return widget;
+	}
+
+	_deleteWidget(widgetid) {
+		const widget = this._widgets.get(widgetid);
+
+		this._content_body.removeChild(widget.getView());
+		this._deactivateWidget(widget);
+
+		widget.destroy();
+
+		this._widgets.delete(widgetid);
+	}
+
+	_deleteWidgets() {
+		for (const widgetid of this._widgets.keys()) {
+			this._deleteWidget(widgetid);
+		}
+	}
+
+	_hasAltContent() {
+		return this._target.classList.contains('iterator-alt-content');
+	}
+
+	_clearAltContent() {
+		if (this._hasAltContent()) {
+			this._target.classList.remove('iterator-alt-content');
+			this._content_body.innerHTML = '';
+		}
+	}
+
+	_setAltContent({body = null, messages = null} = {}) {
+		this._clearAltContent();
+
+		const alt_content = document.createElement('div');
+
+		if (messages !== null) {
+			alt_content.insertAdjacentHTML('afterbegin', messages);
+		}
+
+		if (body !== null) {
+			alt_content.insertAdjacentHTML('afterbegin', body);
+		}
+
+		this._content_body.appendChild(alt_content);
+		this._target.classList.add('iterator-alt-content');
+	}
+
+	_updateTooSmallState() {
+		const is_too_small = this._pos.width < this._getColumnsField()
+			|| this._pos.height < this._getRowsField() * this._widget_min_rows;
+
+		this._target.classList.toggle('iterator-too-small', is_too_small);
+	}
+
+	_isTooSmall() {
+		return this._target.classList.contains('iterator-too-small');
+	}
+
+	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
+		if (this._isTooSmall()) {
+			return;
+		}
+
+		if (this._isResizing()) {
+			if (this._hasContents() || this._hasAltContent()) {
+				return;
+			}
+		}
+
+		super._startUpdating(delay_sec, {do_update_once});
+	}
+
+	getNumHeaderLines() {
+		if (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+				&& this._target.classList.contains('iterator-double-header')) {
+			return 2;
+		}
+
+		return 1;
+	}
+
+	_setContents(response) {
+		this._setName(response.name);
+
+		let response_widgetids = [];
+
+		for (const data of response.children) {
+			response_widgetids.push(data.widgetid);
+		}
+
+		for (const widgetid of this._widgets.keys()) {
+			if (!response_widgetids.includes(widgetid)) {
+				this._deleteWidget(widgetid);
+			}
+		}
+
+		for (const [index, data] of Object.entries(response.children)) {
+			const widget = this._widgets.has(data.widgetid) ? this._widgets.get(data.widgetid) : this._addWidget(data);
+
+			this._alignToGrid(widget.getView(), index);
+			widget.setPosition(this._grid_pos[index], {is_managed: true});
+
+			if (widget.getState() === WIDGET_STATE_INACTIVE) {
+				this._activateWidget(widget);
+			}
+			else {
+				this._updateWidget(widget);
+			}
+		}
+
+		this._appendPlaceholders();
+
+		this._has_contents = true;
+	}
+
+	_clearContents() {
+		this._deleteWidgets();
+		this._deletePlaceholders();
+
+		this._has_contents = false;
+	}
+
+	_hasContents() {
+		return this._has_contents;
+	}
+
+	_processUpdateResponse(response) {
+		if (response.body !== undefined || response.messages !== undefined) {
+			this._clearContents();
+
+			this._setAltContent({
+				body: response.body ?? null,
+				messages: response.messages ?? null
+			});
+		}
+		else {
+			this._clearAltContent();
+			this._setContents(response);
+		}
+	}
+
+	setPosition(pos, {is_managed = false} = {}) {
+		const original_pos = {...this._pos};
+
+		super.setPosition(pos, {is_managed});
+
+		if (this._grid_pos.length > 0
+				&& this._pos.width == original_pos.width && this._pos.height == original_pos.height) {
+			return;
+		}
+
+		this._updateTooSmallState();
+
+		if (this._isTooSmall()) {
+			if (this._state === WIDGET_STATE_ACTIVE) {
+				this._stopUpdating();
+			}
+
+			return;
+		}
+
+		if (this._hasAltContent()) {
+			return;
+		}
+
+		this._calculateGridPositions();
+
+		if (!this._hasContents()) {
+			return;
+		}
+
+		const widgets = [...this._widgets.values()];
+
+		for (let index = 0; index < this._grid_pos.length; index++) {
+			if (index < this._widgets.size) {
+				const widget = widgets[index];
+				const widget_pos = widget.getPosition();
+
+				this._alignToGrid(widget.getView(), index);
+
+				if (widget_pos.width != this._grid_pos[index].width
+						|| widget_pos.height != this._grid_pos[index].height) {
+					widget.setPosition(this._grid_pos[index], {is_managed: true});
+					widget.resize();
+				}
+			}
+			else {
+				this._alignToGrid(this._placeholders[index - this._widgets.size], index);
+			}
+		}
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
+	}
+
+	resize() {
+		super.resize();
+
+		if (this._hasAltContent() || this._isTooSmall() || this._isResizing()) {
+			return;
+		}
+
+		for (const widget of this._widgets.values()) {
+			widget.resize();
+		}
+	}
+
+	_updateWidget(widget) {
+		widget._startUpdating();
+	}
+
+	_alignToGrid(element, grid_index) {
+		const pos = this._grid_pos[grid_index];
+
+		element.style.left = `${pos.x / this._pos.width * 100}%`;
+		element.style.top = `${pos.y * this._cell_height}px`;
+		element.style.width = `${pos.width / this._pos.width * 100}%`;
+		element.style.height =`${pos.height * this._cell_height}px`;
+	}
+
+	_deletePlaceholders() {
+		for (const placeholder of this._placeholders) {
+			placeholder.remove();
+		}
+
+		this._placeholders = [];
+	}
+
+	_appendPlaceholders() {
+		this._deletePlaceholders();
+
+		const placeholder = document.createElement('div');
+
+		placeholder.appendChild(document.createElement('div'));
+		placeholder.classList.add('dashbrd-grid-iterator-placeholder');
+
+		for (let index = this._widgets.size; index < this._grid_pos.length; index++) {
+			const placeholder_clone = placeholder.cloneNode(true);
+
+			this._content_body.appendChild(placeholder_clone);
+			this._alignToGrid(placeholder_clone, index);
+
+			this._placeholders.push(placeholder_clone);
+		}
+	}
+
+	_getColumnsField() {
+		return this._fields.columns !== undefined ? this._fields.columns : 2;
+	}
+
+	_getRowsField() {
+		return this._fields.rows !== undefined ? this._fields.rows : 1;
 	}
 
 	_makeView() {
 		super._makeView();
 
-		this.content_header.prepend(
-			$('<div>', {'class': 'dashbrd-grid-iterator-pager'})
-				.append($('<button>', {
-					'type': 'button',
-					'class': 'btn-iterator-page-previous',
-					'title': t('Previous page')
-				}))
-				.append($('<span>', {'class': 'dashbrd-grid-iterator-pager-info'}))
-				.append($('<button>', {
-					'type': 'button',
-					'class': 'btn-iterator-page-next',
-					'title': t('Next page')
-				}))
-		);
+		this._target.style.minWidth = null;
+		this._target.style.minHeight = null;
 
-		this.content_body.removeClass('no-padding');
+		const pager = document.createElement('div');
 
-		this.container.append(
-			$('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
-				.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
-		);
+		pager.classList.add('dashbrd-grid-iterator-pager');
 
-		this._addPlaceholders(this.getNumColumns() * this.getNumRows());
-		this.alignContents(this.pos);
-	}
+		const page_previous = document.createElement('button');
 
-	_addPlaceholders(count) {
-		$('.dashbrd-grid-iterator-placeholder', this.content_body).remove();
+		page_previous.type = 'button';
+		page_previous.title = t('Previous page');
+		page_previous.classList.add('btn-iterator-page-previous');
+		pager.appendChild(page_previous);
 
-		for (let index = 0; index < count; index++) {
-			this.content_body.append(
-				$('<div>', {'class': 'dashbrd-grid-iterator-placeholder'})
-					.append('<div>').on('mouseenter', () => {
-						// Set single-line header for the iterator.
-						this.div.removeClass('iterator-double-header');
-					})
-			);
-		}
-	}
+		const pager_info = document.createElement('span');
 
-	/**
-	 * @returns {boolean}  Returns true, if to small state.
-	 */
-	alignContents(pos) {
-		if (this.isTooSmall(pos)) {
-			this.setTooSmallState(true);
+		pager_info.classList.add('dashbrd-grid-iterator-pager-info');
+		pager.appendChild(pager_info);
 
-			return false;
-		}
+		const page_next = document.createElement('button');
 
-		if (this.getTooSmallState() && this.update_pending) {
-			this.setTooSmallState(false);
-			this.showPreloader();
+		page_next.type = 'button';
+		page_next.title = t('Next page');
+		page_next.classList.add('btn-iterator-page-next');
+		pager.appendChild(page_next);
 
-			return true;
-		}
+		this._content_header.prepend(pager);
 
-		this.setTooSmallState(false);
+		this._too_small = document.createElement('div');
+		this._too_small.classList.add('dashbrd-grid-iterator-too-small');
 
-		const $placeholders = this.content_body.find('.dashbrd-grid-iterator-placeholder');
-		const num_columns = this.getNumColumns();
-		const num_rows = this.getNumRows();
+		const too_small_content = document.createElement('div');
 
-		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
-			const cell_column = index % num_columns;
-			const cell_row = Math.floor(index / num_columns);
-			const cell_width_min = Math.floor(pos.width / num_columns);
-			const cell_height_min = Math.floor(pos.height / num_rows);
+		too_small_content.textContent = t('Widget is too small for the specified number of columns and rows.');
+		this._too_small.appendChild(too_small_content);
 
-			const num_enlarged_columns = pos.width - cell_width_min * num_columns;
-			const num_enlarged_rows = pos.height - cell_height_min * num_rows;
-
-			const x = cell_column * cell_width_min + Math.min(cell_column, num_enlarged_columns);
-			const y = cell_row * cell_height_min + Math.min(cell_row, num_enlarged_rows);
-			const width = cell_width_min + (cell_column < num_enlarged_columns ? 1 : 0);
-			const height = cell_height_min + (cell_row < num_enlarged_rows ? 1 : 0);
-
-			let css = {
-				left: `${x / pos.width * 100}%`,
-				top: `${y * this._cell_height}px`,
-				width: `${width / pos.width * 100}%`,
-				height: `${height * this._cell_height}px`
-			};
-
-			if (cell_column === (num_columns - 1)) {
-				// Setting right side for last column of widgets (fixes IE11 and Opera issues).
-				css = {
-					...css,
-					'width': 'auto',
-					'right': '0px'
-				};
-			}
-			else {
-				css = {
-					...css,
-					'width': `${Math.round(width / pos.width * 100 * 100) / 100}%`,
-					'right': 'auto'
-				};
-			}
-
-			if (index < this.children.length) {
-				this.children[index].div.css(css);
-			}
-			else {
-				$placeholders.eq(index - this.children.length).css(css);
-			}
-		}
-
-		return false;
+		this._container.appendChild(this._too_small);
 	}
 
 	_registerEvents() {
@@ -334,23 +479,40 @@ class CDashboardWidgetIterator extends CDashboardWidget {
 		this._events = {
 			...this._events,
 
-			previousPage: () => {
-				this.fire(WIDGET_ITERATOR_EVENT_PREVIOUS_PAGE_CLICK);
+			widgetEnter: (e) => {
+				const widget = e.detail.target;
+
+				if (!widget.isEntered()) {
+					widget.enter();
+
+					if (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
+						this._target.classList.toggle('iterator-double-header', widget.getPosition().y == 0);
+					}
+				}
 			},
 
-			nextPage: () => {
-				this.fire(WIDGET_ITERATOR_EVENT_NEXT_PAGE_CLICK);
-			}
-		}
+			widgetLeave: (e) => {
+				const widget = e.detail.target;
 
-//		this.$button_previous_page.on('click', this._events.previousPage);
-//		this.$button_next_page.on('click', this._events.nextPage);
+				if (widget.isEntered()) {
+					widget.leave();
+				}
+			},
+
+			iteratorEnter: (e) => {
+				if (e.target.closest('.dashbrd-grid-iterator-placeholder') !== null) {
+					this._target.classList.remove('iterator-double-header');
+				}
+			}
+		};
+
+		this._target.addEventListener('mousemove', this._events.iteratorEnter);
 	}
 
 	_unregisterEvents() {
-		super._unregisterEvents();
+		this._target.removeEventListener('mousemove', this._events.iteratorEnter);
 
-//		this.$button_previous_page.off('click', this._events.previousPage);
-//		this.$button_next_page.off('click', this._events.nextPage);
+		super._unregisterEvents();
 	}
+
 }

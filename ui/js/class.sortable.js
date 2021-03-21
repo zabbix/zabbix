@@ -871,7 +871,7 @@ class CSortable extends CBaseComponent {
 			this._list.removeEventListener('transitionrun', this._events.listRunTransition);
 			this._list.removeEventListener('transitionend', this._events.listEndTransition);
 
-			// Connected by mousedown event handler.
+			// Added by mousedown event handler.
 			window.removeEventListener('mousemove', this._events.windowMouseMove);
 			window.removeEventListener('mouseup', this._events.windowMouseUp);
 			window.removeEventListener('wheel', this._events.wheel);

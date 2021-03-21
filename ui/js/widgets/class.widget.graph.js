@@ -46,15 +46,19 @@ class CWidgetGraph extends CWidget {
 		super.resize();
 
 		if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
+			const graph_size = this._getGraphSize();
+
+			if (graph_size.width <= 0 || graph_size.height <= 0) {
+				return;
+			}
+
 			const image = document.getElementById('graph_' + this._unique_id);
 
-			if (image.src === '') {
+			if (!image.complete) {
 				image.addEventListener('load', () => this.resize(), {once: true});
 
 				return;
 			}
-
-			const graph_size = this._getGraphSize();
 
 			timeControl.objectList['graph_' + this._unique_id].objDims.width = graph_size.width;
 			timeControl.objectList['graph_' + this._unique_id].objDims.graphHeight = graph_size.height;

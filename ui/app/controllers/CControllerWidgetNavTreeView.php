@@ -470,7 +470,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'navtree' => $fields['navtree'],
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,

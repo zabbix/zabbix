@@ -27,7 +27,7 @@ if ($data['clock']['critical_error'] !== null) {
 	$item = (new CTableInfo())->setNoDataMessage($data['clock']['critical_error']);
 
 	$output = [
-		'header' => $data['name'],
+		'name' => $data['name'],
 		'body' => $item->toString()
 	];
 }
@@ -39,7 +39,7 @@ else {
 	}
 
 	$output = [
-		'header' => $data['name'],
+		'name' => $data['name'],
 		'body' => $item->toString(),
 		'clock_data' => [
 			'time' => $data['clock']['time'],

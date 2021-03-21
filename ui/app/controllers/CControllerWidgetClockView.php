@@ -36,7 +36,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 
 		$time = null;
-		$name = $this->getDefaultHeader();
+		$name = $this->getDefaultName();
 		$time_zone_offset = null;
 		$error = null;
 		$critical_error = null;

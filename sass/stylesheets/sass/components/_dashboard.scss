@@ -139,7 +139,7 @@
 .dashbrd-navigation {
 	display: flex;
 	margin-top: 10px;
-	padding-bottom: 4px;
+	padding-bottom: 2px;
 
 	&.is-scrollable {
 		.dashbrd-navigation-controls {
@@ -599,8 +599,8 @@
 
 		&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
 			.dashbrd-grid-iterator-head {
-				margin-top: -4rem;
-				height: 4rem;
+				margin-top: calc(-4rem - 8px);
+				height: calc(4rem + 8px);
 			}
 		}
 	}

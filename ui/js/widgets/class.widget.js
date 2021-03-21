@@ -44,7 +44,6 @@ class CWidget extends CBaseComponent {
 		fields,
 		configuration,
 		defaults,
-		parent = null,
 		widgetid = null,
 		pos = null,
 		is_new,
@@ -68,7 +67,6 @@ class CWidget extends CBaseComponent {
 		this._fields = fields;
 		this._configuration = configuration;
 		this._defaults = defaults;
-		this._parent = parent;
 		this._widgetid = widgetid;
 		this._pos = pos;
 		this._is_new = is_new;
@@ -260,9 +258,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	isInteracting() {
-		return (this._isResizing() || this._isDragging()
-			|| this._target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0
-		);
+		return this._target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0;
 	}
 
 	_isResizing() {
@@ -394,13 +390,15 @@ class CWidget extends CBaseComponent {
 		return this._pos;
 	}
 
-	setPosition(pos) {
+	setPosition(pos, {is_managed = false} = {}) {
 		this._pos = pos;
 
-		this._target.style.left = `${this._cell_width * this._pos.x}%`;
-		this._target.style.top = `${this._cell_height * this._pos.y}px`;
-		this._target.style.width = `${this._cell_width * this._pos.width}%`;
-		this._target.style.height = `${this._cell_height * this._pos.height}px`;
+		if (!is_managed) {
+			this._target.style.left = `${this._cell_width * this._pos.x}%`;
+			this._target.style.top = `${this._cell_height * this._pos.y}px`;
+			this._target.style.width = `${this._cell_width * this._pos.width}%`;
+			this._target.style.height = `${this._cell_height * this._pos.height}px`;
+		}
 	}
 
 	updateProperties({name, view_mode, fields, configuration}) {
@@ -420,9 +418,8 @@ class CWidget extends CBaseComponent {
 			this._setConfiguration(configuration);
 		}
 
-		this._show_preloader_asap = true;
-
 		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._show_preloader_asap = true;
 			this._startUpdating();
 		}
 	}
@@ -678,7 +675,7 @@ class CWidget extends CBaseComponent {
 
 	_processUpdateResponse(response) {
 		this._setContents({
-			name: response.header,
+			name: response.name,
 			body: response.body,
 			messages: response.messages,
 			info: response.info,
@@ -806,36 +803,34 @@ class CWidget extends CBaseComponent {
 		content_header_text.textContent = this._name !== '' ? this._name : this._defaults.name;
 		this._content_header.appendChild(content_header_text);
 
-		if (this._parent === null) {
-			this._actions = document.createElement('ul');
-			this._actions.classList.add(this._css_classes.actions);
+		this._actions = document.createElement('ul');
+		this._actions.classList.add(this._css_classes.actions);
 
-			if (this._is_editable) {
-				this._button_edit = document.createElement('button');
-				this._button_edit.type = 'button';
-				this._button_edit.title = t('Edit')
-				this._button_edit.classList.add('btn-widget-edit');
-
-				const li = document.createElement('li');
-
-				li.appendChild(this._button_edit);
-				this._actions.appendChild(li);
-			}
-
-			this._button_actions = document.createElement('button');
-			this._button_actions.type = 'button';
-			this._button_actions.title = t('Actions');
-			this._button_actions.setAttribute('aria-expanded', 'false');
-			this._button_actions.setAttribute('aria-haspopup', 'true');
-			this._button_actions.classList.add('btn-widget-action');
+		if (this._is_editable) {
+			this._button_edit = document.createElement('button');
+			this._button_edit.type = 'button';
+			this._button_edit.title = t('Edit')
+			this._button_edit.classList.add('btn-widget-edit');
 
 			const li = document.createElement('li');
 
-			li.appendChild(this._button_actions);
+			li.appendChild(this._button_edit);
 			this._actions.appendChild(li);
-
-			this._content_header.append(this._actions);
 		}
+
+		this._button_actions = document.createElement('button');
+		this._button_actions.type = 'button';
+		this._button_actions.title = t('Actions');
+		this._button_actions.setAttribute('aria-expanded', 'false');
+		this._button_actions.setAttribute('aria-haspopup', 'true');
+		this._button_actions.classList.add('btn-widget-action');
+
+		const li = document.createElement('li');
+
+		li.appendChild(this._button_actions);
+		this._actions.appendChild(li);
+
+		this._content_header.append(this._actions);
 
 		this._container.appendChild(this._content_header);
 
@@ -854,10 +849,8 @@ class CWidget extends CBaseComponent {
 		);
 		this._target.classList.toggle('new-widget', this._is_new);
 
-		if (this._parent === null) {
-			this._target.style.minWidth = `${this._cell_width}%`;
-			this._target.style.minHeight = `${this._cell_height}px`;
-		}
+		this._target.style.minWidth = `${this._cell_width}%`;
+		this._target.style.minHeight = `${this._cell_height}px`;
 	}
 
 	_registerEvents() {
@@ -882,7 +875,7 @@ class CWidget extends CBaseComponent {
 				}
 			},
 
-			enter: (e) => {
+			enter: () => {
 				this.fire(WIDGET_EVENT_ENTER);
 			},
 
@@ -893,33 +886,26 @@ class CWidget extends CBaseComponent {
 
 		this._button_actions.addEventListener('click', this._events.actions);
 
-		if (this._parent === null) {
-			if (this._is_editable) {
-				this._button_edit.addEventListener('click', this._events.edit);
-			}
+		if (this._is_editable) {
+			this._button_edit.addEventListener('click', this._events.edit);
 		}
-
+		this._target.addEventListener('mousemove', this._events.enter);
+		this._target.addEventListener('mouseleave', this._events.leave);
 		this._content_header.addEventListener('focusin', this._events.focusin);
 		this._content_header.addEventListener('focusout', this._events.focusout);
-		this._content_header.addEventListener('mousemove', this._events.enter);
-		this._content_body.addEventListener('mousemove', this._events.enter);
-		this._target.addEventListener('mouseleave', this._events.leave);
 	}
 
 	_unregisterEvents() {
 		this._button_actions.removeEventListener('click', this._events.actions);
 
-		if (this._parent === null) {
-			if (this._is_editable) {
-				this._button_edit.removeEventListener('click', this._events.edit);
-			}
+		if (this._is_editable) {
+			this._button_edit.removeEventListener('click', this._events.edit);
 		}
 
+		this._target.removeEventListener('mousemove', this._events.enter);
+		this._target.removeEventListener('mouseleave', this._events.leave);
 		this._content_header.removeEventListener('focusin', this._events.focusin);
 		this._content_header.removeEventListener('focusout', this._events.focusout);
-		this._content_header.removeEventListener('mousemove', this._events.enter);
-		this._content_body.removeEventListener('mousemove', this._events.enter);
-		this._target.removeEventListener('mouseleave', this._events.leave);
 
 		delete this._events;
 	}

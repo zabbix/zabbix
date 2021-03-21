@@ -39,7 +39,7 @@ if ($data['error'] !== null) {
 }
 
 $output = [
-	'header' => $data['name'],
+	'name' => $data['name'],
 	'body' => $item->toString(),
 	'navtree_data' => $item->getScriptData()
 ];

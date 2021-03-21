@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 class CControllerWidgetGraphView extends CControllerWidget {
 
 	public function __construct() {
@@ -49,7 +48,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$profileIdx = 'web.dashbrd.filter';
 		$profileIdx2 = $this->getInput('dashboardid', 0);
 		$is_resource_available = true;
-		$header_label = $this->getDefaultHeader();
+		$header_name = $this->getDefaultName();
 
 		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $fields['graphid']) {
 			$resource_type = SCREEN_RESOURCE_GRAPH;
@@ -256,7 +255,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 				$item = CMacrosResolverHelper::resolveItemNames([$item])[0];
 
-				$header_label = $is_template_dashboard
+				$header_name = $is_template_dashboard
 					? $item['name_expanded']
 					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
 			}
@@ -267,7 +266,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					? false
 					: (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid != 0);
 
-				$header_label = $prepend_host_name
+				$header_name = $prepend_host_name
 					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
 					: $graph['name'];
 
@@ -396,7 +395,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		}
 
 		$response = [
-			'name' => $this->getInput('name', $header_label),
+			'name' => $this->getInput('name', $header_name),
 			'is_resource_available' => $is_resource_available,
 			'widget' => [
 				'graph_url' => ($is_resource_available && $graph_url !== null) ? $graph_url->getUrl() : null,

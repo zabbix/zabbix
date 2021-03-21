@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+//sleep(1);
 
 class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetIterator {
 
@@ -149,24 +150,29 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 			$children[] = [
 				'widgetid' => (string) $graphid,
-				'type' => 'graph',
-				'header' => $name,
+				'type' => WIDGET_GRAPH,
+				'name' => $name,
 				'fields' => $child_fields,
-				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $this->getInput('view_mode'))
+				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $this->getInput('view_mode')),
+				'defaults' => CWidgetConfig::getDefaults($this->getContext())[WIDGET_GRAPH]
 			];
 		}
 
 		if ($this->hasInput('name')) {
-			$widget_header = $this->getInput('name');
+			$widget_name = $this->getInput('name');
 		}
 		else {
-			$widget_header = $is_template_dashboard
+			$widget_name = $is_template_dashboard
 				? $graph_prototype['name']
 				: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
 		}
 
+//error('dddd');
+//shuffle($children);
+//array_splice($children, 0, rand(0,2));
+
 		return [
-			'header' => $widget_header,
+			'name' => $widget_name,
 			'children' => $children,
 			'page' => $page,
 			'page_count' => $page_count
@@ -268,23 +274,24 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			$children[] = [
 				'widgetid' => (string) $itemid,
 				'type' => WIDGET_GRAPH,
-				'header' => $name,
+				'name' => $name,
 				'fields' => $child_fields,
-				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $this->getInput('view_mode'))
+				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $this->getInput('view_mode')),
+				'js_class' => CWidgetConfig::getTypeJSClasses()[WIDGET_GRAPH]
 			];
 		}
 
 		if ($this->hasInput('name')) {
-			$widget_header = $this->getInput('name');
+			$widget_name = $this->getInput('name');
 		}
 		else {
-			$widget_header = $is_template_dashboard
+			$widget_name = $is_template_dashboard
 				? $item_prototype['name']
 				: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name'];
 		}
 
 		return [
-			'header' => $widget_header,
+			'name' => $widget_name,
 			'children' => $children,
 			'page' => $page,
 			'page_count' => $page_count
@@ -298,7 +305,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	 */
 	protected function inaccessibleError() {
 		return [
-			'header' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'body' => (new CTableInfo())
 				->setNoDataMessage(_('No permissions to referred object or it does not exist!'))
 				->toString()

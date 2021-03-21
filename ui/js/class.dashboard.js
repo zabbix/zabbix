@@ -110,7 +110,7 @@ class CDashboard extends CBaseComponent {
 
 		this._async_timeout_ms = 50;
 
-		this._uniqid_index = 0;
+		this._unique_id_index = 0;
 
 		this._new_widget_dashboard_page = null;
 		this._new_widget_pos = null;
@@ -118,6 +118,7 @@ class CDashboard extends CBaseComponent {
 
 		this._warning_message_box = null;
 
+		this._reserve_header_lines = 0;
 		this._reserve_header_lines_timeout_id = null;
 		this._is_edit_widget_properties_cancel_subscribed = false;
 
@@ -810,8 +811,11 @@ class CDashboard extends CBaseComponent {
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste)
-			.on(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets)
-			.on(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.dashboardPageReserveHeaderLines);
+			.on(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets);
+
+		if (this._is_kiosk_mode) {
+			dashboard_page.on(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.dashboardPageReserveHeaderLines);
+		}
 	}
 
 	_deactivatePage(dashboard_page) {
@@ -825,8 +829,11 @@ class CDashboard extends CBaseComponent {
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste)
-			.off(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets)
-			.off(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.dashboardPageReserveHeaderLines);
+			.off(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets);
+
+		if (this._is_kiosk_mode) {
+			dashboard_page.off(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.dashboardPageReserveHeaderLines);
+		}
 	}
 
 	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
@@ -857,6 +864,8 @@ class CDashboard extends CBaseComponent {
 		}
 
 		this._activatePage(this._selected_dashboard_page);
+
+		this._resetHeaderLines();
 	}
 
 	_announceWidgets() {
@@ -977,7 +986,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_createUniqueId() {
-		return 'U' + (this._uniqid_index++).toString(36).toUpperCase().padStart(6, '0');
+		return 'U' + (this._unique_id_index++).toString(36).toUpperCase().padStart(6, '0');
 	}
 
 	storeWidgetDataCopy(data) {
@@ -1173,6 +1182,8 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_reserveHeaderLines(num_lines) {
+		this._reserve_header_lines = num_lines;
+
 		if (this._reserve_header_lines_timeout_id !== null) {
 			clearTimeout(this._reserve_header_lines_timeout_id);
 			this._reserve_header_lines_timeout_id = null;
@@ -1202,7 +1213,13 @@ class CDashboard extends CBaseComponent {
 				if (num_lines > 0) {
 					this._containers.grid.classList.add(`reserve-header-lines-${num_lines}`);
 				}
-			}, 5000);
+			}, 2000);
+		}
+	}
+
+	_keepSteadyHeaderLines() {
+		if (this._reserve_header_lines_timeout_id !== null) {
+			this._reserveHeaderLines(this._reserve_header_lines);
 		}
 	}
 
@@ -1217,6 +1234,7 @@ class CDashboard extends CBaseComponent {
 
 	_registerEvents() {
 		let grid_container_resize_timeout_id = null;
+		let grid_container_resize_first_time = true;
 
 		this._events = {
 			editWidgetPropertiesCancel: (e, data) => {
@@ -1328,7 +1346,11 @@ class CDashboard extends CBaseComponent {
 			},
 
 			dashboardPageReserveHeaderLines: (e) => {
-				this._reserveHeaderLines(e.detail.num_header_lines);
+				this._reserveHeaderLines(e.detail.num_lines);
+			},
+
+			mouseMove: () => {
+				this._keepSteadyHeaderLines();
 			},
 
 			timeSelectorRangeUpdate: (e, time_period) => {
@@ -1345,6 +1367,16 @@ class CDashboard extends CBaseComponent {
 			},
 
 			gridContainerResize: () => {
+				if (this._state !== DASHBOARD_STATE_ACTIVE) {
+					return;
+				}
+
+				if (grid_container_resize_first_time) {
+					grid_container_resize_first_time = false;
+
+					return;
+				}
+
 				if (grid_container_resize_timeout_id != null) {
 					clearTimeout(grid_container_resize_timeout_id);
 				}
@@ -1355,6 +1387,8 @@ class CDashboard extends CBaseComponent {
 				}, 200);
 			}
 		};
+
+		window.addEventListener('mousemove', this._events.mouseMove);
 
 		if (this._time_period !== null) {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);

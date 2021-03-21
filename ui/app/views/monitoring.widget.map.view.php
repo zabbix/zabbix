@@ -26,7 +26,7 @@
 $item = new CDashboardWidgetMap($data['sysmap_data'], $data['widget_settings']);
 
 $output = [
-	'header' => $data['name'],
+	'name' => $data['name'],
 	'body' => $item->toString(),
 	'sysmap_data' => $item->getScriptData()
 ];

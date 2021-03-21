@@ -730,7 +730,7 @@ footer {
 .dashbrd-navigation {
   display: flex;
   margin-top: 10px;
-  padding-bottom: 4px; }
+  padding-bottom: 2px; }
   .dashbrd-navigation.is-scrollable .dashbrd-navigation-controls button.dashbrd-previous-page, .dashbrd-navigation.is-scrollable .dashbrd-navigation-controls button.dashbrd-next-page {
     display: inline-block; }
 
@@ -1016,8 +1016,8 @@ footer {
       opacity: 1;
       transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out; }
     .dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
-      margin-top: -4rem;
-      height: 4rem; }
+      margin-top: calc(-4rem - 8px);
+      height: calc(4rem + 8px); }
   .dashbrd-grid-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-iterator-container {
     top: auto;
     bottom: 0; }

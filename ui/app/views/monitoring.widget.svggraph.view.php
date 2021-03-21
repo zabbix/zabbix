@@ -29,7 +29,7 @@ $output = [
 
 if (!$data['preview']) {
 	$output += [
-		'header' => $data['name'],
+		'name' => $data['name'],
 		'svg_options' => $data['svg_options']
 	];
 

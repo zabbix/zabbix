@@ -20,10 +20,6 @@
 
 class CWidgetPastePlaceholder extends CWidget {
 
-	_promiseUpdate() {
-		return Promise.reject();
-	}
-
 	_doStart() {
 		super._doStart();
 
@@ -33,6 +29,6 @@ class CWidgetPastePlaceholder extends CWidget {
 	}
 
 	_promiseUpdate() {
-		return Promise.resolve();
+		return Promise.reject();
 	}
 }

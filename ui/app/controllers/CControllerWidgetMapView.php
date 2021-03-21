@@ -79,7 +79,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 
 		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'sysmap_data' => $sysmap_data ?: [],
 			'widget_settings' => [
 				'current_sysmapid' => $sysmapid,
