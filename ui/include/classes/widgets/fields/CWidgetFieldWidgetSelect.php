@@ -73,7 +73,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 
 			ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
 				if (widget.getType() === "'.$this->search_by_value.'") {
-					filter_select.addOption({label: widget.getName(), value: widget.getFields().reference});
+					filter_select.addOption({label: widget.getHeaderName(), value: widget.getFields().reference});
 					if (widget.getFields().reference === "'.$this->getValue().'") {
 						filter_select.value = "'.$this->getValue().'";
 					}

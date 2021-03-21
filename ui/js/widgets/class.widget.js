@@ -220,7 +220,7 @@ class CWidget extends CBaseComponent {
 
 	_setName(name) {
 		this._name = name;
-		this._setHeaderName(name);
+		this._setHeaderName(this._name !== '' ? this._name : this._defaults.name);
 	}
 
 	_setHeaderName(name) {
@@ -251,6 +251,10 @@ class CWidget extends CBaseComponent {
 
 	getName() {
 		return this._name;
+	}
+
+	getHeaderName() {
+		return this._name !== '' ? this._name : this._defaults.name;
 	}
 
 	getView() {
