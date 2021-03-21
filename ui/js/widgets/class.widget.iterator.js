@@ -133,35 +133,24 @@ class CWidgetIterator extends CWidget {
 		widget._actions.style.display = 'none';
 	}
 
-	_doActivate() {
-		super._doActivate();
-
-		if (this._hasContents()) {
-			for (const widget of this._widgets.values()) {
-				this._activateWidget(widget);
-			}
-		}
-	}
-
 	_doDeactivate() {
 		if (this._hasContents()) {
 			for (const widget of this._widgets.values()) {
-				this._deactivateWidget(widget);
+				widget.deactivate();
+				this._removeWidgetEventListeners(widget);
 			}
 		}
 
 		super._doDeactivate();
 	}
 
-	_activateWidget(widget) {
-		widget.activate();
+	_addWidgetEventListeners(widget) {
 		widget
 			.on(WIDGET_EVENT_ENTER, this._events.widgetEnter)
 			.on(WIDGET_EVENT_LEAVE, this._events.widgetLeave);
 	}
 
-	_deactivateWidget(widget) {
-		widget.deactivate();
+	_removeWidgetEventListeners(widget) {
 		widget
 			.off(WIDGET_EVENT_ENTER, this._events.widgetEnter)
 			.off(WIDGET_EVENT_LEAVE, this._events.widgetLeave);
@@ -185,8 +174,8 @@ class CWidgetIterator extends CWidget {
 		const widget = this._widgets.get(widgetid);
 
 		this._content_body.removeChild(widget.getView());
-		this._deactivateWidget(widget);
 
+		this._removeWidgetEventListeners(widget);
 		widget.destroy();
 
 		this._widgets.delete(widgetid);
@@ -282,8 +271,9 @@ class CWidgetIterator extends CWidget {
 			this._alignToGrid(widget.getView(), index);
 			widget.setPosition(this._grid_pos[index], {is_managed: true});
 
-			if (widget.getState() === WIDGET_STATE_INACTIVE) {
-				this._activateWidget(widget);
+			if (widget.getState() !== WIDGET_STATE_ACTIVE) {
+				widget.activate();
+				this._addWidgetEventListeners(widget);
 			}
 			else {
 				this._updateWidget(widget);
@@ -332,10 +322,12 @@ class CWidgetIterator extends CWidget {
 			return;
 		}
 
+		const was_too_small = this._isTooSmall();
+
 		this._updateTooSmallState();
 
 		if (this._isTooSmall()) {
-			if (this._state === WIDGET_STATE_ACTIVE) {
+			if (this._state === WIDGET_STATE_ACTIVE && !was_too_small) {
 				this._stopUpdating();
 			}
 
@@ -349,7 +341,9 @@ class CWidgetIterator extends CWidget {
 		this._updateGridPositions();
 
 		if (!this._hasContents()) {
-			this._startUpdating();
+			if (this._state === WIDGET_STATE_ACTIVE && was_too_small) {
+				this._startUpdating();
+			}
 
 			return;
 		}

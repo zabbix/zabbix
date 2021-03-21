@@ -1175,12 +1175,6 @@ class CDashboard extends CBaseComponent {
 			});
 	}
 
-	_resize() {
-		for (const dashboard_page of this._dashboard_pages.keys()) {
-			dashboard_page.resize();
-		}
-	}
-
 	_reserveHeaderLines(num_lines) {
 		this._reserve_header_lines = num_lines;
 
@@ -1233,10 +1227,6 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_registerEvents() {
-		let grid_container_resize_timeout_id = null;
-		let grid_container_resize_first_time = true;
-		let grid_container_resize_width = null;
-
 		this._events = {
 			editWidgetPropertiesCancel: (e, data) => {
 				if (data.dialogueid === 'widget_properties') {
@@ -1350,7 +1340,7 @@ class CDashboard extends CBaseComponent {
 				this._reserveHeaderLines(e.detail.num_lines);
 			},
 
-			mouseMove: () => {
+			keepSteadyHeaderLines: () => {
 				this._keepSteadyHeaderLines();
 			},
 
@@ -1365,44 +1355,16 @@ class CDashboard extends CBaseComponent {
 				for (const dashboard_page of this._dashboard_pages.keys()) {
 					dashboard_page.setTimePeriod(this._time_period);
 				}
-			},
-
-			gridContainerResize: () => {
-				if (this._state !== DASHBOARD_STATE_ACTIVE) {
-					return;
-				}
-
-				if (grid_container_resize_first_time) {
-					grid_container_resize_first_time = false;
-					grid_container_resize_width = this._containers.grid.clientWidth;
-
-					return;
-				}
-
-				if (this._containers.grid.clientWidth == grid_container_resize_width) {
-					return;
-				}
-
-				grid_container_resize_width = this._containers.grid.clientWidth;
-
-				if (grid_container_resize_timeout_id != null) {
-					clearTimeout(grid_container_resize_timeout_id);
-				}
-
-				grid_container_resize_timeout_id = setTimeout(() => {
-					grid_container_resize_timeout_id = null;
-					this._resize();
-				}, 200);
 			}
 		};
 
-		window.addEventListener('mousemove', this._events.mouseMove);
+		if (this._is_kiosk_mode) {
+			window.addEventListener('mousemove', this._events.keepSteadyHeaderLines);
+		}
 
 		if (this._time_period !== null) {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
 		}
-
-		new ResizeObserver(this._events.gridContainerResize).observe(this._containers.grid);
 	}
 
 	_initTabs() {

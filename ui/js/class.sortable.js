@@ -876,7 +876,7 @@ class CSortable extends CBaseComponent {
 			window.removeEventListener('mouseup', this._events.windowMouseUp);
 			window.removeEventListener('wheel', this._events.wheel);
 
-			list_resize_observer.deactivate();
+			list_resize_observer.disconnect();
 		};
 	}
 }

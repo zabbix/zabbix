@@ -890,6 +890,7 @@ class CWidget extends CBaseComponent {
 		if (this._is_editable) {
 			this._button_edit.addEventListener('click', this._events.edit);
 		}
+
 		this._target.addEventListener('mousemove', this._events.enter);
 		this._target.addEventListener('mouseleave', this._events.leave);
 		this._content_header.addEventListener('focusin', this._events.focusin);
