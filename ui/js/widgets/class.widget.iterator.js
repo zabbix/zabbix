@@ -54,7 +54,7 @@ class CWidgetIterator extends CWidget {
 		return request_data;
 	}
 
-	_calculateGridPositions() {
+	_updateGridPositions() {
 		this._grid_pos = [];
 
 		const num_columns = this._getColumnsField();
@@ -341,7 +341,7 @@ class CWidgetIterator extends CWidget {
 			return;
 		}
 
-		this._calculateGridPositions();
+		this._updateGridPositions();
 
 		if (!this._hasContents()) {
 			return;
@@ -429,6 +429,16 @@ class CWidgetIterator extends CWidget {
 
 	_getRowsField() {
 		return this._fields.rows !== undefined ? this._fields.rows : 1;
+	}
+
+	_setFields(fields) {
+		super._setFields(fields);
+
+		this._clearContents();
+		this._clearAltContent();
+
+		this._updateTooSmallState();
+		this._updateGridPositions();
 	}
 
 	_makeView() {

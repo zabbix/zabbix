@@ -1235,6 +1235,7 @@ class CDashboard extends CBaseComponent {
 	_registerEvents() {
 		let grid_container_resize_timeout_id = null;
 		let grid_container_resize_first_time = true;
+		let grid_container_resize_width = null;
 
 		this._events = {
 			editWidgetPropertiesCancel: (e, data) => {
@@ -1373,9 +1374,16 @@ class CDashboard extends CBaseComponent {
 
 				if (grid_container_resize_first_time) {
 					grid_container_resize_first_time = false;
+					grid_container_resize_width = this._containers.grid.clientWidth;
 
 					return;
 				}
+
+				if (this._containers.grid.clientWidth == grid_container_resize_width) {
+					return;
+				}
+
+				grid_container_resize_width = this._containers.grid.clientWidth;
 
 				if (grid_container_resize_timeout_id != null) {
 					clearTimeout(grid_container_resize_timeout_id);
