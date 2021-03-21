@@ -25,8 +25,9 @@ class CWidgetClock extends CWidget {
 
 		this._time = null;
 		this._time_zone_offset = null;
-		this._has_contents = false;
 		this._interval_id = null;
+
+		this._has_contents = false;
 	}
 
 	_doActivate() {

@@ -46,8 +46,6 @@ jQuery(function ($) {
 		var graph = graph || e.data.graph,
 			data = graph.data('options');
 
-		dropDocumentListeners(e, graph);
-
 		if (data) {
 			if (!data.isHintBoxFrozen) {
 				graph.data('widget')._resumeUpdating();
@@ -57,6 +55,8 @@ jQuery(function ($) {
 			$('.svg-graph-selection-text', graph).text('');
 			graph.data('options').boxing = false;
 		}
+
+		dropDocumentListeners(e, graph);
 	}
 
 	/**
@@ -65,7 +65,14 @@ jQuery(function ($) {
 	 * - to avoid another call of destroySBox on 'mouseup' (in case if user has pressed ESC).
 	 */
 	function dropDocumentListeners(e, graph) {
-		if (e && 'keyCode' in e && e.keyCode == 27) {
+		let widgets_boxing = 0; // Number of widgets with active SBox.
+		ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
+			if (widget.getType() === 'svggraph' && widget._svg !== null && jQuery(widget._svg).data('options').boxing) {
+				widgets_boxing++;
+			}
+		});
+
+		if (widgets_boxing == 0 || (e && 'keyCode' in e && e.keyCode == 27)) {
 			$(document)
 				.off('selectstart', disableSelect)
 				.off('keydown', sBoxKeyboardInteraction)
@@ -607,7 +614,7 @@ jQuery(function ($) {
 	var methods = {
 		init: function(widget) {
 			this.each(function() {
-				widget._$svg
+				jQuery(widget._svg)
 					.data('options', {
 						dimX: widget._svg_options.dims.x,
 						dimY: widget._svg_options.dims.y,
@@ -626,36 +633,36 @@ jQuery(function ($) {
 					.css('user-select', 'none');
 
 				if (widget._svg_options.sbox) {
-					dropDocumentListeners(null, widget._$svg);
+					dropDocumentListeners(null, jQuery(widget._svg));
 				}
 			});
 		},
 		activate: function () {
 			const widget = $(this).data('widget');
 
-			widget._$svg
-				.on('mousemove', {graph: widget._$svg}, showHintbox)
+			jQuery(widget._svg)
+				.on('mousemove', {graph: jQuery(widget._svg)}, showHintbox)
 				.on('mouseleave', function() {
-					destroyHintbox(widget._$svg);
-					hideHelper(widget._$svg);
+					destroyHintbox(jQuery(widget._svg));
+					hideHelper(jQuery(widget._svg));
 				})
 				.on('selectstart', false);
 
 			if (widget._svg_options.sbox) {
-				widget._$svg
+				jQuery(widget._svg)
 					.on('dblclick', function() {
-						hintBox.hideHint(widget._$svg, true);
+						hintBox.hideHint(jQuery(widget._svg), true);
 						$.publish('timeselector.zoomout');
 						return false;
 					})
-					.on('mousedown', {graph: widget._$svg}, startSBoxDrag);
+					.on('mousedown', {graph: jQuery(widget._svg)}, startSBoxDrag);
 			}
 		},
 		deactivate: function (e) {
 			const widget = $(this).data('widget');
 
-			destroySBox(e, widget._$svg);
-			widget._$svg.off('mousemove mouseleave dblclick mousedown selectstart');
+			destroySBox(e, jQuery(widget._svg));
+			jQuery(widget._svg).off('mousemove mouseleave dblclick mousedown selectstart');
 		}
 	};
 

@@ -36,8 +36,6 @@ class CWidgetNavTree extends CWidget {
 		this._max_depth = 10;
 		this._last_id = null;
 
-		this._is_initial_load = false;
-
 		this._has_contents = false;
 	}
 

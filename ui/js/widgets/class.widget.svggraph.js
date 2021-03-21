@@ -23,7 +23,7 @@ class CWidgetSvgGraph extends CWidget {
 	_init() {
 		super._init();
 
-		this._is_svg_loaded = false;
+		this._has_contents = false;
 		this._svg_options = {};
 	}
 
@@ -66,7 +66,7 @@ class CWidgetSvgGraph extends CWidget {
 		super._processUpdateResponse(response);
 
 		if (response.svg_options !== undefined) {
-			this._is_svg_loaded = true;
+			this._has_contents = true;
 
 			this._initGraph({
 				sbox: false,
@@ -77,33 +77,34 @@ class CWidgetSvgGraph extends CWidget {
 			});
 		}
 		else {
-			this._is_svg_loaded = false;
+			this._has_contents = false;
 		}
 	}
 
 	_initGraph(options) {
 		this._svg_options = options;
-		this._$svg = jQuery('svg', jQuery(this._content_body));
-		this._$svg.svggraph(this);
+		this._svg = this._content_body.querySelector('svg');
+		jQuery(this._svg).svggraph(this);
+
 		this._activateGraph();
 	}
 
 	_activateGraph() {
-		if (this._is_svg_loaded) {
-			this._$svg.svggraph('activate');
+		if (this._has_contents) {
+			jQuery(this._svg).svggraph('activate');
 		}
 	}
 
 	_deactivateGraph() {
-		if (this._is_svg_loaded) {
-			this._$svg.svggraph('deactivate');
+		if (this._has_contents) {
+			jQuery(this._svg).svggraph('deactivate');
 		}
 	}
 
 	_destroyGraph() {
-		if (this._is_svg_loaded) {
+		if (this._has_contents) {
 			this._deactivateGraph();
-			this._$svg.remove();
+			this._svg.remove();
 		}
 	}
 }
