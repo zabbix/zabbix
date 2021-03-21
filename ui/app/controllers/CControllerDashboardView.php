@@ -100,9 +100,8 @@ class CControllerDashboardView extends CController {
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
-			'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages'])
-				? getTimeSelectorPeriod($time_selector_options)
-				: null,
+			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
+			'time_period' => getTimeSelectorPeriod($time_selector_options),
 			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
 		];
 

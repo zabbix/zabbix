@@ -25,7 +25,7 @@
 ?>
 
 <script>
-	function initializeView(dashboard, widget_defaults, time_period, dynamic, web_layout_mode) {
+	function initializeView(dashboard, widget_defaults, has_time_selector, time_period, dynamic, web_layout_mode) {
 
 		const init = () => {
 			timeControl.refreshPage = false;
@@ -314,7 +314,7 @@
 					curl.setArgument('dashboardid', dashboard.dashboardid);
 				}
 
-				if (time_period !== null) {
+				if (has_time_selector) {
 					curl.setArgument('from', time_period.from);
 					curl.setArgument('to', time_period.to);
 				}

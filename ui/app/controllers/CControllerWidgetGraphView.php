@@ -38,7 +38,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
-
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
 		$width = (int) $this->getInput('content_width', 100);

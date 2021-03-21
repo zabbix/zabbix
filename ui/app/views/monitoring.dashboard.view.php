@@ -159,12 +159,12 @@ $widget = (new CWidget())
 			->addClass(ZBX_STYLE_SELECTED)
 	])));
 
-if ($data['time_selector'] !== null) {
+if ($data['has_time_selector']) {
 	$widget->addItem(
 		(new CFilter(new CUrl()))
-			->setProfile($data['time_selector']['profileIdx'], $data['time_selector']['profileIdx2'])
+			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['time_selector']['from'], $data['time_selector']['to'],
+			->addTimeSelector($data['time_period']['from'], $data['time_period']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 	);
@@ -214,7 +214,8 @@ $widget
 	'initializeView('.
 		json_encode($data['dashboard']).','.
 		json_encode($data['widget_defaults']).','.
-		json_encode($data['time_selector']).','.
+		json_encode($data['has_time_selector']).','.
+		json_encode($data['time_period']).','.
 		json_encode($data['dynamic']).','.
 		json_encode($web_layout_mode).
 	');'
