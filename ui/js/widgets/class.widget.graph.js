@@ -96,7 +96,10 @@ class CWidgetGraph extends CWidget {
 			this._stopUpdating(true);
 		}
 
-		this._is_graph_mode = false;
+		if (this._is_graph_mode) {
+			this._is_graph_mode = false;
+			this._deactivateGraph();
+		}
 
 		super.setDynamicHost(dynamic_hostid);
 	}
