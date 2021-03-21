@@ -63,18 +63,21 @@ class CControllerFavouriteDelete extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$data['main_block'] =
-				'if (jQuery(\'#addrm_fav\').length) {'."\n".
-					'document.getElementById(\'addrm_fav\').title = \''._('Add to favourites').'\';'."\n".
-					'document.getElementById(\'addrm_fav\').onclick = function() { add2favorites(\''.$object.'\', \''.$objectid.'\'); }'."\n".
-					'switchElementClass(\'addrm_fav\', \'btn-remove-fav\', \'btn-add-fav\');'."\n".
-				'}'."\n".
-				'else {'."\n".
-					'var $widgets = ZABBIX.Dashboard.getWidgetsBy("type", "'.$widgetids[$object].'");'."\n".
-					'jQuery.each($widgets, function(index, widget) {'."\n".
-						'ZABBIX.Dashboard.refreshWidget(widget["widgetid"]);'."\n".
-					'});'."\n".
-				'}';
+
+			$data['main_block'] = '
+				var addrm_fav = document.getElementById("addrm_fav");
+				if (addrm_fav !== null) {
+					addrm_fav.title = "'._('Add to favourites').'";
+					addrm_fav.addEventListener("onclick", () => {add2favorites("'.$object.'", "'.$objectid.'");});
+				}
+				else {
+					ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
+						if (widget.getType() === "'.$widgetids[$object].'") {
+							widget._startUpdating();
+						}
+					});
+				}
+				';
 		}
 		else {
 			$data['main_block'] = '';
