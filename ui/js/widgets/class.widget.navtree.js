@@ -48,11 +48,11 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	_doDeactivate() {
-		super._doDeactivate();
-
 		if (this._has_contents) {
 			this._unregisterContentEvents();
 		}
+
+		super._doDeactivate();
 	}
 
 	announceWidgets(widgets) {
@@ -278,9 +278,9 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	_unregisterEvents() {
-		super._unregisterEvents();
-
 		this.off(WIDGET_EVENT_COPY, this._events.copy);
+
+		super._unregisterEvents();
 	}
 
 	_registerContentEvents() {
