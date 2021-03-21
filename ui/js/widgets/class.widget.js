@@ -220,7 +220,10 @@ class CWidget extends CBaseComponent {
 
 	_setName(name) {
 		this._name = name;
+		this._setHeaderName(name);
+	}
 
+	_setHeaderName(name) {
 		if (this._state !== WIDGET_STATE_INITIAL) {
 			this._content_header.querySelector('h4').textContent = name;
 		}
@@ -703,7 +706,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	_setContents({name, body, messages, info, debug}) {
-		this._setName(name);
+		this._setHeaderName(name);
 
 		this._content_body.innerHTML = '';
 
