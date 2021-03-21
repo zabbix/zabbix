@@ -418,8 +418,9 @@ class CWidget extends CBaseComponent {
 			this._setConfiguration(configuration);
 		}
 
+		this._show_preloader_asap = true;
+
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._show_preloader_asap = true;
 			this._startUpdating();
 		}
 	}

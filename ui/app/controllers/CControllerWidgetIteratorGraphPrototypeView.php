@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-//sleep(1);
 
 class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetIterator {
 
@@ -166,10 +165,6 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				? $graph_prototype['name']
 				: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
 		}
-
-//error('dddd');
-//shuffle($children);
-//array_splice($children, 0, rand(0,2));
 
 		return [
 			'name' => $widget_name,
