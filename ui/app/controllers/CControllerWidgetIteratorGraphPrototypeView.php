@@ -272,7 +272,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				'name' => $name,
 				'fields' => $child_fields,
 				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $this->getInput('view_mode')),
-				'js_class' => CWidgetConfig::getTypeJSClasses()[WIDGET_GRAPH]
+				'defaults' => CWidgetConfig::getDefaults($this->getContext())[WIDGET_GRAPH]
 			];
 		}
 
