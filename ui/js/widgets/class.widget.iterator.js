@@ -250,7 +250,7 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_setContents(response) {
-		this._setName(response.name);
+		this._setHeaderName(response.name);
 		this._updatePager(response.page, response.page_count);
 
 		let response_widgetids = [];
