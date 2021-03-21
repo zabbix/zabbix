@@ -95,10 +95,13 @@ class CMenuPopupHelper {
 				'sysmapid' => $sysmapid,
 				'selementid' => $selement['selementid_orig'],
 				'elementtype' => $selement['elementtype'],
-				'urls' => $selement['urls'],
-				'unique_id' => $selement['unique_id']
+				'urls' => $selement['urls']
 			]
 		];
+
+		if (array_key_exists('unique_id', $selement)) {
+			$data['data']['unique_id'] = $selement['unique_id'];
+		}
 
 		if ($severity_min != TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 			$data['data']['severity_min'] = $severity_min;

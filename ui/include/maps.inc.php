@@ -83,7 +83,9 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 			continue;
 		}
 
-		$elem['unique_id'] = array_key_exists('unique_id', $options) ? $options['unique_id'] : null;
+		if (array_key_exists('unique_id', $options)) {
+			$elem['unique_id'] = $options['unique_id'];
+		}
 
 		$hostid = ($elem['elementtype_orig'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
 				&& $elem['elementsubtype_orig'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)

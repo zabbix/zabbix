@@ -113,7 +113,8 @@ class CMapHelper {
 				'width' => $map['width'],
 				'height' => $map['height']
 			],
-			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'].'&unique_id='.$options['unique_id'],
+			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min']
+				.(array_key_exists('unique_id', $options) ? '&unique_id='.$options['unique_id'] : ''),
 			'background' => $map['backgroundid'],
 			'label_location' => $map['label_location'],
 			'elements' => array_values($map['selements']),
