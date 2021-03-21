@@ -963,36 +963,6 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 	return getMenuPopupScriptItems(tree, trigger_elmnt);
 }
 
-/**
- * Create menu for dashboard widget area selector.
- *
- * @param {object} area_selected  Area in which new widget will be created.
- *
- * @returns {array}
- */
-function getDashboardWidgetActionMenu(area_selected) {
-	return [{
-		items: [{
-			label: t('Add widget'),
-			clickCallback: function() {
-				ZABBIX.Dashboard.addNewWidget(null, area_selected);
-			}
-		}, {
-			label: t('Paste widget'),
-			clickCallback: function() {
-				var widget_dims = {
-					x: area_selected.x,
-					y: area_selected.y,
-					width: area_selected.width,
-					height: area_selected.height
-				};
-
-				ZABBIX.Dashboard.pasteWidget(null, widget_dims);
-			}
-		}]
-	}];
-}
-
 jQuery(function($) {
 
 	/**

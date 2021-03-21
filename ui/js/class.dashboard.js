@@ -334,7 +334,7 @@ class CDashboard extends CBaseComponent {
 
 		const busy_condition = this._createBusyCondition();
 
-		return new Promise((resolve) => resolve(ZABBIX.Dashboard._promiseApplyProperties(properties)))
+		return new Promise((resolve) => resolve(this._promiseApplyProperties(properties)))
 			.then(() => {
 				overlayDialogueDestroy(overlay.dialogueid);
 
@@ -402,7 +402,7 @@ class CDashboard extends CBaseComponent {
 		const busy_condition = this._createBusyCondition();
 
 		return Promise.resolve()
-			.then(() => ZABBIX.Dashboard._promiseApplyDashboardPageProperties(properties, overlay.data))
+			.then(() => this._promiseApplyDashboardPageProperties(properties, overlay.data))
 			.then(() => {
 				overlayDialogueDestroy(overlay.dialogueid);
 			})
@@ -1300,7 +1300,7 @@ class CDashboard extends CBaseComponent {
 
 			dashboardPageWidgetActions: (e) => {
 				const menu = e.detail.widget.getActionsMenu({
-					can_paste_widget: ZABBIX.Dashboard.getStoredWidgetDataCopy() !== null
+					can_paste_widget: this.getStoredWidgetDataCopy() !== null
 				});
 
 				jQuery(e.detail.mouse_event.target).menuPopup(menu, new jQuery.Event(e.detail.mouse_event));
@@ -1494,109 +1494,11 @@ class CDashboard extends CBaseComponent {
 		this._buttons.next_page.addEventListener('click', events.nextPageClick);
 	}
 
-	// =================================================================================================================
-	// =================================================================================================================
-	// =================================================================================================================
-	// TODO: Temporary solution.
-
 	getSelectedDashboardPage() {
 		return this._selected_dashboard_page;
 	}
 
-	getWidgets() {
-		return this.getSelectedPage().getWidgets();
-	}
-
-	getOptions() {
-		return this._options;
-	}
-
-	deactivate() {
-		return this.getSelectedPage().activate();
-	}
-
-	getCopiedWidget() {
-		return this.getSelectedPage().getCopiedWidget();
-	}
-
-	updateDynamicHost(hostid) {
-		return this.getSelectedPage().updateDynamicHost(hostid);
-	}
-
-	setWidgetDefaults(defaults) {
-		this._widget_defaults = defaults;
-	}
-
-	addWidgets(widgets) {
-		return this.getSelectedPage().addWidgets(widgets);
-	}
-
-	setWidgetRefreshRate(widgetid, rf_rate) {
-		return this.getSelectedPage().setWidgetRefreshRate(widgetid, rf_rate);
-	}
-
-	refreshWidget(widgetid) {
-		return this.getSelectedPage().refreshWidget(widgetid);
-	}
-
-	pauseWidgetRefresh(widgetid) {
-		return this.getSelectedPage().pauseWidgetRefresh(widgetid);
-	}
-
-	unpauseWidgetRefresh(widgetid) {
-		return this.getSelectedPage().unpauseWidgetRefresh(widgetid);
-	}
-
-	setWidgetStorageValue(uniqueid, field, value) {
-		return this.getSelectedPage().setWidgetStorageValue(uniqueid, field, value);
-	}
-
-	editDashboard() {
-		return this.getSelectedPage().editDashboard();
-	}
-
-	isDashboardUpdated() {
-		// => isUpdated()
-	}
-
-	saveDashboard() {
-		return this.getSelectedPage().saveDashboard();
-	}
-
-	copyWidget(widget) {
-		return this.getSelectedPage().copyWidget(widget);
-	}
-
-
-	deleteWidget(widget) {
-		return this.getSelectedPage().deleteWidget(widget);
-	}
-
-	getWidgetsBy(key, value) {
-		return this.getSelectedPage().getWidgetsBy(key, value);
-	}
-
-	registerDataExchange(obj) {
-		return this.getSelectedPage().registerDataExchange(obj);
-	}
-
-	widgetDataShare(widget, data_name, data) {
-		return this._selected_page.widgetDataShare(widget, data_name, data);
-	}
-
-	callWidgetDataShare() {
-		return this.getSelectedPage().callWidgetDataShare();
-	}
-
-	makeReference() {
-		return this.getSelectedPage().makeReference();
-	}
-
 	isEditMode() {
 		return this._is_edit_mode;
-	}
-
-	addAction(hook_name, function_to_call, uniqueid = null, options = {}) {
-		return this.getSelectedPage().addAction(hook_name, function_to_call, uniqueid, options);
 	}
 }

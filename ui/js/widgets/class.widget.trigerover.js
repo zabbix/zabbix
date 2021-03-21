@@ -27,7 +27,13 @@ class CWidgetTrigerOver extends CWidget {
 			...this._events,
 
 			acknowledgeCreated: (e, response, overlay) => {
-				refreshWidgetOnAcknowledgeCreate('trigover', response, overlay);
+				clearMessages();
+
+				addMessage(makeMessageBox('good', [], response.message, true, false));
+
+				if (this._state === WIDGET_STATE_ACTIVE) {
+					this._startUpdating();
+				}
 			}
 		}
 
