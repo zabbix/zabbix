@@ -273,14 +273,18 @@ class CWidgetNavTree extends CWidget {
 				}
 			}
 		}
+	}
+
+	_activateEvents() {
+		super._activateEvents();
 
 		this.on(WIDGET_EVENT_COPY, this._events.copy);
 	}
 
-	_unregisterEvents() {
-		this.off(WIDGET_EVENT_COPY, this._events.copy);
+	_deactivateEvents() {
+		super._deactivateEvents();
 
-		super._unregisterEvents();
+		this.off(WIDGET_EVENT_COPY, this._events.copy);
 	}
 
 	_registerContentEvents() {

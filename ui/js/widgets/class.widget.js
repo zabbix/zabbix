@@ -88,6 +88,7 @@ class CWidget extends CBaseComponent {
 		this._unique_id = unique_id;
 
 		this._init();
+		this._registerEvents();
 	}
 
 	_init() {
@@ -149,7 +150,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	_doActivate() {
-		this._registerEvents();
+		this._activateEvents();
 		this._startUpdating();
 	}
 
@@ -168,7 +169,7 @@ class CWidget extends CBaseComponent {
 			this._target.classList.remove('new-widget');
 		}
 
-		this._unregisterEvents();
+		this._deactivateEvents();
 		this._stopUpdating();
 	}
 
@@ -862,8 +863,6 @@ class CWidget extends CBaseComponent {
 	}
 
 	_registerEvents() {
-		let is_mousemove_required = false;
-
 		this._events = {
 			actions: (e) => {
 				this.fire(WIDGET_EVENT_ACTIONS, {mouse_event: e});
@@ -891,7 +890,9 @@ class CWidget extends CBaseComponent {
 				this.fire(WIDGET_EVENT_LEAVE);
 			}
 		};
+	}
 
+	_activateEvents() {
 		this._button_actions.addEventListener('click', this._events.actions);
 
 		if (this._is_editable) {
@@ -904,7 +905,7 @@ class CWidget extends CBaseComponent {
 		this._content_header.addEventListener('focusout', this._events.focusout);
 	}
 
-	_unregisterEvents() {
+	_deactivateEvents() {
 		this._button_actions.removeEventListener('click', this._events.actions);
 
 		if (this._is_editable) {
@@ -915,7 +916,5 @@ class CWidget extends CBaseComponent {
 		this._target.removeEventListener('mouseleave', this._events.leave);
 		this._content_header.removeEventListener('focusin', this._events.focusin);
 		this._content_header.removeEventListener('focusout', this._events.focusout);
-
-		delete this._events;
 	}
 }

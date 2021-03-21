@@ -566,17 +566,21 @@ class CWidgetIterator extends CWidget {
 				}
 			}
 		};
+	}
+
+	_activateEvents() {
+		super._activateEvents();
 
 		this._target.addEventListener('mousemove', this._events.iteratorEnter);
 		this._button_previous_page.addEventListener('click', this._events.previousPageClick);
 		this._button_next_page.addEventListener('click', this._events.nextPageClick);
 	}
 
-	_unregisterEvents() {
+	_deactivateEvents() {
+		super._deactivateEvents();
+
 		this._target.removeEventListener('mousemove', this._events.iteratorEnter);
 		this._button_previous_page.removeEventListener('click', this._events.previousPageClick);
 		this._button_next_page.removeEventListener('click', this._events.nextPageClick);
-
-		super._unregisterEvents();
 	}
 }

@@ -36,13 +36,17 @@ class CWidgetTrigerOver extends CWidget {
 				}
 			}
 		}
+	}
+
+	_activateEvents() {
+		super._activateEvents();
 
 		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	_unregisterEvents() {
-		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
+	_deactivateEvents() {
+		super._deactivateEvents();
 
-		super._unregisterEvents();
+		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 }
