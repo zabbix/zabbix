@@ -36,12 +36,15 @@ class CWidgetIterator extends CWidget {
 		};
 
 		this._widgets = new Map();
+
 		this._placeholders = [];
 
 		this._grid_pos = [];
 
+		this._has_contents = false;
+
 		this._page = 1;
-		this._num_pages = 1;
+		this._page_count = 1;
 
 		this._widget_min_rows = 2;
 	}
@@ -259,6 +262,7 @@ class CWidgetIterator extends CWidget {
 
 	_setContents(response) {
 		this._setName(response.name);
+		this._updatePager(response.page, response.page_count);
 
 		let response_widgetids = [];
 
@@ -294,6 +298,7 @@ class CWidgetIterator extends CWidget {
 	_clearContents() {
 		this._deleteWidgets();
 		this._deletePlaceholders();
+		this._updatePager(1, 1);
 
 		this._has_contents = false;
 	}
@@ -344,6 +349,8 @@ class CWidgetIterator extends CWidget {
 		this._updateGridPositions();
 
 		if (!this._hasContents()) {
+			this._startUpdating();
+
 			return;
 		}
 
@@ -374,6 +381,10 @@ class CWidgetIterator extends CWidget {
 
 	resize() {
 		super.resize();
+
+		if (this._hasContents() && !this._isTooSmall()) {
+			this._updatePager();
+		}
 
 		if (this._hasAltContent() || this._isTooSmall() || this._isResizing()) {
 			return;
@@ -432,13 +443,49 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_setFields(fields) {
+		const num_columns = this._getColumnsField();
+		const num_rows = this._getRowsField();
+
 		super._setFields(fields);
 
-		this._clearContents();
-		this._clearAltContent();
+		if (num_columns != this._getColumnsField() || num_rows != this._getRowsField()) {
+			this._clearContents();
+			this._clearAltContent();
 
-		this._updateTooSmallState();
-		this._updateGridPositions();
+			this._updateTooSmallState();
+
+			if (this._isTooSmall()) {
+				if (this._state === WIDGET_STATE_ACTIVE) {
+					this._stopUpdating();
+				}
+			}
+
+			this._updateGridPositions();
+		}
+	}
+
+	_updatePager(page = this._page, page_count = this._page_count) {
+		this._page = page;
+		this._page_count = page_count;
+
+		if (this._page_count == 1) {
+			this._content_header.classList.remove('pager-visible');
+
+			return;
+		}
+
+		this._pager_stats.textContent = `${this._page} / ${this._page_count}`;
+
+		this._content_header.classList.add('pager-visible');
+
+		const width_available = this._content_header.clientWidth
+			- this._pager.offsetWidth - this._actions.offsetWidth
+			- parseFloat(getComputedStyle(this._content_header).paddingLeft)
+			- parseFloat(getComputedStyle(this._content_header).paddingRight)
+			- parseFloat(getComputedStyle(this._pager).marginLeft)
+			- parseFloat(getComputedStyle(this._pager).marginRight);
+
+		this._content_header.classList.toggle('pager-visible', width_available >= 0);
 	}
 
 	_makeView() {
@@ -447,30 +494,26 @@ class CWidgetIterator extends CWidget {
 		this._target.style.minWidth = null;
 		this._target.style.minHeight = null;
 
-		const pager = document.createElement('div');
+		this._pager = document.createElement('div');
+		this._pager.classList.add('dashbrd-grid-iterator-pager');
 
-		pager.classList.add('dashbrd-grid-iterator-pager');
+		this._button_previous_page = document.createElement('button');
+		this._button_previous_page.type = 'button';
+		this._button_previous_page.title = t('Previous page');
+		this._button_previous_page.classList.add('btn-iterator-page-previous');
+		this._pager.appendChild(this._button_previous_page);
 
-		const page_previous = document.createElement('button');
+		this._pager_stats = document.createElement('span');
+		this._pager_stats.classList.add('dashbrd-grid-iterator-pager-info');
+		this._pager.appendChild(this._pager_stats);
 
-		page_previous.type = 'button';
-		page_previous.title = t('Previous page');
-		page_previous.classList.add('btn-iterator-page-previous');
-		pager.appendChild(page_previous);
+		this._button_next_page = document.createElement('button');
+		this._button_next_page.type = 'button';
+		this._button_next_page.title = t('Next page');
+		this._button_next_page.classList.add('btn-iterator-page-next');
+		this._pager.appendChild(this._button_next_page);
 
-		const pager_info = document.createElement('span');
-
-		pager_info.classList.add('dashbrd-grid-iterator-pager-info');
-		pager.appendChild(pager_info);
-
-		const page_next = document.createElement('button');
-
-		page_next.type = 'button';
-		page_next.title = t('Next page');
-		page_next.classList.add('btn-iterator-page-next');
-		pager.appendChild(page_next);
-
-		this._content_header.prepend(pager);
+		this._content_header.insertBefore(this._pager, this._actions);
 
 		this._too_small = document.createElement('div');
 		this._too_small.classList.add('dashbrd-grid-iterator-too-small');
@@ -513,16 +556,33 @@ class CWidgetIterator extends CWidget {
 				if (e.target.closest('.dashbrd-grid-iterator-placeholder') !== null) {
 					this._target.classList.remove('iterator-double-header');
 				}
+			},
+
+			previousPageClick: () => {
+				if (this._page > 1) {
+					this._page--;
+					this._startUpdating();
+				}
+			},
+
+			nextPageClick: () => {
+				if (this._page < this._page_count) {
+					this._page++;
+					this._startUpdating();
+				}
 			}
 		};
 
 		this._target.addEventListener('mousemove', this._events.iteratorEnter);
+		this._button_previous_page.addEventListener('click', this._events.previousPageClick);
+		this._button_next_page.addEventListener('click', this._events.nextPageClick);
 	}
 
 	_unregisterEvents() {
 		this._target.removeEventListener('mousemove', this._events.iteratorEnter);
+		this._button_previous_page.removeEventListener('click', this._events.previousPageClick);
+		this._button_next_page.removeEventListener('click', this._events.nextPageClick);
 
 		super._unregisterEvents();
 	}
-
 }

@@ -748,7 +748,7 @@ footer {
   .dashbrd.dashbrd-is-multipage .dashbrd-grid-container.reserve-header-lines-1, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-container.reserve-header-lines-1 {
     margin-top: 2rem; }
   .dashbrd.dashbrd-is-multipage .dashbrd-grid-container.reserve-header-lines-2, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-container.reserve-header-lines-2 {
-    margin-top: 4rem; }
+    margin-top: calc(4rem + 8px); }
 
 .dashbrd-grid-widget-blocker {
   position: relative;
@@ -1102,8 +1102,8 @@ footer {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: .5; }
 .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
-  margin-top: -4rem;
-  height: 4rem; }
+  margin-top: calc(-4rem - 8px);
+  height: calc(4rem + 8px); }
 .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging {
   z-index: 1000; }
   .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-resizable-resizing::before, .dashbrd.dashbrd-is-edit-mode .dashbrd-grid-iterator.ui-draggable-dragging::before {

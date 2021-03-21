@@ -799,10 +799,10 @@ class CWidget extends CBaseComponent {
 		this._content_header = document.createElement('div');
 		this._content_header.classList.add(this._css_classes.head);
 
-		const content_header_text = document.createElement('h4');
+		const content_header_h4 = document.createElement('h4');
 
-		content_header_text.textContent = this._name !== '' ? this._name : this._defaults.name;
-		this._content_header.appendChild(content_header_text);
+		content_header_h4.textContent = this._name !== '' ? this._name : this._defaults.name;
+		this._content_header.appendChild(content_header_h4);
 
 		this._actions = document.createElement('ul');
 		this._actions.classList.add(this._css_classes.actions);

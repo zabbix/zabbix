@@ -447,7 +447,12 @@ class CDashboardPage extends CBaseComponent {
 	activate() {
 		this._state = DASHBOARD_PAGE_STATE_ACTIVE;
 
-		this._resizeGrid();
+		if (this._is_edit_mode) {
+			this._resizeGrid(this._getNumRows() + this._grid_pad_rows);
+		}
+		else {
+			this._resizeGrid();
+		}
 
 		for (const widget of this._widgets.keys()) {
 			this._dashboard_grid.appendChild(widget.getView());
@@ -552,7 +557,7 @@ class CDashboardPage extends CBaseComponent {
 		this._initWidgetPlaceholder();
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
-			this._resizeGrid();
+			this._resizeGrid(this._getNumRows() + this._grid_pad_rows);
 
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();

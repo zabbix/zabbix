@@ -187,7 +187,7 @@
 			}
 
 			&.reserve-header-lines-2 {
-				margin-top: 4rem;
+				margin-top: calc(4rem + 8px);
 			}
 
 			@if $ui-transitions {
@@ -791,8 +791,8 @@
 
 			&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
 				.dashbrd-grid-iterator-head {
-					margin-top: -4rem;
-					height: 4rem;
+					margin-top: calc(-4rem - 8px);
+					height: calc(4rem + 8px);
 				}
 			}
 		}
