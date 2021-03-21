@@ -1034,8 +1034,6 @@ class CDashboard extends CBaseComponent {
 			return;
 		}
 
-		dashboard_page.resetWidgetPlaceholder();
-
 		if (widget !== null) {
 			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
@@ -1047,6 +1045,8 @@ class CDashboard extends CBaseComponent {
 			pos: new_widget_pos,
 			unique_id: this._createUniqueId()
 		});
+
+		dashboard_page.resetWidgetPlaceholder();
 
 		const busy_condition = this._createBusyCondition();
 
