@@ -81,6 +81,7 @@ class CDashboardPage extends CBaseComponent {
 		this._unique_id = unique_id;
 
 		this._init();
+		this._registerEvents();
 	}
 
 	_init() {
@@ -106,14 +107,6 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_registerEvents() {
-		this._events_data = {
-			last_num_reserved_header_lines: 0,
-
-			dashboard_grid_resize_timeout_id: null,
-			dashboard_grid_resize_first_time: true,
-			dashboard_grid_resize_width: null
-		};
-
 		this._events = {
 			widgetActions: (e) => {
 				const widget = e.detail.target;
@@ -217,19 +210,26 @@ class CDashboardPage extends CBaseComponent {
 			}
 		};
 
+		this._events_data = {
+			last_num_reserved_header_lines: 0,
+
+			dashboard_grid_resize_timeout_id: null,
+			dashboard_grid_resize_first_time: true,
+			dashboard_grid_resize_width: null
+		};
+	}
+
+	_activateEvents() {
 		this._events_data.dashboard_grid_resize_observer = new ResizeObserver(this._events.dashboardGridResize);
 		this._events_data.dashboard_grid_resize_observer.observe(this._dashboard_grid);
 	}
 
-	_unregisterEvents() {
+	_deactivateEvents() {
 		this._events_data.dashboard_grid_resize_observer.disconnect();
 
 		if (this._events_data.dashboard_grid_resize_timeout_id != null) {
 			clearTimeout(this._events_data.dashboard_grid_resize_timeout_id);
 		}
-
-		delete this._events;
-		delete this._events_data;
 	}
 
 	getWidgets() {
@@ -497,7 +497,7 @@ class CDashboardPage extends CBaseComponent {
 			this._resizeGrid();
 		}
 
-		this._registerEvents();
+		this._activateEvents();
 
 		for (const widget of this._widgets.keys()) {
 			this._dashboard_grid.appendChild(widget.getView());
@@ -531,7 +531,7 @@ class CDashboardPage extends CBaseComponent {
 			this._deactivateWidget(widget);
 		}
 
-		this._unregisterEvents();
+		this._deactivateEvents();
 
 		if (this._is_edit_mode) {
 			this._deactivateWidgetPlaceholder();

@@ -164,7 +164,10 @@ class CDashboard extends CBaseComponent {
 
 		this._state = DASHBOARD_STATE_ACTIVE;
 
+		this._activateEvents();
+
 		this._selectDashboardPage(this._dashboard_pages.keys().next().value);
+
 		this._announceWidgets();
 
 		if (this._is_edit_mode) {
@@ -1357,7 +1360,9 @@ class CDashboard extends CBaseComponent {
 				}
 			}
 		};
+	}
 
+	_activateEvents() {
 		if (this._is_kiosk_mode) {
 			window.addEventListener('mousemove', this._events.keepSteadyHeaderLines);
 		}
