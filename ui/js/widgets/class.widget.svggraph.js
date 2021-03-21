@@ -107,4 +107,41 @@ class CWidgetSvgGraph extends CWidget {
 			this._svg.remove();
 		}
 	}
+
+	getActionsMenu({can_paste_widget}) {
+		const menu = super.getActionsMenu({can_paste_widget});
+
+		if (this._is_edit_mode) {
+			return menu;
+		}
+
+		let menu_actions = null;
+
+		for (const search_menu_actions of menu) {
+			if ('label' in search_menu_actions && search_menu_actions.label === t('Actions')) {
+				menu_actions = search_menu_actions;
+
+				break;
+			}
+		}
+
+		if (menu_actions === null) {
+			menu_actions = {
+				label: t('Actions'),
+				items: []
+			};
+
+			menu.unshift(menu_actions);
+		}
+
+		menu_actions.items.push({
+			label: t('Download image'),
+			disabled: !this._has_contents,
+			clickCallback: () => {
+				downloadSvgImage(this._svg, 'graph.png');
+			}
+		});
+
+		return menu;
+	}
 }

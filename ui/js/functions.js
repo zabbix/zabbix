@@ -819,11 +819,12 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 /**
  * Download svg graph as .png image.
  *
- * @param {object} $dom_node    jQuery svg node to download.
- * @param {string} file_name    File name.
+ * @param {SVGElement} svg
+ * @param {string}     file_name
  */
-function downloadSvgImage($dom_node, file_name) {
-	var canvas = document.createElement('canvas'),
+function downloadSvgImage(svg, file_name) {
+	var $dom_node = jQuery(svg),
+		canvas = document.createElement('canvas'),
 		labels = $dom_node.next('.svg-graph-legend'),
 		$clone = $dom_node.clone(),
 		$container = $dom_node.closest('.dashbrd-grid-widget-content'),
@@ -871,15 +872,15 @@ function downloadSvgImage($dom_node, file_name) {
 }
 
 /**
- * Download classic graph as .png image.
+ * Download classic image as given file name.
  *
- * @param {object} $dom_node    jQuery svg node to download.
- * @param {string} file_name    File name.
+ * @param {HTMLImageElement} img
+ * @param {string}           file_name
  */
-function downloadPngImage($dom_node, file_name) {
+function downloadPngImage(img, file_name) {
 	var a = document.createElement('a');
 
-	a.href = $dom_node.attr('src');
+	a.href = img.src;
 	a.rel = 'noopener';
 	a.download = file_name;
 	a.target = '_blank';

@@ -191,4 +191,41 @@ class CWidgetGraph extends CWidget {
 			height: Math.floor(content.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
 		};
 	}
+
+	getActionsMenu({can_paste_widget}) {
+		const menu = super.getActionsMenu({can_paste_widget});
+
+		if (this._is_edit_mode) {
+			return menu;
+		}
+
+		let menu_actions = null;
+
+		for (const search_menu_actions of menu) {
+			if ('label' in search_menu_actions && search_menu_actions.label === t('Actions')) {
+				menu_actions = search_menu_actions;
+
+				break;
+			}
+		}
+
+		if (menu_actions === null) {
+			menu_actions = {
+				label: t('Actions'),
+				items: []
+			};
+
+			menu.unshift(menu_actions);
+		}
+
+		menu_actions.items.push({
+			label: t('Download image'),
+			disabled: !this._is_graph_mode,
+			clickCallback: () => {
+				downloadPngImage(this._content_body.querySelector('img'), 'graph.png');
+			}
+		});
+
+		return menu;
+	}
 }
