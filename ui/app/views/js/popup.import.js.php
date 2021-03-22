@@ -144,7 +144,8 @@ function openImportComparePopup(overlay) {
 				'class': 'modal-popup modal-popup-fullscreen',
 				'content': response.body,
 				'buttons': response.buttons,
-				'script_inline': response.script_inline
+				'script_inline': response.script_inline,
+				'debug': response.debug // TODO VM: check with no debug mode
 			}, overlay.$btn_submit);
 
 			overlay.unsetLoading();

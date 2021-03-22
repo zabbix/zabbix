@@ -156,34 +156,41 @@ function rowsToDivs($rows) {
 	return $divs;
 }
 
-$output = [
-	'header' => $data['title'],
-	'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
-	'body' => (!$data['diff'])
-		? (new CTableInfo())
-				->setNoDataMessage(_('No changes.')) // TODO VM: (?) need a better style
-				->toString()
-		: (new CForm())
-			->addClass('import-compare')
-			->addVar('parent_overlayid', $data['parent_overlayid'])
-			->addItem(drawToc($data['diff_toc']))
-			->addItem(drawDiff($data['diff']))
-			->toString(),
-	'buttons' => [
-		[
-			'title' => _('Import'),
-			'class' => '',
-			'isSubmit' => true,
-			'action' => 'return submitImportComparePopup(overlay);'
-		],
-		[
-			'title' => _('Cancel'),
-			'cancel' => true,
-			'class' => ZBX_STYLE_BTN_ALT,
-			'action' => ''
+if ($data['errors'] !== null) {
+	$output = [
+		'errors' => $data['errors']
+	];
+}
+else {
+	$output = [
+		'header' => $data['title'],
+		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
+		'body' => (!$data['diff'])
+			? (new CTableInfo())
+					->setNoDataMessage(_('No changes.')) // TODO VM: (?) need a better style
+					->toString()
+			: (new CForm())
+				->addClass('import-compare')
+				->addVar('parent_overlayid', $data['parent_overlayid'])
+				->addItem(drawToc($data['diff_toc']))
+				->addItem(drawDiff($data['diff']))
+				->toString(),
+		'buttons' => [
+			[
+				'title' => _('Import'),
+				'class' => '',
+				'isSubmit' => true,
+				'action' => 'return submitImportComparePopup(overlay);'
+			],
+			[
+				'title' => _('Cancel'),
+				'cancel' => true,
+				'class' => ZBX_STYLE_BTN_ALT,
+				'action' => ''
+			]
 		]
-	]
-];
+	];
+}
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
