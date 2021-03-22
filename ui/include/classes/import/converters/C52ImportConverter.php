@@ -283,13 +283,18 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private function convertTrigger(array $trigger, ?string $host = null, ?string $item = null): array {
+		$converted_expressions = $this->trigger_expression_converter->convert(array_filter([
+			'expression' => $trigger['expression'],
+			'recovery_expression' => array_key_exists('recovery_expression', $trigger)
+				? $trigger['recovery_expression']
+				: null,
+			'host' => $host,
+			'item' => $item
+		]));
+
 		foreach (['expression', 'recovery_expression'] as $source) {
-			if (array_key_exists($source, $trigger)) {
-				$trigger[$source] = $this->trigger_expression_converter->convert(array_filter([
-					'expression' => $trigger[$source],
-					'host' => $host,
-					'item' => $item
-				]));
+			if (array_key_exists($source, $converted_expressions)) {
+				$trigger[$source] = $converted_expressions[$source];
 			}
 		}
 

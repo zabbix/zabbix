@@ -34,7 +34,7 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 		$this->converter = null;
 	}
 
-	public function provider() {
+	public function simpleProviderData() {
 		return [
 			[
 				'{Trapper:trap[1].abschange()} > 10'.
@@ -326,13 +326,90 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 		];
 	}
 
+	public function twoFieldExpressionProvideData() {
+		return [
+			'no repeating missing references' => [
+				[
+					'expression' => '{Trapper:trap[1].dayofweek()} > 0'.
+									' and {Host:trap[1].last()} > 0',
+					'recovery_expression' => '{Trapper:trap[1].dayofweek()} > 0'.
+									' and {Host:trap[1].last()} > 0'
+				],
+				[
+					'expression' => '(dayofweek() > 0 and last(/Host/trap[1]) > 0)'.
+									' or (last(/Trapper/trap[1])<>last(/Trapper/trap[1]))',
+					'recovery_expression' => 'dayofweek() > 0 and last(/Host/trap[1]) > 0'
+				]
+			],
+			'are references gathered in expression field' => [
+				[
+					'expression' => '{Trapper:trap[1].dayofweek()} > 0',
+					'recovery_expression' => '{Trapper2:trap[1].dayofweek()} > 0'
+				],
+				[
+					'expression' => '(dayofweek() > 0)'.
+									' or (last(/Trapper/trap[1])<>last(/Trapper/trap[1]))'.
+									' or (last(/Trapper2/trap[1])<>last(/Trapper2/trap[1]))',
+					'recovery_expression' => 'dayofweek() > 0'
+				]
+			]
+		];
+	}
+
+	public function shortExpressionProvideData() {
+		return [
+			'enrich simple trigger expression' => [
+				[
+					'expression' => '{dayofweek()}=0',
+					'host' => 'Zabbix server',
+					'item' => 'trap'
+				],
+				[
+					'expression' => '(dayofweek()=0) or (last(/Zabbix server/trap)<>last(/Zabbix server/trap))',
+				]
+			],
+			'two short expressions' => [
+				[
+					'expression' => '{dayofweek()}=0',
+					'recovery_expression' => '{dayofweek()}=0',
+					'host' => 'Zabbix server',
+					'item' => 'trap'
+				],
+				[
+					'expression' => '(dayofweek()=0) or (last(/Zabbix server/trap)<>last(/Zabbix server/trap))',
+					'recovery_expression' => 'dayofweek()=0'
+				]
+			]
+		];
+	}
+
 	/**
-	 * @dataProvider provider
+	 * @dataProvider simpleProviderData
 	 *
 	 * @param string $old_expression
 	 * @param string $new_expression
 	 */
-	public function test(string $old_expression, string $new_expression) {
-		$this->assertSame($new_expression, $this->converter->convert(['expression' => $old_expression]));
+	public function testSimpleConversion(string $old_expression, string $new_expression) {
+		$this->assertSame($new_expression, $this->converter->convert(['expression' => $old_expression])['expression']);
+	}
+
+	/**
+	 * @dataProvider twoFieldExpressionProvideData
+	 *
+	 * @param array $old_expressions
+	 * @param array $new_expressions
+	 */
+	public function testTwoExpressionConversion(array $old_expressions, array $new_expressions) {
+		$this->assertSame($new_expressions, $this->converter->convert($old_expressions));
+	}
+
+	/**
+	 * @dataProvider shortExpressionProvideData
+	 *
+	 * @param array $old_expression
+	 * @param array $new_expression
+	 */
+	public function testShortExpressionConversion(array $old_expression, array $new_expression) {
+		$this->assertSame($new_expression, $this->converter->convert($old_expression));
 	}
 }
