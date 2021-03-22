@@ -81,6 +81,18 @@ abstract class CParser {
 	}
 
 	/**
+	 * Return error source string and position for use in parent parsers.
+	 *
+	 * @return array
+	 */
+	protected function errorPosArray(): array {
+		return [
+			$this->error_source,
+			$this->error_pos
+		];
+	}
+
+	/**
 	 * Save error source string and position for later use, when error will be retrieved.
 	 *
 	 * @param string $source

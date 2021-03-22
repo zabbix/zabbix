@@ -75,21 +75,31 @@ class CQueryParser extends CParser {
 		$start_pos = $pos;
 
 		if (!isset($source[$pos]) || $source[$pos] !== '/') {
+			$this->errorPos($source, $pos);
+
 			return CParser::PARSE_FAIL;
 		}
 		$pos++;
 
 		if ($this->host_name_parser->parse($source, $pos) == self::PARSE_FAIL) {
+			[$source, $pos] = $this->host_name_parser->errorPosArray();
+			$this->errorPos($source, $pos);
+
 			return CParser::PARSE_FAIL;
 		}
 		$pos += $this->host_name_parser->getLength();
 
 		if (!isset($source[$pos]) || $source[$pos] !== '/') {
+			$this->errorPos($source, $pos);
+
 			return CParser::PARSE_FAIL;
 		}
 		$pos++;
 
 		if ($this->item_key_parser->parse($source, $pos) == self::PARSE_FAIL) {
+			[$source, $pos] = $this->item_key_parser->errorPosArray();
+			$this->errorPos($source, $pos);
+
 			return CParser::PARSE_FAIL;
 		}
 		$pos += $this->item_key_parser->getLength();
