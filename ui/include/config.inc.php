@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,15 @@ catch (ConfigFileException $e) {
 		case CConfigFile::CONFIG_ERROR:
 			echo (new CView('general.warning', [
 				'header' => 'Configuration file error',
+				'messages' => [$e->getMessage()],
+				'theme' => ZBX_DEFAULT_THEME
+			]))->getOutput();
+
+			exit;
+
+		case CConfigFile::CONFIG_VAULT_ERROR:
+			echo (new CView('general.warning', [
+				'header' => _('Vault connection failed.'),
 				'messages' => [$e->getMessage()],
 				'theme' => ZBX_DEFAULT_THEME
 			]))->getOutput();

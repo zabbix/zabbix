@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 				[
 					'name' => ' ',
 					'error' => 'Page received incorrect data',
-					'error_message' => 'Incorrect value for field "Host name": cannot be empty.',
+					'error_message' => 'Incorrect value for field "Host name": cannot be empty.'
 				]
 			],
 			// Create host prototype with invalid name.
@@ -183,14 +183,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 				[
 					'name' => 'Кириллица Прототип хоста {#FSNAME}',
 					'error' => 'Cannot add host prototype',
-					'error_message' => 'Invalid parameter "/1/host": invalid host name.',
+					'error_message' => 'Invalid parameter "/1/host": invalid host name.'
 				]
 			],
 			[
 				[
 					'name' => 'Host prototype without macro in name',
 					'error' => 'Cannot add host prototype',
-					'error_message' => 'Invalid parameter "/1/host": must contain at least one low-level discovery macro.',
+					'error_message' => 'Invalid parameter "/1/host": must contain at least one low-level discovery macro.'
 				]
 			],
 			[
@@ -198,7 +198,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'name' => 'Host prototype with / in name',
 					'hostgroup' => 'Linux servers',
 					'error' => 'Cannot add host prototype',
-					'error_message' => 'Invalid parameter "/1/host": invalid host name.',
+					'error_message' => 'Invalid parameter "/1/host": invalid host name.'
 				]
 			],
 			// Create host prototype with invalid group.
@@ -206,7 +206,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 				[
 					'name' => 'Host prototype {#GROUP_EMPTY}',
 					'error' => 'Cannot add host prototype',
-					'error_message' => 'Invalid parameter "/1/groupLinks": cannot be empty.',
+					'error_message' => 'Invalid parameter "/1/groupLinks": cannot be empty.'
 				]
 			],
 			[
@@ -217,7 +217,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 						'Group prototype'
 					],
 					'error' => 'Cannot add host prototype',
-					'error_message' => 'Invalid parameter "/1/host": must contain at least one low-level discovery macro.',
+					'error_message' => 'Invalid parameter "/1/host": must contain at least one low-level discovery macro.'
 				]
 			],
 			[
@@ -229,7 +229,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 						'Group prototype {#MACRO}'
 					],
 					'error' => 'Cannot add host prototype',
-					'error_message' => 'Invalid parameter "/1/groupPrototypes/2": value (name)=(Group prototype {#MACRO}) already exists.',
+					'error_message' => 'Invalid parameter "/1/groupPrototypes/2": value (name)=(Group prototype {#MACRO}) already exists.'
 				]
 			]
 		];
@@ -568,7 +568,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'checkbox' => true,
 					'hostgroup' => 'Virtual machines',
 					'group_prototype' => 'New test {#MACRO}',
-					'template' => 'Template OS Windows by Zabbix agent',
+					'template' => 'Windows by Zabbix agent',
 					'inventory' => 'Automatic'
 				]
 			],
@@ -752,7 +752,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			['type' => 'radio', 'value' => 'Certificate'],
 			['type' => 'checkbox', 'value' => 'No encryption'],
 			['type' => 'checkbox', 'value' => 'PSK'],
-			['type' => 'checkbox', 'value' => 'Certificate'],
+			['type' => 'checkbox', 'value' => 'Certificate']
 		];
 
 		foreach ($labels as $label) {
@@ -835,7 +835,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Clone_6 of Host prototype {#1}',
-					'template' => 'Template OS Mac OS X'
+					'template' => 'Mac OS X'
 				]
 			],
 			[

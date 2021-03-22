@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ type AgentOptions struct {
 	Server                 string   `conf:"optional"`
 	UserParameter          []string `conf:"optional"`
 	UnsafeUserParameters   int      `conf:"optional,range=0:1,default=0"`
+	UserParameterDir       string   `conf:"optional"`
 	ControlSocket          string   `conf:"optional"`
 	Alias                  []string `conf:"optional"`
 	PerfCounter            []string `conf:"optional"`

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,9 @@ $fields = [
 										'(isset({add}) || isset({update}))'.
 											' && isset({type}) && {type} != '.ITEM_TYPE_TRAPPER.
 												' && {type} != '.ITEM_TYPE_SNMPTRAP.
-												' && {type} != '.ITEM_TYPE_DEPENDENT,
+												' && {type} != '.ITEM_TYPE_DEPENDENT.
+												' && !({type} == '.ITEM_TYPE_ZABBIX_ACTIVE.
+													' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 										_('Update interval')
 									],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -67,7 +69,7 @@ $fields = [
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
 											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
-											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 										]),
 										'isset({add}) || isset({update})'
 									],
@@ -99,7 +101,7 @@ $fields = [
 	$paramsFieldName =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.
-												ITEM_TYPE_CALCULATED, 'type'
+												ITEM_TYPE_CALCULATED.','.ITEM_TYPE_SCRIPT, 'type'
 											),
 										getParamFieldLabelByType(getRequest('type', 0))
 									],
@@ -158,13 +160,18 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'timeout' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeout' =>	 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO|P_ALLOW_LLD_MACRO,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && '.IN(ITEM_TYPE_HTTPAGENT.','.ITEM_TYPE_SCRIPT, 'type'),
+										_('Timeout')
+									],
 	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
 	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'parameters' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
@@ -342,7 +349,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP && hasRequest('delay_flex')) {
+	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
+			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
+			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser([
 			'usermacros' => true,
@@ -503,6 +512,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ruleid'		=> getRequest('parent_discoveryid')
 		];
 
+		if ($item['type'] == ITEM_TYPE_SCRIPT) {
+			$script_item = [
+				'parameters' => getRequest('parameters', []),
+				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+			];
+
+			$item = prepareScriptItemFormData($script_item) + $item;
+		}
+
 		if ($item['type'] == ITEM_TYPE_JMX) {
 			$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
 		}
@@ -528,7 +546,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes', 'follow_redirects',
 					'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
 					'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps',
-					'discover'
+					'discover', 'parameters'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectApplicationPrototypes' => ['name'],
@@ -565,7 +583,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item = prepareItemHttpAgentFormData($http_item) + $item;
 			}
 
-			$item = CArrayHelper::unsetEqualValues($item, $db_item);
+			if ($db_item['type'] == $item['type']) {
+				$item = CArrayHelper::unsetEqualValues($item, $db_item);
+			}
+
 			$item['itemid'] = $itemId;
 
 			$db_item['applications'] = zbx_objectValues($db_item['applications'], 'applicationid');
@@ -591,6 +612,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($db_item['preprocessing'] !== $preprocessing) {
 				$item['preprocessing'] = $preprocessing;
+			}
+
+			$compare = function($arr, $arr2) {
+				return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
+					array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
+				);
+			};
+			if (getRequest('type') == ITEM_TYPE_SCRIPT && $db_item['type'] == getRequest('type')
+					&& $compare($db_item['parameters'], $item['parameters'])) {
+				unset($item['parameters']);
 			}
 
 			$result = API::ItemPrototype()->update($item);
@@ -795,7 +826,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($application_prototypes as $application_prototype) {
 						if (is_array($application_prototype) && array_key_exists('new', $application_prototype)) {
 							$new_application_prototypes[] = [
-								'name' => $application_prototype['new'],
+								'name' => $application_prototype['new']
 							];
 						}
 						else {
@@ -854,7 +885,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'posts' => getRequest('posts'),
 					'headers' => getRequest('headers', []),
 					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => getRequest('timeout')
 				];
 
 				if ($item_prototype['headers']) {
@@ -1097,6 +1129,10 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					if ($type != ITEM_TYPE_JMX) {
 						unset($update_item_prototype['jmx_endpoint']);
 					}
+
+					if ($type != ITEM_TYPE_HTTPAGENT && $type != ITEM_TYPE_SCRIPT) {
+						unset($update_item_prototype['timeout']);
+					}
 				}
 				unset($update_item_prototype);
 
@@ -1138,13 +1174,13 @@ if (isset($_REQUEST['form'])) {
 		$itemPrototype = API::ItemPrototype()->get([
 			'itemids' => getRequest('itemid'),
 			'output' => [
-				'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid',
-				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'interfaceid', 'description', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields',
-				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
-				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host', 'allow_traps', 'discover'
+				'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid',
+				'description', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
+				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
+				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
+				'verify_host', 'allow_traps', 'discover'
 			],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params']
 		]);
@@ -1288,7 +1324,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_ACTION_ADD),
 		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
-		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
+		'timeout' =>  getRequest('timeout', DB::getDefault('items', 'timeout'))
 	];
 
 	foreach ($data['preprocessing'] as &$step) {
@@ -1370,7 +1407,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 	$data['hosts'] = API::Host()->get([
 		'output' => ['hostid'],
 		'itemids' => $data['item_prototypeids'],
-		'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port']
+		'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
 	]);
 
 	$data['display_interfaces'] = true;
@@ -1446,7 +1483,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 
 	// item types
 	$data['itemTypes'] = item_type2str();
-	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST]);
+	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST], $data['itemTypes'][ITEM_TYPE_SCRIPT]);
 
 	// valuemap
 	$data['valuemaps'] = API::ValueMap()->get([
@@ -1542,6 +1579,7 @@ else {
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view
 	echo (new CView('configuration.item.prototype.list', $data))->getOutput();

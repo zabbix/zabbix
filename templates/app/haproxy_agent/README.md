@@ -1,13 +1,13 @@
 
-# Template App HAProxy by Zabbix agent
+# HAProxy by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor HAProxy by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`Template App HAProxy by Zabbix agent` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/)  with Zabbix agent:
+Template `HAProxy by Zabbix agent` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/)  with Zabbix agent:
 
 Note that this solution supports https and redirects.
 
@@ -19,7 +19,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Setup [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/).
 
@@ -79,7 +79,7 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |HAProxy |HAProxy: Version |<p>-</p> |DEPENDENT |haproxy.version<p>**Preprocessing**:</p><p>- REGEX: `HAProxy version ([^,]*), \1`</p><p>⛔️ON_FAIL: `CUSTOM_ERROR -> HAProxy version is not found`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|HAProxy |HAProxy: Uptime |<p>-</p> |DEPENDENT |haproxy.uptime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `try {     var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);     return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1; } catch (error) {     throw "HAProxy uptime is not found : " + error; }`</p> |
+|HAProxy |HAProxy: Uptime |<p>-</p> |DEPENDENT |haproxy.uptime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |HAProxy |HAProxy: Service status |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |HAProxy |HAProxy: Service response time |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"] |
 |HAProxy |HAProxy Backend {#PXNAME}: Status |<p>-</p> |DEPENDENT |haproxy.backend.status[{#PXNAME}:{#SVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.pxname == '{#PXNAME}' && @.svname == '{#SVNAME}')].status.first()`</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |

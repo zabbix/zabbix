@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ func Test_encloseIPv6(t *testing.T) {
 		{"+not_ip", args{"localhost:443"}, "localhost:443"},
 		{"+already_enclosed", args{"[::1]"}, "[::1]"},
 		{"-empty", args{""}, ""},
-		//unsupport cases for this function
+		//unsupported cases for this function
 		{"-with_port", args{"::1:443"}, "[::1:443]"},
 		{"-with_scheme", args{"https://::1"}, "https://::1"},
 	}

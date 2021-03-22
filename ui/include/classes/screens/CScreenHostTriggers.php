@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,19 +120,32 @@ class CScreenHostTriggers extends CScreenBase {
 				$params['hostids'] = $hostid;
 			}
 
-			$groups_cb = (new CComboBox('tr_groupid', $groupid, 'submit()', $groups))
-				->setEnabled($this->mode != SCREEN_MODE_EDIT);
-			$hosts_cb = (new CComboBox('tr_hostid', $hostid, 'submit()', $hosts))
-				->setEnabled($this->mode != SCREEN_MODE_EDIT);
+			$groups_select = (new CSelect('tr_groupid'))
+				->setId('tr-groupid')
+				->setFocusableElementId('label-group')
+				->setValue($groupid)
+				->addOptions(CSelect::createOptionsFromArray($groups))
+				->setDisabled($this->mode == SCREEN_MODE_EDIT);
+
+			$hosts_select = (new CSelect('tr_hostid'))
+				->setId('tr-hostid')
+				->setFocusableElementId('label-host')
+				->setValue($hostid)
+				->addOptions(CSelect::createOptionsFromArray($hosts))
+				->setDisabled($this->mode == SCREEN_MODE_EDIT);
 
 			$header = (new CDiv([
 				new CTag('h4', true, _('Host issues')),
 				(new CForm('get', $this->pageFile))
 					->addItem(
 						(new CList())
-							->addItem([_('Group'), '&nbsp;', $groups_cb])
+							->addItem([new CLabel(_('Group'), $groups_select->getFocusableElementId()), '&nbsp;',
+								$groups_select
+							])
 							->addItem('&nbsp;')
-							->addItem([_('Host'), '&nbsp;', $hosts_cb])
+							->addItem([new CLabel(_('Host'), $hosts_select->getFocusableElementId()), '&nbsp;',
+								$hosts_select
+							])
 					)
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 		}
@@ -144,7 +157,9 @@ class CScreenHostTriggers extends CScreenBase {
 			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
-		$script = new CScriptTag('monitoringScreen.refreshOnAcknowledgeCreate();');
+		$script = new CScriptTag('monitoringScreen.refreshOnAcknowledgeCreate();'.
+			'$("#tr-groupid, #tr-hostid").on("change", (e) => $(e.target).closest("form").submit())'
+		);
 
 		return $this->getOutput(new CUiWidget('hat_trstatus', [$header, $table, $footer, $script]));
 	}
@@ -160,11 +175,6 @@ class CScreenHostTriggers extends CScreenBase {
 	 * @param string  $filter['sortorder']  Sort order.
 	 */
 	protected function getProblemsListTable(array $filter) {
-		// If no hostids and groupids defined show recent problems.
-		if ($filter['hostids'] === null && $filter['groupids'] === null) {
-			$filter['show'] = TRIGGERS_OPTION_RECENT_PROBLEM;
-		}
-
 		$filter = $filter + [
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'show_timeline' => 0,
@@ -174,7 +184,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'sort_order' => ZBX_SORT_DOWN
 		];
 
-		$data = CScreenProblem::getData($filter, true, true);
+		$data = CScreenProblem::getData($filter);
 
 		$header = [
 			'hostname' => _('Host'),
@@ -199,7 +209,7 @@ class CScreenHostTriggers extends CScreenBase {
 		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown', min($filter['limit'], count($data['problems'])), (count($data['problems']) > $search_limit) ? '+' : '', min($search_limit, count($data['problems'])));
 		$data['problems'] = array_slice($data['problems'], 0, $filter['limit'], true);
-		$data = CScreenProblem::makeData($data, $filter, true, true);
+		$data = CScreenProblem::makeData($data, $filter);
 
 		$hostids = [];
 		foreach ($data['triggers'] as $trigger) {
@@ -214,6 +224,14 @@ class CScreenHostTriggers extends CScreenBase {
 
 		$table = (new CTableInfo())->setHeader($header + [_('Age'), _('Info'), _('Ack'), _('Actions')]);
 
+		$allowed = [
+			'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+			'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+			'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+			'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+		];
+		$allowed_close = CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS);
+
 		foreach ($data['problems'] as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -222,9 +240,15 @@ class CScreenHostTriggers extends CScreenBase {
 			$host = $hosts[$host['hostid']];
 			$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
+			$allowed['close'] = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed_close);
+			$can_be_closed = $allowed['close'];
+
 			// Info.
 			$info_icons = [];
+
 			if ($problem['r_eventid'] != 0) {
+				$can_be_closed = false;
+
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
@@ -242,29 +266,43 @@ class CScreenHostTriggers extends CScreenBase {
 					);
 				}
 			}
+			else {
+				foreach ($problem['acknowledges'] as $acknowledge) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+						$can_be_closed = false;
+						break;
+					}
+				}
+			}
 
 			// Clock.
-			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids[]', $trigger['triggerid'])
-					->setArgument('filter_set', '1')
-			);
+			$clock = $allowed['ui_problems']
+				? new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('triggerids', [$trigger['triggerid']])
+				)
+				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
+
 
 			// Create acknowledge link.
 			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
-			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
+			$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+					|| $can_be_closed)
+				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+				);
 
 			$table->addRow([
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-							'triggerid' => $trigger['triggerid']], $problem['eventid']
-						))
+						->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $problem['eventid']))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,
 				zbx_date2age($problem['clock']),

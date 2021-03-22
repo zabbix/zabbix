@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,12 +101,12 @@ class testDRule extends CAPITest {
 			[
 				'login' => ['user' => 'guest', 'password' => ''],
 				'drule' => ['14'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "drule.delete".'
 			],
 			[
 				'login' => ['user' => 'action-user', 'password' => 'zabbix'],
 				'drule' => ['14'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "drule.delete".'
 			],
 			[
 				'login' => ['user' => 'action-admin', 'password' => 'zabbix'],

@@ -1,0 +1,133 @@
+z-select,
+.z-select {
+	display: inline-grid;
+
+	&:focus {
+		outline: none;
+	}
+
+	button.focusable {
+		position: relative;
+		width: 100%;
+		height: 24px;
+		padding: 3px 18px 3px 4px;
+		overflow: hidden;
+		font-size: $font-form-size;
+		line-height: initial;
+		text-align: left;
+		text-overflow: ellipsis;
+		word-break: break-all;
+		white-space: pre;
+		cursor: default;
+		border-radius: 0;
+
+		@extend %form-input-style;
+		@extend %webkit-scrollbar;
+
+		&::after {
+			content: '';
+			position: absolute;
+			top: 6px;
+			right: 5px;
+			width: 5px;
+			height: 5px;
+			border-right: 1.4px solid;
+			border-bottom: 1.4px solid;
+			transform: rotate(45deg);
+		}
+
+		&:active,
+		&:hover,
+		&:focus {
+			color: $font-color;
+			background-color: $form-bg-color;
+			border-color: $form-border-color;
+			box-shadow: none;
+		}
+	}
+
+	.list {
+		display: none;
+		z-index: 20000;
+		max-height: 362px;
+		overflow-y: auto;
+		border: 1px solid;
+		box-shadow: 0 6px 10px 0 $action-shadow-color;
+
+		@extend %form-input-style;
+		@extend %webkit-scrollbar;
+
+		li {
+			display: block;
+			height: inherit;
+			box-sizing: border-box;
+			min-height: 24px;
+			padding: 5px;
+			line-height: normal;
+			color: $font-color;
+			text-overflow: ellipsis;
+			word-break: break-word;
+			white-space: pre-wrap;
+			user-select: none;
+
+			&.hover {
+				background-color: $action-hover-color;
+			}
+
+			&.red {
+				color: $red;
+			}
+
+			&[disabled] {
+				color: $form-disabled-font-color;
+			}
+
+			&[optgroup] {
+				&::before {
+					content: attr(optgroup);
+					display: block;
+					font-weight: bold;
+				}
+			}
+		}
+
+		> li {
+			> ul {
+				margin: 5px -5px -5px;
+
+				li {
+					padding-left: 15px;
+				}
+			}
+		}
+
+		&.fall-upwards {
+			box-shadow: 0 -6px 10px 0 $action-shadow-color;
+		}
+	}
+
+	&.is-expanded {
+		> ul {
+			display: block;
+			position: fixed;
+		}
+	}
+
+	&[disabled] {
+		button {
+			pointer-events: none;
+			@extend %form-disabled;
+		}
+	}
+
+	&[readonly] {
+		button {
+			@extend %form-disabled;
+			color: $font-color !important;
+
+			&:focus {
+				border-color: $form-border-focus-color;
+			}
+		}
+	}
+}

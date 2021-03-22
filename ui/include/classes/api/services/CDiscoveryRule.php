@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,14 @@
  * Class containing methods for operations with discovery rules.
  */
 class CDiscoveryRule extends CItemGeneral {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'copy' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
@@ -282,6 +290,10 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($result) {
+			if (self::dbDistinct($sqlParts)) {
+				$result = $this->addNclobFieldValues($options, $result);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 
@@ -495,6 +507,17 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['headers'] = '';
 			}
 
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
+						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
+					$item['params'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$item['timeout'] = $defaults['timeout'];
+				}
+			}
+
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
@@ -697,7 +720,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'opdata', 'discover'
+				'opdata', 'discover', 'event_name'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
@@ -751,7 +774,9 @@ class CDiscoveryRule extends CItemGeneral {
 			['sources' => ['expression', 'recovery_expression']]
 		);
 		foreach ($dstTriggers as $id => &$trigger) {
-			unset($trigger['triggerid'], $trigger['templateid']);
+			unset($trigger['triggerid'], $trigger['templateid'], $trigger['hosts'], $trigger['functions'],
+				$trigger['items'], $trigger['discoveryRule']
+			);
 
 			// Update the destination expressions.
 			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],
@@ -905,8 +930,11 @@ class CDiscoveryRule extends CItemGeneral {
 		DB::insert('item_rtdata', $items_rtdata, false);
 
 		$conditions = [];
+		$itemids = [];
+
 		foreach ($items as $key => &$item) {
 			$item['itemid'] = $create_items[$key]['itemid'];
+			$itemids[$key] = $item['itemid'];
 
 			// conditions
 			if (isset($item['filter'])) {
@@ -945,8 +973,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
+		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
-
 		$this->createOverrides($items);
 	}
 
@@ -1409,6 +1437,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
+		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
 
 		// Delete old overrides and replace with new ones if any.
@@ -1519,10 +1548,10 @@ class CDiscoveryRule extends CItemGeneral {
 				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => DB::getDefault('lld_override_operation', 'operator')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_operation', 'value')],
 				'opstatus' =>			['type' => API_OBJECT, 'fields' => [
-					'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED])],
+					'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED])]
 				]],
 				'opdiscover' =>			['type' => API_OBJECT, 'fields' => [
-					'discover' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])],
+					'discover' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])]
 				]],
 				'opperiod' =>			['type' => API_OBJECT, 'fields' => [
 					'delay' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
@@ -2027,11 +2056,11 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
 			'itemids' => $discoveryid,
-			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt',
-				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'mtime', 'flags', 'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url',
-				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt', 'valuemapid', 'params',
+				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime', 'flags',
+				'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url', 'query_fields',
+				'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
 			],
@@ -2168,7 +2197,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-				'allow_traps', 'discover'
+				'allow_traps', 'discover', 'parameters'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
@@ -2463,9 +2492,10 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
 		$prototypes = API::HostPrototype()->get([
 			'discoveryids' => $srcid,
-			'output' => ['host', 'name', 'status', 'inventory_mode', 'discover'],
+			'output' => ['host', 'name', 'status', 'inventory_mode', 'discover', 'custom_interfaces'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
+			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'selectTemplates' => ['templateid'],
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'preservekeys' => true
@@ -2774,7 +2804,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($options['selectLLDMacroPaths'] !== null && $options['selectLLDMacroPaths'] != API_OUTPUT_COUNT) {
 			$lld_macro_paths = API::getApiService()->select('lld_macro_path', [
 				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid', 'lld_macro_pathid']),
-				'filter' => ['itemid' => $itemIds],
+				'filter' => ['itemid' => $itemIds]
 			]);
 
 			foreach ($result as &$lld_macro_path) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2020 Zabbix SIA\n"
+	"Copyright (C) 2021 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -366,9 +366,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 	const char *q;
 	const char *r;
 	char *t;
-	long len;
-	long diff;
-	unsigned long count = 0;
+	long len, diff, count = 0;
 
 	assert(str);
 	assert(sub_str1);
@@ -3630,6 +3628,99 @@ static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_token_parse_expression_macro                                 *
+ *                                                                            *
+ * Purpose: parses expression macro token                                     *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the expression macro was parsed successfully       *
+ *               FAIL    - macro does not point at valid expression macro     *
+ *                                                                            *
+ * Comments: If the macro points at valid expression macro in the expression  *
+ *           then the generic token fields are set and the                    *
+ *           token->data.expression_macro structure is filled with expression *
+ *           macro specific data.                                             *
+ *           Contents of macro are not validated because expression macro may *
+ *           contain user macro contexts and item keys with string arguments. *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_expression_macro(const char *expression, const char *macro, zbx_token_t *token)
+{
+	const char			*ptr;
+	size_t				offset;
+	zbx_token_expression_macro_t	*data;
+	int				quoted = 0;
+
+	for (ptr = macro + 2; '\0' != *ptr ; ptr++)
+	{
+		if (1 == quoted)
+		{
+			if ('\\' == *ptr)
+			{
+				if ('\0' == *(++ptr))
+					break;
+				continue;
+			}
+
+			if ('"' == *ptr)
+				quoted = 0;
+
+			continue;
+		}
+
+		if ('{' == *ptr)
+		{
+			zbx_token_t	tmp;
+
+			/* nested expression macros are not supported */
+			if ('?' == ptr[1])
+				continue;
+
+			if (SUCCEED == zbx_token_find(ptr, 0, &tmp, ZBX_TOKEN_SEARCH_BASIC))
+			{
+				switch (tmp.type)
+				{
+					case ZBX_TOKEN_LLD_MACRO:
+					case ZBX_TOKEN_LLD_FUNC_MACRO:
+					case ZBX_TOKEN_USER_MACRO:
+					case ZBX_TOKEN_SIMPLE_MACRO:
+						ptr += tmp.loc.r;
+						break;
+				}
+			}
+		}
+		else if ('}' == *ptr)
+		{
+			/* empty macro */
+			if (ptr == macro + 2)
+				return FAIL;
+
+			offset = macro - expression;
+
+			/* initialize token */
+			token->type = ZBX_TOKEN_EXPRESSION_MACRO;
+			token->loc.l = offset;
+			token->loc.r = offset + (ptr - macro);
+
+			/* initialize token data */
+			data = &token->data.expression_macro;
+			data->expression.l = offset + 2;
+			data->expression.r = token->loc.r - 1;
+
+			return SUCCEED;
+		}
+		else if ('"' == *ptr)
+			quoted = 1;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_token_parse_objectid                                         *
  *                                                                            *
  * Purpose: parses object id token                                            *
@@ -4117,6 +4208,19 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
 		if (3 == ptr - macro)
 			return FAIL;
 	}
+	else if ('?' == macro[2])
+	{
+		zbx_token_t	expr_token;
+
+		if (SUCCEED != zbx_token_find(macro, 1, &expr_token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) ||
+				ZBX_TOKEN_EXPRESSION_MACRO != expr_token.type ||
+				1 != expr_token.loc.l)
+		{
+			return FAIL;
+		}
+
+		ptr = macro + expr_token.loc.r;
+	}
 	else
 	{
 		zbx_strloc_t	loc;
@@ -4184,32 +4288,25 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 	{
 		ptr = strchr(ptr, '{');
 
-		switch (token_search)
+		if (0 != (token_search & ZBX_TOKEN_SEARCH_REFERENCES))
 		{
-			case ZBX_TOKEN_SEARCH_BASIC:
-				break;
-			case ZBX_TOKEN_SEARCH_REFERENCES:
-				while (NULL != (dollar = strchr(dollar, '$')) && (NULL == ptr || ptr > dollar))
+			while (NULL != (dollar = strchr(dollar, '$')) && (NULL == ptr || ptr > dollar))
+			{
+				if (0 == isdigit(dollar[1]))
 				{
-					if (0 == isdigit(dollar[1]))
-					{
-						dollar++;
-						continue;
-					}
-
-					token->data.reference.index = dollar[1] - '0';
-					token->type = ZBX_TOKEN_REFERENCE;
-					token->loc.l = dollar - expression;
-					token->loc.r = token->loc.l + 1;
-					return SUCCEED;
+					dollar++;
+					continue;
 				}
 
-				if (NULL == dollar)
-					token_search = ZBX_TOKEN_SEARCH_BASIC;
+				token->data.reference.index = dollar[1] - '0';
+				token->type = ZBX_TOKEN_REFERENCE;
+				token->loc.l = dollar - expression;
+				token->loc.r = token->loc.l + 1;
+				return SUCCEED;
+			}
 
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+			if (NULL == dollar)
+				token_search &= ~ZBX_TOKEN_SEARCH_REFERENCES;
 		}
 
 		if (NULL == ptr)
@@ -4226,7 +4323,10 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 			case '#':
 				ret = zbx_token_parse_lld_macro(expression, ptr, token);
 				break;
-
+			case '?':
+				if (0 != (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
+					ret = zbx_token_parse_expression_macro(expression, ptr, token);
+				break;
 			case '{':
 				ret = zbx_token_parse_nested_macro(expression, ptr, token);
 				break;
@@ -4560,25 +4660,15 @@ int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc)
 				offset = 1;
 				continue;
 			case '0':
-				ZBX_FALLTHROUGH;
 			case '1':
-				ZBX_FALLTHROUGH;
 			case '2':
-				ZBX_FALLTHROUGH;
 			case '3':
-				ZBX_FALLTHROUGH;
 			case '4':
-				ZBX_FALLTHROUGH;
 			case '5':
-				ZBX_FALLTHROUGH;
 			case '6':
-				ZBX_FALLTHROUGH;
 			case '7':
-				ZBX_FALLTHROUGH;
 			case '8':
-				ZBX_FALLTHROUGH;
 			case '9':
-				ZBX_FALLTHROUGH;
 			case '.':
 				if (SUCCEED != zbx_suffixed_number_parse(s, &len))
 					return FAIL;
@@ -5337,6 +5427,50 @@ void	remove_param(char *param, int num)
 
 /******************************************************************************
  *                                                                            *
+ * Function: str_n_in_list                                                    *
+ *                                                                            *
+ * Purpose: check if string is contained in a list of delimited strings       *
+ *                                                                            *
+ * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
+ *             value     - [IN] value                                         *
+ *             len       - [IN] value length                                  *
+ *             delimiter - [IN] delimiter                                     *
+ *                                                                            *
+ * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
+ *                                                                            *
+ ******************************************************************************/
+int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
+{
+	const char	*end;
+	size_t		token_len, next = 1;
+
+	while ('\0' != *list)
+	{
+		if (NULL != (end = strchr(list, delimiter)))
+		{
+			token_len = end - list;
+			next = 1;
+		}
+		else
+		{
+			token_len = strlen(list);
+			next = 0;
+		}
+
+		if (len == token_len && 0 == memcmp(list, value, len))
+			return SUCCEED;
+
+		list += token_len + next;
+	}
+
+	if (1 == next && 0 == len)
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: str_in_list                                                      *
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
@@ -5352,27 +5486,7 @@ void	remove_param(char *param, int num)
  ******************************************************************************/
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
-	const char	*end;
-	int		ret = FAIL;
-	size_t		len;
-
-	len = strlen(value);
-
-	while (SUCCEED != ret)
-	{
-		if (NULL != (end = strchr(list, delimiter)))
-		{
-			ret = (len == (size_t)(end - list) && 0 == strncmp(list, value, len) ? SUCCEED : FAIL);
-			list = end + 1;
-		}
-		else
-		{
-			ret = (0 == strcmp(list, value) ? SUCCEED : FAIL);
-			break;
-		}
-	}
-
-	return ret;
+	return str_n_in_list(list, value, strlen(value), delimiter);
 }
 
 /******************************************************************************

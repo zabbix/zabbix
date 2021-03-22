@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 			$this->assertFalse($element->isEnabled());
 		}
 
-		$this->assertRowCount(self::HOST_PROTOTYPES_COUNT);
+		$this->assertTableStats(self::HOST_PROTOTYPES_COUNT);
 
 		// Check tags on the specific host prototype.
 		$tags = $table->findRow('Name', 'Host prototype {#1}')->getColumn('Tags')->query('class:tag')->all();

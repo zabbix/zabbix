@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,18 +53,22 @@ $table = (new CTable())
 	]);
 
 foreach ($data['expressions'] as $i => $expression) {
-	$exp_delimiter = new CComboBox('expressions['.$i.'][exp_delimiter]', $expression['exp_delimiter'], null,
-		expressionDelimiters()
-	);
+	$exp_delimiter = (new CSelect('expressions['.$i.'][exp_delimiter]'))
+		->setValue($expression['exp_delimiter'])
+		->setId('expressions_'.$i.'_exp_delimiter')
+		->addClass('js-expression-delimiter-select')
+		->addOptions(CSelect::createOptionsFromArray(expressionDelimiters()));
 
 	if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
 		$exp_delimiter->addStyle('display: none;');
 	}
 
 	$row = [
-		(new CComboBox('expressions['.$i.'][expression_type]', $expression['expression_type'], null,
-			expression_type2str()
-		))->onChange('onChangeExpressionType(this, '.$i.')'),
+		(new CSelect('expressions['.$i.'][expression_type]'))
+			->setId('expressions_'.$i.'_expression_type')
+			->addClass('js-expression-type-select')
+			->addOptions(CSelect::createOptionsFromArray(expression_type2str()))
+			->setValue($expression['expression_type']),
 		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired(),
@@ -141,9 +145,11 @@ if ($data['regexid'] != 0) {
 		new CSubmit('update', _('Update')),
 		[
 			(new CSimpleButton(_('Clone')))->setId('clone'),
-			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'regex.delete')
-					->setArgument('regexids', (array) $data['regexid']),
+			(new CRedirectButton(_('Delete'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'regex.delete')
+						->setArgument('regexids', (array) $data['regexid'])
+						->setArgumentSID(),
 				_('Delete regular expression?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

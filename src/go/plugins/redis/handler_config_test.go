@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,11 @@ package redis
 
 import (
 	"errors"
-	"github.com/mediocregopher/radix/v3"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/mediocregopher/radix/v3"
 )
 
 func TestPlugin_configHandler(t *testing.T) {
@@ -52,7 +53,7 @@ func TestPlugin_configHandler(t *testing.T) {
 
 	type args struct {
 		conn   redisClient
-		params []string
+		params map[string]string
 	}
 	tests := []struct {
 		name    string
@@ -62,25 +63,25 @@ func TestPlugin_configHandler(t *testing.T) {
 	}{
 		{
 			"Pattern * should be used if it is not explicitly specified",
-			args{conn: conn, params: []string{""}},
+			args{conn: conn, params: map[string]string{"Pattern": "*"}},
 			`{"param1":"foo","param2":"bar"}`,
 			false,
 		},
 		{
 			"Should fetch specified parameter and return its value",
-			args{conn: conn, params: []string{"param1"}},
+			args{conn: conn, params: map[string]string{"Pattern": "param1"}},
 			`foo`,
 			false,
 		},
 		{
 			"Should fail if parameter not found",
-			args{conn: conn, params: []string{"UnknownParam"}},
+			args{conn: conn, params: map[string]string{"Pattern": "UnknownParam"}},
 			nil,
 			true,
 		},
 		{
 			"Should fail if error occurred",
-			args{conn: conn, params: []string{"WantErr"}},
+			args{conn: conn, params: map[string]string{"Pattern": "WantErr"}},
 			nil,
 			true,
 		},

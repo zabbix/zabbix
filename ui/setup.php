@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,11 +47,16 @@ $fields = [
 	'password' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'schema' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'tls_encryption' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'verify_certificate' =>	[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
 	'verify_host' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
 	'key_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'cert_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'ca_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'cipher_list' =>		[T_ZBX_STR, O_OPT, null,	null, 				null],
+	'creds_storage' =>		[T_ZBX_INT, O_OPT, null,	IN([DB_STORE_CREDS_CONFIG, DB_STORE_CREDS_VAULT]),			null],
+	'vault_url' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_db_path' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_token' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_name' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_port' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')],
@@ -63,7 +68,7 @@ $fields = [
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'finish' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'next' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null]
 ];
 
 CSessionHelper::set('check_fields_result', check_fields($fields, false));
@@ -131,7 +136,8 @@ elseif (CWebUser::$data) {
 
 $default_timezone = getRequest('default_timezone', $default_timezone);
 
-if ($default_timezone !== ZBX_DEFAULT_TIMEZONE && !in_array($default_timezone, DateTimeZone::listIdentifiers())) {
+if ($default_timezone !== ZBX_DEFAULT_TIMEZONE
+		&& !array_key_exists($default_timezone, (new CDateTimeZoneHelper())->getAllDateTimeZones())) {
 	$default_timezone = ZBX_DEFAULT_TIMEZONE;
 }
 
@@ -169,6 +175,12 @@ $ZBX_SETUP_WIZARD = new CSetupWizard();
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)
 		->setArgument('lang', $default_lang)
+		->getUrl()
+	)
+	->addJsFile((new CUrl('jsLoader.php'))
+		->setArgument('ver', ZABBIX_VERSION)
+		->setArgument('lang', $default_lang)
+		->setArgument('files', ['setup.js'])
 		->getUrl()
 	)
 	->display();

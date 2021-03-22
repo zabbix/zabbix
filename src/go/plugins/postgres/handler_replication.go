@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,120 +21,149 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"strconv"
 
 	"github.com/jackc/pgx/v4"
-)
-
-const (
-	keyPostgresReplicationCount                          = "pgsql.replication.count"
-	keyPostgresReplicationStatus                         = "pgsql.replication.status"
-	keyPostgresReplicationLagSec                         = "pgsql.replication.lag.sec"
-	keyPostgresReplicationLagB                           = "pgsql.replication.lag.b"
-	keyPostgresReplicationRecoveryRole                   = "pgsql.replication.recovery_role"
-	keyPostgresReplicationMasterDiscoveryApplicationName = "pgsql.replication.master.discovery.application_name"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // replicationHandler gets info about recovery state if all is OK or nil otherwise.
-func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var replicationResult int64
-	var status int
-	var query, stringResult string
-	var inRecovery bool
-	var err error
+func replicationHandler(ctx context.Context, conn PostgresClient,
+	key string, _ map[string]string, _ ...string) (interface{}, error) {
+	var (
+		replicationResult int64
+		status            int
+		query             string
+		stringResult      sql.NullString
+		inRecovery        bool
+	)
 
 	switch key {
-	case keyPostgresReplicationStatus:
-
-		err = conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
+	case keyReplicationStatus:
+		row, err := conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
 		if err != nil {
-			p.Errf(err.Error())
-			return nil, errorCannotFetchData
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
+
+		err = row.Scan(&inRecovery)
+		if err != nil {
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		}
+
 		if inRecovery {
-			err = conn.postgresPool.QueryRow(context.Background(), `SELECT COUNT(*) FROM pg_stat_wal_receiver`).Scan(&status)
+			row, err = conn.QueryRow(ctx, `SELECT COUNT(*) FROM pg_stat_wal_receiver`)
 			if err != nil {
-				if err == pgx.ErrNoRows {
-					p.Errf(err.Error())
-					return nil, errorEmptyResult
+				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+			}
+
+			err = row.Scan(&status)
+			if err != nil {
+				if errors.Is(err, pgx.ErrNoRows) {
+					return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 				}
-				p.Errf(err.Error())
-				return nil, errorCannotFetchData
+
+				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 		} else {
 			status = 2
 		}
+
 		return strconv.Itoa(status), nil
 
-	case keyPostgresReplicationLagSec:
+	case keyReplicationLagSec:
 		query = `SELECT
   					CASE
     					WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
 						ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
   					END as lag`
-	case keyPostgresReplicationLagB:
-		err = conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
+	case keyReplicationLagB:
+		row, err := conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
 		if err != nil {
-			if err == pgx.ErrNoRows {
-				p.Errf(err.Error())
-				return nil, errorEmptyResult
-			}
-			p.Errf(err.Error())
-			return nil, errorCannotFetchData
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
+
+		err = row.Scan(&inRecovery)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
+			}
+
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		}
+
 		if inRecovery {
 			query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
 						   FROM pg_stat_wal_receiver;`
-			err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&replicationResult)
+			row, err = conn.QueryRow(ctx, query)
+
 			if err != nil {
-				if err == pgx.ErrNoRows {
-					p.Errf(err.Error())
-					return nil, errorEmptyResult
+				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+			}
+
+			err = row.Scan(&replicationResult)
+			if err != nil {
+				if errors.Is(err, pgx.ErrNoRows) {
+					return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 				}
-				p.Errf(err.Error())
-				return nil, errorCannotFetchData
+
+				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 		} else {
 			replicationResult = 0
 		}
+
 		return replicationResult, nil
 
-	case keyPostgresReplicationRecoveryRole:
+	case keyReplicationRecoveryRole:
 		query = `SELECT pg_is_in_recovery()::int`
 
-	case keyPostgresReplicationCount:
+	case keyReplicationCount:
 		query = `SELECT count(*) FROM pg_stat_replication`
 
-	case keyPostgresReplicationMasterDiscoveryApplicationName:
-		query = `SELECT '{"data":'|| coalesce(json_agg(T), '[]'::json)::text || '}'
+	case keyReplicationProcessInfo:
+		query = `SELECT json_object_agg(application_name, row_to_json(T))
 				   FROM (
 						SELECT
-							application_name AS "{#APPLICATION_NAME}",
-        					pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), '0/00000000') AS master_current_wal,
-        					pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), sent_lsn) AS master_replication_lag
+						    CONCAT(application_name, ' ', pid) AS application_name,
+							EXTRACT(epoch FROM COALESCE(flush_lag,'0'::interval)) as flush_lag, 
+							EXTRACT(epoch FROM COALESCE(replay_lag,'0'::interval)) as replay_lag,
+							EXTRACT(epoch FROM COALESCE(write_lag, '0'::interval)) as write_lag
 						FROM pg_stat_replication
-					) T`
-		err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&stringResult)
+					) T; `
+		row, err := conn.QueryRow(ctx, query)
+
 		if err != nil {
-			if err == pgx.ErrNoRows {
-				p.Errf(err.Error())
-				return nil, errorEmptyResult
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		}
+
+		err = row.Scan(&stringResult)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 			}
-			p.Errf(err.Error())
-			return nil, errorCannotFetchData
+
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
-		return stringResult, nil
+
+		return stringResult.String, nil
 	}
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&replicationResult)
+	row, err := conn.QueryRow(ctx, query)
+
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
-		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	return replicationResult, nil
 
+	err = row.Scan(&replicationResult)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
+		}
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	return replicationResult, nil
 }

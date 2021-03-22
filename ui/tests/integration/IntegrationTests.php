@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/testDataCollection.php';
+require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 require_once dirname(__FILE__).'/testItemState.php';
@@ -27,6 +28,7 @@ class IntegrationTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('Integration');
 		$suite->addTestSuite('testDataCollection');
+		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');

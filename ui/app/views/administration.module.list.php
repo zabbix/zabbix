@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CForm())
-				->cleanItems()
 				->addVar('action', 'module.scan')
 				->addItem((new CList())
 					->addItem(new CSubmit('form', _('Scan directory')))

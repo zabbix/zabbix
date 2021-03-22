@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 								.prev('.msg-bad')
 								.remove();
 
-							$('#refresh_unsupported').val("<?= DB::getDefault('config', 'refresh_unsupported') ?>");
 							$('#discovery_groupid').multiSelect('clean');
 							$('#default_inventory_mode input[value=<?= $default_inventory_mode ?>]')
 								.prop('checked', true);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,6 +97,10 @@ class CHelpItems {
 					'description' => _('Number of out-of-window collisions. Returns integer')
 				],
 				[
+					'key' => 'net.if.discovery',
+					'description' => _('List of network interfaces. Returns JSON')
+				],
+				[
 					'key' => 'net.if.in[if,<mode>]',
 					'description' => _('Incoming traffic statistics on network interface. Returns integer')
 				],
@@ -141,8 +145,20 @@ class CHelpItems {
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				],
 				[
+					'key' => 'perf_instance.discovery[object]',
+					'description' => _('List of object instances of Windows performance counters. Returns JSON')
+				],
+				[
+					'key' => 'perf_instance_en.discovery[object]',
+					'description' => _('List of object instances of Windows performance counters, discovered using object names in English. Returns JSON')
+				],
+				[
 					'key' => 'perf_counter[counter,<interval>]',
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
+				],
+				[
+					'key' => 'perf_counter_en[counter,<interval>]',
+					'description' => _('Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)')
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
@@ -153,7 +169,7 @@ class CHelpItems {
 					'description' => _('Memory used by process in bytes. Returns integer')
 				],
 				[
-					'key' => 'proc.num[<name>,<user>,<state>,<cmdline>]',
+					'key' => 'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 					'description' => _('The number of processes. Returns integer')
 				],
 				[
@@ -177,6 +193,10 @@ class CHelpItems {
 					'description' => _('System boot time. Returns integer (Unix timestamp)')
 				],
 				[
+					'key' => 'system.cpu.discovery',
+					'description' => _('List of detected CPUs/CPU cores. Returns JSON')
+				],
+				[
 					'key' => 'system.cpu.intr',
 					'description' => _('Device interrupts. Returns integer')
 				],
@@ -193,7 +213,7 @@ class CHelpItems {
 					'description' => _('Count of context switches. Returns integer')
 				],
 				[
-					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
+					'key' => 'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
 					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
@@ -265,6 +285,10 @@ class CHelpItems {
 					'description' => _('Number of users logged in. Returns integer')
 				],
 				[
+					'key' => 'vfs.dev.discovery',
+					'description' => _('List of block devices and their type. Returns JSON')
+				],
+				[
 					'key' => 'vfs.dev.read[<device>,<type>,<mode>]',
 					'description' => _('Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				],
@@ -289,8 +313,8 @@ class CHelpItems {
 					'description' => _('Retrieving contents of a file. Returns text')
 				],
 				[
-					'key' => 'vfs.file.exists[file]',
-					'description' => _('Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists')
+					'key' => 'vfs.file.exists[file,<types_incl>,<types_excl>]',
+					'description' => _('Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists')
 				],
 				[
 					'key' => 'vfs.file.md5sum[file]',
@@ -313,16 +337,20 @@ class CHelpItems {
 					'description' => _('File time information. Returns integer (Unix timestamp)')
 				],
 				[
+					'key' => 'vfs.fs.discovery',
+					'description' => _('List of mounted filesystems and their types. Returns JSON')
+				],
+				[
+					'key' => 'vfs.fs.get',
+					'description' => _('List of mounted filesystems, their types, disk space and inode statistics. Returns JSON')
+				],
+				[
 					'key' => 'vfs.fs.inode[fs,<mode>]',
 					'description' => _('Number or percentage of inodes. Returns integer for number; float for percentage')
 				],
 				[
 					'key' => 'vfs.fs.size[fs,<mode>]',
 					'description' => _('Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage')
-				],
-				[
-					'key' => 'vfs.fs.get',
-					'description' => _('File systems and their spaces in bytes and percentage from total. Returns JSON')
 				],
 				[
 					'key' => 'vm.memory.size[<mode>]',
@@ -407,6 +435,10 @@ class CHelpItems {
 					'description' => _('Reads modbus data. Returns various types')
 				],
 				[
+					'key' => 'mqtt.get[<broker_url>,topic]',
+					'description' => _('Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON')
+				],
+				[
 					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
@@ -417,6 +449,10 @@ class CHelpItems {
 				[
 					'key' => 'net.if.collisions[if]',
 					'description' => _('Number of out-of-window collisions. Returns integer')
+				],
+				[
+					'key' => 'net.if.discovery',
+					'description' => _('List of network interfaces. Returns JSON')
 				],
 				[
 					'key' => 'net.if.in[if,<mode>]',
@@ -463,8 +499,20 @@ class CHelpItems {
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				],
 				[
+					'key' => 'perf_instance.discovery[object]',
+					'description' => _('List of object instances of Windows performance counters. Returns JSON')
+				],
+				[
+					'key' => 'perf_instance_en.discovery[object]',
+					'description' => _('List of object instances of Windows performance counters, discovered using object names in English. Returns JSON')
+				],
+				[
 					'key' => 'perf_counter[counter,<interval>]',
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
+				],
+				[
+					'key' => 'perf_counter_en[counter,<interval>]',
+					'description' => _('Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)')
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
@@ -475,7 +523,7 @@ class CHelpItems {
 					'description' => _('Memory used by process in bytes. Returns integer')
 				],
 				[
-					'key' => 'proc.num[<name>,<user>,<state>,<cmdline>]',
+					'key' => 'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 					'description' => _('The number of processes. Returns integer')
 				],
 				[
@@ -499,6 +547,10 @@ class CHelpItems {
 					'description' => _('System boot time. Returns integer (Unix timestamp)')
 				],
 				[
+					'key' => 'system.cpu.discovery',
+					'description' => _('List of detected CPUs/CPU cores. Returns JSON')
+				],
+				[
 					'key' => 'system.cpu.intr',
 					'description' => _('Device interrupts. Returns integer')
 				],
@@ -515,7 +567,7 @@ class CHelpItems {
 					'description' => _('Count of context switches. Returns integer')
 				],
 				[
-					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
+					'key' => 'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
 					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
@@ -587,6 +639,10 @@ class CHelpItems {
 					'description' => _('Number of users logged in. Returns integer')
 				],
 				[
+					'key' => 'vfs.dev.discovery',
+					'description' => _('List of block devices and their type. Returns JSON')
+				],
+				[
 					'key' => 'vfs.dev.read[<device>,<type>,<mode>]',
 					'description' => _('Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				],
@@ -611,8 +667,8 @@ class CHelpItems {
 					'description' => _('Retrieving contents of a file. Returns text')
 				],
 				[
-					'key' => 'vfs.file.exists[file]',
-					'description' => _('Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists')
+					'key' => 'vfs.file.exists[file,<types_incl>,<types_excl>]',
+					'description' => _('Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists')
 				],
 				[
 					'key' => 'vfs.file.md5sum[file]',
@@ -635,12 +691,16 @@ class CHelpItems {
 					'description' => _('File time information. Returns integer (Unix timestamp)')
 				],
 				[
-					'key' => 'vfs.fs.inode[fs,<mode>]',
-					'description' => _('Number or percentage of inodes. Returns integer for number; float for percentage')
+					'key' => 'vfs.fs.discovery',
+					'description' => _('List of mounted filesystems and their types. Returns JSON')
 				],
 				[
 					'key' => 'vfs.fs.get',
-					'description' => _('File systems and their spaces in bytes and percentage from total. Returns JSON')
+					'description' => _('List of mounted filesystems, their types, disk space and inode statistics. Returns JSON')
+				],
+				[
+					'key' => 'vfs.fs.inode[fs,<mode>]',
+					'description' => _('Number or percentage of inodes. Returns integer for number; float for percentage')
 				],
 				[
 					'key' => 'vfs.fs.size[fs,<mode>]',
@@ -700,7 +760,7 @@ class CHelpItems {
 			ITEM_TYPE_SIMPLE => [
 				[
 					'key' => 'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]',
-					'description' => _('Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful.')
+					'description' => _('Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful.')
 				],
 				[
 					'key' => 'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>]',
@@ -727,20 +787,20 @@ class CHelpItems {
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				],
 				[
+					'key' => 'vmware.cluster.discovery[<url>]',
+					'description' => _('Discovery of VMware clusters, <url> - VMware service URL. Returns JSON')
+				],
+				[
 					'key' => 'vmware.cluster.status[<url>,<name>]',
 					'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name')
 				],
 				[
-					'key' => 'vmware.eventlog[<url>,<mode>]',
-					'description' => _('VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data')
+					'key' => 'vmware.datastore.discovery[<url>]',
+					'description' => _('Discovery of VMware datastores, <url> - VMware service URL. Returns JSON')
 				],
 				[
-					'key' => 'vmware.fullname[<url>]',
-					'description' => _('VMware service full name, <url> - VMware service URL')
-				],
-				[
-					'key' => 'vmware.dc.discovery[<url>]',
-					'description' => _('VMware datacenters and their IDs. Returns JSON')
+					'key' => 'vmware.datastore.hv.list[<url>,<datastore>]',
+					'description' => _('VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name')
 				],
 				[
 					'key' => 'vmware.datastore.read[<url>,<datastore>,<mode>]',
@@ -755,8 +815,16 @@ class CHelpItems {
 					'description' => _('VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum')
 				],
 				[
-					'key' => 'vmware.datastore.hv.list[<url>,<datastore>]',
-					'description' => _('VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name')
+					'key' => 'vmware.dc.discovery[<url>]',
+					'description' => _('VMware datacenters and their IDs. Returns JSON')
+				],
+				[
+					'key' => 'vmware.eventlog[<url>,<mode>]',
+					'description' => _('VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data')
+				],
+				[
+					'key' => 'vmware.fullname[<url>]',
+					'description' => _('VMware service full name, <url> - VMware service URL')
 				],
 				[
 					'key' => 'vmware.hv.cluster.name[<url>,<uuid>]',
@@ -765,6 +833,30 @@ class CHelpItems {
 				[
 					'key' => 'vmware.hv.cpu.usage[<url>,<uuid>]',
 					'description' => _('VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
+					'key' => 'vmware.hv.cpu.usage.perf[<url>,<uuid>]',
+					'description' => _('CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
+					'key' => 'vmware.hv.cpu.utilization[<url>,<uuid>]',
+					'description' => _('CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
+					'key' => 'vmware.hv.datacenter.name[<url>,<uuid>]',
+					'description' => _('VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string')
+				],
+				[
+					'key' => 'vmware.hv.datastore.discovery[<url>,<uuid>]',
+					'description' => _('Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON')
+				],
+				[
+					'key' => 'vmware.hv.datastore.list[<url>,<uuid>]',
+					'description' => _('VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
+					'key' => 'vmware.hv.datastore.multipath[<url>,<uuid>,<datastore>,<partitionid>]',
+					'description' => _('Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery')
 				],
 				[
 					'key' => 'vmware.hv.datastore.read[<url>,<uuid>,<datastore>,<mode>]',
@@ -779,11 +871,11 @@ class CHelpItems {
 					'description' => _('VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency')
 				],
 				[
-					'key' => 'vmware.hv.datastore.list[<url>,<uuid>]',
-					'description' => _('VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+					'key' => 'vmware.hv.discovery[<url>]',
+					'description' => _('Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON')
 				],
 				[
-					'key' => 'vmware.hv.full.name[<url>,<uuid>]',
+					'key' => 'vmware.hv.fullname[<url>,<uuid>]',
 					'description' => _('VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
@@ -839,6 +931,14 @@ class CHelpItems {
 					'description' => _('VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance')
 				],
 				[
+					'key' => 'vmware.hv.power[<url>,<uuid>,<max>]',
+					'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage')
+				],
+				[
+					'key' => 'vmware.hv.sensor.health.state[<url>,<uuid>]',
+					'description' => _('VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red')
+				],
+				[
 					'key' => 'vmware.hv.status[<url>,<uuid>]',
 					'description' => _('VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
@@ -863,20 +963,56 @@ class CHelpItems {
 					'description' => _('VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.cpu.latency[<url>,<uuid>]',
+					'description' => _('Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
 					'key' => 'vmware.vm.cpu.num[<url>,<uuid>]',
 					'description' => _('Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.cpu.readiness[<url>,<uuid>,<instance>]',
+					'description' => _('Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance')
 				],
 				[
 					'key' => 'vmware.vm.cpu.ready[<url>,<uuid>]',
 					'description' => _('VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.cpu.swapwait[<url>,<uuid>,<instance>]',
+					'description' => _('CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance')
+				],
+				[
 					'key' => 'vmware.vm.cpu.usage[<url>,<uuid>]',
 					'description' => _('VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.cpu.usage.perf[<url>,<uuid>]',
+					'description' => _('CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.datacenter.name[<url>,<uuid>]',
+					'description' => _('VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string')
+				],
+				[
+					'key' => 'vmware.vm.discovery[<url>]',
+					'description' => _('Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON')
+				],
+				[
+					'key' => 'vmware.vm.guest.memory.size.swapped[<url>,<uuid>]',
+					'description' => _('Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.guest.osuptime[<url>,<uuid>]',
+					'description' => _('Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
 					'key' => 'vmware.vm.hv.name[<url>,<uuid>]',
 					'description' => _('VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.memory.size[<url>,<uuid>]',
+					'description' => _('VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
 					'key' => 'vmware.vm.memory.size.ballooned[<url>,<uuid>]',
@@ -885,6 +1021,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.vm.memory.size.compressed[<url>,<uuid>]',
 					'description' => _('VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.memory.size.consumed[<url>,<uuid>]',
+					'description' => _('Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
 					'key' => 'vmware.vm.memory.size.private[<url>,<uuid>]',
@@ -907,8 +1047,12 @@ class CHelpItems {
 					'description' => _('VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
-					'key' => 'vmware.vm.memory.size[<url>,<uuid>]',
-					'description' => _('VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'key' => 'vmware.vm.memory.usage[<url>,<uuid>]',
+					'description' => _('Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.net.if.discovery[<url>,<uuid>]',
+					'description' => 'Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON'
 				],
 				[
 					'key' => 'vmware.vm.net.if.in[<url>,<uuid>,<instance>,<mode>]',
@@ -917,6 +1061,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.vm.net.if.out[<url>,<uuid>,<instance>,<mode>]',
 					'description' => _('VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second')
+				],
+				[
+					'key' => 'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
+					'description' => _('Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance')
 				],
 				[
 					'key' => 'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
@@ -931,6 +1079,18 @@ class CHelpItems {
 					'description' => _('VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.storage.readoio[<url>,<uuid>,<instance>]',
+					'description' => _('Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+				],
+				[
+					'key' => 'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
+					'description' => _('	The average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+				],
+				[
+					'key' => 'vmware.vm.storage.totalwritelatency[<url>,<uuid>,<instance>]',
+					'description' => _('The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+				],
+				[
 					'key' => 'vmware.vm.storage.uncommitted[<url>,<uuid>]',
 					'description' => _('VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
@@ -939,8 +1099,16 @@ class CHelpItems {
 					'description' => _('VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.storage.writeoio[<url>,<uuid>,<instance>]',
+					'description' => _('Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+				],
+				[
 					'key' => 'vmware.vm.uptime[<url>,<uuid>]',
 					'description' => _('VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.vfs.dev.discovery[<url>,<uuid>]',
+					'description' => _('Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON')
 				],
 				[
 					'key' => 'vmware.vm.vfs.dev.read[<url>,<uuid>,<instance>,<mode>]',
@@ -949,6 +1117,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.vm.vfs.dev.write[<url>,<uuid>,<instance>,<mode>]',
 					'description' => _('VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second')
+				],
+				[
+					'key' => 'vmware.vm.vfs.fs.discovery[<url>,<uuid>]',
+					'description' => _('Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON')
 				],
 				[
 					'key' => 'vmware.vm.vfs.fs.size[<url>,<uuid>,<fsname>,<mode>]',
@@ -1027,6 +1199,14 @@ class CHelpItems {
 					'description' => _('Returns information associated with Zabbix Java gateway. Valid params are: ping, version.')
 				],
 				[
+					'key' => 'zabbix[lld_queue]',
+					'description' => _('Count of values enqueued in the low-level discovery processing queue.')
+				],
+				[
+					'key' => 'zabbix[preprocessing_queue]',
+					'description' => _('Count of values enqueued in the preprocessing queue.')
+				],
+				[
 					'key' => 'zabbix[process,<type>,<mode>,<state>]',
 					'description' => _('Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage.')
 				],
@@ -1092,7 +1272,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'zabbix[wcache,<cache>,<mode>]',
-					'description' => _('Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free).')
+					'description' => _('Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused).')
 				]
 			],
 			ITEM_TYPE_DB_MONITOR => [

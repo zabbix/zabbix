@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 #include "duktape.h"
 
-#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 10)
+#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 64)
 #define ZBX_ES_TIMEOUT		10
 
 #define ZBX_ES_STACK_LIMIT	1000
@@ -526,7 +526,7 @@ out:
 /******************************************************************************
  *                                                                            *
  * Function: zbx_es_set_timeout                                               *
- *                                              es_init_global_functions                              *
+ *                                                                            *
  * Purpose: sets script execution timeout                                     *
  *                                                                            *
  * Parameters: es      - [IN] the embedded scripting engine                   *

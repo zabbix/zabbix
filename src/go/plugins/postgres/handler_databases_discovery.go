@@ -1,6 +1,6 @@
 /* /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,16 +21,15 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
-)
-
-const (
-	keyPostgresDiscoveryDatabases = "pgsql.db.discovery"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // databasesDiscoveryHandler gets names of all databases and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) databasesDiscoveryHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+func databasesDiscoveryHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
 	var databasesJSON string
 
 	query := `SELECT json_build_object ('data',json_agg(json_build_object('{#DBNAME}',d.datname)))
@@ -38,14 +37,18 @@ func (p *Plugin) databasesDiscoveryHandler(conn *postgresConn, key string, param
 			   WHERE NOT datistemplate
 				 AND datallowconn;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&databasesJSON)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&databasesJSON)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return databasesJSON, nil

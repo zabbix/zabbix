@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,13 @@
  * Class containing methods for operations with user groups.
  */
 class CUserGroup extends CApiService {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
 
 	protected $tableName = 'usrgrp';
 	protected $tableAlias = 'g';
@@ -530,6 +537,7 @@ class CUserGroup extends CApiService {
 
 		foreach ($usrgrps as $usrgrp) {
 			if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
+					&& array_key_exists('userids', $usrgrp)
 					&& uint_in_array(self::$userData['userid'], $usrgrp['userids'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_('User cannot add himself to a disabled group or a group with disabled GUI access.')
@@ -653,7 +661,7 @@ class CUserGroup extends CApiService {
 				if ($db_right['permission'] != $rights[$db_right['groupid']][$db_right['id']]) {
 					$upd_rights[] = [
 						'values' => ['permission' => $rights[$db_right['groupid']][$db_right['id']]],
-						'where' => ['rightid' => $db_right['rightid']],
+						'where' => ['rightid' => $db_right['rightid']]
 					];
 				}
 				unset($rights[$db_right['groupid']][$db_right['id']]);

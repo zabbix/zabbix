@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 					'output' => ['itemid', 'name', 'key_', 'hostid'],
 					'hostids' => [$itemPrototype['discoveryRule']['hostid']],
 					'selectItemDiscovery' => ['itemid', 'parent_itemid'],
-					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 				]);
 
 				// collect those items where parent item is item prototype selected for this screen item as resource

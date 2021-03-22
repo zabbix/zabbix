@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,21 +21,22 @@
 
 class CImportReaderFactory {
 
-	const YAML = 'yaml';
-	const XML = 'xml';
-	const JSON = 'json';
+	public const YAML = 'yaml';
+	public const XML = 'xml';
+	public const JSON = 'json';
 
 	/**
 	 * Get reader class for required format.
 	 *
 	 * @static
+	 *
 	 * @throws Exception
 	 *
 	 * @param string $format
 	 *
 	 * @return CImportReader
 	 */
-	public static function getReader($format) {
+	public static function getReader(string $format): CImportReader {
 		switch ($format) {
 			case self::YAML:
 				return new CYamlImportReader();
@@ -55,23 +56,24 @@ class CImportReaderFactory {
 	 * Converts file extension to associated import format.
 	 *
 	 * @static
+	 *
 	 * @throws Exception
 	 *
 	 * @param string $ext
 	 *
 	 * @return string
 	 */
-	public static function fileExt2ImportFormat($ext) {
+	public static function fileExt2ImportFormat(string $ext): string {
 		switch ($ext) {
 			case 'yaml':
 			case 'yml':
-				return CImportReaderFactory::YAML;
+				return self::YAML;
 
 			case 'xml':
-				return CImportReaderFactory::XML;
+				return self::XML;
 
 			case 'json':
-				return CImportReaderFactory::JSON;
+				return self::JSON;
 
 			default:
 				throw new Exception(_s('Unsupported import file extension "%1$s".', $ext));

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,29 +95,41 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 	zbx_vector_uint64_create(&locked_triggerids);
 
 	result = DBselect("select a.userid,a.eventid,e.objectid"
-				" from task_close_problem tcp,acknowledges a"
+				" from task_close_problem tcp"
+				" left join acknowledges a"
+					" on tcp.acknowledgeid=a.acknowledgeid"
 				" left join events e"
 					" on a.eventid=e.eventid"
-				" where tcp.taskid=" ZBX_FS_UI64
-					" and tcp.acknowledgeid=a.acknowledgeid",
+				" where tcp.taskid=" ZBX_FS_UI64,
 			taskid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[2]);
-		zbx_vector_uint64_append(&triggerids, triggerid);
-		DCconfig_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
-
-		/* only close the problem if source trigger was successfully locked */
-		if (0 != locked_triggerids.values_num)
+		if (SUCCEED == DBis_null(row[0]))
 		{
-			ZBX_STR2UINT64(userid, row[0]);
-			ZBX_STR2UINT64(eventid, row[1]);
-			tm_execute_task_close_problem(taskid, triggerid, eventid, userid);
-
-			DCconfig_unlock_triggers(&locked_triggerids);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process close problem task because related event"
+					" was removed");
+			DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
 			ret = SUCCEED;
+		}
+		else
+		{
+			ZBX_STR2UINT64(triggerid, row[2]);
+			zbx_vector_uint64_append(&triggerids, triggerid);
+			DCconfig_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
+
+			/* only close the problem if source trigger was successfully locked */
+			if (0 != locked_triggerids.values_num)
+			{
+				ZBX_STR2UINT64(userid, row[0]);
+				ZBX_STR2UINT64(eventid, row[1]);
+				tm_execute_task_close_problem(taskid, triggerid, eventid, userid);
+
+				DCconfig_unlock_triggers(&locked_triggerids);
+
+				ret = SUCCEED;
+			}
 		}
 	}
 	DBfree_result(result);
@@ -778,7 +790,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if (SUCCEED == zbx_is_export_enabled())
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_problems_export_init("task-manager", process_num);
 
 	sec1 = zbx_time();

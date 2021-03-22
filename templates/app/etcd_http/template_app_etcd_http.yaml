@@ -1,0 +1,1433 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:01Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Etcd by HTTP'
+      name: 'Etcd by HTTP'
+      description: |
+        Get Etcd metrics by HTTP agent.
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: Etcd
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Etcd: Cluster version'
+          type: DEPENDENT
+          key: etcd.cluster.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the Etcd cluster.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.etcdcluster
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: etcd.get_version
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Etcd version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Etcd: CPU'
+          type: DEPENDENT
+          key: etcd.cpu.util
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Total user and system CPU time spent in seconds.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_cpu_seconds_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: DB size'
+          type: DEPENDENT
+          key: etcd.db.size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Total size of the underlying database.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_mvcc_db_total_size_in_bytes
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Deletes per second'
+          type: DEPENDENT
+          key: etcd.delete.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of deletes seen by this member per second.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_mvcc_delete_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Pending events'
+          type: DEPENDENT
+          key: etcd.events.sent.rate
+          delay: '0'
+          history: 7d
+          description: 'Total number of pending events to be sent.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_mvcc_pending_events_total
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Get node metrics'
+          type: HTTP_AGENT
+          key: etcd.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$ETCD.USER}'
+          password: '{$ETCD.PASSWORD}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          url: '{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/metrics'
+        -
+          name: 'Etcd: Get version'
+          type: HTTP_AGENT
+          key: etcd.get_version
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          url: '{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/version'
+        -
+          name: 'Etcd: RPCs received per second'
+          type: DEPENDENT
+          key: etcd.grpc.received.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of RPC stream messages received on the server.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - grpc_server_msg_received_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valueArr = JSON.parse(value);
+                  return valueArr.reduce(function(acc,obj){
+                     return acc + parseFloat(obj['value'])
+                  },0);
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: RPCs sent per second'
+          type: DEPENDENT
+          key: etcd.grpc.sent.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of gRPC stream messages sent by the server.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - grpc_server_msg_sent_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valueArr = JSON.parse(value);
+                  return valueArr.reduce(function(acc,obj){
+                     return acc + parseFloat(obj['value'])
+                  },0);
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: RPCs started per second'
+          type: DEPENDENT
+          key: etcd.grpc.started.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of RPCs started on the server.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - grpc_server_started_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valueArr = JSON.parse(value);
+                  return valueArr.reduce(function(acc,obj){
+                     return acc + parseFloat(obj['value'])
+                  },0);
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Server has a leader'
+          type: DEPENDENT
+          key: etcd.has.leader
+          delay: '0'
+          history: 7d
+          description: 'Whether or not a leader exists. 1 is existence, 0 is not.'
+          applications:
+            -
+              name: Etcd
+          valuemap:
+            name: 'Etcd leader'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_server_has_leader
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: etcd.get_metrics
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Etcd: Member has no leader'
+              priority: AVERAGE
+              description: '"If a member does not have a leader, it is totally unavailable."'
+        -
+          name: 'Etcd: Node health'
+          type: HTTP_AGENT
+          key: etcd.health
+          history: 7d
+          authtype: BASIC
+          username: '{$ETCD.USER}'
+          password: '{$ETCD.PASSWORD}'
+          applications:
+            -
+              name: Etcd
+          valuemap:
+            name: 'Etcd healthcheck'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          url: '{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/health'
+          status_codes: ''
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Etcd: Node healthcheck failed'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'https://etcd.io/docs/v3.4.0/op-guide/monitoring/#health-check'
+              dependencies:
+                -
+                  name: 'Etcd: Service is unavailable'
+                  expression: '{Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0'
+        -
+          name: 'Etcd: HTTP 4XX'
+          type: DEPENDENT
+          key: etcd.http.requests.4xx.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of handle failures of requests (non-watches), by method (GET/PUT etc.), and code 4XX.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'etcd_http_failed_total{code=~"4.+"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valueArr = JSON.parse(value);
+                  return valueArr.reduce(function(acc,obj){
+                     return acc + parseFloat(obj['value'])
+                  },0);
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: HTTP 5XX'
+          type: DEPENDENT
+          key: etcd.http.requests.5xx.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of handle failures of requests (non-watches), by method (GET/PUT etc.), and code 5XX.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'etcd_http_failed_total{code=~"5.+"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valueArr = JSON.parse(value);
+                  return valueArr.reduce(function(acc,obj){
+                     return acc + parseFloat(obj['value'])
+                  },0);
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$ETCD.HTTP.FAIL.MAX.WARN}'
+              name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'''
+              priority: WARNING
+              description: '"Too many reqvests failed on etcd instance with 5xx HTTP code"'
+        -
+          name: 'Etcd: HTTP requests received'
+          type: DEPENDENT
+          key: etcd.http.requests.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of requests received into the system (successfully parsed and authd).'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - etcd_http_received_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valueArr = JSON.parse(value);
+                  return valueArr.reduce(function(acc,obj){
+                     return acc + parseFloat(obj['value'])
+                  },0);
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Server is a leader'
+          type: DEPENDENT
+          key: etcd.is.leader
+          delay: '0'
+          history: 7d
+          description: 'Whether or not this member is a leader. 1 if is, 0 otherwise.'
+          applications:
+            -
+              name: Etcd
+          valuemap:
+            name: 'Etcd leader'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_server_is_leader
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: etcd.get_metrics
+          triggers:
+            -
+              expression: '{nodata(30m)}=1'
+              name: 'Etcd: Failed to fetch info data (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 30 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Etcd: Service is unavailable'
+                  expression: '{Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0'
+        -
+          name: 'Etcd: Keys compacted per second'
+          type: DEPENDENT
+          key: etcd.keys.compacted.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of DB keys compacted per second.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_mvcc_db_compaction_keys_total
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Keys expired per second'
+          type: DEPENDENT
+          key: etcd.keys.expired.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of expired keys per second.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_store_expires_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Keys total'
+          type: DEPENDENT
+          key: etcd.keys.total
+          delay: '0'
+          history: 7d
+          description: 'Total number of keys.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_mvcc_keys_total
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Leader changes'
+          type: DEPENDENT
+          key: etcd.leader.changes
+          delay: '0'
+          history: 7d
+          description: 'The the number of leader changes the member has seen since its start.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_server_leader_changes_seen_total
+                - ''
+          master_item:
+            key: etcd.get_metrics
+          triggers:
+            -
+              expression: '{delta(15m)}>{$ETCD.LEADER.CHANGES.MAX.WARN}'
+              name: 'Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)'''
+              priority: WARNING
+              description: 'Rapid leadership changes impact the performance of etcd significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the etcd cluster.'
+        -
+          name: 'Etcd: Maximum open file descriptors'
+          type: DEPENDENT
+          key: etcd.max.fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The Maximum number of open file descriptors.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_max_fds
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Client gRPC received bytes per second'
+          type: DEPENDENT
+          key: etcd.network.grpc.received.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The number of bytes received from grpc clients per second'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_network_client_grpc_received_bytes_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Client gRPC sent bytes per second'
+          type: DEPENDENT
+          key: etcd.network.grpc.sent.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The number of bytes sent from grpc clients per second'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_network_client_grpc_sent_bytes_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Open file descriptors'
+          type: DEPENDENT
+          key: etcd.open.fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open file descriptors.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_open_fds
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Proposals applied per second'
+          type: DEPENDENT
+          key: etcd.proposals.applied.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of consensus proposals applied.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_server_proposals_applied_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Proposals committed per second'
+          type: DEPENDENT
+          key: etcd.proposals.committed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of consensus proposals committed.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_server_proposals_committed_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Proposals failed per second'
+          type: DEPENDENT
+          key: etcd.proposals.failed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of failed proposals seen.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_server_proposals_failed_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
+              name: 'Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)'''
+              priority: WARNING
+              description: |
+                "Normally related to two issues: temporary failures related to a leader election or 
+                longer downtime caused by a loss of quorum in the cluster."
+        -
+          name: 'Etcd: Proposals pending'
+          type: DEPENDENT
+          key: etcd.proposals.pending
+          delay: '0'
+          history: 7d
+          description: 'The current number of pending proposals to commit.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_server_proposals_pending
+                - ''
+          master_item:
+            key: etcd.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
+              name: 'Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)'''
+              priority: WARNING
+              description: '"Rising pending proposals suggests there is a high client load or the member cannot commit proposals."'
+        -
+          name: 'Etcd: PUT per second'
+          type: DEPENDENT
+          key: etcd.put.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of puts seen by this member per second.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_mvcc_put_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Range per second'
+          type: DEPENDENT
+          key: etcd.range.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of ranges seen by this member per second.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_mvcc_range_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Reads per second'
+          type: DEPENDENT
+          key: etcd.reads.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of reads action by (get/getRecursive), local to this member.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - etcd_debugging_store_reads_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //calculates total reads
+                  var valueArr = JSON.parse(value);
+                  return valueArr.reduce(function(acc,obj){
+                     return acc + parseFloat(obj['value'])
+                  },0);
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Resident memory'
+          type: DEPENDENT
+          key: etcd.res.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_resident_memory_bytes
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Server version'
+          type: DEPENDENT
+          key: etcd.server.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the Etcd server.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.etcdserver
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: etcd.get_version
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Etcd version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Etcd: Transaction per second'
+          type: DEPENDENT
+          key: etcd.txn.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of transactions seen by this member per second.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - etcd_debugging_mvcc_range_total
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Uptime'
+          type: DEPENDENT
+          key: etcd.uptime
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Etcd server uptime.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_start_time_seconds
+                - ''
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //use boottime to calculate uptime
+                  return (Math.floor(Date.now()/1000)-Number(value));
+          master_item:
+            key: etcd.get_metrics
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'Etcd: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'Etcd: Virtual memory'
+          type: DEPENDENT
+          key: etcd.virtual.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Virtual memory size in bytes.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_bytes
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Writes per second'
+          type: DEPENDENT
+          key: etcd.writes.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of writes (e.g. set/compareAndDelete) seen by this member.'
+          applications:
+            -
+              name: Etcd
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - etcd_debugging_store_writes_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valueArr = JSON.parse(value);
+                  return valueArr.reduce(function(acc,obj){
+                     return acc + parseFloat(obj['value'])
+                  },0);
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: etcd.get_metrics
+        -
+          name: 'Etcd: Service''s TCP port state'
+          type: SIMPLE
+          key: 'net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"]'
+          history: 7d
+          applications:
+            -
+              name: Etcd
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Etcd: Service is unavailable'
+              priority: AVERAGE
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'gRPC codes discovery'
+          type: DEPENDENT
+          key: etcd.grpc_code.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#GRPC.CODE}'
+                value: '{$ETCD.GRPC_CODE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#GRPC.CODE}'
+                value: '{$ETCD.GRPC_CODE.MATCHES}'
+                formulaid: B
+          item_prototypes:
+            -
+              name: 'Etcd: RPCs completed with code {#GRPC.CODE}'
+              type: DEPENDENT
+              key: 'etcd.grpc.handled.rate[{#GRPC.CODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of RPCs completed on the server with grpc_code {#GRPC.CODE}'
+              applications:
+                -
+                  name: Etcd
+              preprocessing:
+                -
+                  type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - 'grpc_server_handled_total{grpc_method="{#GRPC.CODE}"}'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var valueArr = JSON.parse(value);
+                      return valueArr.reduce(function(acc,obj){
+                         return acc + parseFloat(obj['value'])
+                      },0);
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: etcd.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$ETCD.GRPC.ERRORS.MAX.WARN}'
+                  name: 'Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m)'
+                  priority: WARNING
+          master_item:
+            key: etcd.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - grpc_server_handled_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value),
+                   lookup = {},
+                   result =[];
+                  for (var item, i = 0; item = data[i++];) {
+                   var code = item.labels.grpc_code;
+                   if (!(code in lookup)) {
+                    lookup[code] = 1;
+                    result.push({ "{#GRPC.CODE}": code});
+                  }
+                  }
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          overrides:
+            -
+              name: trigger
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#GRPC.CODE}'
+                    value: '{$ETCD.GRPC_CODE.TRIGGER.MATCHES}'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'Too many failed gRPC requests'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          name: 'Peers discovery'
+          type: DEPENDENT
+          key: etcd.peer.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              name: 'Etcd: Etcd peer {#ETCD.PEER}: Bytes received'
+              type: DEPENDENT
+              key: 'etcd.bytes.received.rate[{#ETCD.PEER}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'The number of bytes received from peer with ID {#ETCD.PEER}'
+              application_prototypes:
+                -
+                  name: 'Etcd peer {#ETCD.PEER}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}'
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: etcd.get_metrics
+            -
+              name: 'Etcd: Etcd peer {#ETCD.PEER}: Bytes sent'
+              type: DEPENDENT
+              key: 'etcd.bytes.sent.rate[{#ETCD.PEER}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'The number of bytes sent to peer with ID {#ETCD.PEER}'
+              application_prototypes:
+                -
+                  name: 'Etcd peer {#ETCD.PEER}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}'
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: etcd.get_metrics
+            -
+              name: 'Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures'
+              type: DEPENDENT
+              key: 'etcd.received.fail.rate[{#ETCD.PEER}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of receive failures from the peer with ID {#ETCD.PEER}'
+              application_prototypes:
+                -
+                  name: 'Etcd peer {#ETCD.PEER}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}'
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: etcd.get_metrics
+            -
+              name: 'Etcd: Etcd peer {#ETCD.PEER}: Send failures'
+              type: DEPENDENT
+              key: 'etcd.sent.fail.rate[{#ETCD.PEER}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of send failures from peer with ID {#ETCD.PEER}'
+              application_prototypes:
+                -
+                  name: 'Etcd peer {#ETCD.PEER}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}'
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: etcd.get_metrics
+          master_item:
+            key: etcd.get_metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#ETCD.PEER}'
+              path: $.labels.To
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - etcd_network_peer_sent_bytes_total
+      macros:
+        -
+          macro: '{$ETCD.GRPC.ERRORS.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of gRPC requests failures'
+        -
+          macro: '{$ETCD.GRPC_CODE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md'
+        -
+          macro: '{$ETCD.GRPC_CODE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md'
+        -
+          macro: '{$ETCD.GRPC_CODE.TRIGGER.MATCHES}'
+          value: Aborted|Unavailable
+          description: 'Filter of discoverable gRPC codes which will be create triggers'
+        -
+          macro: '{$ETCD.HTTP.FAIL.MAX.WARN}'
+          value: '2'
+          description: 'Maximum number of HTTP requests failures'
+        -
+          macro: '{$ETCD.LEADER.CHANGES.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of leader changes'
+        -
+          macro: '{$ETCD.OPEN.FDS.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used file descriptors'
+        -
+          macro: '{$ETCD.PASSWORD}'
+        -
+          macro: '{$ETCD.PORT}'
+          value: '2379'
+          description: 'The port of Etcd API endpoint'
+        -
+          macro: '{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
+          value: '2'
+          description: 'Maximum number of proposal failures'
+        -
+          macro: '{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of proposals in queue'
+        -
+          macro: '{$ETCD.SCHEME}'
+          value: http
+          description: 'Request scheme which may be http or https'
+        -
+          macro: '{$ETCD.USER}'
+  triggers:
+    -
+      expression: '{Etcd by HTTP:etcd.open.fds.min(5m)}/{Etcd by HTTP:etcd.max.fds.last()}*100>{$ETCD.OPEN.FDS.MAX.WARN}'
+      name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
+      priority: WARNING
+      description: |
+        "Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. 
+        If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files."
+  graphs:
+    -
+      name: 'Etcd: File descriptors'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.open.fds
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.max.fds
+    -
+      name: 'Etcd: gRPC client traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.network.grpc.received.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.network.grpc.sent.rate
+    -
+      name: 'Etcd: gRPC requests rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.grpc.received.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.grpc.sent.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.grpc.started.rate
+    -
+      name: 'Etcd: HTTP requests rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.http.requests.4xx.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.http.requests.5xx.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.http.requests.rate
+    -
+      name: 'Etcd: Memory usage'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.res.bytes
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.virtual.bytes
+    -
+      name: 'Etcd: Proposals rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.proposals.failed.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.proposals.committed.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.proposals.applied.rate
+        -
+          sortorder: '3'
+          drawtype: BOLD_LINE
+          color: A54F10
+          yaxisside: RIGHT
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.proposals.pending
+    -
+      name: 'Etcd: Read/Write rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.reads.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Etcd by HTTP'
+            key: etcd.writes.rate
+  value_maps:
+    -
+      name: 'Etcd healthcheck'
+      mappings:
+        -
+          value: '0'
+          newvalue: Failed
+        -
+          value: '1'
+          newvalue: Ok
+    -
+      name: 'Etcd leader'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'No'
+        -
+          value: '1'
+          newvalue: 'Yes'
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

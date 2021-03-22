@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,9 +31,7 @@ $header = (new CDiv())
 				makeLogo(LOGO_TYPE_SIDEBAR)->addClass('sidebar-logo'),
 				makeLogo(LOGO_TYPE_SIDEBAR_COMPACT)->addClass('sidebar-logo-compact')
 			],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.view')
-				->getUrl()
+			CMenuHelper::getFirstUrl()
 		))->addClass(ZBX_STYLE_LOGO)
 	)
 	->addItem(
@@ -73,8 +71,8 @@ $search = (new CForm('get', 'zabbix.php'))
 		(new CVar('action', 'search'))->removeId(),
 		(new CTextBox('search', getRequest('search', ''), false, 255))
 			->addClass(ZBX_STYLE_SEARCH)
-			->setAttribute('autocomplete', 'off')
-			->setAttribute('aria-label', _('type here to search')),
+			->setAttribute('aria-label', _('type here to search'))
+			->disableAutocomplete(),
 		$search_icon
 	]);
 

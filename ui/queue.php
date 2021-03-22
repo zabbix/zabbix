@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,8 @@ if ($config == QUEUE_OVERVIEW) {
 		ITEM_TYPE_SSH,
 		ITEM_TYPE_TELNET,
 		ITEM_TYPE_JMX,
-		ITEM_TYPE_CALCULATED
+		ITEM_TYPE_CALCULATED,
+		ITEM_TYPE_SCRIPT
 	];
 
 	$table->setHeader([

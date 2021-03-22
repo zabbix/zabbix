@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ class CPassBox extends CInput {
 	public function __construct($name = 'password', $value = '', $maxlength = 255) {
 		parent::__construct('password', $name, $value);
 		$this->setAttribute('maxlength', $maxlength);
+		$this->setAttribute('autocomplete', 'new-password');
 	}
 
 	public function setWidth($value) {

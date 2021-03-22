@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import "C"
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"os/user"
 	"regexp"
@@ -37,6 +38,7 @@ import (
 
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/procfs"
 )
 
 const (
@@ -53,10 +55,16 @@ type Plugin struct {
 	stats   map[int64]*cpuUtil
 }
 
+type PluginExport struct {
+	plugin.Base
+}
+
 var impl Plugin = Plugin{
 	stats:   make(map[int64]*cpuUtil),
 	queries: make(map[procQuery]*cpuUtilStats),
 }
+
+var implExport PluginExport = PluginExport{}
 
 type historyIndex int
 
@@ -137,7 +145,6 @@ type cpuUtil struct {
 	err     error
 }
 
-
 func (q *cpuUtilQuery) match(p *procInfo) bool {
 	if q.name != "" && q.name != p.name && q.name != p.arg0 {
 		return false
@@ -207,7 +214,7 @@ func (p *Plugin) Collect() (err error) {
 	p.scanid++
 	queries, flags := p.prepareQueries()
 	var processes []*procInfo
-	if processes, err = p.getProcesses(flags); err != nil {
+	if processes, err = getProcesses(flags); err != nil {
 		return
 	}
 	p.Tracef("%s() queries:%d", log.Caller(), len(p.queries))
@@ -237,7 +244,7 @@ func (p *Plugin) Collect() (err error) {
 	for pid, stat := range stats {
 		p.getProcCpuUtil(pid, stat)
 		if stat.err != nil {
-			p.Debugf("cannot get process %d CPU utilisation statistics: %s", pid, stat.err)
+			p.Debugf("cannot get process %d CPU utilization statistics: %s", pid, stat.err)
 		}
 	}
 
@@ -360,7 +367,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if stats, ok := p.queries[query]; ok {
 		stats.accessed = now
 		if stats.err != nil {
-			p.Debugf("CPU utilisation gathering error %s", err)
+			p.Debugf("CPU utilization gathering error %s", err)
 			return nil, stats.err
 		}
 		if stats.tail == stats.head {
@@ -398,13 +405,275 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	if err == nil {
 		p.queries[query] = stats
-		p.Debugf("registered new CPU utilisation query: %s, %s, %s", name, user, cmdline)
+		p.Debugf("registered new CPU utilization query: %s, %s, %s", name, user, cmdline)
 	} else {
-		p.Debugf("cannot register CPU utilisation query: %s", err)
+		p.Debugf("cannot register CPU utilization query: %s", err)
 	}
 	return
 }
 
+// Export -
+func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	var name, mode, cmdline, memtype string
+	var usr *user.User
+
+	switch len(params) {
+	case 5:
+		memtype = params[4]
+		fallthrough
+	case 4:
+		cmdline = params[3]
+		fallthrough
+	case 3:
+		mode = params[2]
+		fallthrough
+	case 2:
+		if username := params[1]; username != "" {
+			usr, err = user.Lookup(username)
+			if err == user.UnknownUserError(username) {
+				p.Debugf("Failed to obtain user '%s': %s", username, err.Error())
+				return 0, nil
+			}
+			if err != nil {
+				return nil, fmt.Errorf("Failed to obtain user '%s': %s", username, err.Error())
+			}
+		}
+		fallthrough
+	case 1:
+		name = params[0]
+	case 0:
+	default:
+		return nil, errors.New("Too many parameters.")
+	}
+
+	switch mode {
+	case "sum", "", "avg", "max", "min":
+	default:
+		return nil, errors.New("Invalid third parameter.")
+	}
+
+	var mem uint64
+	if memtype == "pmem" {
+		mem, err = procfs.GetMemory("MemTotal")
+		if err != nil {
+			p.Debugf("cannot obtain memory: %s", err.Error())
+			return 0, nil
+		}
+
+		if mem == 0 {
+			return nil, errors.New("Total memory reported is 0.")
+		}
+	}
+
+	var typeStr string
+	if memtype != "size" && memtype != "pmem" {
+		typeStr, err = getTypeString(memtype)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var count int
+	var memSize, value float64
+	var cmdRgx *regexp.Regexp
+	if cmdline != "" {
+		cmdRgx, err = regexp.Compile(cmdline)
+		if err != nil {
+			p.Debugf("Failed to compile provided regex expression '%s': %s", cmdline, err.Error())
+			return 0, nil
+		}
+	}
+
+	userID := int64(-1)
+	if usr != nil {
+		userID, err = strconv.ParseInt(usr.Uid, 10, 64)
+		if err != nil {
+			p.Logger.Tracef(
+				"failed to convert user id '%s' to uint64 for user '%s'", usr.Uid, usr.Username)
+			return 0, nil
+		}
+	}
+
+	processes, err := getProcesses(procInfoName | procInfoCmdline | procInfoUser)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to obtain processes: %s", err.Error())
+	}
+
+	for _, proc := range processes {
+		if !p.validFile(proc, name, userID, cmdRgx) {
+			continue
+		}
+
+		data, err := procfs.ReadAll("/proc/" + strconv.FormatInt(proc.pid, 10) + "/status")
+		if err != nil {
+			return nil, fmt.Errorf("Failed to read status file for pid '%d': %s", proc.pid, err.Error())
+		}
+
+		switch memtype {
+		case "pmem":
+			vmRSS, found, err := procfs.ByteFromProcFileData(data, "VmRSS")
+			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of VmRSS: %s", err.Error())
+			}
+
+			if !found {
+				continue
+			}
+
+			value = float64(vmRSS) / float64(mem) * 100.00
+		case "size":
+			vmData, found, err := procfs.ByteFromProcFileData(data, "VmData")
+			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of VmData: %s", err.Error())
+			}
+
+			if !found {
+				continue
+			}
+
+			vmStk, found, err := procfs.ByteFromProcFileData(data, "VmStk")
+			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of VmStk: %s", err.Error())
+			}
+
+			if !found {
+				continue
+			}
+
+			vmExe, found, err := procfs.ByteFromProcFileData(data, "VmExe")
+			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of VmExe: %s", err.Error())
+			}
+
+			if !found {
+				continue
+			}
+			value = float64(vmData + vmStk + vmExe)
+		default:
+			typeValue, found, err := procfs.ByteFromProcFileData(data, typeStr)
+			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of %s: %s", typeStr, err.Error())
+			}
+
+			if !found {
+				continue
+			}
+
+			value = float64(typeValue)
+		}
+
+		if count != 0 {
+			switch mode {
+			case "max":
+				memSize = getMax(memSize, value)
+			case "min":
+				memSize = getMin(memSize, value)
+			default:
+				memSize += value
+			}
+		} else {
+			memSize = value
+		}
+		count++
+	}
+
+	if count == 0 {
+		p.Debugf("no memory found for '%s'.", typeStr)
+		return 0, nil
+	}
+
+	if mode == "avg" {
+		return memSize / float64(count), nil
+	}
+
+	if memtype != "pmem" {
+		return uint64(memSize), nil
+	}
+	return memSize, nil
+}
+
+func getMax(a, b float64) float64 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func getMin(a, b float64) float64 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func checkProcessName(cmdName, stats, name string) bool {
+	return name == "" || stats == name || cmdName == name
+}
+
+func checkUserInfo(uid, puid int64) bool {
+	return uid == -1 || uid == puid
+}
+
+func checkProccom(cmd string, cmdRgx *regexp.Regexp) bool {
+	if cmdRgx == nil {
+		return true
+	}
+
+	return cmdRgx.MatchString(cmd)
+}
+
+func getTypeString(t string) (string, error) {
+	switch t {
+	case "vsize", "":
+		return "VmSize", nil
+	case "rss":
+		return "VmRSS", nil
+	case "peak":
+		return "VmPeak", nil
+	case "swap":
+		return "VmSwap", nil
+	case "lib":
+		return "VmLib", nil
+	case "lck":
+		return "VmLck", nil
+	case "pin":
+		return "VmPin", nil
+	case "hwm":
+		return "VmHWM", nil
+	case "data":
+		return "VmData", nil
+	case "stk":
+		return "VmStk", nil
+	case "exe":
+		return "VmExe", nil
+	case "pte":
+		return "VmPTE", nil
+	default:
+		return "", errors.New("Invalid fifth parameter.")
+	}
+}
+
+func (p *PluginExport) validFile(proc *procInfo, name string, uid int64, cmdRgx *regexp.Regexp) bool {
+	if proc == nil {
+		return false
+	}
+
+	if !checkProcessName(proc.arg0, proc.name, name) {
+		return false
+	}
+
+	if !checkUserInfo(uid, proc.userid) {
+		return false
+	}
+
+	if !checkProccom(proc.cmdline, cmdRgx) {
+		return false
+	}
+
+	return true
+}
+
 func init() {
-	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilisation percentage.")
+	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
+	plugin.RegisterMetrics(&implExport, "ProcExporter", "proc.mem", "Process memory utilization values.")
 }

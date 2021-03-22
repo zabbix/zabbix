@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,43 +31,43 @@ class CActionCondValidatorTest extends CValidatorTest {
 		return [
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_GROUP,
-				'value' => ['1'],
+				'value' => ['1']
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TEMPLATE,
-				'value' => ['1'],
+				'value' => ['1']
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER,
-				'value' => ['1'],
+				'value' => ['1']
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST,
-				'value' => ['1'],
+				'value' => ['1']
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DRULE,
-				'value' => ['1'],
+				'value' => ['1']
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DCHECK,
-				'value' => '1',
+				'value' => '1'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_PROXY,
-				'value' => ['1'],
+				'value' => ['1']
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DOBJECT,
-				'value' => EVENT_OBJECT_DHOST,
+				'value' => EVENT_OBJECT_DHOST
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DOBJECT,
-				'value' => EVENT_OBJECT_DSERVICE,
+				'value' => EVENT_OBJECT_DSERVICE
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
-				'value' => '5-7,00:00-09:00;1,10:00-20:00',
+				'value' => '5-7,00:00-09:00;1,10:00-20:00'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
@@ -115,47 +115,47 @@ class CActionCondValidatorTest extends CValidatorTest {
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
-				'value' => SVC_SSH,
+				'value' => SVC_SSH
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
-				'value' => '100-200',
+				'value' => '100-200'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DSTATUS,
-				'value' => DOBJECT_STATUS_UP,
+				'value' => DOBJECT_STATUS_UP
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_SUPPRESSED,
-				'value' => null,
+				'value' => null
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-				'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
-				'value' => 'abc',
+				'value' => 'abc'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DUPTIME,
-				'value' => 'abc',
+				'value' => 'abc'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DVALUE,
-				'value' => 'abc',
+				'value' => 'abc'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_APPLICATION,
-				'value' => 'abc',
+				'value' => 'abc'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_NAME,
-				'value' => 'abc',
+				'value' => 'abc'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_METADATA,
-				'value' => 'abc',
+				'value' => 'abc'
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_EVENT_TAG,
@@ -181,70 +181,70 @@ class CActionCondValidatorTest extends CValidatorTest {
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TEMPLATE,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DRULE,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DCHECK,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_PROXY,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DOBJECT,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DOBJECT,
-					'value' => 100,
+					'value' => 100
 				],
 				'Incorrect action condition discovery object.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
-					'value' => '',
+					'value' => ''
 				],
 				'Invalid time period.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
-					'value' => 'QQQQQQ',
+					'value' => 'QQQQQQ'
 				],
 				'Invalid time period.'
 			],
@@ -300,119 +300,119 @@ class CActionCondValidatorTest extends CValidatorTest {
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
-					'value' => 100,
+					'value' => 100
 				],
 				'Incorrect action condition discovery check.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
-					'value' => '3mdn-jiwiw',
+					'value' => '3mdn-jiwiw'
 				],
 				'Incorrect action condition port "3mdn-jiwiw".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSTATUS,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSTATUS,
-					'value' => 100,
+					'value' => 100
 				],
 				'Incorrect action condition discovery status.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_SUPPRESSED,
-					'value' => 123,
+					'value' => 123
 				],
 				'Incorrect value for field "value": should be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-					'value' => 100,
+					'value' => 100
 				],
 				'Incorrect action condition trigger severity.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
-					'value' => 100,
+					'value' => 100
 				],
 				'Incorrect action condition event type.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DUPTIME,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DVALUE,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_APPLICATION,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST_NAME,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST_METADATA,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
 			],
@@ -420,7 +420,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 			[[],
 				[
 					'conditiontype' => 9999,
-					'value' => '',
+					'value' => ''
 				],
 				'Incorrect action condition type.'
 			]

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,12 +195,13 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		// Check trigger filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
 			// Select trigger
-			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
+			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			COverlayDialogElement::find()->one()->waitUntilReady()->setDataContext($this->trigger_host);
 			$this->zbxTestClickLinkTextWait($name);
 			// Apply filter
-			$this->zbxTestClickButtonText('Apply');
+			$this->query('name:filter_apply')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 			//Reset filter
@@ -217,7 +218,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						'Selenium user group for tag permissions AAA' => [
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle'],
+					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle']
 				]
 			],
 			[
@@ -252,7 +253,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							]
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions MySQL'],
+					'trigger_names' => ['Trigger for tag permissions MySQL']
 				]
 			],
 			[
@@ -264,7 +265,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							]
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle'],
+					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle']
 				]
 			]
 		];
@@ -299,13 +300,14 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		// Check trigger filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
 			// Select trigger
-			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
+			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
-			$this->zbxTestClickButtonText('Apply');
+			$this->query('name:filter_apply')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter
@@ -333,7 +335,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							]
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions Oracle'],
+					'trigger_names' => ['Trigger for tag permissions Oracle']
 				]
 			],
 			[
@@ -348,7 +350,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							]
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle'],
+					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle']
 				]
 			],
 			[
@@ -400,12 +402,13 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		// Check filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
 			// Select trigger
-			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
+			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
-			$this->zbxTestClickButtonText('Apply');
+			$this->query('name:filter_apply')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter

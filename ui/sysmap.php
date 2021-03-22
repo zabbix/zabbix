@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,10 @@ $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'sysmapid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
@@ -48,7 +52,7 @@ $fields = [
 	// ajax
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
-	'source' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action}) && {action} == "expand"'],
+	'source' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action}) && {action} == "expand"']
 ];
 check_fields($fields);
 

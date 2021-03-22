@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,9 @@ foreach ($data['graphs'] as $graph) {
 		: "rm4favorites('graphid','".$graph['graphid']."')";
 
 	$table->addRow([
-		new CLink($graph['label'], $url),
+		($graph['simple'] && $data['allowed_ui_latest_data']) || (!$graph['simple'] && $data['allowed_ui_hosts'])
+			? new CLink($graph['label'], $url)
+			: $graph['label'],
 		(new CButton())
 			->onClick($on_click)
 			->addClass(ZBX_STYLE_REMOVE_BTN)

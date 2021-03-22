@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -327,7 +327,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'name' => 'Email',
 					'form' => [
-						'Send to' => ' ',
+						'Send to' => ' '
 					],
 					'error' => 'Invalid email address " ".'
 				]
@@ -336,7 +336,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'name' => 'Email',
 					'form' => [
-						'Send to' => 'zabbixzabbix.com',
+						'Send to' => 'zabbixzabbix.com'
 					],
 					'error' => 'Invalid email address "zabbixzabbix.com".'
 				]
@@ -345,7 +345,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'name' => 'Email',
 					'form' => [
-						'Send to' => 'zabbix@zabbixcom',
+						'Send to' => 'zabbix@zabbixcom'
 					],
 					'error' => 'Invalid email address "zabbix@zabbixcom".'
 				]
@@ -354,7 +354,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'name' => 'Email',
 					'form' => [
-						'Send to' => 'zabbix@zabbixcom',
+						'Send to' => 'zabbix@zabbixcom'
 					],
 					'error' => 'Invalid email address "zabbix@zabbixcom".'
 				]
@@ -363,7 +363,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'name' => 'Email',
 					'form' => [
-						'Send to' => '@zabbix.com',
+						'Send to' => '@zabbix.com'
 					],
 					'error' => 'Invalid email address "@zabbix.com".'
 				]
@@ -372,7 +372,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'name' => 'Email',
 					'form' => [
-						'Send to' => 'zabbix1@zabbix.com,zabbix2@zabbix.com',
+						'Send to' => 'zabbix1@zabbix.com,zabbix2@zabbix.com'
 					],
 					'error' => 'Invalid email address "zabbix1@zabbix.com,zabbix2@zabbix.com".'
 				]

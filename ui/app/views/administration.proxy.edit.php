@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,6 +112,7 @@ $encryption_form_list = (new CFormList('encryption'))
 		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableAutocomplete()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

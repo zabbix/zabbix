@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,16 +46,22 @@ class CControllerExport extends CController {
 	protected function checkPermissions() {
 		switch ($this->getInput('action')) {
 			case 'export.mediatypes':
+				return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
+
 			case 'export.valuemaps':
-				return (CWebUser::$data['type'] >= USER_TYPE_SUPER_ADMIN);
+				return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 
 			case 'export.hosts':
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+
 			case 'export.templates':
-				return (CWebUser::$data['type'] >= USER_TYPE_ZABBIX_ADMIN);
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 			case 'export.screens':
+				return $this->checkAccess(CRoleHelper::UI_MONITORING_SCREENS);
+
 			case 'export.sysmaps':
-				return (CWebUser::$data['type'] >= USER_TYPE_ZABBIX_USER);
+				return $this->checkAccess(CRoleHelper::UI_MONITORING_MAPS);
 
 			default:
 				return false;

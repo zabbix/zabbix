@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -204,6 +204,9 @@ static int	punycode_encode_part(zbx_uint32_t *codepoints, zbx_uint32_t count, ch
 
 	if (0 == count)
 		return SUCCEED;
+
+	if (MAX_STRING_LEN <= count)
+		return FAIL;
 
 	for (i = 0; i < count; i++)
 	{

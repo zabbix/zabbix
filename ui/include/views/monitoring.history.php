@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 /**
  * @var CView $this
  */
+$this->includeJsFile('monitoring.history.js.php');
 
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
@@ -31,6 +32,7 @@ $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
 		->cleanItems()
+		->setName('filter_view_as')
 		->addVar('itemids', $data['itemids'])
 ];
 $header_row = [];
@@ -86,11 +88,14 @@ elseif (count($data['items']) > 1) {
 
 $action_list = (new CList())
 	->addItem([
-		new CLabel(_('View as')),
+		new CLabel(new CLabel(_('View as'), 'label-view-as')),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CComboBox('action', $data['action'], 'submit()', $actions))
-			->setEnabled((bool) $data['items'])
-			->removeId()
+		(new CSelect('action'))
+			->setId('filter-view-as')
+			->setFocusableElementId('label-view-as')
+			->setValue($data['action'])
+			->addOptions(CSelect::createOptionsFromArray($actions))
+			->setDisabled(!$data['items'])
 	]);
 
 if ($data['action'] !== HISTORY_GRAPH && $data['action'] !== HISTORY_BATCH_GRAPH) {
@@ -159,23 +164,30 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 						->removeId()
 				);
 
-			$tasks = [(new CComboBox('filter_task', $data['filter_task'], 'submit()', [
-				FILTER_TASK_SHOW => _('Show selected'),
-				FILTER_TASK_HIDE => _('Hide selected'),
-				FILTER_TASK_MARK => _('Mark selected'),
-				FILTER_TASK_INVERT_MARK => _('Mark others')
-			]))->removeId()];
+			$tasks = [];
+			$tasks[] = (new CSelect('filter_task'))
+				->setValue($data['filter_task'])
+				->setId('filter-task')
+				->setFocusableElementId('label-selected')
+				->addOptions(CSelect::createOptionsFromArray([
+					FILTER_TASK_SHOW => _('Show selected'),
+					FILTER_TASK_HIDE => _('Hide selected'),
+					FILTER_TASK_MARK => _('Mark selected'),
+					FILTER_TASK_INVERT_MARK => _('Mark others')
+				]));
 
 			if (str_in_array($data['filter_task'], [FILTER_TASK_MARK, FILTER_TASK_INVERT_MARK])) {
 				$tasks[] = ' ';
-				$tasks[] = (new CComboBox('mark_color', getRequest('mark_color', 0), null, [
-					MARK_COLOR_RED => _('as Red'),
-					MARK_COLOR_GREEN => _('as Green'),
-					MARK_COLOR_BLUE => _('as Blue')
-				]))->removeId();
+				$tasks[] = (new CSelect('mark_color'))
+					->setValue(getRequest('mark_color', 0))
+					->addOptions(CSelect::createOptionsFromArray([
+						MARK_COLOR_RED => _('as Red'),
+						MARK_COLOR_GREEN => _('as Green'),
+						MARK_COLOR_BLUE => _('as Blue')
+					]));
 			}
 
-			$filterColumn1->addRow(_('Selected'), $tasks);
+			$filterColumn1->addRow(new CLabel(_('Selected'), $tasks[0]->getFocusableElementId()), $tasks);
 			$filter_tab[] = $filterColumn1;
 		}
 	}

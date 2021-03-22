@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,11 @@ typedef enum
 	ZBX_MUTEX_SQLITE3,
 	ZBX_MUTEX_PROCSTAT,
 	ZBX_MUTEX_PROXY_HISTORY,
+#ifdef HAVE_VMINFO_T_UPDATES
 	ZBX_MUTEX_KSTAT,
+#endif
 	ZBX_MUTEX_MODBUS,
+	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }
 zbx_mutex_name_t;
@@ -85,8 +88,10 @@ void	zbx_locks_disable(void);
 typedef int zbx_mutex_t;
 typedef int zbx_rwlock_t;
 #endif
-int	zbx_locks_create(char **error);
-int	zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error);
+int		zbx_locks_create(char **error);
+int		zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error);
+zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name);
+zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name);
 #endif	/* _WINDOWS */
 #	define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
 #	define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)

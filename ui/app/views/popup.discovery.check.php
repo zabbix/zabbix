@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,11 +36,23 @@ if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
 }
 
+$select_type = (new CSelect('type'))
+	->setId('type-select')
+	->setValue($data['params']['type'])
+	->setFocusableElementId('type')
+	->addOptions(CSelect::createOptionsFromArray($discovery_ckeck_types));
+
+$select_snmpv3_securitylevel = (new CSelect('snmpv3_securitylevel'))
+	->setId('snmpv3-securitylevel')
+	->setValue($data['params']['snmpv3_securitylevel'])
+	->setFocusableElementId('snmpv3-securitylevel-button')
+	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv'))
+	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv'))
+	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv'));
+
 $form_list = (new CFormList())
 	->cleanItems()
-	->addRow(new CLabel(_('Check type'), 'type'),
-		(new CComboBox('type', $data['params']['type'], '', $discovery_ckeck_types))
-	)
+	->addRow(new CLabel(_('Check type'), $select_type->getFocusableElementId()), $select_type)
 	->addRow((new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
 		(new CTextBox('ports', $data['params']['ports']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -77,12 +89,8 @@ $form_list = (new CFormList())
 			->setAttribute('maxlength', 64),
 		'row_dcheck_snmpv3_securityname'
 	)
-	->addRow(new CLabel(_('Security level'), 'snmpv3_securitylevel'),
-		new CComboBox('snmpv3_securitylevel', $data['params']['snmpv3_securitylevel'], null, [
-			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-		]),
+	->addRow(new CLabel(_('Security level'), $select_snmpv3_securitylevel->getFocusableElementId()),
+		$select_snmpv3_securitylevel,
 		'row_dcheck_snmpv3_securitylevel'
 	)
 	->addRow(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'),
@@ -95,7 +103,8 @@ $form_list = (new CFormList())
 	->addRow(new CLabel(_('Authentication passphrase'), 'snmpv3_authpassphrase'),
 		(new CTextBox('snmpv3_authpassphrase', $data['params']['snmpv3_authpassphrase']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('maxlength', 64),
+			->setAttribute('maxlength', 64)
+			->disableAutocomplete(),
 		'row_dcheck_snmpv3_authpassphrase'
 	)
 	->addRow(new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'),
@@ -109,7 +118,8 @@ $form_list = (new CFormList())
 		(new CTextBox('snmpv3_privpassphrase', $data['params']['snmpv3_privpassphrase']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
-			->setAttribute('maxlength', 64),
+			->setAttribute('maxlength', 64)
+			->disableAutocomplete(),
 		'row_dcheck_snmpv3_privpassphrase'
 	);
 

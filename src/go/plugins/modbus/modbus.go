@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,7 +143,7 @@ var impl Plugin
 
 func init() {
 	plugin.RegisterMetrics(&impl, "Modbus",
-		"modbus.get", "Returns a JSON array of the requested values, usage: modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianess>,<offset>].")
+		"modbus.get", "Returns a JSON array of the requested values, usage: modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianness>,<offset>].")
 }
 
 // Export - main function of plugin
@@ -308,7 +308,7 @@ func modbusRead(p *mbParams, timeout int) (results []byte, err error) {
 	return results, nil
 }
 
-// make new modbus hendler depends on connection type
+// make new modbus handler depend on connection type
 func newHandler(p *mbParams, timeout int) (handler mblib.ClientHandler) {
 	switch p.ReqType {
 	case TCP:

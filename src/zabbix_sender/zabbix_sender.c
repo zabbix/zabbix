@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -343,10 +343,11 @@ zbx_send_destinations_t;
 static zbx_send_destinations_t	*destinations = NULL;		/* list of servers to send data to */
 static int			destinations_count = 0;
 
-#if !defined(_WINDOWS)
-static void	send_signal_handler(int sig)
-{
+volatile sig_atomic_t	sig_exiting = 0;
 
+#if !defined(_WINDOWS)
+static void	sender_signal_handler(int sig)
+{
 #define CASE_LOG_WARNING(signal) \
 	case signal:							\
 		zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #signal " while executing operation"); \
@@ -368,6 +369,24 @@ static void	send_signal_handler(int sig)
 	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
 	/* Return FAIL instead of EXIT_FAILURE to keep return signals consistent for send_value() */
 	_exit(FAIL);
+}
+
+static void	main_signal_handler(int sig)
+{
+	if (0 == sig_exiting)
+	{
+		int	i;
+
+		sig_exiting = 1;
+
+		for (i = 0; i < destinations_count; i++)
+		{
+			pid_t	child = *(destinations[i].thread);
+
+			if (ZBX_THREAD_HANDLE_NULL != child)
+				kill(child, sig);
+		}
+	}
 }
 #endif
 
@@ -601,21 +620,21 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	char			*tls_arg1, *tls_arg2;
 	zbx_socket_t		sock;
 
+#if !defined(_WINDOWS)
+	signal(SIGINT, sender_signal_handler);
+	signal(SIGQUIT, sender_signal_handler);
+	signal(SIGTERM, sender_signal_handler);
+	signal(SIGHUP, sender_signal_handler);
+	signal(SIGALRM, sender_signal_handler);
+	signal(SIGPIPE, sender_signal_handler);
+#endif
+
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		/* take TLS data passed from 'main' thread */
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
-#endif
-
-#if !defined(_WINDOWS)
-	signal(SIGINT, send_signal_handler);
-	signal(SIGQUIT, send_signal_handler);
-	signal(SIGTERM, send_signal_handler);
-	signal(SIGHUP, send_signal_handler);
-	signal(SIGALRM, send_signal_handler);
-	signal(SIGPIPE, send_signal_handler);
 #endif
 	switch (configured_tls_connect_mode)
 	{
@@ -749,9 +768,11 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const char *host, unsigned short port)
+static int	sender_add_serveractive_host_cb(const char *host, unsigned short port, zbx_vector_str_t *hostnames)
 {
 	int	i;
+
+	ZBX_UNUSED(hostnames);
 
 	for (i = 0; i < destinations_count; i++)
 	{
@@ -807,7 +828,7 @@ static void	zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"ServerActive",		&cfg_active_hosts,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"Hostname",			&cfg_hostname,				TYPE_STRING,
+		{"Hostname",			&cfg_hostname,				TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"TLSConnect",			&cfg_tls_connect,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -841,16 +862,29 @@ static void	zbx_load_config(const char *config_file)
 	/* do not complain about unknown parameters in agent configuration file */
 	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
 
+	/* get first hostname only */
+	if (NULL != cfg_hostname)
+	{
+		if (NULL == ZABBIX_HOSTNAME)
+		{
+			char	*p;
+
+			ZABBIX_HOSTNAME = NULL != (p = strchr(cfg_hostname, ',')) ?
+					zbx_dsprintf(NULL, "%.*s", (int)(p - cfg_hostname), cfg_hostname) :
+					zbx_strdup(NULL, cfg_hostname);
+		}
+
+		zbx_free(cfg_hostname);
+	}
+
 	zbx_fill_from_config_file(&CONFIG_SOURCE_IP, cfg_source_ip);
 
 	if (NULL == ZABBIX_SERVER)
 	{
 		if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
-			zbx_set_data_destination_hosts(cfg_active_hosts, sender_add_serveractive_host_cb);
+			zbx_set_data_destination_hosts(cfg_active_hosts, sender_add_serveractive_host_cb, NULL);
 	}
 	zbx_free(cfg_active_hosts);
-
-	zbx_fill_from_config_file(&ZABBIX_HOSTNAME, cfg_hostname);
 
 	zbx_fill_from_config_file(&CONFIG_TLS_CONNECT, cfg_tls_connect);
 	zbx_fill_from_config_file(&CONFIG_TLS_CA_FILE, cfg_tls_ca_file);
@@ -1023,7 +1057,7 @@ static void	parse_commandline(int argc, char **argv)
 		else
 			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
 
-		sender_add_serveractive_host_cb(ZABBIX_SERVER, port);
+		sender_add_serveractive_host_cb(ZABBIX_SERVER, port, NULL);
 	}
 
 	/* every option may be specified only once */
@@ -1394,7 +1428,14 @@ int	main(int argc, char **argv)
 		zabbix_log(LOG_LEVEL_CRIT, "'ServerActive' parameter required");
 		goto exit;
 	}
-
+#if !defined(_WINDOWS)
+	signal(SIGINT, main_signal_handler);
+	signal(SIGQUIT, main_signal_handler);
+	signal(SIGTERM, main_signal_handler);
+	signal(SIGHUP, main_signal_handler);
+	signal(SIGALRM, main_signal_handler);
+	signal(SIGPIPE, main_signal_handler);
+#endif
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
 			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
@@ -1462,7 +1503,7 @@ int	main(int argc, char **argv)
 
 		ret = SUCCEED;
 
-		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
+		while (0 == sig_exiting && (SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
 				NULL != zbx_fgets_alloc(&in_line, &in_line_alloc, in))
 		{
 			char		hostname[MAX_STRING_LEN], clock[32];

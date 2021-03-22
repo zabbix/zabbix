@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 				))
 			))->setAttribute('aria-label', _('Content controls'))
 		)
-		->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+		->setNavigation(getHostNavigation('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
 	$widget = (new CWidget())
@@ -54,7 +54,7 @@ else {
 		);
 
 	if (!empty($this->data['hostid'])) {
-		$widget->addItem(get_header_host_table('graphs', $this->data['hostid']));
+		$widget->setNavigation(getHostNavigation('graphs', $this->data['hostid']));
 	}
 
 	// Add filter tab.
@@ -157,11 +157,9 @@ foreach ($data['graphs'] as $graph) {
 		$hostList = implode(', ', $hostList);
 	}
 
+	$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 	$name = [];
-	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ($data['parent_discoveryid'] === null)
-		? ZBX_FLAG_DISCOVERY_NORMAL
-		: ZBX_FLAG_DISCOVERY_PROTOTYPE
-	);
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
 
 	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
 		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			[
 				[
 					1 => 'condition1',
-					2 => 'condition2',
+					2 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2}'
 			],
@@ -45,7 +45,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 				[
 					1 => 'condition1',
 					2 => 'condition2',
-					3 => 'condition3',
+					3 => 'condition3'
 				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2} and {3}'
 			],
@@ -53,7 +53,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			[
 				[
 					1 => 'condition1',
-					2 => 'condition1',
+					2 => 'condition1'
 				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2}'
 			],
@@ -61,7 +61,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 				[
 					1 => 'condition1',
 					2 => 'condition1',
-					3 => 'condition2',
+					3 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_AND, '({1} and {2}) and {3}'
 			],
@@ -70,7 +70,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
-					4 => 'condition2',
+					4 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_AND, '({1} and {2}) and ({3} and {4})'
 			],
@@ -85,7 +85,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			[
 				[
 					1 => 'condition1',
-					2 => 'condition2',
+					2 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2}'
 			],
@@ -93,7 +93,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 				[
 					1 => 'condition1',
 					2 => 'condition2',
-					3 => 'condition3',
+					3 => 'condition3'
 				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2} or {3}'
 			],
@@ -101,7 +101,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			[
 				[
 					1 => 'condition1',
-					2 => 'condition1',
+					2 => 'condition1'
 				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2}'
 			],
@@ -109,7 +109,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 				[
 					1 => 'condition1',
 					2 => 'condition1',
-					3 => 'condition2',
+					3 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_OR, '({1} or {2}) or {3}'
 			],
@@ -118,7 +118,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
-					4 => 'condition2',
+					4 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_OR, '({1} or {2}) or ({3} or {4})'
 			],
@@ -133,7 +133,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			[
 				[
 					1 => 'condition1',
-					2 => 'condition2',
+					2 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} and {2}'
 			],
@@ -141,7 +141,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 				[
 					1 => 'condition1',
 					2 => 'condition2',
-					3 => 'condition3',
+					3 => 'condition3'
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} and {2} and {3}'
 			],
@@ -149,7 +149,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			[
 				[
 					1 => 'condition1',
-					2 => 'condition1',
+					2 => 'condition1'
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} or {2}'
 			],
@@ -157,7 +157,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 				[
 					1 => 'condition1',
 					2 => 'condition1',
-					3 => 'condition2',
+					3 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '({1} or {2}) and {3}'
 			],
@@ -166,10 +166,10 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
-					4 => 'condition2',
+					4 => 'condition2'
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '({1} or {2}) and ({3} or {4})'
-			],
+			]
 		];
 	}
 
@@ -192,7 +192,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			['1', [1 => 'A']],
 			['1 and 2', [1 => 'A', 2 => 'B']],
 			['1 and 2 and 1', [1 => 'A', 2 => 'B']],
-			['(1 and 2) and 3', [1 => 'A', 2 => 'B', 3 => 'C']],
+			['(1 and 2) and 3', [1 => 'A', 2 => 'B', 3 => 'C']]
 		];
 	}
 
@@ -224,7 +224,7 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{1} and {2} or {1}', [1 => 'A', 2 => 'B'], 'A and B or A'
-			],
+			]
 		];
 	}
 

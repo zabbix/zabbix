@@ -40,6 +40,9 @@ fi
 if [ -n "$TIMEOUT" ]; then
 	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.timeout=$TIMEOUT"
 fi
+if [ -n "$PROPERTIES_FILE" ]; then
+	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.propertiesFile=$PROPERTIES_FILE"
+fi
 
 tcp_timeout=${TIMEOUT:=3}000
 ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dsun.rmi.transport.tcp.responseTimeout=$tcp_timeout"

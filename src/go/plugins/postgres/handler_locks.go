@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@ package postgres
 
 import (
 	"context"
-)
+	"errors"
 
-const (
-	keyPostgresLocks = "pgsql.locks"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // locksHandler executes select from pg_stat_database command and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) locksHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+func locksHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
 	var locksJSON string
-	var err error
+
 	query := `
 WITH T AS
 	(SELECT db.datname dbname,
@@ -79,13 +79,18 @@ FROM
 	FROM T
 	GROUP BY dbname) T2`
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&locksJSON)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
+	err = row.Scan(&locksJSON)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
 	if len(locksJSON) == 0 {
-		return nil, errorCannotParseData
+		return nil, errors.New("cannot parse data")
 	}
 
 	return locksJSON, nil

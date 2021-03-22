@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,17 @@ require_once dirname(__FILE__).'/../CElement.php';
  * Table element.
  */
 class CTableElement extends CElement {
+
+	/**
+	 * Table element selectors.
+	 *
+	 * @var array
+	 */
+	protected $selectors = [
+		'header' => 'xpath:./thead/tr/th',
+		'row' => 'xpath:./tbody/tr',
+		'column' => 'xpath:./td'
+	];
 
 	/**
 	 * Header element collection.
@@ -67,7 +78,7 @@ class CTableElement extends CElement {
 	 */
 	public function getHeaders() {
 		if ($this->headers === null) {
-			$this->headers = $this->query('xpath:./thead/tr/th')->all();
+			$this->headers = $this->query($this->selectors['header'])->all();
 		}
 
 		return $this->headers;
@@ -92,7 +103,10 @@ class CTableElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getRows() {
-		return $this->query('xpath:./tbody/tr')->asTableRow(['parent' => $this])->all();
+		return $this->query($this->selectors['row'])->asTableRow([
+			'parent' => $this,
+			'column_selector' => $this->selectors['column']
+		])->all();
 	}
 
 	/**
@@ -103,7 +117,10 @@ class CTableElement extends CElement {
 	 * @return CTableRow
 	 */
 	public function getRow($index) {
-		return $this->query('xpath:./tbody/tr['.((int)$index + 1).']')->asTableRow(['parent' => $this])->one();
+		return $this->query($this->selectors['row'].'['.((int)$index + 1).']')->asTableRow([
+			'parent' => $this,
+			'column_selector' => $this->selectors['column']
+		])->one();
 	}
 
 	/**
@@ -117,8 +134,7 @@ class CTableElement extends CElement {
 		$table = [];
 		foreach ($this->getRows() as $row) {
 			$data = [];
-
-			foreach ($row->query('xpath:./td|./th')->all() as $i => $column) {
+			foreach ($row->query('xpath:./'.CXPathHelper::fromSelector($this->selectors['column']).'|./th')->all() as $i => $column) {
 				$data[CTestArrayHelper::get($headers, $i, $i)] = $column;
 			}
 
@@ -151,10 +167,12 @@ class CTableElement extends CElement {
 
 		$suffix = $contains ? '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..'
 			: '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
-
 		$xpaths = ['.//tbody/tr/td'.$suffix, './/tbody/tr/th'.$suffix];
 
-		return $this->query('xpath', implode('|', $xpaths))->asTableRow(['parent' => $this])->one(false);
+		return $this->query('xpath', implode('|', $xpaths))->asTableRow([
+			'parent' => $this,
+			'column_selector' => $this->selectors['column']
+		])->one(false);
 	}
 
 	/**

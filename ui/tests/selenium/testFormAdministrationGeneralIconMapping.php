@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'name' => 'LongNameqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwerr',
 					'mappings' => [
 						['expression' => 'Create with long name']
-					],
+					]
 				]
 			],
 			[
@@ -245,7 +245,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('default_icon', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_default_iconid', $data['default_icon']);
+			$this->zbxTestDropdownSelect('iconmap[default_iconid]', $data['default_icon']);
 		}
 
 		// Input new row for Icon mapping.
@@ -447,7 +447,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => '/!@#$%^&*()123updated', 'action' => 'update']
 					],
-					'check_db' => true,
+					'check_db' => true
 				]
 			],
 			[
@@ -526,15 +526,15 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_mappings_0_inventory_link', $data['inventory']);
+			$this->zbxTestDropdownSelect('iconmap[mappings][0][inventory_link]', $data['inventory']);
 		}
 
 		if (array_key_exists('icon', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_mappings_0_iconid', $data['icon']);
+			$this->zbxTestDropdownSelect('iconmap[mappings][0][iconid]', $data['icon']);
 		}
 
 		if (array_key_exists('default_icon', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_default_iconid', $data['default_icon']);
+			$this->zbxTestDropdownSelect('iconmap[default_iconid]', $data['default_icon']);
 		}
 
 		$this->zbxTestClick('update');
@@ -636,7 +636,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						['action' => 'remove'],
 						['action' => 'remove'],
 						['action' => 'remove'],
-						['action' => 'remove'],
+						['action' => 'remove']
 					],
 					'error' => 'Invalid parameter "/1": the parameter "mappings" is missing.'
 				]
@@ -646,7 +646,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				[
 					'new_name' => 'CLONE: change first expression name as the second expression name',
 					'mappings' => [
-						['expression' => 'expression 2 for clone', 'action' => 'update'],
+						['expression' => 'expression 2 for clone', 'action' => 'update']
 					],
 					'error' => 'Invalid parameter "/1/mappings/2": value (inventory_link, expression)=(1, expression 2 for clone) already exists.'
 				]
@@ -777,15 +777,15 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('inventory', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_mappings_0_inventory_link', $data['inventory']);
+			$this->zbxTestDropdownSelect('iconmap[mappings][0][inventory_link]', $data['inventory']);
 		}
 
 		if (array_key_exists('icon', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_mappings_0_iconid', $data['icon']);
+			$this->zbxTestDropdownSelect('iconmap[mappings][0][iconid]', $data['icon']);
 		}
 
 		if (array_key_exists('default_icon', $data)) {
-			$this->zbxTestDropdownSelect('iconmap_default_iconid', $data['default_icon']);
+			$this->zbxTestDropdownSelect('iconmap[default_iconid]', $data['default_icon']);
 		}
 
 		$this->zbxTestClick('add');
@@ -922,11 +922,11 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					break;
 
 				case 'remove':
-					if ($this->zbxTestIsElementPresent("//tr[@id='iconmapidRow_new".$i."']//button")) {
-						$this->zbxTestClickXpathWait("//tr[@id='iconmapidRow_new".$i."']//button");
+					if ($this->zbxTestIsElementPresent('//tr[@id="iconmapidRow_new'.$i.'"]//button[@name="remove"]')) {
+						$this->zbxTestClickXpathWait('//tr[@id="iconmapidRow_new'.$i.'"]//button[@name="remove"]');
 					}
 					else {
-						$this->zbxTestClickXpathWait("//tr[@id='iconmapidRow_".$i."']//button");
+						$this->zbxTestClickXpathWait('//tr[@id="iconmapidRow_'.$i.'"]//button[@name="remove"]');
 					}
 					break;
 			}

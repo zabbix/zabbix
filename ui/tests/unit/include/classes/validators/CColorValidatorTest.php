@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class CColorValidatorTest extends CValidatorTest {
 			[[], 'F3F3F3'],
 			[[], 'FFFFFF'],
 			[[], 'ffffff'],
-			[['empty' => true], ''],
+			[['empty' => true], '']
 		];
 	}
 
@@ -69,7 +69,7 @@ class CColorValidatorTest extends CValidatorTest {
 				['messageRegex' => 'Incorrect color "%1$s"'],
 				'fff',
 				'Incorrect color "fff"'
-			],
+			]
 		];
 	}
 
@@ -99,7 +99,7 @@ class CColorValidatorTest extends CValidatorTest {
 				['messageRegex' => 'Incorrect color "%2$s" for "%1$s"'],
 				'fff',
 				'Incorrect color "fff" for "object"'
-			],
+			]
 		];
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	_ "zabbix.com/plugins"
 
@@ -46,6 +47,8 @@ import (
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxlib"
 )
+
+const remoteCommandSendingTimeout = time.Second
 
 var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
@@ -133,7 +136,7 @@ func run() (err error) {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	var control *remotecontrol.Conn
-	if control, err = remotecontrol.New(agent.Options.ControlSocket); err != nil {
+	if control, err = remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout); err != nil {
 		return
 	}
 	confirmService()
@@ -225,10 +228,9 @@ func main() {
 	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
 
 	var remoteCommand string
-	const (
-		remoteDefault     = ""
-		remoteDescription = "Perform administrative functions (send 'help' for available commands)"
-	)
+	const remoteDefault = ""
+	var remoteDescription = "Perform administrative functions (send 'help' for available commands) " +
+		"(" + remoteCommandSendingTimeout.String() + " timeout)"
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
 	var helpFlag bool
@@ -272,18 +274,19 @@ func main() {
 		os.Exit(0)
 	}
 
-	if err := openEventLog(); err != nil {
+	var err error
+	if err = openEventLog(); err != nil {
 		fatalExit("", err)
 	}
 
-	if err := validateExclusiveFlags(); err != nil {
+	if err = validateExclusiveFlags(); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("", err)
 	}
 
-	if err := conf.Load(confFlag, &agent.Options); err != nil {
+	if err = conf.Load(confFlag, &agent.Options); err != nil {
 		if argConfig || !(argTest || argPrint) {
 			if eerr := eventLogErr(err); eerr != nil {
 				err = fmt.Errorf("%s and %s", err, eerr)
@@ -296,21 +299,21 @@ func main() {
 		}
 	}
 
-	if err := agent.ValidateOptions(agent.Options); err != nil {
+	if err = agent.ValidateOptions(&agent.Options); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("cannot validate configuration", err)
 	}
 
-	if err := handleWindowsService(confFlag); err != nil {
+	if err = handleWindowsService(confFlag); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("", err)
 	}
 
-	if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
+	if err = log.Open(log.Console, log.Warning, "", 0); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
@@ -321,16 +324,16 @@ func main() {
 		} else {
 			level = log.None
 		}
-		if err := log.Open(log.Console, level, "", 0); err != nil {
+		if err = log.Open(log.Console, level, "", 0); err != nil {
 			fatalExit("cannot initialize logger", err)
 		}
 
-		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+		if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		var err error
-		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
+		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+			agent.Options.UserParameterDir); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
 
@@ -339,6 +342,18 @@ func main() {
 			fatalExit("cannot create scheduling manager", err)
 		}
 		m.Start()
+		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+			fatalExit("cannot process configuration", err)
+		}
+		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+		if err != nil {
+			fatalExit("cannot parse the \"Hostname\" parameter", err)
+		}
+		agent.FirstHostname = hostnames[0]
+
+		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+			fatalExit("cannot process configuration", err)
+		}
 
 		if argTest {
 			checkMetric(m, testFlag)
@@ -349,6 +364,7 @@ func main() {
 		m.Stop()
 		monitor.Wait(monitor.Scheduler)
 		os.Exit(0)
+
 	}
 
 	if argVerbose {
@@ -361,7 +377,8 @@ func main() {
 			os.Exit(0)
 		}
 
-		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand); err != nil {
+		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
+			remoteCommandSendingTimeout); err != nil {
 			log.Errf("Cannot send remote command: %s", err)
 		} else {
 			log.Infof(reply)
@@ -393,13 +410,13 @@ func main() {
 		logLevel = log.Trace
 	}
 
-	if err := log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
+	if err = log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
 	zbxlib.SetLogLevel(logLevel)
 
-	greeting := fmt.Sprintf("Starting Zabbix Agent 2 [%s]. (%s)", agent.Options.Hostname, version.Long())
+	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())
 	log.Infof(greeting)
 
 	addresses, err := serverconnector.ParseServerActive()
@@ -407,15 +424,11 @@ func main() {
 		fatalExit("cannot parse the \"ServerActive\" parameter", err)
 	}
 
-	if err = resultcache.Prepare(&agent.Options, addresses); err != nil {
-		fatalExit("cannot prepare result cache", err)
-	}
-
 	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {
 		fatalExit("cannot use encryption configuration", err)
 	} else {
 		if tlsConfig != nil {
-			if err := tls.Init(tlsConfig); err != nil {
+			if err = tls.Init(tlsConfig); err != nil {
 				fatalExit("cannot configure encryption", err)
 			}
 		}
@@ -428,12 +441,13 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 		log.Errf("Failed to load key access rules: %s", err.Error())
 		os.Exit(1)
 	}
 
-	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
+	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+		agent.Options.UserParameterDir); err != nil {
 		fatalExit("cannot initialize user parameters", err)
 	}
 
@@ -460,7 +474,6 @@ func main() {
 		if agent.Options.LogType != "console" {
 			fmt.Println(greeting)
 		}
-		fmt.Println("Press Ctrl+C to exit.")
 	}
 
 	manager.Start()
@@ -469,13 +482,35 @@ func main() {
 		fatalExit("cannot process configuration", err)
 	}
 
-	serverConnectors = make([]*serverconnector.Connector, len(addresses))
-
-	for i := 0; i < len(serverConnectors); i++ {
-		if serverConnectors[i], err = serverconnector.New(manager, addresses[i], &agent.Options); err != nil {
-			fatalExit("cannot create server connector", err)
+	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+	if err != nil {
+		fatalExit("cannot parse the \"Hostname\" parameter", err)
+	}
+	agent.FirstHostname = hostnames[0]
+	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", agent.Options.Hostname)
+	log.Infof(hostmessage)
+	if foregroundFlag {
+		if agent.Options.LogType != "console" {
+			fmt.Println(hostmessage)
 		}
-		serverConnectors[i].Start()
+		fmt.Println("Press Ctrl+C to exit.")
+	}
+	if err = resultcache.Prepare(&agent.Options, addresses, hostnames); err != nil {
+		fatalExit("cannot prepare result cache", err)
+	}
+
+	serverConnectors = make([]*serverconnector.Connector, len(addresses)*len(hostnames))
+
+	var idx int
+	for i := 0; i < len(addresses); i++ {
+		for j := 0; j < len(hostnames); j++ {
+			if serverConnectors[idx], err = serverconnector.New(manager, addresses[i], hostnames[j], &agent.Options); err != nil {
+				fatalExit("cannot create server connector", err)
+			}
+			serverConnectors[idx].Start()
+			agent.SetHostname(serverConnectors[idx].ClientID(), hostnames[j])
+			idx++
+		}
 	}
 
 	for _, listener := range listeners {
@@ -513,7 +548,7 @@ func main() {
 
 	// split shutdown in two steps to ensure that result cache is still running while manager is
 	// being stopped, because there might be pending exporters that could block if result cache
-	// is stoppped and its input channel is full.
+	// is stopped and its input channel is full.
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].StopCache()
 	}

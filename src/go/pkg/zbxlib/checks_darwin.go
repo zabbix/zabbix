@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,8 +73,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		return unsafe.Pointer(C.NET_UDP_LISTEN)
 	case "system.cpu.load":
 		return unsafe.Pointer(C.SYSTEM_CPU_LOAD)
-	case "system.users.num":
-		return unsafe.Pointer(C.SYSTEM_USERS_NUM)
 	case "vfs.dir.count":
 		return unsafe.Pointer(C.VFS_DIR_COUNT)
 	case "vfs.dir.size":

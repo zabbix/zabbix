@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -781,6 +781,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(4040)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(4050)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5000)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5010)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(5020)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -802,6 +803,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(4050), "5.0 development"},
 	{DBPATCH_VERSION(5000), "5.0 maintenance"},
 	{DBPATCH_VERSION(5010), "5.2 development"},
+	{DBPATCH_VERSION(5020), "5.2 maintenance"},
 	{NULL}
 };
 

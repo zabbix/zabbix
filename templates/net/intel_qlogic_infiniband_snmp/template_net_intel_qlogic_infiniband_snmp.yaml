@@ -1,0 +1,381 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:33Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'Intel_Qlogic Infiniband SNMP'
+      name: 'Intel_Qlogic Infiniband SNMP'
+      description: |
+        Template Net Intel_Qlogic Infiniband
+        
+        MIBs used:
+        ICS-CHASSIS-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+      items:
+        -
+          name: 'Firmware version'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.10222.2.1.1.1.0
+          key: system.hw.firmware
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ICS-CHASSIS-MIB'
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'Firmware Version: ([0-9.]+),'
+                - \1
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.10222.2.1.1.1.0
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ICS-CHASSIS-MIB'
+          inventory_link: MODEL
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - '(.+) - Firmware'
+                - \1
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+      discovery_rules:
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.10222.2.1.6.5.1.2]'
+          key: fan.discovery
+          delay: 1h
+          description: 'icsChassisFanDescription of icsChassisFanTable'
+          item_prototypes:
+            -
+              name: '{#SNMPVALUE}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.10222.2.1.6.5.1.3.{#SNMPINDEX}'
+              key: 'sensor.fan.status[icsChassisFanOperStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: ICS-CHASSIS-MIB
+                The operational status of the fan unit.
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'ICS-CHASSIS-MIB::icsChassisFanOperStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  name: '{#SNMPVALUE}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.10222.2.1.4.7.1.2]'
+          key: psu.discovery
+          delay: 1h
+          description: 'A textual description of the power supply, that can be assigned by the administrator.'
+          item_prototypes:
+            -
+              name: '{#SNMPVALUE}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.10222.2.1.4.7.1.3.{#SNMPINDEX}'
+              key: 'sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: ICS-CHASSIS-MIB
+                Actual status of the power supply:
+                (1) unknown: status not known.
+                (2) disabled: power supply is disabled.
+                (3) failed - power supply is unable to supply power due to failure.
+                (4) warning - power supply is supplying power, but an output or sensor is bad or warning.
+                (5) standby - power supply believed usable,but not supplying power.
+                (6) engaged - power supply is supplying power.
+                (7) redundant - power supply is supplying power, but not needed.
+                (8) notPresent - power supply is supplying power is not present.
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  name: '{#SNMPVALUE}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+                -
+                  expression: '{count(#1,{$PSU_WARN_STATUS},eq)}=1'
+                  name: '{#SNMPVALUE}: Power supply is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors'
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: Power supply is in critical state'
+                      expression: '{Intel_Qlogic Infiniband SNMP:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+        -
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.4.1.10222.2.1.9.8.1.2,{#SENSOR_INFO},1.3.6.1.4.1.10222.2.1.9.8.1.7]'
+          key: temp.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#SENSOR_TYPE}'
+                value: '2'
+                formulaid: A
+          description: 'Discovering sensor''s table with temperature filter'
+          item_prototypes:
+            -
+              name: '{#SENSOR_INFO}: Temperature status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.10222.2.1.9.8.1.3.{#SNMPINDEX}'
+              key: 'sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: ICS-CHASSIS-MIB
+                The operational status of the sensor.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus'
+            -
+              name: '{#SENSOR_INFO}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.10222.2.1.9.8.1.8.{#SNMPINDEX}'
+              key: 'sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: ICS-CHASSIS-MIB
+                The current value read from the sensor.
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+          trigger_prototypes:
+            -
+              expression: |
+                {Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
+                or
+                {Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+              name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+            -
+              expression: |
+                {Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""}
+                or
+                {Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3'
+              name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              dependencies:
+                -
+                  name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  expression: |
+                    {Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
+                    or
+                    {Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                  recovery_expression: '{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+        -
+          name: 'Unit Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.4.1.10222.2.1.1.9.1.3,{#ENT_NAME},1.3.6.1.4.1.10222.2.1.1.9.1.2]'
+          key: unit.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: '2'
+                formulaid: A
+          item_prototypes:
+            -
+              name: '{#ENT_NAME}: Hardware serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.10222.2.1.1.10.1.1.{#SNMPINDEX}'
+              key: 'system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ICS-CHASSIS-MIB
+                The serial number of the FRU.  If not available, this value is a zero-length string.
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Device serial number has changed. Ack to close'
+                  manual_close: 'YES'
+      macros:
+        -
+          macro: '{$FAN_CRIT_STATUS}'
+          value: '3'
+        -
+          macro: '{$PSU_CRIT_STATUS}'
+          value: '3'
+        -
+          macro: '{$PSU_WARN_STATUS}'
+          value: '4'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_CRIT_STATUS}'
+          value: '3'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN_STATUS}'
+          value: '2'
+  value_maps:
+    -
+      name: 'ICS-CHASSIS-MIB::icsChassisFanOperStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: online
+        -
+          value: '2'
+          newvalue: operational
+        -
+          value: '3'
+          newvalue: failed
+        -
+          value: '4'
+          newvalue: offline
+    -
+      name: 'ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: unknown
+        -
+          value: '2'
+          newvalue: disabled
+        -
+          value: '3'
+          newvalue: failed
+        -
+          value: '4'
+          newvalue: warning
+        -
+          value: '5'
+          newvalue: standby
+        -
+          value: '6'
+          newvalue: engaged
+        -
+          value: '7'
+          newvalue: redundant
+        -
+          value: '8'
+          newvalue: notPresent
+    -
+      name: 'ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: invalid
+        -
+          value: '2'
+          newvalue: bad
+        -
+          value: '3'
+          newvalue: warning
+        -
+          value: '4'
+          newvalue: good
+        -
+          value: '5'
+          newvalue: disabled

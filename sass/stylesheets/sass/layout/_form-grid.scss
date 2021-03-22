@@ -1,0 +1,68 @@
+.form-grid {
+	display: grid;
+	row-gap: 10px;
+	column-gap: 10px;
+	grid-template-columns: auto 1fr;
+
+	> label {
+		line-height: 24px;
+		text-align: right;
+		word-wrap: break-word;
+	}
+
+	.form-actions,
+	.form-field,
+	.field-fluid {
+		grid-column: 2 / -1;
+		text-align: left;
+		line-height: 24px;
+	}
+
+	.form-field {
+		$offsets: (
+				1: 2,
+				2: 3,
+				3: 4
+		);
+
+		@each $offset, $value in $offsets {
+			&.offset-#{$offset} {
+				grid-column-start: $value !important;
+			}
+		}
+	}
+
+	&.form-grid-3-1 {
+		grid-template-columns: auto 3fr auto auto;
+	}
+
+	&.form-grid-1-1 {
+		grid-template-columns: repeat(2, auto 1fr);
+	}
+
+	&.form-grid-3-1,
+	&.form-grid-1-1 {
+		.form-field:not(.field-fluid) {
+				grid-column-start: initial;
+				grid-column-end: span 1;
+		}
+	}
+}
+
+.form-grid {
+	.table-forms-separator {
+		line-height: 1.4;
+
+		td {
+			padding: 5px 5px 5px 0;
+		}
+	}
+
+	.form-actions {
+		button {
+			&:not(:first-of-type) {
+				margin-left: 10px;
+			}
+		}
+	}
+}

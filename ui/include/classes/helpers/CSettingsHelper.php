@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,6 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const PROBLEM_ACK_STYLE = 'problem_ack_style';
 	public const PROBLEM_UNACK_COLOR = 'problem_unack_color';
 	public const PROBLEM_UNACK_STYLE = 'problem_unack_style';
-	public const REFRESH_UNSUPPORTED = 'refresh_unsupported';
 	public const SCRIPT_TIMEOUT = 'script_timeout';
 	public const SEARCH_LIMIT = 'search_limit';
 	public const SERVER_CHECK_INTERVAL = 'server_check_interval';
@@ -93,11 +92,11 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	protected static function loadParams(?string $param = null, bool $is_global = false): void {
 		if (!self::$params) {
 			self::$params = $is_global
-				? API::Settings()->getGlobal(['output' => 'extend'])
+				? API::getApiService('settings')->getGlobal(['output' => 'extend'], false)
 				: API::Settings()->get(['output' => 'extend']);
 		}
 		else if (!$is_global && $param && !array_key_exists($param, self::$params)) {
-			self::$params = API::Settings()->get(['output' => 'extend']);
+			self::$params = API::Settings()->get(['output' => 'extend']) + self::$params;
 		}
 
 		if (self::$params === false) {

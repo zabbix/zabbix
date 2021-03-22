@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
-		$timezones = DateTimeZone::listIdentifiers();
-		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -42,21 +40,21 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'password2' =>		'string',
 			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
-			'timezone' =>		'db users.timezone|in '.implode(',', $timezones),
+			'timezone' =>		'db users.timezone|in '.implode(',', $this->timezones),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
 			'autologout' =>		'db users.autologout|not_empty',
 			'refresh' =>		'db users.refresh|not_empty',
 			'rows_per_page' =>	'db users.rows_per_page',
 			'url' =>			'db users.url',
-			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
+			'roleid' =>			'required|db users.roleid',
 			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && !$this->validatePassword()) {
+		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
 			$error = self::VALIDATION_ERROR;
 			$ret = false;
 		}
@@ -80,7 +78,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)) {
 			return false;
 		}
 
@@ -95,7 +93,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$user = [];
 
 		$this->getInputs($user, ['userid', 'alias', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
-			'autologout', 'refresh', 'rows_per_page', 'url', 'type'
+			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class CPage {
 	/**
 	 * Page defaults.
 	 */
-	const DEFAULT_PAGE_WIDTH = 1280;
+	const DEFAULT_PAGE_WIDTH = 1440;
 	const DEFAULT_PAGE_HEIGHT = 1024;
 
 	/**
@@ -81,6 +81,14 @@ class CPage {
 	 * Web driver and CElementQuery initialization.
 	 */
 	public function __construct() {
+		$this->connect();
+		CElementQuery::setPage($this);
+	}
+
+	/**
+	 * Web driver initialization.
+	 */
+	public function connect() {
 		$capabilities = DesiredCapabilities::chrome();
 		if (defined('PHPUNIT_BROWSER_NAME')) {
 			$capabilities->setBrowserName(PHPUNIT_BROWSER_NAME);
@@ -97,13 +105,17 @@ class CPage {
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
-		$this->driver = RemoteWebDriver::create('http://'.PHPUNIT_DRIVER_ADDRESS.':4444/wd/hub', $capabilities);
+		$phpunit_driver_address = PHPUNIT_DRIVER_ADDRESS;
+
+		if (strpos($phpunit_driver_address, ':') === false) {
+			$phpunit_driver_address .= ':4444';
+		}
+
+		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
 		);
-
-		CElementQuery::setPage($this);
 	}
 
 	/**
@@ -165,6 +177,14 @@ class CPage {
 	}
 
 	/**
+	 * Reconnect web driver.
+	 */
+	public function reset() {
+		$this->destroy();
+		$this->connect();
+	}
+
+	/**
 	 * Login as specified user.
 	 *
 	 * @param string  $sessionid   session id
@@ -177,22 +197,20 @@ class CPage {
 			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
 		}
 
-		$cookie_sessionid = '';
 		if (self::$cookie !== null) {
-			$cookie = unserialize(base64_decode(self::$cookie['value']));
-			$cookie_sessionid = $cookie['sessionid'];
+			$cookie = json_decode(base64_decode(urldecode(self::$cookie['value'])), true);
 		}
 
-		if (self::$cookie === null || $sessionid !== $cookie_sessionid) {
+		if (self::$cookie === null || $sessionid !== $cookie['sessionid']) {
 			$data = ['sessionid' => $sessionid];
 
 			$config = CDBHelper::getRow('select session_key from config where configid=1');
-			$data['sign'] = openssl_encrypt(serialize($data), 'aes-256-ecb', $config['session_key']);
+			$data['sign'] = openssl_encrypt(json_encode($data), 'aes-256-ecb', $config['session_key']);
 
 			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
 				'name' => 'zbx_session',
-				'value' => base64_encode(serialize($data)),
+				'value' => base64_encode(json_encode($data)),
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
@@ -494,9 +512,11 @@ class CPage {
 	 */
 	public function removeFocus() {
 		try {
-			$this->driver->executeScript('document.activeElement.blur();');
-		} catch (Exception $ex) {
-			// Code is not missing here.
+			$this->driver->executeScript('for (var i = 0; i < 5; i++) if (document.activeElement.tagName !== "BODY")'.
+					' document.activeElement.blur(); else break;');
+		}
+		catch (\Exception $ex) {
+			throw new \Exception('Cannot remove focus.');
 		}
 	}
 
@@ -555,5 +575,40 @@ class CPage {
 		$this->query('id:password')->one()->fill($password);
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
+	}
+
+	/**
+	 * Check page title text.
+	 *
+	 * @param string $title		page title
+	 *
+	 * @throws Exception
+	 */
+	public function assertTitle($title) {
+		global $ZBX_SERVER_NAME;
+
+		if ($ZBX_SERVER_NAME !== '') {
+			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
+		}
+
+		$text = $this->getTitle();
+		if ($text !== $title) {
+			throw new \Exception('Title of the page "'.$text.'" is not equal to "'.$title.'".');
+		}
+	}
+
+	/**
+	 * Check page header.
+	 *
+	 * @param string $header	page header to be compared
+	 *
+	 * @throws Exception
+	 */
+	public function assertHeader($header) {
+		$text = $this->query('xpath://h1[@id="page-title-general"]')->one()->getText();
+
+		if ($text !== $header) {
+			throw new \Exception('Header of the page "'.$text.'" is not equal to "'.$header.'".');
+		}
 	}
 }

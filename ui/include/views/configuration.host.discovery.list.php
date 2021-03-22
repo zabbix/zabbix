@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ $widget = (new CWidget())
 	);
 
 if ($data['hostid'] != 0) {
-	$widget->addItem(get_header_host_table('discoveries', $data['hostid']));
+	$widget->setNavigation(getHostNavigation('discoveries', $data['hostid']));
 }
 
 // Add filter tab.
@@ -96,19 +96,26 @@ $filter_column1 = (new CFormList())
 
 // type select
 $filter_type_visibility = [];
-$cmb_type = new CComboBox('filter_type', $data['filter']['type'], null, [-1 => _('all')]);
+$type_select = (new CSelect('filter_type'))
+	->setId('filter_type')
+	->setFocusableElementId('label-type')
+	->addOption(new CSelectOption(-1, _('all')))
+	->setValue($data['filter']['type']);
+
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
+zbx_subarray_push($filter_type_visibility, -1, 'filter_delay');
 
 $lld_types = item_type2str();
 unset($lld_types[ITEM_TYPE_AGGREGATE], $lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED],
 	$lld_types[ITEM_TYPE_SNMPTRAP]
 );
 
-$cmb_type->addItems($lld_types);
+$type_select->addOptions(CSelect::createOptionsFromArray($lld_types));
 
 foreach ($lld_types as $type => $name) {
 	if ($type != ITEM_TYPE_TRAPPER) {
 		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay_row');
+		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay');
 	}
 	if ($type == ITEM_TYPE_SNMP) {
 		zbx_subarray_push($filter_type_visibility, $type, 'filter_snmp_oid_row');
@@ -120,7 +127,7 @@ zbx_add_post_js(
 );
 
 $filter_column2 = (new CFormList())
-	->addRow(_('Type'), $cmb_type)
+	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), $type_select)
 	->addRow(_('Update interval'),
 		(new CTextBox('filter_delay', $data['filter']['delay']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_delay_row'
@@ -134,19 +141,27 @@ $filter_column2 = (new CFormList())
 	);
 
 $filter_column3 = (new CFormList())
-	->addRow(_('State'),
-		new CComboBox('filter_state', $data['filter']['state'], null, [
-			-1 => _('all'),
-			ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
-			ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
-		])
+	->addRow(new CLabel(_('State'), 'label-state'),
+		(new CSelect('filter_state'))
+			->setId('filter_state')
+			->setValue($data['filter']['state'])
+			->setFocusableElementId('label-state')
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
+				ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
+			]))
 	)
-	->addRow(_('Status'),
-		new CComboBox('filter_status', $data['filter']['status'], null, [
-			-1 => _('all'),
-			ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
-			ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
-		])
+	->addRow(new CLabel(_('Status'), 'label-status'),
+		(new CSelect('filter_status'))
+			->setId('filter_status')
+			->setFocusableElementId('label-status')
+			->setValue($data['filter']['status'])
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
+				ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
+			]))
 	);
 
 $filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2, $filter_column3]);
@@ -186,7 +201,9 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
-	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE);
+	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
@@ -231,7 +248,8 @@ foreach ($data['discoveries'] as $discovery) {
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
-			|| $discovery['type'] == ITEM_TYPE_DEPENDENT) {
+			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+				&& strncmp($discovery['key_'], 'mqtt.get', 8) === 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {

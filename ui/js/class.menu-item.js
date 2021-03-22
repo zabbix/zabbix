@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,10 @@ class CMenuItem extends CBaseComponent {
 		this._toggle.blur();
 	}
 
+	isExpanded() {
+		return this._is_expanded;
+	}
+
 	isSelected() {
 		return this._is_selected;
 	}
@@ -90,9 +94,7 @@ class CMenuItem extends CBaseComponent {
 		this._events = {
 
 			click: (e) => {
-				if (!this._is_expanded) {
-					this.expandSubmenu();
-				}
+				this.expandSubmenu();
 				e.preventDefault();
 			},
 

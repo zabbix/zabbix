@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,8 +32,9 @@ import (
 	"zabbix.com/pkg/log"
 )
 
-func Execute(s string, timeout time.Duration) (string, error) {
+func execute(s string, timeout time.Duration, path string, strict bool) (string, error) {
 	cmd := exec.Command("sh", "-c", s)
+	cmd.Dir = path
 
 	var b bytes.Buffer
 	cmd.Stdout = &b
@@ -54,14 +55,19 @@ func Execute(s string, timeout time.Duration) (string, error) {
 		}
 	})
 
-	cmd.Wait()
+	werr := cmd.Wait()
 
 	if !t.Stop() {
 		return "", fmt.Errorf("Timeout while executing a shell script.")
 	}
 
-	if maxExecuteOutputLenB <= len(b.String()) {
-		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024)
+	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
+	if strict && werr != nil {
+		return "", fmt.Errorf("Command execution failed: %s", werr)
+	}
+
+	if MaxExecuteOutputLenB <= len(b.String()) {
+		return "", fmt.Errorf("Command output exceeded limit of %d KB", MaxExecuteOutputLenB/1024)
 	}
 
 	return strings.TrimRight(b.String(), " \t\r\n"), nil

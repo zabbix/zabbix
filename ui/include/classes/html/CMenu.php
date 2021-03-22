@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,5 +186,9 @@ class CMenu extends CTag {
 		array_splice($this->menu_items, $position, 0, [$menu_item]);
 
 		return $this;
+	}
+
+	public function getMenuItems(): array {
+		return $this->menu_items;
 	}
 }

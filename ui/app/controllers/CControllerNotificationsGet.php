@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,18 +98,43 @@ class CControllerNotificationsGet extends CController {
 		$events = API::Problem()->get($options);
 
 		// Select latest status for already known events that are no longer available in problems table.
-		$resolved_events = $this->settings['show_recovered']
+		$other_still_shown_eventids = $this->settings['show_recovered']
 			? array_diff(array_keys($this->known_eventids), array_keys($events))
 			: [];
 
-		if ($resolved_events) {
-			$events += API::Event()->get([
+		if ($other_still_shown_eventids) {
+			$resolved_events = API::Event()->get([
 				'output' => ['eventid', 'r_eventid', 'clock', 'severity'],
-				'eventids' => $resolved_events,
+				'eventids' => $other_still_shown_eventids,
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
 				'preservekeys' => true
 			]);
+
+			$r_eventids = [];
+
+			foreach ($resolved_events as $eventid => $resolved_event) {
+				if ($resolved_event['r_eventid'] != 0) {
+					$r_eventids[$eventid] = $resolved_event['r_eventid'];
+				}
+			}
+
+			if ($r_eventids) {
+				$r_clocks = API::Event()->get([
+					'output' => ['clock'],
+					'eventids' => array_values($r_eventids),
+					'sortfield' => 'clock',
+					'sortorder' => ZBX_SORT_DOWN,
+					'preservekeys' => true
+				]);
+
+				foreach ($r_eventids as $eventid => &$r_eventid) {
+					$resolved_events[$eventid]['r_clock'] = $r_clocks[$r_eventid]['clock'];
+				}
+				unset($r_eventid);
+			}
+
+			$events += $resolved_events;
 		}
 
 		// Append selected events to notifications array.
@@ -132,7 +157,7 @@ class CControllerNotificationsGet extends CController {
 					 */
 				}
 				// Filter by problem start time, because that is not done by API if show_recovered is enabled.
-				elseif ($event['clock'] < $this->time_from && !in_array($eventid, $resolved_events)) {
+				elseif ($event['clock'] < $this->time_from && !in_array($eventid, $other_still_shown_eventids)) {
 					continue;
 				}
 			}
@@ -166,14 +191,14 @@ class CControllerNotificationsGet extends CController {
 
 				$url_problems = (new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_hostids[]', $trigger['hosts'][0]['hostid'])
-					->setArgument('filter_set', '1')
+					->setArgument('filter_name', '')
+					->setArgument('hostids[]', $trigger['hosts'][0]['hostid'])
 					->getUrl();
 
 				$url_events = (new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids[]', $triggerid)
-					->setArgument('filter_set', '1')
+					->setArgument('filter_name', '')
+					->setArgument('triggerids[]', $triggerid)
 					->getUrl();
 
 				$url_trigger_events_pt = (new CUrl('tr_events.php'))->setArgument('triggerid', $triggerid);
@@ -193,7 +218,7 @@ class CControllerNotificationsGet extends CController {
 							'[url='.$url_events.']'.CHtml::encode($notification['name']).'[/url]',
 							'[url='.$url_trigger_events.']'.
 								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']).
-							'[/url]',
+							'[/url]'
 						]
 					];
 				}

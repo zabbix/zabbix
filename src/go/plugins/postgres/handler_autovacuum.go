@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,33 +21,35 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
-)
-
-const (
-	keyPostgresAutovacuum = "pgsql.autovacuum.count"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // autovacuumHandler returns count of autovacuum workers if all is OK or nil otherwise.
-func (p *Plugin) autovacuumHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+func autovacuumHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
 	var countAutovacuumWorkers int64
-	var err error
+
 	query := `SELECT count(*)
 				FROM pg_catalog.pg_stat_activity
 			   WHERE query like '%%autovacuum%%'
 				 AND state <> 'idle'
 				 AND pid <> pg_catalog.pg_backend_pid()`
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&countAutovacuumWorkers)
-
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&countAutovacuumWorkers)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return countAutovacuumWorkers, nil

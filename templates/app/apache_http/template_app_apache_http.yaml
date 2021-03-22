@@ -1,0 +1,862 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:32:59Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Apache by HTTP'
+      name: 'Apache by HTTP'
+      description: |
+        Get metrics from mod_status module using HTTP agent.
+        https://httpd.apache.org/docs/current/mod/mod_status.html
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: Apache
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Apache: Total bytes'
+          type: DEPENDENT
+          key: apache.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Total bytes served'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$["Total kBytes"]'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Bytes per second'
+          type: DEPENDENT
+          key: apache.bytes.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: |
+            Calculated as change rate for 'Total bytes' stat.
+            BytesPerSec is not used, as it counts average since last Apache server start.
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$["Total kBytes"]'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Get status'
+          type: HTTP_AGENT
+          key: apache.get_status
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            Getting data from a machine-readable version of the Apache status page.
+            https://httpd.apache.org/docs/current/mod/mod_status.html
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  // Convert Apache status to JSON
+                  var lines = value.split('\n');
+                  var output = {},
+                      workers = {
+                          '_': 0, 'S': 0, 'R': 0, 'W': 0,
+                          'K': 0, 'D': 0, 'C': 0, 'L': 0,
+                          'G': 0, 'I': 0, '.': 0
+                      };
+                  
+                  // Get all "Key: Value" pairs as an object
+                  for (var i = 0; i < lines.length; i++) {
+                      var line = lines[i].match(/([A-z0-9 ]+): (.*)/);
+                  
+                      if (line !== null) {
+                          output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);
+                      }
+                  }
+                  
+                  // Multiversion metrics
+                  output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime;
+                  output.ServerVersion = output.Server || output.ServerVersion;
+                  
+                  // Parse "Scoreboard" to get worker count.
+                  if (typeof output.Scoreboard === 'string') {
+                      for (var i = 0; i < output.Scoreboard.length; i++) {
+                          var char = output.Scoreboard[i];
+                  
+                          workers[char]++;
+                      }
+                  }
+                  
+                  // Add worker data to the output
+                  output.Workers = {
+                      waiting: workers['_'], starting: workers['S'], reading: workers['R'],
+                      sending: workers['W'], keepalive: workers['K'], dnslookup: workers['D'],
+                      closing: workers['C'], logging: workers['L'], finishing: workers['G'],
+                      cleanup: workers['I'], slot: workers['.']
+                  };
+                  
+                  // Return JSON string
+                  return JSON.stringify(output);
+          url: '{$APACHE.STATUS.SCHEME}://{HOST.CONN}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}'
+          retrieve_mode: BOTH
+          triggers:
+            -
+              expression: '{nodata(30m)}=1'
+              name: 'Apache: Failed to fetch status page (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Apache: Service is down'
+                  expression: '{Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0'
+        -
+          name: 'Apache: Total requests'
+          type: DEPENDENT
+          key: apache.requests
+          delay: '0'
+          history: 7d
+          description: 'A total number of accesses'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$["Total Accesses"]'
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Requests per second'
+          type: DEPENDENT
+          key: apache.requests.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            Calculated as change rate for 'Total requests' stat.
+            ReqPerSec is not used, as it counts average since last Apache server start.
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$["Total Accesses"]'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Uptime'
+          type: DEPENDENT
+          key: apache.uptime
+          delay: '0'
+          history: 7d
+          units: uptime
+          description: 'Service uptime in seconds'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.ServerUptimeSeconds
+          master_item:
+            key: apache.get_status
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'Apache: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'Apache: Version'
+          type: DEPENDENT
+          key: apache.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Service version'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.ServerVersion
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: apache.get_status
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Apache version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Apache: Workers idle cleanup'
+          type: DEPENDENT
+          key: apache.workers.cleanup
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in cleanup state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.cleanup
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers closing connection'
+          type: DEPENDENT
+          key: apache.workers.closing
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in closing state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.closing
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers DNS lookup'
+          type: DEPENDENT
+          key: apache.workers.dnslookup
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in dnslookup state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.dnslookup
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers finishing'
+          type: DEPENDENT
+          key: apache.workers.finishing
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in finishing state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.finishing
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers keepalive (read)'
+          type: DEPENDENT
+          key: apache.workers.keepalive
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in keepalive state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.keepalive
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers logging'
+          type: DEPENDENT
+          key: apache.workers.logging
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in logging state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.logging
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers reading request'
+          type: DEPENDENT
+          key: apache.workers.reading
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in reading state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.reading
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers sending reply'
+          type: DEPENDENT
+          key: apache.workers.sending
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in sending state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.sending
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers slot with no current process'
+          type: DEPENDENT
+          key: apache.workers.slot
+          delay: '0'
+          history: 7d
+          description: 'Number of slots with no current process'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.slot
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers starting up'
+          type: DEPENDENT
+          key: apache.workers.starting
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in starting state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.starting
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Workers waiting for connection'
+          type: DEPENDENT
+          key: apache.workers.waiting
+          delay: '0'
+          history: 7d
+          description: 'Number of workers in waiting state'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Workers.waiting
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Total workers busy'
+          type: DEPENDENT
+          key: apache.workers_total.busy
+          delay: '0'
+          history: 7d
+          description: 'Total number of busy worker threads/processes'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.BusyWorkers
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Total workers idle'
+          type: DEPENDENT
+          key: apache.workers_total.idle
+          delay: '0'
+          history: 7d
+          description: 'Total number of idle worker threads/processes'
+          applications:
+            -
+              name: Apache
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.IdleWorkers
+          master_item:
+            key: apache.get_status
+        -
+          name: 'Apache: Service response time'
+          type: SIMPLE
+          key: 'net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          applications:
+            -
+              name: Apache
+          triggers:
+            -
+              expression: '{min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}'
+              name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Apache: Service is down'
+                  expression: '{Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0'
+        -
+          name: 'Apache: Service ping'
+          type: SIMPLE
+          key: 'net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]'
+          history: 7d
+          applications:
+            -
+              name: Apache
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Apache: Service is down'
+              priority: AVERAGE
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Event MPM discovery'
+          type: DEPENDENT
+          key: apache.mpm.event.discovery
+          delay: '0'
+          description: |
+            Additional metrics if event MPM is used
+            https://httpd.apache.org/docs/current/mod/event.html
+          item_prototypes:
+            -
+              name: 'Apache: Bytes per request'
+              type: DEPENDENT
+              key: 'apache.bytes[per_request{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Average number of client requests per second'
+              applications:
+                -
+                  name: Apache
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.BytesPerReq
+              master_item:
+                key: apache.get_status
+            -
+              name: 'Apache: Connections async closing'
+              type: DEPENDENT
+              key: 'apache.connections[async_closing{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of async connections in closing state (only applicable to event MPM)'
+              applications:
+                -
+                  name: Apache
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.ConnsAsyncClosing
+              master_item:
+                key: apache.get_status
+            -
+              name: 'Apache: Connections async keep alive'
+              type: DEPENDENT
+              key: 'apache.connections[async_keep_alive{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of async connections in keep-alive state (only applicable to event MPM)'
+              applications:
+                -
+                  name: Apache
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.ConnsAsyncKeepAlive
+              master_item:
+                key: apache.get_status
+            -
+              name: 'Apache: Connections async writing'
+              type: DEPENDENT
+              key: 'apache.connections[async_writing{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of async connections in writing state (only applicable to event MPM)'
+              applications:
+                -
+                  name: Apache
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.ConnsAsyncWriting
+              master_item:
+                key: apache.get_status
+            -
+              name: 'Apache: Connections total'
+              type: DEPENDENT
+              key: 'apache.connections[total{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of total connections'
+              applications:
+                -
+                  name: Apache
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.ConnsTotal
+              master_item:
+                key: apache.get_status
+            -
+              name: 'Apache: Number of async processes'
+              type: DEPENDENT
+              key: 'apache.process[num{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of async processes'
+              applications:
+                -
+                  name: Apache
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Processes
+              master_item:
+                key: apache.get_status
+          graph_prototypes:
+            -
+              name: 'Apache: Current async connections{#SINGLETON}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Apache by HTTP'
+                    key: 'apache.connections[async_closing{#SINGLETON}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Apache by HTTP'
+                    key: 'apache.connections[async_keep_alive{#SINGLETON}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Apache by HTTP'
+                    key: 'apache.connections[async_writing{#SINGLETON}]'
+                -
+                  sortorder: '3'
+                  drawtype: BOLD_LINE
+                  color: A54F10
+                  item:
+                    host: 'Apache by HTTP'
+                    key: 'apache.connections[total{#SINGLETON}]'
+            -
+              name: 'Apache: Current async processes{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Apache by HTTP'
+                    key: 'apache.process[num{#SINGLETON}]'
+          master_item:
+            key: apache.get_status
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.ServerMPM
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value === ''event'' ? [{''{#SINGLETON}'': ''''}] : []);'
+      macros:
+        -
+          macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'
+          value: '10'
+          description: 'Maximum Apache response time in seconds for trigger expression'
+        -
+          macro: '{$APACHE.STATUS.PATH}'
+          value: 'server-status?auto'
+          description: 'The URL path'
+        -
+          macro: '{$APACHE.STATUS.PORT}'
+          value: '80'
+          description: 'The port of Apache status page'
+        -
+          macro: '{$APACHE.STATUS.SCHEME}'
+          value: http
+          description: 'Request scheme which may be http or https'
+      dashboards:
+        -
+          name: 'Apache performance'
+          widgets:
+            -
+              type: GRAPH_CLASSIC
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Apache: Requests per second'
+                    host: 'Apache by HTTP'
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Apache: Workers total'
+                    host: 'Apache by HTTP'
+            -
+              type: GRAPH_PROTOTYPE
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: columns
+                  value: '1'
+                -
+                  type: GRAPH_PROTOTYPE
+                  name: graphid
+                  value:
+                    name: 'Apache: Current async connections{#SINGLETON}'
+                    host: 'Apache by HTTP'
+            -
+              type: GRAPH_PROTOTYPE
+              x: '12'
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: columns
+                  value: '1'
+                -
+                  type: GRAPH_PROTOTYPE
+                  name: graphid
+                  value:
+                    name: 'Apache: Current async processes{#SINGLETON}'
+                    host: 'Apache by HTTP'
+            -
+              type: GRAPH_CLASSIC
+              'y': '10'
+              width: '12'
+              height: '6'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Apache: Worker states'
+                    host: 'Apache by HTTP'
+  graphs:
+    -
+      name: 'Apache: Requests per second'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Apache by HTTP'
+            key: apache.requests.rate
+    -
+      name: 'Apache: Worker states'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.dnslookup
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.cleanup
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.logging
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.reading
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.sending
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.starting
+        -
+          sortorder: '6'
+          color: AC8C14
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.closing
+        -
+          sortorder: '7'
+          color: 611F27
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.finishing
+        -
+          sortorder: '8'
+          color: F230E0
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.keepalive
+        -
+          sortorder: '9'
+          color: FFAD40
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.slot
+        -
+          sortorder: '10'
+          color: 40CDFF
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers.waiting
+    -
+      name: 'Apache: Workers total'
+      type: STACKED
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers_total.busy
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Apache by HTTP'
+            key: apache.workers_total.idle
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

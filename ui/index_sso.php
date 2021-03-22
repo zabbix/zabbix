@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ $settings = [
 			'url' => $baseurl.'?acs'
 		],
 		'singleLogoutService' => [
-			'url' => $baseurl.'?sls',
+			'url' => $baseurl.'?sls'
 		],
 		'NameIDFormat' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_NAMEID_FORMAT),
 		'x509cert' => $sp_cert,
@@ -105,10 +105,10 @@ $settings = [
 	'idp' => [
 		'entityId' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_IDP_ENTITYID),
 		'singleSignOnService' => [
-			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL),
+			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL)
 		],
 		'singleLogoutService' => [
-			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL),
+			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL)
 		],
 		'x509cert' => $idp_cert
 	],
@@ -224,18 +224,21 @@ try {
 
 	if (CSessionHelper::has('saml_data')) {
 		$saml_data = CSessionHelper::get('saml_data');
-		$user = API::getApiService('user')->loginByAlias($saml_data['username_attribute'],
+		CWebUser::$data = API::getApiService('user')->loginByAlias($saml_data['username_attribute'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
-		if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
+		if (CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 			CSessionHelper::unset(['saml_data']);
 
 			throw new Exception(_('GUI access disabled.'));
 		}
 
-		$redirect = array_filter([$request, $user['url'], $relay_state, ZBX_DEFAULT_URL]);
+		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+
+		$redirect = array_filter([$request, CWebUser::$data['url'], $relay_state, CMenuHelper::getFirstUrl()]);
 		redirect(reset($redirect));
 	}
 

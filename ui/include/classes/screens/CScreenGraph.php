@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -198,7 +198,8 @@ class CScreenGraph extends CScreenBase {
 			);
 		}
 
-		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault) {
+		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault
+				|| !CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS)) {
 			$item = new CDiv();
 		}
 		elseif ($this->mode == SCREEN_MODE_PREVIEW) {

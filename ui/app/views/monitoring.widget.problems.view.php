@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,11 @@
 // indicator of sort field
 $sort_div = (new CSpan())->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
-$url_details = (new CUrl('tr_events.php'))
-	->setArgument('triggerid', '')
-	->setArgument('eventid', '');
+$url_details = $data['allowed_ui_problems']
+	? (new CUrl('tr_events.php'))
+		->setArgument('triggerid', '')
+		->setArgument('eventid', '')
+	: null;
 
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
@@ -73,13 +75,24 @@ if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
 }
 
+$allowed = [
+	'ui_problems' => $data['allowed_ui_problems'],
+	'add_comments' => $data['allowed_add_comments'],
+	'change_severity' => $data['allowed_change_severity'],
+	'acknowledge' => $data['allowed_acknowledge']
+];
+
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
+
+	$allowed['close'] = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $data['allowed_close']);
+	$can_be_closed = $allowed['close'];
 
 	if ($problem['r_eventid'] != 0) {
 		$value = TRIGGER_VALUE_FALSE;
 		$value_str = _('RESOLVED');
 		$value_clock = $problem['r_clock'];
+		$can_be_closed = false;
 	}
 	else {
 		$in_closing = false;
@@ -87,6 +100,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		foreach ($problem['acknowledges'] as $acknowledge) {
 			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 				$in_closing = true;
+				$can_be_closed = false;
 				break;
 			}
 		}
@@ -96,14 +110,19 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$value_clock = $in_closing ? time() : $problem['clock'];
 	}
 
-	$url_details
-		->setArgument('triggerid', $problem['objectid'])
-		->setArgument('eventid', $problem['eventid']);
-
 	$cell_clock = ($problem['clock'] >= $today)
 		? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
-	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+
+	if ($url_details !== null) {
+		$url_details
+			->setArgument('triggerid', $problem['objectid'])
+			->setArgument('eventid', $problem['eventid']);
+		$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+	}
+	else {
+		$cell_clock = new CCol($cell_clock);
+	}
 
 	$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 
@@ -112,7 +131,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			$cell_r_clock = ($problem['r_clock'] >= $today)
 				? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
 				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
-			$cell_r_clock = (new CCol(new CLink($cell_r_clock, $url_details)))
+			$cell_r_clock = (new CCol($url_details !== null ? new CLink($cell_r_clock, $url_details) : $cell_r_clock))
 				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_RIGHT);
 		}
@@ -184,12 +203,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$problem_link = [
 		(new CLinkAction($problem['name']))
-			->setHint(
-				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-					'triggerid' => $trigger['triggerid']], $eventid, $show_timeline, $data['fields']['show_tags'],
-					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority']
-				)
-			)
+			->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $eventid, $show_timeline,
+				$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
+				$data['fields']['tag_priority']
+			))
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], getSeverityName($problem['severity'])
 			))
@@ -245,10 +262,15 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	}
 
 	// Create acknowledge link.
-	$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-		->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-		->addClass(ZBX_STYLE_LINK_ALT)
-		->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
+	$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+			|| $can_be_closed)
+		? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+		: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+			$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+		);
 
 	$table->addRow(array_merge($row, [
 		$show_recovery_data ? $cell_r_clock : null,

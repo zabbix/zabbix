@@ -1,0 +1,2395 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-01-22T14:56:18Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Jenkins by HTTP'
+      name: 'Jenkins by HTTP'
+      description: |
+        Get Jenkins metrics by HTTP agent.
+        Metrics are collected by requests to Metrics API. Install  Metrics plugin and configure access to the Metrics Servlet by issuing API key.
+        Don't forget to change macros {$JENKINS.URL}, {$JENKINS.USER}, {$JENKINS.API.TOKEN}, {$JENKINS.API.KEY}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: Jenkins
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Jenkins: Get computer info'
+          type: HTTP_AGENT
+          key: jenkins.computer_info
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$JENKINS.USER}'
+          password: '{$JENKINS.API.TOKEN}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
+          url: '{$JENKINS.URL}/computer/api/json'
+        -
+          name: 'Jenkins: File descriptor ratio'
+          type: DEPENDENT
+          key: jenkins.descriptor.ratio
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The ratio of used to total file descriptors'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''vm.file.descriptor.ratio''].value'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '100'
+          master_item:
+            key: jenkins.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
+              name: 'Jenkins: Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)'
+              priority: WARNING
+        -
+          name: 'Jenkins: Disk space check'
+          type: DEPENDENT
+          key: jenkins.disk_space
+          delay: '0'
+          history: 7d
+          description: 'Returns FAIL if any of the Jenkins disk space monitors are reporting the disk space as less than the configured threshold.'
+          applications:
+            -
+              name: Jenkins
+          valuemap:
+            name: 'Jenkins healthcheck'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[''disk-space''].healthy'
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.healthcheck
+        -
+          name: 'Jenkins: Disk space check message'
+          type: DEPENDENT
+          key: jenkins.disk_space.message
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The message will reference the first node which fails this check.  There may be other nodes that fail the check, but this health check is designed to fail fast.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[''disk-space''].message'
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: jenkins.healthcheck
+        -
+          name: 'Jenkins: Executors count'
+          type: DEPENDENT
+          key: jenkins.executor.count
+          delay: '0'
+          history: 7d
+          description: 'The number of executors available to Jenkins. This is corresponds to the sum of all the executors of all the on-line nodes.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.executor.count.value''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Executors free'
+          type: DEPENDENT
+          key: jenkins.executor.free
+          delay: '0'
+          history: 7d
+          description: 'The number of executors available to Jenkins that are not currently in use.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.executor.free.value''].value'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Executors in use'
+          type: DEPENDENT
+          key: jenkins.executor.in_use
+          delay: '0'
+          history: 7d
+          description: 'The number of executors available to Jenkins that are currently in use.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.executor.in-use.value''].value'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Get service metrics'
+          type: HTTP_AGENT
+          key: jenkins.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
+          url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/metrics'
+          status_codes: ''
+        -
+          name: 'Jenkins: Get healthcheck'
+          type: HTTP_AGENT
+          key: jenkins.healthcheck
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
+          url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/healthcheck'
+          status_codes: ''
+        -
+          name: 'Jenkins: HTTP active requests, rate'
+          type: DEPENDENT
+          key: jenkins.http.active_requests.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of currently active requests against the Jenkins master Web UI.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.counters.[''http.activeRequests''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 400, rate'
+          type: DEPENDENT
+          key: jenkins.http.bad_request.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/400 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.badRequest''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 201, rate'
+          type: DEPENDENT
+          key: jenkins.http.created.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/201 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.created''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 403, rate'
+          type: DEPENDENT
+          key: jenkins.http.forbidden.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/403 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.forbidden''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 404, rate'
+          type: DEPENDENT
+          key: jenkins.http.not_found.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/404 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.notFound''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 304, rate'
+          type: DEPENDENT
+          key: jenkins.http.not_modified.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/304 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.notModified''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 204, rate'
+          type: DEPENDENT
+          key: jenkins.http.no_content.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/204 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.noContent''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 200, rate'
+          type: DEPENDENT
+          key: jenkins.http.ok.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/200 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.ok''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response other, rate'
+          type: DEPENDENT
+          key: jenkins.http.other.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a non-informational status code that is not in the list: HTTP/200, HTTP/201, HTTP/204, HTTP/304, HTTP/400, HTTP/403, HTTP/404, HTTP/500, or HTTP/503.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.other''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP requests, rate'
+          type: DEPENDENT
+          key: jenkins.http.requests.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is receiving requests.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''http.requests''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP requests, median'
+          type: DEPENDENT
+          key: jenkins.http.requests_p50.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The time spent generating the corresponding responses.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''http.requests''].p50'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP requests, p95'
+          type: DEPENDENT
+          key: jenkins.http.requests_p95.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The time spent generating the corresponding responses.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''http.requests''].p95'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 500, rate'
+          type: DEPENDENT
+          key: jenkins.http.server_error.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/500 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.serverError''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: HTTP response 503, rate'
+          type: DEPENDENT
+          key: jenkins.http.service_unavailable.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/503 status code.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''http.responseCodes.serviceUnavailable''].count'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job blocked duration, median'
+          type: DEPENDENT
+          key: jenkins.job.blocked.duration.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The amount of time which jobs spend in the blocked state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.blocked.duration''].p50'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job blocked duration, p95'
+          type: DEPENDENT
+          key: jenkins.job.blocked.duration.p95
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The amount of time which jobs spend in the blocked state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.blocked.duration''].p95'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job blocked, m1 rate'
+          type: DEPENDENT
+          key: jenkins.job.blocked.m1.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs in the build queue enter the blocked state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.blocked.duration''].m1_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job blocked, m5 rate'
+          type: DEPENDENT
+          key: jenkins.job.blocked.m5.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs in the build queue enter the blocked state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.blocked.duration''].m5_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job buildable duration, median'
+          type: DEPENDENT
+          key: jenkins.job.buildable.duration.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The amount of time which jobs spend inthe buildable state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.buildable.duration''].p50'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job buildable duration, p95'
+          type: DEPENDENT
+          key: jenkins.job.buildable.duration.p95
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The amount of time which jobs spend inthe buildable state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.buildable.duration''].p95'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job buildable, m1 rate'
+          type: DEPENDENT
+          key: jenkins.job.buildable.m1.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs in the build queue enter the buildable state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.buildable.duration''].m1_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job buildable, m5 rate'
+          type: DEPENDENT
+          key: jenkins.job.buildable.m5.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs in the build queue enter the buildable state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.buildable.duration''].m5_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job building duration, median'
+          type: DEPENDENT
+          key: jenkins.job.building.duration.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The amount of time which jobs spend building.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.building.duration''].p50'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job building duration, p95'
+          type: DEPENDENT
+          key: jenkins.job.building.duration.p95
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The amount of time which jobs spend building.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.building.duration''].p95'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job building, m1 rate'
+          type: DEPENDENT
+          key: jenkins.job.building.m1.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs are built.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.building.duration''].m1_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job building, m5 rate'
+          type: DEPENDENT
+          key: jenkins.job.building.m5.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs are built.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.building.duration''].m5_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Jobs count'
+          type: DEPENDENT
+          key: jenkins.job.count.value
+          delay: '0'
+          history: 7d
+          description: 'The number of jobs in Jenkins.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.job.count.value''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job queuing duration, median'
+          type: DEPENDENT
+          key: jenkins.job.queuing.duration.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The total time which jobs spend in the build queue.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.queuing.duration''].p50'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job queuing duration, p95'
+          type: DEPENDENT
+          key: jenkins.job.queuing.duration.p95
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The total time which jobs spend in the build queue.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.queuing.duration''].p95'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job queuing, m1 rate'
+          type: DEPENDENT
+          key: jenkins.job.queuing.m1.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs are queued.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.queuing.duration''].m1_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job queuing, m5 rate'
+          type: DEPENDENT
+          key: jenkins.job.queuing.m5.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs are queued.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.queuing.duration''].m5_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job scheduled, m1 rate'
+          type: DEPENDENT
+          key: jenkins.job.scheduled.m1.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs are scheduled. If a job is already in the queue and an identical request for scheduling the job is received then Jenkins will coalesce the two requests. This metric gives a reasonably pure measure of the load requirements of the Jenkins master as it is unaffected by the number of executors available to the system.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''jenkins.job.scheduled''].m1_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Jobs scheduled, m5 rate'
+          type: DEPENDENT
+          key: jenkins.job.scheduled.m5.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs are scheduled. If a job is already in the queue and an identical request for scheduling the job is received then Jenkins will coalesce the two requests. This metric gives a reasonably pure measure of the load requirements of the Jenkins master as it is unaffected by the number of executors available to the system.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.meters.[''jenkins.job.scheduled''].m5_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job total duration, median'
+          type: DEPENDENT
+          key: jenkins.job.total.duration.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The total time which jobs spend from entering the build queue to completing building.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.total.duration''].p50'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job total duration, p95'
+          type: DEPENDENT
+          key: jenkins.job.total.duration.p95
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The total time which jobs spend from entering the build queue to completing building.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.total.duration''].p95'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job total, m1 rate'
+          type: DEPENDENT
+          key: jenkins.job.total.m1.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs are queued.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.total.duration''].m1_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job total, m5 rate'
+          type: DEPENDENT
+          key: jenkins.job.total.m5.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs are queued.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.total.duration''].m5_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job waiting duration, median'
+          type: DEPENDENT
+          key: jenkins.job.waiting.duration.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The total amount of time that jobs spend in their quiet period.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.waiting.duration''].p50'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job waiting duration, p95'
+          type: DEPENDENT
+          key: jenkins.job.waiting.duration.p95
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The total amount of time that jobs spend in their quiet period.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.waiting.duration''].p95'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job waiting, m1 rate'
+          type: DEPENDENT
+          key: jenkins.job.waiting.m1.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs enter the quiet period.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.waiting.duration''].m1_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Job waiting, m5 rate'
+          type: DEPENDENT
+          key: jenkins.job.waiting.m5.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate at which jobs enter the quiet period.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.timers.[''jenkins.job.waiting.duration''].m5_rate'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Get jobs info'
+          type: HTTP_AGENT
+          key: jenkins.job_info
+          delay: 5m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$JENKINS.USER}'
+          password: '{$JENKINS.API.TOKEN}'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
+          url: '{$JENKINS.URL}/api/json'
+          query_fields:
+            -
+              name: tree
+              value: 'jobs[name,description,url,healthReport[score],lastBuild[number,result,duration,timestamp],lastSuccessfulBuild[number,result,duration,timestamp],lastFailedBuild[number,result,duration,timestamp]]'
+        -
+          name: 'Jenkins: Nodes count'
+          type: DEPENDENT
+          key: jenkins.node.count
+          delay: '0'
+          history: 7d
+          description: 'The number of build nodes available to Jenkins, both on-line and off-line.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.node.count.value''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Nodes offline'
+          type: DEPENDENT
+          key: jenkins.node.offline
+          delay: '0'
+          history: 7d
+          description: 'The number of build nodes available to Jenkins but currently off-line.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.node.offline.value''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Nodes online'
+          type: DEPENDENT
+          key: jenkins.node.online
+          delay: '0'
+          history: 7d
+          description: 'The number of build nodes available to Jenkins and currently on-line.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.node.online.value''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Jenkins: Service has no online nodes'
+              priority: AVERAGE
+        -
+          name: 'Jenkins: Service ping'
+          type: HTTP_AGENT
+          key: jenkins.ping
+          history: 7d
+          applications:
+            -
+              name: Jenkins
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: REGEX
+              parameters:
+                - '{$JENKINS.PING.REPLY}$'
+                - '1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/ping'
+          status_codes: ''
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Jenkins: Service is down'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: 'Jenkins: Plugins check'
+          type: DEPENDENT
+          key: jenkins.plugins
+          delay: '0'
+          history: 7d
+          description: 'Returns FAIL if any of the Jenkins plugins failed to start.'
+          applications:
+            -
+              name: Jenkins
+          valuemap:
+            name: 'Jenkins healthcheck'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.plugins.healthy
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.healthcheck
+        -
+          name: 'Jenkins: Plugins active'
+          type: DEPENDENT
+          key: jenkins.plugins.active
+          delay: '0'
+          history: 7d
+          description: 'The number of plugins in the Jenkins instance that started successfully.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.plugins.active''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Plugins failed'
+          type: DEPENDENT
+          key: jenkins.plugins.failed
+          delay: '0'
+          history: 7d
+          description: 'The number of plugins in the Jenkins instance that failed to start. A value other than 0 is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the plugin(s) or by resolving the plugin dependency issues.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.plugins.failed''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Plugins inactive'
+          type: DEPENDENT
+          key: jenkins.plugins.inactive
+          delay: '0'
+          history: 7d
+          description: 'The number of plugins in the Jenkins instance that are not currently enabled.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.plugins.inactive''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Plugins check message'
+          type: DEPENDENT
+          key: jenkins.plugins.message
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The message of plugins health check.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[''plugins''].message'
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: jenkins.healthcheck
+        -
+          name: 'Jenkins: Plugins with update'
+          type: DEPENDENT
+          key: jenkins.plugins.with_update
+          delay: '0'
+          history: 7d
+          description: 'The number of plugins in the Jenkins instance that have an newer version reported as available in the current Jenkins update center metadata held by Jenkins. This value is not indicative of an issue with Jenkins but high values can be used as a trigger to review the plugins with updates with a view to seeing whether those updates potentially contain fixes for issues that could be affecting your Jenkins instance.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.plugins.withUpdate''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Projects count'
+          type: DEPENDENT
+          key: jenkins.project.count
+          delay: '0'
+          history: 7d
+          description: 'The number of projects.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.project.count.value''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Build queue, blocked'
+          type: DEPENDENT
+          key: jenkins.queue.blocked
+          delay: '0'
+          history: 7d
+          description: 'The number of jobs that are in the Jenkins build queue and currently in the blocked state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.queue.blocked.value''].value'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Build queue, buildable'
+          type: DEPENDENT
+          key: jenkins.queue.buildable
+          delay: '0'
+          history: 7d
+          description: 'The number of jobs that are in the Jenkins build queue and currently in the blocked state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.queue.buildable.value''].value'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Build queue, pending'
+          type: DEPENDENT
+          key: jenkins.queue.pending
+          delay: '0'
+          history: 7d
+          description: 'The number of jobs that are in the Jenkins build queue and currently in the blocked state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.queue.pending.value''].value'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Build queue, size'
+          type: DEPENDENT
+          key: jenkins.queue.size
+          delay: '0'
+          history: 7d
+          description: 'The number of jobs that are in the Jenkins build queue.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.queue.size.value''].value'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Build queue, stuck'
+          type: DEPENDENT
+          key: jenkins.queue.stuck
+          delay: '0'
+          history: 7d
+          description: 'The number of jobs that are in the Jenkins build queue and currently in the blocked state.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.queue.stuck.value''].value'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: CPU Load'
+          type: DEPENDENT
+          key: jenkins.system.cpu.load
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The system load on the Jenkins master as reported by the JVM’s Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''system.cpu.load''].value'
+          master_item:
+            key: jenkins.get_metrics
+        -
+          name: 'Jenkins: Uptime'
+          type: DEPENDENT
+          key: jenkins.system.uptime
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'The number of seconds since the Jenkins master JVM started.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''vm.uptime.milliseconds''].value'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: jenkins.get_metrics
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'Jenkins: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'Jenkins: Temporary space check'
+          type: DEPENDENT
+          key: jenkins.temporary_space
+          delay: '0'
+          history: 7d
+          description: 'Returns FAIL if any of the Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold.'
+          applications:
+            -
+              name: Jenkins
+          valuemap:
+            name: 'Jenkins healthcheck'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[''temporary-space''].healthy'
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.healthcheck
+        -
+          name: 'Jenkins: Temporary space check message'
+          type: DEPENDENT
+          key: jenkins.temporary_space.message
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The message will reference the first node which fails this check. There may be other nodes that fail the check, but this health check is designed to fail fast.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[''temporary-space''].message'
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: jenkins.healthcheck
+        -
+          name: 'Jenkins: Thread deadlock check'
+          type: DEPENDENT
+          key: jenkins.thread_deadlock
+          delay: '0'
+          history: 7d
+          description: 'Returns FAIL if there are any deadlocked threads in the Jenkins master JVM.'
+          applications:
+            -
+              name: Jenkins
+          valuemap:
+            name: 'Jenkins healthcheck'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[''thread-deadlock''].healthy'
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.healthcheck
+        -
+          name: 'Jenkins: Thread deadlock check message'
+          type: DEPENDENT
+          key: jenkins.thread_deadlock.message
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The message of thread deadlock health check.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[''thread-deadlock''].message'
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: jenkins.healthcheck
+        -
+          name: 'Jenkins: Version'
+          type: DEPENDENT
+          key: jenkins.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of Jenkins server.'
+          applications:
+            -
+              name: Jenkins
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.gauges.[''jenkins.versions.core''].value'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: jenkins.get_metrics
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Jenkins: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Jenkins version has changed. Ack to close.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Computers discovery'
+          type: HTTP_AGENT
+          key: jenkins.computers
+          delay: 1h
+          authtype: BASIC
+          username: '{$JENKINS.USER}'
+          password: '{$JENKINS.API.TOKEN}'
+          item_prototypes:
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available physical memory'
+              type: DEPENDENT
+              key: 'jenkins.computer.available_physical_memory[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The total physical memory of the system, available bytes.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.SwapSpaceMonitor''].availablePhysicalMemory.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available swap space'
+              type: DEPENDENT
+              key: 'jenkins.computer.available_swap_space[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Available swap space in bytes.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.SwapSpaceMonitor''].availableSwapSpace.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Clock difference'
+              type: DEPENDENT
+              key: 'jenkins.computer.clock_difference[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'The clock difference between the master and nodes.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.ClockMonitor''].diff.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available disk space'
+              type: DEPENDENT
+              key: 'jenkins.computer.disk_space[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The available disk space of $JENKINS_HOME on agent.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.DiskSpaceMonitor''].size.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Idle'
+              type: DEPENDENT
+              key: 'jenkins.computer.idle[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Returns true if all the executors of this computer are idle.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              valuemap:
+                name: 'Computer state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].idle.first()'
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Executors'
+              type: DEPENDENT
+              key: 'jenkins.computer.numExecutors[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The maximum number of concurrent builds that Jenkins may perform on this node.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].numExecutors.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Offline cause reason'
+              type: DEPENDENT
+              key: 'jenkins.computer.offline.reason[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'If the computer was offline (either temporarily or not), will return the cause as a string (without user info). Empty string if the system was put offline without given a cause.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].offlineCauseReason.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Response time average'
+              type: DEPENDENT
+              key: 'jenkins.computer.response_time[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'The round trip network response time from the master to the agent'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.ResponseTimeMonitor''].average.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: State'
+              type: DEPENDENT
+              key: 'jenkins.computer.state[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                Represents the actual online/offline state.
+                Node description: {#DESCRIPTION}
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              valuemap:
+                name: 'Computer online'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].offline.first()'
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Temporarily offline'
+              type: DEPENDENT
+              key: 'jenkins.computer.temp_offline[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Returns true if this node is marked temporarily offline.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              valuemap:
+                name: 'Computer state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].temporarilyOffline.first()'
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available temp space'
+              type: DEPENDENT
+              key: 'jenkins.computer.temp_space[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The available disk space of the temporary directory. Java tools and tests/builds often create files in the temporary directory, and may not function properly if there''s no available space.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.TemporarySpaceMonitor''].size.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Total physical memory'
+              type: DEPENDENT
+              key: 'jenkins.computer.total_physical_memory[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total physical memory of the system, in bytes.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.SwapSpaceMonitor''].totalPhysicalMemory.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: jenkins.computer_info
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Total swap space'
+              type: DEPENDENT
+              key: 'jenkins.computer.total_swap_space[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total number of swap space in bytes.'
+              application_prototypes:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.SwapSpaceMonitor''].totalSwapSpace.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: jenkins.computer_info
+          trigger_prototypes:
+            -
+              expression: '{Jenkins by HTTP:jenkins.computer.state[{#DISPLAY_NAME}].last()}=1 and {Jenkins by HTTP:jenkins.computer.offline.reason[{#DISPLAY_NAME}].strlen()}>0'
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is down'
+              priority: AVERAGE
+              description: 'Node down with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}'
+              dependencies:
+                -
+                  name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is temporarily offline'
+                  expression: '{Jenkins by HTTP:jenkins.computer.temp_offline[{#DISPLAY_NAME}].last()}=1 and {Jenkins by HTTP:jenkins.computer.offline.reason[{#DISPLAY_NAME}].strlen()}>0'
+                -
+                  name: 'Jenkins: Service has no online nodes'
+                  expression: '{Jenkins by HTTP:jenkins.node.online.last()}=0'
+            -
+              expression: '{Jenkins by HTTP:jenkins.computer.temp_offline[{#DISPLAY_NAME}].last()}=1 and {Jenkins by HTTP:jenkins.computer.offline.reason[{#DISPLAY_NAME}].strlen()}>0'
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is temporarily offline'
+              priority: INFO
+              description: 'Node is temporarily Offline with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}'
+              manual_close: 'YES'
+          graph_prototypes:
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Physical memory'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Jenkins by HTTP'
+                    key: 'jenkins.computer.total_physical_memory[{#DISPLAY_NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Jenkins by HTTP'
+                    key: 'jenkins.computer.available_physical_memory[{#DISPLAY_NAME}]'
+            -
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Swap space'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Jenkins by HTTP'
+                    key: 'jenkins.computer.available_swap_space[{#DISPLAY_NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Jenkins by HTTP'
+                    key: 'jenkins.computer.total_swap_space[{#DISPLAY_NAME}]'
+          url: '{$JENKINS.URL}/computer/api/json'
+          query_fields:
+            -
+              name: tree
+              value: 'computer[description,displayName,monitorData]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#DESCRIPTION}'
+              path: $.description
+            -
+              lld_macro: '{#DISPLAY_NAME}'
+              path: $.displayName
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.computer.[*]'
+        -
+          name: 'Jobs discovery'
+          type: HTTP_AGENT
+          key: jenkins.jobs
+          delay: 1h
+          authtype: BASIC
+          username: '{$JENKINS.USER}'
+          password: '{$JENKINS.API.TOKEN}'
+          item_prototypes:
+            -
+              name: 'Jenkins job [{#NAME}]: Health score'
+              type: DEPENDENT
+              key: 'jenkins.build.health[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                Represents health of project. A number between 0-100.
+                Job Description: {#DESCRIPTION}
+                Job Url: {#URL}
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].healthReport..score.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+              trigger_prototypes:
+                -
+                  expression: '{last()}<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
+                  name: 'Jenkins job [{#NAME}]: Job is unhealthy'
+                  priority: WARNING
+                  manual_close: 'YES'
+            -
+              name: 'Jenkins job [{#NAME}]: Last Build duration'
+              type: DEPENDENT
+              key: 'jenkins.last_build.duration[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Build duration (in seconds).'
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastBuild.duration.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Build number'
+              type: DEPENDENT
+              key: 'jenkins.last_build.number[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Details: {#URL}/lastBuild/'
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastBuild.number.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Build result'
+              type: DEPENDENT
+              key: 'jenkins.last_build.result[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastBuild.result.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Build timestamp'
+              type: DEPENDENT
+              key: 'jenkins.last_build.timestamp[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: unixtime
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastBuild.timestamp.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Failed Build duration'
+              type: DEPENDENT
+              key: 'jenkins.last_failed_build.duration[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Build duration (in seconds).'
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastFailedBuild.duration.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Failed Build number'
+              type: DEPENDENT
+              key: 'jenkins.last_failed_build.number[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Details: {#URL}/lastFailedBuild/'
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastFailedBuild.number.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Failed Build timestamp'
+              type: DEPENDENT
+              key: 'jenkins.last_failed_build.timestamp[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: unixtime
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastFailedBuild.timestamp.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Successful Build duration'
+              type: DEPENDENT
+              key: 'jenkins.last_successful_build.duration[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Build duration (in seconds).'
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastSuccessfulBuild.duration.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Successful Build number'
+              type: DEPENDENT
+              key: 'jenkins.last_successful_build.number[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Details: {#URL}/lastSuccessfulBuild/'
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastSuccessfulBuild.number.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+            -
+              name: 'Jenkins job [{#NAME}]: Last Successful Build timestamp'
+              type: DEPENDENT
+              key: 'jenkins.last_successful_build.timestamp[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: unixtime
+              application_prototypes:
+                -
+                  name: 'Jenkins job [{#NAME}]'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].lastSuccessfulBuild.timestamp.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+          url: '{$JENKINS.URL}/api/json'
+          query_fields:
+            -
+              name: tree
+              value: 'jobs[name,description,url]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#DESCRIPTION}'
+              path: $.description
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#URL}'
+              path: $.url
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.jobs.[*]'
+      macros:
+        -
+          macro: '{$JENKINS.API.KEY}'
+          description: 'API key to access Metrics Servlet'
+        -
+          macro: '{$JENKINS.API.TOKEN}'
+          description: 'API token for HTTP BASIC authentication.'
+        -
+          macro: '{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
+          value: '85'
+          description: 'Maximum percentage of file descriptors usage alert threshold (for trigger expression).'
+        -
+          macro: '{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
+          value: '50'
+          description: 'Minimum job''s health score (for trigger expression).'
+        -
+          macro: '{$JENKINS.PING.REPLY}'
+          value: pong
+          description: 'Expected reply to the ping.'
+        -
+          macro: '{$JENKINS.URL}'
+          description: 'Jenkins URL in the format `<scheme>://<host>:<port>`'
+        -
+          macro: '{$JENKINS.USER}'
+          value: zabbix
+          description: 'Username for HTTP BASIC authentication'
+  triggers:
+    -
+      expression: '{Jenkins by HTTP:jenkins.disk_space.last()}=0 and {Jenkins by HTTP:jenkins.disk_space.message.strlen()}>0'
+      name: 'Jenkins: Disk space is too low'
+      priority: WARNING
+      description: |
+        Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.
+        Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
+    -
+      expression: '{Jenkins by HTTP:jenkins.plugins.last()}=0 and {Jenkins by HTTP:jenkins.plugins.message.strlen()}>0'
+      name: 'Jenkins: One or more Jenkins plugins failed to start'
+      priority: INFO
+      description: |
+        A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues. 
+        Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
+      manual_close: 'YES'
+    -
+      expression: '{Jenkins by HTTP:jenkins.temporary_space.last()}=0 and {Jenkins by HTTP:jenkins.temporary_space.message.strlen()}>0'
+      name: 'Jenkins: Temporary space is too low'
+      priority: WARNING
+      description: |
+        Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.
+        Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
+    -
+      expression: '{Jenkins by HTTP:jenkins.thread_deadlock.last()}=0 and {Jenkins by HTTP:jenkins.thread_deadlock.message.strlen()}>0'
+      name: 'Jenkins: There are deadlocked threads in Jenkins master JVM'
+      priority: WARNING
+      description: |
+        There are any deadlocked threads in the Jenkins master JVM.
+        Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}
+  graphs:
+    -
+      name: 'Jenkins: Executors'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Jenkins by HTTP'
+            key: jenkins.executor.count
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Jenkins by HTTP'
+            key: jenkins.executor.free
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Jenkins by HTTP'
+            key: jenkins.executor.in_use
+    -
+      name: 'Jenkins: Queues'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Jenkins by HTTP'
+            key: jenkins.queue.blocked
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Jenkins by HTTP'
+            key: jenkins.queue.size
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Jenkins by HTTP'
+            key: jenkins.queue.buildable
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Jenkins by HTTP'
+            key: jenkins.queue.pending
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Jenkins by HTTP'
+            key: jenkins.queue.stuck
+  value_maps:
+    -
+      name: 'Computer online'
+      mappings:
+        -
+          value: '0'
+          newvalue: Online
+        -
+          value: '1'
+          newvalue: Offline
+    -
+      name: 'Computer state'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'False'
+        -
+          value: '1'
+          newvalue: 'True'
+    -
+      name: 'Jenkins healthcheck'
+      mappings:
+        -
+          value: '0'
+          newvalue: Failed
+        -
+          value: '1'
+          newvalue: Ok
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,16 +66,19 @@ $widget = (new CWidget())
 		(new CTag('nav', true, (new CList())
 			->addItem((new CForm('get'))
 				->cleanItems()
+				->setName('main_filter')
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem(new CInput('hidden', 'type', $data['type']))
 				->addItem((new CList())
 					->addItem([
-						new CLabel(_('Hosts location'), 'view_style'),
+						new CLabel(_('Hosts location'), 'label-view-style'),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						new CComboBox('view_style', $data['view_style'], 'submit()', [
-							STYLE_TOP => _('Top'),
-							STYLE_LEFT => _('Left')
-						])
+						(new CSelect('view_style'))
+							->setId('hosts-location')
+							->setValue($data['view_style'])
+							->setFocusableElementId('label-view-style')
+							->addOption(new CSelectOption(STYLE_TOP, _('Top')))
+							->addOption(new CSelectOption(STYLE_LEFT, _('Left')))
 					])
 				)
 			)
@@ -156,22 +159,12 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	);
 }
 
-if ($data['view_style'] == STYLE_TOP) {
-	$table = new CPartial('dataoverview.table.top', [
-		'visible_items' => $data['visible_items'],
-		'db_hosts' => $data['db_hosts'],
-		'items_by_name' => $data['items_by_name'],
-		'has_hidden_data' => $data['has_hidden_data']
-	]);
-}
-else {
-	$table = new CPartial('dataoverview.table.left', [
-		'visible_items' => $data['visible_items'],
-		'db_hosts' => $data['db_hosts'],
-		'items_by_name' => $data['items_by_name'],
-		'has_hidden_data' => $data['has_hidden_data']
-	]);
-}
+$partial = ($data['view_style'] == STYLE_TOP) ? 'dataoverview.table.top' : 'dataoverview.table.left';
+$table = new CPartial($partial, [
+	'items' => $data['items'],
+	'hosts' => $data['hosts'],
+	'has_hidden_data' => $data['has_hidden_data']
+]);
 
 $widget->addItem($table);
 

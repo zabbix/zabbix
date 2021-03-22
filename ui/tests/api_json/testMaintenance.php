@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'tags' => [
 						[
-							'tag' => 'tag',
+							'tag' => 'tag'
 						],
 						[
 							'tag' => 'tag',
@@ -368,7 +368,7 @@ class testMaintenance extends CAPITest {
 					]
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
-			],
+			]
 		];
 	}
 

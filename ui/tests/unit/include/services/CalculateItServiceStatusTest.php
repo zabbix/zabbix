@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 			// single service without an algorithm
 			[
 				[
-					0 => ['algorithm' => SERVICE_ALGORITHM_NONE, 'triggerid' => 0],
+					0 => ['algorithm' => SERVICE_ALGORITHM_NONE, 'triggerid' => 0]
 				],
 				[],
 				[],
@@ -52,14 +52,14 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 				[
 					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
 					1 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
-					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2]
 				],
 				[
 					0 => [1, 2]
 				],
 				[
 					1 => $this->createTrigger(TRIGGER_VALUE_FALSE),
-					2 => $this->createTrigger(TRIGGER_VALUE_FALSE),
+					2 => $this->createTrigger(TRIGGER_VALUE_FALSE)
 				],
 				[
 					0 => SERVICE_STATUS_OK,
@@ -73,14 +73,14 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 				[
 					0 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 0],
 					1 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 1],
-					2 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 2],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 2]
 				],
 				[
 					0 => [1, 2]
 				],
 				[
 					1 => $this->createTrigger(TRIGGER_VALUE_FALSE),
-					2 => $this->createTrigger(TRIGGER_VALUE_FALSE),
+					2 => $this->createTrigger(TRIGGER_VALUE_FALSE)
 				],
 				[
 					0 => SERVICE_STATUS_OK,
@@ -95,7 +95,7 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
 					1 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
 					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2],
-					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 3],
+					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 3]
 				],
 				[
 					0 => [1, 2, 3]
@@ -103,7 +103,7 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 				[
 					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
 					2 => $this->createTrigger(TRIGGER_VALUE_TRUE, TRIGGER_SEVERITY_DISASTER),
-					3 => $this->createTrigger(TRIGGER_VALUE_FALSE),
+					3 => $this->createTrigger(TRIGGER_VALUE_FALSE)
 				],
 				[
 					0 => TRIGGER_SEVERITY_DISASTER,
@@ -119,7 +119,7 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 					0 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 0],
 					1 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
 					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2],
-					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 3],
+					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 3]
 				],
 				[
 					0 => [1, 2, 3]
@@ -127,7 +127,7 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 				[
 					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
 					2 => $this->createTrigger(TRIGGER_VALUE_TRUE, TRIGGER_SEVERITY_DISASTER),
-					3 => $this->createTrigger(TRIGGER_VALUE_TRUE),
+					3 => $this->createTrigger(TRIGGER_VALUE_TRUE)
 				],
 				[
 					0 => TRIGGER_SEVERITY_DISASTER,
@@ -143,21 +143,21 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
 					1 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
 					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
-					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
+					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1]
 				],
 				[
 					0 => [1, 2],
 					1 => [3],
-					2 => [3],
+					2 => [3]
 				],
 				[
-					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
+					1 => $this->createTrigger(TRIGGER_VALUE_TRUE)
 				],
 				[
 					0 => TRIGGER_SEVERITY_AVERAGE,
 					1 => TRIGGER_SEVERITY_AVERAGE,
 					2 => TRIGGER_SEVERITY_AVERAGE,
-					3 => TRIGGER_SEVERITY_AVERAGE,
+					3 => TRIGGER_SEVERITY_AVERAGE
 				]
 			],
 
@@ -166,21 +166,21 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 				[
 					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
 					1 => ['algorithm' => SERVICE_ALGORITHM_NONE, 'triggerid' => 0],
-					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1]
 				],
 				[
 					0 => [1],
 					1 => [2]
 				],
 				[
-					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
+					1 => $this->createTrigger(TRIGGER_VALUE_TRUE)
 				],
 				[
 					0 => SERVICE_STATUS_OK,
 					1 => SERVICE_STATUS_OK,
-					2 => TRIGGER_SEVERITY_AVERAGE,
+					2 => TRIGGER_SEVERITY_AVERAGE
 				]
-			],
+			]
 		];
 	}
 

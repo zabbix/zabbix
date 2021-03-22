@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,16 +92,19 @@ $hostFormList->addRow(
 );
 
 // append proxy to form list
-$proxyComboBox = new CComboBox('proxy_hostid', $data['proxy_hostid']);
-$proxyComboBox->addItem(0, _('(no proxy)'));
+$proxy_select = (new CSelect('proxy_hostid'))
+	->setId('proxy_hostid')
+	->setValue($data['proxy_hostid'])
+	->addOption(new CSelectOption(0, _('(no proxy)')));
+
 foreach ($data['proxies'] as $proxie) {
-	$proxyComboBox->addItem($proxie['hostid'], $proxie['host']);
+	$proxy_select->addOption(new CSelectOption($proxie['hostid'], $proxie['host']));
 }
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))
 		->setLabel(_('Monitored by proxy'))
 		->setChecked(array_key_exists('proxy_hostid', $data['visible'])),
-	$proxyComboBox
+	$proxy_select
 );
 
 // append status to form list
@@ -109,10 +112,13 @@ $hostFormList->addRow(
 	(new CVisibilityBox('visible[status]', 'status', _('Original')))
 		->setLabel(_('Status'))
 		->setChecked(array_key_exists('status', $data['visible'])),
-	new CComboBox('status', $data['status'], null, [
-		HOST_STATUS_MONITORED => _('Enabled'),
-		HOST_STATUS_NOT_MONITORED => _('Disabled')
-	])
+	(new CSelect('status'))
+		->setValue($data['status'])
+		->setId('status')
+		->addOptions(CSelect::createOptionsFromArray([
+			HOST_STATUS_MONITORED => _('Enabled'),
+			HOST_STATUS_NOT_MONITORED => _('Disabled')
+		]))
 );
 
 $templatesFormList = new CFormList('templatesFormList');
@@ -168,28 +174,38 @@ $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_authtype]', 'ipmi_authtype', _('Original')))
 		->setLabel(_('Authentication algorithm'))
 		->setChecked(array_key_exists('ipmi_authtype', $data['visible'])),
-	new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes())
+	(new CSelect('ipmi_authtype'))
+		->setId('ipmi_authtype')
+		->setValue($data['ipmi_authtype'])
+		->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_privilege]', 'ipmi_privilege', _('Original')))
 		->setLabel(_('Privilege level'))
 		->setChecked(array_key_exists('ipmi_privilege', $data['visible'])),
-	new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges())
+	(new CSelect('ipmi_privilege'))
+		->setId('ipmi_privilege')
+		->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+		->setValue($data['ipmi_privilege'])
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
 		->setLabel(_('Username'))
 		->setChecked(array_key_exists('ipmi_username', $data['visible'])),
-	(new CTextBox('ipmi_username', $data['ipmi_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	(new CTextBox('ipmi_username', $data['ipmi_username']))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->disableAutocomplete()
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
 		->setLabel(_('Password'))
 		->setChecked(array_key_exists('ipmi_password', $data['visible'])),
-	(new CTextBox('ipmi_password', $data['ipmi_password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	(new CTextBox('ipmi_password', $data['ipmi_password']))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->disableAutocomplete()
 );
 
 $inventoryFormList = new CFormList('inventoryFormList');
@@ -281,6 +297,7 @@ $encryption_table = (new CTable())
 		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
+			->disableAutocomplete()
 	])
 	->addRow([_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)

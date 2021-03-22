@@ -1,0 +1,24 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:31Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'Network Generic Device SNMP'
+      name: 'Network Generic Device SNMP'
+      description: |
+        Template Net Network Generic Device
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'EtherLike-MIB SNMP'
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces Simple SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'

@@ -1,0 +1,3058 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-03-16T09:50:57Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'MongoDB node by Zabbix Agent 2'
+      name: 'MongoDB node by Zabbix Agent 2'
+      description: |
+        Get MongoDB metrics from plugin for the zabbix-agent2.
+          1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.
+          2. Set the {$MONGODB.CONNSTRING} such as <protocol(host:port)> or named session.
+          3. Set the user name and password in host macros ({$MONGODB.USER}, {$MONGODB.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: MongoDB
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'MongoDB: Document: deleted, rate'
+          type: DEPENDENT
+          key: mongod.document.deleted.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of documents deleted per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.document.deleted
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Document: inserted, rate'
+          type: DEPENDENT
+          key: mongod.document.inserted.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of documents inserted per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.document.inserted
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Document: returned, rate'
+          type: DEPENDENT
+          key: mongod.document.returned.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of documents returned by queries per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.document.returned
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Document: updated, rate'
+          type: DEPENDENT
+          key: mongod.document.updated.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of documents updated per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.document.updated
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Active clients: readers'
+          type: DEPENDENT
+          key: mongodb.active_clients.readers
+          delay: '0'
+          history: 7d
+          description: 'The number of the active client connections performing read operations.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.globalLock.activeClients.readers
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Active clients: total'
+          type: DEPENDENT
+          key: mongodb.active_clients.total
+          delay: '0'
+          history: 7d
+          description: 'The total number of internal client connections to the database including system threads as well as queued readers and writers.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.globalLock.activeClients.total
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Active clients: writers'
+          type: DEPENDENT
+          key: mongodb.active_clients.writers
+          delay: '0'
+          history: 7d
+          description: 'The number of active client connections performing write operations.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.globalLock.activeClients.writers
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Asserts: message, rate'
+          type: DEPENDENT
+          key: mongodb.asserts.msg.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            The number of message assertions raised per second.
+            Check the log file for more information about these messages.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.asserts.msg
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Asserts: regular, rate'
+          type: DEPENDENT
+          key: mongodb.asserts.regular.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            The number of regular assertions raised per second.
+            Check the log file for more information about these messages.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.asserts.regular
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Asserts: rollovers, rate'
+          type: DEPENDENT
+          key: mongodb.asserts.rollovers.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            Number of times that the rollover counters roll over per second.
+            The counters rollover to zero every 2^30 assertions.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.asserts.rollovers
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Asserts: user, rate'
+          type: DEPENDENT
+          key: mongodb.asserts.user.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            The number of “user asserts” that have occurred per second.
+            These are errors that user may generate, such as out of disk space or duplicate key.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.asserts.user
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Asserts: warning, rate'
+          type: DEPENDENT
+          key: mongodb.asserts.warning.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of warnings raised per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.asserts.warning
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Get collections usage stats'
+          key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns usage statistics for each collection.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MongoDB: Connections, active'
+          type: DEPENDENT
+          key: mongodb.connections.active
+          delay: '0'
+          history: 7d
+          description: |
+            The number of active client connections to the server.
+            Active client connections refers to client connections that currently have operations in progress.
+            Available starting in  4.0.7, 0 for older versions.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connections.active
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Connections, available'
+          type: DEPENDENT
+          key: mongodb.connections.available
+          delay: '0'
+          history: 7d
+          description: 'The number of unused incoming connections available.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connections.available
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Connections, current'
+          type: DEPENDENT
+          key: mongodb.connections.current
+          delay: '0'
+          history: 7d
+          description: |
+            The number of incoming connections from clients to the database server.
+            This number includes the current shell session
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connections.current
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: New connections, rate'
+          type: DEPENDENT
+          key: mongodb.connections.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Rps
+          description: 'Rate of all incoming connections created to the server.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connections.totalCreated
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Current queue: readers'
+          type: DEPENDENT
+          key: mongodb.current_queue.readers
+          delay: '0'
+          history: 7d
+          description: |
+            The number of operations that are currently queued and waiting for the read lock.
+            A consistently small read-queue, particularly of shorter operations, should cause no concern.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.globalLock.currentQueue.readers
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Current queue: total'
+          type: DEPENDENT
+          key: mongodb.current_queue.total
+          delay: '0'
+          history: 7d
+          description: 'The total number of operations queued waiting for the lock.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.globalLock.currentQueue.total
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Current queue: writers'
+          type: DEPENDENT
+          key: mongodb.current_queue.writers
+          delay: '0'
+          history: 7d
+          description: |
+            The number of operations that are currently queued and waiting for the write lock. 
+             A consistently small write-queue, particularly of shorter operations, is no cause for concern.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.globalLock.currentQueue.writers
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Cursor: open pinned'
+          type: DEPENDENT
+          key: mongodb.cursor.open.pinned
+          delay: '0'
+          history: 7d
+          description: 'Number of pinned open cursors.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cursor.open.pinned
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Cursor: open total'
+          type: DEPENDENT
+          key: mongodb.cursor.open.total
+          delay: '0'
+          history: 7d
+          description: 'Number of cursors that MongoDB is maintaining for clients.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cursor.open.total
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+              name: 'MongoDB: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
+              priority: WARNING
+        -
+          name: 'MongoDB: Cursor: timed out, rate'
+          type: DEPENDENT
+          key: mongodb.cursor.timed_out.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of cursors that time out, per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cursor.timedOut
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+              name: 'MongoDB: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
+              priority: WARNING
+        -
+          name: 'MongoDB: Architecture'
+          type: DEPENDENT
+          key: mongodb.mem.bits
+          delay: '0'
+          history: 7d
+          units: bit
+          description: 'A number, either 64 or 32, that indicates whether the MongoDB instance is compiled for 64-bit or 32-bit architecture.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mem.bits
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Memory: mapped'
+          type: DEPENDENT
+          key: mongodb.mem.mapped
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Amount of mapped memory by the database.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mem.mapped
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Memory: mapped with journal'
+          type: DEPENDENT
+          key: mongodb.mem.mapped_with_journal
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The amount of mapped memory, including the memory used for journaling.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mem.mappedWithJournal
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Memory: resident'
+          type: DEPENDENT
+          key: mongodb.mem.resident
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Amount of memory currently used by the database process.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mem.resident
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Memory: virtual'
+          type: DEPENDENT
+          key: mongodb.mem.virtual
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Amount of virtual memory used by the mongod process.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mem.virtual
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Cursor: open no timeout'
+          type: DEPENDENT
+          key: mongodb.metrics.cursor.open.no_timeout
+          delay: '0'
+          history: 7d
+          description: 'Number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cursor.open.noTimeout
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Bytes in, rate'
+          type: DEPENDENT
+          key: mongodb.network.bytes_in.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The total number of bytes that the server has received over network connections initiated by clients or other mongod/mongos instances per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.network.bytesIn
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Bytes out, rate'
+          type: DEPENDENT
+          key: mongodb.network.bytes_out.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The total number of bytes that the server has sent over network connections initiated by clients or other mongod/mongos instances per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.network.bytesOut
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Requests, rate'
+          type: DEPENDENT
+          key: mongodb.network.numRequests.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!Rps'
+          description: 'Number of distinct requests that the server has received per second'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.network.numRequests
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Operations: command, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.command.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            The number of commands issued to the database the mongod instance per second.
+            Counts all commands except the write commands: insert, update, and delete.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.command
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Operations: delete, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.delete.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of delete operations the mongod instance per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.delete
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Operations: getmore, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.getmore.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            The number of “getmore” operations since the mongod instance per second. This counter can be high even if the query count is low. 
+            Secondary nodes send getMore operations as part of the replication process.
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.getmore
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Operations: insert, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.insert.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of insert operations received since the mongod instance per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.insert
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Operations: query, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.query.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of queries received the mongod instance per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.query
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Operations: update, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.update.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of update operations the mongod instance per second.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.update
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB: Get oplog stats'
+          key: 'mongodb.oplog.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns status of the replica set, using data polled from the oplog.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MongoDB: Ping'
+          key: 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          delay: 30s
+          history: 7d
+          description: 'Test if a connection is alive or not.'
+          applications:
+            -
+              name: MongoDB
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'MongoDB: Connection to MongoDB is unavailable'
+              priority: HIGH
+              description: 'Connection to MongoDB instance is currently unavailable.'
+        -
+          name: 'MongoDB: Get Replica Set status'
+          key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns the replica set status from the point of view of the member where the method is run.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MongoDB: Get server status'
+          key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns a database’s state.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MongoDB: Uptime'
+          type: DEPENDENT
+          key: mongodb.uptime
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Number of seconds that the mongod process has been active.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.uptime
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{nodata(10m)}=1'
+              name: 'MongoDB: Failed to fetch info data (or no data for 10m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'MongoDB: Connection to MongoDB is unavailable'
+                  expression: '{MongoDB node by Zabbix Agent 2:mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"].last()}=0'
+            -
+              expression: '{last()}<10m'
+              name: 'MongoDB: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'MongoDB: MongoDB version'
+          type: DEPENDENT
+          key: mongodb.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the MongoDB server.'
+          applications:
+            -
+              name: MongoDB
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'MongoDB: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'MongoDB version has changed. Ack to close.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Collection discovery'
+          key: 'mongodb.collections.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          delay: 30m
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DBNAME}'
+                value: '{$MONGODB.LLD.FILTER.DB.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#DBNAME}'
+                value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#COLLECTION}'
+                value: '{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#COLLECTION}'
+                value: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Collect collections metrics.'
+          item_prototypes:
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, avg size'
+              type: DEPENDENT
+              key: 'mongodb.collection.avg_obj_size["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The size of the average object in the collection in bytes.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.avgObjSize
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped'
+              type: DEPENDENT
+              key: 'mongodb.collection.capped["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              description: 'Whether or not the collection is capped.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              valuemap:
+                name: 'MongoDB flag'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.capped
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, count'
+              type: DEPENDENT
+              key: 'mongodb.collection.count["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of objects in the collection.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.count
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped: max number'
+              type: DEPENDENT
+              key: 'mongodb.collection.max_number["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Maximum number of documents that may be present in a capped collection.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.max
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped: max size'
+              type: DEPENDENT
+              key: 'mongodb.collection.max_size["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Maximum size of a capped collection in bytes.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.maxSize
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Indexes'
+              type: DEPENDENT
+              key: 'mongodb.collection.nindexes["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of indices on the collection.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.nindexes
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: commands, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.commands.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].commands.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: commands, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.commands.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].commands.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: getmore, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.getmore.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].getmore.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: getmore, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.getmore.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].getmore.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: insert, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.insert.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].insert.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: insert, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.insert.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].insert.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: queries, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.queries.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].queries.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: queries, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.queries.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].queries.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: remove, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.remove.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].remove.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: remove, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.remove.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].remove.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: total, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.total.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].total.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: total, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.total.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].total.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: update, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.update.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].update.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations: update, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.ops.update.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].update.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Read lock, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.read_lock.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].readLock.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Read lock, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.read_lock.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].readLock.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Size'
+              type: DEPENDENT
+              key: 'mongodb.collection.size["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The total size in bytes of the data in the collection plus the size of every indexes on the mongodb.collection.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.size
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Get collection stats {#DBNAME}.{#COLLECTION}'
+              key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Returns a variety of storage statistics for a given collection.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Storage size'
+              type: DEPENDENT
+              key: 'mongodb.collection.storage_size["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total storage space allocated to this collection for document storage.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageSize
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Write lock, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.collection.write_lock.ms["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent to operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].writeLock.time'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Write lock, rate'
+              type: DEPENDENT
+              key: 'mongodb.collection.write_lock.rate["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.totals["{#DBNAME}.{#COLLECTION}"].writeLock.count'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          graph_prototypes:
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Locks'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.read_lock.rate["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.write_lock.rate["{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Locks time'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.read_lock.ms["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.write_lock.ms["{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.queries.rate["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.getmore.rate["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.insert.rate["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.update.rate["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.remove.rate["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.commands.rate["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '6'
+                  drawtype: BOLD_LINE
+                  color: AC8C14
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.total.rate["{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations time'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.queries.ms["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.getmore.ms["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.insert.ms["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.update.ms["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.remove.ms["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.commands.ms["{#DBNAME}","{#COLLECTION}"]'
+                -
+                  sortorder: '6'
+                  drawtype: BOLD_LINE
+                  color: AC8C14
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.collection.ops.total.ms["{#DBNAME}","{#COLLECTION}"]'
+        -
+          name: 'Database discovery'
+          key: 'mongodb.db.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          delay: 30m
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DBNAME}'
+                value: '{$MONGODB.LLD.FILTER.DB.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#DBNAME}'
+                value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Collect database metrics.'
+          item_prototypes:
+            -
+              name: 'MongoDB {#DBNAME}: Collections'
+              type: DEPENDENT
+              key: 'mongodb.db.collections["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Contains a count of the number of collections in that database.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.collections
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Size, data'
+              type: DEPENDENT
+              key: 'mongodb.db.data_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total size of the data held in this database including the padding factor.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.dataSize
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Extents'
+              type: DEPENDENT
+              key: 'mongodb.db.extents["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Contains a count of the number of extents in the database across all collections.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.numExtents
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Size, file'
+              type: DEPENDENT
+              key: 'mongodb.db.file_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total size of the data held in this database including the padding factor (only available with the mmapv1 storage engine).'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileSize
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Size, index'
+              type: DEPENDENT
+              key: 'mongodb.db.index_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total size of all indexes created on this database.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.indexSize
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Objects, count'
+              type: DEPENDENT
+              key: 'mongodb.db.objects["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of objects (documents) in the database across all collections.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.objects
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Objects, avg size'
+              type: DEPENDENT
+              key: 'mongodb.db.size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The average size of each document in bytes.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.avgObjSize
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Get db stats {#DBNAME}'
+              key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Returns statistics reflecting the database system’s state.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MongoDB {#DBNAME}: Size, storage'
+              type: DEPENDENT
+              key: 'mongodb.db.storage_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total amount of space allocated to collections in this database for document storage.'
+              application_prototypes:
+                -
+                  name: 'MongoDB: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageSize
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+          graph_prototypes:
+            -
+              name: 'MongoDB {#DBNAME}: Collections stats'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.db.collections["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.db.objects["{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Disk usage'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.db.index_size["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.db.storage_size["{#DBNAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.db.file_size["{#DBNAME}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.db.data_size["{#DBNAME}"]'
+        -
+          name: 'Replication discovery'
+          type: DEPENDENT
+          key: mongodb.rs.discovery
+          delay: '0'
+          description: 'Collect metrics by Zabbix agent if it exists'
+          item_prototypes:
+            -
+              name: 'MongoDB: Apply batches, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.rs.apply.batches.ms.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) the mongod has spent applying operations from the oplog.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.apply.batches.totalMillis
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Apply batches, rate'
+              type: DEPENDENT
+              key: 'mongodb.rs.apply.batches.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of batches applied across all databases per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.apply.batches.num
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Apply ops, rate'
+              type: DEPENDENT
+              key: 'mongodb.rs.apply.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of oplog operations applied per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.apply.ops
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Buffer'
+              type: DEPENDENT
+              key: 'mongodb.rs.buffer.count[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of operations in the oplog buffer.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.buffer.count
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Buffer, max size'
+              type: DEPENDENT
+              key: 'mongodb.rs.buffer.max_size[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Maximum size of the buffer.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.buffer.maxSizeBytes
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Buffer, size'
+              type: DEPENDENT
+              key: 'mongodb.rs.buffer.size[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Current size of the contents of the oplog buffer.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.buffer.sizeBytes
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Replication lag'
+              type: DEPENDENT
+              key: 'mongodb.rs.lag[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Delay between a write operation on the primary and its copy to a secondary.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.self == "true")].lag.first()'
+              master_item:
+                key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MONGODB.REPL.LAG.MAX.WARN}'
+                  name: 'MongoDB: Replication lag with primary is too high (over {$MONGODB.REPL.LAG.MAX.WARN} in 5m)'
+                  priority: WARNING
+            -
+              name: 'MongoDB: Network bytes, rate'
+              type: DEPENDENT
+              key: 'mongodb.rs.network.bytes.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Amount of data read from the replication sync source per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.network.bytes
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Network getmores, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.rs.network.getmores.ms.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) required to collect data from getmore operations.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.network.getmores.totalMillis
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Network getmores, rate'
+              type: DEPENDENT
+              key: 'mongodb.rs.network.getmores.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of getmore operations per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.network.getmores.num
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Network ops, rate'
+              type: DEPENDENT
+              key: 'mongodb.rs.network.ops.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of operations read from the replication source per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.network.ops
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Network readers created, rate'
+              type: DEPENDENT
+              key: 'mongodb.rs.network.readers.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of oplog query processes created per second.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.network.readersCreated
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB {#RS_NAME}: Oplog time diff'
+              type: DEPENDENT
+              key: 'mongodb.rs.oplog.timediff[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Oplog window: difference between the first and last operation in the oplog. Only present if there are entries in the oplog.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.timediff
+              master_item:
+                key: 'mongodb.oplog.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Preload docs, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.rs.preload.docs.ms.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) spent loading documents as part of the pre-fetch stage of replication.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.preload.docs.totalMillis
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Preload docs, rate'
+              type: DEPENDENT
+              key: 'mongodb.rs.preload.docs.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of documents loaded per second during the pre-fetch stage of replication.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.preload.docs.num
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Preload indexes, ms/s'
+              type: DEPENDENT
+              key: 'mongodb.rs.preload.indexes.ms.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms/s
+              description: 'Fraction of time (ms/s) spent loading documents as part of the pre-fetch stage of replication.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.preload.indexes.totalMillis
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Preload indexes, rate'
+              type: DEPENDENT
+              key: 'mongodb.rs.preload.indexes.rate[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of index entries loaded by members before updating documents as part of the pre-fetch stage of replication.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.repl.preload.indexes.num
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Node state'
+              type: DEPENDENT
+              key: 'mongodb.rs.state[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'An integer between 0 and 10 that represents the replica state of the current member.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              valuemap:
+                name: 'ReplicaSet node state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.myState
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              trigger_prototypes:
+                -
+                  expression: '{change()}=1'
+                  recovery_mode: NONE
+                  name: 'MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})'
+                  priority: WARNING
+                  description: 'Node in ReplicaSet  changed the state. Ack to close.'
+                  manual_close: 'YES'
+            -
+              name: 'MongoDB: Number of replicas'
+              type: DEPENDENT
+              key: 'mongodb.rs.total_nodes[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The number of replucated nodes in current ReplicaSet.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.self == "true")].totalNodes.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Unhealthy replicas'
+              type: DEPENDENT
+              key: 'mongodb.rs.unhealthy[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              discover: NO_DISCOVER
+              value_type: CHAR
+              description: 'The replicated nodes in current ReplicaSet with member health value  = 0.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.self == "true")].unhealthyNodes.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var value = JSON.parse(value);
+                      return value.length ? JSON.stringify(value) : '';
+                      
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: Number of unhealthy replicas'
+              type: DEPENDENT
+              key: 'mongodb.rs.unhealthy_count[{#RS_NAME}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The number of replicated nodes with member health value  = 0.'
+              application_prototypes:
+                -
+                  name: 'MongoDB Replica Set: {#RS_NAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.self == "true")].unhealthyCount.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          trigger_prototypes:
+            -
+              expression: '{MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy_count[{#RS_NAME}].last()}>0  and {MongoDB node by Zabbix Agent 2:mongodb.rs.unhealthy[{#RS_NAME}].strlen()}>0'
+              name: 'MongoDB: There are unhealthy replicas in ReplicaSet'
+              priority: AVERAGE
+          graph_prototypes:
+            -
+              name: 'MongoDB: Replication lag time [{#RS_NAME}]'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'MongoDB node by Zabbix Agent 2'
+                    key: 'mongodb.rs.lag[{#RS_NAME}]'
+          master_item:
+            key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var status = JSON.parse(value)
+                  return JSON.stringify(status.set
+                  ? [{'{#RS_NAME}': status.set, '{#NODE_STATE}': status.myState}]
+                  : []);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          overrides:
+            -
+              name: 'Primary metrics'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#NODE_STATE}'
+                    value: '1'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Number of replicas'
+                  status: ENABLED
+                  discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Unhealthy replicas'
+                  status: ENABLED
+                  discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Number of unhealthy replicas'
+                  status: ENABLED
+                  discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Replication lag'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+        -
+          name: 'WiredTiger metrics'
+          type: DEPENDENT
+          key: mongodb.wired_tiger.discovery
+          delay: '0'
+          description: 'Collect metrics of WiredTiger Storage Engine if it exists'
+          item_prototypes:
+            -
+              name: 'MongoDB: WiredTiger cache: bytes'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.bytes_in_cache[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Size of the data currently in cache.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache[''bytes currently in the cache'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: bytes, max'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.maximum_bytes_configured[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Maximum cache size.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache[''maximum bytes configured'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: max page size at eviction'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.max_page_size_eviction[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Maximum page size at eviction.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache[''maximum page size at eviction'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: modified pages evicted'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.modified_pages_evicted[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of pages, that have been modified, evicted from the cache.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache[''modified pages evicted'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: pages evicted by application threads, rate'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.pages_evicted_threads.rate[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of page evicted by application threads per second.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache.[''pages evicted by application threads'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: pages held in cache'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.pages_in_cache[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of pages currently held in the cache.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache[''pages currently held in the cache'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: pages read into cache'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.pages_read[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of pages read into the cache.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache[''pages read into cache'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: pages written from cache'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.pages_written[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of pages writtent from the cache.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache[''pages written from cache'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: in-memory page splits'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.splits[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'In-memory page splits.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache[''in-memory page splits'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: tracked dirty bytes in the cache'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.tracked_dirty_bytes[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Size of the dirty data in the cache.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache.[''tracked dirty bytes in the cache'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger cache: unmodified pages evicted'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.cache.unmodified_pages_evicted[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of pages, that were not modified, evicted from the cache.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.wiredTiger.cache.[''unmodified pages evicted'']'
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger concurrent transactions: read, available'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of available read tickets (concurrent transactions) remaining.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.wiredTiger.concurrentTransactions.read.available
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              trigger_prototypes:
+                -
+                  expression: '{max(5m)}<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  name: 'MongoDB: Available WiredTiger read tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  priority: WARNING
+                  description: |
+                    "Too few available read tickets.
+                    When the number of available read tickets remaining reaches zero, new read requests will be queued until a new read ticket is available."
+            -
+              name: 'MongoDB: WiredTiger concurrent transactions: read, out'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.concurrent_transactions.read.out[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of read tickets (concurrent transactions) in use.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.wiredTiger.concurrentTransactions.read.out
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger concurrent transactions: read, total tickets'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.concurrent_transactions.read.totalTickets[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of read tickets (concurrent transactions) available.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.wiredTiger.concurrentTransactions.read.totalTickets
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger concurrent transactions: write, available'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of available write tickets (concurrent transactions) remaining.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.wiredTiger.concurrentTransactions.write.available
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+              trigger_prototypes:
+                -
+                  expression: '{max(5m)}<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  name: 'MongoDB: Available WiredTiger write tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  priority: WARNING
+                  description: |
+                    "Too few available write tickets.
+                    When the number of available write tickets remaining reaches zero, new write requests will be queued until a new write ticket is available."
+            -
+              name: 'MongoDB: WiredTiger concurrent transactions: write, out'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.concurrent_transactions.write.out[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of write tickets (concurrent transactions) in use.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.wiredTiger.concurrentTransactions.write.out
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+            -
+              name: 'MongoDB: WiredTiger concurrent transactions: write, total tickets'
+              type: DEPENDENT
+              key: 'mongodb.wired_tiger.concurrent_transactions.write.totalTickets[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of write tickets (concurrent transactions) available.'
+              applications:
+                -
+                  name: MongoDB
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.wiredTiger.concurrentTransactions.write.totalTickets
+              master_item:
+                key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return JSON.stringify(JSON.parse(value).wiredTiger
+                    ? [{'{#SINGLETON}': ''}] : []);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      macros:
+        -
+          macro: '{$MONGODB.CONNS.PCT.USED.MAX.WARN}'
+          value: '80'
+          description: 'Maximum percentage of used connections'
+        -
+          macro: '{$MONGODB.CONNSTRING}'
+          value: 'tcp://localhost:27017'
+          description: 'Connection string in the URI format (password is not used). This param overwrites a value configured in the "Server" option of the configuration file (if it''s set), otherwise, the plugin''s default value is used: "tcp://localhost:27017"'
+        -
+          macro: '{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+          value: '10000'
+          description: 'Maximum number of open cursors'
+        -
+          macro: '{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of cursors timing out per second'
+        -
+          macro: '{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable collections'
+        -
+          macro: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered collections'
+        -
+          macro: '{$MONGODB.LLD.FILTER.DB.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable databases'
+        -
+          macro: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
+          value: (admin|config|local)
+          description: 'Filter to exclude discovered databases'
+        -
+          macro: '{$MONGODB.PASSWORD}'
+          description: 'MongoDB user password'
+        -
+          macro: '{$MONGODB.REPL.LAG.MAX.WARN}'
+          value: 10s
+          description: 'Maximum replication lag in seconds'
+        -
+          macro: '{$MONGODB.USER}'
+          description: 'MongoDB username'
+        -
+          macro: '{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+          value: '5'
+          description: 'Minimum number of available WiredTiger read or write tickets remaining'
+  triggers:
+    -
+      expression: '{MongoDB node by Zabbix Agent 2:mongodb.connections.current.min(5m)}/({MongoDB node by Zabbix Agent 2:mongodb.connections.available.last()}+{MongoDB node by Zabbix Agent 2:mongodb.connections.current.last()})*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}'
+      name: 'MongoDB: Total number of open connections is too high (over {$MONGODB.CONNS.PCT.USED.MAX.WARN%} in 5m)'
+      priority: WARNING
+      description: 'Too few available connections. If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.'
+  graphs:
+    -
+      name: 'MongoDB: Active clients'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.active_clients.total
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.active_clients.readers
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.active_clients.writers
+    -
+      name: 'MongoDB: Activity'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.connections.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.network.numRequests.rate
+    -
+      name: 'MongoDB: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.connections.available
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.connections.active
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.connections.current
+    -
+      name: 'MongoDB: Cursors'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.cursor.open.total
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.cursor.open.pinned
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.metrics.cursor.open.no_timeout
+    -
+      name: 'MongoDB: Documents'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongod.document.deleted.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongod.document.inserted.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongod.document.returned.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongod.document.updated.rate
+    -
+      name: 'MongoDB: Memory usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.mem.mapped
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.mem.resident
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.mem.virtual
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.mem.mapped_with_journal
+    -
+      name: 'MongoDB: Network'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.network.bytes_out.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.network.bytes_in.rate
+    -
+      name: 'MongoDB: Operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.opcounters.query.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.opcounters.insert.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.opcounters.getmore.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.opcounters.update.rate
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.opcounters.delete.rate
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.opcounters.command.rate
+    -
+      name: 'MongoDB: Queued operations'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.current_queue.total
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.current_queue.readers
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: 'MongoDB node by Zabbix Agent 2'
+            key: mongodb.current_queue.writers
+  value_maps:
+    -
+      name: 'MongoDB flag'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'False'
+        -
+          value: '1'
+          newvalue: 'True'
+    -
+      name: 'ReplicaSet node state'
+      mappings:
+        -
+          value: '0'
+          newvalue: STARTUP
+        -
+          value: '1'
+          newvalue: PRIMARY
+        -
+          value: '2'
+          newvalue: SECONDARY
+        -
+          value: '3'
+          newvalue: RECOVERING
+        -
+          value: '5'
+          newvalue: STARTUP2
+        -
+          value: '6'
+          newvalue: UNKNOWN
+        -
+          value: '7'
+          newvalue: ARBITER
+        -
+          value: '8'
+          newvalue: DOWN
+        -
+          value: '9'
+          newvalue: ROLLBACK
+        -
+          value: '10'
+          newvalue: REMOVED
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

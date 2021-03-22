@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,6 +46,11 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 		ret = diag_add_historycache_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_PREPROCESSING))
 		ret = diag_add_preproc_info(jp, json, error);
+	else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
+	{
+		diag_add_locks_info(json);
+		ret = SUCCEED;
+	}
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
 

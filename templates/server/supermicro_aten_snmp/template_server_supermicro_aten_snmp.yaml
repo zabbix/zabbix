@@ -1,0 +1,134 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:42Z'
+  groups:
+    -
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      template: 'Supermicro Aten SNMP'
+      name: 'Supermicro Aten SNMP'
+      description: |
+        Template Server Supermicro Aten
+        
+        MIBs used:
+        ATEN-IPMI-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'Generic SNMP'
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      applications:
+        -
+          name: Fans
+        -
+          name: Temperature
+      discovery_rules:
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.21317.1.3.1.2,{#SENSOR_DESCR},1.3.6.1.4.1.21317.1.3.1.13]'
+          key: fan.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '[1-9]+'
+                formulaid: B
+              -
+                macro: '{#SENSOR_DESCR}'
+                value: 'FAN.*'
+                formulaid: A
+          description: 'Scanning ATEN-IPMI-MIB::sensorTable with filter: not connected FAN sensors (Value = 0)'
+          item_prototypes:
+            -
+              name: '{#SENSOR_DESCR}: Fan speed, %'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.21317.1.3.1.2.{#SNMPINDEX}'
+              key: 'sensor.fan.speed.percentage[sensorReading.{#SNMPINDEX}]'
+              units: '%'
+              description: |
+                MIB: ATEN-IPMI-MIB
+                A textual string containing information about the interface.
+                This string should include the name of the manufacturer, the product name and the version of the interface hardware/software.
+              applications:
+                -
+                  name: Fans
+        -
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.21317.1.3.1.2,{#SENSOR_DESCR},1.3.6.1.4.1.21317.1.3.1.13]'
+          key: tempDescr.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '[1-9]+'
+                formulaid: B
+              -
+                macro: '{#SENSOR_DESCR}'
+                value: '.*Temp.*'
+                formulaid: A
+          description: 'Scanning ATEN-IPMI-MIB::sensorTable with filter: not connected temp sensors (Value = 0)'
+          item_prototypes:
+            -
+              name: '{#SENSOR_DESCR}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.21317.1.3.1.2.{#SNMPINDEX}'
+              key: 'sensor.temp.value[sensorReading.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: ATEN-IPMI-MIB
+                A textual string containing information about the interface.
+                This string should include the name of the manufacturer, the product name and the version of the interface hardware/software.
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                      expression: '{Supermicro Aten SNMP:sensor.temp.value[sensorReading.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
+                      recovery_expression: '{Supermicro Aten SNMP:sensor.temp.value[sensorReading.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+      macros:
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'

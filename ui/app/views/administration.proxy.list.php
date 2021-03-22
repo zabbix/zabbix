@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,9 @@ foreach ($data['proxies'] as $proxy) {
 			$hosts[] = ', ';
 		}
 
-		$hosts[] = (new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid']))->addClass($style);
+		$hosts[] = $data['allowed_ui_conf_hosts']
+			? (new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid']))->addClass($style)
+			: (new CSpan($host['name']))->addClass($style);
 	}
 
 	$name = new CLink($proxy['host'], 'zabbix.php?action=proxy.edit&proxyid='.$proxy['proxyid']);

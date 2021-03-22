@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package scheduler
 
 import (
 	"errors"
+	"fmt"
 	"hash/fnv"
 	"sync/atomic"
 	"time"
@@ -60,8 +61,6 @@ type client struct {
 	exporters map[uint64]exporterTaskAccessor
 	// plugins used by client
 	pluginsInfo map[*pluginAgent]*pluginInfo
-	// server refresh unsupported value
-	refreshUnsupported int
 	// server global regular expression bundle
 	globalRegexp unsafe.Pointer
 	// plugin result sink, can be nil for bulk passive checks (in future)
@@ -70,16 +69,9 @@ type client struct {
 
 // ClientAccessor interface exports client data required for scheduler tasks.
 type ClientAccessor interface {
-	RefreshUnsupported() int
 	Output() plugin.ResultWriter
 	GlobalRegexp() *glexpr.Bundle
 	ID() uint64
-}
-
-// RefreshUnsupported returns scheduling interval for unsupported items.
-// This function is used only by scheduler, no synchronization is required.
-func (c *client) RefreshUnsupported() int {
-	return c.refreshUnsupported
 }
 
 // GlobalRegexp returns global regular expression bundle.
@@ -98,7 +90,7 @@ func (c *client) ID() uint64 {
 	return c.id
 }
 
-// Output returns client ouput interface where plugins results can be written.
+// Output returns client output interface where plugins results can be written.
 // While it's used by tasks to implement ContextProvider interface, client output cannot
 // change, so no synchronization is required.
 func (c *client) Output() plugin.ResultWriter {
@@ -145,7 +137,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if c.id > agent.MaxBuiltinClientID {
 			var task *exporterTask
 
-			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
+			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now); err != nil {
 				return err
 			}
 			if tacc, ok = c.exporters[r.Itemid]; ok {
@@ -211,6 +203,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			log.Debugf("[%d] created direct exporter task for plugin '%s' itemid:%d key '%s'",
 				c.id, p.name(), task.item.itemid, task.item.key)
 		}
+	} else if c.id <= agent.MaxBuiltinClientID {
+		return fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, r.Key)
 	}
 
 	// handle runner interface for inactive plugins

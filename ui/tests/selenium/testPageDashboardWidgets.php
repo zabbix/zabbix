@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -233,7 +233,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		// Set type to "Clock".
-		$form->getField('Type')->asDropdown()->select('Clock');
+		$form->getField('Type')->asZDropdown()->select('Clock');
 		// Wait until overlay is reloaded.
 		$overlay->waitUntilReady();
 		// Set name of widget.

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,6 +96,8 @@ static int	get_flags(const char *path)
 			flags |= ZBX_MACRO_SIMPLE;
 		else if (0 == strcmp(flag, "ZBX_MACRO_FUNC"))
 			flags |= ZBX_MACRO_FUNC;
+		else if (0 == strcmp(flag, "ZBX_TOKEN_EXPRESSION_MACRO"))
+			flags |= ZBX_TOKEN_EXPRESSION_MACRO;
 
 		flags_num++;
 	}

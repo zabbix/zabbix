@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -238,12 +238,12 @@ func getFuncID(p *[]string, n int) (funcID uint8, err error) {
 
 	var val uint64
 	if val, err = strconv.ParseUint(v, 10, 8); err != nil {
-		return 0, fmt.Errorf("Opration id: %w", err)
+		return 0, fmt.Errorf("Operation id: %w", err)
 	}
 	funcID = uint8(val)
 
 	if funcID == 0 || funcID > 4 {
-		return 0, fmt.Errorf("Unsupported modbus opration:%d", funcID)
+		return 0, fmt.Errorf("Unsupported modbus operation:%d", funcID)
 	}
 
 	return funcID, nil

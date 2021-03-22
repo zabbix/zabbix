@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,13 +24,13 @@
  */
 class CWidgetFormGraph extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_GRAPH);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_GRAPH);
 
 		// Select graph type field.
 		$field_source = (new CWidgetFieldRadioButtonList('source_type', _('Source'), [
 			ZBX_WIDGET_FIELD_RESOURCE_GRAPH => _('Graph'),
-			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
+			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph')
 		]))
 			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
 			->setAction('updateWidgetConfigDialogue()')
@@ -45,11 +45,15 @@ class CWidgetFormGraph extends CWidgetForm {
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 			// Select simple graph field.
-			$field_item = (new CWidgetFieldMsItem('itemid', _('Item')))
+			$field_item = (new CWidgetFieldMsItem('itemid', _('Item'), $templateid))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
-				->setFilterParameter('numeric', true) // For filtering items.
-				->setFilterParameter('with_simple_graph_items', true); // For groups and hosts selection.
+				->setFilterParameter('numeric', true);
+
+			if ($templateid === null) {
+				// For groups and hosts selection.
+				$field_item->setFilterParameter('with_simple_graph_items', true);
+			}
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);
@@ -59,7 +63,7 @@ class CWidgetFormGraph extends CWidgetForm {
 		}
 		else {
 			// Select graph field.
-			$field_graph = (new CWidgetFieldMsGraph('graphid', _('Graph')))
+			$field_graph = (new CWidgetFieldMsGraph('graphid', _('Graph'), $templateid))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false);
 
@@ -80,10 +84,12 @@ class CWidgetFormGraph extends CWidgetForm {
 		$this->fields[$field_legend->getName()] = $field_legend;
 
 		// Dynamic item.
-		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
+		if ($templateid === null) {
+			$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 
-		$field_dynamic->setValue(array_key_exists('dynamic', $this->data) ? $this->data['dynamic'] : false);
+			$field_dynamic->setValue(array_key_exists('dynamic', $this->data) ? $this->data['dynamic'] : false);
 
-		$this->fields[$field_dynamic->getName()] = $field_dynamic;
+			$this->fields[$field_dynamic->getName()] = $field_dynamic;
+		}
 	}
 }

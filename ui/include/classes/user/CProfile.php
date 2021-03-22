@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,8 +32,7 @@ class CProfile {
 		self::$userDetails = CWebUser::$data;
 		self::$profiles = [];
 
-		$profilesTableSchema = DB::getSchema('profiles');
-		self::$stringProfileMaxLength = $profilesTableSchema['fields']['value_str']['length'];
+		self::$stringProfileMaxLength = DB::getFieldLength('profiles', 'value_str');
 		DBselect('SELECT NULL FROM users u WHERE '.dbConditionId('u.userid', (array) self::$userDetails['userid']).
 			' FOR UPDATE'
 		);
@@ -337,6 +336,8 @@ class CProfile {
 			$value_type => zbx_dbstr($value),
 			'type' => $type,
 			'idx2' => zbx_dbstr($idx2)
+		] + [
+			'value_str' => zbx_dbstr('')
 		];
 
 		return DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');

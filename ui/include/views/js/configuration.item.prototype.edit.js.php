@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,11 @@
 /**
  * @var CView $this
  */
+
+$interface_ids_by_types = [];
+foreach ($data['interfaces'] as $interface) {
+	$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+}
 
 include dirname(__FILE__).'/common.item.edit.js.php';
 include dirname(__FILE__).'/item.preprocessing.js.php';

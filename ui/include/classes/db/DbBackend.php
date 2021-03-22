@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ abstract class DbBackend {
 	protected $tls_cipher_list = '';
 
 	/**
-	 * Set TLS specific options for db conection.
+	 * Set TLS specific options for db connection.
 	 *
 	 * @param string $key_file       Path to TLS key file.
 	 * @param string $cert_file      Path to TLS cert file.

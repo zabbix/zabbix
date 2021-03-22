@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,10 +129,12 @@ class CScreenEvents extends CScreenBase {
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				($event['r_eventid'] == 0) ? '' : zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['r_clock']),
 				$host['name'],
-				new CLink(
-					$event['name'],
-					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
-				),
+				CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
+					? new CLink(
+						$event['name'],
+						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
+					)
+					: $event['name'],
 				$statusSpan,
 				getSeverityCell($event['severity'])
 			]);

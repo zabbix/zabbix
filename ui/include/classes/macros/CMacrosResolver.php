@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		],
 		'hostInterfaceIpDnsAgentPrimary' => [
 			'types' => ['host', 'user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsSecurityname' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsAuthPassphrase' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsPrivPassphrase' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsContextName' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsCommunity' => [
+			'types' => ['user'],
 			'method' => 'resolveTexts'
 		],
 		'hostInterfacePort' => [
@@ -527,7 +547,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'host' => [],
 			'interface' => [],
 			'item' => [],
-			'log' => [],
+			'log' => []
 		];
 		$usermacros = [];
 		$macro_values = [];
@@ -1020,19 +1040,25 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 									$link = (new CSpan($function['host'].':'.$function['key_']))->addClass($style);
 								}
 								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-									$link = (new CLink($function['host'].':'.$function['key_'],
-										'disc_prototypes.php?form=update&itemid='.$function['itemid'].
-										'&parent_discoveryid='.$function['parent_itemid']
-									))
-										->addClass(ZBX_STYLE_LINK_ALT)
-										->addClass($style);
+									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+										? (new CLink($function['host'].':'.$function['key_'],
+											'disc_prototypes.php?form=update&itemid='.$function['itemid'].
+											'&parent_discoveryid='.$function['parent_itemid']
+										))
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->addClass($style)
+										: (new CSpan($function['host'].':'.$function['key_']))
+											->addClass($style);
 								}
 								else {
-									$link = (new CLink($function['host'].':'.$function['key_'],
+									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+									? (new CLink($function['host'].':'.$function['key_'],
 										'items.php?form=update&itemid='.$function['itemid']
 									))
 										->addClass(ZBX_STYLE_LINK_ALT)
 										->setAttribute('data-itemid', $function['itemid'])
+										->addClass($style)
+									: (new CSpan($function['host'].':'.$function['key_']))
 										->addClass($style);
 								}
 
@@ -2736,7 +2762,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param array  $data['texts_support_macros']               List of texts potentially could contain macros.
 	 * @param array  $data['texts_support_user_macros']          List of texts potentially could contain user macros.
 	 * @param array  $data['texts_support_lld_macros']           List of texts potentially could contain LLD macros.
-	 * @param int    $data['hostids']                            Hostid for which tested item belongs to.
+	 * @param int    $data['hostid']                             Hostid for which tested item belongs to.
+	 * @param array  $data['macros_values']                      Values for supported macros.
 	 *
 	 * @return array
 	 */

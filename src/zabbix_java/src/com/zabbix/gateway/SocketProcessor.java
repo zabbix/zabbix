@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,6 +71,8 @@ class SocketProcessor implements Runnable
 					cleanDiscoveredObjects(now);
 					cleanupTime = now + MILLISECONDS_IN_HOUR;
 				}
+
+				cleanRMISSLhintCache((JMXItemChecker)checker);
 			}
 			else
 				throw new ZabbixException("bad request tag value: '%s'", request.getString(ItemChecker.JSON_TAG_REQUEST));
@@ -129,6 +131,23 @@ class SocketProcessor implements Runnable
 
 			if (now >= expirationTime)
 				it.remove();
+		}
+	}
+
+	public static final long MILLISECONDS_IN_24HOURS = MILLISECONDS_IN_HOUR * 24;
+	private static long RMISSLhintCacheCleanupTime = System.currentTimeMillis() + MILLISECONDS_IN_24HOURS;
+
+	public void cleanRMISSLhintCache(JMXItemChecker checker)
+	{
+		long now = System.currentTimeMillis();
+
+		logger.debug("RMI SSL hint cache cleanup is scheduled on " + RMISSLhintCacheCleanupTime +
+				", now is: " + now);
+
+		if (now >= RMISSLhintCacheCleanupTime)
+		{
+			checker.cleanUseRMISSLforURLHintCache();
+			RMISSLhintCacheCleanupTime = now + MILLISECONDS_IN_24HOURS;
 		}
 	}
 }

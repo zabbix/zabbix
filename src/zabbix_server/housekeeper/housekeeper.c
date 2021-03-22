@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -562,6 +562,7 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  ******************************************************************************/
 static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
+#if defined(HAVE_POSTGRESQL)
 	int		keep_from, history_seconds;
 	DB_RESULT	result;
 
@@ -569,16 +570,27 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 
 	history_seconds = *rule->poption;
 
-	if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
+	if (0 == history_seconds)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
-		return;
+		keep_from = INT_MAX;
+	}
+	else
+	{
+		if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
+			return;
+		}
+
+		keep_from = now - history_seconds;
 	}
 
-	keep_from = now - history_seconds;
 	zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
 
-	result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rule->table);
+	result = DBselect(1 == ZBX_DB_TSDB_V1 ?
+				"select drop_chunks(table_name=>'%s',older_than=>%d)" :
+				"select drop_chunks(relation=>'%s',older_than=>%d)",
+				rule->table, keep_from);
 
 	if (NULL == result)
 		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rule->table);
@@ -588,6 +600,10 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return;
+#else
+	ZBX_UNUSED(rule);
+	ZBX_UNUSED(now);
+#endif
 }
 
 /******************************************************************************

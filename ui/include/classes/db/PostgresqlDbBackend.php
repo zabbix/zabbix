@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -272,10 +272,30 @@ class PostgresqlDbBackend extends DbBackend {
 			return false;
 		}
 
-		$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
-			' FROM timescaledb_information.compressed_hypertable_stats'.
-			' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
+		$timescale_v1 = DBfetch(DBselect(
+			'SELECT NULL FROM pg_catalog.pg_class c'.
+			' JOIN pg_catalog.pg_namespace n'.
+			' ON n.oid=c.relnamespace'.
+			' WHERE n.nspname='.zbx_dbstr('timescaledb_information').
+			' AND c.relname='.zbx_dbstr('compressed_hypertable_stats')
 		));
+
+		if ($timescale_v1) {
+			$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
+				' FROM timescaledb_information.compressed_hypertable_stats'.
+				' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
+			));
+
+			return (bool) $result['chunks'];
+		}
+
+		$query = implode(' UNION ', array_map(function ($table) {
+			return 'SELECT number_compressed_chunks chunks'.
+				' FROM hypertable_compression_stats('.zbx_dbstr($table).')'.
+				' WHERE number_compressed_chunks != 0';
+		}, $tables));
+
+		$result = DBfetch(DBselect($query));
 
 		return (bool) $result['chunks'];
 	}

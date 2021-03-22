@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
 **/
 
 #include "checks_ssh.h"
+
+/* the size of temporary buffer used to read from data channel */
+#define DATA_BUFFER_SIZE	4096
 
 #if defined(HAVE_SSH2)
 #include <libssh2.h>
@@ -88,8 +91,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	LIBSSH2_SESSION	*session;
 	LIBSSH2_CHANNEL	*channel;
 	int		auth_pw = 0, rc, ret = NOTSUPPORTED, exitcode;
-	char		buffer[MAX_BUFFER_LEN], *userauthlist, *publickey = NULL, *privatekey = NULL, *ssherr, *output;
-	size_t		bytecount = 0;
+	char		tmp_buf[DATA_BUFFER_SIZE], *userauthlist, *publickey = NULL, *privatekey = NULL, *ssherr,
+			*output, *buffer = NULL;
+	size_t		offset = 0, buf_size = DATA_BUFFER_SIZE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -258,7 +262,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		}
 	}
 
-	while (0 != (rc = libssh2_channel_read(channel, buffer + bytecount, sizeof(buffer) - bytecount - 1)))
+	buffer = (char *)zbx_malloc(buffer, buf_size);
+
+	while (0 != (rc = libssh2_channel_read(channel, tmp_buf, sizeof(tmp_buf))))
 	{
 		if (rc < 0)
 		{
@@ -266,25 +272,34 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				waitsocket(s.socket, session);
 
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read data from SSH server"));
-				goto channel_close;
+			goto channel_close;
 		}
-		bytecount += (size_t)rc;
-		if (sizeof(buffer) - 1 == bytecount)
-			break;
+
+		if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
+					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE));
+			goto channel_close;
+		}
+
+		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, rc);
 	}
-	buffer[bytecount] = '\0';
-	output = convert_to_utf8(buffer, bytecount, encoding);
+
+	output = convert_to_utf8(buffer, offset, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
+	zbx_replace_invalid_utf8(output);
 
-	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_TEXT, output))
-		ret = SYSINFO_RET_OK;
+	SET_TEXT_RESULT(result, output);
+	output = NULL;
 
-	zbx_free(output);
+	ret = SYSINFO_RET_OK;
 channel_close:
 	/* close an active data channel */
 	exitcode = 127;
 	while (LIBSSH2_ERROR_EAGAIN == (rc = libssh2_channel_close(channel)))
 		waitsocket(s.socket, session);
+
+	zbx_free(buffer);
 
 	if (0 != rc)
 	{
@@ -294,7 +309,7 @@ channel_close:
 	else
 		exitcode = libssh2_channel_get_exit_status(channel);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:" ZBX_FS_SIZE_T, __func__, exitcode, bytecount);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:" ZBX_FS_SIZE_T, __func__, exitcode, offset);
 
 	libssh2_channel_free(channel);
 	channel = NULL;
@@ -324,9 +339,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	ssh_channel	channel;
 	ssh_key 	privkey = NULL, pubkey = NULL;
 	int		rc, userauth, ret = NOTSUPPORTED;
-	char		*output, *publickey = NULL, *privatekey = NULL;
-	char		buffer[MAX_BUFFER_LEN], userauthlist[64];
-	size_t		offset = 0, bytecount = 0;
+	char		*output, *publickey = NULL, *privatekey = NULL, *buffer = NULL;
+	char		tmp_buf[DATA_BUFFER_SIZE], userauthlist[64];
+	size_t		offset = 0, buf_size = DATA_BUFFER_SIZE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -542,7 +557,10 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		}
 	}
 
-	while (0 != (rc = ssh_channel_read(channel, buffer + bytecount, sizeof(buffer) - bytecount - 1, 0)))
+	buffer = (char *)zbx_malloc(buffer, buf_size);
+	offset = 0;
+
+	while (0 != (rc = ssh_channel_read(channel, tmp_buf, sizeof(tmp_buf), 0)))
 	{
 		if (rc < 0)
 		{
@@ -552,21 +570,28 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read data from SSH server"));
 			goto channel_close;
 		}
-		bytecount += (size_t)rc;
-		if (sizeof(buffer) - 1 == bytecount)
-			break;
+
+		if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
+					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE));
+			goto channel_close;
+		}
+
+		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, rc);
 	}
-	buffer[bytecount] = '\0';
-	output = convert_to_utf8(buffer, (size_t)bytecount, encoding);
+
+	output = convert_to_utf8(buffer, offset, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
+	zbx_replace_invalid_utf8(output);
 
-	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_TEXT, output))
-		ret = SYSINFO_RET_OK;
+	SET_TEXT_RESULT(result, output);
+	output = NULL;
 
-	zbx_free(output);
-
+	ret = SYSINFO_RET_OK;
 channel_close:
 	ssh_channel_close(channel);
+	zbx_free(buffer);
 channel_free:
 	ssh_channel_free(channel);
 session_close:

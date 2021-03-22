@@ -10,6 +10,7 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
@@ -39,12 +40,11 @@ zbx_trapper_preproc_test_run_SOURCES = \
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)
 zbx_trapper_preproc_test_run_LDADD += @SERVER_LIBS@ 
-zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@
-
-zbx_trapper_preproc_test_run_CFLAGS = \
-	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ \
+zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_preprocessor_test \
 	-Wl,--wrap=DBget_user_by_active_session
 
+zbx_trapper_preproc_test_run_CFLAGS = \
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@
 endif
 

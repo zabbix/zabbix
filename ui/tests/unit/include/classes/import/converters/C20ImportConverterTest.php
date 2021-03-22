@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'item_prototypes' => [],
 									'graph_prototypes' => [],
 									'trigger_prototypes' => []
-								],
+								]
 							]
 						]
 					]
@@ -243,7 +243,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 											[
 												'macro' => '{#MACRO}',
 												'value' => 'regex',
-												'operator' => CONDITION_OPERATOR_REGEXP,
+												'operator' => CONDITION_OPERATOR_REGEXP
 											]
 										]
 									],
@@ -446,7 +446,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'item_prototypes' => [],
 									'graph_prototypes' => [],
 									'trigger_prototypes' => []
-								],
+								]
 							]
 						]
 					]
@@ -550,7 +550,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 											'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
 										]
 									],
-									'host_prototypes' => [],
+									'host_prototypes' => []
 								],
 								[
 									'type' => ITEM_TYPE_ZABBIX,
@@ -588,7 +588,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 											[
 												'macro' => '{#MACRO}',
 												'value' => 'regex',
-												'operator' => CONDITION_OPERATOR_REGEXP,
+												'operator' => CONDITION_OPERATOR_REGEXP
 											]
 										]
 									],
@@ -596,7 +596,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
-								],
+								]
 							],
 							'description' => ''
 						]

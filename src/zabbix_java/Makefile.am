@@ -9,7 +9,7 @@ EXTRA_DIST = \
 	startup.sh
 
 ZJG = bin/zabbix-java-gateway-$(VERSION).jar
-LIB = lib/android-json-4.3_r3.1.jar:lib/logback-core-0.9.27.jar:lib/logback-classic-0.9.27.jar:lib/slf4j-api-1.6.1.jar
+LIB = lib/android-json-4.3_r3.1.jar:lib/logback-core-1.2.3.jar:lib/logback-classic-1.2.3.jar:lib/slf4j-api-1.7.30.jar
 JUNIT = tests/junit-4.8.2.jar
 
 ZJG_DEST = $(DESTDIR)$(sbindir)/zabbix_java
@@ -21,6 +21,9 @@ $(ZJG): class src/com/zabbix/gateway/*.java
 	$(JAR) cf $(ZJG) -C class/src .
 
 test: class
+	echo "badger useruser" > tests/com/zabbix/gateway/jmx_test_beans/jmxremote.password
+	chmod 600 tests/com/zabbix/gateway/jmx_test_beans/jmxremote.password
+	$(JAVAC) tests/com/zabbix/gateway/jmx_test_beans/*.java
 	$(JAVAC) -d class/tests -classpath class/src:$(JUNIT) tests/com/zabbix/gateway/*.java
 	java -classpath class/tests:$(LIB):$(ZJG):$(JUNIT) com.zabbix.gateway.AllTestRunner
 
@@ -40,5 +43,7 @@ install: all
 
 clean:
 	rm -f $(ZJG)
+	rm -f tests/com/zabbix/gateway/jmx_test_beans/*.class
+	rm -f bin/*
 	rm -rf class/src/*
 	rm -rf class/tests/*

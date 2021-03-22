@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,6 +171,27 @@ class CApiInputValidator {
 
 			case API_URL:
 				return self::validateUrl($rule, $data, $path, $error);
+
+			case API_IP:
+				return self::validateIp($rule, $data, $path, $error);
+
+			case API_DNS:
+				return self::validateDns($rule, $data, $path, $error);
+
+			case API_PORT:
+				return self::validatePort($rule, $data, $path, $error);
+
+			case API_TRIGGER_EXPRESSION:
+				return self::validateTriggerExpression($rule, $data, $path, $error);
+
+			case API_EVENT_NAME:
+				return self::validateEventName($rule, $data, $path, $error);
+
+			case API_JSONRPC_PARAMS:
+				return self::validateJsonRpcParams($rule, $data, $path, $error);
+
+			case API_JSONRPC_ID:
+				return self::validateJsonRpcId($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -219,6 +240,13 @@ class CApiInputValidator {
 			case API_HTTP_POST:
 			case API_VARIABLE_NAME:
 			case API_URL:
+			case API_IP:
+			case API_DNS:
+			case API_PORT:
+			case API_TRIGGER_EXPRESSION:
+			case API_EVENT_NAME:
+			case API_JSONRPC_PARAMS:
+			case API_JSONRPC_ID:
 				return true;
 
 			case API_OBJECT:
@@ -1798,5 +1826,271 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * IP address validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateIp($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$ip_parser = new CIPParser([
+			'v6' => ZBX_HAVE_IPV6,
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'macros' => ($flags & API_ALLOW_MACRO)
+		]);
+
+		if ($ip_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP address is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * DNS name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateDns($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$dns_parser = new CDnsParser([
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'macros' => ($flags & API_ALLOW_MACRO)
+		]);
+
+		if ($dns_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a DNS name is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Port number validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validatePort($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (!is_int($data) && !is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		$data = (string) $data;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ($flags & API_ALLOW_USER_MACRO) {
+			$user_macro_parser = new CUserMacroParser();
+
+			if ($user_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$lld_macro_parser = new CLLDMacroParser();
+
+			if ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
+			return false;
+		}
+
+		$data = (string) $data;
+
+		return true;
+	}
+
+	/**
+	 * Trigger expression validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO, API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateTriggerExpression($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$expression_data = new CTriggerExpression([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'lowercase_errors' => true
+		]);
+
+		if (!$expression_data->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+			return false;
+		}
+
+		if (!$expression_data->expressions) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('trigger expression must contain at least one host:key reference')
+			);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Event name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateEventName($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$eventname_validator = new CEventNameValidator();
+
+		if (!$eventname_validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $eventname_validator->getError());
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * JSON RPC parameters validator. Parameters MUST contain an array or object value.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateJsonRpcParams($rule, &$data, $path, &$error) {
+		if (is_array($data)) {
+			return true;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or object is expected'));
+
+		return false;
+	}
+
+	/**
+	 * JSON RPC identifier validator. This identifier MUST contain a String, Number, or NULL value.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateJsonRpcId($rule, &$data, $path, &$error) {
+		if (is_string($data) || is_int($data) || is_float($data) || $data === null) {
+			return true;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a string, number or null value is expected'));
+
+		return false;
 	}
 }

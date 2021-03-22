@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -177,6 +177,18 @@
 
 		jQuery('#esc_period').change(function() {
 			jQuery('form[name="action.edit"]').submit();
+		});
+
+		$('.js-edit-button').on('click', function() {
+			var operation = $(this).data('operation');
+
+			operation_details.open(this, operation.actionid, operation.eventsource, operation.operationtype,
+				JSON.parse($(['#operations_for_popup', operation.operationtype, operation.operationid].join('_')).val())
+			);
+		});
+
+		$('#evaltype').on('change', () => {
+			processTypeOfCalculation();
 		});
 
 		processTypeOfCalculation();
@@ -438,19 +450,24 @@
 		conf.usergroups.forEach(usergroup => this.addUserGroup(usergroup));
 		conf.users.forEach(user => this.addUser(user));
 
-		const $mediatype_default_select = this.$mediatype_default.find('select');
-		const $mediatype_only_select = this.$mediatype_only.find('select');
+		const $mediatype_default_select = this.$mediatype_default.find('z-select');
+		$mediatype_default_select.get(0).addOption({value: 0, label: `- ${t('All')} -`});
+
+		const $mediatype_only_select = this.$mediatype_only.find('z-select');
+		$mediatype_only_select.get(0).addOption({value: 0, label: `- ${t('All')} -`});
+
 		conf.mediatypes.forEach(({mediatypeid, name, status}) => {
-			$mediatype_default_select.append($('<option />', {
-				text: name,
+			$mediatype_default_select.get(0).addOption({
 				value: mediatypeid,
-				class: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
-			}));
-			$mediatype_only_select.append($('<option />', {
-				text: name,
+				label: name,
+				class_name: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
+			});
+
+			$mediatype_only_select.get(0).addOption({
 				value: mediatypeid,
-				class: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
-			}));
+				label: name,
+				class_name: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
+			});
 		});
 
 		$mediatype_default_select.val(conf.mediatypeid);
@@ -624,7 +641,7 @@
 		this.$port = $obj.siblings('#operation-command-port');
 		this.$cmd = $obj.siblings('#operation-command-cmd');
 
-		this.$authtype_select = this.$authtype.find('select');
+		this.$authtype_select = this.$authtype.find('z-select');
 		this.$privatekey_input = this.$privatekey.find('input');
 		this.$publickey_input = this.$pubkey.find('input');
 		this.$password_input = this.$password.find('input');
@@ -773,7 +790,7 @@
 		this.type_telnet = new OperationViewCommandTypeTelnet($obj);
 
 		this.$type = $obj.siblings('#operation-command-type');
-		this.$type_select = $obj.find('[name="operation[opcommand][type]"]');
+		this.$type_select = $obj.find('z-select[name="operation[opcommand][type]"]');
 
 		this.$targets = $obj.siblings('#operation-command-targets');
 		this.$targets_current = this.$targets.find('#operation-command-chst');
@@ -915,7 +932,7 @@
 	 */
 	function OperationViewType($obj) {
 		this.$obj = $obj;
-		this.$select = this.$obj.find('select');
+		this.$select = this.$obj.find('z-select');
 		this.$select.on('change', ({target}) => this.onchange(target.value));
 	}
 
@@ -938,7 +955,7 @@
 			this.$select.replaceWith([options[0].name, $hidden_input]);
 		}
 		else {
-			options.forEach(({value, name}) => this.$select.append($('<option>', {value, text: name})));
+			options.forEach(({value, name}) => this.$select.get(0).addOption({value, label: name}));
 			this.$select.val(selected);
 		}
 	};
@@ -1072,7 +1089,7 @@
 		this.$evaltype = $obj.siblings('#operation-condition-evaltype');
 
 		this.$evaltype_formula = this.$evaltype.find('#operation-condition-evaltype-formula');
-		this.$evaltype_select = this.$evaltype.find('select');
+		this.$evaltype_select = this.$evaltype.find('z-select');
 
 		this.$list = $obj.siblings('#operation-condition-list');
 

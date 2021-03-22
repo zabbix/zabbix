@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ $widget = (new CWidget())->setTitle(_('Triggers'));
 
 // Append host summary to widget header.
 if ($data['hostid'] != 0) {
-	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
+	$widget->setNavigation(getHostNavigation('triggers', $data['hostid']));
 }
 
 // Create form.
@@ -89,6 +89,13 @@ $triggersFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(
+		(new CLabel(_('Event name'), 'event_name')),
+		(new CTextAreaFlexible('event_name', $data['event_name']))
+			->setReadonly($readonly)
+			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(
 		new CLabel(_('Operational data'), 'opdata'),

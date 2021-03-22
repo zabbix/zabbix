@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,12 +26,17 @@
 
 <script type="text/x-jquery-tmpl" id="row_expr">
 	<?= (new CRow([
-			(new CComboBox('expressions[#{rowNum}][expression_type]', null, null, expression_type2str()))
-				->onChange('onChangeExpressionType(this, #{rowNum})'),
+			(new CSelect('expressions[#{rowNum}][expression_type]'))
+				->addClass('js-expression-type-select')
+				->setId('expressions_#{rowNum}_expression_type')
+				->addOptions(CSelect::createOptionsFromArray(expression_type2str())),
 			(new CTextBox('expressions[#{rowNum}][expression]', '', false, 255))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired(),
-			(new CComboBox('expressions[#{rowNum}][exp_delimiter]', null, null, expressionDelimiters()))
+			(new CSelect('expressions[#{rowNum}][exp_delimiter]'))
+				->addOptions(CSelect::createOptionsFromArray(expressionDelimiters()))
+				->setId('expressions_#{rowNum}_exp_delimiter')
+				->addClass('js-expression-delimiter-select')
 				->addStyle('display: none;'),
 			new CCheckBox('expressions[#{rowNum}][case_sensitive]'),
 			(new CCol(
@@ -65,15 +70,6 @@
 </script>
 
 <script>
-	function onChangeExpressionType(obj, index) {
-		if (obj.value === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>') {
-			jQuery('#expressions_' + index + '_exp_delimiter').show();
-		}
-		else {
-			jQuery('#expressions_' + index + '_exp_delimiter').hide();
-		}
-	}
-
 	(function($) {
 		/**
 		 * Object to manage expression related GUI elements.
@@ -233,9 +229,16 @@
 				});
 		});
 
-		$('#tbl_expr').dynamicRows({
-			template: '#row_expr'
-		});
+		$('#tbl_expr')
+			.dynamicRows({
+				template: '#row_expr'
+			})
+			.on('change', '.js-expression-type-select', (e) => {
+				$(e.target)
+					.closest('[data-index]')
+					.find('.js-expression-delimiter-select')
+					.toggle(e.target.value === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>');
+			});
 
 		$form.find('#clone').click(function() {
 			var url = new Curl('zabbix.php?action=regex.edit');

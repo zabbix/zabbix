@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,11 +58,12 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 		CArrayHelper::sort($maps, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAV_MAPS]),
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes($this->getContext())[WIDGET_FAV_MAPS]),
 			'maps' => $maps,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed_ui_maps' => $this->checkAccess(CRoleHelper::UI_MONITORING_MAPS)
 		]));
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,6 +186,10 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 			else if (0 == strcmp(section, ZBX_DIAG_PREPROCESSING))
 			{
 				scope = ZBX_DIAGINFO_PREPROCESSING;
+			}
+			else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
+			{
+				scope = ZBX_DIAGINFO_LOCKS;
 			}
 			else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)))
 			{

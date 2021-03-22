@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,9 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 			'graphs' => $graphs,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed_ui_hosts' => $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
+			'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 		]));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,7 +110,15 @@ elseif ($empty_btn) {
 
 // Show Type dropdown in header for help items.
 if ($data['popup_type'] === 'help_items') {
-	$cmb_types = new CComboBox('itemtype', $options['itemtype'], 'javascript: reloadPopup(this.form);');
+	$types_select = (new CSelect('itemtype'))
+		->setId('itemtype')
+		->setFocusableElementId('label-itemtype')
+		->setAttribute('autofocus', 'autofocus')
+		->setValue($options['itemtype']);
+
+	$output['script_inline'] .= '$("#itemtype").on("change", (e) => {'.
+		'reloadPopup($(e.target).closest("form").get(0));'.
+	'});';
 
 	$header_form
 		->addVar('srctbl', $data['popup_type'])
@@ -119,13 +127,13 @@ if ($data['popup_type'] === 'help_items') {
 		->addVar('dstfld1', $options['dstfld1']);
 
 	foreach (CControllerPopupGeneric::ALLOWED_ITEM_TYPES as $type) {
-		$cmb_types->addItem($type, item_type2str($type));
+		$types_select->addOption(new CSelectOption($type, item_type2str($type)));
 	}
 
 	$controls[] = [
-		new CLabel(_('Type'), 'itemtype'),
+		new CLabel(_('Type'), $types_select->getFocusableElementId()),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$cmb_types
+		$types_select
 	];
 }
 
@@ -172,6 +180,8 @@ switch ($data['popup_type']) {
 	case 'applications':
 	case 'application_prototypes':
 	case 'drules':
+	case 'roles':
+	case 'api_methods':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -359,7 +369,7 @@ switch ($data['popup_type']) {
 	case 'help_items':
 		foreach ($data['table_records'] as $item) {
 			$action = get_window_opener($options['dstfld1'], $item[$options['srcfld1']]);
-			$action .= 'updateItemTestBtn();';
+			$action .= 'updateItemFormElements();';
 			$action .= $options['srcfld2']
 				? get_window_opener($options['dstfld2'], $item[$options['srcfld2']])
 				: '';
@@ -614,7 +624,7 @@ switch ($data['popup_type']) {
 				$check_box,
 				$description,
 				$script_execute_on,
-				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
+				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'))
 			]);
 		}
 		unset($data['table_records']);
@@ -635,7 +645,7 @@ if ($data['multiselect'] && $form !== null) {
 
 // Types require results returned as array.
 $types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
-	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
+	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods'
 ];
 
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {

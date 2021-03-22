@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,13 +62,16 @@ if ($http_user) {
 	}
 
 	try {
-		$user = API::getApiService('user')->loginByAlias($http_user,
+		CWebUser::$data = API::getApiService('user')->loginByAlias($http_user,
 			(CAuthenticationHelper::get(CAuthenticationHelper::HTTP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
-		if ($user) {
-			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
+		if (!empty(CWebUser::$data)) {
+			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+			API::getWrapper()->auth = CWebUser::$data['sessionid'];
+
+			$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
 			redirect(reset($redirect));
 		}
 	}
@@ -77,7 +80,7 @@ if ($http_user) {
 	}
 }
 else {
-	error(_('Login name or password is incorrect.'));
+	error(_('Incorrect user name or password or account is temporarily blocked.'));
 }
 
 echo (new CView('general.warning', [

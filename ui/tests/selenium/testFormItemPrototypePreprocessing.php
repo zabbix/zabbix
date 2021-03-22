@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,6 +98,14 @@ class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 	 */
 	public function testFormItemPrototypePreprocessing_CreateAllSteps($data) {
 		$this->checkCreate($data);
+	}
+
+	/**
+	 * Check that adding two 'Check for not supported value'
+	 * preprocessing steps is impossible.
+	 */
+	public function testFormItemPrototypePreprocessing_RepeatedNotSupported() {
+		$this->checkRepeatedNotSupported();
 	}
 
 	/**

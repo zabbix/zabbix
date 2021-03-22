@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		free_result(&value);
 	}
 clean:
-	DCrequeue_items(&item.itemid, &item.state, &ts->sec, &errcode, 1);
+	DCrequeue_items(&item.itemid, &ts->sec, &errcode, 1);
 
 	DCconfig_clean_items(&item, &errcode, 1);
 
@@ -407,7 +407,7 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
  ******************************************************************************/
 static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count)
 {
-	DC_ITEM			items[MAX_PINGER_ITEMS];
+	DC_ITEM			item, *items;
 	int			i, num, count, interval, size, timeout, rc, errcode = SUCCEED;
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
@@ -415,7 +415,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, items);
+	items = &item;
+	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, &items);
 
 	for (i = 0; i < num; i++)
 	{
@@ -444,13 +445,16 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags, NULL, &ts,
 					items[i].state, error);
 
-			DCrequeue_items(&items[i].itemid, &items[i].state, &ts.sec, &errcode, 1);
+			DCrequeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
 		}
 
 		zbx_free(items[i].key);
 	}
 
 	DCconfig_clean_items(items, NULL, num);
+
+	if (items != &item)
+		zbx_free(items);
 
 	zbx_preprocessor_flush();
 

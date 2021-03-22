@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,22 +26,25 @@
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-tmpl">
 	<?php
-	$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
+	$preproc_types_select = (new CSelect('preprocessing[#{rowNum}][type]'))
+		->setId('preprocessing_#{rowNum}_type')
+		->setValue(ZBX_PREPROC_REGSUB)
+		->setWidthAuto();
 
 	foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $group) {
-		$cb_group = new COptGroup($group['label']);
+		$opt_group = new CSelectOptionGroup($group['label']);
 
 		foreach ($group['types'] as $type => $label) {
-			$cb_group->addItem(new CComboItem($type, $label));
+			$opt_group->addOption(new CSelectOption($type, $label));
 		}
 
-		$preproc_types_cbbox->addItem($cb_group);
+		$preproc_types_select->addOptionGroup($opt_group);
 	}
 
 	echo (new CListItem([
 		(new CDiv([
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-			(new CDiv($preproc_types_cbbox))
+			(new CDiv($preproc_types_select))
 				->addClass('list-numbered-item')
 				->addClass('step-name'),
 			(new CDiv())->addClass('step-parameters'),
@@ -226,6 +229,32 @@
 			}
 		}
 
+		/**
+		 * Allow only one option with value "ZBX_PREPROC_VALIDATE_NOT_SUPPORTED" to be enabled.
+		 */
+		function updateTypeOptionsAvailability() {
+			const $preproc_steps = $('z-select[name^="preprocessing["][name$="[type]"]');
+			const $preproc_steps_ns = $preproc_steps
+				.filter((_index, {value}) => value != <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>);
+
+			if ($preproc_steps_ns.length == $preproc_steps.length) {
+				for (let select of $preproc_steps_ns) {
+					for (let option of select.getOptions()) {
+						option.disabled = false;
+					}
+				}
+				return;
+			}
+
+			for (let select of $preproc_steps_ns) {
+				for (let option of select.getOptions()) {
+					if (option.value == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>) {
+						option.disabled = true;
+					}
+				}
+			}
+		}
+
 		var $preprocessing = $('#preprocessing'),
 			step_index = $preprocessing.find('li.sortable').length;
 
@@ -243,8 +272,8 @@
 		$preprocessing
 			.on('click', '.element-table-add', function() {
 				var preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html()),
-					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index})),
-					type = $('select[name*="type"]', $row).val();
+					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index}));
+					type = $('z-select[name*="type"]', $row).val();
 
 				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
@@ -265,11 +294,12 @@
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
+				updateTypeOptionsAvailability();
 				step_index++;
 			})
 			.on('click', '#preproc_test_all', function() {
 				var step_nums = [];
-				$('select[name^="preprocessing"][name$="[type]"]', $preprocessing).each(function() {
+				$('z-select[name^="preprocessing"][name$="[type]"]', $preprocessing).each(function() {
 					var str = $(this).attr('name');
 					step_nums.push(str.substr(14, str.length - 21));
 				});
@@ -297,8 +327,10 @@
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
+
+				updateTypeOptionsAvailability();
 			})
-			.on('change', 'select[name*="type"]', function() {
+			.on('change', 'z-select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),
 					type = $(this).val(),
 					$on_fail = $row.find('[name*="on_fail"]');
@@ -318,12 +350,23 @@
 							.prop('checked', false)
 							.prop('disabled', true)
 							.trigger('change');
+						$row.find('[name*="[test]"]').prop('disabled', false);
+						break;
+
+					case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
+						$on_fail
+							.prop('checked', true)
+							.prop('disabled', true)
+							.trigger('change');
 						break;
 
 					default:
 						$on_fail.prop('disabled', false);
+						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
+
+				updateTypeOptionsAvailability();
 			})
 			.on('change', 'input[type="text"][name*="params"]', function() {
 				$(this).attr('title', $(this).val());

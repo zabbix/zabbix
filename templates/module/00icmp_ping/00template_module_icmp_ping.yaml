@@ -1,0 +1,97 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:24Z'
+  groups:
+    -
+      name: Templates/Modules
+  templates:
+    -
+      template: 'ICMP Ping'
+      name: 'ICMP Ping'
+      description: |
+        Template Module ICMP Ping
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Modules
+      applications:
+        -
+          name: Status
+      items:
+        -
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 1w
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'Service state'
+          triggers:
+            -
+              expression: '{max(#3)}=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+        -
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: Status
+          triggers:
+            -
+              expression: '{min(5m)}>{$ICMP_LOSS_WARN} and {min(5m)}<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: '{ICMP Ping:icmpping.max(#3)}=0'
+        -
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 1w
+          value_type: FLOAT
+          units: s
+          applications:
+            -
+              name: Status
+          triggers:
+            -
+              expression: '{avg(5m)}>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: '{ICMP Ping:icmppingloss.min(5m)}>{$ICMP_LOSS_WARN} and {ICMP Ping:icmppingloss.min(5m)}<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: '{ICMP Ping:icmpping.max(#3)}=0'
+      macros:
+        -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

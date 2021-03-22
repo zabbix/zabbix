@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$this->assertSame(['Message type', 'Template', 'Actions'], $templates_list->getHeadersText());
 		$this->assertEquals(1, $templates_list->getRows()->count());
 		// Check that media type configuration form buttons are clickable from Message templates tab.
-		$this->assertEquals(2, $this->query('id', ['add', 'cancel'])->all()->filter(CElementQuery::CLICKABLE)->count());
+		$this->assertEquals(2, $this->query('id', ['add', 'cancel'])->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		// Check message template configuration form.
 		$templates_list->query('button:Add')->one()->click();
@@ -51,16 +52,18 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$this->assertEquals(255, $form->getField('Subject')->getAttribute('maxlength'));
 		$this->assertEquals(65535, $form->getField('Message')->getAttribute('maxlength'));
 		// Check that both buttons in the media type template configuration form are clickable.
-		$this->assertEquals(2, $overlay->query('button', ['Add', 'Cancel'])->all()->filter(CElementQuery::CLICKABLE)->count());
+		$this->assertEquals(2, $overlay->query('button', ['Add', 'Cancel'])->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		// Add a "Problem" message template and check that corresponding row is added in Message templates table.
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$templates_list->invalidate();
 		$row = $templates_list->findRow('Message type', 'Problem');
 
 		// Check that both buttons in column Actions are clickable.
-		$this->assertEquals(2, $row->getColumn('Actions')->query('button', ['Edit', 'Remove'])->all()->
-				filter(CElementQuery::CLICKABLE)->count()
+		$this->assertEquals(2, $row->getColumn('Actions')->query('button', ['Edit', 'Remove'])->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 		// Check that it is possible to edit a newly created message template.
 		$row->query('button:Edit')->one()->click();
@@ -74,7 +77,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	public function getDefaultMessageTemplateData() {
 		return [
-			// Defult messages for plain text Email media type
+			// Default messages for plain text Email media type
 			[
 				[
 					'media_type' => [
@@ -145,7 +148,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					]
 				]
 			],
-			// Defult messages for HTML text Email media type
+			// Default messages for HTML text Email media type
 			[
 				[
 					'media_type' => [
@@ -210,7 +213,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					]
 				]
 			],
-			// Defult messages for SMS media type
+			// Default messages for SMS media type
 			[
 				[
 					'media_type' => [
@@ -298,8 +301,9 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				$templates_list->query('button:Add')->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$form->invalidate();
-				$disabled_options = $form->getField('Message type')->getOptions()->filter(CElementQuery::ATTRIBUTES_PRESENT,
-						['disabled'])->asText();
+				$disabled_options = $form->getField('Message type')->getOptions()->filter(
+						new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled'])
+				)->asText();
 				$this->assertContains($template['Message type'], $disabled_options);
 				COverlayDialogElement::find()->one()->close();
 			}
@@ -652,7 +656,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				case 'Edit':
 				case 'Add':
 				case 'Skip':
-					// Open the correspondig message template and check its content according to the values in data provider.
+					// Open the corresponding message template and check its content according to the values in data provider.
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Edit')->one()->click();
 					COverlayDialogElement::find()->one()->waitUntilReady();
 					$form = $this->query('id:mediatype_message_form')->asForm()->one();

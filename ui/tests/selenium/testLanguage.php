@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'field' => [
-						'Default language' => 'Английский (en_GB)'
+						'Язык по умолчанию' => 'Английский (en_GB)'
 					],
 					'message' => 'Настройки обновлены',
 					'page_title' => 'Configuration of GUI',
@@ -253,11 +253,13 @@ class testLanguage extends CWebTest {
 		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
+		$form->selectTab('Permissions');
+		$form->fill(['Role' => 'Super admin role']);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
 		$this->page->userLogin($data['fields']['Alias'], $data['fields']['Password']);
-		$this->assertPageTitle($data['page_title']);
+		$this->page->assertTitle($data['page_title']);
 		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.
 				zbx_dbstr($data['fields']['Alias'])));
@@ -266,7 +268,7 @@ class testLanguage extends CWebTest {
 
 	private function checkLanguage($message, $page_title, $body_lang, $defaultdb_lang) {
 		$this->assertMessage(TEST_GOOD, $message);
-		$this->assertPageTitle($page_title);
+		$this->page->assertTitle($page_title);
 		$this->assertEquals($body_lang, $this->query('xpath://body')->one()->getAttribute('lang'));
 		$this->assertEquals($defaultdb_lang, CDBHelper::getValue('SELECT default_lang FROM config'));
 	}

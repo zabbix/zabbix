@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
@@ -518,12 +517,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($templateId == 0) {
 			$messageSuccess = _('Template added');
 			$messageFailed = _('Cannot add template');
-			$auditAction = AUDIT_ACTION_ADD;
 		}
 		else {
 			$messageSuccess = _('Template updated');
 			$messageFailed = _('Cannot update template');
-			$auditAction = AUDIT_ACTION_UPDATE;
 		}
 
 		// Add new group.
@@ -585,7 +582,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$result = API::Template()->update($template);
 
-			if (!$result) {
+			if ($result) {
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
+			}
+			else {
 				throw new Exception();
 			}
 		}
@@ -653,28 +653,21 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 
-			// copy template screens
-			$dbTemplateScreens = API::TemplateScreen()->get([
-				'output' => ['screenid'],
+			// Copy template dashboards.
+			$db_template_dashboards = API::TemplateDashboard()->get([
+				'output' => API_OUTPUT_EXTEND,
 				'templateids' => $cloneTemplateId,
-				'preservekeys' => true,
-				'inherited' => false
+				'selectWidgets' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
 			]);
 
-			if ($dbTemplateScreens) {
-				$result &= API::TemplateScreen()->copy([
-					'screenIds' => zbx_objectValues($dbTemplateScreens, 'screenid'),
-					'templateIds' => $templateId
-				]);
+			if ($db_template_dashboards) {
+				$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards, $templateId);
 
-				if (!$result) {
+				if (!API::TemplateDashboard()->create($db_template_dashboards)) {
 					throw new Exception();
 				}
 			}
-		}
-
-		if ($result) {
-			add_audit_ext($auditAction, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
 		}
 
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
@@ -1100,7 +1093,7 @@ else {
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
-		'selectScreens' => API_OUTPUT_COUNT,
+		'selectDashboards' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectTags' => ['tag', 'value'],
 		'templateids' => zbx_objectValues($templates, 'templateid'),
@@ -1158,7 +1151,8 @@ else {
 		'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
 		'config' => [
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
-		]
+		],
+		'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 	];
 
 	$view = new CView('configuration.template.list', $data);

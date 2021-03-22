@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -859,31 +859,31 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_FLOAT],
 				1.23E+11,
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'1.23E+11',
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'1.23e+11',
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'-1.23e+11',
 				'/1/float',
-				-1.23E+11,
+				-1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'.23E11',
 				'/1/float',
-				0.23E+11,
+				0.23E+11
 			],
 			[
 				['type' => API_FLOATS],
@@ -1197,6 +1197,20 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				],
 				'/',
 				'Invalid parameter "/": the parameter "name" is missing.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'roles' => ['type' => API_OBJECT, 'default' => [], 'fields' => [
+						'value' => ['type' => API_STRING_UTF8, 'default' => 'test']
+					]]
+				]],
+				[],
+				'/',
+				[
+					'roles' => [
+						'value' => 'test'
+					]
+				]
 			],
 			[
 				['type' => API_IDS],
@@ -1515,7 +1529,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_OBJECT, 'fields' => [
 					'tags' => ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-						'tag'	=> ['type' => API_STRING_UTF8],
+						'tag'	=> ['type' => API_STRING_UTF8]
 					]]
 				]],
 				[
@@ -1636,7 +1650,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_OBJECTS, 'fields' => [
 					'host' =>	['type' => API_H_NAME, 'flags' => API_REQUIRED],
-					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host'],
+					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host']
 				]],
 				[
 					['host' => 'host 0'],
@@ -1912,13 +1926,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'.124',
 				'/1/numeric',
-				'0.124',
+				'0.124'
 			],
 			[
 				['type' => API_NUMERIC],
 				'-.124',
 				'/1/numeric',
-				'-0.124',
+				'-0.124'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3101,6 +3115,573 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/1/url',
 				'text{EVENT.TAGS."JIRAID"}text'
 			],
+			[
+				['type' => API_IP],
+				'',
+				'/1/ip',
+				''
+			],
+			[
+				['type' => API_IP, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/ip',
+				'Invalid parameter "/1/ip": cannot be empty.'
+			],
+			[
+				['type' => API_IP],
+				[],
+				'/1/ip',
+				'Invalid parameter "/1/ip": a character string is expected.'
+			],
+			[
+				['type' => API_IP],
+				true,
+				'/1/ip',
+				'Invalid parameter "/1/ip": a character string is expected.'
+			],
+			[
+				['type' => API_IP],
+				null,
+				'/1/ip',
+				'Invalid parameter "/1/ip": a character string is expected.'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
+				// broken UTF-8 byte sequence
+				'{$MACRO: "'."\xd1".'"}',
+				'/1/ip',
+				'Invalid parameter "/1/ip": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO: "context"}',
+				'/1/ip',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_IP],
+				'0.0.0.x',
+				'/1/ip',
+				'Invalid parameter "/1/ip": an IP address is expected.'
+			],
+			[
+				['type' => API_IP],
+				'1.1.1.1',
+				'/1/ip',
+				'1.1.1.1'
+			],
+			[
+				['type' => API_IP, 'length' => 11],
+				'192.168.3.5',
+				'/1/ip',
+				'192.168.3.5'
+			],
+			[
+				['type' => API_IP, 'length' => 10],
+				'192.168.3.5',
+				'/1/ip',
+				'Invalid parameter "/1/ip": value is too long.'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
+				'{$}',
+				'/1/ip',
+				'Invalid parameter "/1/ip": an IP address is expected.'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO1}',
+				'/1/ip',
+				'{$MACRO1}'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#}',
+				'/1/ip',
+				'Invalid parameter "/1/ip": an IP address is expected.'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO1}',
+				'/1/ip',
+				'{#MACRO1}'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_MACRO],
+				'{HOST.IP}',
+				'/1/ip',
+				'{HOST.IP}'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_MACRO],
+				'{$MACRO}',
+				'/1/ip',
+				'Invalid parameter "/1/ip": an IP address is expected.'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
+				'{HOST.HOST}',
+				'/1/ip',
+				'Invalid parameter "/1/ip": an IP address is expected.'
+			],
+			[
+				['type' => API_DNS],
+				'',
+				'/1/dns',
+				''
+			],
+			[
+				['type' => API_DNS, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/dns',
+				'Invalid parameter "/1/dns": cannot be empty.'
+			],
+			[
+				['type' => API_DNS],
+				[],
+				'/1/dns',
+				'Invalid parameter "/1/dns": a character string is expected.'
+			],
+			[
+				['type' => API_DNS],
+				true,
+				'/1/dns',
+				'Invalid parameter "/1/dns": a character string is expected.'
+			],
+			[
+				['type' => API_DNS],
+				null,
+				'/1/dns',
+				'Invalid parameter "/1/dns": a character string is expected.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
+				// broken UTF-8 byte sequence
+				'{$MACRO: "'."\xd1".'"}',
+				'/1/dns',
+				'Invalid parameter "/1/dns": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO: "context"}',
+				'/1/ip',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_DNS],
+				'%%%',
+				'/1/dns',
+				'Invalid parameter "/1/dns": a DNS name is expected.'
+			],
+			[
+				['type' => API_DNS],
+				'3.3.3.3',
+				'/1/dns',
+				'3.3.3.3'
+			],
+			[
+				['type' => API_DNS, 'length' => 15],
+				'www.example.com',
+				'/1/dns',
+				'www.example.com'
+			],
+			[
+				['type' => API_DNS, 'length' => 14],
+				'www.example.com',
+				'/1/dns',
+				'Invalid parameter "/1/dns": value is too long.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$}',
+				'/1/dns',
+				'Invalid parameter "/1/dns": a DNS name is expected.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO2}',
+				'/1/dns',
+				'{$MACRO2}'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#}',
+				'/1/dns',
+				'Invalid parameter "/1/dns": a DNS name is expected.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO2}',
+				'/1/dns',
+				'{#MACRO2}'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO3}{#MACRO4}',
+				'/1/dns',
+				'{#MACRO3}{#MACRO4}'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_MACRO],
+				'{HOST.IP}',
+				'/1/dns',
+				'{HOST.IP}'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO3}{$MACRO4}',
+				'/1/dns',
+				'{$MACRO3}{$MACRO4}'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_MACRO],
+				'{$MACRO}',
+				'/1/dns',
+				'Invalid parameter "/1/dns": a DNS name is expected.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
+				'{HOST.HOST}',
+				'/1/dns',
+				'Invalid parameter "/1/dns": a DNS name is expected.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO],
+				'a{HOST.HOST}b{$MACRO5}c{#MACRO5}d{HOST.NAME}e{$MACRO6}',
+				'/1/dns',
+				'a{HOST.HOST}b{$MACRO5}c{#MACRO5}d{HOST.NAME}e{$MACRO6}'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_MACRO],
+				'a{HOST.HOST}b{HOST.IP}c',
+				'/1/dns',
+				'a{HOST.HOST}b{HOST.IP}c'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
+				'a{$MACRO7}b{#MACRO6}c{HOST.NAME}d{$MACRO8}',
+				'/1/dns',
+				'Invalid parameter "/1/dns": a DNS name is expected.'
+			],
+			[
+				['type' => API_PORT],
+				'',
+				'/1/port',
+				''
+			],
+			[
+				['type' => API_PORT, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/port',
+				'Invalid parameter "/1/port": cannot be empty.'
+			],
+			[
+				['type' => API_PORT],
+				[],
+				'/1/port',
+				'Invalid parameter "/1/port": a number is expected.'
+			],
+			[
+				['type' => API_PORT],
+				true,
+				'/1/port',
+				'Invalid parameter "/1/port": a number is expected.'
+			],
+			[
+				['type' => API_PORT],
+				null,
+				'/1/port',
+				'Invalid parameter "/1/port": a number is expected.'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				// broken UTF-8 byte sequence
+				'{$MACRO: "'."\xd1".'"}',
+				'/1/port',
+				'Invalid parameter "/1/port": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO: "context"}',
+				'/1/ip',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_PORT],
+				false,
+				'/1/port',
+				'Invalid parameter "/1/port": a number is expected.'
+			],
+			[
+				['type' => API_PORT],
+				'123',
+				'/1/port',
+				'123'
+			],
+			[
+				['type' => API_PORT],
+				456,
+				'/1/port',
+				'456'
+			],
+			[
+				['type' => API_PORT, 'length' => 5],
+				'65535',
+				'/1/port',
+				'65535'
+			],
+			[
+				['type' => API_PORT, 'length' => 4],
+				'65535',
+				'/1/port',
+				'Invalid parameter "/1/port": value is too long.'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				'{$}',
+				'/1/port',
+				'Invalid parameter "/1/port": an integer is expected.'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO9}',
+				'/1/port',
+				'{$MACRO9}'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#}',
+				'/1/port',
+				'Invalid parameter "/1/port": an integer is expected.'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO7}',
+				'/1/port',
+				'{#MACRO7}'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO10}{$MACRO11}',
+				'/1/port',
+				'Invalid parameter "/1/port": an integer is expected.'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO8}{#MACRO9}',
+				'/1/port',
+				'Invalid parameter "/1/port": an integer is expected.'
+			],
+			[
+				['type' => API_PORT],
+				'-1',
+				'/1/port',
+				'Invalid parameter "/1/port": value must be one of 0-65535.'
+			],
+			[
+				['type' => API_PORT],
+				'9999999999',
+				'/1/port',
+				'Invalid parameter "/1/port": a number is too large.'
+			],
+			[
+				['type' => API_PORT],
+				'65536',
+				'/1/port',
+				'Invalid parameter "/1/port": value must be one of 0-65535.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				null,
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/expression',
+				'Invalid parameter "/1/expression": cannot be empty.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				[],
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'length' => 10],
+				'{host:item.last()} = 0',
+				'/1/expression',
+				'Invalid parameter "/1/expression": value is too long.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last() = 0',
+				'/1/expression',
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from "{host:item.last() = 0".'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'9 and 1',
+				'/1/expression',
+				'Invalid parameter "/1/expression": trigger expression must contain at least one host:key reference.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = {#LLD_MACRO}',
+				'/1/expression',
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#LLD_MACRO}".'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
+				'{host:item.last()} = {#LLD_MACRO}',
+				'/1/expression',
+				'{host:item.last()} = {#LLD_MACRO}'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = 0',
+				'/1/expression',
+				'{host:item.last()} = 0'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = {$USER_MACRO}',
+				'/1/expression',
+				'{host:item.last()} = {$USER_MACRO}'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'',
+				'/1/expression',
+				''
+			],
+			[
+				['type' => API_EVENT_NAME],
+				null,
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": a character string is expected.'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				[],
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": a character string is expected.'
+			],
+			[
+				['type' => API_EVENT_NAME, 'length' => 10],
+				'12345678901',
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": value is too long.'
+			],
+			[
+				['type' => API_EVENT_NAME, 'length' => 10],
+				'1234567890',
+				'/1/event_name',
+				'1234567890'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last() = 0}',
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": incorrect syntax near "{host:item.last() = 0}".'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?9 and 1}',
+				'/1/event_name',
+				'event name {?9 and 1}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last()} = 0}',
+				'/1/event_name',
+				'event name {?{host:item.last()} = 0}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last()} = {$USER_MACRO}}',
+				'/1/event_name',
+				'event name {?{host:item.last()} = {$USER_MACRO}}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'',
+				'/1/event_name',
+				''
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				[],
+				'/params',
+				[]
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				1,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				true,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'23',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				null,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				[],
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'id',
+				'/id',
+				'id'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				1,
+				'/id',
+				1
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				true,
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'23',
+				'/id',
+				'23'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				null,
+				'/id',
+				null
+			]
 		];
 	}
 
@@ -3110,7 +3691,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'9.99999999999999E+15',
 				'/1/numeric',
-				'9.99999999999999E+15',
+				'9.99999999999999E+15'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3122,7 +3703,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'-9.99999999999999E+15',
 				'/1/numeric',
-				'-9.99999999999999E+15',
+				'-9.99999999999999E+15'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3134,25 +3715,25 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'10000000000.0001',
 				'/1/numeric',
-				'10000000000.0001',
+				'10000000000.0001'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1.00001',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.',
+				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1E-4',
 				'/1/numeric',
-				'1E-4',
+				'1E-4'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1E-5',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.',
+				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
 			]
 		];
 	}

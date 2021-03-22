@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_High',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_triggerids%5B%5D=100035&filter_set=1',
+						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
 						'Configuration' => 'triggers.php?form=update&triggerid=100035',
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
 						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
@@ -49,7 +49,7 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_triggerids%5B%5D=100032&filter_set=1',
+						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
 						'Configuration' => 'triggers.php?form=update&triggerid=100032',
 						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
 						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
@@ -281,7 +281,7 @@ class testPageTriggerUrl extends CWebTest {
 		}
 		else {
 			// Follow trigger link in overlay dialogue.
-			$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
+			$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
 			$hintbox->query('link', $data['links']['Trigger URL'])->one()->click();
 		}
 

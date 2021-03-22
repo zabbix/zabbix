@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,15 @@
 #include <stdarg.h>
 #include <setjmp.h>
 #include <cmocka.h>
+
+/* hint to a compiler that cmocka _fail returns immediately, so it does not raise 'uninitialized variable' warnings */
+#if defined(__GNUC__) || defined(__clang__)
+#	define ZBX_NO_RETURN	__attribute__((noreturn))
+#else
+#	define ZBX_NO_RETURN
+#endif
+
+ZBX_NO_RETURN void	_fail(const char * const file, const int line);
 
 void	zbx_mock_test_entry(void **state);
 

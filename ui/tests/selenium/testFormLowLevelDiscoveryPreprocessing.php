@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 						['type' => 'JSONPath', 'parameter_1' => '    $.data.test      '],
 						['type' => 'JavaScript', 'parameter_1' => "  Test line 1\n   Test line   2\n   Test line 3   "],
 						['type' => 'Does not match regular expression', 'parameter_1' => '    Pattern     '],
-						['type' => 'Check for error in JSON', 'parameter_1' => '    $.new.path    '],
+						['type' => 'Check for error in JSON', 'parameter_1' => '    $.new.path    ']
 					]
 				]
 			],
@@ -214,7 +214,7 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getCommonCustomOnFailData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFail($data) {
-		$this->checkCustomOnFail($data);
+		$this->checkCustomOnFail($data, true);
 	}
 
 	/**

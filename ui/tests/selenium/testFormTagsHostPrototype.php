@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,333 +18,41 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CFormParametersBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/common/testFormTags.php';
 
 /**
  * @backup hosts
  */
-class testFormTagsHostPrototype extends CWebTest {
+class testFormTagsHostPrototype extends testFormTags {
 
-	const DICROVERY_RULE_ID = 90001;			// "Discovery rule 1" on host "Host for host prototype tests"
-
-	/**
-	 * The name of the host for cloning in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $clone_prototype = '{#HOST} prototype with tags for cloning';
+	public $update_name = '{#HOST} prototype with tags for updating';
+	public $clone_name = '{#HOST} prototype with tags for cloning';
+	public $link = 'host_prototypes.php?parent_discoveryid=90001';
+	public $saved_link = 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=';
+	public $new_name = 'Cloned Host prototype {#KEY}';
 
 	/**
-	 * The name of the host for updating in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $update_prototype = '{#HOST} prototype with tags for updating';
-
-	/**
-	 * Attach FormParametersBehavior and CMessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			[
-				'class' => CFormParametersBehavior::class,
-				'table_selector' => 'id:tags-table'
-			],
-			CMessageBehavior::class
-		];
-	}
-
-	public static function getCreateData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'host_name' => 'Host with tags {#KEY}',
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => '!@#$%^&*()_+<>,.\/',
-							'value' => '!@#$%^&*()_+<>,.\/'
-						],
-						[
-							'name' => 'tag1',
-							'value' => 'value1'
-						],
-						[
-							'name' => 'tag2'
-						],
-						[
-							'name' => '{$MACRO:A}',
-							'value' => '{$MACRO:A}'
-						],
-						[
-							'name' => '{$MACRO}',
-							'value' => '{$MACRO}'],
-						[
-							'name' => 'Таг',
-							'value' => 'Значение'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'host_name' => 'Host with equal tag names {#KEY}',
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => 'tag3',
-							'value' => '3'
-						],
-						[
-							'name' => 'tag3',
-							'value' => '4'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'host_name' => 'Host with equal tag values {#KEY}',
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => 'tag4',
-							'value' => '5'
-						],
-						[
-							'name' => 'tag5',
-							'value' => '5'
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'host_name' => 'Host with empty tag name {#KEY}',
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'value' => 'value1'
-						]
-					],
-					'error' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'host_name' => 'Host with equal tags {#KEY}',
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => 'tag',
-							'value' => 'value'
-						],
-						[
-							'name' => 'tag',
-							'value' => 'value'
-						]
-					],
-					'error' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
-				]
-			]
-		];
-	}
-
-	/**
-	 * Test creating of host prototype with tags.
+	 * Test creating of Host prototype with tags.
 	 *
 	 * @dataProvider getCreateData
 	 */
 	public function testFormTagsHostPrototype_Create($data) {
-		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
-		$old_hash = CDBHelper::getHash($sql_hosts);
-
-		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
-		$this->query('button:Create host prototype')->waitUntilPresent()->one()->click();
-		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
-		$form->fill(['Host name' => $data['host_name']]);
-
-		$form->selectTab('Groups');
-		$form->fill(['Groups' => 'Zabbix servers']);
-
-		$form->selectTab('Tags');
-		$this->fillParameters($data['tags']);
-		$form->submit();
-		$this->page->waitUntilReady();
-
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->assertMessage(TEST_GOOD, 'Host prototype added');
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['host_name'])));
-				// Check the results in form.
-				$this->checkTagFields($data);
-				break;
-			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, $data['error'], $data['error_details']);
-				// Check that DB hash is not changed.
-				$this->assertEquals($old_hash, CDBHelper::getHash($sql_hosts));
-				break;
-		}
-	}
-
-	public static function getUpdateData() {
-		return [
-			[
-				[
-					'expected' => TEST_BAD,
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => '',
-							'value' => 'value1'
-						]
-					],
-					'error' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'name' => 'action', 'value' => 'update'
-						]
-					],
-					'error' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'tags' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => '!@#$%^&*()_+<>,.\/',
-							'value' => '!@#$%^&*()_+<>,.\/'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'name' => 'tag1',
-							'value' => 'value1'
-						],
-						[
-							'name' => 'tag2'
-						],
-						[
-							'name' => '{$MACRO:A}',
-							'value' => '{$MACRO:A}'
-						],
-						[
-							'name' => '{$MACRO}',
-							'value' => '{$MACRO}'
-						],
-						[
-							'name' => 'Таг',
-							'value' => 'Значение'
-						]
-					]
-				]
-			]
-		];
+		$this->checkTagsCreate($data, 'host prototype');
 	}
 
 	/**
-	 * Test update of host prototype with tags.
+	 * Test update of Host prototype with tags.
 	 *
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormTagsHostPrototype_Update($data) {
-		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
-		$old_hash = CDBHelper::getHash($sql_hosts);
-		$data['host_name'] = $this->update_prototype;
-
-		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
-		$this->query('link', $this->update_prototype)->waitUntilPresent()->one()->click();
-		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
-
-		$form->selectTab('Tags');
-		$this->fillParameters($data['tags']);
-		$form->submit();
-		$this->page->waitUntilReady();
-
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->assertMessage(TEST_GOOD, 'Host prototype updated');
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->update_prototype)));
-				// Check the results in form.
-				$this->checkTagFields($data);
-				break;
-			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, $data['error'], $data['error_details']);
-				// Check that DB hash is not changed.
-				$this->assertEquals($old_hash, CDBHelper::getHash($sql_hosts));
-				break;
-		}
+		$this->checkTagsUpdate($data, 'host prototype');
 	}
 
 	/**
-	 * Test cloning of host prototype with tags
+	 * Test cloning of Host prototype with tags.
 	 */
 	public function testFormTagsHostPrototype_Clone() {
-		$new_name = 'Cloned {#HOST} prototype with tags for cloning';
-
-		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
-		$this->query('link', $this->clone_prototype)->waitUntilPresent()->one()->click();
-		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
-		$form->getField('Host name')->fill($new_name);
-
-		$form->selectTab('Tags');
-		$tags = $this->getValues();
-
-		$this->query('button:Clone')->one()->click();
-		$form->submit();
-		$this->page->waitUntilReady();
-
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Host prototype added', $message->getTitle());
-		// Check the results in DB.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_prototype)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name)));
-
-		// Check created clone.
-		$this->query('link', $new_name)->one()->click();
-		$form->invalidate();
-		$this->assertEquals($new_name, $form->getField('Host name')->getValue());
-
-		$form->selectTab('Tags');
-		$this->assertValues($tags);
-	}
-
-	private function checkTagFields($data) {
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_name']));
-		$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.self::DICROVERY_RULE_ID.'&hostid='.$id);
-		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
-		$form->selectTab('Tags');
-		$this->assertValues($data['tags']);
+		$this->executeCloning('host prototype', 'Clone');
 	}
 }
-

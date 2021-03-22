@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 **/
 
 
+require_once dirname(__FILE__).'/testJSONRPC.php';
 require_once dirname(__FILE__).'/testAPIInfo.php';
 require_once dirname(__FILE__).'/testAction.php';
 require_once dirname(__FILE__).'/testApplication.php';
@@ -35,11 +36,13 @@ require_once dirname(__FILE__).'/testHostGroup.php';
 require_once dirname(__FILE__).'/testHostImport.php';
 require_once dirname(__FILE__).'/testIconMap.php';
 require_once dirname(__FILE__).'/testItem.php';
+require_once dirname(__FILE__).'/testItemPrototype.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testTriggers.php';
 require_once dirname(__FILE__).'/testTriggerPermissions.php';
+require_once dirname(__FILE__).'/testTriggerValidation.php';
 require_once dirname(__FILE__).'/testTaskCreate.php';
 require_once dirname(__FILE__).'/testTemplateImport.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
@@ -55,6 +58,7 @@ class ApiJsonTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
+		$suite->addTestSuite('testJSONRPC');
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testApplication');
@@ -72,11 +76,13 @@ class ApiJsonTests {
 		$suite->addTestSuite('testHostImport');
 		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testItem');
+		$suite->addTestSuite('testItemPrototype');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testTriggers');
 		$suite->addTestSuite('testTriggerPermissions');
+		$suite->addTestSuite('testTriggerValidation');
 		$suite->addTestSuite('testTaskCreate');
 		$suite->addTestSuite('testTemplateImport');
 		$suite->addTestSuite('testUserGroup');

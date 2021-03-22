@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 				'value' => $val['name']
 			];
 
-			// Add default values to avoid check of key existance.
+			// Add default values to avoid check of key existence.
 			$val = array_merge([
 				'order' => 1,
 				'parent' => 0,

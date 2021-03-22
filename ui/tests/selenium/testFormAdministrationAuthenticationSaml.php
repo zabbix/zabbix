@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,7 +247,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 					'username' => 'Admin',
 					'custom_settings' => [
 						'Case sensitive login' => true
-					],
+					]
 				]
 			],
 			// Login as zabbix user
@@ -300,7 +300,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 					'expected' => TEST_BAD,
 					'username' => 'Admin2',
 					'error_title' => 'You are not logged in',
-					'error_details' => 'Login name or password is incorrect.'
+					'error_details' => 'Incorrect user name or password or account is temporarily blocked.'
 				]
 			],
 			// Login as Admin - case sensitive login - negative test.
@@ -312,7 +312,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'Case sensitive login' => true
 					],
 					'error_title' => 'You are not logged in',
-					'error_details' => 'Login name or password is incorrect.'
+					'error_details' => 'Incorrect user name or password or account is temporarily blocked.'
 				]
 			]
 		];

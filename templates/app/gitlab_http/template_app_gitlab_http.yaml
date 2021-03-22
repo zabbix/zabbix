@@ -1,0 +1,1460 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-12-07T09:00:10Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'GitLab by HTTP'
+      name: 'GitLab by HTTP'
+      description: |
+        Get GitLab metrics by HTTP agent from Prometheus metrics endpoint.
+        
+        To access the metrics, the client IP address must be explicitly allowed. See https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html.
+        
+        Don't forget change macros {$GITLAB.URL}, {$GITLAB.PORT}. 
+        Some metrics may not be collected depending on your Gitlab instance version and configuration. See (Gitlab’s documentation[)https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html] for further information about its metric collection.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: GitLab
+        -
+          name: 'GitLab: Puma stats'
+        -
+          name: 'GitLab: Unicorn stats'
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'GitLab: Cache: Misses rate, total'
+          type: DEPENDENT
+          key: gitlab.cache.misses_total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The cache read miss count.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_cache_misses_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Cache: Operations rate, total'
+          type: DEPENDENT
+          key: gitlab.cache.operations_total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of cache operations.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_cache_operations_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Database: Connection pool, busy'
+          type: DEPENDENT
+          key: gitlab.database.connection_pool_busy
+          delay: '0'
+          history: 7d
+          description: 'Connections to the main database in use where the owner is still alive.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_database_connection_pool_busy" && @.labels.class == "ActiveRecord::Base")].value.sum()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Database: Connection pool, current'
+          type: DEPENDENT
+          key: gitlab.database.connection_pool_connections
+          delay: '0'
+          history: 7d
+          description: 'Current connections to the main database in the pool.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_database_connection_pool_connections" && @.labels.class == "ActiveRecord::Base")].value.sum()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Database: Connection pool, dead'
+          type: DEPENDENT
+          key: gitlab.database.connection_pool_dead
+          delay: '0'
+          history: 7d
+          description: 'Connections to the main database in use where the owner is not alive.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_database_connection_pool_dead" && @.labels.class == "ActiveRecord::Base")].value.sum()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Database: Connection pool, idle'
+          type: DEPENDENT
+          key: gitlab.database.connection_pool_idle
+          delay: '0'
+          history: 7d
+          description: 'Connections to the main database not in use.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_database_connection_pool_idle" && @.labels.class == "ActiveRecord::Base")].value.sum()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Database: Connection pool, size'
+          type: DEPENDENT
+          key: gitlab.database.connection_pool_size
+          delay: '0'
+          history: 7d
+          description: 'Total connection to the main database pool capacity.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_database_connection_pool_size" && @.labels.class == "ActiveRecord::Base")].value.sum()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Database: Connection pool, waiting'
+          type: DEPENDENT
+          key: gitlab.database.connection_pool_waiting
+          delay: '0'
+          history: 7d
+          description: 'Threads currently waiting on this queue.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_database_connection_pool_waiting" && @.labels.class == "ActiveRecord::Base")].value.sum()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Version'
+          type: DEPENDENT
+          key: gitlab.deployments.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the GitLab instance.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="deployments")].labels.version.first()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: gitlab.get_metrics
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'GitLab version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'GitLab: User CAPTCHA logins failed, total'
+          type: DEPENDENT
+          key: gitlab.failed_login_captcha_total
+          delay: '0'
+          history: 7d
+          description: 'Counter of failed CAPTCHA attempts during login.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="failed_login_captcha_total")].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Get instance metrics'
+          type: HTTP_AGENT
+          key: gitlab.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - ''
+          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
+        -
+          name: 'GitLab: HTTP requests rate, 4xx'
+          type: DEPENDENT
+          key: gitlab.http.requests.4xx.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of handle failures of requests with code 4XX.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="http_requests_total" && @.labels.status =~ ''4..'' )].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: HTTP requests rate, 5xx'
+          type: DEPENDENT
+          key: gitlab.http.requests.5xx.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of handle failures of requests with HTTP-code 5xx.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="http_requests_total" && @.labels.status =~ ''5..'' )].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$GITLAB.HTTP.FAIL.MAX.WARN}'
+              name: 'GitLab: Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)'''
+              priority: WARNING
+              description: '"Too many requests failed on GitLab instance with 5xx HTTP code"'
+        -
+          name: 'GitLab: HTTP requests rate, total'
+          type: DEPENDENT
+          key: gitlab.http.requests.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of requests received into the system.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="http_requests_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Application server status'
+          type: HTTP_AGENT
+          key: gitlab.liveness
+          history: 7d
+          description: 'Checks whether the application server is running. This probe is used to know if Rails Controllers are not deadlocked due to a multi-threading.'
+          applications:
+            -
+              name: GitLab
+          valuemap:
+            name: 'GitLab healthcheck'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"status": "failed"}'
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/liveness'
+          status_codes: ''
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'GitLab: Liveness check was failed'
+              priority: HIGH
+              description: 'The application server is not running or Rails Controllers are deadlocked.'
+        -
+          name: 'GitLab: Pipelines: Auto DevOps pipelines, total'
+          type: DEPENDENT
+          key: gitlab.pipeine.auto_devops_completed.total
+          delay: '0'
+          history: 7d
+          description: 'Counter of completed Auto DevOps pipelines.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="auto_devops_pipelines_completed_total")].value.sum()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Pipelines: Auto DevOps pipelines, failed'
+          type: DEPENDENT
+          key: gitlab.pipeine.auto_devops_completed_total.failed
+          delay: '0'
+          history: 7d
+          description: 'Counter of completed Auto DevOps pipelines with status "failed".'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="auto_devops_pipelines_completed_total" && @.labels.status == "failed")].value.sum()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Pipelines: Created, total'
+          type: DEPENDENT
+          key: gitlab.pipeine.created_total
+          delay: '0'
+          history: 7d
+          description: 'Counter of pipelines created.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="pipelines_created_total")].value.sum()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Pipelines: CI/CD creation duration'
+          type: DEPENDENT
+          key: gitlab.pipeine.pipeline_creation
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'The sum of the time in seconds it takes to create a CI/CD pipeline.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_ci_pipeline_creation_duration_seconds_sum")].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Pipelines: Pipelines: CI/CD creation count'
+          type: DEPENDENT
+          key: gitlab.pipeine.pipeline_creation.count
+          delay: '0'
+          history: 7d
+          description: 'The count of the time it takes to create a CI/CD pipeline.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_ci_pipeline_creation_duration_seconds_count")].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Pipelines: Processing events, total'
+          type: DEPENDENT
+          key: gitlab.pipeine.processing_events_total
+          delay: '0'
+          history: 7d
+          description: 'Total amount of pipeline processing events.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_ci_pipeline_processing_events_total")].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Instance readiness check'
+          type: HTTP_AGENT
+          key: gitlab.readiness
+          history: 7d
+          description: 'The readiness probe checks whether the GitLab instance is ready to accept traffic via Rails Controllers.'
+          applications:
+            -
+              name: GitLab
+          valuemap:
+            name: 'GitLab healthcheck'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"master_check":[{"status":"failed"}]}'
+            -
+              type: JSONPATH
+              parameters:
+                - '$.master_check[0].status'
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/readiness'
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'GitLab: Gitlab instance is not able to accept traffic'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'GitLab: Liveness check was failed'
+                  expression: '{GitLab by HTTP:gitlab.liveness.last()}=0'
+        -
+          name: 'GitLab: Redis: Client exceptions rate, cache'
+          type: DEPENDENT
+          key: gitlab.redis.client_exceptions.cache.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of Redis client exceptions per second. (Instance: cache)'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_redis_client_exceptions_total" && @.labels.storage == "cache")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$GITLAB.REDIS.FAIL.MAX.WARN}'
+              name: 'GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: '"Too many  Redis client exceptions during  to requests to  Redis instance cache."'
+        -
+          name: 'GitLab: Redis: Client exceptions rate, queues'
+          type: DEPENDENT
+          key: gitlab.redis.client_exceptions.queues.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of Redis client exceptions per second. (Instance: queues)'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_redis_client_exceptions_total" && @.labels.storage == "queues")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$GITLAB.REDIS.FAIL.MAX.WARN}'
+              name: 'GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: '"Too many  Redis client exceptions during  to requests to  Redis instance queues."'
+        -
+          name: 'GitLab: Redis: client exceptions rate, shared_state'
+          type: DEPENDENT
+          key: gitlab.redis.client_exceptions.shared_state.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of Redis client exceptions per second. (Instance: shared_state)'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_redis_client_exceptions_total" && @.labels.storage == "shared_state")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$GITLAB.REDIS.FAIL.MAX.WARN}'
+              name: 'GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: '"Too many  Redis client exceptions during  to requests to  Redis instance shared_state."'
+        -
+          name: 'GitLab: Redis: Client requests rate, cache'
+          type: DEPENDENT
+          key: gitlab.redis.client_requests.cache.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of Redis client requests per second. (Instance: cache)'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_redis_client_requests_total" && @.labels.storage == "cache")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Redis: Client requests rate, queues'
+          type: DEPENDENT
+          key: gitlab.redis.client_requests.queues.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of Redis client requests per second. (Instance: queues)'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_redis_client_requests_total" && @.labels.storage == "queues")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Redis: Client requests rate, shared_state'
+          type: DEPENDENT
+          key: gitlab.redis.client_requests.shared_state.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of Redis client requests per second. (Instance: shared_state)'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_redis_client_requests_total" && @.labels.storage == "shared_state")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: File descriptors opened, avg'
+          type: DEPENDENT
+          key: gitlab.ruby.file_descriptors.avg
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Average number of opened file descriptors.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_file_descriptors")].value.avg()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: File descriptors opened, max'
+          type: DEPENDENT
+          key: gitlab.ruby.file_descriptors.max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum number of opened file descriptors.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_file_descriptors")].value.max()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: File descriptors opened, min'
+          type: DEPENDENT
+          key: gitlab.ruby.file_descriptors.min
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Minimum number of opened file descriptors.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_file_descriptors")].value.min()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: CPU  usage per second'
+          type: DEPENDENT
+          key: gitlab.ruby.process_cpu_seconds.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Average CPU time util in seconds.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_process_cpu_seconds_total")].value.avg()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: File descriptors, max'
+          type: DEPENDENT
+          key: gitlab.ruby.process_max_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum number of open file descriptors per process.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_process_max_fds")].value.avg()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: RSS memory, avg'
+          type: DEPENDENT
+          key: gitlab.ruby.process_resident_memory_bytes.avg
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: "Average RSS\tMemory usage in bytes."
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_process_resident_memory_bytes")].value.avg()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: RSS memory, max'
+          type: DEPENDENT
+          key: gitlab.ruby.process_resident_memory_bytes.max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: "Maxinun RSS\tMemory usage in bytes."
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_process_resident_memory_bytes")].value.max()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: RSS memory, min'
+          type: DEPENDENT
+          key: gitlab.ruby.process_resident_memory_bytes.min
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: "Minimum RSS\tMemory usage in bytes."
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_process_resident_memory_bytes")].value.min()'
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: First process start time'
+          type: DEPENDENT
+          key: gitlab.ruby.process_start_time_seconds.first
+          delay: '0'
+          history: 7d
+          units: unixtime
+          description: 'Minimum UNIX timestamp of ruby processes start time.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_process_start_time_seconds")].value.min()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: Last process start time'
+          type: DEPENDENT
+          key: gitlab.ruby.process_start_time_seconds.last
+          delay: '0'
+          history: 7d
+          units: unixtime
+          description: 'Maximum UNIX timestamp ruby processes start time.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="ruby_process_start_time_seconds")].value.max()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Ruby: Running_threads'
+          type: DEPENDENT
+          key: gitlab.ruby.threads_running
+          delay: '0'
+          history: 7d
+          description: 'Number of running Ruby threads.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="gitlab_ruby_threads_running_threads")].value.sum()'
+          master_item:
+            key: gitlab.get_metrics
+          triggers:
+            -
+              expression: '{nodata(30m)}=1'
+              name: 'GitLab: Failed to fetch info data (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for metrics for the last 30 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'GitLab: Liveness check was failed'
+                  expression: '{GitLab by HTTP:gitlab.liveness.last()}=0'
+        -
+          name: 'GitLab: User CAPTCHA logins, total'
+          type: DEPENDENT
+          key: gitlab.successful_login_captcha_total
+          delay: '0'
+          history: 7d
+          description: 'Counter of successful CAPTCHA attempts during login.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="successful_login_captcha_total")].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Transactions per second'
+          type: DEPENDENT
+          key: gitlab.transactions.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Transactions per second (gitlab_transaction_* metrics).'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=~"gitlab_transaction_.*_count_total")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: Upload file does not exist'
+          type: DEPENDENT
+          key: gitlab.upload_file_does_not_exist
+          delay: '0'
+          history: 7d
+          description: 'Number of times an upload record could not find its file.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - "$[?(@.name==\"upload_file_does_not_exist\t\")].value.first()"
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+        -
+          name: 'GitLab: User logins, total'
+          type: DEPENDENT
+          key: gitlab.user_session_logins_total
+          delay: '0'
+          history: 7d
+          description: 'Counter of how many users have logged in since GitLab was started or restarted.'
+          applications:
+            -
+              name: GitLab
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="user_session_logins_total")].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gitlab.get_metrics
+      discovery_rules:
+        -
+          name: 'Puma metrics discovery'
+          type: HTTP_AGENT
+          key: gitlab.puma.discovery
+          delay: 3h
+          description: 'Discovery Puma specific metrics, when Puma is used.'
+          item_prototypes:
+            -
+              name: 'GitLab: Active connections'
+              type: DEPENDENT
+              key: 'gitlab.puma.active_connections[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of puma threads processing a request.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_active_connections'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Idle threads'
+              type: DEPENDENT
+              key: 'gitlab.puma.idle_threads[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of spawned puma threads which are not processing a request.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_idle_threads'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Killer terminations, total'
+              type: DEPENDENT
+              key: 'gitlab.puma.killer_terminations_total[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of workers terminated by PumaWorkerKiller.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_killer_terminations_total'')].value.sum()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Max threads'
+              type: DEPENDENT
+              key: 'gitlab.puma.max_threads[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The maximum number of puma worker threads.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_max_threads'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Pool capacity'
+              type: DEPENDENT
+              key: 'gitlab.puma.pool_capacity[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of requests the puma worker is capable of taking right now.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_pool_capacity'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Queued connections'
+              type: DEPENDENT
+              key: 'gitlab.puma.queued_connections[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of connections in that puma worker''s "todo" set waiting for a worker thread.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_queued_connections'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{min(15m)}>{$GITLAB.PUMA.QUEUE.MAX.WARN}'
+                  name: 'GitLab: Puma is queueing requests (over {$GITLAB.PUMA.QUEUE.MAX.WARN}% for 15m)'
+                  priority: WARNING
+            -
+              name: 'GitLab: Running threads'
+              type: DEPENDENT
+              key: 'gitlab.puma.running[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of running puma threads.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_running'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Running workers'
+              type: DEPENDENT
+              key: 'gitlab.puma.running_workers[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of booted puma workers.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_running_workers'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Stale workers'
+              type: DEPENDENT
+              key: 'gitlab.puma.stale_workers[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of old puma workers.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_stale_workers'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Workers'
+              type: DEPENDENT
+              key: 'gitlab.puma.workers[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of puma workers.'
+              applications:
+                -
+                  name: 'GitLab: Puma stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''puma_workers'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+          trigger_prototypes:
+            -
+              expression: '{GitLab by HTTP:gitlab.puma.active_connections[{#SINGLETON}].min(5m)}/{GitLab by HTTP:gitlab.puma.max_threads[{#SINGLETON}].last()}*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
+              name: 'GitLab: Puma instance thread utilization is too hight (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
+              priority: WARNING
+          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - puma_workers
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+        -
+          name: 'Unicorn metrics discovery'
+          type: HTTP_AGENT
+          key: gitlab.unicorn.discovery
+          delay: 3h
+          description: 'DiscoveryUnicorn specific metrics, when Unicorn is used.'
+          item_prototypes:
+            -
+              name: 'GitLab: Unicorn: Active connections'
+              type: DEPENDENT
+              key: 'gitlab.unicorn.active_connections[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of active Unicorn connections.'
+              applications:
+                -
+                  name: 'GitLab: Unicorn stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''unicorn_active_connections'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+            -
+              name: 'GitLab: Unicorn: Queued connections'
+              type: DEPENDENT
+              key: 'gitlab.unicorn.queued_connections[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of queued Unicorn connections.'
+              applications:
+                -
+                  name: 'GitLab: Unicorn stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''unicorn_queued_connections'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
+                  name: 'GitLab: Unicorn is queueing requests (over {$GITLAB.UNICORN.QUEUE.MAX.WARN}% for 5m)'
+                  priority: WARNING
+            -
+              name: 'GitLab: Unicorn: Workers'
+              type: DEPENDENT
+              key: 'gitlab.unicorn.unicorn_workers[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of Unicorn workers'
+              applications:
+                -
+                  name: 'GitLab: Unicorn stats'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name==''unicorn_workers'')].value.sum()'
+              master_item:
+                key: gitlab.get_metrics
+          trigger_prototypes:
+            -
+              expression: '{GitLab by HTTP:gitlab.unicorn.active_connections[{#SINGLETON}].min(5m)}/{GitLab by HTTP:gitlab.unicorn.unicorn_workers[{#SINGLETON}].last()}*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
+              name: 'GitLab: Unicorn worker utilization is too high (over {$GITLAB.UNICORN.UTILIZATION.MAX.WARN}% for 5m)'
+              priority: WARNING
+          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - unicorn_workers
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+      macros:
+        -
+          macro: '{$GITLAB.HTTP.FAIL.MAX.WARN}'
+          value: '2'
+          description: 'Maximum number of HTTP requests failures for trigger expression.'
+        -
+          macro: '{$GITLAB.OPEN.FDS.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used file descriptors for trigger expression.'
+        -
+          macro: '{$GITLAB.PORT}'
+          value: '80'
+          description: 'The port of GitLab web endpoint'
+        -
+          macro: '{$GITLAB.PUMA.QUEUE.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of Puma queued requests for trigger expression.'
+        -
+          macro: '{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used Puma thread utilization for trigger expression.'
+        -
+          macro: '{$GITLAB.REDIS.FAIL.MAX.WARN}'
+          value: '2'
+          description: 'Maximum number of Redis client exceptions for trigger expression.'
+        -
+          macro: '{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of Unicorn queued requests for trigger expression.'
+        -
+          macro: '{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used Unicorn workers utilization for trigger expression.'
+        -
+          macro: '{$GITLAB.URL}'
+          value: localhost
+          description: 'GitLab instance URL'
+  triggers:
+    -
+      expression: '{GitLab by HTTP:gitlab.ruby.file_descriptors.max.min(5m)}/{GitLab by HTTP:gitlab.ruby.process_max_fds.last()}*100>{$GITLAB.OPEN.FDS.MAX.WARN}'
+      name: 'GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m)'
+      priority: WARNING
+  graphs:
+    -
+      name: 'GitLab: Database: Connection pool'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.database.connection_pool_busy
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.database.connection_pool_connections
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.database.connection_pool_dead
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.database.connection_pool_idle
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.database.connection_pool_waiting
+        -
+          sortorder: '5'
+          drawtype: BOLD_LINE
+          color: 6C59DC
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.database.connection_pool_waiting
+    -
+      name: 'GitLab: HTTP requests rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.http.requests.4xx.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.http.requests.5xx.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.http.requests.rate
+    -
+      name: 'GitLab: Redis requests rate'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.redis.client_requests.shared_state.rate
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.redis.client_requests.cache.rate
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.redis.client_requests.queues.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          yaxisside: RIGHT
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.redis.client_exceptions.shared_state.rate
+        -
+          sortorder: '4'
+          color: FC6EA3
+          yaxisside: RIGHT
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.redis.client_exceptions.cache.rate
+        -
+          sortorder: '5'
+          color: 6C59DC
+          yaxisside: RIGHT
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.redis.client_exceptions.queues.rate
+    -
+      name: 'GitLab: Ruby: File descriptors'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.ruby.file_descriptors.avg
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.ruby.file_descriptors.max
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.ruby.file_descriptors.min
+        -
+          sortorder: '3'
+          drawtype: BOLD_LINE
+          color: A54F10
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.ruby.process_max_fds
+    -
+      name: 'GitLab: Ruby: RSS memory'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.ruby.process_resident_memory_bytes.avg
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.ruby.process_resident_memory_bytes.min
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'GitLab by HTTP'
+            key: gitlab.ruby.process_resident_memory_bytes.max
+  value_maps:
+    -
+      name: 'GitLab healthcheck'
+      mappings:
+        -
+          value: '0'
+          newvalue: Failed
+        -
+          value: '1'
+          newvalue: Ok

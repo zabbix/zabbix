@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
-		$timezones = DateTimeZone::listIdentifiers();
-		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -37,7 +35,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'password1' =>			'string',
 			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
-			'timezone' =>			'db users.timezone|in '.implode(',', $timezones),
+			'timezone' =>			'db users.timezone|in '.implode(',', array_keys($this->timezones)),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
@@ -106,6 +104,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'password2' => '',
 			'lang' => $this->user['lang'],
 			'timezone' => $this->user['timezone'],
+			'timezones' => $this->timezones,
 			'theme' => $this->user['theme'],
 			'autologin' => $this->user['autologin'],
 			'autologout' => $this->user['autologout'],

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@
  * Class containing methods for operations with auditlog records.
  */
 class CAuditLog extends CApiService {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
 
 	/**
 	 * @var string Database table name.
@@ -91,7 +95,8 @@ class CAuditLog extends CApiService {
 			AUDIT_RESOURCE_MACRO, AUDIT_RESOURCE_TEMPLATE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, AUDIT_RESOURCE_ICON_MAP,
 			AUDIT_RESOURCE_DASHBOARD, AUDIT_RESOURCE_CORRELATION, AUDIT_RESOURCE_GRAPH_PROTOTYPE,
 			AUDIT_RESOURCE_ITEM_PROTOTYPE, AUDIT_RESOURCE_HOST_PROTOTYPE, AUDIT_RESOURCE_AUTOREGISTRATION,
-			AUDIT_RESOURCE_MODULE, AUDIT_RESOURCE_SETTINGS, AUDIT_RESOURCE_HOUSEKEEPING, AUDIT_RESOURCE_AUTHENTICATION
+			AUDIT_RESOURCE_MODULE, AUDIT_RESOURCE_SETTINGS, AUDIT_RESOURCE_HOUSEKEEPING, AUDIT_RESOURCE_AUTHENTICATION,
+			AUDIT_RESOURCE_TEMPLATE_DASHBOARD
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

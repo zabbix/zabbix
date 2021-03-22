@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class CControllerReportServices extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
 			return false;
 		}
 
@@ -108,7 +108,7 @@ class CControllerReportServices extends CController {
 
 			case 'daily':
 				$from = 1;
-				$to = DAY_IN_YEAR;
+				$to = DAY_IN_YEAR + date('L', mktime(0, 0, 0, 1, 1, $data['year']));
 
 				function get_time($year, $d) {
 					return mktime(0, 0, 0, 1, $d, $year);

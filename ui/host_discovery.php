@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,9 @@ $fields = [
 	'delay' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 									'(isset({add}) || isset({update})) && isset({type})'.
 										' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
-										' && {type} != '.ITEM_TYPE_DEPENDENT,
+										' && {type} != '.ITEM_TYPE_DEPENDENT.
+										' && !({type} == '.ITEM_TYPE_ZABBIX_ACTIVE.
+											' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 									_('Update interval')
 								],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -67,7 +69,7 @@ $fields = [
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 									]),
 									'isset({add}) || isset({update})'
 								],
@@ -92,7 +94,7 @@ $fields = [
 								],
 	$paramsFieldName =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update}))'.
 									' && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.
-										ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'
+										ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED.','.ITEM_TYPE_SCRIPT, 'type'
 									),
 									getParamFieldLabelByType(getRequest('type', 0))
 								],
@@ -116,13 +118,18 @@ $fields = [
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
-	'timeout' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeout' => 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
+									'(isset({add}) || isset({update})) && isset({type})'.
+										' && '.IN(ITEM_TYPE_HTTPAGENT.','.ITEM_TYPE_SCRIPT, 'type'),
+									_('Timeout')
+								],
 	'url' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 									'(isset({add}) || isset({update})) && isset({type})'.
 										' && {type} == '.ITEM_TYPE_HTTPAGENT,
 									_('URL')
 								],
 	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'parameters' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>		[T_ZBX_INT, O_OPT, null,
@@ -214,7 +221,7 @@ $fields = [
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 									]),
 									null
 								],
@@ -381,8 +388,10 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+		'request' => [
+			'itemid' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -397,7 +406,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP && hasRequest('delay_flex')) {
+	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
+			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
+			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
 		$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
@@ -535,6 +546,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$newItem = prepareItemHttpAgentFormData($http_item) + $newItem;
 		}
 
+		if ($newItem['type'] == ITEM_TYPE_SCRIPT) {
+			$script_item = [
+				'parameters' => getRequest('parameters', []),
+				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+			];
+
+			$newItem = prepareScriptItemFormData($script_item) + $newItem;
+		}
+
 		if ($newItem['type'] == ITEM_TYPE_JMX) {
 			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');
 		}
@@ -591,8 +611,20 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if (hasRequest('update')) {
 			DBstart();
 
-			// unset unchanged values
-			$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
+			// Unset equal values if item script type and parameters have not changed.
+			$compare = function($arr, $arr2) {
+				return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
+					array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
+				);
+			};
+			if ($newItem['type'] == ITEM_TYPE_SCRIPT && $newItem['type'] == $item['type']
+					&& $compare($item['parameters'], $newItem['parameters'])) {
+				unset($newItem['parameters']);
+			}
+
+			if ($newItem['type'] == $item['type']) {
+				$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
+			}
 
 			// don't update the filter if it hasn't changed
 			$conditionsChanged = false;
@@ -701,10 +733,18 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('g_hostdruleid')
-	]);
+	$tasks = [];
+
+	foreach (getRequest('g_hostdruleid') as $taskid) {
+		$tasks[] = [
+			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+			'request' => [
+				'itemid' => $taskid
+			]
+		];
+	}
+
+	$result = (bool) API::Task()->create($tasks);
 
 	if ($result) {
 		uncheckTableRows($checkbox_hash);
@@ -783,7 +823,7 @@ if (hasRequest('form')) {
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
-		// Sort overides to be listed in step order.
+		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], [
 			['field' => 'step', 'order' => ZBX_SORT_UP]
 		]);
@@ -869,7 +909,8 @@ else {
 			];
 			$options['filter']['delay'] = $filter['delay'];
 		}
-		elseif ($filter['type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT) {
+		elseif ($filter['type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT
+				|| ($filter['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter['key'], 'mqtt.get', 8) === 0)) {
 			$options['filter']['delay'] = -1;
 		}
 		else {
@@ -944,6 +985,7 @@ else {
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view
 	echo (new CView('configuration.host.discovery.list', $data))->getOutput();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -575,7 +575,7 @@ if (isset($_REQUEST['form'])) {
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
 		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests)
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		$data['agent'] = ZBX_AGENT_OTHER;
@@ -723,7 +723,7 @@ if (isset($_REQUEST['form'])) {
 			'query_fields' => [],
 			'post_fields' => [],
 			'variables' => [],
-			'headers' => [],
+			'headers' => []
 		];
 
 		if (array_key_exists('pairs', $step)) {
@@ -889,6 +889,7 @@ else {
 	$data['parent_templates'] = getHttpTestParentTemplates($httpTests);
 	$data['httpTests'] = $httpTests;
 	$data['httpTestsLastData'] = $httpTestsLastData;
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view
 	echo (new CView('configuration.httpconf.list', $data))->getOutput();

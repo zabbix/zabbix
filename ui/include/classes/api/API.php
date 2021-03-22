@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -340,6 +340,13 @@ class API {
 	}
 
 	/**
+	 * @return CRole
+	 */
+	public static function Role() {
+		return self::getApi('role');
+	}
+
+	/**
 	 * @return CScreen
 	 */
 	public static function Screen() {
@@ -389,17 +396,10 @@ class API {
 	}
 
 	/**
-	 * @return CTemplateScreen
+	 * @return CTemplateDashboard
 	 */
-	public static function TemplateScreen() {
-		return self::getApi('templatescreen');
-	}
-
-	/**
-	 * @return CTemplateScreenItem
-	 */
-	public static function TemplateScreenItem() {
-		return self::getApi('templatescreenitem');
+	public static function TemplateDashboard() {
+		return self::getApi('templatedashboard');
 	}
 
 	/**

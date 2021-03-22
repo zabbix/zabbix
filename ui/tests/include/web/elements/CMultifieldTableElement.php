@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,16 @@ use  \Facebook\WebDriver\Exception\UnrecognizedExceptionException;
  */
 class CMultifieldTableElement extends CTableElement {
 
-	const ROW_SELECTOR = 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or contains(@class, "editable_table_row")]';
+	/**
+	 * Element selectors.
+	 *
+	 * @var array
+	 */
+	protected $selectors = [
+		'header' => 'xpath:./thead/tr/th',
+		'row' => 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or contains(@class, "editable_table_row")]',
+		'column' => 'xpath:./td'
+	];
 
 	/**
 	 * Field mapping.
@@ -39,12 +48,38 @@ class CMultifieldTableElement extends CTableElement {
 	protected $mapping;
 
 	/**
+	 * Field mapping names.
+	 *
+	 * @var array
+	 */
+	protected $names;
+
+	/**
 	 * Get field mapping.
 	 *
 	 * @return array
 	 */
 	public function getFieldMapping() {
 		return is_array($this->mapping) ? $this->mapping : [];
+	}
+
+	/**
+	 * Set field mapping names.
+	 *
+	 * @param array $names	field name
+	 *
+	 * @return CMultifieldTableElement
+	 */
+	public function setFieldNames($names) {
+		if (!is_array($this->names)) {
+			$this->names = [];
+		}
+
+		foreach ($names as $field => $name) {
+			$this->names[$field] = $name;
+		}
+
+		return $this;
 	}
 
 	/**
@@ -117,7 +152,7 @@ class CMultifieldTableElement extends CTableElement {
 		}
 
 		$result = [];
-		foreach ($rows->first()->query('xpath:./td')->all() as $i => $column) {
+		foreach ($rows->first()->query($this->selectors['column'])->all() as $i => $column) {
 			$label = CTestArrayHelper::get($headers, $i, $i);
 			$element = CElementQuery::getInputElement($column, '.')->detect();
 
@@ -142,11 +177,19 @@ class CMultifieldTableElement extends CTableElement {
 					if ($pos !== false) {
 						$name = substr($value, $pos + 1, -1);
 					}
+
+					if (!$name) {
+						$name = $label;
+					}
 				}
 			}
 			else {
 				// Element name cannot be detected, using label or index.
 				$name = $label;
+			}
+
+			if (!empty($this->names) && array_key_exists($name, $this->names)) {
+				$name = $this->names[$name];
 			}
 
 			$result[$label] = [
@@ -157,26 +200,6 @@ class CMultifieldTableElement extends CTableElement {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Get collection of table rows.
-	 *
-	 * @return CElementCollection
-	 */
-	public function getRows() {
-		return $this->query(self::ROW_SELECTOR)->asTableRow(['parent' => $this])->all();
-	}
-
-	/**
-	 * Get table row by index.
-	 *
-	 * @param $index    row index
-	 *
-	 * @return CTableRow
-	 */
-	public function getRow($index) {
-		return $this->query(self::ROW_SELECTOR.'['.((int)$index + 1).']')->asTableRow(['parent' => $this])->one();
 	}
 
 	/**
@@ -198,7 +221,7 @@ class CMultifieldTableElement extends CTableElement {
 			$this->mapping = $this->detectFieldMapping();
 		}
 
-		foreach ($row->query('xpath:./td|./th')->all() as $i => $column) {
+		foreach ($row->query($this->selectors['column'].'|./th')->all() as $i => $column) {
 			$label = CTestArrayHelper::get($headers, $i, $i);
 			$mapping = CTestArrayHelper::get($this->mapping, $label, $label);
 			if ($mapping === null) {
@@ -284,7 +307,7 @@ class CMultifieldTableElement extends CTableElement {
 		$this->query('button:Add')->one()->click();
 
 		// Wait until new table row appears.
-		$this->query(self::ROW_SELECTOR.'['.($rows + 1).']')->waitUntilPresent();
+		$this->query('xpath:.//'.CXPathHelper::fromSelector($this->selectors['row']).'['.($rows + 1).']')->waitUntilPresent();
 		return $this->updateRow($rows, $values);
 	}
 
@@ -352,7 +375,7 @@ class CMultifieldTableElement extends CTableElement {
 			$row->query('button:Remove')->one()->click();
 		}
 
-		$this->query(self::ROW_SELECTOR)->waitUntilNotPresent();
+		$this->query($this->selectors['row'])->waitUntilNotPresent();
 
 		return $this;
 	}

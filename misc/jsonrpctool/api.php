@@ -13,7 +13,7 @@ function do_post_request($url, $data){
 		'http' => [
 			'method' => 'post',
 			'content' => $data,
-			'header' => $header,
+			'header' => $header
 		]
 	];
 

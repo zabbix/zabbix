@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,15 @@
 #ifndef ZABBIX_EVALFUNC_H
 #define ZABBIX_EVALFUNC_H
 
+typedef enum
+{
+	ZBX_FORMAT_RAW,
+	ZBX_FORMAT_HUMAN
+}
+zbx_output_format_t;
+
 int	evaluate_macro_function(char **result, const char *host, const char *key, const char *function,
-		const char *parameter);
+		const char *parameter, zbx_output_format_t format);
 int	evaluatable_for_notsupported(const char *fn);
 
 #endif

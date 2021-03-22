@@ -1,0 +1,433 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:16Z'
+  groups:
+    -
+      name: 'Templates/Operating systems'
+  templates:
+    -
+      template: 'Mac OS X'
+      name: 'Mac OS X'
+      templates:
+        -
+          name: 'Zabbix agent'
+      groups:
+        -
+          name: 'Templates/Operating systems'
+      applications:
+        -
+          name: CPU
+        -
+          name: Filesystems
+        -
+          name: General
+        -
+          name: Memory
+        -
+          name: 'Network interfaces'
+        -
+          name: OS
+        -
+          name: Performance
+        -
+          name: Processes
+        -
+          name: Security
+      items:
+        -
+          name: 'Maximum number of opened files'
+          key: kernel.maxfiles
+          delay: 1h
+          history: 1w
+          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          applications:
+            -
+              name: OS
+          triggers:
+            -
+              expression: '{last()}<1024'
+              name: 'Configured max number of opened files is too low on {HOST.NAME}'
+              priority: INFO
+        -
+          name: 'Maximum number of processes'
+          key: kernel.maxproc
+          delay: 1h
+          history: 1w
+          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          applications:
+            -
+              name: OS
+          triggers:
+            -
+              expression: '{last()}<256'
+              name: 'Configured max number of processes is too low on {HOST.NAME}'
+              priority: INFO
+        -
+          name: 'Incoming network traffic on en0'
+          key: 'net.if.in[en0]'
+          history: 1w
+          units: bps
+          applications:
+            -
+              name: 'Network interfaces'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+        -
+          name: 'Outgoing network traffic on en0'
+          key: 'net.if.out[en0]'
+          history: 1w
+          units: bps
+          applications:
+            -
+              name: 'Network interfaces'
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+        -
+          name: 'Host boot time'
+          key: system.boottime
+          delay: 10m
+          history: 1w
+          units: unixtime
+          applications:
+            -
+              name: General
+            -
+              name: OS
+        -
+          name: 'Processor load (1 min average per core)'
+          key: 'system.cpu.load[percpu,avg1]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+          triggers:
+            -
+              expression: '{avg(5m)}>5'
+              name: 'Processor load is too high on {HOST.NAME}'
+              priority: WARNING
+        -
+          name: 'Processor load (5 min average per core)'
+          key: 'system.cpu.load[percpu,avg5]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'Processor load (15 min average per core)'
+          key: 'system.cpu.load[percpu,avg15]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'Host name'
+          key: system.hostname
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'System host name.'
+          inventory_link: NAME
+          applications:
+            -
+              name: General
+            -
+              name: OS
+          triggers:
+            -
+              expression: '{diff(0)}>0'
+              name: 'Hostname was changed on {HOST.NAME}'
+              priority: INFO
+        -
+          name: 'Host local time'
+          key: system.localtime
+          history: 1w
+          units: unixtime
+          applications:
+            -
+              name: General
+            -
+              name: OS
+        -
+          name: 'System information'
+          key: system.uname
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'The information as normally returned by ''uname -a''.'
+          inventory_link: OS
+          applications:
+            -
+              name: General
+            -
+              name: OS
+          triggers:
+            -
+              expression: '{diff(0)}>0'
+              name: 'Host information was changed on {HOST.NAME}'
+              priority: INFO
+        -
+          name: 'System uptime'
+          key: system.uptime
+          delay: 10m
+          history: 1w
+          units: uptime
+          applications:
+            -
+              name: General
+            -
+              name: OS
+          triggers:
+            -
+              expression: '{change(0)}<0'
+              name: '{HOST.NAME} has just been restarted'
+              priority: INFO
+        -
+          name: 'Number of logged in users'
+          key: system.users.num
+          history: 1w
+          description: 'Number of users who are currently logged in.'
+          applications:
+            -
+              name: OS
+            -
+              name: Security
+        -
+          name: 'Checksum of /etc/passwd'
+          key: 'vfs.file.cksum[/etc/passwd]'
+          delay: 1h
+          history: 1w
+          applications:
+            -
+              name: Security
+          triggers:
+            -
+              expression: '{diff(0)}>0'
+              name: '/etc/passwd has been changed on {HOST.NAME}'
+              priority: WARNING
+        -
+          name: 'Available memory'
+          key: 'vm.memory.size[available]'
+          history: 1w
+          units: B
+          description: 'Available memory is defined as free+cached+buffers memory.'
+          applications:
+            -
+              name: Memory
+          triggers:
+            -
+              expression: '{last()}<20M'
+              name: 'Lack of available memory on server {HOST.NAME}'
+              priority: AVERAGE
+        -
+          name: 'Total memory'
+          key: 'vm.memory.size[total]'
+          delay: 1h
+          history: 1w
+          units: B
+          applications:
+            -
+              name: Memory
+      discovery_rules:
+        -
+          name: 'Mounted filesystem discovery'
+          key: vfs.fs.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#FSTYPE}'
+                value: '@File systems for discovery'
+                formulaid: A
+          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          item_prototypes:
+            -
+              name: 'Free inodes on {#FSNAME} (percentage)'
+              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              applications:
+                -
+                  name: Filesystems
+              trigger_prototypes:
+                -
+                  expression: '{last()}<20'
+                  name: 'Free inodes is less than 20% on volume {#FSNAME}'
+                  priority: WARNING
+            -
+              name: 'Free disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},free]'
+              history: 1w
+              units: B
+              applications:
+                -
+                  name: Filesystems
+            -
+              name: 'Free disk space on {#FSNAME} (percentage)'
+              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              applications:
+                -
+                  name: Filesystems
+              trigger_prototypes:
+                -
+                  expression: '{last()}<20'
+                  name: 'Free disk space is less than 20% on volume {#FSNAME}'
+                  priority: WARNING
+            -
+              name: 'Total disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},total]'
+              delay: 1h
+              history: 1w
+              units: B
+              applications:
+                -
+                  name: Filesystems
+            -
+              name: 'Used disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},used]'
+              history: 1w
+              units: B
+              applications:
+                -
+                  name: Filesystems
+          graph_prototypes:
+            -
+              name: 'Disk space usage {#FSNAME}'
+              width: '600'
+              height: '340'
+              show_work_period: 'NO'
+              show_triggers: 'NO'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: C80000
+                  type: GRAPH_SUM
+                  item:
+                    host: 'Mac OS X'
+                    key: 'vfs.fs.size[{#FSNAME},total]'
+                -
+                  sortorder: '1'
+                  color: 00C800
+                  item:
+                    host: 'Mac OS X'
+                    key: 'vfs.fs.size[{#FSNAME},free]'
+      dashboards:
+        -
+          name: 'System performance'
+          widgets:
+            -
+              type: GRAPH_CLASSIC
+              width: '24'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'CPU load'
+                    host: 'Mac OS X'
+            -
+              type: GRAPH_CLASSIC
+              'y': '5'
+              width: '24'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Memory usage'
+                    host: 'Mac OS X'
+  graphs:
+    -
+      name: 'CPU load'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: '009900'
+          item:
+            host: 'Mac OS X'
+            key: 'system.cpu.load[percpu,avg1]'
+        -
+          sortorder: '1'
+          color: '000099'
+          item:
+            host: 'Mac OS X'
+            key: 'system.cpu.load[percpu,avg5]'
+        -
+          sortorder: '2'
+          color: '990000'
+          item:
+            host: 'Mac OS X'
+            key: 'system.cpu.load[percpu,avg15]'
+    -
+      name: 'Memory usage'
+      ymin_type_1: FIXED
+      ymax_type_1: ITEM
+      ymax_item_1:
+        host: 'Mac OS X'
+        key: 'vm.memory.size[total]'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 00C800
+          item:
+            host: 'Mac OS X'
+            key: 'vm.memory.size[available]'
+    -
+      name: 'Network traffic on en0'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 00AA00
+          item:
+            host: 'Mac OS X'
+            key: 'net.if.in[en0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 3333FF
+          item:
+            host: 'Mac OS X'
+            key: 'net.if.out[en0]'

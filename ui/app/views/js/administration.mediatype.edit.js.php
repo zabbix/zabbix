@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
 				new CInput('hidden', 'message_templates[#{message_type}][eventsource]', '#{eventsource}'),
 				new CInput('hidden', 'message_templates[#{message_type}][recovery]', '#{recovery}'),
 				new CInput('hidden', 'message_templates[#{message_type}][subject]', '#{subject}'),
-				new CInput('hidden', 'message_templates[#{message_type}][message]', '#{message}'),
+				new CInput('hidden', 'message_templates[#{message_type}][message]', '#{message}')
 			]))
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;'),

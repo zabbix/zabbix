@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,16 +25,9 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyASMDiskGroups = "oracle.diskgroups.stats"
-
-const ASMDiskGroupsInfoMaxParams = 0
-
-func ASMDiskGroupsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var diskGroups string
-
-	if len(params) > ASMDiskGroupsInfoMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
@@ -49,7 +42,7 @@ func ASMDiskGroupsHandler(ctx context.Context, conn OraClient, params []string) 
 							ROUND(100 - (USABLE_FILE_MB / (TOTAL_MB / 
 							DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3))) * 100, 2)
 				    )
-				)
+				) RETURNING CLOB 
 			)
          FROM 
          	V$ASM_DISKGROUP

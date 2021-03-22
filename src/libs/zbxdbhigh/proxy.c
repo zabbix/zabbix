@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -557,7 +557,7 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 				" and r.proxy_hostid=" ZBX_FS_UI64
 				" and r.status in (%d,%d)"
 				" and t.flags<>%d"
-				" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 			" order by t.%s",
 			proxy_hostid,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
@@ -565,7 +565,7 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 			ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMP, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER,
 			ITEM_TYPE_SIMPLE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
 			ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL,
-			ITEM_TYPE_HTTPAGENT, ITEM_TYPE_DEPENDENT,
+			ITEM_TYPE_HTTPAGENT, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT,
 			table->recid);
 
 	if (NULL == (result = DBselect("%s", sql)))
@@ -1117,6 +1117,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"items",
 		"item_rtdata",
 		"item_preproc",
+		"item_parameter",
 		"drules",
 		"dchecks",
 		"regexps",
@@ -1158,7 +1159,8 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		{
 			ret = get_proxyconfig_table_items(proxy_hostid, j, table, &itemids);
 		}
-		else if (0 == strcmp(proxytable[i], "item_preproc") || 0 == strcmp(proxytable[i], "item_rtdata"))
+		else if (0 == strcmp(proxytable[i], "item_preproc") || 0 == strcmp(proxytable[i], "item_rtdata") ||
+				0 == strcmp(proxytable[i], "item_parameter"))
 		{
 			if (0 != itemids.num_data)
 				ret = get_proxyconfig_table_items_ext(proxy_hostid, &itemids, j, table);
@@ -3848,7 +3850,11 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 		for (i = 0; i < values_num; i++)
 		{
 			if (SUCCEED != errcodes[i])
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve key \"%s\" on host \"%s\" from "
+						"configuration cache", hostkeys[i].key, hostkeys[i].host);
 				continue;
+			}
 
 			if (last_hostid != items[i].host.hostid)
 			{
@@ -3872,6 +3878,11 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					zbx_free(error);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "unknown validation error for item \"%s\"",
+							(NULL == items[i].key) ? items[i].key_orig : items[i].key);
 				}
 
 				DCconfig_clean_items(&items[i], &errcodes[i], 1);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,28 +41,31 @@ if ($data['params']['old_message_type'] != -1) {
 	}
 }
 
-$form_list = (new CFormList())->addRow(_('Message type'),
-	(new CComboBox('message_type', $data['params']['old_message_type']))
-		->addItem(CMediatypeHelper::MSG_TYPE_PROBLEM, _('Problem'), null,
-			!in_array(CMediatypeHelper::MSG_TYPE_PROBLEM, $data['params']['message_types'])
+$form_list = (new CFormList())->addRow(new CLabel(_('Message type'), 'label-message-type'),
+	(new CSelect('message_type'))
+		->setId('message_type')
+		->setFocusableElementId( 'label-message-type')
+		->setValue($data['params']['old_message_type'])
+		->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_PROBLEM, _('Problem')))
+			->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_PROBLEM, $data['params']['message_types']))
 		)
-		->addItem(CMediatypeHelper::MSG_TYPE_RECOVERY, _('Problem recovery'), null,
-			!in_array(CMediatypeHelper::MSG_TYPE_RECOVERY, $data['params']['message_types'])
+		->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_RECOVERY, _('Problem recovery')))
+			->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_RECOVERY, $data['params']['message_types']))
 		)
-		->addItem(CMediatypeHelper::MSG_TYPE_UPDATE, _('Problem update'), null,
-			!in_array(CMediatypeHelper::MSG_TYPE_UPDATE, $data['params']['message_types'])
+		->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_UPDATE, _('Problem update')))
+			->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_UPDATE, $data['params']['message_types']))
 		)
-		->addItem(CMediatypeHelper::MSG_TYPE_DISCOVERY, _('Discovery'), null,
-			!in_array(CMediatypeHelper::MSG_TYPE_DISCOVERY, $data['params']['message_types'])
+		->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_DISCOVERY, _('Discovery')))
+			->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_DISCOVERY, $data['params']['message_types']))
 		)
-		->addItem(CMediatypeHelper::MSG_TYPE_AUTOREG, _('Autoregistration'), null,
-			!in_array(CMediatypeHelper::MSG_TYPE_AUTOREG, $data['params']['message_types'])
+		->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_AUTOREG, _('Autoregistration')))
+			->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_AUTOREG, $data['params']['message_types']))
 		)
-		->addItem(CMediatypeHelper::MSG_TYPE_INTERNAL, _('Internal problem'), null,
-			!in_array(CMediatypeHelper::MSG_TYPE_INTERNAL, $data['params']['message_types'])
+		->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_INTERNAL, _('Internal problem')))
+			->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_INTERNAL, $data['params']['message_types']))
 		)
-		->addItem(CMediatypeHelper::MSG_TYPE_INTERNAL_RECOVERY, _('Internal problem recovery'), null,
-			!in_array(CMediatypeHelper::MSG_TYPE_INTERNAL_RECOVERY, $data['params']['message_types'])
+		->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_INTERNAL_RECOVERY, _('Internal problem recovery')))
+			->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_INTERNAL_RECOVERY, $data['params']['message_types']))
 		)
 );
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
 #include "zbxkstat.h"
 #include "mutexs.h"
@@ -115,8 +115,11 @@ out:
 
 void	zbx_kstat_destroy(void)
 {
-	if (NULL != kc)
-		kstat_close(kc);
+	if (NULL == kc)
+		return;
+
+	kstat_close(kc);
+	zbx_mutex_destroy(&kstat_lock);
 }
 
 /******************************************************************************
@@ -196,4 +199,4 @@ out:
 	return ret;
 }
 
-#endif
+#endif /*#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)*/

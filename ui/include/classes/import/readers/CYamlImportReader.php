@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,6 +54,27 @@ class CYamlImportReader extends CImportReader {
 		elseif (!is_array($data)) {
 			throw new ErrorException(_s('Cannot read YAML: %1$s.', _('Invalid YAML file contents')));
 		}
+
+		return self::trimEmptyLine($data);
+	}
+
+	/**
+	 * Removes trailing empty line from multiline strings.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	private static function trimEmptyLine(array $data): array {
+		foreach ($data as &$value) {
+			if (is_array($value)) {
+				$value = self::trimEmptyLine($value);
+			}
+			else if (is_string($value) && $value !== '' && $value[strlen($value) - 1] === "\n") {
+				$value = substr($value, 0, -1);
+			}
+		}
+		unset($value);
 
 		return $data;
 	}

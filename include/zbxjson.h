@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,6 +175,7 @@
 #define ZBX_PROTO_TAG_EXPRESSIONS		"expressions"
 #define ZBX_PROTO_TAG_EXPRESSION		"expression"
 #define ZBX_PROTO_TAG_CLIENTIP			"clientip"
+#define ZBX_PROTO_TAG_PROXY_UPLOAD		"upload"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -206,6 +207,9 @@
 #define ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST	"item.test"
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
+
+#define ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED	"enabled"
+#define ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED	"disabled"
 
 typedef enum
 {

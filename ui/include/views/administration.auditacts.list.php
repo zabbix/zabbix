@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ foreach ($this->data['alerts'] as $alert) {
 		$status = (new CSpan([
 			_('In progress').':',
 			BR(),
-			_n('%1$s retry left', '%1$s retries left', $mediatype['maxattempts'] - $alert['retries']),
+			_n('%1$s retry left', '%1$s retries left', $mediatype['maxattempts'] - $alert['retries'])
 		]))->addClass(ZBX_STYLE_YELLOW);
 	}
 	else {
@@ -133,8 +133,7 @@ $objData = [
 	'domid' => 'events',
 	'loadSBox' => 0,
 	'loadImage' => 0,
-	'dynamic' => 0,
-	'mainObject' => 1
+	'dynamic' => 0
 ];
 zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');

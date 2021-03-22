@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $triggersWidget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
-	->addItem(get_header_host_table('triggers', $data['hostid'], $data['parent_discoveryid']));
+	->setNavigation(getHostNavigation('triggers', $data['hostid'], $data['parent_discoveryid']));
 
 // create form
 $triggersForm = (new CForm())
@@ -68,6 +68,13 @@ $triggersFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(
+		(new CLabel(_('Event name'), 'event_name')),
+		(new CTextAreaFlexible('event_name', $data['event_name']))
+			->setReadonly($data['limited'])
+			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(
 		new CLabel(_('Operational data'), 'opdata'),

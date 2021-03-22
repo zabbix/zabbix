@@ -1,0 +1,257 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:17Z'
+  groups:
+    -
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      template: 'Intel SR1530 IPMI'
+      name: 'Intel SR1530 IPMI'
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      applications:
+        -
+          name: Fans
+        -
+          name: Temperature
+        -
+          name: Voltage
+      items:
+        -
+          name: 'BB +1.8V SM'
+          type: IPMI
+          key: bb_1.8v_sm
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +1.8V SM'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<1.597 or {last()}>2.019'
+              name: 'BB +1.8V SM Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1530 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<1.646 or {last()}>1.960'
+              name: 'BB +1.8V SM Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +1.8V SM Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1530 IPMI:bb_1.8v_sm.last()}<1.597 or {Intel SR1530 IPMI:bb_1.8v_sm.last()}>2.019'
+                -
+                  name: Power
+                  expression: '{Intel SR1530 IPMI:power.last()}=0'
+        -
+          name: 'BB +3.3V'
+          type: IPMI
+          key: bb_3.3v
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +3.3V'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<2.876 or {last()}>3.729'
+              name: 'BB +3.3V Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1530 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<2.970 or {last()}>3.618'
+              name: 'BB +3.3V Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +3.3V Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1530 IPMI:bb_3.3v.last()}<2.876 or {Intel SR1530 IPMI:bb_3.3v.last()}>3.729'
+                -
+                  name: Power
+                  expression: '{Intel SR1530 IPMI:power.last()}=0'
+        -
+          name: 'BB +3.3V STBY'
+          type: IPMI
+          key: bb_3.3v_stby
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +3.3V STBY'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<2.876 or {last()}>3.729'
+              name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+            -
+              expression: '{last()}<2.970 or {last()}>3.618'
+              name: 'BB +3.3V STBY Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1530 IPMI:bb_3.3v_stby.last()}<2.876 or {Intel SR1530 IPMI:bb_3.3v_stby.last()}>3.729'
+        -
+          name: 'BB +5.0V'
+          type: IPMI
+          key: bb_5.0v
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +5.0V'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<4.362 or {last()}>5.663'
+              name: 'BB +5.0V Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1530 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<4.483 or {last()}>5.495'
+              name: 'BB +5.0V Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +5.0V Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1530 IPMI:bb_5.0v.last()}<4.362 or {Intel SR1530 IPMI:bb_5.0v.last()}>5.663'
+                -
+                  name: Power
+                  expression: '{Intel SR1530 IPMI:power.last()}=0'
+        -
+          name: 'BB Ambient Temp'
+          type: IPMI
+          key: bb_ambient_temp
+          history: 1w
+          value_type: FLOAT
+          units: C
+          ipmi_sensor: 'BB Ambient Temp'
+          applications:
+            -
+              name: Temperature
+          triggers:
+            -
+              expression: '{last()}<5 or {last()}>66'
+              name: 'BB Ambient Temp Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+            -
+              expression: '{last()}<10 or {last()}>61'
+              name: 'BB Ambient Temp Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB Ambient Temp Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1530 IPMI:bb_ambient_temp.last()}<5 or {Intel SR1530 IPMI:bb_ambient_temp.last()}>66'
+        -
+          name: Power
+          type: IPMI
+          key: power
+          history: 1w
+          ipmi_sensor: power
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: Power
+              priority: WARNING
+        -
+          name: 'Processor Vcc'
+          type: IPMI
+          key: processor_vcc
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'Processor Vcc'
+          applications:
+            -
+              name: Voltage
+        -
+          name: 'System Fan 3'
+          type: IPMI
+          key: system_fan_3
+          history: 1w
+          value_type: FLOAT
+          units: RPM
+          ipmi_sensor: 'System Fan 3'
+          applications:
+            -
+              name: Fans
+  graphs:
+    -
+      name: 'Fan speed and ambient temperature'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: EE0000
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_ambient_temp
+        -
+          sortorder: '1'
+          color: '000000'
+          yaxisside: RIGHT
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: system_fan_3
+    -
+      name: Voltage
+      yaxismax: '5.5'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: '880000'
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: power
+        -
+          sortorder: '1'
+          color: '009900'
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_1.8v_sm
+        -
+          sortorder: '2'
+          color: 00CCCC
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_3.3v
+        -
+          sortorder: '3'
+          color: '000000'
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_3.3v_stby
+        -
+          sortorder: '4'
+          color: 3333FF
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_5.0v
+        -
+          sortorder: '5'
+          color: '777700'
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: processor_vcc

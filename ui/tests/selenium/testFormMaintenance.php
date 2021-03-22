@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,14 +47,11 @@ class testFormMaintenance extends CLegacyWebTest {
 		// Type maintenance name.
 		$this->zbxTestInputTypeWait('mname', $this->name);
 
-		// "Periods" tab.
-		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
-
 		// Add "One time only" maintenance period.
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
 		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
-		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr/td','One time only');
+		$this->zbxTestAssertElementText('//div[@id="maintenance_periods"]//tbody/tr/td','One time only');
 
 		// Add "Daily" maintenance period.
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
@@ -62,7 +59,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Daily');
 		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
 		$this->page->waitUntilReady();
-		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[2]/td','Daily');
+		$this->zbxTestAssertElementText('//div[@id="maintenance_periods"]//tbody/tr[2]/td','Daily');
 
 		// Add "Weekly" maintenance period with "Monday" and "Sunday".
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
@@ -73,8 +70,8 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
 		$this->page->waitUntilReady();
 		// Check weekly period in frontend.
-		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[3]/td','Weekly');
-		$text = $this->zbxTestGetText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[3]/td[2]');
+		$this->zbxTestAssertElementText('//div[@id="maintenance_periods"]//tbody/tr[3]/td','Weekly');
+		$text = $this->zbxTestGetText('//div[@id="maintenance_periods"]//tbody/tr[3]/td[2]');
 		$this->assertRegexp('/Monday/', $text);
 		$this->assertRegexp('/Sunday/', $text);
 
@@ -87,13 +84,12 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//button[text()="Add"]');
 		$this->page->waitUntilReady();
 		// Check monthly period in frontend.
-		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[4]/td','Monthly');
-		$text = $this->zbxTestGetText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[4]/td[2]');
+		$this->zbxTestAssertElementText('//div[@id="maintenance_periods"]//tbody/tr[4]/td','Monthly');
+		$text = $this->zbxTestGetText('//div[@id="maintenance_periods"]//tbody/tr[4]/td[2]');
 		$this->assertRegexp('/January/', $text);
 		$this->assertRegexp('/November/', $text);
 
-		// Open "Hosts and groups" tab and add group.
-		$this->zbxTestTabSwitchById('tab_hostTab', 'Hosts and groups');
+		// Add group.
 		$this->zbxTestClickButtonMultiselect('groupids_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
@@ -132,8 +128,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->name);
 		$this->zbxTestInputTypeOverwrite('mname', 'Some random text');
 
-		// Open "Periods" tab and remove 4th defined period.
-		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
+		// Remove 4th defined period.
 		$this->zbxTestClickXpathWait('//td[contains(text(), "Monthly")]/..//button[text()="Remove"]');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -147,11 +142,10 @@ class testFormMaintenance extends CLegacyWebTest {
 		// Open form to check changes was not saved.
 		$this->zbxTestClickLinkTextWait($this->name);
 
-		// "Maintenance" tab, check name.
+		// Check name.
 		$this->zbxTestAssertElementValue('mname', $this->name);
 
-		// "Periods" tab, check that 4th period exist.
-		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
+		// Check that 4th period exist.
 		$this->zbxTestAssertElementPresentXpath('//td[contains(text(), "Monthly")]/..//button[text()="Edit"]');
 	}
 
@@ -169,8 +163,6 @@ class testFormMaintenance extends CLegacyWebTest {
 		// Change maintenance type.
 		$this->zbxTestClickXpathWait('//label[contains(text(), "No data collection")]');
 
-		// Open "Periods" tab.
-		$this->zbxTestTabSwitchById('tab_periodsTab', 'Periods');
 		// Remove "One time only".
 		$this->zbxTestClickXpath('//td[contains(text(), "One time only")]/..//button[text()="Remove"]');
 		$this->zbxTestWaitForPageToLoad();
@@ -220,7 +212,6 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($maintenance);
 
 		// Update tags.
-		$this->zbxTestTabSwitch('Hosts and groups');
 		$this->zbxTestClickXpathWait('//label[text()="And/Or"]');
 		$tag = 'Tag';
 		$values = ['A1','B1'];

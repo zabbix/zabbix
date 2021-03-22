@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,10 @@ size_t	zbx_curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 	zbx_http_response_t	*response;
 
 	response = (zbx_http_response_t*)userdata;
+
+	if (ZBX_MAX_RECV_DATA_SIZE < response->offset + r_size)
+		return 0;
+
 	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
 
 	return r_size;

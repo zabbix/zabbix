@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ $widget = (new CWidget())->setTitle(_('Web monitoring'));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$widget->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
 // create form
@@ -65,8 +65,11 @@ $http_form_list->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), $nam
 // Application
 if ($this->data['application_list']) {
 	$applications = zbx_array_merge([''], $this->data['application_list']);
-	$http_form_list->addRow(_('Application'),
-		new CComboBox('applicationid', $this->data['applicationid'], null, $applications)
+	$http_form_list->addRow(new CLabel(_('Application'), 'label-application'),
+		(new CSelect('applicationid'))
+			->setFocusableElementId('label-application')
+			->setValue($this->data['applicationid'])
+			->addOptions(CSelect::createOptionsFromArray($applications))
 	);
 }
 else {
@@ -92,16 +95,21 @@ $http_form_list
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
-$agent_combo_box = new CComboBox('agent', $this->data['agent']);
+$agent_select = (new CSelect('agent'))
+	->setId('agent')
+	->setFocusableElementId('label-agent')
+	->setValue($this->data['agent']);
 
 $user_agents_all = userAgents();
 $user_agents_all[_('Others')][ZBX_AGENT_OTHER] = _('other').' ...';
 
 foreach ($user_agents_all as $user_agent_group => $user_agents) {
-	$agent_combo_box->addItemsInGroup($user_agent_group, $user_agents);
+	$agent_select->addOptionGroup((new CSelectOptionGroup($user_agent_group))
+		->addOptions(CSelect::createOptionsFromArray($user_agents))
+	);
 }
 
-$http_form_list->addRow(_('Agent'), $agent_combo_box);
+$http_form_list->addRow(new CLabel(_('Agent'), $agent_select->getFocusableElementId()), $agent_select);
 
 $http_form_list->addRow(_('User agent string'),
 	(new CTextBox('agent_other', $this->data['agent_other']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
@@ -113,7 +121,9 @@ $http_form_list
 	->addRow(_('HTTP proxy'),
 		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'));
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->disableAutocomplete()
+	);
 
 $http_form_list->addRow(_('Variables'), (new CDiv(
 	(new CTable())
@@ -159,16 +169,24 @@ $http_form_list->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$th
 $http_authentication_form_list = new CFormList();
 
 // Authentication type
-$http_authentication_form_list->addRow(_('HTTP authentication'),
-	new CComboBox('authentication', $this->data['authentication'], null, httptest_authentications())
+$http_authentication_form_list->addRow(new CLabel(_('HTTP authentication'), 'label-authentication'),
+	(new CSelect('authentication'))
+		->setId('authentication')
+		->setFocusableElementId('label-authentication')
+		->setValue($this->data['authentication'])
+		->addOptions(CSelect::createOptionsFromArray(httptest_authentications()))
 );
 
 $http_authentication_form_list
 	->addRow(new CLabel(_('User'), 'http_user'),
-		(new CTextBox('http_user', $this->data['http_user'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_user', $this->data['http_user'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	)
 	->addRow(new CLabel(_('Password'), 'http_password'),
-		(new CTextBox('http_password', $this->data['http_password'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_password', $this->data['http_password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
@@ -185,6 +203,7 @@ $http_authentication_form_list
 	->addRow(_('SSL key password'),
 		(new CTextBox('ssl_key_password', $this->data['ssl_key_password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	);
 
 /*

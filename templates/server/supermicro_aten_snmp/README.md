@@ -1,9 +1,9 @@
 
-# Template Server Supermicro Aten SNMP
+# Supermicro Aten SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 for BMC ATEN IPMI controllers of Supermicro servers
 https://www.supermicro.com/solutions/IPMI.cfm
 
@@ -31,7 +31,7 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Generic SNMP |
+|Generic SNMP |
 
 ## Discovery rules
 

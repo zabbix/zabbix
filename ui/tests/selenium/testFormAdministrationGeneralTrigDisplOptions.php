@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,494 +18,821 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
  */
-class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
+class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrationGeneral {
 
-	public static function allValues() {
-		return CDBHelper::getDataProvider(
-			'SELECT custom_color,problem_unack_color,problem_unack_style,problem_ack_color,problem_ack_style,'.
-				'ok_unack_color,ok_unack_style,ok_ack_color,ok_ack_style,ok_period,blink_period,'.
-				'severity_name_0,severity_color_0,severity_name_1,severity_color_1,'.
-				'severity_name_2,severity_color_2,severity_name_3,severity_color_3,severity_name_4,'.
-				'severity_color_4,severity_name_5,severity_color_5'.
-			' FROM config'
+	public $config_link = 'zabbix.php?action=trigdisplay.edit';
+	public $form_selector = 'xpath://form[contains(@action, "trigdisplay.update")]';
+
+	public $default = [
+		'Use custom event status colours' => false,
+		'Unacknowledged PROBLEM events' => true,
+		'Acknowledged PROBLEM events' => true,
+		'Unacknowledged RESOLVED events' => true,
+		'Acknowledged RESOLVED events' => true,
+		'id:problem_unack_color' => 'CC0000',
+		'id:problem_ack_color'=> 'CC0000',
+		'id:ok_unack_color'=> '009900',
+		'id:ok_ack_color'=> '009900',
+		'Display OK triggers for' => '5m',
+		'On status change triggers blink for' => '2m',
+		'Not classified' => 'Not classified',
+		'Information' => 'Information',
+		'Warning' => 'Warning',
+		'Average' => 'Average',
+		'High' => 'High',
+		'Disaster' => 'Disaster',
+		'id:severity_color_0' => '97AAB3',
+		'id:severity_color_1' => '7499FF',
+		'id:severity_color_2' => 'FFC859' ,
+		'id:severity_color_3' => 'FFA059',
+		'id:severity_color_4' => 'E97659',
+		'id:severity_color_5' => 'E45959'
+	];
+
+	public $db_default = [
+		'custom_color' => 0,
+		'problem_unack_style' => 1,
+		'problem_ack_style'=> 1,
+		'ok_unack_style'=> 1,
+		'ok_ack_style'=> 1,
+		'problem_unack_color' => 'CC0000',
+		'problem_ack_color' => 'CC0000',
+		'ok_unack_color' => '009900',
+		'ok_ack_color' => '009900',
+		'ok_period' => '5m',
+		'blink_period' => '2m',
+		'severity_name_0' => 'Not classified',
+		'severity_name_1' => 'Information',
+		'severity_name_2' => 'Warning',
+		'severity_name_3' => 'Average',
+		'severity_name_4' => 'High',
+		'severity_name_5' => 'Disaster',
+		'severity_color_0' => '97AAB3',
+		'severity_color_1' => '7499FF',
+		'severity_color_2' => 'FFC859' ,
+		'severity_color_3' => 'FFA059',
+		'severity_color_4' => 'E97659',
+		'severity_color_5' => 'E45959'
+	];
+
+	public $custom = [
+		'Use custom event status colours' => true,
+		'Unacknowledged PROBLEM events' => false,
+		'Acknowledged PROBLEM events' => false,
+		'Unacknowledged RESOLVED events' => false,
+		'Acknowledged RESOLVED events' => false,
+		'id:problem_unack_color' => 'CC0000',
+		'id:problem_ack_color'=> 'CC0000',
+		'id:ok_unack_color'=> '009900',
+		'id:ok_ack_color'=> '009900',
+		// This should be changed to really custom values after DEV-1673 is fixed.
+//		'id:problem_unack_color' => 'D81B60',
+//		'id:problem_ack_color' => 'F8BBD0',
+//		'id:ok_unack_color' => '1A237E',
+//		'id:ok_ack_color' => 'B3E5FC',
+		'Display OK triggers for' => '23h',
+		'On status change triggers blink for' => '17h',
+		'Not classified' => 'Custom Not classified',
+		'Information' => 'Custom Information',
+		'Warning' => 'Custom Warning',
+		'Average' => 'Custom Average',
+		'High' => 'Custom High',
+		'High' => 'Custom Disaster',
+		'id:severity_color_0' => 'E8EAF6',
+		'id:severity_color_1' => 'D1C4E9',
+		'id:severity_color_2' => 'B39DDB' ,
+		'id:severity_color_3' => '9575CD',
+		'id:severity_color_4' => '673AB7',
+		'id:severity_color_5' => '4527A0'
+	];
+
+	/**
+	 * Test for checking form layout.
+	 */
+	public function testFormAdministrationGeneralTrigDisplOptions_CheckLayout() {
+		$this->page->login()->open($this->config_link);
+		$this->page->assertTitle('Configuration of trigger displaying options');
+		$this->page->assertHeader('Trigger displaying options');
+		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
+
+		$limits = [
+			'problem_unack_color' => 6,
+			'problem_ack_color' => 6,
+			'ok_unack_color' => 6,
+			'ok_ack_color' => 6,
+			'ok_period' => 32,
+			'blink_period' => 32,
+			'severity_name_0' => 32,
+			'severity_name_1' => 32,
+			'severity_name_2' => 32,
+			'severity_name_3' => 32,
+			'severity_name_4' => 32,
+			'severity_name_5' => 32,
+			'severity_color_0' => 6,
+			'severity_color_1' => 6,
+			'severity_color_2' => 6,
+			'severity_color_3' => 6,
+			'severity_color_4' => 6,
+			'severity_color_5' => 6
+		];
+
+		foreach ($limits as $id => $limit) {
+			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
+		}
+
+		$checkboxes = [
+			'custom_color',
+			'problem_unack_style',
+			'problem_ack_style',
+			'ok_unack_style',
+			'ok_ack_style'
+		];
+
+		foreach ($checkboxes as $checkbox) {
+			$this->assertTrue($this->query('id', $checkbox)->one()->isEnabled());
+		}
+
+		$colorpickers = [
+			'lbl_problem_unack_color',
+			'lbl_problem_ack_color',
+			'lbl_ok_unack_color',
+			'lbl_ok_ack_color',
+			'lbl_severity_color_0',
+			'lbl_severity_color_1',
+			'lbl_severity_color_2',
+			'lbl_severity_color_3',
+			'lbl_severity_color_4',
+			'lbl_severity_color_5'
+		];
+
+		$form->fill(['Use custom event status colours' => true]);
+		foreach ($colorpickers as $colorpicker) {
+			$this->query('id', $colorpicker)->one()->click();
+			$overlay = $this->query('id:color_picker')->waitUntilVisible()->asOverlayDialog()->one();
+			$overlay->close();
+		}
+
+		$event_colors = [
+			'problem_unack_color',
+			'problem_ack_color',
+			'ok_unack_color',
+			'ok_ack_color'
+		];
+
+		foreach ([true, false] as $status) {
+			$form->fill(['Use custom event status colours' => $status]);
+
+			foreach ($event_colors as $input) {
+				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
+			}
+		}
+
+		$this->assertEquals(
+			'Custom severity names affect all locales and require manual translation!',
+			$this->query('class:table-forms-separator')->one()->getText()
 		);
+
+		foreach (['Update', 'Reset defaults'] as $button) {
+			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
+		}
 	}
 
 	/**
-	 * @dataProvider allValues
+	 * Test for checking form update without changing any data.
 	 */
-	public function testFormAdministrationGeneralTrigDisplOptions_Layout($allValues) {
-		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
-		$this->zbxTestCheckHeader('Trigger displaying options');
-		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
-		$this->zbxTestTextPresent(
+	public function testFormAdministrationGeneralTrigDisplOptions_SimpleUpdate() {
+		$this->executeSimpleUpdate();
+	}
+
+	/**
+	 * Test for checking 'Reset defaults' button.
+	 */
+	public function testFormAdministrationGeneralTrigDisplOptions_ResetButton() {
+		$this->executeResetButtonTest();
+	}
+
+	/**
+	 * Test data for Trigger display options form.
+	 */
+	public function getCheckFormData() {
+		return [
+			// All valid custom values, checked checkboxes, custom colors.
 			[
-				'Trigger displaying options',
-				'Use custom event status colours',
-				'blinking',
-				'Unacknowledged PROBLEM events',
-				'Acknowledged PROBLEM events',
-				'Unacknowledged RESOLVED events',
-				'Acknowledged RESOLVED events',
-				'Display OK triggers for',
-				'On status change triggers blink for'
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Use custom event status colours' => true,
+						'Unacknowledged PROBLEM events' => true,
+						'Acknowledged PROBLEM events' => true,
+						'Unacknowledged RESOLVED events' => true,
+						'Acknowledged RESOLVED events' => true,
+						'id:problem_unack_color' => 'D81B60',
+						'id:problem_ack_color' => 'F8BBD0',
+						'id:ok_unack_color' => '1A237E',
+						'id:ok_ack_color' => 'B3E5FC',
+						'Display OK triggers for' => '25m',
+						'On status change triggers blink for' => '12m',
+						'Not classified' => 'Test Not classified',
+						'Information' => 'Test Information',
+						'Warning' => 'Test Warning',
+						'Average' => 'Test Average',
+						'High' => 'Test High',
+						'Disaster' => 'Test Disaster',
+						'id:severity_color_0' => 'E8EAF6',
+						'id:severity_color_1' => 'D1C4E9',
+						'id:severity_color_2' => 'B39DDB' ,
+						'id:severity_color_3' => '9575CD',
+						'id:severity_color_4' => '673AB7',
+						'id:severity_color_5' => '4527A0'
+					],
+					'db' => [
+						'custom_color' => 1,
+						'problem_unack_style' => 1,
+						'problem_ack_style'=> 1,
+						'ok_unack_style'=> 1,
+						'ok_ack_style'=> 1,
+						'problem_unack_color' => 'D81B60',
+						'problem_ack_color' => 'F8BBD0',
+						'ok_unack_color' => '1A237E',
+						'ok_ack_color' => 'B3E5FC',
+						'ok_period' => '25m',
+						'blink_period' => '12m',
+						'severity_name_0' => 'Test Not classified',
+						'severity_name_1' => 'Test Information',
+						'severity_name_2' => 'Test Warning',
+						'severity_name_3' => 'Test Average',
+						'severity_name_4' => 'Test High',
+						'severity_name_5' => 'Test Disaster',
+						'severity_color_0' => 'E8EAF6',
+						'severity_color_1' => 'D1C4E9',
+						'severity_color_2' => 'B39DDB' ,
+						'severity_color_3' => '9575CD',
+						'severity_color_4' => '673AB7',
+						'severity_color_5' => '4527A0'
+					]
+				]
+			],
+			// Unchecked checkboxes.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Use custom event status colours' => false,
+						'Unacknowledged PROBLEM events' => false,
+						'Acknowledged PROBLEM events' => false,
+						'Unacknowledged RESOLVED events' => false,
+						'Acknowledged RESOLVED events' => false
+					],
+					'db' => [
+						'custom_color' => 0,
+						'problem_unack_style' => 0,
+						'problem_ack_style'=> 0,
+						'ok_unack_style'=> 0,
+						'ok_ack_style'=> 0
+					]
+				]
+			],
+			// Zeros in custom colors.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Use custom event status colours' => true,
+						'id:problem_unack_color' => '000000',
+						'id:problem_ack_color' => '000000',
+						'id:ok_unack_color' => '000000',
+						'id:ok_ack_color' => '000000',
+						'id:severity_color_0' => '000000',
+						'id:severity_color_1' => '000000',
+						'id:severity_color_2' => '000000' ,
+						'id:severity_color_3' => '000000',
+						'id:severity_color_4' => '000000',
+						'id:severity_color_5' => '000000'
+					],
+					'db' => [
+						'custom_color' => 1,
+						'problem_unack_color' => '000000',
+						'problem_ack_color' => '000000',
+						'ok_unack_color' => '000000',
+						'ok_ack_color' => '000000',
+						'severity_color_0' => '000000',
+						'severity_color_1' => '000000',
+						'severity_color_2' => '000000' ,
+						'severity_color_3' => '000000',
+						'severity_color_4' => '000000',
+						'severity_color_5' => '000000'
+					]
+				]
+			],
+			// Letters in custom colors.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Use custom event status colours' => true,
+						'id:problem_unack_color' => 'AAAAAA',
+						'id:problem_ack_color' => 'BBBBBB',
+						'id:ok_unack_color' => 'CCCCCC',
+						'id:ok_ack_color' => 'ABCDEF',
+						'id:severity_color_0' => 'AAAAAA',
+						'id:severity_color_1' => 'BBBBBB',
+						'id:severity_color_2' => 'CCCCCC' ,
+						'id:severity_color_3' => 'DDDDDD',
+						'id:severity_color_4' => 'EEEEEE',
+						'id:severity_color_5' => 'DEDEDE'
+					],
+					'db' => [
+						'custom_color' => 1,
+						'problem_unack_color' => 'AAAAAA',
+						'problem_ack_color' => 'BBBBBB',
+						'ok_unack_color' => 'CCCCCC',
+						'ok_ack_color' => 'ABCDEF',
+						'severity_color_0' => 'AAAAAA',
+						'severity_color_1' => 'BBBBBB',
+						'severity_color_2' => 'CCCCCC' ,
+						'severity_color_3' => 'DDDDDD',
+						'severity_color_4' => 'EEEEEE',
+						'severity_color_5' => 'DEDEDE'
+					]
+				]
+			],
+			// Maximal valid values.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Use custom event status colours' => true,
+						'id:problem_unack_color' => '999999',
+						'id:problem_ack_color' => '999999',
+						'id:ok_unack_color' => '999999',
+						'id:ok_ack_color' => '999999',
+						'Not classified' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
+						'Information' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
+						'Warning' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
+						'Average' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+						'High' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+						'Disaster' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
+						'id:severity_color_0' => '999999',
+						'id:severity_color_1' => '999999',
+						'id:severity_color_2' => '999999' ,
+						'id:severity_color_3' => '999999',
+						'id:severity_color_4' => '999999',
+						'id:severity_color_5' => '999999'
+					],
+					'db' => [
+						'custom_color' => 1,
+						'problem_unack_color' => '999999',
+						'problem_ack_color' => '999999',
+						'ok_unack_color' => '999999',
+						'ok_ack_color' => '999999',
+						'severity_name_0' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
+						'severity_name_1' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
+						'severity_name_2' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
+						'severity_name_3' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+						'severity_name_4' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+						'severity_name_5' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
+						'severity_color_0' => '999999',
+						'severity_color_1' => '999999',
+						'severity_color_2' => '999999' ,
+						'severity_color_3' => '999999',
+						'severity_color_4' => '999999',
+						'severity_color_5' => '999999'
+					]
+				]
+			],
+			// Valid zero values in time in period fields without "s".
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '0',
+						'On status change triggers blink for' => '0'
+					],
+					'db' => [
+						'ok_period' => '0',
+						'blink_period' => '0'
+					]
+				]
+			],
+			// Valid zero values in time in period fields with "s".
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '0s',
+						'On status change triggers blink for' => '0s'
+					],
+					'db' => [
+						'ok_period' => '0s',
+						'blink_period' => '0s'
+					]
+				]
+			],
+			// Valid zero values in minutes.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '0m',
+						'On status change triggers blink for' => '0m'
+					],
+					'db' => [
+						'ok_period' => '0m',
+						'blink_period' => '0m'
+					]
+				]
+			],
+			// Valid zero values in hours.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '0h',
+						'On status change triggers blink for' => '0h'
+					],
+					'db' => [
+						'ok_period' => '0h',
+						'blink_period' => '0h'
+					]
+				]
+			],
+			// Valid zero values in days.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '0d',
+						'On status change triggers blink for' => '0d'
+					],
+					'db' => [
+						'ok_period' => '0d',
+						'blink_period' => '0d'
+					]
+				]
+			],
+			// Valid zero values in weeks.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '0w',
+						'On status change triggers blink for' => '0w'
+					],
+					'db' => [
+						'ok_period' => '0w',
+						'blink_period' => '0w'
+					]
+				]
+			],
+			// Valid maximum values in period fields in seconds without "s".
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '86400',
+						'On status change triggers blink for' => '86400'
+					],
+					'db' => [
+						'ok_period' => '86400',
+						'blink_period' => '86400'
+					]
+				]
+			],
+			// Valid maximum values in period fields in seconds with "s".
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '86400s',
+						'On status change triggers blink for' => '86400s'
+					],
+					'db' => [
+						'ok_period' => '86400s',
+						'blink_period' => '86400s'
+					]
+				]
+			],
+			// Valid maximum values in period fields with in minutes.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '1440m',
+						'On status change triggers blink for' => '1440m'
+					],
+					'db' => [
+						'ok_period' => '1440m',
+						'blink_period' => '1440m'
+					]
+				]
+			],
+			// Valid maximum values in period fields with in hours.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '24h',
+						'On status change triggers blink for' => '24h'
+					],
+					'db' => [
+						'ok_period' => '24h',
+						'blink_period' => '24h'
+					]
+				]
+			],
+			// Valid maximum values in period fields with in days.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Display OK triggers for' => '1d',
+						'On status change triggers blink for' => '1d'
+					],
+					'db' => [
+						'ok_period' => '1d',
+						'blink_period' => '1d'
+					]
+				]
+			],
+			// Invalid zero values in Moths (Months not supported).
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Display OK triggers for' => '0M',
+						'On status change triggers blink for' => '0M'
+					],
+					'details' => [
+						'Incorrect value for field "ok_period": a time unit is expected.',
+						'Incorrect value for field "blink_period": a time unit is expected.'
+					]
+				]
+			],
+			// Invalid zero values in years (years not supported).
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Display OK triggers for' => '0y',
+						'On status change triggers blink for' => '0y'
+					],
+					'details' => [
+						'Incorrect value for field "ok_period": a time unit is expected.',
+						'Incorrect value for field "blink_period": a time unit is expected.'
+					]
+				]
+			],
+			// Invalid maximum values in period fields in seconds without "s".
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Display OK triggers for' => '86401',
+						'On status change triggers blink for' => '86401'
+					],
+					'details' => [
+						'Incorrect value for field "ok_period": value must be one of 0-86400.',
+						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					]
+				]
+			],
+			// Invalid maximum values in period fields in seconds with "s".
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Display OK triggers for' => '86401s',
+						'On status change triggers blink for' => '86401s'
+					],
+					'details' => [
+						'Incorrect value for field "ok_period": value must be one of 0-86400.',
+						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					]
+				]
+			],
+			// Invalid maximum values in period fields in minutes.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Display OK triggers for' => '1441m',
+						'On status change triggers blink for' => '1441m'
+					],
+					'details' => [
+						'Incorrect value for field "ok_period": value must be one of 0-86400.',
+						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					]
+				]
+			],
+			// Invalid maximum values in period fields in hours.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Display OK triggers for' => '25h',
+						'On status change triggers blink for' => '25h'
+					],
+					'details' => [
+						'Incorrect value for field "ok_period": value must be one of 0-86400.',
+						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					]
+				]
+			],
+			// Invalid maximum values in period fields in days.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Display OK triggers for' => '2d',
+						'On status change triggers blink for' => '2d'
+					],
+					'details' => [
+						'Incorrect value for field "ok_period": value must be one of 0-86400.',
+						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					]
+				]
+			],
+			// Maximal invalid values in period fields.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Display OK triggers for' => '99999999999999999999999999999999',
+						'On status change triggers blink for' => '99999999999999999999999999999999'
+					],
+					'details' => [
+						'Incorrect value for field "ok_period": value must be one of 0-86400.',
+						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					]
+				]
+			],
+			// Invalid string values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Use custom event status colours' => true,
+						'id:problem_unack_color' => 'test',
+						'id:problem_ack_color' => 'test',
+						'id:ok_unack_color' => 'test',
+						'id:ok_ack_color' => 'test',
+						'Display OK triggers for' => 'test',
+						'On status change triggers blink for' => 'test',
+						'id:severity_color_0' => 'test',
+						'id:severity_color_1' => 'test',
+						'id:severity_color_2' => 'test' ,
+						'id:severity_color_3' => 'test',
+						'id:severity_color_4' => 'test',
+						'id:severity_color_5' => 'test'
+					],
+					'details' => [
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_period": a time unit is expected.',
+						'Incorrect value for field "blink_period": a time unit is expected.',
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// Invalid string values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Use custom event status colours' => true,
+						'id:problem_unack_color' => '!@#$%^&*()_+',
+						'id:problem_ack_color' => '!@#$%^&*()_+',
+						'id:ok_unack_color' => '!@#$%^&*()_+',
+						'id:ok_ack_color' => '!@#$%^&*()_+',
+						'Display OK triggers for' => '!@#$%^&*()_+',
+						'On status change triggers blink for' => '!@#$%^&*()_+',
+						'id:severity_color_0' => '!@#$%^&*()_+',
+						'id:severity_color_1' => '!@#$%^&*()_+',
+						'id:severity_color_2' => '!@#$%^&*()_+' ,
+						'id:severity_color_3' => '!@#$%^&*()_+',
+						'id:severity_color_4' => '!@#$%^&*()_+',
+						'id:severity_color_5' => '!@#$%^&*()_+'
+					],
+					'details' => [
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_period": a time unit is expected.',
+						'Incorrect value for field "blink_period": a time unit is expected.',
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// Invalid empty values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Use custom event status colours' => true,
+						'id:problem_unack_color' => '',
+						'id:problem_ack_color'=> '',
+						'id:ok_unack_color'=> '',
+						'id:ok_ack_color'=> '',
+						'Display OK triggers for' => '',
+						'On status change triggers blink for' => '',
+						'Not classified' => '',
+						'Information' => '',
+						'Warning' => '',
+						'Average' => '',
+						'High' => '',
+						'Disaster' => '',
+						'id:severity_color_0' => '',
+						'id:severity_color_1' => '',
+						'id:severity_color_2' => '' ,
+						'id:severity_color_3' => '',
+						'id:severity_color_4' => '',
+						'id:severity_color_5' => ''
+					],
+					'details' => [
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_period": cannot be empty.',
+						'Incorrect value for field "blink_period": cannot be empty.',
+						'Incorrect value for field "severity_name_0": cannot be empty.',
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_name_1": cannot be empty.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_name_2": cannot be empty.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_name_3": cannot be empty.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_name_4": cannot be empty.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_name_5": cannot be empty.',
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// Invalid negative values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Use custom event status colours' => true,
+						'id:problem_unack_color' => '-1',
+						'id:problem_ack_color'=> '-1',
+						'id:ok_unack_color'=> '-1',
+						'id:ok_ack_color'=> '-1',
+						'Display OK triggers for' => '-1',
+						'On status change triggers blink for' => '-1',
+						'id:severity_color_0' => '-1',
+						'id:severity_color_1' => '-1',
+						'id:severity_color_2' => '-1' ,
+						'id:severity_color_3' => '-1',
+						'id:severity_color_4' => '-1',
+						'id:severity_color_5' => '-1'
+					],
+					'details' => [
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_period": a time unit is expected.',
+						'Incorrect value for field "blink_period": a time unit is expected.',
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
 			]
-		);
-
-		$this->assertEquals($this->zbxTestCheckboxSelected('custom_color'), (bool) $allValues['custom_color']);
-
-		$this->zbxTestAssertElementValue('problem_unack_color', $allValues['problem_unack_color']);
-		$this->zbxTestAssertElementValue('problem_ack_color', $allValues['problem_ack_color']);
-		$this->zbxTestAssertElementValue('ok_unack_color', $allValues['ok_unack_color']);
-		$this->zbxTestAssertElementValue('ok_ack_color', $allValues['ok_ack_color']);
-
-		$this->assertEquals($this->zbxTestCheckboxSelected('problem_unack_style'), (bool) $allValues['problem_unack_style']);
-		$this->assertEquals($this->zbxTestCheckboxSelected('problem_ack_style'), (bool) $allValues['problem_ack_style']);
-		$this->assertEquals($this->zbxTestCheckboxSelected('ok_unack_style'), (bool) $allValues['ok_unack_style']);
-		$this->assertEquals($this->zbxTestCheckboxSelected('ok_ack_style'), (bool) $allValues['ok_ack_style']);
-
-		$this->zbxTestAssertElementValue('ok_period', $allValues['ok_period']);
-		$this->zbxTestAssertElementValue('blink_period', $allValues['blink_period']);
-
-		$this->zbxTestAssertElementPresentXpath("//input[@id='problem_unack_color'][@disabled]");
-		$this->zbxTestAssertElementPresentXpath("//input[@id='problem_ack_color'][@disabled]");
-		$this->zbxTestAssertElementPresentXpath("//input[@id='ok_unack_color'][@disabled]");
-		$this->zbxTestAssertElementPresentXpath("//input[@id='ok_ack_color'][@disabled]");
-
-		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
-		$this->zbxTestTextPresent(['Info', 'Custom severity names affect all locales and require manual translation!']);
-
-		$this->zbxTestAssertElementPresentId('severity_name_0');
-		$this->zbxTestAssertElementPresentId('severity_name_1');
-		$this->zbxTestAssertElementPresentId('severity_name_2');
-		$this->zbxTestAssertElementPresentId('severity_name_3');
-		$this->zbxTestAssertElementPresentId('severity_name_4');
-		$this->zbxTestAssertElementPresentId('severity_name_5');
-		$this->zbxTestAssertElementPresentId('severity_color_0');
-		$this->zbxTestAssertElementPresentId('severity_color_1');
-		$this->zbxTestAssertElementPresentId('severity_color_2');
-		$this->zbxTestAssertElementPresentId('severity_color_3');
-		$this->zbxTestAssertElementPresentId('severity_color_4');
-		$this->zbxTestAssertElementPresentId('severity_color_5');
-		$this->zbxTestAssertElementPresentId('lbl_severity_color_0');
-		$this->zbxTestAssertElementPresentId('lbl_severity_color_1');
-		$this->zbxTestAssertElementPresentId('lbl_severity_color_2');
-		$this->zbxTestAssertElementPresentId('lbl_severity_color_3');
-		$this->zbxTestAssertElementPresentId('lbl_severity_color_4');
-		$this->zbxTestAssertElementPresentId('lbl_severity_color_5');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_0']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_0']", "size", '20');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_1']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_1']", "size", '20');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_2']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_2']", "size", '20');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_3']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_3']", "size", '20');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_4']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_4']", "size", '20');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_5']", "maxlength", '32');
-		$this->zbxTestAssertAttribute("//input[@id='severity_name_5']", "size", '20');
-
-		// checking values in this report
-		$this->zbxTestAssertElementValue('severity_name_0', $allValues['severity_name_0']);
-		$this->zbxTestAssertElementValue('severity_name_1', $allValues['severity_name_1']);
-		$this->zbxTestAssertElementValue('severity_name_2', $allValues['severity_name_2']);
-		$this->zbxTestAssertElementValue('severity_name_3', $allValues['severity_name_3']);
-		$this->zbxTestAssertElementValue('severity_name_4', $allValues['severity_name_4']);
-		$this->zbxTestAssertElementValue('severity_name_5', $allValues['severity_name_5']);
-		$this->zbxTestAssertElementValue('severity_color_0', $allValues['severity_color_0']);
-		$this->zbxTestAssertElementValue('severity_color_1', $allValues['severity_color_1']);
-		$this->zbxTestAssertElementValue('severity_color_2', $allValues['severity_color_2']);
-		$this->zbxTestAssertElementValue('severity_color_3', $allValues['severity_color_3']);
-		$this->zbxTestAssertElementValue('severity_color_4', $allValues['severity_color_4']);
-		$this->zbxTestAssertElementValue('severity_color_5', $allValues['severity_color_5']);
-	}
-
-	public function testFormAdministrationGeneralTrigDisplOptions_UpdateTrigDisplOptions() {
-		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
-		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
-		$this->zbxTestCheckHeader('Trigger displaying options');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger displaying options');
-		$this->zbxTestTextPresent(['Trigger displaying options', 'blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged RESOLVED events', 'Acknowledged RESOLVED events', 'Display OK triggers for', 'On status change triggers blink for']);
-
-		// hash calculation for not-changed DB fields
-		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['custom_color', 'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
-		$old_hash = CDBHelper::getHash($sql_hash);
-
-		$this->zbxTestCheckboxSelect('custom_color');
-		$this->zbxTestInputType('problem_unack_color', 'AAAAAA');
-		$this->zbxTestInputType('problem_ack_color', 'BBBBBB');
-		$this->zbxTestInputType('ok_unack_color', 'CCCCCC');
-		$this->zbxTestInputType('ok_ack_color', 'DDDDDD');
-		$this->zbxTestCheckboxSelect('problem_unack_style', false);
-		$this->zbxTestCheckboxSelect('problem_ack_style', false);
-		$this->zbxTestCheckboxSelect('ok_unack_style', false);
-		$this->zbxTestCheckboxSelect('ok_ack_style', false);
-		$this->zbxTestInputType('ok_period', '1h');
-		$this->zbxTestInputType('blink_period', '5m');
-
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
-
-		// checking values in the DB
-		$this->assertEquals(1, CDBHelper::getCount('SELECT custom_color FROM config WHERE custom_color=1'));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT problem_unack_color FROM config WHERE problem_unack_color='AAAAAA'"));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT problem_ack_color FROM config WHERE problem_ack_color='BBBBBB'"));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT ok_unack_color FROM config WHERE ok_unack_color='CCCCCC'"));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT ok_ack_color FROM config WHERE ok_ack_color='DDDDDD'"));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT problem_unack_style FROM config WHERE problem_unack_style=0'));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT problem_ack_style FROM config WHERE problem_ack_style=0'));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT ok_unack_style FROM config WHERE ok_unack_style=0'));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT ok_ack_style FROM config WHERE ok_ack_style=0'));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT ok_period FROM config WHERE ok_period='1h'"));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT blink_period FROM config WHERE blink_period='5m'"));
-
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
-	}
-
-	public static function ok_period() {
-		return [
-			[[
-				'expected' => TEST_BAD,
-				'period' => '',
-				'error_msg' => 'Incorrect value for field "ok_period": cannot be empty.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => ' ',
-				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => 's',
-				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '1.5',
-				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '{$BAD}',
-				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '1441m',
-				'error_msg' => 'Incorrect value for field "ok_period": value must be one of 0-86400.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '2d',
-				'error_msg' => 'Incorrect value for field "ok_period": value must be one of 0-86400.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '86401',
-				'error_msg' => 'Incorrect value for field "ok_period": value must be one of 0-86400.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '1y',
-				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '0'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '86400s'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '1440m'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '1h'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '1d'
-			]]
 		];
 	}
 
 	/**
-	 * @dataProvider ok_period
+	 * Backup in needed because of DEV-1673, and can be removed after bug is fixed.
+	 * @backup config
+	 *
+	 * @dataProvider getCheckFormData
 	 */
-	public function testFormAdministrationGeneralTrigDisplOptions_OKPeriod($data) {
-		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
-
-		$this->zbxTestInputTypeOverwrite('ok_period', $data['period']);
-		$this->zbxTestClickWait('update');
-
-		$this->zbxTestCheckHeader('Trigger displaying options');
-
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
-				break;
-
-			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
-				$this->zbxTestTextPresent($data['error_msg']);
-				break;
-		}
-	}
-
-	public static function blink_period() {
-		return [
-			[[
-				'expected' => TEST_BAD,
-				'period' => '',
-				'error_msg' => 'Incorrect value for field "blink_period": cannot be empty.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => ' ',
-				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => 's',
-				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '1.5',
-				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '{$BAD}',
-				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '1441m',
-				'error_msg' => 'Incorrect value for field "blink_period": value must be one of 0-86400.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '2d',
-				'error_msg' => 'Incorrect value for field "blink_period": value must be one of 0-86400.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '86401',
-				'error_msg' => 'Incorrect value for field "blink_period": value must be one of 0-86400.'
-			]],
-			[[
-				'expected' => TEST_BAD,
-				'period' => '1y',
-				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '0'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '86400s'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '1440m'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '1h'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'period' => '1d'
-			]]
-		];
-	}
-
-	/**
-	 * @dataProvider blink_period
-	 */
-	public function testFormAdministrationGeneralTrigDisplOptions_BlinkPeriod($data) {
-		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
-
-		$this->zbxTestInputTypeOverwrite('blink_period', $data['period']);
-		$this->zbxTestClickWait('update');
-
-		$this->zbxTestCheckHeader('Trigger displaying options');
-
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
-				break;
-
-			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
-				$this->zbxTestTextPresent($data['error_msg']);
-				break;
-		}
-	}
-
-	public function testFormAdministrationGeneralTrigDisplOptions_ResetTrigDisplOptions() {
-		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
-		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
-		$this->zbxTestCheckHeader('Trigger displaying options');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger displaying options');
-
-		// hash calculation for the DB fields that should be changed in this report
-		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['custom_color', 'problem_unack_style', 'problem_ack_style',
-				'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
-		$old_hash = CDBHelper::getHash($sql_hash);
-
-		$this->zbxTestClick('resetDefaults');
-		$this->zbxTestClickXpath("//div[contains(@class, 'overlay-dialogue modal')]//button[text()='Reset defaults']");
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
-
-		// checking values in the DB
-		$this->assertEquals(1, CDBHelper::getCount('SELECT custom_color FROM config WHERE custom_color=0'));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT problem_unack_style FROM config WHERE problem_unack_style=1'));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT problem_ack_style FROM config WHERE problem_ack_style=1'));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT ok_unack_style FROM config WHERE ok_unack_style=1'));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT ok_ack_style FROM config WHERE ok_ack_style=1'));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT ok_period FROM config WHERE ok_period='5m'"));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT blink_period FROM config WHERE blink_period='2m'"));
-
-		// hash calculation for the DB fields that should be changed in this report
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
-	}
-
-	public function testFormAdministrationGeneralTrigDisplOptions_ChangeTriggerSeverities() {
-
-		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
-		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
-		$this->zbxTestCheckHeader('Trigger displaying options');
-		$this->zbxTestTextPresent('Custom severity names affect all locales and require manual translation!');
-
-		$this->zbxTestInputType('severity_name_0', 'Not classified2');
-		$this->zbxTestInputType('severity_name_1', 'Information2');
-		$this->zbxTestInputType('severity_name_2', 'Warning2');
-		$this->zbxTestInputType('severity_name_3', 'Average2');
-		$this->zbxTestInputType('severity_name_4', 'High2');
-		$this->zbxTestInputType('severity_name_5', 'Disaster2');
-
-		$this->zbxTestClick('lbl_severity_color_5');
-		$this->zbxTestClickXpath('//div[@title="#FF0000"]');
-
-		$this->zbxTestClick('lbl_severity_color_4');
-		$this->zbxTestClickXpath('//div[@title="#CC6600"]');
-
-		$this->zbxTestClick('lbl_severity_color_3');
-		$this->zbxTestClickXpath('//div[@title="#E57373"]');
-
-		$this->zbxTestClick('lbl_severity_color_2');
-		$this->zbxTestClickXpath('//div[@title="#FFA000"]');
-
-		$this->zbxTestClick('lbl_severity_color_1');
-		$this->zbxTestClickXpath('//div[@title="#0097A7"]');
-
-		$this->zbxTestClick('lbl_severity_color_0');
-		$this->zbxTestClickXpath('//div[@title="#A5A5A5"]');
-
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
-
-		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified2');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_0"');
-
-		$sql = 'SELECT severity_name_1 FROM config WHERE severity_name_1='.zbx_dbstr('Information2');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_1"');
-
-		$sql = 'SELECT severity_name_2 FROM config WHERE severity_name_2='.zbx_dbstr('Warning2');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_2"');
-
-		$sql = 'SELECT severity_name_3 FROM config WHERE severity_name_3='.zbx_dbstr('Average2');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_3"');
-
-		$sql = 'SELECT severity_name_4 FROM config WHERE severity_name_4='.zbx_dbstr('High2');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_4"');
-
-		$sql = 'SELECT severity_name_5 FROM config WHERE severity_name_5='.zbx_dbstr('Disaster2');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_5"');
-
-		// checking severity colors in the DB
-
-		$sql = 'SELECT severity_color_0 FROM config where severity_color_0='.zbx_dbstr('A5A5A5');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_0"');
-
-		$sql = 'SELECT severity_color_1 FROM config WHERE severity_color_1='.zbx_dbstr('0097A7');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_1"');
-
-		$sql = 'SELECT severity_color_2 FROM config WHERE severity_color_2='.zbx_dbstr('FFA000');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_2"');
-
-		$sql = 'SELECT severity_color_3 FROM config WHERE severity_color_3='.zbx_dbstr('E57373');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_3"');
-
-		$sql = 'SELECT severity_color_4 FROM config WHERE severity_color_4='.zbx_dbstr('CC6600');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_4"');
-
-		$sql = 'SELECT severity_color_5 FROM config WHERE severity_color_5='.zbx_dbstr('FF0000');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_5"');
-	}
-
-	public function testFormAdministrationGeneralTrigDisplOptions_ResetDefaults() {
-
-		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
-		$this->zbxTestCheckHeader('Trigger displaying options');
-		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
-		$this->zbxTestTextPresent(['Custom severity names affect all locales and require manual translation!']);
-		$this->zbxTestClick('resetDefaults');
-		$this->zbxTestClickXpath("//div[contains(@class, 'overlay-dialogue modal')]//button[text()='Reset defaults']");
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
-
-		// checking that values were reset in the DB
-		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_0"');
-
-		$sql = 'SELECT severity_name_1 FROM config WHERE severity_name_1='.zbx_dbstr('Information');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_1"');
-
-		$sql = 'SELECT severity_name_2 FROM config WHERE severity_name_2='.zbx_dbstr('Warning');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_2"');
-
-		$sql = 'SELECT severity_name_3 FROM config WHERE severity_name_3='.zbx_dbstr('Average');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_3"');
-
-		$sql = 'SELECT severity_name_4 FROM config WHERE severity_name_4='.zbx_dbstr('High');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_4"');
-
-		$sql = 'SELECT severity_name_5 FROM config WHERE severity_name_5='.zbx_dbstr('Disaster');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_5"');
-
-		$sql = 'SELECT severity_color_0 FROM config WHERE severity_color_0='.zbx_dbstr('97AAB3');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_0"');
-
-		$sql = 'SELECT severity_color_1 FROM config WHERE severity_color_1='.zbx_dbstr('7499FF');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_2"');
-
-		$sql = 'SELECT severity_color_2 FROM config WHERE severity_color_2='.zbx_dbstr('FFC859');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_3"');
-
-		$sql = 'SELECT severity_color_3 FROM config WHERE severity_color_3='.zbx_dbstr('FFA059');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_3"');
-
-		$sql = 'SELECT severity_color_4 FROM config WHERE severity_color_4='.zbx_dbstr('E97659');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_4"');
-
-		$sql = 'SELECT severity_color_5 FROM config WHERE severity_color_5='.zbx_dbstr('E45959');
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_5"');
-
-// TODO: can also check that trigger severities have NOT been reset after clicking Cancel in the "Reset confirmation" dialog box after clicking "Reset defaults" button
-
+	public function testFormAdministrationGeneralTrigDisplOptions_CheckForm($data) {
+		$this->executeCheckForm($data);
 	}
 }

@@ -1,0 +1,73 @@
+{
+  "fsid": "603425a8-3f71-4515-adb7-05555cde280c",
+  "health": {
+    "status": "HEALTH_OK",
+    "checks": {},
+    "mutes": []
+  },
+  "election_epoch": 278,
+  "quorum": [
+    0,
+    1,
+    2
+  ],
+  "quorum_names": [
+    "node1",
+    "node2",
+    "node3"
+  ],
+  "quorum_age": 2385,
+  "monmap": {
+    "epoch": 2,
+    "min_mon_release_name": "octopus",
+    "num_mons": 3
+  },
+  "osdmap": {
+    "epoch": 291170,
+    "num_osds": 3,
+    "num_up_osds": 3,
+    "osd_up_since": 1599566704,
+    "num_in_osds": 3,
+    "osd_in_since": 1597332199,
+    "num_remapped_pgs": 0
+  },
+  "pgmap": {
+    "pgs_by_state": [
+      {
+        "state_name": "active+clean",
+        "count": 33
+      }
+    ],
+    "num_pgs": 33,
+    "num_pools": 2,
+    "num_objects": 0,
+    "data_bytes": 0,
+    "bytes_used": 3463643136,
+    "bytes_avail": 9408675840,
+    "bytes_total": 12872318976
+  },
+  "fsmap": {
+    "epoch": 210888,
+    "by_rank": [],
+    "up:standby": 3
+  },
+  "mgrmap": {
+    "available": true,
+    "num_standbys": 2,
+    "modules": [
+      "iostat",
+      "restful",
+      "selftest",
+      "zabbix"
+    ],
+    "services": {
+      "restful": "https://node1.zabbix.demo:8003/"
+    }
+  },
+  "servicemap": {
+    "epoch": 1,
+    "modified": "2020-08-13T16:39:28.797928+0300",
+    "services": {}
+  },
+  "progress_events": {}
+}

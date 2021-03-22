@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		return [
 			[
 				[
-					'error' => 'Incorrect value for field "name": cannot be empty.',
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
@@ -53,7 +53,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'checks' => [
 						['check_action' => 'Add', 'type' => 'HTTPS', 'ports' => '447']
 					],
-					'error' => 'Discovery rule "Local network" already exists.',
+					'error' => 'Discovery rule "Local network" already exists.'
 				]
 			],
 			[

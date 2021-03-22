@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ $widget = (new CWidget())
 			))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
+	->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
 
 // create form
 $itemForm = (new CForm())
@@ -68,7 +68,9 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldm
 
 foreach ($data['items'] as $item) {
 	$description = [];
-	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
@@ -137,7 +139,8 @@ foreach ($data['items'] as $item) {
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-			|| $item['type'] == ITEM_TYPE_DEPENDENT) {
+			|| $item['type'] == ITEM_TYPE_DEPENDENT
+			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {

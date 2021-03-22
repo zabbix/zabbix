@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ class CControllerHousekeepingUpdate extends CController {
 						'hk_history_global' => '0',
 						'hk_trends_mode' => '0',
 						'hk_trends_global' => '0',
-						'compression_status' => '0',
+						'compression_status' => '0'
 					]);
 					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 					$this->setResponse($response);
@@ -77,7 +77,7 @@ class CControllerHousekeepingUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction() {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->includeJsFile('monitoring.screen.constructor.edit.js.php');
 $action = 'screenedit.php?form=update&screenid='.getRequest('screenid');
 if (isset($_REQUEST['screenitemid'])) {
 	$action .= '&screenitemid='.getRequest('screenitemid');
@@ -32,10 +33,6 @@ $form = (new CForm('post', $action))
 	->setName('screen_item_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('screenid', getRequest('screenid'));
-
-if (array_key_exists('templateid', $data['screen'])) {
-	$form->addVar('templateid', $data['screen']['templateid']);
-}
 
 if (hasRequest('screenitemid')) {
 	$form->addVar('screenitemid', getRequest('screenitemid'));
@@ -85,20 +82,14 @@ else {
 
 // append resource types to form list
 $screenResources = screen_resources();
-if (array_key_exists('templateid', $data['screen'])) {
-	unset(
-		$screenResources[SCREEN_RESOURCE_DATA_OVERVIEW], $screenResources[SCREEN_RESOURCE_ACTIONS],
-		$screenResources[SCREEN_RESOURCE_EVENTS], $screenResources[SCREEN_RESOURCE_HOST_INFO],
-		$screenResources[SCREEN_RESOURCE_MAP], $screenResources[SCREEN_RESOURCE_SERVER_INFO],
-		$screenResources[SCREEN_RESOURCE_HOSTGROUP_TRIGGERS], $screenResources[SCREEN_RESOURCE_HOST_TRIGGERS],
-		$screenResources[SCREEN_RESOURCE_SYSTEM_STATUS], $screenResources[SCREEN_RESOURCE_TRIGGER_INFO],
-		$screenResources[SCREEN_RESOURCE_TRIGGER_OVERVIEW]
-	);
-}
 
 $screenFormList = (new CFormList())
-	->addRow((new CLabel(_('Resource'), 'resourcetype')),
-		(new CComboBox('resourcetype', $resourceType, 'submit()', $screenResources))
+	->addRow((new CLabel(_('Resource'), 'label-resourcetype')),
+		(new CSelect('resourcetype'))
+			->setId('resourcetype')
+			->setFocusableElementId('label-resourcetype')
+			->setValue($resourceType)
+			->addOptions(CSelect::createOptionsFromArray($screenResources))
 	);
 
 /*
@@ -138,19 +129,15 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 				]
 				: [],
 			'popup' => [
-				'parameters' => array_merge([
+				'parameters' => [
 					'srctbl' => 'graphs',
 					'srcfld1' => 'graphid',
 					'srcfld2' => 'name',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid'
-				], array_key_exists('templateid', $data['screen']) ? [
-					'templated_hosts' => '1',
-					'hostid' => $data['screen']['templateid']
-				] : [
+					'dstfld1' => 'resourceid',
 					'real_hosts' => '1',
 					'with_graphs' => '1'
-				]),
+				]
 			]
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -196,18 +183,14 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 					]
 					: [],
 				'popup' => [
-					'parameters' => array_merge([
+					'parameters' => [
 						'srctbl' => 'graph_prototypes',
 						'srcfld1' => 'graphid',
 						'srcfld2' => 'name',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'resourceid'
-					], array_key_exists('templateid', $data['screen']) ? [
-						'templated_hosts' => '1',
-						'hostid' => $data['screen']['templateid']
-					] : [
+						'dstfld1' => 'resourceid',
 						'real_hosts' => '1'
-					]),
+					]
 				]
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -264,9 +247,9 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'webitems' => true,
 					'numeric' => true,
-					'hostid' => array_key_exists('templateid', $data['screen']) ? $data['screen']['templateid'] : 0,
-					'real_hosts' => !array_key_exists('templateid', $data['screen']),
-					'with_simple_graph_items' => !array_key_exists('templateid', $data['screen'])
+					'hostid' => 0,
+					'real_hosts' => true,
+					'with_simple_graph_items' => true
 				]
 			]
 		]))
@@ -298,41 +281,22 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		$caption = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 	}
 
-	if (array_key_exists('templateid', $data['screen'])) {
-		$selectButton = (new CButton('select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
-					'srctbl' => 'item_prototypes',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
-					'dstfld2' => 'caption',
-					'templated_hosts' => '1',
-					'only_hostid' => $data['screen']['templateid'],
-					'numeric' => '1'
-				]).', null, this);'
-			);
-	}
-	else {
-		$selectButton = (new CButton('select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
-					'srctbl' => 'item_prototypes',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
-					'dstfld2' => 'caption',
-					'real_hosts' => '1',
-					'with_discovery_rule' => '1',
-					'items' => '1',
-					'numeric' => '1'
-				]).', null, this);'
-			);
-	}
+	$selectButton = (new CButton('select', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.generic",'.
+			json_encode([
+				'srctbl' => 'item_prototypes',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'name',
+				'dstfrm' => $form->getName(),
+				'dstfld1' => 'resourceid',
+				'dstfld2' => 'caption',
+				'real_hosts' => '1',
+				'with_discovery_rule' => '1',
+				'items' => '1',
+				'numeric' => '1'
+			]).', null, this);'
+		);
 
 	$form->addVar('resourceid', $id);
 	$screenFormList->addRow((new CLabel(_('Item prototype'), 'caption'))->setAsteriskMark(), [
@@ -431,11 +395,11 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 						'srcfld1' => 'itemid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
-						'hostid' => array_key_exists('templateid', $data['screen']) ? $data['screen']['templateid'] : 0,
-						'real_hosts' => !array_key_exists('templateid', $data['screen']),
+						'hostid' => 0,
+						'real_hosts' => true,
 						'webitems' => true
 					]
-				],
+				]
 			]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(true)
@@ -490,7 +454,8 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
-						'real_hosts' => true
+						'real_hosts' => true,
+						'enrich_parent_groups' => true
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -541,12 +506,15 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 	$screenFormList->addRow(
-		_('Sort triggers by'),
-		new CComboBox('sort_triggers', $sortTriggers, null, [
-			SCREEN_SORT_TRIGGERS_DATE_DESC => _('Last change (descending)'),
-			SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity (descending)'),
-			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host (ascending)')
-		])
+		new CLabel(_('Sort triggers by'), 'label-sort-triggers'),
+		(new CSelect('sort_triggers'))
+			->setFocusableElementId('label-sort-triggers')
+			->setValue($sortTriggers)
+			->addOptions(CSelect::createOptionsFromArray([
+				SCREEN_SORT_TRIGGERS_DATE_DESC => _('Last change (descending)'),
+				SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity (descending)'),
+				SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host (ascending)')
+			]))
 	);
 }
 
@@ -561,17 +529,20 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 	$screenFormList->addRow(
-		_('Sort entries by'),
-		new CComboBox('sort_triggers', $sortTriggers, null, [
-			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
-			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
-		])
+		new CLabel(_('Sort entries by'), 'label-sort-triggers'),
+		(new CSelect('sort_triggers'))
+			->setFocusableElementId('label-sort-triggers')
+			->setValue($sortTriggers)
+			->addOptions(CSelect::createOptionsFromArray([
+				SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
+				SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
+				SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
+				SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
+				SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
+				SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
+				SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
+				SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
+			]))
 	);
 }
 
@@ -700,11 +671,17 @@ elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RE
 elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 	$item = false;
 
-	$screenFormList->addRow(_('Time type'), new CComboBox('style', $style, 'submit()', [
-		TIME_TYPE_LOCAL => _('Local time'),
-		TIME_TYPE_SERVER => _('Server time'),
-		TIME_TYPE_HOST => _('Host time')
-	]));
+	$screenFormList->addRow(new CLabel(_('Time type'), 'label-time-type'),
+		(new CSelect('style'))
+			->setValue($style)
+			->setId('style')
+			->setFocusableElementId('label-time-type')
+			->addOptions(CSelect::createOptionsFromArray([
+				TIME_TYPE_LOCAL => _('Local time'),
+				TIME_TYPE_SERVER => _('Server time'),
+				TIME_TYPE_HOST => _('Host time')
+			]))
+	);
 
 	if ($style == TIME_TYPE_HOST) {
 		if ($resourceId > 0) {
@@ -742,8 +719,8 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 						'srcfld1' => 'itemid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
-						'hostid' => array_key_exists('templateid', $data['screen']) ? $data['screen']['templateid'] : 0,
-						'real_hosts' => !array_key_exists('templateid', $data['screen']),
+						'hostid' => 0,
+						'real_hosts' => true,
 						'webitems' => true
 					]
 				]
@@ -859,7 +836,7 @@ $resourcesWithDynamic = [
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 ];
-if (!array_key_exists('templateid', $this->data['screen']) && in_array($resourceType, $resourcesWithDynamic)) {
+if (in_array($resourceType, $resourcesWithDynamic)) {
 	$screenFormList->addRow(_('Dynamic item'), (new CCheckBox('dynamic'))->setChecked($dynamic == 1));
 }
 
@@ -871,15 +848,15 @@ if (isset($_REQUEST['screenitemid'])) {
 	$form->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CButtonDelete(null, url_params(['form', 'screenid', 'templateid', 'screenitemid'])),
-			new CButtonCancel(url_params(['screenid', 'templateid']))
+			new CButtonDelete(null, url_params(['form', 'screenid', 'screenitemid'])),
+			new CButtonCancel(url_param('screenid'))
 		]
 	));
 }
 else {
 	$form->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_params(['screenid', 'templateid']))]
+		[new CButtonCancel(url_param('screenid'))]
 	));
 }
 

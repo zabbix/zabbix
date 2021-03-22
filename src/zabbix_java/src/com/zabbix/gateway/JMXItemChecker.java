@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 package com.zabbix.gateway;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
+import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 import org.json.*;
 
@@ -56,6 +58,8 @@ class JMXItemChecker extends ItemChecker
 		ATTRIBUTES,
 		BEANS
 	}
+
+	private static HashMap<String, Boolean> useRMISSLforURLHintCache = new HashMap<String, Boolean>();
 
 	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
@@ -92,16 +96,46 @@ class JMXItemChecker extends ItemChecker
 
 		try
 		{
-			HashMap<String, String[]> env = null;
+			HashMap<String, Object> env = new HashMap<String, Object>();
 
 			if (null != username && null != password)
 			{
-				env = new HashMap<String, String[]>();
 				env.put(JMXConnector.CREDENTIALS, new String[] {username, password});
 			}
 
-			jmxc = ZabbixJMXConnectorFactory.connect(url, env);
+			if (!useRMISSLforURLHintCache.containsKey(url.getURLPath()) ||
+					!useRMISSLforURLHintCache.get(url.getURLPath()))
+			{
+				try
+				{
+					jmxc = ZabbixJMXConnectorFactory.connect(url, env);
+					useRMISSLforURLHintCache.put(url.getURLPath(), false);
+				}
+				catch (IOException e)
+				{
+					env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+					jmxc = ZabbixJMXConnectorFactory.connect(url, env);
+					useRMISSLforURLHintCache.put(url.getURLPath(), true);
+				}
+			}
+			else
+			{
+				try
+				{
+					env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+					jmxc = ZabbixJMXConnectorFactory.connect(url, env);
+					useRMISSLforURLHintCache.put(url.getURLPath(), true);
+				}
+				catch (IOException e)
+				{
+					env.remove("com.sun.jndi.rmi.factory.socket");
+					jmxc = ZabbixJMXConnectorFactory.connect(url, env);
+					useRMISSLforURLHintCache.put(url.getURLPath(), false);
+				}
+			}
+
 			mbsc = jmxc.getMBeanServerConnection();
+			logger.debug("using RMI SSL for " + url.getURLPath() + ": " + useRMISSLforURLHintCache.get(url.getURLPath()));
 
 			for (String key : keys)
 				values.put(getJSONValue(key));
@@ -110,7 +144,8 @@ class JMXItemChecker extends ItemChecker
 		{
 			JSONObject value = new JSONObject();
 
-			logger.warn("cannot process keys '{}': {}: {}", new Object[] {keys, ZabbixException.getRootCauseMessage(e1), url});
+			logger.warn("cannot process keys '{}': {}: {}", new Object[] {keys,
+					ZabbixException.getRootCauseMessage(e1), url});
 			logger.debug("error caused by", e1);
 
 			try
@@ -119,7 +154,8 @@ class JMXItemChecker extends ItemChecker
 			}
 			catch (JSONException e2)
 			{
-				Object[] logInfo = {JSON_TAG_ERROR, e1.getMessage(), ZabbixException.getRootCauseMessage(e2)};
+				Object[] logInfo = {JSON_TAG_ERROR, e1.getMessage(),
+						ZabbixException.getRootCauseMessage(e2)};
 				logger.warn("cannot add JSON attribute '{}' with message '{}': {}", logInfo);
 				logger.debug("error caused by", e2);
 			}
@@ -614,5 +650,12 @@ class JMXItemChecker extends ItemChecker
 		return HelperFunctionChest.arrayContains(clazzez, obj.getClass()) ||
 				(!(obj instanceof CompositeData)) && (!(obj instanceof TabularDataSupport)) &&
 				(obj.getClass().getMethod("toString").getDeclaringClass() != Object.class);
+	}
+
+	public void cleanUseRMISSLforURLHintCache()
+	{
+		int s = useRMISSLforURLHintCache.size();
+		useRMISSLforURLHintCache.clear();
+		logger.debug("Finished cleanup of RMI SSL hint cache. " + s + " entries removed.");
 	}
 }

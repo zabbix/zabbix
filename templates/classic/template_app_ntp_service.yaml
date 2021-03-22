@@ -1,0 +1,42 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:11Z'
+  groups:
+    -
+      name: Templates/Modules
+  templates:
+    -
+      template: 'NTP Service'
+      name: 'NTP Service'
+      groups:
+        -
+          name: Templates/Modules
+      applications:
+        -
+          name: 'NTP service'
+      items:
+        -
+          name: 'NTP service is running'
+          type: SIMPLE
+          key: 'net.udp.service[ntp]'
+          history: 1w
+          applications:
+            -
+              name: 'NTP service'
+          valuemap:
+            name: 'Service state'
+          triggers:
+            -
+              expression: '{max(#3)}=0'
+              name: 'NTP service is down on {HOST.NAME}'
+              priority: AVERAGE
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

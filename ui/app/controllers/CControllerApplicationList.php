@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,7 +97,8 @@ class CControllerApplicationList extends CController {
 				? $filter_hostids[0]
 				: $this->getInput('hostid', 0),
 			'profileIdx' => 'web.applications.filter',
-			'active_tab' => CProfile::get('web.applications.filter.active', 1)
+			'active_tab' => CProfile::get('web.applications.filter.active', 1),
+			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 
 		// Get host groups.

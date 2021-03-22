@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ foreach ($data['hosts_by_name'] as $hostname => $hostid) {
 	$table->addRow($row);
 }
 
-if ($data['exceeded_hosts'] || $data['exceeded_trigs']) {
+if ($data['exceeded_limit']) {
 	$table->setFooter([
 		(new CCol(_('Not all results are displayed. Please provide more specific search criteria.')))
 			->setColSpan($table->getNumCols())

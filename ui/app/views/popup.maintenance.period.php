@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,13 +66,18 @@ foreach ([1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12] as $month) {
 }
 
 $form_list
-	->addRow((new CLabel(_('Period type'), 'timeperiod_type')),
-		(new CComboBox('timeperiod_type', $data['timeperiod_type'], null, [
-			TIMEPERIOD_TYPE_ONETIME	=> _('One time only'),
-			TIMEPERIOD_TYPE_DAILY	=> _('Daily'),
-			TIMEPERIOD_TYPE_WEEKLY	=> _('Weekly'),
-			TIMEPERIOD_TYPE_MONTHLY	=> _('Monthly')
-		]))->setAttribute('autofocus', 'autofocus')
+	->addRow((new CLabel(_('Period type'), 'label-timeperiod-type')),
+		(new CSelect('timeperiod_type'))
+			->setId('timeperiod_type')
+			->setFocusableElementId('label-timeperiod-type')
+			->setValue($data['timeperiod_type'])
+			->addOptions(CSelect::createOptionsFromArray([
+				TIMEPERIOD_TYPE_ONETIME	=> _('One time only'),
+				TIMEPERIOD_TYPE_DAILY	=> _('Daily'),
+				TIMEPERIOD_TYPE_WEEKLY	=> _('Weekly'),
+				TIMEPERIOD_TYPE_MONTHLY	=> _('Monthly')
+			]))
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow((new CLabel(_('Every day(s)'), 'every_day'))->setAsteriskMark(),
 		(new CNumericBox('every', ($data['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) ? $data['every'] : 1, 3))
@@ -111,14 +116,18 @@ $form_list
 			->setModern(true),
 		'row_timeperiod_date'
 	)
-	->addRow((new CLabel(_('Day of week'), 'every_dow'))->setAsteriskMark(),
-		(new CComboBox('every', ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) ? $data['every'] : 1, null, [
-			1 => _('first'),
-			2 => _x('second', 'adjective'),
-			3 => _('third'),
-			4 => _('fourth'),
-			5 => _('last')
-		]))->setId('every_dow'),
+	->addRow((new CLabel(_('Day of week'), 'label-every-dow'))->setAsteriskMark(),
+		(new CSelect('every'))
+			->setValue($data['every'])
+			->setFocusableElementId('label-every-dow')
+			->addOptions(CSelect::createOptionsFromArray([
+				1 => _('first'),
+				2 => _x('second', 'adjective'),
+				3 => _('third'),
+				4 => _('fourth'),
+				5 => _x('last', 'week of month')
+			]))
+			->setId('every_dow'),
 		'row_timeperiod_week'
 	)
 	->addRow('',
@@ -154,10 +163,16 @@ $form_list
 		(new CDiv([
 			(new CNumericBox('period_days', $data['period_days'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			new CLabel(_('Days'), 'period_days'),
-			new CComboBox('period_hours', $data['period_hours'], null, range(0, 23)),
-			new CLabel(_('Hours'), 'period_hours'),
-			new CComboBox('period_minutes', $data['period_minutes'], null, range(0, 59)),
-			new CLabel(_('Minutes'), 'period_minutes')
+			(new CSelect('period_hours'))
+				->setFocusableElementId('label-period-hours')
+				->setValue($data['period_hours'])
+				->addOptions(CSelect::createOptionsFromArray(range(0, 23))),
+			new CLabel(_('Hours'), 'label-period-hours'),
+			(new CSelect('period_minutes'))
+				->setFocusableElementId('label-period-minutes')
+				->setValue($data['period_minutes'])
+				->addOptions(CSelect::createOptionsFromArray(range(0, 59))),
+			new CLabel(_('Minutes'), 'label-period-minutes')
 		]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
 		'row_timeperiod_period_length'
 	);

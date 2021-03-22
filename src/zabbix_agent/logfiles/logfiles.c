@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,8 @@
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
 extern int	CONFIG_MAX_LINES_PER_SECOND;
-extern char	*CONFIG_HOSTNAME;
+
+extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
@@ -1750,6 +1751,13 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	{
 		for (; p < p_end; p++)
 		{
+			/* detect NULL byte and replace it with '?' character */
+			if (0x0 == *p)
+			{
+				*p = '?';
+				continue;
+			}
+
 			if (0xd < *p || 0xa > *p)
 				continue;
 
@@ -1777,6 +1785,15 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	{
 		while (p <= p_end - szbyte)
 		{
+			/* detect NULL byte in UTF-16 encoding and replace it with '?' character */
+			if (2 == szbyte && 0x0 == *p && 0x0 == *(p + 1))
+			{
+				if (0x0 == *cr)			/* Big-endian */
+					p[1] = '?';
+				else				/* Little-endian */
+					*p = '?';
+			}
+
 			if (0 == memcmp(p, lf, szbyte))		/* LF (Unix) */
 			{
 				*p_next = p + szbyte;

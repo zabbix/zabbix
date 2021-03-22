@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -711,7 +711,7 @@ class testDependentItems extends CAPITest {
 				'request_data' => array_merge(
 					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 4495, 5494)
 				)
-			],
+			]
 		];
 	}
 	/**

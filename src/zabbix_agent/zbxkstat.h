@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #ifndef ZABBIX_ZBXKSTAT_H
 #define ZABBIX_ZBXKSTAT_H
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
 #include "zbxtypes.h"
 

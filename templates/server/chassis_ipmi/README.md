@@ -1,9 +1,9 @@
 
-# Template Server Chassis by IPMI
+# Chassis by IPMI
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 Template for monitoring servers with BMC over IPMI that work without any external scripts.  
 All metrics are collected at once, thanks to Zabbix's bulk data collection. The template is available starting from Zabbix version 5.0.  
 It collects metrics by polling BMC remotely using an IPMI agent.
@@ -15,7 +15,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/ipmi) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/ipmi) for basic instructions.
 
 You can set {$IPMI.USER} and {$IPMI.PASSWORD} macros in the template for using on the host level.
 

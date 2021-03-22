@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ class CFilter extends CDiv {
 
 		$this
 			->setAttribute('data-accessible', 1)
-			->addClass('filter-space')
+			->addClass(ZBX_STYLE_FILTER_SPACE)
 			->setId(uniqid('filter_'));
 
 		$this->form = (new CForm('get'))

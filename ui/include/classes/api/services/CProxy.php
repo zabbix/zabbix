@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,13 @@
  * Class containing methods for operations with proxies.
  */
 class CProxy extends CApiService {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
 
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';

@@ -1,13 +1,13 @@
 
-# Template App Memcached
+# Memcached
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor Memcached server by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`Template App Memcached` — collects metrics by polling zabbix-agent2.
+Template `Memcached` — collects metrics by polling zabbix-agent2.
 
 
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 Setup and configure zabbix-agent2 compiled with the Memcached monitoring [plugin](/go/plugins/memcached).
 
@@ -84,10 +84,10 @@ There are no template links in this template.
 |Memcached: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:memcached.cpu.sys.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Memcached: Service is down</p> |
 |Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m) |<p>The max number of connections is reachedand and a new connection had to wait in the queue as a result.</p> |`{TEMPLATE_NAME:memcached.connections.queued.rate.min(5m)}>{$MEMCACHED.CONN.QUEUED.MAX.WARN}` |WARNING | |
 |Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m) |<p>Number of times a client connection was throttled is too hight.</p><p>When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p> |`{TEMPLATE_NAME:memcached.connections.throttled.rate.min(5m)}>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}` |WARNING | |
-|Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m) |<p>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</p> |`{TEMPLATE_NAME:memcached.connections.current.min(5m)}/{Template App Memcached:memcached.connections.max.last()}*100>{$MEMCACHED.CONN.PRC.MAX.WARN}` |WARNING | |
+|Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m) |<p>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</p> |`{TEMPLATE_NAME:memcached.connections.current.min(5m)}/{Memcached:memcached.connections.max.last()}*100>{$MEMCACHED.CONN.PRC.MAX.WARN}` |WARNING | |
 |Memcached: Version has changed (new version: {ITEM.VALUE}) |<p>Memcached version has changed. Ack to close.</p> |`{TEMPLATE_NAME:memcached.version.diff()}=1 and {TEMPLATE_NAME:memcached.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Memcached: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:memcached.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
-|Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:memcached.stats.bytes.min(5m)}/{Template App Memcached:memcached.config.limit_maxbytes.last()}*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}` |WARNING | |
+|Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:memcached.stats.bytes.min(5m)}/{Memcached:memcached.config.limit_maxbytes.last()}*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}` |WARNING | |
 
 ## Feedback
 

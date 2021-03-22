@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 		result = DBselect(
 				"select triggerid,description,expression,priority,comments,url,recovery_expression,"
-					"recovery_mode,value,opdata"
+					"recovery_mode,value,opdata,event_name"
 				" from triggers"
 				" where%s",
 				sql);
@@ -196,6 +196,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 					ZBX_STR2UCHAR(event->trigger.recovery_mode, row[7]);
 					ZBX_STR2UCHAR(event->trigger.value, row[8]);
 					event->trigger.opdata = zbx_strdup(NULL, row[9]);
+					event->trigger.event_name = ('\0' != *row[10] ? zbx_strdup(NULL, row[10]) :
+							NULL);
 				}
 			}
 		}
@@ -225,6 +227,7 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
 	zbx_free(trigger->comments);
 	zbx_free(trigger->url);
 	zbx_free(trigger->opdata);
+	zbx_free(trigger->event_name);
 }
 
 /******************************************************************************

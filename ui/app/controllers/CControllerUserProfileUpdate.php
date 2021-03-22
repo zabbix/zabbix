@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
-		$timezones = DateTimeZone::listIdentifiers();
-		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -38,7 +36,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			'password2' =>		'string',
 			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
-			'timezone' =>		'db users.timezone|in '.implode(',', $timezones),
+			'timezone' =>		'db users.timezone|in '.implode(',', $this->timezones),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
 			'autologout' =>		'db users.autologout|not_empty',
@@ -116,7 +114,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(ZBX_DEFAULT_URL);
+			$response = new CControllerResponseRedirect(CMenuHelper::getFirstUrl());
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}
 		else {

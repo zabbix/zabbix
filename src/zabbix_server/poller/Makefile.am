@@ -19,6 +19,8 @@ libzbxpoller_a_SOURCES = \
 	checks_internal.h \
 	checks_java.c \
 	checks_java.h \
+	checks_script.c \
+	checks_script.h \
 	checks_simple.c \
 	checks_simple.h \
 	checks_simple_vmware.c \

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ if (isset($_REQUEST['maintenanceid'])) {
 		'selectTimeperiods' => API_OUTPUT_EXTEND,
 		'selectTags' => API_OUTPUT_EXTEND,
 		'editable' => true,
-		'maintenanceids' => getRequest('maintenanceid'),
+		'maintenanceids' => getRequest('maintenanceid')
 	]);
 	if (empty($dbMaintenance)) {
 		access_deny();
@@ -94,6 +94,12 @@ if (isset($_REQUEST['maintenanceid'])) {
 }
 if (hasRequest('action') && (!hasRequest('maintenanceids') || !is_array(getRequest('maintenanceids')))) {
 	access_deny();
+}
+
+$allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
+
+if (!$allowed_edit && hasRequest('form') && getRequest('form') !== 'update') {
+	access_deny(ACCESS_DENY_PAGE);
 }
 
 /*
@@ -104,6 +110,10 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	if (hasRequest('update')) {
 		$messageSuccess = _('Maintenance updated');
 		$messageFailed = _('Cannot update maintenance');
@@ -188,6 +198,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdelete') {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$maintenanceids = getRequest('maintenanceid', []);
 	if (hasRequest('maintenanceids')) {
 		$maintenanceids = getRequest('maintenanceids');
@@ -217,6 +231,7 @@ elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdel
  */
 $data = [
 	'form' => getRequest('form'),
+	'allowed_edit' => $allowed_edit
 ];
 
 if (!empty($data['form'])) {
@@ -346,7 +361,8 @@ else {
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
 		'profileIdx' => 'web.maintenance.filter',
-		'active_tab' => CProfile::get('web.maintenance.filter.active', 1)
+		'active_tab' => CProfile::get('web.maintenance.filter.active', 1),
+		'allowed_edit' => $allowed_edit
 	];
 
 	// Get list of maintenances.

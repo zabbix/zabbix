@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -174,7 +174,8 @@ typedef enum
 	ITEM_TYPE_SNMPTRAP,
 	ITEM_TYPE_DEPENDENT,
 	ITEM_TYPE_HTTPAGENT,
-	ITEM_TYPE_SNMP		/* 20 */
+	ITEM_TYPE_SNMP,
+	ITEM_TYPE_SCRIPT	/* 21 */
 }
 zbx_item_type_t;
 const char	*zbx_agent_type_string(zbx_item_type_t item_type);
@@ -205,6 +206,9 @@ extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 #define ZBX_FLAG_DISCOVERY_RULE		0x01
 #define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
 #define ZBX_FLAG_DISCOVERY_CREATED	0x04
+
+#define ZBX_HOST_PROT_INTERFACES_INHERIT	0
+#define ZBX_HOST_PROT_INTERFACES_CUSTOM		1
 
 typedef enum
 {
@@ -779,6 +783,17 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 
 #define ZBX_USER_ONLINE_TIME	600
 
+/* user role permissions */
+typedef enum
+{
+	ROLE_PERM_DENY = 0,
+	ROLE_PERM_ALLOW = 1,
+}
+zbx_user_role_permission_t;
+
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
+
 /* user permissions */
 typedef enum
 {
@@ -792,6 +807,7 @@ typedef struct
 {
 	zbx_uint64_t	userid;
 	zbx_user_type_t	type;
+	zbx_uint64_t	roleid;
 }
 zbx_user_t;
 
@@ -889,7 +905,8 @@ while (0)
 														\
 do														\
 {														\
-	zbx_error("ERROR [file:%s,line:%d] Something impossible has just happened.", __FILE__, __LINE__);	\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s] Something impossible has just happened.",    \
+			__FILE__, __func__, ZABBIX_REVISION);							\
 	zbx_backtrace();											\
 }														\
 while (0)
@@ -1093,6 +1110,7 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	str_in_list(const char *list, const char *value, char delimiter);
+int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
@@ -1323,7 +1341,6 @@ int	is_macro_char(unsigned char c);
 
 int	is_discovery_macro(const char *name);
 
-int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);
 
 int	parse_key(const char **exp);
@@ -1412,18 +1429,20 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_SIMPLE_MACRO		0x00020
 #define ZBX_TOKEN_REFERENCE		0x00040
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
+#define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
 
 /* additional token flags */
-#define ZBX_TOKEN_TRIGGER	0x004000
-#define ZBX_TOKEN_NUMERIC	0x008000
-#define ZBX_TOKEN_JSON		0x010000
-#define ZBX_TOKEN_XML		0x020000
-#define ZBX_TOKEN_REGEXP	0x040000
-#define ZBX_TOKEN_XPATH		0x080000
-#define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
-#define ZBX_TOKEN_PROMETHEUS	0x200000
-#define ZBX_TOKEN_JSONPATH	0x400000
-#define ZBX_TOKEN_STR_REPLACE	0x800000
+#define ZBX_TOKEN_TRIGGER	0x0004000
+#define ZBX_TOKEN_NUMERIC	0x0008000
+#define ZBX_TOKEN_JSON		0x0010000
+#define ZBX_TOKEN_XML		0x0020000
+#define ZBX_TOKEN_REGEXP	0x0040000
+#define ZBX_TOKEN_XPATH		0x0080000
+#define ZBX_TOKEN_REGEXP_OUTPUT	0x0100000
+#define ZBX_TOKEN_PROMETHEUS	0x0200000
+#define ZBX_TOKEN_JSONPATH	0x0400000
+#define ZBX_TOKEN_STR_REPLACE	0x0800000
+#define ZBX_TOKEN_STRING	0x1000000
 
 /* location of a substring */
 typedef struct
@@ -1441,6 +1460,13 @@ typedef struct
 	zbx_strloc_t	name;
 }
 zbx_token_macro_t;
+
+/* data used by macros, ldd macros and objectid tokens */
+typedef struct
+{
+	zbx_strloc_t	expression;
+}
+zbx_token_expression_macro_t;
 
 /* data used by user macros */
 typedef struct
@@ -1492,6 +1518,7 @@ typedef union
 	zbx_token_macro_t		objectid;
 	zbx_token_macro_t		macro;
 	zbx_token_macro_t		lld_macro;
+	zbx_token_expression_macro_t	expression_macro;
 	zbx_token_user_macro_t		user_macro;
 	zbx_token_func_macro_t		func_macro;
 	zbx_token_func_macro_t		lld_func_macro;
@@ -1512,12 +1539,11 @@ typedef struct
 }
 zbx_token_t;
 
-typedef enum
-{
-	ZBX_TOKEN_SEARCH_BASIC,
-	ZBX_TOKEN_SEARCH_REFERENCES
-}
-zbx_token_search_t;
+#define ZBX_TOKEN_SEARCH_BASIC			0x00
+#define ZBX_TOKEN_SEARCH_REFERENCES		0x01
+#define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
+
+typedef int zbx_token_search_t;
 
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
@@ -1554,6 +1580,7 @@ char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 #define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
 #define ZBX_PREPROC_CSV_TO_JSON			24
 #define ZBX_PREPROC_STR_REPLACE			25
+#define ZBX_PREPROC_VALIDATE_NOT_SUPPORTED	26
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
@@ -1629,8 +1656,8 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
-int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
-		int refresh_unsupported, int *nextcheck, char **error);
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
+		int *nextcheck, char **error);
 
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
@@ -1651,5 +1678,39 @@ int	zbx_str_extract(const char *text, size_t len, char **value);
 
 #define AUDIT_ACTION_EXECUTE	7
 #define AUDIT_RESOURCE_SCRIPT	25
+
+typedef enum
+{
+	ZBX_TIME_UNIT_UNKNOWN,
+	ZBX_TIME_UNIT_HOUR,
+	ZBX_TIME_UNIT_DAY,
+	ZBX_TIME_UNIT_WEEK,
+	ZBX_TIME_UNIT_MONTH,
+	ZBX_TIME_UNIT_YEAR,
+	ZBX_TIME_UNIT_COUNT
+}
+zbx_time_unit_t;
+
+void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
+void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
+
+void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
+void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
+
+const char	*zbx_timespec_str(const zbx_timespec_t *ts);
+
+zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
+int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
+
+typedef enum
+{
+	ZBX_FUNCTION_TYPE_UNKNOWN,
+	ZBX_FUNCTION_TYPE_HISTORY,
+	ZBX_FUNCTION_TYPE_TIMER,
+	ZBX_FUNCTION_TYPE_TRENDS
+}
+zbx_function_type_t;
+
+zbx_function_type_t	zbx_get_function_type(const char *func);
 
 #endif

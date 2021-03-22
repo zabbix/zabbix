@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -958,7 +958,7 @@ function get_conditions_by_eventsource($eventsource) {
 function get_opconditions_by_eventsource($eventsource) {
 	$conditions = [
 		EVENT_SOURCE_TRIGGERS => [CONDITION_TYPE_EVENT_ACKNOWLEDGED],
-		EVENT_SOURCE_DISCOVERY => [],
+		EVENT_SOURCE_DISCOVERY => []
 	];
 
 	if (isset($conditions[$eventsource])) {
@@ -1151,7 +1151,7 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_NOT_EQUAL
 	];
 	$operators[CONDITION_TYPE_DOBJECT] = [
-		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_EQUAL
 	];
 	$operators[CONDITION_TYPE_PROXY] = [
 		CONDITION_OPERATOR_EQUAL,
@@ -1170,7 +1170,7 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_NOT_EQUAL
 	];
 	$operators[CONDITION_TYPE_DSTATUS] = [
-		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_EQUAL
 	];
 	$operators[CONDITION_TYPE_DUPTIME] = [
 		CONDITION_OPERATOR_MORE_EQUAL,

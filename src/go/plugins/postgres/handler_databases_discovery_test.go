@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,19 +22,23 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
 
 func TestPlugin_databasesDiscoveryHandler(t *testing.T) {
-	sharedPool, err := getConnPool(t)
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *postgresConn
-		params []string
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -45,14 +49,14 @@ func TestPlugin_databasesDiscoveryHandler(t *testing.T) {
 		{
 			fmt.Sprintf("databasesDiscoveryHandler should return JSON with data if OK "),
 			&impl,
-			args{conn: sharedPool},
+			args{context.Background(), sharedPool, keyDatabasesDiscovery, nil, []string{}},
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := tt.p.databasesDiscoveryHandler(tt.args.conn, keyPostgresDiscoveryDatabases, tt.args.params)
+			got, err := databasesDiscoveryHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.databaseDiscoveryHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

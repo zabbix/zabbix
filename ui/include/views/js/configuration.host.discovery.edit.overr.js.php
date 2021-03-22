@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,10 +73,10 @@ insert_javascript_for_visibilitybox();
 				->addClass('macro')
 				->setAttribute('placeholder', '{#MACRO}')
 				->setAttribute('data-formulaid', '#{formulaId}'),
-			(new CComboBox('overrides_filters[#{rowNum}][operator]', CONDITION_OPERATOR_REGEXP, null, [
-				CONDITION_OPERATOR_REGEXP => _('matches'),
-				CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-			]))->addClass('operator'),
+			(new CSelect('overrides_filters[#{rowNum}][operator]'))
+				->setValue(CONDITION_OPERATOR_REGEXP)
+				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match'))),
 			(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
 					DB::getFieldLength('lld_override_condition', 'value')))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -683,7 +683,7 @@ insert_javascript_for_visibilitybox();
 		delete this.data.filter;
 
 		/*
-		 * Used to add propper letter, when creating new dynamic row for filter. If no filters are configured,
+		 * Used to add proper letter, when creating new dynamic row for filter. If no filters are configured,
 		 * one empty row is created by View.
 		 */
 		this.filter_counter = (this.data.overrides_filters.length > 0) ? this.data.overrides_filters.length : 1;
@@ -748,7 +748,7 @@ insert_javascript_for_visibilitybox();
 			});
 		});
 
-		jQuery('#overrides_expression').html(getConditionFormula(filters, +jQuery('#overrides_evaltype').val()));
+		jQuery('#overrides_expression').html(getConditionFormula(filters, +jQuery('#overrides-evaltype').val()));
 	};
 
 	OverrideEditForm.prototype.filterDynamicRows = function() {
@@ -768,20 +768,21 @@ insert_javascript_for_visibilitybox();
 			.bind('tableupdate.dynamicRows', function(event, options) {
 				jQuery('#overrideRow').toggle(jQuery(options.row, jQuery(this)).length > 1);
 
-				if (jQuery('#overrides_evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+				if (jQuery('#overrides-evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 					that.updateExpression();
 				}
 			})
 			.on('change', '.macro', function() {
-				if (jQuery('#overrides_evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+				if (jQuery('#overrides-evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 					that.updateExpression();
 				}
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
+				overlays_stack.end().centerDialog();
 			});
 
-		jQuery('#overrides_evaltype').change(function() {
+		jQuery('#overrides-evaltype').change(function() {
 			var show_formula = (jQuery(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 
 			jQuery('#overrides_expression').toggle(!show_formula);
@@ -793,7 +794,7 @@ insert_javascript_for_visibilitybox();
 			overlays_stack.end().centerDialog();
 		});
 
-		jQuery('#overrides_evaltype').trigger('change');
+		jQuery('#overrides-evaltype').trigger('change');
 	};
 
 	/**
@@ -809,10 +810,16 @@ insert_javascript_for_visibilitybox();
 		this.$form.trimValues(['input[type="text"]']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
+		var form_data = this.$form.serializeJSON();
+		if (Object.keys(form_data.overrides_filters).length <= 1) {
+			delete form_data.overrides_formula;
+			delete form_data.overrides_evaltype;
+		}
+
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: this.$form.serialize(),
+			data: form_data,
 			dataType: 'json',
 			type: 'post'
 		})

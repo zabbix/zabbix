@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -300,7 +300,8 @@ foreach ($data['hosts'] as $host) {
 			break;
 		}
 
-		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+		if (array_key_exists($template['templateid'], $data['writable_templates'])
+				&& $data['allowed_ui_conf_templates']) {
 			$caption = [
 				(new CLink(CHtml::encode($template['name']),
 					(new CUrl('templates.php'))
@@ -324,7 +325,8 @@ foreach ($data['hosts'] as $host) {
 			$caption[] = ' (';
 
 			foreach ($parent_templates as $parent_template) {
-				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])) {
+				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
+						&& $data['allowed_ui_conf_templates']) {
 					$caption[] = (new CLink(CHtml::encode($parent_template['name']),
 						(new CUrl('templates.php'))
 							->setArgument('form', 'update')

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,8 @@ class CButtonDropdown extends CButton {
 						'items' => $this->dropdown_items,
 						'toggle_class' => ZBX_STYLE_BTN_TOGGLE
 					]
-				]))
+				])
+			)
 			->addItem((new CInput('hidden', $name, $this->getAttribute('value')))
 				->addClass(self::ZBX_STYLE_BTN_VALUE)
 		);

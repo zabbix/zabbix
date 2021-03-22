@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if len(params) == 1 || params[1] == "" || params[1] == "wait" {
-		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(p.options.Timeout))
+		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(p.options.Timeout), "")
 		if err != nil {
 			return nil, err
 		}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -316,7 +316,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				'context' => null,
 				'regex' => null,
 				'error' => 'incorrect syntax near "{$MACRO2}"'
-			],],
+			]],
 			['{$MACRO1}{$MACRO2}', 9, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO2}',
@@ -324,7 +324,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				'context' => null,
 				'regex' => null,
 				'error' => ''
-			],],
+			]],
 			['abc"def"ghi{$MACRO:""}', 11, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:""}',

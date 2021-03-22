@@ -47,14 +47,14 @@ Zabbix checks parameters in the following order:
 
 **modbus.get[endpoint,slaveid,function,address,count,type,endianness,offset]** — receive value from modbus device
 *Params:*
-endpoint — tcp or rtu connection string. tcp://localhost:511 rtu://COM1:9600:8n1
-slaveid — Modbus address of the device. Optional.
-function — 1,2,3,4 modbus read functions. Optional.
-address — Address of first registry , coil or input. Default 00001. Optional.
-count — count of number for return. Default 1. Optional.
-type — acceptable values: bit, int8, uint8, uint16, int16, uint32, int32, float, uint64 and double. Deafault bit or uint8. Optional.
-endianness — acceptable values: be, le, mbe, mle. Optional.
-offset — Number of registers or bits, starting from 'address', the result of which will be discarded. Optional.
+- endpoint — tcp or rtu connection string. tcp://localhost:511 rtu://COM1:9600:8n1
+- slaveid — Modbus address of the device. Optional.
+- function — 1,2,3,4 modbus read functions. Optional.
+- address — Address of first registry , coil or input. Default 00001. Optional.
+- count — count of number for return. Default 1. Optional.
+- type — acceptable values: bit, int8, uint8, uint16, int16, uint32, int32, float, uint64 and double. Default bit or uint8. Optional.
+- endianness — acceptable values: be, le, mbe, mle. Optional.
+- offset — Number of registers or bits, starting from 'address', the result of which will be discarded. Optional.
 *Returns:*
 Array of numbers in JSON format.
 

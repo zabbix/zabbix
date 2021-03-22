@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,21 +22,26 @@
 package postgres
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"testing"
 )
 
 func TestPlugin_locksHandler(t *testing.T) {
 
-	// create pool or aquare conn from old pool for test
-	sharedPool, err := getConnPool(t)
+	// create pool or acquire conn from old pool for test
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *postgresConn
-		params []string
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -47,18 +52,19 @@ func TestPlugin_locksHandler(t *testing.T) {
 		{
 			fmt.Sprintf("Plugin.locksHandler() should return ptr to Pool for Plugin.locksHandler()"),
 			&impl,
-			args{conn: sharedPool},
+			args{context.Background(), sharedPool, keyLocks, nil, []string{}},
+
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.locksHandler(tt.args.conn, keyPostgresLocks, tt.args.params)
+			got, err := locksHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.locksHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if len(got.(string)) == 0 && err != errorCannotParseData {
+			if len(got.(string)) == 0 && err != errors.New("cannot parse data") {
 				t.Errorf("Plugin.locksHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

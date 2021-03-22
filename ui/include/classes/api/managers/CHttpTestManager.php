@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,30 +158,38 @@ class CHttpTestManager {
 			]);
 
 			$checkItemsUpdate = [];
-			$updateFields = [];
 			$itemids = [];
 			$dbCheckItems = DBselect(
-				'SELECT i.itemid,hi.type'.
+				'SELECT i.itemid,i.name,i.key_,hi.type'.
 				' FROM items i,httptestitem hi'.
 				' WHERE hi.httptestid='.zbx_dbstr($httptest['httptestid']).
 					' AND hi.itemid=i.itemid'
 			);
 			while ($checkitem = DBfetch($dbCheckItems)) {
 				$itemids[] = $checkitem['itemid'];
+				$update_fields = [];
 
-				if (isset($httptest['name'])) {
-					$updateFields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
+				$update_fields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
+				if ($update_fields['name'] === $checkitem['name']) {
+					unset($update_fields['name']);
+				}
+
+				$update_fields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
+				if ($update_fields['key_'] === $checkitem['key_']) {
+					unset($update_fields['key_']);
 				}
 
 				if (isset($httptest['status'])) {
-					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httptest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+					$update_fields['status'] = (HTTPTEST_STATUS_ACTIVE == $httptest['status'])
+						? ITEM_STATUS_ACTIVE
+						: ITEM_STATUS_DISABLED;
 				}
 				if (isset($httptest['delay'])) {
-					$updateFields['delay'] = $httptest['delay'];
+					$update_fields['delay'] = $httptest['delay'];
 				}
-				if (!empty($updateFields)) {
+				if (!empty($update_fields)) {
 					$checkItemsUpdate[] = [
-						'values' => $updateFields,
+						'values' => $update_fields,
 						'where' => ['itemid' => $checkitem['itemid']]
 					];
 				}
@@ -218,14 +226,6 @@ class CHttpTestManager {
 
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
 				}
-
-				// IF application ID was not set, use the ID from DB so new items can be linked.
-				if (!array_key_exists('applicationid', $httptest)) {
-					$httptest['applicationid'] = $db_httptest['applicationid'];
-				}
-				elseif (bccomp($httptest['applicationid'], $db_httptest['applicationid'])) {
-					unset($httptest['applicationid']);
-				}
 			}
 		}
 
@@ -245,32 +245,7 @@ class CHttpTestManager {
 				}
 			}
 			else {
-				if (isset($httptest['applicationid'])) {
-					$dbStepIds = DBfetchColumn(DBselect(
-						'SELECT i.itemid'.
-						' FROM items i'.
-							' INNER JOIN httpstepitem hi ON hi.itemid=i.itemid'.
-						' WHERE '.dbConditionInt('hi.httpstepid', zbx_objectValues($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid')))
-						, 'itemid'
-					);
-					$this->updateItemsApplications($dbStepIds, $httptest['applicationid']);
-				}
-
-				if (isset($httptest['status'])) {
-					$status = ($httptest['status'] == HTTPTEST_STATUS_ACTIVE) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-
-					$itemIds = DBfetchColumn(DBselect(
-						'SELECT hsi.itemid'.
-							' FROM httpstep hs,httpstepitem hsi'.
-							' WHERE hs.httpstepid=hsi.httpstepid'.
-								' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
-					), 'itemid');
-
-					DB::update('items', [
-						'values' => ['status' => $status],
-						'where' => ['itemid' => $itemIds]
-					]);
-				}
+				$this->updateStepItems($httptest, $db_httptests);
 			}
 		}
 
@@ -697,21 +672,21 @@ class CHttpTestManager {
 	protected function createHttpTestItems(array $http_test) {
 		$checkitems = [
 			[
-				'name'				=> 'Download speed for scenario "$1".',
+				'name'				=> $this->getTestName(HTTPSTEP_ITEM_TYPE_IN, $http_test['name']),
 				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_IN, $http_test['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'				=> 'Bps',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
 			],
 			[
-				'name'				=> 'Failed step of scenario "$1".',
+				'name'				=> $this->getTestName(HTTPSTEP_ITEM_TYPE_LASTSTEP, $http_test['name']),
 				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTSTEP, $http_test['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
 			],
 			[
-				'name'				=> 'Last error message of scenario "$1".',
+				'name'				=> $this->getTestName(HTTPSTEP_ITEM_TYPE_LASTERROR, $http_test['name']),
 				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTERROR, $http_test['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_STR,
 				'units'				=> '',
@@ -1013,21 +988,21 @@ class CHttpTestManager {
 
 			$stepitems = [
 				[
-					'name' => 'Download speed for step "$2" of scenario "$1".',
+					'name' => $this->getStepName(HTTPSTEP_ITEM_TYPE_IN, $http_test['name'], $webstep['name']),
 					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_IN, $http_test['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 'Bps',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
 				],
 				[
-					'name' => 'Response time for step "$2" of scenario "$1".',
+					'name' => $this->getStepName(HTTPSTEP_ITEM_TYPE_TIME, $http_test['name'], $webstep['name']),
 					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_TIME, $http_test['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 's',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
 				],
 				[
-					'name' => 'Response code for step "$2" of scenario "$1".',
+					'name' => $this->getStepName(HTTPSTEP_ITEM_TYPE_RSPCODE, $http_test['name'], $webstep['name']),
 					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_RSPCODE, $http_test['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'units' => '',
@@ -1101,16 +1076,6 @@ class CHttpTestManager {
 	protected function updateStepsReal($httpTest, $websteps) {
 		$item_key_parser = new CItemKey();
 
-		// get all used keys
-		$webstepids = zbx_objectValues($websteps, 'httpstepid');
-		$dbKeys = DBfetchArrayAssoc(DBselect(
-			'SELECT i.key_'.
-			' FROM items i,httpstepitem hi'.
-			' WHERE '.dbConditionInt('hi.httpstepid', $webstepids).
-				' AND hi.itemid=i.itemid')
-			, 'key_'
-		);
-
 		foreach ($websteps as &$webstep) {
 			if (array_key_exists('posts', $webstep)) {
 				if (is_array($webstep['posts'])) {
@@ -1134,15 +1099,16 @@ class CHttpTestManager {
 
 			// update item keys
 			$itemids = [];
-			$stepitemsUpdate = $updateFields = [];
+			$stepitems_update = [];
 			$dbStepItems = DBselect(
-				'SELECT i.itemid,i.key_,hi.type'.
+				'SELECT i.itemid,i.name,i.key_,hi.type'.
 				' FROM items i,httpstepitem hi'.
 				' WHERE hi.httpstepid='.zbx_dbstr($webstep['httpstepid']).
 					' AND hi.itemid=i.itemid'
 			);
 			while ($stepitem = DBfetch($dbStepItems)) {
 				$itemids[] = $stepitem['itemid'];
+				$update_fields = [];
 
 				if (isset($httpTest['name']) || isset($webstep['name'])) {
 					if (!isset($httpTest['name']) || !isset($webstep['name'])) {
@@ -1155,27 +1121,34 @@ class CHttpTestManager {
 						}
 					}
 
-					$updateFields['key_'] = $this->getStepKey($stepitem['type'], $httpTest['name'], $webstep['name']);
-				}
-				if (isset($dbKeys[$updateFields['key_']])) {
-					unset($updateFields['key_']);
+					$update_fields['name'] = $this->getStepName($stepitem['type'], $httpTest['name'], $webstep['name']);
+					if ($update_fields['name'] === $stepitem['name']) {
+						unset($update_fields['name']);
+					}
+
+					$update_fields['key_'] = $this->getStepKey($stepitem['type'], $httpTest['name'], $webstep['name']);
+					if ($update_fields['key_'] === $stepitem['key_']) {
+						unset($update_fields['key_']);
+					}
 				}
 				if (isset($httpTest['status'])) {
-					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+					$update_fields['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status'])
+						? ITEM_STATUS_ACTIVE
+						: ITEM_STATUS_DISABLED;
 				}
 				if (isset($httpTest['delay'])) {
-					$updateFields['delay'] = $httpTest['delay'];
+					$update_fields['delay'] = $httpTest['delay'];
 				}
-				if (!empty($updateFields)) {
-					$stepitemsUpdate[] = [
-						'values' => $updateFields,
+				if (!empty($update_fields)) {
+					$stepitems_update[] = [
+						'values' => $update_fields,
 						'where' => ['itemid' => $stepitem['itemid']]
 					];
 				}
 			}
 
-			if ($stepitemsUpdate) {
-				DB::update('items', $stepitemsUpdate);
+			if ($stepitems_update) {
+				DB::update('items', $stepitems_update);
 			}
 
 			if (array_key_exists('applicationid', $httpTest)) {
@@ -1184,6 +1157,70 @@ class CHttpTestManager {
 		}
 
 		$this->updateHttpStepFields($websteps, 'update');
+	}
+
+	/**
+	 * Update web items after changes in web scenario.
+	 * This should be used, when individual steps are not being updated.
+	 *
+	 * @param array $httptest
+	 * @param array $db_httptests
+	 */
+	protected function updateStepItems(array $httptest, array $db_httptests): void {
+		$has_applicationid = array_key_exists('applicationid', $httptest);
+		$has_status = array_key_exists('status', $httptest);
+		$has_name_changed = ($httptest['name'] !== $db_httptests[$httptest['httptestid']]['name']);
+
+		if (!$has_applicationid && !$has_status && !$has_name_changed) {
+			return;
+		}
+
+		$stepids = array_column($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid');
+
+		$stepitems = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid, hsi.httpstepid, hsi.type'.
+				' FROM items i,httpstepitem hsi'.
+				' WHERE i.itemid=hsi.itemid'.
+					' AND '.dbConditionInt('hsi.httpstepid', $stepids)
+		), 'itemid');
+
+		$stepitemids = array_keys($stepitems);
+
+		if ($has_applicationid) {
+			$this->updateItemsApplications($stepitemids, $httptest['applicationid']);
+		}
+
+		if ($has_status) {
+			$status = ($httptest['status'] == HTTPTEST_STATUS_ACTIVE)
+				? ITEM_STATUS_ACTIVE
+				: ITEM_STATUS_DISABLED;
+
+			DB::update('items', [
+				'values' => ['status' => $status],
+				'where' => ['itemid' => $stepitemids]
+			]);
+		}
+
+		if ($has_name_changed) {
+			$db_websteps = zbx_toHash($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid');
+			$stepitems_update = [];
+
+			foreach ($stepitems as $stepitem) {
+				$db_webstep = $db_websteps[$stepitem['httpstepid']];
+
+				$stepitems_update[] = [
+					'values' => [
+						'name' => $this->getStepName($stepitem['type'], $httptest['name'], $db_webstep['name']),
+						'key_' => $this->getStepKey($stepitem['type'], $httptest['name'], $db_webstep['name'])
+					],
+					'where' => ['itemid' => $stepitem['itemid']]
+				];
+			}
+
+			if ($stepitems_update) {
+				DB::update('items', $stepitems_update);
+			}
+		}
 	}
 
 	/**
@@ -1235,43 +1272,86 @@ class CHttpTestManager {
 	 * Get item key for test item.
 	 *
 	 * @param int    $type
-	 * @param string $testName
+	 * @param string $test_name
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
-	protected function getTestKey($type, $testName) {
+	protected function getTestKey(int $type, string $test_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'web.test.in['.quoteItemKeyParam($testName).',,bps]';
+				return 'web.test.in['.quoteItemKeyParam($test_name).',,bps]';
 			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-				return 'web.test.fail['.quoteItemKeyParam($testName).']';
+				return 'web.test.fail['.quoteItemKeyParam($test_name).']';
 			case HTTPSTEP_ITEM_TYPE_LASTERROR:
-				return 'web.test.error['.quoteItemKeyParam($testName).']';
+				return 'web.test.error['.quoteItemKeyParam($test_name).']';
 		}
 
-		return false;
+		return 'unknown';
+	}
+
+	/**
+	 * Get item name for test item.
+	 *
+	 * @param int    $type
+	 * @param string $test_name
+	 *
+	 * @return string
+	 */
+	protected function getTestName(int $type, string $test_name): string {
+		switch ($type) {
+			case HTTPSTEP_ITEM_TYPE_IN:
+				return 'Download speed for scenario "'.$test_name.'".';
+			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
+				return 'Failed step of scenario "'.$test_name.'".';
+			case HTTPSTEP_ITEM_TYPE_LASTERROR:
+				return 'Last error message of scenario "'.$test_name.'".';
+		}
+
+		return 'unknown';
 	}
 
 	/**
 	 * Get item key for step item.
 	 *
 	 * @param int    $type
-	 * @param string $testName
-	 * @param string $stepName
+	 * @param string $test_name
+	 * @param string $step_name
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
-	protected function getStepKey($type, $testName, $stepName) {
+	protected function getStepKey(int $type, string $test_name, string $step_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'web.test.in['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).',bps]';
+				return 'web.test.in['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).',bps]';
 			case HTTPSTEP_ITEM_TYPE_TIME:
-				return 'web.test.time['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).',resp]';
+				return 'web.test.time['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).',resp]';
 			case HTTPSTEP_ITEM_TYPE_RSPCODE:
-				return 'web.test.rspcode['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).']';
+				return 'web.test.rspcode['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).']';
 		}
 
-		return false;
+		return 'unknown';
+	}
+
+	/**
+	 * Get item name for step item.
+	 *
+	 * @param int    $type
+	 * @param string $test_name
+	 * @param string $step_name
+	 *
+	 * @return string
+	 */
+	protected function getStepName(int $type, string $test_name, string $step_name): string {
+		switch ($type) {
+			case HTTPSTEP_ITEM_TYPE_IN:
+				return 'Download speed for step "'.$step_name.'" of scenario "'.$test_name.'".';
+			case HTTPSTEP_ITEM_TYPE_TIME:
+				return 'Response time for step "'.$step_name.'" of scenario "'.$test_name.'".';
+			case HTTPSTEP_ITEM_TYPE_RSPCODE:
+				return 'Response code for step "'.$step_name.'" of scenario "'.$test_name.'".';
+		}
+
+		return 'unknown';
 	}
 
 	/**

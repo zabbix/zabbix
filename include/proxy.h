@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,10 @@
 
 #define ZBX_PROXY_DATA_DONE	0
 #define ZBX_PROXY_DATA_MORE	1
+
+#define ZBX_PROXY_UPLOAD_UNDEFINED	0
+#define ZBX_PROXY_UPLOAD_DISABLED	1
+#define ZBX_PROXY_UPLOAD_ENABLED	2
 
 int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);

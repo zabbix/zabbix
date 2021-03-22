@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,41 +21,35 @@ package oracle
 
 import (
 	"context"
-	"encoding/json"
+	"strings"
 
 	"zabbix.com/pkg/zbxerr"
 )
-
-const keySysMetrics = "oracle.sys.metrics"
-const sysMetricsMaxParams = 1
 
 const (
 	duration60sec = "2"
 	duration15sec = "3"
 )
 
-func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	var groupID = duration60sec
+func sysMetricsHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
+	var (
+		sysmetrics string
+		groupID    = duration60sec
+	)
 
-	if len(params) > sysMetricsMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
+	switch params["Duration"] {
+	case "15":
+		groupID = duration15sec
+	case "60":
+		groupID = duration60sec
+	default:
+		return nil, zbxerr.ErrorInvalidParams
 	}
 
-	if len(params) == 1 {
-		switch params[0] {
-		case "15":
-			groupID = duration15sec
-		case "60":
-			groupID = duration60sec
-		default:
-			return nil, zbxerr.ErrorInvalidParams
-		}
-	}
-
-	rows, err := conn.Query(ctx, `
+	row, err := conn.QueryRow(ctx, `
 		SELECT
-			METRIC_NAME AS METRIC,
-			ROUND(VALUE, 3) AS VALUE
+			JSON_OBJECTAGG(METRIC_NAME VALUE ROUND(VALUE, 3) RETURNING CLOB)
 		FROM
 			V$SYSMETRIC
 		WHERE
@@ -64,26 +58,16 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	defer rows.Close()
 
-	var metric, value string
-
-	res := make(map[string]string)
-
-	for rows.Next() {
-		err = rows.Scan(&metric, &value)
-		if err != nil {
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
-		}
-
-		res[metric] = value
-	}
-
-	// Manually marshall JSON due to get around the problem with VARCHAR2 limit (ORA-40478, maximum: 4000)
-	jsonRes, err := json.Marshal(res)
+	err = row.Scan(&sysmetrics)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	return string(jsonRes), nil
+	// Add leading zeros for floats: ".03" -> "0.03".
+	// Oracle JSON functions are not RFC 4627 compliant.
+	// There should be a better way to do that, but I haven't come up with it ¯\_(ツ)_/¯
+	sysmetrics = strings.ReplaceAll(sysmetrics, "\":.", "\":0.")
+
+	return sysmetrics, nil
 }

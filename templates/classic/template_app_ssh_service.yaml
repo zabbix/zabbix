@@ -1,0 +1,42 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:13Z'
+  groups:
+    -
+      name: Templates/Modules
+  templates:
+    -
+      template: 'SSH Service'
+      name: 'SSH Service'
+      groups:
+        -
+          name: Templates/Modules
+      applications:
+        -
+          name: 'SSH service'
+      items:
+        -
+          name: 'SSH service is running'
+          type: SIMPLE
+          key: 'net.tcp.service[ssh]'
+          history: 1w
+          applications:
+            -
+              name: 'SSH service'
+          valuemap:
+            name: 'Service state'
+          triggers:
+            -
+              expression: '{max(#3)}=0'
+              name: 'SSH service is down on {HOST.NAME}'
+              priority: AVERAGE
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

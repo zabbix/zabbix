@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,16 +29,29 @@
 </script>
 
 <script type="text/javascript">
-	jQuery(function($) {
-		$('#tags-table')
-			.dynamicRows({template: '#tag-row-tmpl'})
-			.on('click', 'button.element-table-add', function() {
-				$('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-			})
-			.on('click', 'button.element-table-disable', function() {
-				var tag_id = $(this).attr('id').split('_')[1];
+	jQuery(function() {
+		let tags_initialized = false;
 
-				$('#tags_' + tag_id + '_type').val(<?= ZBX_PROPERTY_INHERITED ?>);
-			});
+		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
+			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+
+			if ($panel.attr('id') === 'tags-tab') {
+				if (tags_initialized) {
+					return;
+				}
+
+				const $table = $('#tags-table');
+
+				$table
+					.dynamicRows({template: '#tag-row-tmpl'})
+					.on('afteradd.dynamicRows', function() {
+						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
+					})
+					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+					.textareaFlexible();
+
+				tags_initialized = true;
+			}
+		});
 	});
 </script>

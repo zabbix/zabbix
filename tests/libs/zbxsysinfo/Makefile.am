@@ -140,9 +140,9 @@ process_WRAP_FUNCS = \
 
 process_LDADD += @AGENT_LIBS@
 
-process_LDFLAGS = @AGENT_LDFLAGS@
+process_LDFLAGS = @AGENT_LDFLAGS@ $(process_WRAP_FUNCS)
 
-process_CFLAGS = $(process_WRAP_FUNCS) -DZABBIX_DAEMON -I@top_srcdir@/tests
+process_CFLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
 
 # check_key_access_rules
 

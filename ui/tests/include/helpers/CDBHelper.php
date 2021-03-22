@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,6 +189,11 @@ class CDBHelper {
 		}
 
 		if (in_array($top_table, $tables)) {
+			return;
+		}
+
+		if (substr($top_table, 0, 1) === '!') {
+			$tables[] = substr($top_table, 1);
 			return;
 		}
 
@@ -466,7 +471,7 @@ class CDBHelper {
 							'values' => [
 								'r_eventid' => $fields['eventid'],
 								'r_clock' => $fields['clock'],
-								'r_ns' => $fields['ns'],
+								'r_ns' => $fields['ns']
 							],
 							'where' => ['eventid' => array_column($problems, 'eventid')]
 						]);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
-	->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
+	->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
 
 $form = (new CForm())
 	->setName('item_prototype_form')
@@ -41,50 +41,29 @@ $item_form_list = (new CFormList('item-form-list'))
 			->setLabel(_('Type'))
 			->setChecked(array_key_exists('type', $data['visible']))
 			->setAttribute('autofocus', 'autofocus'),
-		new CComboBox('type', $data['type'], null, $data['itemTypes'])
+		(new CSelect('type'))
+			->setId('type')
+			->setValue($data['type'])
+			->addOptions(CSelect::createOptionsFromArray($data['itemTypes']))
 	);
 
 // Add interfaces if mass updating item prototypes on host level.
 if ($data['display_interfaces']) {
-	$interfaces_combo_box = new CComboBox('interfaceid', $data['interfaceid']);
-	$interfaces_combo_box->addItem(new CComboItem(0, '', false, false));
-
-	// Set up interface groups sorted by priority.
-	$interface_types = zbx_objectValues($data['hosts']['interfaces'], 'type');
-	$interface_groups = [];
-
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		if (in_array($interface_type, $interface_types)) {
-			$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
-		}
-	}
-
-	// Add interfaces to groups.
-	foreach ($data['hosts']['interfaces'] as $interface) {
-		$option = new CComboItem(
-			$interface['interfaceid'],
-			$interface['useip']
-				? $interface['ip'].' : '.$interface['port']
-				: $interface['dns'].' : '.$interface['port'],
-			($interface['interfaceid'] == $data['interfaceid'])
-		);
-		$option->setAttribute('data-interfacetype', $interface['type']);
-		$interface_groups[$interface['type']]->addItem($option);
-	}
-	foreach ($interface_groups as $interface_group) {
-		$interfaces_combo_box->addItem($interface_group);
-	}
-
-	$span = (new CSpan(_('No interface found')))
-		->addClass(ZBX_STYLE_RED)
-		->setId('interface_not_defined')
-		->addStyle('display: none;');
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
 			->setChecked(array_key_exists('interfaceid', $data['visible']))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
-		(new CDiv([$interfaces_combo_box, $span]))->setId('interfaceDiv'),
+		(new CDiv([
+			getInterfaceSelect($data['hosts']['interfaces'])
+				->setId('interface-select')
+				->setValue($data['interfaceid'])
+				->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE),
+			(new CSpan(_('No interface found')))
+				->addClass(ZBX_STYLE_RED)
+				->setId('interface_not_defined')
+				->addStyle('display: none;')
+		]))->setId('interfaceDiv'),
 		'interface_row'
 	);
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
@@ -118,6 +97,12 @@ $item_form_list
 				->addValue(_('XML data'), ZBX_POSTTYPE_XML)
 				->setModern(true)
 		))->setId('post_type_container')
+	)
+	->addRow(
+		(new CVisibilityBox('visible[timeout]', 'timeout', _('Original')))
+			->setLabel(_('Timeout'))
+			->setChecked(array_key_exists('timeout', $data['visible'])),
+		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	// Append "Request body" field (optional) for item prototype type "ITEM_TYPE_HTTPAGENT".
 	->addRow(
@@ -182,13 +167,16 @@ $item_form_list
 		(new CVisibilityBox('visible[value_type]', 'value_type', _('Original')))
 			->setLabel(_('Type of information'))
 			->setChecked(array_key_exists('value_type', $data['visible'])),
-		new CComboBox('value_type', $data['value_type'], null, [
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		])
+		(new CSelect('value_type'))
+			->setId('value_type')
+			->setValue($data['value_type'])
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
 	)
 	// Append units to form list.
 	->addRow(
@@ -202,17 +190,22 @@ $item_form_list
 		(new CVisibilityBox('visible[authtype]', 'authtype', _('Original')))
 			->setLabel(_('Authentication method'))
 			->setChecked(array_key_exists('authtype', $data['visible'])),
-		new CComboBox('authtype', $data['authtype'], null, [
-			ITEM_AUTHTYPE_PASSWORD => _('Password'),
-			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-		])
+		(new CSelect('authtype'))
+			->setId('authtype')
+			->setValue($data['authtype'])
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_AUTHTYPE_PASSWORD => _('Password'),
+				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+			]))
 	)
 	// Append username to form list.
 	->addRow(
 		(new CVisibilityBox('visible[username]', 'username', _('Original')))
 			->setLabel(_('User name'))
 			->setChecked(array_key_exists('username', $data['visible'])),
-		(new CTextBox('username', $data['username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('username', $data['username']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete()
 	)
 	// Append publickey to form list.
 	->addRow(
@@ -233,7 +226,9 @@ $item_form_list
 		(new CVisibilityBox('visible[password]', 'password', _('Original')))
 			->setLabel(_('Password'))
 			->setChecked(array_key_exists('password', $data['visible'])),
-		(new CTextBox('password', $data['password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('password', $data['password']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete()
 	);
 
 // Create preprocessing form list.
@@ -356,19 +351,17 @@ $item_form_list
 			->setId('trends_div')
 	);
 
-	// Append status (create enabled) to form list.
-$status_combo_box = new CComboBox('status', $data['status']);
-
-foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
-	$status_combo_box->addItem($status, item_status2str($status));
-}
-
 $item_form_list
+	// Append status (create enabled) to form list.
 	->addRow(
 		(new CVisibilityBox('visible[status]', 'status', _('Original')))
 			->setLabel(_('Create enabled'))
 			->setChecked(array_key_exists('status', $data['visible'])),
-		$status_combo_box
+		(new CSelect('status'))
+			->setId('status')
+			->setValue($data['status'])
+			->addOption(new CSelectOption(ITEM_STATUS_ACTIVE, item_status2str(ITEM_STATUS_ACTIVE)))
+			->addOption(new CSelectOption(ITEM_STATUS_DISABLED, item_status2str(ITEM_STATUS_DISABLED)))
 	)
 	->addRow(
 		(new CVisibilityBox('visible[discover]', 'discover', _('Original')))
@@ -388,11 +381,13 @@ $item_form_list
 	);
 
 // append valuemap to form list
-$valuemaps_combo_box = new CComboBox('valuemapid', $data['valuemapid']);
-$valuemaps_combo_box->addItem(0, _('As is'));
+$valuemaps_select = (new CSelect('valuemapid'))
+	->setId('valuemapid')
+	->setValue($data['valuemapid'])
+	->addOption(new CSelectOption(0, _('As is')));
 
 foreach ($data['valuemaps'] as $valuemap) {
-	$valuemaps_combo_box->addItem($valuemap['valuemapid'], $valuemap['name']);
+	$valuemaps_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }
 
 $item_form_list
@@ -400,7 +395,7 @@ $item_form_list
 		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
 			->setLabel(_('Show value'))
 			->setChecked(array_key_exists('valuemapid', $data['visible'])),
-		(new CDiv([$valuemaps_combo_box, ' ',
+		(new CDiv([$valuemaps_select, ' ',
 			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 				->getUrl()
@@ -533,7 +528,7 @@ $item_form_list
 			->setChecked(array_key_exists('master_itemid', $data['visible'])),
 		(new CDiv([
 			(new CVar('master_itemname')),
-			$master_item,
+			$master_item
 		]))->setId('master_item')
 	)
 	// Append description to form list.
@@ -562,6 +557,13 @@ if (!hasRequest('massupdate')) {
 $form->addItem($tabs);
 
 $widget->addItem($form);
+
+$interface_ids_by_types = [];
+if ($data['display_interfaces']) {
+	foreach ($data['hosts']['interfaces'] as $interface) {
+		$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+	}
+}
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ class CIPRangeParser {
 			$this->user_macro_parser = new CUserMacroParser();
 		}
 		if ($this->options['macros']) {
-			$this->macro_parser = new CMacroParser($this->options['macros']);
+			$this->macro_parser = new CMacroParser(['macros' => $this->options['macros']]);
 		}
 	}
 

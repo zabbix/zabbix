@@ -1,0 +1,489 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:42Z'
+  groups:
+    -
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      template: 'IBM IMM SNMP'
+      name: 'IBM IMM SNMP'
+      description: |
+        Template Server IBM IMM
+        
+        MIBs used:
+        IMM-MIB
+        
+        Known Issues:
+        
+          Description: Some IMMs (IMM1) do not return disks
+          Version: IMM1
+          Device: IBM x3250M3
+        
+          Description: Some IMMs (IMM1) do not return fan status: fanHealthStatus
+          Version: IMM1
+          Device: IBM x3250M3
+        
+          Description: IMM1 servers (M2, M3 generations) sysObjectID is NET-SNMP-MIB::netSnmpAgentOIDs.10
+          Version: IMM1
+          Device: IMM1 servers (M2,M3 generations)
+        
+          Description: IMM1 servers (M2, M3 generations) only Ambient temperature sensor available
+          Version: IMM1
+          Device: IMM1 servers (M2,M3 generations)
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'Generic SNMP'
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      applications:
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: 'Physical disks'
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+      items:
+        -
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2.3.51.3.1.5.2.1.5.0
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: IMM-MIB'
+          inventory_link: MODEL
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2.3.51.3.1.5.2.1.3.0
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IMM-MIB
+            Machine serial number VPD information
+          inventory_link: SERIALNO_A
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Overall system health status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2.3.51.3.1.4.1.0
+          key: 'system.status[systemHealthStat.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          description: |
+            MIB: IMM-MIB
+            Indicates status of system health for the system in which the IMM resides. Value of 'nonRecoverable' indicates a severe error has occurred and the system may not be functioning. A value of 'critical' indicates that a error has occurred but the system is currently functioning properly. A value of 'nonCritical' indicates that a condition has occurred that may change the state of the system in the future but currently the system is working properly. A value of 'normal' indicates that the system is operating normally.
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'IMM-MIB::systemHealthStat'
+          triggers:
+            -
+              expression: '{count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1'
+              name: 'System is in unrecoverable state!'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check the device for faults'
+            -
+              expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+              name: 'System status is in critical state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check the device for errors'
+              dependencies:
+                -
+                  name: 'System is in unrecoverable state!'
+                  expression: '{IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1'
+            -
+              expression: '{count(#1,{$HEALTH_WARN_STATUS},eq)}=1'
+              name: 'System status is in warning state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Please check the device for warnings'
+              dependencies:
+                -
+                  name: 'System is in unrecoverable state!'
+                  expression: '{IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1'
+                -
+                  name: 'System status is in critical state'
+                  expression: '{IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+      discovery_rules:
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#FAN_DESCR},1.3.6.1.4.1.2.3.51.3.1.3.2.1.2]'
+          key: fan.discovery
+          delay: 1h
+          description: 'IMM-MIB::fanDescr'
+          item_prototypes:
+            -
+              name: '{#FAN_DESCR}: Fan speed, %'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2.3.51.3.1.3.2.1.3.{#SNMPINDEX}'
+              key: 'sensor.fan.speed.percentage[fanSpeed.{#SNMPINDEX}]'
+              units: '%'
+              description: |
+                MIB: IMM-MIB
+                Fan speed expressed in percent(%) of maximum RPM.
+                An octet string expressed as 'ddd% of maximum' where:d is a decimal digit or blank space for a leading zero.
+                If the fan is determined not to be running or the fan speed cannot be determined, the string will indicate 'Offline'.
+              applications:
+                -
+                  name: Fans
+              preprocessing:
+                -
+                  type: REGEX
+                  parameters:
+                    - '(\d{1,3}) *%( of maximum)?'
+                    - \1
+            -
+              name: '{#FAN_DESCR}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2.3.51.3.1.3.2.1.10.{#SNMPINDEX}'
+              key: 'sensor.fan.status[fanHealthStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IMM-MIB
+                A description of the fan component status.
+              applications:
+                -
+                  name: Fans
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
+                  name: '{#FAN_DESCR}: Fan is not in normal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Please check the fan unit'
+        -
+          name: 'Physical Disk Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2.3.51.3.1.12.2.1.1]'
+          key: physicalDisk.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#SNMPINDEX}: Physical disk part number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2.3.51.3.1.12.2.1.2.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.part_number[diskFruName.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IMM-MIB
+                disk module FRU name.
+              applications:
+                -
+                  name: 'Physical disks'
+            -
+              name: '{#SNMPINDEX}: Physical disk status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2.3.51.3.1.12.2.1.3.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.status[diskHealthStatus.{#SNMPINDEX}]'
+              delay: 3m
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: IMM-MIB'
+              applications:
+                -
+                  name: 'Physical disks'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_OK_STATUS},ne)}=1'
+                  name: '{#SNMPINDEX}: Physical disk is not in OK state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check physical disk for warnings or errors'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#PSU_DESCR},1.3.6.1.4.1.2.3.51.3.1.11.2.1.2]'
+          key: psu.discovery
+          delay: 1h
+          description: 'IMM-MIB::powerFruName'
+          item_prototypes:
+            -
+              name: '{#PSU_DESCR}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2.3.51.3.1.11.2.1.6.{#SNMPINDEX}'
+              key: 'sensor.psu.status[powerHealthStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IMM-MIB
+                A description of the power module status.
+              applications:
+                -
+                  name: 'Power supply'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
+                  name: '{#PSU_DESCR}: Power supply is not in normal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Please check the power supply unit for errors'
+        -
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2.3.51.3.1.1.2.1.2]'
+          key: tempDescr.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '(DIMM|PSU|PCH|RAID|RR|PCI).*'
+                formulaid: A
+          description: 'Scanning IMM-MIB::tempTable'
+          item_prototypes:
+            -
+              name: '{#SNMPVALUE}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2.3.51.3.1.1.2.1.3.{#SNMPINDEX}'
+              key: 'sensor.temp.value[tempReading.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: IMM-MIB
+                Temperature readings of testpoint: {#SNMPVALUE}
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                      expression: '{IBM IMM SNMP:sensor.temp.value[tempReading.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
+                      recovery_expression: '{IBM IMM SNMP:sensor.temp.value[tempReading.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temperature Discovery Ambient'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2.3.51.3.1.1.2.1.2]'
+          key: tempDescr.discovery.ambient
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: 'Ambient.*'
+                formulaid: A
+          description: 'Scanning IMM-MIB::tempTable with Ambient filter'
+          item_prototypes:
+            -
+              name: 'Ambient: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2.3.51.3.1.1.2.1.3.{#SNMPINDEX}'
+              key: 'sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: IMM-MIB
+                Temperature readings of testpoint: Ambient
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                  name: 'Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Ambient"}-3'
+                  name: 'Ambient: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                      expression: '{IBM IMM SNMP:sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                      recovery_expression: '{IBM IMM SNMP:sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Ambient"}+3'
+                  name: 'Ambient: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temperature Discovery CPU'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2.3.51.3.1.1.2.1.2]'
+          key: tempDescr.discovery.cpu
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: 'CPU [0-9]* Temp'
+                formulaid: A
+          description: 'Scanning IMM-MIB::tempTable with CPU filter'
+          item_prototypes:
+            -
+              name: 'CPU: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2.3.51.3.1.1.2.1.3.{#SNMPINDEX}'
+              key: 'sensor.temp.value[tempReading.CPU.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: IMM-MIB
+                Temperature readings of testpoint: CPU
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"CPU"}-3'
+                  name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"CPU"}-3'
+                  name: 'CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                      expression: '{IBM IMM SNMP:sensor.temp.value[tempReading.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: '{IBM IMM SNMP:sensor.temp.value[tempReading.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+      macros:
+        -
+          macro: '{$DISK_OK_STATUS}'
+          value: Normal
+        -
+          macro: '{$FAN_OK_STATUS}'
+          value: Normal
+        -
+          macro: '{$HEALTH_CRIT_STATUS}'
+          value: '2'
+        -
+          macro: '{$HEALTH_DISASTER_STATUS}'
+          value: '0'
+        -
+          macro: '{$HEALTH_WARN_STATUS}'
+          value: '4'
+        -
+          macro: '{$PSU_OK_STATUS}'
+          value: Normal
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT:"Ambient"}'
+          value: '35'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN:"Ambient"}'
+          value: '30'
+  value_maps:
+    -
+      name: 'IMM-MIB::systemHealthStat'
+      mappings:
+        -
+          value: '0'
+          newvalue: nonRecoverable
+        -
+          value: '2'
+          newvalue: critical
+        -
+          value: '4'
+          newvalue: nonCritical
+        -
+          value: '255'
+          newvalue: normal

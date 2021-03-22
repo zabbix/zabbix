@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					],
+					]
 				],
 				'((({host:item.regexp(a)})<>0) or (({host:item.regexp(b)})<>0))'
 			],
@@ -102,7 +102,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				],
 				'(({host:item.regexp(a)})=0) and (({host:item.regexp(b)})=0)'
 			],
@@ -117,7 +117,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(с) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					],
+					]
 				],
 				'((({host:item.regexp(a)})<>0 and ({host:item.regexp(b)})<>0) or (({host:item.regexp(с)})<>0 or ({host:item.regexp(d)})<>0))'
 			],
@@ -132,7 +132,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(c) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				],
 				'(({host:item.regexp(a)})=0 and ({host:item.regexp(b)})=0) and (({host:item.regexp(c)})=0 or ({host:item.regexp(d)})=0)'
 			],
@@ -227,7 +227,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'not regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					],
+					]
 				],
 				'(((not {host:item.regexp(a)})<>0) or ((not {host:item.regexp(b)})<>0))'
 			],
@@ -288,10 +288,10 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => '- regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					],
+					]
 				],
 				'(((-{host:item.regexp(a)})<>0) or ((-{host:item.regexp(b)})<>0))'
-			],
+			]
 		];
 	}
 
@@ -357,7 +357,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				]
 			],
 			[
@@ -370,7 +370,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				]
 			],
 			[
@@ -383,7 +383,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				]
 			],
 			[
@@ -396,7 +396,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(b) and regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				]
 			],
 			[
@@ -413,7 +413,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				]
 			],
 			[
@@ -426,7 +426,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(c) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				]
 			],
 			[
@@ -443,7 +443,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 					[
 						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					],
+					]
 				]
 			],
 
@@ -530,7 +530,7 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
 					]
 				]
-			],
+			]
 		];
 	}
 

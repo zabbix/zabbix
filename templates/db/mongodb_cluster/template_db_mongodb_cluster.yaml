@@ -1,0 +1,1357 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-03-16T09:51:01Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'MongoDB cluster by Zabbix Agent 2'
+      name: 'MongoDB cluster by Zabbix Agent 2'
+      description: |
+        Get MongoDB metrics from plugin for the zabbix-agent2.
+          1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.
+          2. Set the {$MONGODB.CONNSTRING} such as <protocol(host:port)> or named session.
+          3. Set the user name and password in host macros ({$MONGODB.USER}, {$MONGODB.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.
+        
+          All sharded Mongodb nodes (mongod) will be discovered with attached template "MongoDB node".
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: 'MongoDB sharded cluster'
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'MongoDB cluster: Configserver heartbear'
+          type: DEPENDENT
+          key: mongodb.config_server_heartbit
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  data = JSON.parse(value)
+                  return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTime.ts)/Math.pow(2,32);
+                  
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Connections, active'
+          type: DEPENDENT
+          key: mongodb.connections.active
+          delay: '0'
+          history: 7d
+          description: |
+            "The number of active client connections to the server. 
+            Active client connections refers to client connections that currently have operations in progress.
+            Available starting in  4.0.7, 0 for older versions."
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connections.active
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Connections, available'
+          type: DEPENDENT
+          key: mongodb.connections.available
+          delay: '0'
+          history: 7d
+          description: '"The number of unused incoming connections available."'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connections.available
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{max(5m)}<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+              name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+              priority: WARNING
+              description: |
+                "Too few available connections.
+                Consider this value in combination with the value of connections current to understand the connection load on the database"
+        -
+          name: 'MongoDB cluster: Connections, current'
+          type: DEPENDENT
+          key: mongodb.connections.current
+          delay: '0'
+          history: 7d
+          description: |
+            "The number of incoming connections from clients to the database server. 
+            This number includes the current shell session"
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connections.current
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: New connections, rate'
+          type: DEPENDENT
+          key: mongodb.connections.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: '"Rate of all incoming connections created to the server."'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connections.totalCreated
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Connection pool: available'
+          type: DEPENDENT
+          key: mongodb.connection_pool.available
+          delay: '0'
+          history: 7d
+          description: 'The total number of available outgoing connections from the current mongos instance to other members of the sharded cluster.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.totalAvailable
+          master_item:
+            key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Connection pool: client connections'
+          type: DEPENDENT
+          key: mongodb.connection_pool.client
+          delay: '0'
+          history: 7d
+          description: 'The number of active and stored outgoing synchronous connections from the current mongos instance to other members of the sharded cluster.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.numClientConnections
+          master_item:
+            key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Connection pool: created, rate'
+          type: DEPENDENT
+          key: mongodb.connection_pool.created.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The total number of outgoing connections created per second by the current mongos instance to other members of the sharded cluster.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.totalCreated
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Connection pool: in use'
+          type: DEPENDENT
+          key: mongodb.connection_pool.in_use
+          delay: '0'
+          history: 7d
+          description: 'Reports the total number of outgoing connections from the current mongos instance to other members of the sharded cluster set that are currently in use.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.totalInUse
+          master_item:
+            key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Connection pool: refreshing'
+          type: DEPENDENT
+          key: mongodb.connection_pool.refreshing
+          delay: '0'
+          history: 7d
+          description: 'Reports the total number of outgoing connections from the current mongos instance to other members of the sharded cluster that are currently being refreshed.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.totalRefreshing
+          master_item:
+            key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Connection pool: scoped'
+          type: DEPENDENT
+          key: mongodb.connection_pool.scoped
+          delay: '0'
+          history: 7d
+          description: 'Number of active and stored outgoing scoped synchronous connections from the current mongos instance to other members of the sharded cluster.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.numAScopedConnections
+          master_item:
+            key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Get mongodb.connpool.stats'
+          key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns current info about connpool.stats.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MongoDB cluster: Cursor: open pinned'
+          type: DEPENDENT
+          key: mongodb.cursor.open.pinned
+          delay: '0'
+          history: 7d
+          description: 'Number of pinned open cursors.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cursor.open.pinned
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Cursor: open total'
+          type: DEPENDENT
+          key: mongodb.cursor.open.total
+          delay: '0'
+          history: 7d
+          description: 'Number of cursors that MongoDB is maintaining for clients.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cursor.open.total
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+              name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
+              priority: WARNING
+        -
+          name: 'MongoDB cluster: Cursor: timed out, rate'
+          type: DEPENDENT
+          key: mongodb.cursor.timed_out.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of cursors that time out, per second.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cursor.timedOut
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+              name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
+              priority: WARNING
+        -
+          name: 'MongoDB cluster: Jumbo chunks'
+          key: 'mongodb.jumbo_chunks.count["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          history: 7d
+          description: 'Total number of ''jumbo'' chunks in the mongo cluster.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+        -
+          name: 'MongoDB cluster: Last seen configserver'
+          type: DEPENDENT
+          key: mongodb.last_seen_config_server
+          delay: '0'
+          history: 7d
+          units: unixtime
+          description: 'The latest optime of the CSRS primary that the mongos has seen.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  data = JSON.parse(value)
+                  return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
+                  
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Architecture'
+          type: DEPENDENT
+          key: mongodb.mem.bits
+          delay: '0'
+          history: 7d
+          units: bit
+          description: 'A number, either 64 or 32, that indicates whether the MongoDB instance is compiled for 64-bit or 32-bit architecture.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mem.bits
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Memory: resident'
+          type: DEPENDENT
+          key: mongodb.mem.resident
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Amount of memory currently used by the database process.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mem.resident
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Memory: virtual'
+          type: DEPENDENT
+          key: mongodb.mem.virtual
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Amount of virtual memory used by the mongos process.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mem.virtual
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Cursor: open no timeout'
+          type: DEPENDENT
+          key: mongodb.metrics.cursor.open.no_timeout
+          delay: '0'
+          history: 7d
+          description: 'Number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout after a period of inactivity.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cursor.open.noTimeout
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Bytes in, rate'
+          type: DEPENDENT
+          key: mongodb.network.bytes_in.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The total number of bytes that the server has received over network connections initiated by clients or other mongod/mongos instances per second.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.network.bytesIn
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Bytes out, rate'
+          type: DEPENDENT
+          key: mongodb.network.bytes_out.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The total number of bytes that the server has sent over network connections initiated by clients or other mongod/mongos instances per second.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.network.bytesOut
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Requests, rate'
+          type: DEPENDENT
+          key: mongodb.network.numRequests.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!Rps'
+          description: 'Number of distinct requests that the server has received per second'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.network.numRequests
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Operations: command'
+          type: DEPENDENT
+          key: mongodb.opcounters.command.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            "The number of commands issued to the database per second.
+            Counts all commands except the write commands: insert, update, and delete."
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.command
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Operations: delete'
+          type: DEPENDENT
+          key: mongodb.opcounters.delete.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: '"The number of delete operations the mongos instance per second."'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.delete
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Operations: getmore, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.getmore.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            "The number of “getmore” operations the mongos per second. This counter can be high even if the query count is low.
+            Secondary nodes send getMore operations as part of the replication process."
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.getmore
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Operations: insert, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.insert.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: '"The number of insert operations received the mongos instance per second."'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.insert
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Operations: query, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.query.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: '"The number of queries received the mongos instance per second."'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.query
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Operations: update, rate'
+          type: DEPENDENT
+          key: mongodb.opcounters.update.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: '"The number of update operations the mongos instance per second."'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.opcounters.update
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+        -
+          name: 'MongoDB cluster: Ping'
+          key: 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          delay: 30s
+          history: 7d
+          description: 'Test if a connection is alive or not.'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
+              priority: HIGH
+              description: 'Connection to mongos proxy instance is currently unavailable.'
+        -
+          name: 'MongoDB cluster: Get server status'
+          key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The mongos statistic'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MongoDB cluster: Uptime'
+          type: DEPENDENT
+          key: mongodb.uptime
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'Number of seconds since Mongos server start'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.uptime
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{nodata(10m)}=1'
+              name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
+                  expression: '{MongoDB cluster by Zabbix Agent 2:mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"].last()}=0'
+            -
+              expression: '{last()}<10m'
+              name: 'MongoDB cluster: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'MongoDB cluster: Mongos version'
+          type: DEPENDENT
+          key: mongodb.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the Mongos server'
+          applications:
+            -
+              name: 'MongoDB sharded cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'MongoDB cluster version has changed. Ack to close.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Config servers discovery'
+          key: 'mongodb.cfg.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          delay: 30m
+          description: 'Discovery shared cluster config servers.'
+          host_prototypes:
+            -
+              host: '{#HOSTNAME}'
+              name: '{#HOSTNAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Databases
+              group_prototypes:
+                -
+                  name: 'MongoDB sharded cluster/{#REPLICASET}'
+              templates:
+                -
+                  name: 'MongoDB node by Zabbix Agent 2'
+              macros:
+                -
+                  macro: '{$MONGODB.CONNSTRING}'
+                  value: '{#MONGOD_URI}'
+                  description: 'Connection string in the URI format (password is not used).'
+        -
+          name: 'Collection discovery'
+          key: 'mongodb.collections.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          delay: 30m
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DBNAME}'
+                value: '{$MONGODB.LLD.FILTER.DB.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#DBNAME}'
+                value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#COLLECTION}'
+                value: '{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#COLLECTION}'
+                value: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Collect collections metrics.'
+          item_prototypes:
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, avg size'
+              type: DEPENDENT
+              key: 'mongodb.collection.avg_obj_size["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The size of the average object in the collection in bytes.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.avgObjSize
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped'
+              type: DEPENDENT
+              key: 'mongodb.collection.capped["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Whether or not the collection is capped.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+              valuemap:
+                name: 'MongoDB flag'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.capped
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, count'
+              type: DEPENDENT
+              key: 'mongodb.collection.count["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of objects in the collection.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.count
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped, max number'
+              type: DEPENDENT
+              key: 'mongodb.collection.max["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Maximum number of documents in a capped collection.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.max
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped, max size'
+              type: DEPENDENT
+              key: 'mongodb.collection.max_size["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Maximum size of a capped collection in bytes.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.maxSize
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Indexes'
+              type: DEPENDENT
+              key: 'mongodb.collection.nindexes["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of indices on the collection.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.nindexes
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Size'
+              type: DEPENDENT
+              key: 'mongodb.collection.size["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The total size in bytes of the data in the collection plus the size of every indexes on the mongodb.collection.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.size
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Get collection stats {#DBNAME}.{#COLLECTION}'
+              key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Returns a variety of storage statistics for a given collection.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MongoDB {#DBNAME}.{#COLLECTION}: Storage size'
+              type: DEPENDENT
+              key: 'mongodb.collection.storage_size["{#DBNAME}","{#COLLECTION}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total storage space allocated to this collection for document storage.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageSize
+              master_item:
+                key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
+        -
+          name: 'Database discovery'
+          key: 'mongodb.db.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          delay: 30m
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DBNAME}'
+                value: '{$MONGODB.LLD.FILTER.DB.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#DBNAME}'
+                value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Collect database metrics.'
+          item_prototypes:
+            -
+              name: 'MongoDB {#DBNAME}: Size, data'
+              type: DEPENDENT
+              key: 'mongodb.db.data_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total size of the data held in this database including the padding factor.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.dataSize
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Extents'
+              type: DEPENDENT
+              key: 'mongodb.db.extents["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Contains a count of the number of extents in the database across all collections.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.numExtents
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Size, file'
+              type: DEPENDENT
+              key: 'mongodb.db.file_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total size of the data held in this database including the padding factor (only available with the mmapv1 storage engine).'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileSize
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Size, index'
+              type: DEPENDENT
+              key: 'mongodb.db.index_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total size of all indexes created on this database.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.indexSize
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Objects, count'
+              type: DEPENDENT
+              key: 'mongodb.db.objects["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of objects (documents) in the database across all collections.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.objects
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Objects, avg size'
+              type: DEPENDENT
+              key: 'mongodb.db.size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The average size of each document in bytes.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.avgObjSize
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'MongoDB {#DBNAME}: Get db stats {#DBNAME}'
+              key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Returns statistics reflecting the database system’s state.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MongoDB {#DBNAME}: Size, storage'
+              type: DEPENDENT
+              key: 'mongodb.db.storage_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total amount of space allocated to collections in this database for document storage.'
+              application_prototypes:
+                -
+                  name: 'MongoDB sharded cluster: {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageSize
+              master_item:
+                key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
+          graph_prototypes:
+            -
+              name: 'MongoDB {#DBNAME}: Disk usage'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    key: 'mongodb.db.index_size["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    key: 'mongodb.db.storage_size["{#DBNAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    key: 'mongodb.db.file_size["{#DBNAME}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    key: 'mongodb.db.data_size["{#DBNAME}"]'
+        -
+          name: 'Shards discovery'
+          key: 'mongodb.sh.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
+          delay: 30m
+          description: 'Discovery shared cluster hosts.'
+          host_prototypes:
+            -
+              host: '{#HOSTNAME}'
+              name: '{#HOSTNAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Databases
+              group_prototypes:
+                -
+                  name: 'MongoDB sharded cluster/{#ID}'
+              templates:
+                -
+                  name: 'MongoDB node by Zabbix Agent 2'
+              macros:
+                -
+                  macro: '{$MONGODB.CONNSTRING}'
+                  value: '{#MONGOD_URI}'
+                  description: 'Connection string in the URI format (password is not used).'
+      macros:
+        -
+          macro: '{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+          value: '1000'
+          description: 'Minimum number of available connections'
+        -
+          macro: '{$MONGODB.CONNSTRING}'
+          value: 'tcp://localhost:27017'
+          description: 'Connection string in the URI format (password is not used). This param overwrites a value configured in the "Server" option of the configuration file (if it''s set), otherwise, the plugin''s default value is used: "tcp://localhost:27017"'
+        -
+          macro: '{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+          value: '10000'
+          description: 'Maximum number of open cursors'
+        -
+          macro: '{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of cursors timing out per second'
+        -
+          macro: '{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable collections'
+        -
+          macro: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered collections'
+        -
+          macro: '{$MONGODB.LLD.FILTER.DB.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable databases'
+        -
+          macro: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
+          value: (admin|config|local)
+          description: 'Filter to exclude discovered databases'
+        -
+          macro: '{$MONGODB.PASSWORD}'
+          description: 'MongoDB user password'
+        -
+          macro: '{$MONGODB.USER}'
+          description: 'MongoDB username'
+  graphs:
+    -
+      name: 'MongoDB cluster: Connection pool'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connection_pool.available
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connection_pool.refreshing
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connection_pool.in_use
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connection_pool.scoped
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connection_pool.client
+    -
+      name: 'MongoDB cluster: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connections.available
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connections.active
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connections.current
+        -
+          sortorder: '3'
+          drawtype: BOLD_LINE
+          color: A54F10
+          yaxisside: RIGHT
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.connections.rate
+    -
+      name: 'MongoDB cluster: Cursors'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.cursor.open.total
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.cursor.open.pinned
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.metrics.cursor.open.no_timeout
+    -
+      name: 'MongoDB cluster: Network'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.network.bytes_out.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.network.bytes_in.rate
+    -
+      name: 'MongoDB cluster: Operations rate'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.opcounters.query.rate
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.opcounters.insert.rate
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.opcounters.getmore.rate
+        -
+          sortorder: '3'
+          drawtype: BOLD_LINE
+          color: A54F10
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.opcounters.update.rate
+        -
+          sortorder: '4'
+          drawtype: BOLD_LINE
+          color: FC6EA3
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.opcounters.delete.rate
+        -
+          sortorder: '5'
+          drawtype: BOLD_LINE
+          color: 6C59DC
+          item:
+            host: 'MongoDB cluster by Zabbix Agent 2'
+            key: mongodb.opcounters.command.rate
+  value_maps:
+    -
+      name: 'MongoDB flag'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'False'
+        -
+          value: '1'
+          newvalue: 'True'
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

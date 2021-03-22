@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -377,6 +377,8 @@ function invalid_url($msg = null) {
 
 	unset_all();
 	show_error_message($msg);
+
+	(new CWidget())->show();
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 

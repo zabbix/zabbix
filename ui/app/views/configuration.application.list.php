@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,7 +101,9 @@ foreach ($data['applications'] as $application) {
 
 	// Inherited app, display the template list.
 	if ($application['templateids']) {
-		$name = makeApplicationTemplatePrefix($application['applicationid'], $data['parent_templates']);
+		$name = makeApplicationTemplatePrefix($application['applicationid'], $data['parent_templates'],
+			$data['allowed_ui_conf_templates']
+		);
 		$name[] = $application['name'];
 	}
 	elseif ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $application['discoveryRule']) {
@@ -175,7 +177,7 @@ $form->addItem([
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(get_header_host_table('applications', $data['hostid']))
+	->setNavigation(getHostNavigation('applications', $data['hostid']))
 	->addItem($filter)
 	->addItem($form)
 	->show();

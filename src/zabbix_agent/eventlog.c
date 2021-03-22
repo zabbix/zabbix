@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,10 @@
 #include <strsafe.h>
 #include "eventlog.h"
 #include <delayimp.h>
+#include <sddl.h>
 
-#define	DEFAULT_EVENT_CONTENT_SIZE 256
+#define	DEFAULT_EVENT_CONTENT_SIZE	256
+#define MAX_NAME			256
 
 static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Provider/@Name",
@@ -590,6 +592,94 @@ out:
 	return out_message;
 }
 
+static void	replace_sid_to_account(PSID sidVal, char **out_message)
+{
+	DWORD	nlen = MAX_NAME, dlen = MAX_NAME;
+	wchar_t	name[MAX_NAME], dom[MAX_NAME], *sid = NULL;
+	int	iUse;
+	char	userName[MAX_NAME * 4], domName[MAX_NAME * 4], sidName[MAX_NAME * 4], *tmp, buffer[MAX_NAME * 8];
+
+	if (0 == LookupAccountSid(NULL, sidVal, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
+	{
+		/* don't replace security ID if no mapping between account names and security IDs was done */
+		zabbix_log(LOG_LEVEL_DEBUG, "LookupAccountSid failed:%s", strerror_from_system(GetLastError()));
+		return;
+	}
+
+	if (0 == nlen)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "LookupAccountSid returned empty user name");
+		return;
+	}
+
+	if (0 == ConvertSidToStringSid(sidVal, &sid))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ConvertSidToStringSid failed:%s", strerror_from_system(GetLastError()));
+		return;
+	}
+
+	zbx_unicode_to_utf8_static(sid, sidName, sizeof(sidName));
+	zbx_unicode_to_utf8_static(name, userName, sizeof(userName));
+
+	if (0 != dlen)
+	{
+		zbx_unicode_to_utf8_static(dom, domName, sizeof(domName));
+		zbx_snprintf(buffer, sizeof(buffer), "%s\\%s", domName, userName);
+	}
+	else
+		zbx_strlcpy(buffer, userName, sizeof(buffer));	/* NULL SID */
+
+	tmp = *out_message;
+	*out_message = string_replace(*out_message, sidName, buffer);
+
+	LocalFree(sid);
+	zbx_free(tmp);
+}
+
+static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_message)
+{
+	DWORD		status, dwBufferSize = 0, dwBufferUsed = 0, dwPropertyCount = 0, i;
+	PEVT_VARIANT	renderedContent = NULL;
+	EVT_HANDLE	render_context;
+
+	if (NULL == (render_context = EvtCreateRenderContext(0, NULL, EvtRenderContextUser)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
+		goto cleanup;
+	}
+
+	if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, dwBufferSize, renderedContent,
+			&dwBufferUsed, &dwPropertyCount))
+	{
+		if (ERROR_INSUFFICIENT_BUFFER != (status = GetLastError()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", strerror_from_system(status));
+			goto cleanup;
+		}
+
+		dwBufferSize = dwBufferUsed;
+		renderedContent = (PEVT_VARIANT)zbx_malloc(NULL, dwBufferSize);
+
+		if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, dwBufferSize,
+				renderedContent, &dwBufferUsed, &dwPropertyCount))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", strerror_from_system(GetLastError()));
+			goto cleanup;
+		}
+	}
+
+	for (i = 0; i < dwPropertyCount; i++)
+	{
+		if (EvtVarTypeSid == renderedContent[i].Type)
+			replace_sid_to_account(renderedContent[i].SidVal, out_message);
+	}
+cleanup:
+	if (NULL != render_context)
+		EvtClose(render_context);
+
+	zbx_free(renderedContent);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_parse_eventlog_message6                                      *
@@ -668,6 +758,9 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 	*out_timestamp = (unsigned long)((VAR_TIME_CREATED(renderedContent) - sec_1970) / 10000000);
 	*out_eventid = VAR_EVENT_ID(renderedContent);
 	*out_message = expand_message6(pprovider, *event_bookmark);
+
+	if (NULL != *out_message)
+		replace_sids_to_accounts(*event_bookmark, out_message);
 
 	tmp_str = zbx_unicode_to_utf8(wsource);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+const KEY_ARROW_DOWN = 40;
+const KEY_ARROW_LEFT = 37;
+const KEY_ARROW_RIGHT = 39;
+const KEY_ARROW_UP = 38;
+const KEY_BACKSPACE = 8;
+const KEY_DELETE = 46;
+const KEY_ENTER = 13;
+const KEY_ESCAPE = 27;
+const KEY_TAB = 9;
+const KEY_PAGE_UP = 33;
+const KEY_PAGE_DOWN = 34;
+const KEY_END = 35;
+const KEY_HOME = 36;
+const KEY_SPACE = 32;
 
 /**
  * jQuery based publish/subscribe handler.

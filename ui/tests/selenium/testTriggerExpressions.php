@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testTriggerExpressions extends CWebTest {
 
-	const TRIGGER_ID = 13357;		//'Lack of available memory on server {HOST.NAME}'
+	const TRIGGER_ID = 17094;		//'Lack of available memory on server {HOST.NAME}'
 
 	public function testTriggerExpressions_SimpleTest() {
 		// Open advanced editor for testing trigger expression results.

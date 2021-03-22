@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -609,12 +609,9 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestAssertVisibleId('typename');
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'size', 20);
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'readonly');
-
-			$type = $this->zbxTestGetValue("//input[@id='typename']");
+			$this->zbxTestAssertVisibleId('type');
+			$this->zbxTestAssertAttribute("//z-select[@id='type']", 'readonly');
+			$type = $this->zbxTestGetSelectedLabel('type');
 		}
 
 		$this->zbxTestTextPresent('Key');
@@ -666,24 +663,24 @@ class testFormItemPrototype extends CLegacyWebTest {
 					$dbInterfaces = $data[0];
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
-							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
-							$host_interface['ip'].' : '.$host_interface['port'].'"]');
+							$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.
+									$host_interface['ip'].' : '.$host_interface['port'].'"]');
 						}
 					}
 					else {
 						$this->zbxTestTextPresent('No interface found');
-						$this->zbxTestAssertNotVisibleId('interfaceid');
+						$this->zbxTestAssertNotVisibleId('interface-select');
 					}
 					break;
 				default:
 					$this->zbxTestTextNotVisible(['Host interface', 'No interface found']);
-					$this->zbxTestAssertNotVisibleId('interfaceid');
+					$this->zbxTestAssertNotVisibleId('interface-select');
 					break;
 			}
 		}
 
 		if (isset($templateid)) {
-			$value_type = $this->zbxTestGetValue("//input[@id='value_type_name']");
+			$value_type = $this->zbxTestGetSelectedLabel('value_type');
 		}
 		elseif (isset($data['value_type'])) {
 			$this->zbxTestDropdownSelect('value_type', $data['value_type']);
@@ -853,21 +850,21 @@ class testFormItemPrototype extends CLegacyWebTest {
 			]);
 
 			if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
-				$this->zbxTestAssertAttribute("//*[@id='value_type']/option[text()='Character']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='value_type']/option[text()='Log']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='value_type']/option[text()='Text']", 'disabled');
+				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Character']", 'disabled');
+				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Log']", 'disabled');
+				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Text']", 'disabled');
 			}
 			else {
-				$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Character']");
-				$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Log']");
-				$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Text']");
+				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Character']");
+				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Log']");
+				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Text']");
 			}
 		}
 
 		if (!isset($templateid)) {
 			$this->zbxTestDropdownAssertSelected('value_type', $value_type);
-			$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Numeric (unsigned)']");
-			$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Numeric (float)']");
+			$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Numeric (unsigned)']");
+			$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Numeric (float)']");
 		}
 
 		if ($value_type === 'Numeric (float)' || ($value_type == 'Numeric (unsigned)')) {
@@ -937,7 +934,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Show value', 'show value mappings']);
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
 			if (!isset($templateid)) {
-				$this->zbxTestAssertVisibleId('valuemapid');
 				$this->zbxTestDropdownAssertSelected('valuemapid', 'As is');
 
 				$options = ['As is'];
@@ -948,14 +944,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestDropdownHasOptions('valuemapid', $options);
 			}
 			else {
-				$this->zbxTestAssertVisibleId('valuemap_name');
-				$this->zbxTestAssertAttribute("//input[@id='valuemap_name']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='valuemap_name']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='valuemap_name']", 'readonly');
+				$this->zbxTestAssertVisibleId('valuemapid');
+				$this->zbxTestAssertAttribute("//z-select[@id='valuemapid']", 'readonly');
 			}
 		}
 		else {
-			$this->zbxTestAssertNotVisibleId('valuemapid');
+			$this->zbxTestAssertNotVisibleXpath('//z-select[@name="valuemapid"]');
 		}
 
 		if ($type == 'Zabbix trapper') {
@@ -1032,7 +1026,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$preprocessing_type = get_preprocessing_types($itemPreproc['type'], false,
 					CItemPrototype::$supported_preprocessing_types
 				);
-				$this->zbxTestAssertAttribute("//select[@id='preprocessing_".($itemPreproc['step']-1)."_type']", 'readonly');
+				$this->zbxTestAssertAttribute("//z-select[@id='preprocessing_".($itemPreproc['step']-1)."_type']", 'readonly');
 				$this->zbxTestDropdownAssertSelected("preprocessing_".($itemPreproc['step']-1)."_type", $preprocessing_type);
 				if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {
 					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0']", 'readonly');
@@ -1700,6 +1694,17 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// Update and custom intervals are hidden if item key is mqtt.get
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Zabbix agent (active)',
+					'name' => 'Zabbix agent (active) mqtt',
+					'key' => 'mqtt.get[0]',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2042,7 +2047,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		if (isset($data['type'])) {
 			$type = $data['type'];
-			$type_value = $this->zbxTestGetValue("//select[@id='type']//option[text()='".$type."']");
+			$type_value = $this->zbxTestGetValue("//z-select[@id='type']//li[text()='".$type."']");
 			$this->zbxTestDropdownSelect('type', $type);
 			$this->zbxTestAssertElementValue('type', $type_value);
 		}
@@ -2102,6 +2107,15 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
 		}
 
+		// Check hidden update and custom interval for mqtt.get key.
+		if (CTestArrayHelper::get($data, 'type') === 'Zabbix agent (active)'
+				&& substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
+			$this->zbxTestTextNotVisible('Update interval');
+			$this->zbxTestAssertNotVisibleId('row_delay');
+			$this->zbxTestTextNotVisible('Custom intervals');
+			$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+		}
+
 		$itemFlexFlag = true;
 		if (isset($data['flexPeriod'])) {
 
@@ -2142,10 +2156,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 			case 'SSH agent':
 			case 'TELNET agent':
 			case 'JMX agent':
-				$interfaceid = $this->zbxTestGetText("//select[@id='interfaceid']/optgroup/option[not(@disabled)]");
+				$interfaceid = $this->zbxTestGetText('//z-select[@id="interface-select"]//li[not(@disabled)]');
 				break;
 			default:
-				$this->zbxTestAssertNotVisibleId('interfaceid');
+				$this->zbxTestAssertNotVisibleId('interface-select');
 		}
 
 		$value_type = $this->zbxTestGetSelectedLabel('value_type');
@@ -2194,7 +2208,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $itemName);
 			$this->zbxTestAssertElementValue('key', $keyName);
-			$this->zbxTestAssertElementPresentXpath("//select[@id='type']/option[text()='$type']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='type']//li[text()='$type']");
 			switch ($type) {
 				case 'Zabbix agent':
 				case 'Simple check':
@@ -2205,12 +2219,28 @@ class testFormItemPrototype extends CLegacyWebTest {
 				case 'SSH agent':
 				case 'TELNET agent':
 				case 'JMX agent':
-			$this->zbxTestAssertElementPresentXpath("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.$interfaceid.'"]');
+					break;
+				case 'Zabbix agent (active)':
+					$this->zbxTestAssertNotVisibleId('interfaceid');
+					// Check hidden update and custom interval for mqtt.get key.
+					if (substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
+						$this->zbxTestTextNotVisible('Update interval');
+						$this->zbxTestAssertNotVisibleId('row_delay');
+						$this->zbxTestTextNotVisible('Custom intervals');
+						$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+					}
+					else {
+						$this->zbxTestTextVisible('Update interval');
+						$this->zbxTestAssertVisibleId('row_delay');
+						$this->zbxTestTextVisible('Custom intervals');
+						$this->zbxTestAssertVisibleId('row_flex_intervals');
+					}
 					break;
 				default:
-					$this->zbxTestAssertNotVisibleId('interfaceid');
+					$this->zbxTestAssertNotVisibleId('interface-select');
 			}
-			$this->zbxTestAssertElementPresentXpath("//select[@id='value_type']/option[text()='$value_type']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='value_type']//li[text()='$value_type']");
 
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");

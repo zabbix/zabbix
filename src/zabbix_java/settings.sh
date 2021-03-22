@@ -42,6 +42,14 @@ PID_FILE="/tmp/zabbix_java.pid"
 # Default:
 # TIMEOUT=3
 
+### Option: zabbix.propertiesFile
+#	Name of properties file. Can be used to set additional properties in a such way that they are not visible on
+#	a command line or to overwrite existing ones.
+# Mandatory: no
+# Default:
+# PROPERTIES_FILE=
+
 # uncomment to enable remote monitoring of the standard JMX objects on the Zabbix Java Gateway itself
 #JAVA_OPTIONS="$JAVA_OPTIONS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345
-#	-Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+#	-Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+#	-Dcom.sun.management.jmxremote.registry.ssl=false"

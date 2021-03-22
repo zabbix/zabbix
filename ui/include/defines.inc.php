@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.2.0beta1');
-define('ZABBIX_API_VERSION',	'5.2.0');
+define('ZABBIX_VERSION',		'5.2.6rc1');
+define('ZABBIX_API_VERSION',	'5.2.6');
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010028);
+define('ZABBIX_DB_VERSION',		5020000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2020');
+define('ZABBIX_COPYRIGHT_TO',	'2021');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
@@ -56,6 +56,9 @@ define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
+
+// TTL timeout in seconds used to invalidate data cache of Vault response. Set 0 to disable Vault response caching.
+define('ZBX_DATA_CACHE_TTL', 60);
 
 define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
 define('ZBX_HISTORY_SOURCE_SQL',		'sql');
@@ -140,6 +143,9 @@ define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
 define('ORACLE_MAX_STRING_SIZE', 4000);
 define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
 define('ORACLE_CESU8_CHARSET', 'UTF8');
+
+define('DB_STORE_CREDS_CONFIG', 0);
+define('DB_STORE_CREDS_VAULT', 1);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -245,6 +251,8 @@ define('AUDIT_RESOURCE_MODULE',				39);
 define('AUDIT_RESOURCE_SETTINGS',			40);
 define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
 define('AUDIT_RESOURCE_AUTHENTICATION',		42);
+define('AUDIT_RESOURCE_TEMPLATE_DASHBOARD',	43);
+define('AUDIT_RESOURCE_USER_ROLE',			44);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -338,6 +346,9 @@ define('INTERFACE_TYPE_AGENT',		1);
 define('INTERFACE_TYPE_SNMP',		2);
 define('INTERFACE_TYPE_IPMI',		3);
 define('INTERFACE_TYPE_JMX',		4);
+
+define('HOST_PROT_INTERFACES_INHERIT',	0);
+define('HOST_PROT_INTERFACES_CUSTOM',	1);
 
 define('SNMP_BULK_DISABLED',	0);
 define('SNMP_BULK_ENABLED',		1);
@@ -480,6 +491,7 @@ define('ITEM_TYPE_SNMPTRAP',		17);
 define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
 define('ITEM_TYPE_SNMP',			20);
+define('ITEM_TYPE_SCRIPT',			21);
 
 define('SNMP_V1', 1);
 define('SNMP_V2C', 2);
@@ -551,31 +563,32 @@ define('ITEM_DELAY_FLEXIBLE',	0);
 define('ITEM_DELAY_SCHEDULING',	1);
 
 // Item pre-processing types.
-define('ZBX_PREPROC_MULTIPLIER',			1);
-define('ZBX_PREPROC_RTRIM',					2);
-define('ZBX_PREPROC_LTRIM',					3);
-define('ZBX_PREPROC_TRIM',					4);
-define('ZBX_PREPROC_REGSUB',				5);
-define('ZBX_PREPROC_BOOL2DEC',				6);
-define('ZBX_PREPROC_OCT2DEC',				7);
-define('ZBX_PREPROC_HEX2DEC',				8);
-define('ZBX_PREPROC_DELTA_VALUE',			9);
-define('ZBX_PREPROC_DELTA_SPEED',			10);
-define('ZBX_PREPROC_XPATH',					11);
-define('ZBX_PREPROC_JSONPATH',				12);
-define('ZBX_PREPROC_VALIDATE_RANGE',		13);
-define('ZBX_PREPROC_VALIDATE_REGEX',		14);
-define('ZBX_PREPROC_VALIDATE_NOT_REGEX',	15);
-define('ZBX_PREPROC_ERROR_FIELD_JSON',		16);
-define('ZBX_PREPROC_ERROR_FIELD_XML',		17);
-define('ZBX_PREPROC_ERROR_FIELD_REGEX',		18);
-define('ZBX_PREPROC_THROTTLE_VALUE',		19);
-define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
-define('ZBX_PREPROC_SCRIPT',				21);
-define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
-define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
-define('ZBX_PREPROC_CSV_TO_JSON',			24);
-define('ZBX_PREPROC_STR_REPLACE',			25);
+define('ZBX_PREPROC_MULTIPLIER',				1);
+define('ZBX_PREPROC_RTRIM',						2);
+define('ZBX_PREPROC_LTRIM',						3);
+define('ZBX_PREPROC_TRIM',						4);
+define('ZBX_PREPROC_REGSUB',					5);
+define('ZBX_PREPROC_BOOL2DEC',					6);
+define('ZBX_PREPROC_OCT2DEC',					7);
+define('ZBX_PREPROC_HEX2DEC',					8);
+define('ZBX_PREPROC_DELTA_VALUE',				9);
+define('ZBX_PREPROC_DELTA_SPEED',				10);
+define('ZBX_PREPROC_XPATH',						11);
+define('ZBX_PREPROC_JSONPATH',					12);
+define('ZBX_PREPROC_VALIDATE_RANGE',			13);
+define('ZBX_PREPROC_VALIDATE_REGEX',			14);
+define('ZBX_PREPROC_VALIDATE_NOT_REGEX',		15);
+define('ZBX_PREPROC_ERROR_FIELD_JSON',			16);
+define('ZBX_PREPROC_ERROR_FIELD_XML',			17);
+define('ZBX_PREPROC_ERROR_FIELD_REGEX',			18);
+define('ZBX_PREPROC_THROTTLE_VALUE',			19);
+define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',		20);
+define('ZBX_PREPROC_SCRIPT',					21);
+define('ZBX_PREPROC_PROMETHEUS_PATTERN',		22);
+define('ZBX_PREPROC_PROMETHEUS_TO_JSON',		23);
+define('ZBX_PREPROC_CSV_TO_JSON',				24);
+define('ZBX_PREPROC_STR_REPLACE',				25);
+define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -963,9 +976,13 @@ define('ZBX_EVENT_HISTORY_ALERT',				3);
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
 define('ZBX_TM_TASK_CHECK_NOW',		6);
+define('ZBX_TM_TASK_DATA',			7);
 
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
+
+define('ZBX_TM_DATA_TYPE_DIAGINFO',		1);
+define('ZBX_TM_DATA_TYPE_CHECK_NOW',	6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
@@ -1272,42 +1289,49 @@ define('XML_REQUIRED',		0x08);
 
 // API validation
 // multiple types
-define('API_MULTIPLE',			0);
+define('API_MULTIPLE',				0);
 // scalar data types
-define('API_STRING_UTF8',		1);
-define('API_INT32',				2);
-define('API_ID',				3);
-define('API_BOOLEAN',			4);
-define('API_FLAG',				5);
-define('API_FLOAT',				6);
-define('API_UINT64',			7);
+define('API_STRING_UTF8',			1);
+define('API_INT32',					2);
+define('API_ID',					3);
+define('API_BOOLEAN',				4);
+define('API_FLAG',					5);
+define('API_FLOAT',					6);
+define('API_UINT64',				7);
 // arrays
-define('API_OBJECT',			8);
-define('API_IDS',				9);
-define('API_OBJECTS',			10);
-define('API_STRINGS_UTF8',		11);
-define('API_INTS32',			12);
-define('API_FLOATS',			13);
-define('API_UINTS64',			14);
+define('API_OBJECT',				8);
+define('API_IDS',					9);
+define('API_OBJECTS',				10);
+define('API_STRINGS_UTF8',			11);
+define('API_INTS32',				12);
+define('API_FLOATS',				13);
+define('API_UINTS64',				14);
 // specific types
-define('API_HG_NAME',			15);
-define('API_SCRIPT_NAME',		16);
-define('API_USER_MACRO',		17);
-define('API_TIME_PERIOD',		18);
-define('API_REGEX',				19);
-define('API_HTTP_POST',			20);
-define('API_VARIABLE_NAME',		21);
-define('API_OUTPUT',			22);
-define('API_TIME_UNIT',			23);
-define('API_URL',				24);
-define('API_H_NAME',			25);
-define('API_RANGE_TIME',		26);
-define('API_COLOR',				27);
-define('API_NUMERIC',			28);
-define('API_LLD_MACRO',			29);
-define('API_PSK',				30);
-define('API_SORTORDER',			31);
-define('API_CALC_FORMULA',		32);
+define('API_HG_NAME',				15);
+define('API_SCRIPT_NAME',			16);
+define('API_USER_MACRO',			17);
+define('API_TIME_PERIOD',			18);
+define('API_REGEX',					19);
+define('API_HTTP_POST',				20);
+define('API_VARIABLE_NAME',			21);
+define('API_OUTPUT',				22);
+define('API_TIME_UNIT',				23);
+define('API_URL',					24);
+define('API_H_NAME',				25);
+define('API_RANGE_TIME',			26);
+define('API_COLOR',					27);
+define('API_NUMERIC',				28);
+define('API_LLD_MACRO',				29);
+define('API_PSK',					30);
+define('API_SORTORDER',				31);
+define('API_CALC_FORMULA',			32);
+define('API_IP',					33);
+define('API_DNS',					34);
+define('API_PORT',					35);
+define('API_TRIGGER_EXPRESSION',	36);
+define('API_EVENT_NAME',			37);
+define('API_JSONRPC_PARAMS',		38);
+define('API_JSONRPC_ID',			39);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1322,6 +1346,7 @@ define('API_REQUIRED_LLD_MACRO',		0x0100);
 define('API_TIME_UNIT_WITH_YEAR',		0x0200);
 define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 define('API_PRESERVE_KEYS',				0x0800);
+define('API_ALLOW_MACRO',				0x1000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
@@ -1350,6 +1375,7 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
+define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in HashiCorp Vault).
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
@@ -1502,8 +1528,6 @@ define('THEME_DEFAULT', 'default');
 // the default theme
 define('ZBX_DEFAULT_THEME', 'blue-theme');
 
-define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
-
 // date format context, usable for translators
 define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 
@@ -1577,7 +1601,6 @@ define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
 define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
 define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
 define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
-define('TAB_INDICATOR_PERIODS', 'periods');
 define('TAB_INDICATOR_PERMISSIONS', 'permissions');
 
 // CSS styles
@@ -1673,11 +1696,11 @@ define('ZBX_STYLE_TIME_INPUT_ERROR', 'time-input-error');
 define('ZBX_STYLE_TIME_QUICK', 'time-quick');
 define('ZBX_STYLE_TIME_QUICK_RANGE', 'time-quick-range');
 define('ZBX_STYLE_TIME_SELECTION_CONTAINER', 'time-selection-container');
-define('ZBX_STYLE_FILTER_BREADCRUMB', 'filter-breadcrumb');
 define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
+define('ZBX_STYLE_FILTER_SPACE', 'filter-space');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
 define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
 define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
@@ -1696,6 +1719,7 @@ define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
+define('ZBX_STYLE_HEADER_Z_SELECT', 'header-z-select');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
@@ -1766,12 +1790,12 @@ define('ZBX_STYLE_NOTIF_INDIC_CONTAINER', 'notif-indic-container');
 define('ZBX_STYLE_NOTHING_TO_SHOW', 'nothing-to-show');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_WORDWRAP', 'wordwrap');
+define('ZBX_STYLE_WORDBREAK', 'wordbreak');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
 define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');
 define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
-define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
 define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');
@@ -1921,6 +1945,12 @@ define('ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE', 'interface-btn-toggle');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE', 'interface-btn-remove');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE', 'interface-btn-main-interface');
 define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
+
+define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
+
+// Dashboard list table classes.
+define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
+define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

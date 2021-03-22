@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,6 +98,13 @@ ZBX_METRIC	parameters_common[] =
 	{NULL}
 };
 
+static const char	*user_parameter_dir = NULL;
+
+void	set_user_parameter_dir(const char *path)
+{
+	user_parameter_dir = path;
+}
+
 static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
@@ -107,28 +114,13 @@ static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_FAIL;
 }
 
-int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	char	*command;
-
-	if (1 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	command = get_rparam(request, 0);
-
-	return EXECUTE_STR(command, result);
-}
-
-int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
+static int	execute_str(const char *command, AGENT_RESULT *result, const char* dir)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
 	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT,
-			ZBX_EXIT_CODE_CHECKS_DISABLED))
+			ZBX_EXIT_CODE_CHECKS_DISABLED, dir))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		goto out;
@@ -146,6 +138,22 @@ out:
 	zbx_free(cmd_result);
 
 	return ret;
+}
+
+int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	if (1 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	return execute_str(get_rparam(request, 0), result, user_parameter_dir);
+}
+
+int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
+{
+	return execute_str(command, result, NULL);
 }
 
 int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)

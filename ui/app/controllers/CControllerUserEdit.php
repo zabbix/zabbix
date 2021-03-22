@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
-		$timezones = DateTimeZone::listIdentifiers();
-		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -42,7 +40,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'password1' =>			'string',
 			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
-			'timezone' =>			'db users.timezone|in '.implode(',', $timezones),
+			'timezone' =>			'db users.timezone|in '.implode(',', array_keys($this->timezones)),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
@@ -53,7 +51,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'new_media' =>			'array',
 			'enable_media' =>		'int32',
 			'disable_media' =>		'int32',
-			'type' =>				'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
+			'roleid' =>				'db users.roleid',
 			'form_refresh' =>		'int32'
 		];
 
@@ -67,17 +65,18 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)) {
 			return false;
 		}
 
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'type', 'timezone'
+					'rows_per_page', 'url', 'roleid', 'timezone'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
 				'selectUsrgrps' => ['usrgrpid'],
+				'selectRole' => ['name', 'type'],
 				'userids' => $this->getInput('userid'),
 				'editable' => true
 			]);
@@ -104,6 +103,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'password2' => '',
 			'lang' => $db_defaults['lang'],
 			'timezone' => $db_defaults['timezone'],
+			'timezones' => $this->timezones,
 			'theme' => $db_defaults['theme'],
 			'autologin' => $db_defaults['autologin'],
 			'autologout' => '0',
@@ -112,7 +112,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'url' => '',
 			'medias' => [],
 			'new_media' => [],
-			'type' => $db_defaults['type'],
+			'roleid' => '',
+			'role' => [],
+			'user_type' => '',
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
@@ -138,16 +140,22 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['rows_per_page'] = $this->user['rows_per_page'];
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
-			$data['type'] = $this->user['type'];
 			$data['db_user']['alias'] = $this->user['alias'];
+
+			if (!$this->getInput('form_refresh', 0)) {
+				$data['roleid'] = $this->user['roleid'];
+				$data['user_type'] = $this->user['role']['type'];
+				$data['role'] = [['id' => $data['roleid'], 'name' => $this->user['role']['name']]];
+			}
 		}
 		else {
 			$data['change_password'] = true;
+			$data['roleid'] = $this->getInput('roleid', '');
 		}
 
 		// Overwrite with input variables.
 		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'timezone', 'theme',
-			'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'type'
+			'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'roleid'
 		]);
 		if ($data['form_refresh'] != 0) {
 			$user_groups = $this->getInput('user_groups', []);
@@ -165,7 +173,19 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
 
-		if ($data['type'] == USER_TYPE_SUPER_ADMIN) {
+		if ($data['form_refresh'] && $this->hasInput('roleid')) {
+			$roles = API::Role()->get([
+				'output' => ['name', 'type'],
+				'roleids' => $data['roleid']
+			]);
+
+			if ($roles) {
+				$data['role'] = [['id' => $data['roleid'], 'name' => $roles[0]['name']]];
+				$data['user_type'] = $roles[0]['type'];
+			}
+		}
+
+		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			$data['groups_rights'] = [
 				'0' => [
 					'permission' => PERM_READ_WRITE,
@@ -177,6 +197,12 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		else {
 			$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights($user_groups));
 		}
+
+		$data['modules'] = API::Module()->get([
+			'output' => ['id'],
+			'filter' => ['status' => MODULE_STATUS_ENABLED],
+			'preservekeys' => true
+		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyArchive = "oracle.archive.info"
-
-const archiveMaxParams = 0
-
-func archiveHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func archiveHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var archiveLogs string
-
-	if len(params) > archiveMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
@@ -45,7 +37,7 @@ func archiveHandler(ctx context.Context, conn OraClient, params []string) (inter
 						'log_sequence' VALUE d.LOG_SEQUENCE,
 						'error'        VALUE NVL(TO_CHAR(d.ERROR), ' ')
 					)
-				)
+				) RETURNING CLOB 
 			)		
 		FROM
 			V$ARCHIVE_DEST d,

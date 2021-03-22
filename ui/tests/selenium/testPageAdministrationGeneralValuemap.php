@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,12 +32,12 @@ class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 
 		$strings = [];
 
-		foreach (CDBHelper::getAll('SELECT name FROM valuemaps ORDER BY name', 100) as $valuemap) {
+		foreach (CDBHelper::getAll('SELECT name FROM valuemaps ORDER BY lower(name)', 100) as $valuemap) {
 			$strings[] = $valuemap['name'];
 		}
 
 		foreach (CDBHelper::getAll('SELECT value,newvalue FROM mappings m'.
-				' INNER JOIN (SELECT valuemapid FROM valuemaps ORDER BY name LIMIT 100) v'.
+				' INNER JOIN (SELECT valuemapid FROM valuemaps ORDER BY lower(name) LIMIT 100) v'.
 				' ON m.valuemapid=v.valuemapid') as $mapping) {
 			$strings[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
 		}

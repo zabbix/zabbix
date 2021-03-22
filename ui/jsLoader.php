@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ $availableJScripts = [
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
 	// classes
+	'component.z-select.js' => '',
 	'class.base-component.js' => '',
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -105,6 +106,8 @@ $availableJScripts = [
 	'class.cviewswitcher.js' => '',
 	'class.pmaster.js' => '',
 	'class.rpc.js' => '',
+	'class.tabfilter.js' => '',
+	'class.tabfilteritem.js' => '',
 	'class.template.js' => '',
 	'init.js' => '',
 	'class.tab-indicators.js' => '',
@@ -112,6 +115,11 @@ $availableJScripts = [
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
+	'report2.js' => 'pages/',
+	'report4.js' => 'pages/',
+	'setup.js' => 'pages/',
+	'srv_status.js' => 'pages/',
+	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/'
 ];
@@ -134,8 +142,6 @@ $tranStrings = [
 		'Edit' => _('Edit'),
 		'Cancel' => _('Cancel'),
 		'Delete' => _('Delete'),
-		'You have unsaved changes.' => _('You have unsaved changes.'),
-		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
 		'Add a new widget' => _('Add a new widget'),
@@ -323,7 +329,8 @@ $tranStrings = [
 	],
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
-		'No interface found' => _('No interface found')
+		'No interface found' => _('No interface found'),
+		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'class.cnavtree.js' => [
 		'Edit' => _('Edit'),
@@ -346,8 +353,13 @@ $tranStrings = [
 	'common.js' => [
 		'Cancel' => _('Cancel')
 	],
+	'component.z-select.js' => [
+		'All' => _('All')
+	],
 	'macrovalue.js' => [
-		'Set new value' => _('Set new value')
+		'Set new value' => _('Set new value'),
+		'path/to/secret:key' => _('path/to/secret:key'),
+		'value' => _('value')
 	]
 ];
 
@@ -358,6 +370,7 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
+		'component.z-select.js',
 		'class.base-component.js',
 		'class.cdebug.js',
 		'class.overlaycollection.js',
@@ -384,7 +397,7 @@ if (empty($_GET['files'])) {
 	require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {
-		$session = unserialize(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)));
+		$session = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 		$js .= 'window.ZBX_SESSION_NAME = "'.crc32($session['sessionid']).'";';
 		$files[] = 'class.localstorage.js';
 	}

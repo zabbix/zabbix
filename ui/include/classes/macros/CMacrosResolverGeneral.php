@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -152,23 +152,28 @@ class CMacrosResolverGeneral {
 		}
 
 		if ($extract_macros) {
-			$macro_parser = new CMacroParser($types['macros']);
+			$macro_parser = new CMacroParser(['macros' => $types['macros']]);
 		}
 
 		if ($extract_macros_n) {
-			$macro_n_parser = new CMacroParser($types['macros_n'], ['ref_type' => CMacroParser::REFERENCE_NUMERIC]);
+			$macro_n_parser = new CMacroParser([
+				'macros' => $types['macros_n'],
+				'ref_type' => CMacroParser::REFERENCE_NUMERIC
+			]);
 		}
 
 		if ($extract_macros_an) {
-			$macro_an_parser = new CMacroParser($types['macros_an'],
-				['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC]
-			);
+			$macro_an_parser = new CMacroParser([
+				'macros' => $types['macros_an'],
+				'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
+			]);
 		}
 
 		if ($extract_macro_funcs_n) {
-			$macro_func_n_parser = new CMacroFunctionParser($types['macro_funcs_n'],
-				['ref_type' => CMacroParser::REFERENCE_NUMERIC]
-			);
+			$macro_func_n_parser = new CMacroFunctionParser([
+				'macros' => $types['macro_funcs_n'],
+				'ref_type' => CMacroParser::REFERENCE_NUMERIC
+			]);
 		}
 
 		if ($extract_references) {
@@ -271,7 +276,7 @@ class CMacrosResolverGeneral {
 			$macros['macros'] = [];
 
 			foreach ($types['macros'] as $key => $macro_patterns) {
-				$types['macros'][$key] = new CMacroParser($macro_patterns);
+				$types['macros'][$key] = new CMacroParser(['macros' => $macro_patterns]);
 				$macros['macros'][$key] = [];
 			}
 		}
@@ -280,9 +285,10 @@ class CMacrosResolverGeneral {
 			$macros['macros_n'] = [];
 
 			foreach ($types['macros_n'] as $key => $macro_patterns) {
-				$types['macros_n'][$key] = new CMacroParser($macro_patterns,
-					['ref_type' => CMacroParser::REFERENCE_NUMERIC]
-				);
+				$types['macros_n'][$key] = new CMacroParser([
+					'macros' => $macro_patterns,
+					'ref_type' => CMacroParser::REFERENCE_NUMERIC
+				]);
 				$macros['macros_n'][$key] = [];
 			}
 		}
@@ -291,9 +297,10 @@ class CMacrosResolverGeneral {
 			$macros['macros_an'] = [];
 
 			foreach ($types['macros_an'] as $key => $macro_patterns) {
-				$types['macros_an'][$key] = new CMacroParser($macro_patterns,
-					['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC]
-				);
+				$types['macros_an'][$key] = new CMacroParser([
+					'macros' => $macro_patterns,
+					'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
+				]);
 				$macros['macros_an'][$key] = [];
 			}
 		}
@@ -302,9 +309,10 @@ class CMacrosResolverGeneral {
 			$macros['macro_funcs_n'] = [];
 
 			foreach ($types['macro_funcs_n'] as $key => $macro_patterns) {
-				$types['macro_funcs_n'][$key] = new CMacroFunctionParser($macro_patterns,
-					['ref_type' => CMacroParser::REFERENCE_NUMERIC]
-				);
+				$types['macro_funcs_n'][$key] = new CMacroFunctionParser([
+					'macros' => $macro_patterns,
+					'ref_type' => CMacroParser::REFERENCE_NUMERIC
+				]);
 				$macros['macro_funcs_n'][$key] = [];
 			}
 		}
@@ -636,7 +644,7 @@ class CMacrosResolverGeneral {
 		$functionids = [];
 
 		$functionid_parser = new CFunctionIdParser();
-		$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
 		$user_macro_parser = new CUserMacroParser();
 
 		for ($pos = 0, $i = 1; isset($expression[$pos]); $pos++) {
@@ -900,9 +908,10 @@ class CMacrosResolverGeneral {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
 				$value = UNRESOLVED_MACRO_STRING;
 
-				$history = Manager::History()->getLastValues([$function], 1,
+				$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
 					CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
-				);
+				));
+
 				if (!array_key_exists($function['itemid'], $history)) {
 					continue;
 				}
@@ -1209,7 +1218,7 @@ class CMacrosResolverGeneral {
 							}
 							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
 								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
-									if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+									if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
 										$value['value'] = $val;
 										break;
 									}
@@ -1286,7 +1295,7 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+						if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default
@@ -1342,7 +1351,9 @@ class CMacrosResolverGeneral {
 	 * @return string
 	 */
 	public static function getMacroValue(array $macro): string {
-		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_SECRET_MASK : $macro['value'];
+		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET || $macro['type'] == ZBX_MACRO_TYPE_VAULT)
+			? ZBX_SECRET_MASK
+			: $macro['value'];
 	}
 
 	/**

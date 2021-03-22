@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2020 Zabbix SIA
+dnl Copyright (C) 2001-2021 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[5.2.0beta1])
+AC_INIT([Zabbix],[5.2.6rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -98,6 +98,21 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #  include <net/if.h>
 #endif
 ])
+
+AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
+checked_werror_cpp_CFLAGS=""
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Werror=cpp"
+AC_TRY_COMPILE(,[
+  void f() {};
+],checked_werror_cpp_CFLAGS="-Werror=cpp"
+  AC_MSG_RESULT(yes),
+  AC_MSG_RESULT(no)
+)
+CFLAGS="$saved_CFLAGS"
+
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$checked_werror_cpp_CFLAGS $CFLAGS"
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -106,6 +121,8 @@ AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #  include <sys/param.h>
 #endif
 ])
+CFLAGS="$saved_CFLAGS"
+
 AC_CHECK_HEADERS(sys/swap.h, [], [], [
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
@@ -692,6 +709,19 @@ AC_DEFINE(HAVE_THREAD_LOCAL,1,[Define to 1 if compiler keyword '__thread' suppor
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no)
 HAVE_THREAD_LOCAL="no")
+
+AC_MSG_CHECKING(for field updates in struct vminfo_t)
+AC_TRY_COMPILE([
+#include <sys/sysinfo.h>
+],
+[
+	vminfo_t vminfo;
+	vminfo.updates;
+],
+AC_DEFINE(HAVE_VMINFO_T_UPDATES,1,[Define to 1 if 'vminfo.updates' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -1348,7 +1378,7 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([ZBXCMOCKA], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
@@ -2014,6 +2044,7 @@ AC_OUTPUT([
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxvault/Makefile
 	src/libs/zbxdiag/Makefile
+	src/libs/zbxtrends/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile

@@ -1,9 +1,9 @@
 
-# Template Module ICMP Ping
+# ICMP Ping
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 

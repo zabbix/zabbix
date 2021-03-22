@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,8 @@ class CControllerDashboardDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+				&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 	}
 
 	protected function doAction() {

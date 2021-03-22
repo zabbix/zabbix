@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ class CXmlExportWriter extends CExportWriter {
 			'headers' => 'header',
 			'variables' => 'variable',
 			'query_fields' => 'query_field',
+			'parameters' => 'parameter',
 			'posts' => 'post_field',
 			'shapes' => 'shape',
 			'lines' => 'line',
@@ -138,7 +139,10 @@ class CXmlExportWriter extends CExportWriter {
 			'parameters' => 'parameter',
 			'message_templates' => 'message_template',
 			'overrides' => 'override',
-			'operations' => 'operation'
+			'operations' => 'operation',
+			'dashboards' => 'dashboard',
+			'widgets' => 'widget',
+			'fields' => 'field'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

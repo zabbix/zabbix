@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@
  */
 class CWidgetFormProblemsBySv extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_PROBLEMS_BY_SV);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_PROBLEMS_BY_SV);
 
 		$this->data = self::convertDottedKeys($this->data);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,12 @@
  */
 class CControllerTimeSelectorUpdate extends CController {
 
+	public static $profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.charts.filter', 'web.httpdetails.filter',
+		'web.problem.filter', 'web.auditlog.filter', 'web.slides.filter', 'web.auditacts.filter',
+		'web.item.graph.filter', 'web.toptriggers.filter', 'web.avail_report.filter', CControllerHost::FILTER_IDX,
+		CControllerProblem::FILTER_IDX
+	];
+
 	/**
 	 * @var CRangeTimeParser
 	 */
@@ -32,20 +38,13 @@ class CControllerTimeSelectorUpdate extends CController {
 	private $data = [];
 
 	public function init() {
-		$this->disableSIDvalidation();
-
 		$this->range_time_parser = new CRangeTimeParser();
 	}
 
 	protected function checkInput() {
-		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.charts.filter', 'web.httpdetails.filter',
-			'web.problem.filter', 'web.auditlog.filter', 'web.slides.filter', 'web.auditacts.filter',
-			'web.item.graph.filter', 'web.toptriggers.filter', 'web.avail_report.filter'
-		];
-
 		$fields = [
 			'method' => 'required|in increment,zoomout,decrement,rangechange,rangeoffset',
-			'idx' => 'required|in '.implode(',', $profiles),
+			'idx' => 'required|in '.implode(',', static::$profiles),
 			'idx2' => 'required|id',
 			'from' => 'required|string',
 			'to' => 'required|string',
@@ -200,11 +199,8 @@ class CControllerTimeSelectorUpdate extends CController {
 			'from_date' => $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME),
 			'to' => $value['to'],
 			'to_ts' => $ts['to'],
-			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME),
-			'can_zoomout' => ($ts['to'] - $ts['from'] + 1 < $max_period),
-			'can_decrement' => ($ts['from'] > 0),
-			'can_increment' => ($ts['to'] < $ts['now'] - ZBX_MIN_PERIOD)
-		])]));
+			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME)
+		] + getTimeselectorActions($value['from'], $value['to']))]));
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,6 +124,7 @@ typedef enum
 } modbus_endianness_t;
 
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int 	zbx_init_modbus(char **error);
+int	zbx_init_modbus(char **error);
+void	zbx_deinit_modbus(void);
 
 #endif /* ZABBIX_SYSINFO_COMMON_MODBTYPE_H */

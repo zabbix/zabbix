@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,6 +91,7 @@ class CFavorite {
 			'userid' => CWebUser::$data['userid'],
 			'idx' => zbx_dbstr($idx),
 			'value_id' => zbx_dbstr($favid),
+			'value_str' =>zbx_dbstr(''),
 			'type' => PROFILE_TYPE_ID
 		];
 		if (!is_null($favobj)) {

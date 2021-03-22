@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,9 @@
 #define MACRO_TYPE_HTTP_XML		0x00400000
 #define MACRO_TYPE_ALLOWED_HOSTS	0x00800000
 #define MACRO_TYPE_ITEM_TAG		0x01000000
+#define MACRO_TYPE_EVENT_NAME		0x02000000	/* event name in trigger configuration */
+#define MACRO_TYPE_EXPRESSION		0x04000000	/* macros in expression macro */
+#define MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x08000000
 
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1

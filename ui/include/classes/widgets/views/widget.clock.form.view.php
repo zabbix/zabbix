@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,14 +26,16 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
+$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
+
 $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $fields['rf_rate']
+	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
 $scripts = [];
 
 // Time type.
-$form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getComboBox($fields['time_type']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getSelect($fields['time_type']));
 
 // Item.
 if (array_key_exists('itemid', $fields)) {
@@ -43,6 +45,8 @@ if (array_key_exists('itemid', $fields)) {
 	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
 	$scripts[] = $field_itemid->getPostJS();
 }
+
+$scripts[] = '$("#time_type").on("change", updateWidgetConfigDialogue);';
 
 $form->addItem($form_list);
 

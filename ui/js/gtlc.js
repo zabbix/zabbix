@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ jQuery(function($) {
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
+	endpoint.addSID();
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 
 	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout' +
@@ -490,7 +491,9 @@ jQuery(function($) {
 		});
 	}
 
-	checkDisableTimeSelectorUI();
+	if (!$container.data('disable-initial-check')) {
+		checkDisableTimeSelectorUI();
+	}
 });
 
 /**
@@ -529,9 +532,7 @@ var timeControl = {
 			src: location.href,
 			dynamic: 1,
 			loadSBox: 0,
-			loadImage: 0,
-			mainObject: 0, // object on changing will reflect on all others
-			onDashboard: 0 // object is on dashboard
+			loadImage: 0
 		}, objData);
 
 		var _this = this;
@@ -591,7 +592,6 @@ var timeControl = {
 						this.refreshImage(id);
 					}
 				}
-
 			}
 		}
 	},

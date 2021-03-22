@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ package zbxlib
 int CONFIG_TIMEOUT = 3;
 int CONFIG_MAX_LINES_PER_SECOND = 20;
 int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = 20;
-char *CONFIG_HOSTNAME = NULL;
+char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
 int	CONFIG_UNSAFE_USER_PARAMETERS= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS= 0;
 char *CONFIG_SOURCE_IP = NULL;

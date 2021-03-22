@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,14 +144,15 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['show_suppressed']       (optional)
 	 * @param int    $filter['show_opdata']           (optional)
 	 * @param bool   $resolve_comments
-	 * @param bool   $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, $resolve_comments = false, $resolve_urls = false) {
-		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
+	public static function getData(array $filter, bool $resolve_comments = false) {
+		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids']
+			? getSubGroups($filter['groupids'])
+			: null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
@@ -159,6 +160,8 @@ class CScreenProblem extends CScreenBase {
 			: null;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
+
 			if ($filter_hostids === null) {
 				// get all groups if no selected groups defined
 				if ($filter_groupids === null) {
@@ -169,7 +172,7 @@ class CScreenProblem extends CScreenBase {
 					]));
 				}
 
-				$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
+				$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
 
 				// get available hosts
 				$filter_hostids = array_keys(API::Host()->get([
@@ -181,7 +184,7 @@ class CScreenProblem extends CScreenBase {
 
 			$exclude_hostids = array_keys(API::Host()->get([
 				'output' => [],
-				'groupids' => $filter['exclude_groupids'],
+				'groupids' => $exclude_groupids,
 				'preservekeys' => true
 			]));
 
@@ -298,7 +301,7 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['priority'],
+						'output' => ['priority', 'manual_close'],
 						'selectHosts' => ['hostid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
@@ -317,7 +320,7 @@ class CScreenProblem extends CScreenBase {
 							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
 					}
 
-					if ($resolve_comments || $resolve_urls || $show_opdata || $details) {
+					if ($resolve_comments || $show_opdata || $details) {
 						$options['output'][] = 'expression';
 					}
 
@@ -327,10 +330,6 @@ class CScreenProblem extends CScreenBase {
 
 					if ($resolve_comments) {
 						$options['output'][] = 'comments';
-					}
-
-					if ($resolve_urls) {
-						$options['output'][] = 'url';
 					}
 
 					$data['triggers'] += API::Trigger()->get($options);
@@ -548,13 +547,12 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['show']
 	 * @param int   $filter['show_opdata']
 	 * @param bool  $resolve_comments
-	 * @param bool  $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter, $resolve_comments = false, $resolve_urls = false) {
+	public static function makeData(array $data, array $filter, bool $resolve_comments = false) {
 		// unset unused triggers
 		$triggerids = [];
 
@@ -618,15 +616,6 @@ class CScreenProblem extends CScreenBase {
 				unset($trigger['comments']);
 			}
 			unset($trigger);
-		}
-
-		if ($resolve_urls) {
-			foreach ($data['problems'] as &$problem) {
-				$trigger = $data['triggers'][$problem['objectid']];
-				$trigger['eventid'] = $problem['eventid'];
-				$problem['url'] = CMacrosResolverHelper::resolveTriggerUrl($trigger, $url) ? $url : '';
-			}
-			unset($problem);
 		}
 
 		// get additional data
@@ -758,6 +747,21 @@ class CScreenProblem extends CScreenBase {
 		$this->dataId = 'problem';
 
 		$url = (new CUrl('zabbix.php'))->setArgument('action', 'problem.view');
+		$args = [
+			'sort' => $this->data['sort'],
+			'sortorder' => $this->data['sortorder']
+		] + $this->data['filter'];
+
+		if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+			$args['from'] = $this->timeline['from'];
+			$args['to'] = $this->timeline['to'];
+		}
+
+		if (array_key_exists('severities', $args)) {
+			$args['severities'] = array_combine($args['severities'], $args['severities']);
+		}
+
+		array_map([$url, 'setArgument'], array_keys($args), $args);
 
 		$data = self::getData($this->data['filter'], true);
 		$data = self::sortData($data, $this->data['sort'], $this->data['sortorder']);
@@ -921,6 +925,13 @@ class CScreenProblem extends CScreenBase {
 				$dependencies = getTriggerDependencies($data['triggers']);
 			}
 
+			$allowed = [
+				'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+				'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+				'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+				'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			];
+
 			// Add problems to table.
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
@@ -950,10 +961,13 @@ class CScreenProblem extends CScreenBase {
 					$cell_r_clock = '';
 				}
 
+				$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']);
+
 				if ($problem['r_eventid'] != 0) {
 					$value = TRIGGER_VALUE_FALSE;
 					$value_str = _('RESOLVED');
 					$value_clock = $problem['r_clock'];
+					$can_be_closed = false;
 				}
 				else {
 					$in_closing = false;
@@ -961,6 +975,7 @@ class CScreenProblem extends CScreenBase {
 					foreach ($problem['acknowledges'] as $acknowledge) {
 						if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 							$in_closing = true;
+							$can_be_closed = false;
 							break;
 						}
 					}
@@ -1015,6 +1030,7 @@ class CScreenProblem extends CScreenBase {
 					? makeTriggerDependencies($dependencies[$trigger['triggerid']])
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
+					->addClass(ZBX_STYLE_WORDWRAP)
 					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
 
 				$opdata = null;
@@ -1087,10 +1103,15 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				// Create acknowledge link.
-				$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
+				$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity']
+						|| $allowed['acknowledge'] || $can_be_closed)
+					? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+						->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+					: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+						$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+					);
 
 				// Add table row.
 				$table->addRow(array_merge($row, [
@@ -1119,7 +1140,12 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'popup.acknowledge.edit' => ['name' => _('Mass update')]
+				'popup.acknowledge.edit' => [
+					'name' => _('Mass update'),
+					'disabled' => !($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+							|| $allowed['close']
+					)
+				]
 			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
@@ -1240,12 +1266,12 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @static
 	 *
-	 * @param array $items  An array of trigger items.
+	 * @param array $items    An array of trigger items.
 	 * @param bool  $html
 	 *
 	 * @return array|string
 	 */
-	public static function getLatestValues(array $items, $html = true) {
+	public static function getLatestValues(array $items, bool $html = true) {
 		$latest_values = [];
 
 		$items = zbx_toHash($items, 'itemid');
@@ -1284,16 +1310,20 @@ class CScreenProblem extends CScreenBase {
 					new CCol($last_value['value']),
 					new CCol(
 						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-							? new CLink(_('Graph'), (new CUrl('history.php'))
-								->setArgument('action', HISTORY_GRAPH)
-								->setArgument('itemids[]', $itemid)
-								->getUrl()
-							)
-							: new CLink(_('History'), (new CUrl('history.php'))
-								->setArgument('action', HISTORY_VALUES)
-								->setArgument('itemids[]', $itemid)
-								->getUrl()
-							)
+							? (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+								? new CLink(_('Graph'), (new CUrl('history.php'))
+									->setArgument('action', HISTORY_GRAPH)
+									->setArgument('itemids[]', $itemid)
+									->getUrl()
+								)
+								: _('Graph'))
+							: (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+								? new CLink(_('History'), (new CUrl('history.php'))
+									->setArgument('action', HISTORY_VALUES)
+									->setArgument('itemids[]', $itemid)
+									->getUrl()
+								)
+								: _('History'))
 					)
 				]);
 

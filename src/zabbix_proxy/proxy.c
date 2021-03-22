@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
 	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
-	"                                 section (historycache, preprocessing) or",
+	"                                 section (historycache, preprocessing, locks) or",
 	"                                 everything if section is not specified",
 	"",
 	"      Log level control targets:",
@@ -239,6 +239,7 @@ char	*CONFIG_DB_TLS_CA_FILE		= NULL;
 char	*CONFIG_DB_TLS_CIPHER		= NULL;
 char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
 char	*CONFIG_EXPORT_DIR		= NULL;
+char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -988,7 +989,8 @@ static void	zbx_main_sigusr_handler(int flags)
 		int	scope = ZBX_RTC_GET_SCOPE(flags);
 
 		if (ZBX_DIAGINFO_ALL == scope)
-			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) |	(1 << ZBX_DIAGINFO_PREPROCESSING);
+			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) |
+			(1 << ZBX_DIAGINFO_LOCKS);
 		else
 			zbx_diaginfo_scope = 1 << scope;
 	}

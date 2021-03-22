@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -168,5 +168,14 @@ class CPartial {
 		if (!in_array($directory, self::$directories)) {
 			array_unshift(self::$directories, $directory);
 		}
+	}
+
+	/**
+	 * Get partial file name.
+	 *
+	 * @return string
+	 */
+	public function getName(): string {
+		return $this->name;
 	}
 }

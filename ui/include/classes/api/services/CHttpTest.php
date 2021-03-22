@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,13 @@
  * Class containing methods for operations with http tests.
  */
 class CHttpTest extends CApiService {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
 
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
@@ -862,7 +869,7 @@ class CHttpTest extends CApiService {
 					ZBX_HTTPFIELD_HEADER => 'headers',
 					ZBX_HTTPFIELD_VARIABLE => 'variables',
 					ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields',
-					ZBX_HTTPFIELD_POST_FIELD => 'posts',
+					ZBX_HTTPFIELD_POST_FIELD => 'posts'
 				];
 				foreach ($fields as $type => $field) {
 					if (!$this->outputIsRequested($field, $options['selectSteps'])) {

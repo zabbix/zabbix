@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Group to check triggers filtering' => [
-							'Average' => '1',
+							'Average' => '1'
 						],
 						'Host group for tag permissions' => [
 							'Not classified' => '2'
@@ -587,7 +587,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				[
 					'widget to update' => 'Reference widget 2',
 					'fields' => [
-						'Name' => 'Hide timeline and groupt without problems',
+						'Name' => 'Hide timeline and grouped without problems',
 						'Refresh interval' => 'Default (1 minute)',
 						'Hide groups without problems' => true,
 						'Show operational data' => 'With problem name',
@@ -1017,7 +1017,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Average' => '1',
-						'Warning' => '1',
+						'Warning' => '1'
 					]
 				]
 			],
@@ -1631,7 +1631,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	private function checkPopupContent($data, $widget, $show){
 		$expected_popup = [
 			'fields' => [
-				'Time' => '2018-10-23 12:33:48',
+				'Time' => '2020-10-23 15:33:48',
 				'Host' => 'ЗАББИКС Сервер',
 				'Problem' => 'Test trigger to check tag filter on problem page',
 				'Ack' => 'No'

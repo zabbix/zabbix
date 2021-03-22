@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -665,11 +665,11 @@ class CFrontendSetup {
 		}
 
 		return [
-			'name' => _('TLS certificate file'),
+			'name' => _('Database TLS certificate file'),
 			'current' => implode(', ', $writeable),
 			'required' => null,
 			'result' => $writeable ? self::CHECK_FATAL : self::CHECK_OK,
-			'error' => _s('TLS certificate files must be read-only')
+			'error' => _s('Database TLS certificate files must be read-only')
 		];
 	}
 }

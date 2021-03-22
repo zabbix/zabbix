@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageScreens extends CLegacyWebTest {
 
 	public static function allScreens() {
-		return CDBHelper::getDataProvider('SELECT screenid,name FROM screens WHERE templateid IS NULL ORDER BY screenid');
+		return CDBHelper::getDataProvider('SELECT screenid,name FROM screens ORDER BY screenid');
 	}
 
 	public function testPageScreens_CheckLayout() {
-		$screens = CDBHelper::getAll('SELECT name FROM screens WHERE templateid IS NULL');
+		$screens = CDBHelper::getAll('SELECT name FROM screens');
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');

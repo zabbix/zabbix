@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,6 +104,7 @@ do									\
 }									\
 while (0)
 
+/* AR_META is always excluded */
 #define UNSET_RESULT_EXCLUDING(res, exc_type) 					\
 										\
 do										\
@@ -213,6 +214,7 @@ void	free_key_access_rules(void);
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
+void	set_user_parameter_dir(const char *path);
 int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
 int	add_user_module(const char *key, int (*function)(void));
 void	test_parameters(void);

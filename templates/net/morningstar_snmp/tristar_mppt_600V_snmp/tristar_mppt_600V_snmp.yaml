@@ -1,0 +1,1043 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-11-12T10:51:57Z'
+  groups:
+    -
+      name: Templates/Modules
+  templates:
+    -
+      template: 'Morningstar TriStar MPPT 600V SNMP'
+      name: 'Morningstar TriStar MPPT 600V SNMP'
+      description: |
+        MIBs used:
+        TRISTAR-MPPT
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Modules
+      applications:
+        -
+          name: Array
+        -
+          name: Battery
+        -
+          name: Counter
+        -
+          name: Status
+        -
+          name: Temperature
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Array: Array Current'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.31.0
+          key: 'array.current[arrayCurrent.0]'
+          history: 7d
+          value_type: FLOAT
+          units: A
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Array Current
+            Scaling Factor:1.0
+            Units:A
+            Range:[-10, 80]
+            Modbus address:0x001d
+          applications:
+            -
+              name: Array
+        -
+          name: 'Array: Sweep Pmax'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.33.0
+          key: 'array.sweep_pmax[arrayPmaxLastSweep.0]'
+          history: 7d
+          value_type: FLOAT
+          units: W
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Pmax (last sweep)
+            Scaling Factor:1.0
+            Units:W
+            Range:[-10, 5000]
+            Modbus address:0x003c
+          applications:
+            -
+              name: Array
+        -
+          name: 'Array: Sweep Vmp'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.34.0
+          key: 'array.sweep_vmp[arrayVmpLastSweep.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Vmp (last sweep)
+            Scaling Factor:1.0
+            Units:V
+            Range:[-10, 650.0]
+            Modbus address:0x003d
+          applications:
+            -
+              name: Array
+        -
+          name: 'Array: Sweep Voc'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.35.0
+          key: 'array.sweep_voc[arrayVocLastSweep.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Voc (last sweep)
+            Scaling Factor:1.0
+            Units:V
+            Range:[-10, 650.0]
+            Modbus address:0x003e
+          applications:
+            -
+              name: Array
+        -
+          name: 'Array: Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.30.0
+          key: 'array.voltage[arrayVoltage.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Array Voltage
+            Scaling Factor:1.0
+            Units:V
+            Range:[-10, 650]
+            Modbus address:0x001b
+          applications:
+            -
+              name: Array
+        -
+          name: 'Battery: Battery Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.36.0
+          key: 'battery.voltage.discovery[batteryVoltage.0]'
+          delay: 15m
+          history: '0'
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Battery voltage
+            Scaling Factor:1.0
+            Units:V
+            Range:[-10, 80]
+            Modbus address:0x0018
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'Battery: Charge Current'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.42.0
+          key: 'charge.current[batteryCurrent.0]'
+          history: 7d
+          value_type: FLOAT
+          units: A
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Battery Current
+            Scaling Factor:1.0
+            Units:A
+            Range:[-10, 80]
+            Modbus address:0x001c
+          applications:
+            -
+              name: Battery
+        -
+          name: 'Battery: Output Power'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.44.0
+          key: 'charge.output_power[ outputPower.0]'
+          history: 7d
+          value_type: FLOAT
+          units: W
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Output Power
+            Scaling Factor:1.0
+            Units:W
+            Range:[-10, 4000]
+            Modbus address:0x003a
+          applications:
+            -
+              name: Battery
+        -
+          name: 'Battery: Charge State'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.46.0
+          key: 'charge.state[chargeState.0]'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Charge State
+            Modbus address:0x0032
+            
+            0: Start
+            1: NightCheck
+            2: Disconnect
+            3: Night
+            4: Fault
+            5: Mppt
+            6: Absorption
+            7: Float
+            8: Equalize
+            9: Slave
+            10: Fixed
+          applications:
+            -
+              name: Battery
+          valuemap:
+            name: 'TriStar MPPT 600V charge state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          triggers:
+            -
+              expression: '{last()}={$CHARGE.STATE.CRIT}'
+              name: 'Battery: Device charge in critical state'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{last()}={$CHARGE.STATE.WARN}'
+              name: 'Battery: Device charge in warning state'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Battery: Device charge in critical state'
+                  expression: '{Morningstar TriStar MPPT 600V SNMP:charge.state[chargeState.0].last()}={$CHARGE.STATE.CRIT}'
+        -
+          name: 'Counter: Charge Amp-hours'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.50.0
+          key: 'counter.charge_amp_hours[ahChargeResetable.0]'
+          history: 7d
+          value_type: FLOAT
+          units: Ah
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Ah Charge Resetable
+            Scaling Factor:1.0
+            Units:Ah
+            Range:[0.0, 5000]
+            Modbus addresses:H=0x0034 L=0x0035
+          applications:
+            -
+              name: Counter
+        -
+          name: 'Counter: Charge KW-hours'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.52.0
+          key: 'counter.charge_kw_hours[kwhChargeResetable.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '!kWh'
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:kWh Charge Resetable
+            Scaling Factor:1.0
+            Units:kWh
+            Range:[0.0, 65535.0]
+            Modbus address:0x0038
+          applications:
+            -
+              name: Counter
+        -
+          name: 'Status: Alarms'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.57.0
+          key: 'status.alarms[alarms.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Alarms
+            Modbus addresses:H=0x002e L=0x002f
+          applications:
+            -
+              name: Status
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'rtsOpen',
+                    'rtsShorted',
+                    'rtsDisconnected',
+                    'heatsinkTempSensorOpen',
+                    'heatsinkTempSensorShorted',
+                    'highTemperatureCurrentLimit',
+                    'currentLimit',
+                    'currentOffset',
+                    'batterySense',
+                    'batterySenseDisconnected',
+                    'uncalibrated',
+                    'rtsMiswire',
+                    'highVoltageDisconnect',
+                    'undefined',
+                    'systemMiswire',
+                    'mosfetSOpen',
+                    'p12VoltageOutOfRange',
+                    'highArrayVCurrentLimit',
+                    'maxAdcValueReached',
+                    'controllerWasReset',
+                    'alarm21Internal',
+                    'p3VoltageOutOfRange',
+                    'derateLimit',
+                    'arrayCurrentOffset',
+                    'ee-i2cRetryLimit',
+                    'ethernetAlarm',
+                    'lvd',
+                    'software',
+                    'fp12VoltageOutOfRange',
+                    'extflashFault',
+                    'slaveControlFault',
+                    'alarm32Undefined'
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No alarms';
+                  
+          triggers:
+            -
+              expression: '{count(#3,"alarm21Internal","like")}=2'
+              name: 'Status: Device has "alarm21Internal" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"arrayCurrentOffset","like")}=2'
+              name: 'Status: Device has "arrayCurrentOffset" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"batterySense","like")}=2'
+              name: 'Status: Device has "batterySense" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"batterySenseDisconnected","like")}=2'
+              name: 'Status: Device has "batterySenseDisconnected" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"controllerWasReset","like")}=2'
+              name: 'Status: Device has "controllerWasReset" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"currentLimit","like")}=2'
+              name: 'Status: Device has "currentLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"currentOffset","like")}=2'
+              name: 'Status: Device has "currentOffset" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"derateLimit","like")}=2'
+              name: 'Status: Device has "derateLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"ee-i2cRetryLimit","like")}=2'
+              name: 'Status: Device has "ee-i2cRetryLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"ethernetAlarm","like")}=2'
+              name: 'Status: Device has "ethernetAlarm" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"extflashFault","like")}=2'
+              name: 'Status: Device has "extflashFault" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"fp12VoltageOutOfRange","like")}=2'
+              name: 'Status: Device has "fp12VoltageOutOfRange" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"heatsinkTempSensorOpen","like")}=2'
+              name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"heatsinkTempSensorShorted","like")}=2'
+              name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"highArrayVCurrentLimit","like")}=2'
+              name: 'Status: Device has "highArrayVCurrentLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"highTemperatureCurrentLimit","like")}=2'
+              name: 'Status: Device has "highTemperatureCurrentLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"highVoltageDisconnect","like")}=2'
+              name: 'Status: Device has "highVoltageDisconnect" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"lvd","like")}=2'
+              name: 'Status: Device has "lvd" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"maxAdcValueReached","like")}=2'
+              name: 'Status: Device has "maxAdcValueReached" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"mosfetSOpen","like")}=2'
+              name: 'Status: Device has "mosfetSOpen" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"p3VoltageOutOfRange","like")}=2'
+              name: 'Status: Device has "p3VoltageOutOfRange" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"p12VoltageOutOfRange","like")}=2'
+              name: 'Status: Device has "p12VoltageOutOfRange" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"rtsDisconnected","like")}=2'
+              name: 'Status: Device has "rtsDisconnected" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"rtsMiswire","like")}=2'
+              name: 'Status: Device has "rtsMiswire" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"rtsShorted","like")}=2'
+              name: 'Status: Device has "rtsShorted" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"slaveControlFault","like")}=2'
+              name: 'Status: Device has "slaveControlFault" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"software","like")}=2'
+              name: 'Status: Device has "software" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"systemMiswire","like")}=2'
+              name: 'Status: Device has "systemMiswire" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              expression: '{count(#3,"uncalibrated","like")}=2'
+              name: 'Status: Device has "uncalibrated" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+        -
+          name: 'Status: Faults'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.55.0
+          key: 'status.faults[faults.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Faults
+            Modbus addresses:H=0x002c L=0x002d
+          applications:
+            -
+              name: Status
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'overcurrent',
+                    'fetShort',
+                    'softwareFault',
+                    'batteryHvd',
+                    'arrayHvd',
+                    'dipSwitchChange',
+                    'customSettingsEdit',
+                    'rtsShorted',
+                    'rtsDisconnected',
+                    'eepromRetryLimit',
+                    'controllerWasReset',
+                    'chargeSlaveControlTimeout',
+                    'rs232SerialToMeterBridge',
+                    'batteryLvd',
+                    'fault14Undefined',
+                    'powerboardCommunicationFault',
+                    'fault16Software',
+                    'fault17Software',
+                    'fault18Software',
+                    'fault19Software',
+                    'fault20Software',
+                    'fault21Software',
+                    'fpgaVersion',
+                    'currentSensorReferenceOutOfRange',
+                    'ia-refSlaveModeTimeout',
+                    'blockbusBoot',
+                    'hscommMaster',
+                    'hscomm',
+                    'slave',
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No faults';
+                  
+          triggers:
+            -
+              expression: '{count(#3,"arrayHvd","like")}=2'
+              name: 'Status: Device has "arrayHvd" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"batteryHvd","like")}=2'
+              name: 'Status: Device has "batteryHvd" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"batteryLvd","like")}=2'
+              name: 'Status: Device has "batteryLvd" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"blockbusBoot","like")}=2'
+              name: 'Status: Device has "blockbusBoot" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"chargeSlaveControlTimeout","like")}=2'
+              name: 'Status: Device has "chargeSlaveControlTimeout" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"controllerWasReset","like")}=2'
+              name: 'Status: Device has "controllerWasReset" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"currentSensorReferenceOutOfRange","like")}=2'
+              name: 'Status: Device has "currentSensorReferenceOutOfRange" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"customSettingsEdit","like")}=2'
+              name: 'Status: Device has "customSettingsEdit" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"dipSwitchChange","like")}=2'
+              name: 'Status: Device has "dipSwitchChange" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"eepromRetryLimit","like")}=2'
+              name: 'Status: Device has "eepromRetryLimit" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"fault16Software","like")}=2'
+              name: 'Status: Device has "fault16Software" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"fault17Software","like")}=2'
+              name: 'Status: Device has "fault17Software" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"fault18Software","like")}=2'
+              name: 'Status: Device has "fault18Software" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"fault19Software","like")}=2'
+              name: 'Status: Device has "fault19Software" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"fault20Software","like")}=2'
+              name: 'Status: Device has "fault20Software" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"fault21Software","like")}=2'
+              name: 'Status: Device has "fault21Software" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"fetShort","like")}=2'
+              name: 'Status: Device has "fetShort" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"fpgaVersion","like")}=2'
+              name: 'Status: Device has "fpgaVersion" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"hscomm","like")}=2'
+              name: 'Status: Device has "hscomm" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"hscommMaster","like")}=2'
+              name: 'Status: Device has "hscommMaster" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"ia-refSlaveModeTimeout","like")}=2'
+              name: 'Status: Device has "ia-refSlaveModeTimeout" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"overcurrent","like")}=2'
+              name: 'Status: Device has "overcurrent" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"powerboardCommunicationFault","like")}=2'
+              name: 'Status: Device has "powerboardCommunicationFault" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"rs232SerialToMeterBridge","like")}=2'
+              name: 'Status: Device has "rs232SerialToMeterBridge" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"rtsDisconnected","like")}=2'
+              name: 'Status: Device has "rtsDisconnected" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"rtsShorted","like")}=2'
+              name: 'Status: Device has "rtsShorted" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"slave","like")}=2'
+              name: 'Status: Device has "slave" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{count(#3,"softwareFault","like")}=2'
+              name: 'Status: Device has "softwareFault" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+        -
+          name: 'Status: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: status.uptime
+          history: 7d
+          units: uptime
+          description: 'Device uptime in seconds'
+          applications:
+            -
+              name: Status
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'Status: Device has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+            -
+              expression: '{nodata(5m)}=1'
+              name: 'Status: Failed to fetch data (or no data for 5m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 5 minutes'
+              manual_close: 'YES'
+        -
+          name: 'Battery: Target Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.45.0
+          key: 'target.voltage[targetRegulationVoltage.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Target Voltage
+            Scaling Factor:1.0
+            Units:V
+            Range:[-10, 650.0]
+            Modbus address:0x0033
+          applications:
+            -
+              name: Battery
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'Temperature: Battery'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.48.0
+          key: 'temp.battery[batteryTemperature.0]'
+          history: 7d
+          value_type: FLOAT
+          units: C
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:Batt. Temp
+            Scaling Factor:1.0
+            Units:C
+            Range:[-40, 80]
+            Modbus address:0x0025
+          applications:
+            -
+              name: Temperature
+          triggers:
+            -
+              expression: '{min(5m)}>{$BATTERY.TEMP.MAX.CRIT}'
+              name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{max(5m)}<{$BATTERY.TEMP.MIN.CRIT}'
+              name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+            -
+              expression: '{min(5m)}>{$BATTERY.TEMP.MAX.WARN}'
+              name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+                  expression: '{Morningstar TriStar MPPT 600V SNMP:temp.battery[batteryTemperature.0].min(5m)}>{$BATTERY.TEMP.MAX.CRIT}'
+            -
+              expression: '{max(5m)}<{$BATTERY.TEMP.MIN.WARN}'
+              name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+                  expression: '{Morningstar TriStar MPPT 600V SNMP:temp.battery[batteryTemperature.0].max(5m)}<{$BATTERY.TEMP.MIN.CRIT}'
+        -
+          name: 'Temperature: Heatsink'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.7.49.0
+          key: 'temp.heatsink[heatsinkTemperature.0]'
+          history: 7d
+          value_type: FLOAT
+          units: C
+          description: |
+            MIB: TRISTAR-MPPT
+            Description:HS Temp
+            Scaling Factor:1.0
+            Units:C
+            Range:[-40, 80]
+            Modbus address:0x0023
+          applications:
+            -
+              name: Temperature
+      discovery_rules:
+        -
+          name: 'Battery voltage discovery'
+          type: DEPENDENT
+          key: battery.voltage.discovery
+          delay: '0'
+          description: 'Discovery for battery voltage triggers'
+          item_prototypes:
+            -
+              name: 'Battery: Voltage{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.7.36.0
+              key: 'battery.voltage[batteryVoltage.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: TRISTAR-MPPT
+                Description:Battery voltage
+                Scaling Factor:1.0
+                Units:V
+                Range:[-10, 80]
+                Modbus address:0x0018
+              applications:
+                -
+                  name: Battery
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{#VOLTAGE.MAX.CRIT}'
+                  name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                -
+                  expression: '{max(5m)}<{#VOLTAGE.MIN.CRIT}'
+                  name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                -
+                  expression: '{min(5m)}>{#VOLTAGE.MAX.WARN}'
+                  name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                      expression: '{Morningstar TriStar MPPT 600V SNMP:battery.voltage[batteryVoltage.0{#SINGLETON}].min(5m)}>{#VOLTAGE.MAX.CRIT}'
+                -
+                  expression: '{max(5m)}<{#VOLTAGE.MIN.WARN}'
+                  name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                      expression: '{Morningstar TriStar MPPT 600V SNMP:battery.voltage[batteryVoltage.0{#SINGLETON}].max(5m)}<{#VOLTAGE.MIN.CRIT}'
+          graph_prototypes:
+            -
+              name: 'Battery: Voltage{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Morningstar TriStar MPPT 600V SNMP'
+                    key: 'battery.voltage[batteryVoltage.0{#SINGLETON}]'
+          master_item:
+            key: 'battery.voltage.discovery[batteryVoltage.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var v_range = [
+                        [[0, 18], [12, 15, 11.5, 15.5]],
+                        [[18, 36], [24, 30, 23, 31]],
+                        [[36, 99], [48, 60, 46, 62]],
+                    ],
+                    result = [];
+                  
+                  for (var idx in v_range) {
+                      if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {
+                          result = [{
+                              '{#VOLTAGE.MIN.WARN}': parseInt({$VOLTAGE.MIN.WARN}) || v_range[idx][1][0],
+                              '{#VOLTAGE.MAX.WARN}': parseInt({$VOLTAGE.MAX.WARN}) || v_range[idx][1][1],
+                              '{#VOLTAGE.MIN.CRIT}': parseInt({$VOLTAGE.MIN.CRIT}) || v_range[idx][1][2],
+                              '{#VOLTAGE.MAX.CRIT}': parseInt({$VOLTAGE.MAX.CRIT}) || v_range[idx][1][3],
+                              '{#SINGLETON}': ''
+                          }];
+                          break;
+                      }
+                  }
+                  
+                  return JSON.stringify(result);
+      macros:
+        -
+          macro: '{$BATTERY.TEMP.MAX.CRIT}'
+          value: '60'
+          description: 'Battery high temperature critical value'
+        -
+          macro: '{$BATTERY.TEMP.MAX.WARN}'
+          value: '45'
+          description: 'Battery high temperature warning value'
+        -
+          macro: '{$BATTERY.TEMP.MIN.CRIT}'
+          value: '-20'
+          description: 'Battery low temperature critical value'
+        -
+          macro: '{$BATTERY.TEMP.MIN.WARN}'
+          value: '0'
+          description: 'Battery low temperature warning value'
+        -
+          macro: '{$CHARGE.STATE.CRIT}'
+          value: '4'
+          description: fault
+        -
+          macro: '{$CHARGE.STATE.WARN}'
+          value: '2'
+          description: disconnect
+        -
+          macro: '{$LOAD.STATE.CRIT:"fault"}'
+          value: '4'
+          description: fault
+        -
+          macro: '{$LOAD.STATE.CRIT:"lvd"}'
+          value: '3'
+          description: lvd
+        -
+          macro: '{$LOAD.STATE.WARN:"disconnect"}'
+          value: '5'
+          description: disconnect
+        -
+          macro: '{$LOAD.STATE.WARN:"lvdWarning"}'
+          value: '2'
+          description: lvdWarning
+        -
+          macro: '{$LOAD.STATE.WARN:"override"}'
+          value: '7'
+          description: override
+        -
+          macro: '{$VOLTAGE.MAX.CRIT}'
+        -
+          macro: '{$VOLTAGE.MAX.WARN}'
+        -
+          macro: '{$VOLTAGE.MIN.CRIT}'
+        -
+          macro: '{$VOLTAGE.MIN.WARN}'
+  graphs:
+    -
+      name: 'Array: Voltage'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar TriStar MPPT 600V SNMP'
+            key: 'array.sweep_vmp[arrayVmpLastSweep.0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Morningstar TriStar MPPT 600V SNMP'
+            key: 'array.sweep_voc[arrayVocLastSweep.0]'
+        -
+          sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: F63100
+          item:
+            host: 'Morningstar TriStar MPPT 600V SNMP'
+            key: 'array.voltage[arrayVoltage.0]'
+    -
+      name: 'Battery: Current'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar TriStar MPPT 600V SNMP'
+            key: 'charge.current[batteryCurrent.0]'
+    -
+      name: 'Battery: Output Power (Watts)'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar TriStar MPPT 600V SNMP'
+            key: 'charge.output_power[ outputPower.0]'
+    -
+      name: 'Temperature: Battery/Heatsink'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar TriStar MPPT 600V SNMP'
+            key: 'temp.battery[batteryTemperature.0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Morningstar TriStar MPPT 600V SNMP'
+            key: 'temp.heatsink[heatsinkTemperature.0]'
+  value_maps:
+    -
+      name: 'TriStar MPPT 600V charge state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Start
+        -
+          value: '1'
+          newvalue: NightCheck
+        -
+          value: '2'
+          newvalue: Disconnect
+        -
+          value: '3'
+          newvalue: Night
+        -
+          value: '4'
+          newvalue: Fault
+        -
+          value: '5'
+          newvalue: Mppt
+        -
+          value: '6'
+          newvalue: Absorption
+        -
+          value: '7'
+          newvalue: Float
+        -
+          value: '8'
+          newvalue: Equalize
+        -
+          value: '9'
+          newvalue: Slave
+        -
+          value: '10'
+          newvalue: Fixed

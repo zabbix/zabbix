@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,11 +86,11 @@ class CApiWrapper {
 	 * Pre-process and call the client method.
 	 *
 	 * @param string 	$method		API method name
-	 * @param mixed 	$params		API method parameters
+	 * @param array 	$params		API method parameters
 	 *
 	 * @return CApiClientResponse
 	 */
-	protected function callMethod($method, $params) {
+	protected function callMethod($method, array $params) {
 		return $this->callClientMethod($method, $params);
 	}
 
@@ -98,11 +98,11 @@ class CApiWrapper {
 	 * Call the client method and return the result.
 	 *
 	 * @param string 	$method		API method name
-	 * @param mixed 	$params		API method parameters
+	 * @param array 	$params		API method parameters
 	 *
 	 * @return CApiClientResponse
 	 */
-	protected function callClientMethod($method, $params) {
+	protected function callClientMethod($method, array $params) {
 		return $this->client->callMethod($this->api, $method, $params, $this->auth);
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,23 @@
 
 class CControllerGuiEdit extends CController {
 
+	/**
+	 * @var array
+	 */
+	protected $timezones;
+
 	protected function init() {
 		$this->disableSIDValidation();
+
+		$this->timezones = [
+			ZBX_DEFAULT_TIMEZONE => CDateTimeZoneHelper::getSystemDateTimeZone()
+		] + (new CDateTimeZoneHelper())->getAllDateTimeZones();
 	}
 
 	protected function checkInput() {
 		$fields = [
 			'default_lang' =>				'db config.default_lang',
-			'default_timezone' =>			'db config.default_timezone',
+			'default_timezone' =>			'db config.default_timezone|in '.implode(',', array_keys($this->timezones)),
 			'default_theme' =>				'db config.default_theme',
 			'search_limit' =>				'db config.search_limit',
 			'max_overview_table_size' =>	'db config.max_overview_table_size',
@@ -51,7 +60,7 @@ class CControllerGuiEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction() {
@@ -60,6 +69,7 @@ class CControllerGuiEdit extends CController {
 			'default_timezone' => $this->getInput('default_timezone', CSettingsHelper::get(
 				CSettingsHelper::DEFAULT_TIMEZONE
 			)),
+			'timezones' => $this->timezones,
 			'default_theme' => $this->getInput('default_theme', CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME)),
 			'search_limit' => $this->getInput('search_limit', CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)),
 			'max_overview_table_size' => $this->getInput('max_overview_table_size', CSettingsHelper::get(

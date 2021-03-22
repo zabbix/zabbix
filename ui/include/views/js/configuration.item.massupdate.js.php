@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,11 +54,13 @@ include dirname(__FILE__).'/itemtest.js.php';
 </script>
 <script type="text/javascript">
 	jQuery(function($) {
-		$('#visible_type, #visible_interface').click(function() {
+		var item_interface_types = <?= json_encode(itemTypeInterface()) ?>,
+			interface_ids_by_types = <?= json_encode($interface_ids_by_types) ?>;
+
+		$('#visible_type, #visible_interfaceid').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!$('#visible_type').is(':checked')) {
-				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
-				organizeInterfaces(itemInterfaceTypes[<?= json_encode($data['initial_item_type']) ?>]);
+				organizeInterfaces(interface_ids_by_types, item_interface_types, <?= json_encode($data['initial_item_type']) ?>);
 			}
 			else {
 				$('#type').trigger('change');
@@ -68,8 +70,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
-				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
+				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(jQuery(this).val()));
 			})
 			.trigger('change');
 

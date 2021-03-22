@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ class CJsonRpc {
 	 */
 	protected $apiClient;
 
-	private $_error;
 	private $_response;
 	private $_error_list;
 	private $_zbx2jsonErrors;
@@ -47,7 +46,6 @@ class CJsonRpc {
 
 		$this->initErrors();
 
-		$this->_error = false;
 		$this->_response = [];
 		$this->_jsonDecoded = json_decode($data, true);
 	}
@@ -59,67 +57,63 @@ class CJsonRpc {
 	 */
 	public function execute() {
 		if (json_last_error()) {
-			$this->jsonError(null, '-32700', null, null, true);
+			$this->jsonError([], '-32700', null, null, true);
 			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 		}
 
 		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded === []) {
-			$this->jsonError(null, '-32600', null, null, true);
+			$this->jsonError([], '-32600', null, null, true);
 			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
 		}
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
-			$call = is_array($call) ? $call : [$call];
-
-			// notification
-			if (!array_key_exists('id', $call)) {
-				$call['id'] = null;
-			}
-
 			if (!$this->validate($call)) {
 				continue;
 			}
 
-			list($api, $method) = array_merge(explode('.', $call['method']), [null, null]);
-			$result = $this->apiClient->callMethod($api, $method, $call['params'],
-				array_key_exists('auth', $call) ? $call['auth'] : null
-			);
+			list($api, $method) = explode('.', $call['method']) + [1 => ''];
+			$result = $this->apiClient->callMethod($api, $method, $call['params'], $call['auth']);
 
 			$this->processResult($call, $result);
+		}
+
+		if ($this->_response === array_fill(0, count($this->_response), null)) {
+			return '';
 		}
 
 		if (is_array($this->_jsonDecoded)
 				&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)) {
 			// Return response as encoded batch if $this->_jsonDecoded is associative array.
-			return json_encode($this->_response, JSON_UNESCAPED_SLASHES);
+			return json_encode(array_values(array_filter($this->_response)), JSON_UNESCAPED_SLASHES);
 		}
 
-		return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
+		return ($this->_response[0] !== null) ? json_encode($this->_response[0], JSON_UNESCAPED_SLASHES) : '';
 	}
 
-	public function validate($call) {
-		if (!isset($call['jsonrpc'])) {
-			$this->jsonError($call['id'], '-32600', _('JSON-rpc version is not specified.'), null, true);
-
-			return false;
+	public function validate(&$call) {
+		if (is_array($call)) {
+			$call = array_intersect_key($call, array_flip(['jsonrpc', 'method', 'params', 'auth', 'id']));
 		}
 
-		if ($call['jsonrpc'] != self::VERSION) {
-			$this->jsonError($call['id'], '-32600',
-				_s('Expecting JSON-rpc version 2.0, "%1$s" is given.', $call['jsonrpc']), null, true
-			);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'jsonrpc' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => self::VERSION],
+			'method' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'params' =>		['type' => API_JSONRPC_PARAMS, 'flags' => API_REQUIRED],
+			'auth' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null],
+			'id' =>			['type' => API_JSONRPC_ID]
+		]];
 
-			return false;
-		}
+		if (!CApiInputValidator::validate($api_input_rules, $call, '/', $error)) {
+			$call_id = is_array($call) ? array_intersect_key($call, array_flip(['id'])) : [];
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+				'id' =>	['type' => API_JSONRPC_ID]
+			]];
 
-		if (!isset($call['method'])) {
-			$this->jsonError($call['id'], '-32600', _('JSON-rpc method is not defined.'));
+			if (!CApiInputValidator::validate($api_input_rules, $call_id, '', $err)) {
+				$call_id = [];
+			}
 
-			return false;
-		}
-
-		if (isset($call['params']) && !is_array($call['params'])) {
-			$this->jsonError($call['id'], '-32602', _('JSON-rpc params is not an Array.'));
+			$this->jsonError($call_id, '-32600', $error, null, true);
 
 			return false;
 		}
@@ -127,58 +121,51 @@ class CJsonRpc {
 		return true;
 	}
 
-	public function processResult($call, CApiClientResponse $response) {
+	public function processResult(array $call, CApiClientResponse $response) {
 		if ($response->errorCode) {
 			$errno = $this->_zbx2jsonErrors[$response->errorCode];
 
-			$this->jsonError($call['id'], $errno, $response->errorMessage, $response->debug);
+			$this->jsonError($call, $errno, $response->errorMessage, $response->debug);
 		}
 		else {
-			// Notifications MUST NOT be answered
-			if ($call['id'] === null) {
-				return;
-			}
-
-			$formedResp = [
-				'jsonrpc' => self::VERSION,
-				'result' => $response->data,
-				'id' => $call['id']
-			];
-
-			$this->_response[] = $formedResp;
+			// Notifications (request object without an "id" member) MUST NOT be answered.
+			$this->_response[] = array_key_exists('id', $call)
+				? [
+					'jsonrpc' => self::VERSION,
+					'result' => $response->data,
+					'id' => $call['id']
+				]
+				: null;
 		}
 	}
 
-	private function jsonError($id, $errno, $data = null, $debug = null, $force_err = false) {
+	private function jsonError(array $call, $errno, $data = null, $debug = null, $force_err = false) {
 		// Notifications MUST NOT be answered, but error MUST be generated on JSON parse error
-		if (is_null($id) && !$force_err) {
+		if (!$force_err && !array_key_exists('id', $call)) {
+			$this->_response[] = null;
 			return;
 		}
 
-		$this->_error = true;
-
-		if (!isset($this->_error_list[$errno])) {
-			$data = _s('JSON-rpc error generation failed. No such error "%1$s".', $errno);
+		if (!array_key_exists($errno, $this->_error_list)) {
+			$data = _s('JSON-RPC error generation failed. No such error "%1$s".', $errno);
 			$errno = '-32400';
 		}
 
 		$error = $this->_error_list[$errno];
 
-		if (!is_null($data)) {
+		if ($data !== null) {
 			$error['data'] = $data;
 		}
-		if (!is_null($debug)) {
+
+		if ($debug !== null) {
 			$error['debug'] = $debug;
 		}
 
-
-		$formed_error = [
+		$this->_response[] = [
 			'jsonrpc' => self::VERSION,
 			'error' => $error,
-			'id' => $id
+			'id' => array_key_exists('id', $call) ? $call['id'] : null
 		];
-
-		$this->_response[] = $formed_error;
 	}
 
 	private function initErrors() {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'parse' => true,
 					'parse_query' => [
 						['name' => 'login', 'value' => 'admin'],
-						['name' => 'password', 'value' => 's00p3r$ecr3&'],
+						['name' => 'password', 'value' => 's00p3r$ecr3&']
 					],
 					'check_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
@@ -99,12 +99,12 @@ class testFormWebStep extends CLegacyWebTest {
 					'step_name' => 'Step existing query fields merge',
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?password=s00p3r%24ecr3%26',
 					'query' => [
-						['name' => 'login', 'value' => 'admin'],
+						['name' => 'login', 'value' => 'admin']
 					],
 					'parse' => true,
 					'parse_query' => [
 						['name' => 'login', 'value' => 'admin'],
-						['name' => 'password', 'value' => 's00p3r$ecr3&'],
+						['name' => 'password', 'value' => 's00p3r$ecr3&']
 					],
 					'check_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
@@ -118,7 +118,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'parse' => true,
 					'parse_query' => [
 						['name' => 'login', 'value' => 'admin'],
-						['name' => 'password', 'value' => 's00p3r$ecr3&'],
+						['name' => 'password', 'value' => 's00p3r$ecr3&']
 					],
 					'check_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
@@ -217,7 +217,7 @@ class testFormWebStep extends CLegacyWebTest {
 						['name' => 'zab bix', 'value' => 'tes&t']
 					],
 					'raw' => true,
-					'check_raw' => 'zab%20bix=tes%26t',
+					'check_raw' => 'zab%20bix=tes%26t'
 				]
 			],
 			[
@@ -586,7 +586,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'step_name' => 'Step headers -empty value',
 					'url' => 'http://www.zabbix.com',
 					'headers' => [
-						['name' => 'test'],
+						['name' => 'test']
 					],
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
@@ -603,7 +603,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'step_name' => 'Step headers -empty name',
 					'url' => 'http://www.zabbix.com',
 					'headers' => [
-						['value' => 'test'],
+						['value' => 'test']
 					],
 					'error_webform' => true,
 					'error_msg' => 'Cannot add web scenario',
@@ -639,7 +639,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'step_name' => 'Step retrieve only headers with post value',
 					'url' => 'http://www.zabbix.com',
 					'post' => [
-						['value' => 'test'],
+						['value' => 'test']
 					],
 					'retrieve' => 'Headers'
 				]
@@ -651,7 +651,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'step_name' => 'Step retrieve mode headers with post name',
 					'url' => 'http://www.zabbix.com',
 					'post' => [
-						['name' => 'test'],
+						['name' => 'test']
 					],
 					'retrieve' => 'Headers'
 				]
@@ -663,7 +663,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'step_name' => 'Step retrieve mode headers with post value and name',
 					'url' => 'http://www.zabbix.com',
 					'post' => [
-						['name' => 'xxx' , 'value' => 'yyy'],
+						['name' => 'xxx' , 'value' => 'yyy']
 					],
 					'retrieve' => 'Headers'
 				]
@@ -756,10 +756,10 @@ class testFormWebStep extends CLegacyWebTest {
 						['name' => 'query', 'value' => 'test_query']
 					],
 					'variables' => [
-						['name' => '{variable}', 'value' => 'test_variable'],
+						['name' => '{variable}', 'value' => 'test_variable']
 					],
 					'headers' => [
-						['name' => 'header', 'value' => 'test_header'],
+						['name' => 'header', 'value' => 'test_header']
 					],
 					'timeout' => 3600,
 					'string' => 'Zabbix',
@@ -783,10 +783,10 @@ class testFormWebStep extends CLegacyWebTest {
 						['name' => 'query', 'value' => 'test_query']
 					],
 					'variables' => [
-						['name' => '{variable}', 'value' => 'test_variable'],
+						['name' => '{variable}', 'value' => 'test_variable']
 					],
 					'headers' => [
-						['name' => 'header', 'value' => 'test_header'],
+						['name' => 'header', 'value' => 'test_header']
 					],
 					'retrieve' => 'Body and headers',
 					'timeout' => 1,

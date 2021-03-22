@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,7 @@ else {
 	$data = $_REQUEST;
 }
 
-if (is_array($data) && array_key_exists('method', $data)
-		&& in_array($data['method'], ['message.settings', 'message.get', 'zabbix.status'])) {
+if (is_array($data) && array_key_exists('method', $data) && $data['method'] === 'zabbix.status') {
 	CWebUser::disableSessionExtension();
 }
 
@@ -509,6 +508,42 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'roles':
+				$roles = API::Role()->get([
+					'output' => ['roleid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($roles) {
+					CArrayHelper::sort($roles, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$roles = array_slice($roles, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($roles, ['roleid' => 'id']);
+				}
+				break;
+
+			case 'api_methods':
+				$result = [];
+				$user_type = array_key_exists('user_type', $data) ? $data['user_type'] : USER_TYPE_ZABBIX_USER;
+				$search = array_key_exists('search', $data) ? $data['search'] : '';
+
+				$api_methods = array_slice(
+					preg_grep('/'.preg_quote($search).'/',
+						array_merge(CRoleHelper::getApiMethodMasks($user_type), CRoleHelper::getApiMethods($user_type))
+					),
+					0, $limit
+				);
+
+				foreach ($api_methods as $api_method) {
+					$result[] = ['id' => $api_method, 'name' => $api_method];
+				}
+				break;
 		}
 		break;
 

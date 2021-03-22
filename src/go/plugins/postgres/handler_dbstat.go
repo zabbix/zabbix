@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,23 +21,23 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresStatSum = "pgsql.dbstat.sum"
-	keyPostgresStat    = "pgsql.dbstat"
-)
+const pgVersionWithChecksum = 120000
 
-// dbStatHandler executes select from pg_catalog.pg_stat_database command for each database and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+// dbStatHandler executes select from pg_catalog.pg_stat_database
+// command for each database and returns JSON if all is OK or nil otherwise.
+func dbStatHandler(ctx context.Context, conn PostgresClient,
+	key string, _ map[string]string, _ ...string) (interface{}, error) {
 	var statJSON, query string
-	var err error
 
 	switch key {
-	case keyPostgresStatSum:
+	case keyDBStatSum:
 		query = `
   SELECT row_to_json (T)
     FROM  (
@@ -61,13 +61,13 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) 
       , sum(blk_write_time) as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if conn.version >= 120000 {
-			query = fmt.Sprintf(query, "sum(checksum_failures)")
+		if conn.PostgresVersion() >= pgVersionWithChecksum {
+			query = fmt.Sprintf(query, "sum(COALESCE(checksum_failures, 0))")
 		} else {
 			query = fmt.Sprintf(query, "null")
 		}
 
-	case keyPostgresStat:
+	case keyDBStat:
 		query = `
   SELECT json_object_agg(coalesce (datname,'null'), row_to_json(T))
     FROM  (
@@ -92,21 +92,25 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) 
       , blk_write_time as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if conn.version >= 120000 {
-			query = fmt.Sprintf(query, "checksum_failures")
+		if conn.PostgresVersion() >= pgVersionWithChecksum {
+			query = fmt.Sprintf(query, "COALESCE(checksum_failures, 0)")
 		} else {
 			query = fmt.Sprintf(query, "null")
 		}
 	}
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&statJSON)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&statJSON)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return statJSON, nil

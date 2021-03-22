@@ -30,7 +30,7 @@ This guide describes how to integrate your Zabbix 5.0 installation with OTRS usi
 
 [![](images/thumb.06.png?raw=true)](images/06.png)
 
-2\. In the **Administration** > **Media types** section, import the [media_otrs.xml](media_otrs.xml)
+2\. In the **Administration** > **Media types** section, import the [media_otrs.yaml](media_otrs.yaml)
 
 3\. Open the added **OTRS** media type and set:
 
@@ -58,7 +58,7 @@ For **Send to**: enter any text, as this value is not used, but is required.
 
 [![](images/thumb.09.png?raw=true)](images/09.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [OTRS](https://doc.otrs.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [OTRS](https://doc.otrs.com) documentations.
 
 ## Supported Versions
 

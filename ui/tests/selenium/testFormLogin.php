@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class testFormLogin extends CLegacyWebTest {
 				'password' => '',
 				'success_expected' => true,
 				'dbCheck' => false
-			]],
+			]]
 		];
 	}
 
@@ -97,13 +97,15 @@ class testFormLogin extends CLegacyWebTest {
 				$this->zbxTestTextPresent(['Username', 'Password']);
 				break;
 			case 'admin':
-				$this->zbxTestAssertElementText("//form//div[@class='red']", 'Login name or password is incorrect.');
+				$this->zbxTestAssertElementText("//form//div[@class='red']",
+					'Incorrect user name or password or account is temporarily blocked.'
+				);
 				$this->zbxTestTextPresent(['Username', 'Password']);
 				break;
 		}
 
 		if ($data['success_expected']) {
-			$this->zbxTestTextNotPresent('Login name or password is incorrect.');
+			$this->zbxTestTextNotPresent('Incorrect user name or password or account is temporarily blocked.');
 			$this->zbxTestCheckHeader('Global view');
 			$this->zbxTestTextNotPresent('Password');
 			$this->zbxTestTextNotPresent('Username');
@@ -114,7 +116,9 @@ class testFormLogin extends CLegacyWebTest {
 			$this->zbxTestTextNotPresent('Dashboard');
 		}
 		elseif ($data['dbCheck']) {
-			$this->zbxTestAssertElementText("//form//div[@class='red']", 'Login name or password is incorrect.');
+			$this->zbxTestAssertElementText("//form//div[@class='red']",
+				'Incorrect user name or password or account is temporarily blocked.'
+			);
 			$this->zbxTestTextPresent(['Username', 'Password']);
 			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'"));
 			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'"));
@@ -129,7 +133,7 @@ class testFormLogin extends CLegacyWebTest {
 			$this->zbxTestInputTypeWait('name', 'user-for-blocking');
 			$this->zbxTestInputTypeWait('password', '!@$#%$&^*(\"\'\\*;:');
 			$this->zbxTestClickWait('enter');
-			$this->zbxTestTextPresent('Login name or password is incorrect');
+			$this->zbxTestTextPresent('Incorrect user name or password or account is temporarily blocked.');
 			$this->zbxTestTextPresent('Username');
 			$this->zbxTestTextPresent('Password');
 
@@ -144,7 +148,7 @@ class testFormLogin extends CLegacyWebTest {
 		$this->zbxTestInputType('name', 'user-for-blocking');
 		$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->zbxTestClickWait('enter');
-		$this->zbxTestTextPresent(['Account is blocked for', 'seconds', 'Username', 'Password']);
+		$this->zbxTestTextPresent(['account is temporarily blocked', 'Username', 'Password']);
 		// account is blocked, waiting 30 sec and trying to login
 		sleep(30);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,10 @@
 				jQuery('#showsla').change();
 			}
 		}).change();
+
+		$('#period-type').on('change', (e) => {
+			document.forms['servicesForm'].submit();
+		});
 	});
 
 	function add_child_service(name, serviceid, trigger) {

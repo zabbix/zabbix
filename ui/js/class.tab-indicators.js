@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,13 +20,13 @@
 
 'use strict';
 
-const TAB_INDICATOR_ATTR_COUNT      = 'data-indicator-count';
-const TAB_INDICATOR_ATTR_STATUS     = 'data-indicator-status';
+const TAB_INDICATOR_ATTR_TYPE    = 'data-indicator';
+const TAB_INDICATOR_ATTR_VALUE   = 'data-indicator-value';
 
-const TAB_INDICATOR_STATUS_ENABLED  = 'enabled';
-const TAB_INDICATOR_STATUS_DISABLED = 'disabled';
+const TAB_INDICATOR_TYPE_COUNT   = 'count';
+const TAB_INDICATOR_TYPE_MARK    = 'mark';
 
-const TAB_INDICATOR_UPDATE_EVENT    = 'tab-indicator-update';
+const TAB_INDICATOR_UPDATE_EVENT = 'tab-indicator-update';
 
 /**
  * Main class to initialize tab indicators.
@@ -66,7 +66,6 @@ class TabIndicators {
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
 		const MAP = document.querySelector('#sysmap-form');
 		const GRAPH = document.querySelector('#widget-dialogue-form');
-		const MAINTENANCE = document.querySelector('#maintenance-form');
 
 		switch (true) {
 			case !!TEMPLATE:
@@ -105,8 +104,6 @@ class TabIndicators {
 				return MAP;
 			case !!GRAPH:
 				return GRAPH;
-			case !!MAINTENANCE:
-				return MAINTENANCE;
 			default:
 				throw 'Form not found.';
 		}
@@ -118,44 +115,26 @@ class TabIndicators {
 	activateIndicators() {
 		const tabs = this.form.querySelectorAll('#tabs a');
 
-		Object.values(tabs).map((elem) => {
-			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(elem));
+		Object.values(tabs).map((element) => {
+			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(element));
 
 			if (indicator_item instanceof TabIndicatorItem) {
-				this.addAttribute(elem, indicator_item.getType(), indicator_item.getValue());
-				indicator_item.initObserver(elem);
+				indicator_item
+					.addAttributes(element)
+					.initObserver(element);
 			}
 		});
 	}
 
 	/**
-	 * Add tab indicator attribute to tab element.
-	 *
-	 * @param {HTMLElement} elem  tab element
-	 * @param {null|TabIndicatorStatusType|TabIndicatorNumberType} type
-	 * @param {null|boolean|number} value
-	 */
-	addAttribute(elem, type, value) {
-		if (type instanceof TabIndicatorStatusType) {
-			elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-				value ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-			);
-		}
-
-		if (type instanceof TabIndicatorNumberType) {
-			elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, value);
-		}
-	}
-
-	/**
 	 * Get tab indicator name.
 	 *
-	 * @param {HTMLElement} elem  tab element.
+	 * @param {HTMLElement} element  tab element.
 	 *
 	 * @return {?string}
 	 */
-	getIndicatorNameByElement(elem) {
-		const attr = elem.getAttribute('js-indicator');
+	getIndicatorNameByElement(element) {
+		const attr = element.getAttribute('js-indicator');
 
 		if (attr) {
 			return attr
@@ -253,8 +232,6 @@ class TabIndicatorFactory {
 				return new GraphProblemsTabIndicatorItem;
 			case 'GraphOverrides':
 				return new GraphOverridesTabIndicatorItem;
-			case 'Periods':
-				return new PeriodsTabIndicatorItem;
 			case 'Permissions':
 				return new PermissionsTabIndicatorItem;
 		}
@@ -263,48 +240,69 @@ class TabIndicatorFactory {
 	}
 }
 
-class TabIndicatorNumberType { }
-
-class TabIndicatorStatusType { }
-
 /**
  * Tab indicator item.
  */
 class TabIndicatorItem {
 
+	constructor(type) {
+		this._type = type;
+	}
+
 	/**
 	 * Get tab indicator type.
 	 *
-	 * @return {TabIndicatorNumberType|TabIndicatorStatusType}
+	 * @return {string}
 	 */
 	getType() {
-		return this.TYPE;
+		return this._type;
 	}
 
 	/**
 	 * Get tab indicator value.
 	 *
-	 * @return {boolean|number} Boolean for TabIndicatorStatusType or number for TabIndicatorNumberType
+	 * @return {boolean|number} Boolean for mark indicator and number for count indicator
 	 */
 	getValue() {
-		throw 'Fatal error: can not call abstract class.';
+		throw 'Fatal error: can not call abstract method.';
 	}
 
 	/**
 	 * Init observer for html changes.
 	 *
-	 * @param {HTMLElement} elem
+	 * @param {HTMLElement} element
 	 */
-	initObserver(elem) {
-		throw 'Fatal error: can not call abstract class.';
+	initObserver(element) {
+		throw 'Fatal error: can not call abstract method.';
+	}
+
+	/**
+	 * Add tab indicator attribute to tab element.
+	 *
+	 * @param {HTMLElement} element  tab element
+	 *
+	 * @return {TabIndicatorItem}
+	 */
+	addAttributes(element) {
+		element.setAttribute(TAB_INDICATOR_ATTR_TYPE, this.getType());
+
+		switch (this.getType()) {
+			case TAB_INDICATOR_TYPE_COUNT:
+				element.setAttribute(TAB_INDICATOR_ATTR_VALUE, this.getValue().toString());
+				break;
+			case TAB_INDICATOR_TYPE_MARK:
+				element.setAttribute(TAB_INDICATOR_ATTR_VALUE, !!this.getValue() ? '1' : '0');
+				break;
+		}
+
+		return this;
 	}
 }
 
 class MacrosTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -317,23 +315,23 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	 * @inheritdoc
 	 * This observer yet init in include\views\js\common.template.edit.js.php.
 	 *
-	 * @param {HTMLElement} elem
+	 * @param {HTMLElement} element
 	 */
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#tbl_macros');
 		const observer_options = {
 			childList: true,
 			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
+			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
 					case 'attributes':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -349,8 +347,7 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -375,18 +372,18 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 		return isNaN(count) ? 0 : count;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#add_templates_ .multiselect-list');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -402,8 +399,7 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 class TagsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -412,21 +408,21 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#tags-table');
 		const observer_options = {
 			childList: true,
 			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
+			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
 					case 'attributes':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -442,28 +438,25 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 class HttpTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector('#http_auth_enabled');
+		const element = document.querySelector('#http_auth_enabled');
 
-		if (node) {
-			return node.checked;
+		if (element) {
+			return element.checked;
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#http_auth_enabled');
 
 		if (target_node) {
 			target_node.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		}
 	}
@@ -472,28 +465,25 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 class LdapTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector('#ldap_configured');
+		const element = document.querySelector('#ldap_configured');
 
-		if (node) {
-			return node.checked;
+		if (element) {
+			return element.checked;
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#ldap_configured');
 
 		if (target_node) {
 			target_node.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		}
 	}
@@ -502,28 +492,25 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 class SamlTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector('#saml_auth_enabled');
+		const element = document.querySelector('#saml_auth_enabled');
 
-		if (node) {
-			return node.checked;
+		if (element) {
+			return element.checked;
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#saml_auth_enabled');
 
 		if (target_node) {
 			target_node.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		}
 	}
@@ -532,26 +519,23 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 class InventoryTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector('[name=inventory_mode]:checked');
+		const element = document.querySelector('[name=inventory_mode]:checked');
 
-		if (node) {
-			return (node.value === '0' || node.value === '1');
+		if (element) {
+			return (element.value === '0' || element.value === '1');
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		[...document.querySelectorAll('[name=inventory_mode]')].map((value) => {
 			value.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		});
 	}
@@ -560,8 +544,7 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
@@ -577,26 +560,26 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 		return tls_in_psk || tls_in_cert;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
 		const tls_in_cert_node = document.querySelector('[name=tls_in_cert]');
 
 		[...document.querySelectorAll('[name=tls_connect]')].map((value) =>
-			value.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-			))
+			value.addEventListener('click', () => {
+				this.addAttributes(element);
+			})
 		);
 
 		if (tls_in_psk_node) {
-			tls_in_psk_node.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-			));
+			tls_in_psk_node.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
 		}
 
 		if (tls_in_cert_node) {
-			tls_in_cert_node.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-			));
+			tls_in_cert_node.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
 		}
 	}
 }
@@ -604,8 +587,7 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 class GroupsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -614,18 +596,18 @@ class GroupsTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#group_links_ .multiselect-list');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -641,8 +623,7 @@ class GroupsTabIndicatorItem extends TabIndicatorItem {
 class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -651,18 +632,18 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#preprocessing');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -678,8 +659,7 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 class DependencyTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -688,18 +668,18 @@ class DependencyTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#dependency-table tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -715,8 +695,7 @@ class DependencyTabIndicatorItem extends TabIndicatorItem {
 class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -725,21 +704,21 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#lld_macro_paths');
 		const observer_options = {
 			childList: true,
 			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
+			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
 					case 'attributes':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -755,8 +734,7 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 class FiltersTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -765,7 +743,7 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#conditions');
 		const observer_options = {
 			childList: true,
@@ -774,12 +752,12 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
 					case 'attributes':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -795,8 +773,7 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 class OverridesTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -805,18 +782,18 @@ class OverridesTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('.lld-overrides-table tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -832,8 +809,7 @@ class OverridesTabIndicatorItem extends TabIndicatorItem {
 class StepsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -842,18 +818,18 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('.httpconf-steps-dynamic-row tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -869,8 +845,7 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
@@ -882,39 +857,29 @@ class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 			return true;
 		}
 
-		if (document.querySelector('#ssl_cert_file').value !== ''
-				|| document.querySelector('#ssl_key_file').value !== ''
-				|| document.querySelector('#ssl_key_password').value !== '') {
-			return true;
-		}
-
-		return false;
+		return document.querySelector('#ssl_cert_file').value !== ''
+			|| document.querySelector('#ssl_key_file').value !== ''
+			|| document.querySelector('#ssl_key_password').value !== '';
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const auth_node = document.querySelector('#authentication');
 
 		if (auth_node) {
 			auth_node.addEventListener('change', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		}
 
 		[...document.querySelectorAll('#verify_peer, #verify_host')].map((value) => {
 			value.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		});
 
 		[...document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')].map((value) => {
 			value.addEventListener('change', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		});
 	}
@@ -923,8 +888,7 @@ class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 class OperationsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -943,7 +907,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		return count;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node_op = document.querySelector('#op-table tbody');
 		const target_node_rec = document.querySelector('#rec-table tbody');
 		const target_node_ack = document.querySelector('#ack-table tbody');
@@ -952,11 +916,11 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -982,8 +946,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 class ServiceDependencyTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -992,18 +955,18 @@ class ServiceDependencyTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#service_children tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -1019,8 +982,7 @@ class ServiceDependencyTabIndicatorItem extends TabIndicatorItem {
 class TimeTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -1029,18 +991,18 @@ class TimeTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#time-table tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -1056,8 +1018,7 @@ class TimeTabIndicatorItem extends TabIndicatorItem {
 class TagFilterTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
@@ -1066,12 +1027,10 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 			.length > 0;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		// This event triggered in app/views/js/administration.usergroup.edit.js.php:179
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-			);
+			this.addAttributes(element);
 		});
 	}
 }
@@ -1079,8 +1038,7 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 class MediaTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -1089,18 +1047,18 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#media-table tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -1116,8 +1074,7 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -1126,18 +1083,18 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#message-templates tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -1153,28 +1110,25 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector('#messages_enabled');
+		const element = document.querySelector('#messages_enabled');
 
-		if (node) {
-			return node.checked;
+		if (element) {
+			return element.checked;
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#messages_enabled');
 
 		if (target_node) {
 			target_node.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		}
 	}
@@ -1183,31 +1137,24 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 class SharingTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector("[name='private']:checked");
+		const element = document.querySelector("[name='private']:checked");
 
-		if (node && node.value > 0) {
+		if (element && element.value > 0) {
 			return true;
 		}
 
-		if (document.querySelectorAll('#user-group-share-table tbody tr:not(:last-child)').length > 0
-				|| document.querySelectorAll('#user-share-table tbody tr:not(:last-child)').length > 0) {
-			return true;
-		}
-
-		return false;
+		return document.querySelectorAll('#user-group-share-table tbody tr:not(:last-child)').length > 0
+			|| document.querySelectorAll('#user-share-table tbody tr:not(:last-child)').length > 0;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		[...document.querySelectorAll('[name=private]')].map((value) => {
 			value.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		});
 
@@ -1218,13 +1165,11 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-							!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-						);
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -1245,8 +1190,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -1255,18 +1199,18 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#data_sets');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -1282,26 +1226,23 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector("[name='source']:checked");
+		const element = document.querySelector("[name='source']:checked");
 
-		if (node) {
-			return node.value > 0;
+		if (element) {
+			return element.value > 0;
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		[...document.querySelectorAll("[name='source']")].map((value) => {
 			value.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		});
 	}
@@ -1310,28 +1251,25 @@ class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector('#graph_time');
+		const element = document.querySelector('#graph_time');
 
-		if (node) {
-			return node.checked;
+		if (element) {
+			return element.checked;
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#graph_time');
 
 		if (target_node) {
 			target_node.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		}
 	}
@@ -1340,28 +1278,25 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector('#legend');
+		const element = document.querySelector('#legend');
 
-		if (node) {
-			return node.checked;
+		if (element) {
+			return element.checked;
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#legend');
 
 		if (target_node) {
 			target_node.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		}
 	}
@@ -1370,28 +1305,25 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const node = document.querySelector('#show_problems');
+		const element = document.querySelector('#show_problems');
 
-		if (node) {
-			return node.checked;
+		if (element) {
+			return element.checked;
 		}
 
 		return false;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('#show_problems');
 
 		if (target_node) {
 			target_node.addEventListener('click', () => {
-				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-				);
+				this.addAttributes(element);
 			});
 		}
 	}
@@ -1400,8 +1332,7 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
@@ -1410,55 +1341,18 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		const target_node = document.querySelector('.overrides-list');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
 
-		const observer_callback = (mutationList, observer) => {
+		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
-	}
-}
-
-class PeriodsTabIndicatorItem extends TabIndicatorItem {
-
-	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
-	}
-
-	getValue() {
-		return document
-			.querySelectorAll('#maintenance_periods tbody tr')
-			.length;
-	}
-
-	initObserver(elem) {
-		const target_node = document.querySelector('#maintenance_periods tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						this.addAttributes(element);
 						break;
 				}
 			});
@@ -1474,8 +1368,7 @@ class PeriodsTabIndicatorItem extends TabIndicatorItem {
 class PermissionsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
+		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
@@ -1484,12 +1377,10 @@ class PermissionsTabIndicatorItem extends TabIndicatorItem {
 			.length > 1;
 	}
 
-	initObserver(elem) {
+	initObserver(element) {
 		// This event triggered in app/views/js/administration.usergroup.edit.js.php:164
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-			);
+			this.addAttributes(element);
 		});
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,24 @@ class CSegmentedRadioElement extends CElement {
 	 * @return string
 	 */
 	public function getText() {
-		return $this->query('xpath:.//input[@checked="checked"]/../label')->one()->getText();
+		$radio = $this->query('xpath:.//input[@type="radio"]')->all()->filter(new CElementFilter(CElementFilter::SELECTED));
+
+		if ($radio->isEmpty()) {
+			throw new Exception('Failed to find selected element.');
+		}
+		if ($radio->count() > 1) {
+			$radio = $radio->filter(new CElementFilter(CElementFilter::VISIBLE));
+
+			if ($radio->isEmpty()) {
+				throw new Exception('Failed to find visible selected element.');
+			}
+
+			if ($radio->count() > 1) {
+				CTest::addWarning('Selected element is not one.');
+			}
+		}
+
+		return $radio->first()->query('xpath:../label')->one()->getText();
 	}
 
 	/**

@@ -1,0 +1,42 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:12Z'
+  groups:
+    -
+      name: Templates/Modules
+  templates:
+    -
+      template: 'SMTP Service'
+      name: 'SMTP Service'
+      groups:
+        -
+          name: Templates/Modules
+      applications:
+        -
+          name: 'SMTP service'
+      items:
+        -
+          name: 'SMTP service is running'
+          type: SIMPLE
+          key: 'net.tcp.service[smtp]'
+          history: 1w
+          applications:
+            -
+              name: 'SMTP service'
+          valuemap:
+            name: 'Service state'
+          triggers:
+            -
+              expression: '{max(#3)}=0'
+              name: 'SMTP service is down on {HOST.NAME}'
+              priority: AVERAGE
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

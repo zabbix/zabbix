@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,13 +69,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'key'					=> 'string',
 			'interface'				=> 'array',
 			'ipmi_sensor'			=> 'string',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT]),
 			'jmx_endpoint'			=> 'string',
 			'macros'				=> 'array',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
+			'script'				=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
@@ -84,6 +85,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'privatekey'			=> 'string',
 			'publickey'				=> 'string',
 			'query_fields'			=> 'array',
+			'parameters'			=> 'array',
 			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
 			'show_final_result'		=> 'in 0,1',
@@ -102,13 +104,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
 			'valuemapid'			=> 'int32',
 			'verify_host'			=> 'in 0,1',
-			'verify_peer'			=> 'in 0,1'
+			'verify_peer'			=> 'in 0,1',
+			'not_supported'			=> 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', 0));
+			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->get_value_from_host = (bool) $this->getInput('get_value');
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
@@ -149,15 +152,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				$ret = false;
 			}
 			elseif ($this->get_value_from_host && array_key_exists($this->item_type, $this->items_require_interface)) {
-				if ($this->items_require_interface[$this->item_type]['address']
-						&& (!array_key_exists('address', $interface) || $interface['address'] === '')) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
-					$ret = false;
-				}
-
-				if ($this->items_require_interface[$this->item_type]['port']
-						&& (!array_key_exists('port', $interface) || $interface['port'] === '')) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+				if (!$this->validateInterface($interface)) {
 					$ret = false;
 				}
 			}
@@ -234,7 +229,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$preproc_test_data = [
 			'value' => $this->getInput('value', ''),
 			'steps' => $this->getInput('steps', []),
-			'single' => !$this->show_final_result
+			'single' => !$this->show_final_result,
+			'state' => 0
 		];
 
 		// Get previous value and time.
@@ -262,7 +258,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			// Get post data for particular item type.
 			$item_test_data = $this->getItemTestProperties($this->getInputAll());
 
-			// Apply efective macros values to properties.
+			// Apply effective macros values to properties.
 			$item_test_data = $this->resolveItemPropertyMacros($item_test_data);
 
 			// Rename fields according protocol.
@@ -270,6 +266,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				'params_ap' => 'params',
 				'params_es' => 'params',
 				'params_f' => 'params',
+				'script' => 'params',
 				'http_username' => 'username',
 				'http_password' => 'password',
 				'http_authtype' => 'authtype',
@@ -284,8 +281,20 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				$item_test_data['query_fields'] = $this->transformQueryFields($item_test_data['query_fields']);
 			}
 
+			if (array_key_exists('parameters', $item_test_data)) {
+				$item_test_data['parameters'] = $this->transformParametersFields($item_test_data['parameters']);
+			}
+
 			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
+
+			/*
+			 * Server will turn off status code check if field value is empty. If field is not present, then server will
+			 * default to check if status code is 200.
+			 */
+			if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $item_test_data)) {
+				$item_test_data['status_codes'] = '';
+			}
 
 			if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {
 				unset($item_test_data['value_type']);
@@ -320,13 +329,22 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				}
 
 				if (array_key_exists('error', $result) && $result['error'] !== '') {
-					error($result['error']);
+					if ($preproc_test_data['steps']
+							&& $preproc_test_data['steps'][0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+						$preproc_test_data['state'] = 1;
+					}
+					else {
+						error($result['error']);
+					}
 				}
 			}
 
 			if (($messages = getMessages(false)) !== null) {
 				$output['messages'] = $messages->toString();
 			}
+		}
+		else {
+			$preproc_test_data['state'] = $this->getInput('not_supported', 0);
 		}
 
 		// Test preprocessing steps.
@@ -366,6 +384,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 								unset($step['result']);
 								$test_failed = true;
 							}
+						}
+						elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+							$step['result'] = $preproc_test_data['value'];
 						}
 					}
 

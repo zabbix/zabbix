@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,10 +128,11 @@ function cleanPreviousTestResults() {
 
 	jQuery('[id^="preproc-test-step-"][id$="-result"]', $form).empty();
 	jQuery('[id^="preproc-test-step-"][id$="-name"] > div', $form).remove();
-	jQuery('#final-result', $form)
+	jQuery('.js-final-result', $form)
 		.hide()
-		.find('.table-forms-td-right')
-		.empty();
+		.next()
+		.empty()
+		.hide();
 }
 
 /**
@@ -154,7 +155,8 @@ function itemGetValueTest(overlay) {
 			address: interface ? interface['address'].trim() : '',
 			port: (interface && interface['port']) ? interface['port'].trim() : '',
 			interfaceid: interface ? interface['interfaceid'] : null,
-			useip: interface ? interface['useip'] : null
+			useip: interface ? interface['useip'] : null,
+			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
 		proxy_hostid: form_data['proxy_hostid'],
@@ -236,7 +238,8 @@ function itemCompleteTest(overlay) {
 			address: interface ? interface['address'].trim() : '',
 			port: (interface && interface['port']) ? interface['port'].trim() : '',
 			interfaceid: interface ? interface['interfaceid'] : null,
-			useip: interface ? interface['useip'] : null
+			useip: interface ? interface['useip'] : null,
+			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
 		proxy_hostid: form_data['proxy_hostid'],
@@ -244,7 +247,8 @@ function itemCompleteTest(overlay) {
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
 		valuemapid: <?= $data['valuemapid'] ?>,
-		value: form_data['value']
+		value: form_data['value'],
+		not_supported: form_data['not_supported']
 	});
 
 	<?php if ($data['show_prev']): ?>
@@ -303,6 +307,7 @@ function itemCompleteTest(overlay) {
 				}
 
 				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
+					.css({whiteSpace: 'normal'})
 					.append(jQuery('<div>').append(ret.final.action, $result))
 					.css({display: 'block', width: '675px'});
 
@@ -319,10 +324,11 @@ function itemCompleteTest(overlay) {
 					);
 				}
 
-				jQuery('#final-result')
+				jQuery('.js-final-result')
 					.show()
-					.find('.table-forms-td-right')
-					.append($result_row);
+					.next()
+					.append($result_row)
+					.show();
 			}
 		},
 		dataType: 'json',
@@ -390,6 +396,8 @@ function saveItemTestInputs() {
 			value: jQuery('#value').multilineInput('value'),
 			eol: jQuery('#eol').find(':checked').val()
 		},
+		form_data = $form.serializeJSON(),
+		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		macros = {};
 
 	<?php if ($data['is_item_testable']): ?>
@@ -398,7 +406,8 @@ function saveItemTestInputs() {
 			proxy_hostid: jQuery('#proxy_hostid', $form).val(),
 			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
-			port: jQuery('#interface_port', $form).val()
+			port: jQuery('#interface_port', $form).val(),
+			interface_details: (interface && 'details' in interface) ? interface['details'] : null
 		});
 	<?php endif ?>
 
@@ -418,7 +427,7 @@ function saveItemTestInputs() {
 	<?php if ($data['step_obj'] == -2): ?>
 		$test_obj = jQuery('.tfoot-buttons');
 	<?php elseif ($data['step_obj'] == -1): ?>
-		$test_obj = jQuery('preprocessing-list-foot', jQuery('#preprocessing'));
+		$test_obj = jQuery('.preprocessing-list-foot', jQuery('#preprocessing'));
 	<?php else: ?>
 		$test_obj = jQuery('.preprocessing-list-item[data-step=<?= $data['step_obj'] ?>]', jQuery('#preprocessing'));
 	<?php endif ?>
@@ -427,7 +436,7 @@ function saveItemTestInputs() {
 }
 
 jQuery(document).ready(function($) {
-	$('#final-result').hide();
+	$('.js-final-result').hide().next().hide();
 
 	<?php if ($data['show_prev']): ?>
 		jQuery('#upd_last').val(Math.ceil(+new Date() / 1000));
@@ -455,15 +464,26 @@ jQuery(document).ready(function($) {
 	});
 
 	<?php if ($data['is_item_testable']): ?>
-		$('#get_value').on('change', function() {
-			var $rows = $('#host_address_row, #proxy_hostid_row, #get_value_row, #empty_row_1, #empty_row_2,'
-					+ ' #host_port_row'
-				),
-				$form = $('#preprocessing-test-form'),
-				$submit_btn = overlays_stack.getById('item-test').$btn_submit;
+		$('#not_supported').on('change', function() {
+			var $form = $('#preprocessing-test-form');
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
+			}
+			else {
+				$('#value', $form).multilineInput('unsetReadOnly');
+			}
+		});
+
+		$('#get_value').on('change', function() {
+			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
+				$form = $('#preprocessing-test-form'),
+				$submit_btn = overlays_stack.getById('item-test').$btn_submit,
+				$not_supported = $('#not_supported', $form);
+
+			if ($(this).is(':checked')) {
+				$('#value', $form).multilineInput('setReadOnly');
+				$not_supported.prop('disabled', true);
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('setReadOnly');
@@ -484,9 +504,54 @@ jQuery(document).ready(function($) {
 
 				$submit_btn.html('<?= _('Get value and test') ?>');
 				$rows.show();
+
+				<?php if ($data['show_snmp_form']): ?>
+					$('#interface_details_version').on('change', function (e) {
+						$(`.js-popup-row-snmp-community, .js-popup-row-snmpv3-contextname,
+							.js-popup-row-snmpv3-securityname, .js-popup-row-snmpv3-securitylevel,
+							.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,
+							.js-popup-row-snmpv3-privprotocol, .js-popup-row-snmpv3-privpassphrase`).hide();
+
+						switch (e.target.value) {
+							case '<?= SNMP_V1 ?>':
+								$('#interface_details_securitylevel').off('change');
+								$('.js-popup-row-snmp-community').show();
+								break;
+							case '<?= SNMP_V2C ?>':
+								$('#interface_details_securitylevel').off('change');
+								$('.js-popup-row-snmp-community').show();
+								break;
+							case '<?= SNMP_V3 ?>':
+								$(`.js-popup-row-snmpv3-contextname, .js-popup-row-snmpv3-securityname,
+									.js-popup-row-snmpv3-securitylevel`).show();
+
+								$('#interface_details_securitylevel').on('change', function (e) {
+									$(`.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,
+										.js-popup-row-snmpv3-privprotocol, .js-popup-row-snmpv3-privpassphrase`).hide();
+									switch (e.target.value) {
+										case '<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>':
+											$(`.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase`)
+												.show();
+											break;
+										case '<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>':
+											$(`.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,
+												.js-popup-row-snmpv3-privprotocol, .js-popup-row-snmpv3-privpassphrase`)
+												.show();
+											break;
+									}
+
+									overlays_stack.end().centerDialog();
+								}).trigger('change');
+								break;
+						}
+
+						overlays_stack.end().centerDialog();
+					}).trigger('change');
+				<?php endif ?>
 			}
 			else {
-				$('#value', $form).multilineInput('unsetReadOnly');
+				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
+				$not_supported.prop('disabled', false);
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');

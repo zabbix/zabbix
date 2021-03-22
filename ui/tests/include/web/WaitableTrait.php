@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilReady() {
-		CElementQuery::waitUntil($this, CElementQuery::READY);
+		CElementQuery::waitUntil($this, CElementFilter::READY);
 
 		return $this;
 	}
@@ -56,7 +56,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilVisible() {
-		CElementQuery::waitUntil($this, CElementQuery::VISIBLE);
+		CElementQuery::waitUntil($this, CElementFilter::VISIBLE);
 
 		return $this;
 	}
@@ -67,7 +67,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilNotVisible() {
-		CElementQuery::waitUntil($this, CElementQuery::NOT_VISIBLE);
+		CElementQuery::waitUntil($this, CElementFilter::NOT_VISIBLE);
 
 		return $this;
 	}
@@ -78,7 +78,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilPresent() {
-		CElementQuery::waitUntil($this, CElementQuery::PRESENT);
+		CElementQuery::waitUntil($this, CElementFilter::PRESENT);
 
 		return $this;
 	}
@@ -89,7 +89,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilNotPresent() {
-		CElementQuery::waitUntil($this, CElementQuery::NOT_PRESENT);
+		CElementQuery::waitUntil($this, CElementFilter::NOT_PRESENT);
 
 		return $this;
 	}
@@ -100,7 +100,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilTextPresent($text) {
-		CElementQuery::waitUntil($this, CElementQuery::TEXT_PRESENT, [$text]);
+		CElementQuery::waitUntil($this, CElementFilter::TEXT_PRESENT, [$text]);
 
 		return $this;
 	}
@@ -113,7 +113,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilTextNotPresent($text) {
-		CElementQuery::waitUntil($this, CElementQuery::TEXT_NOT_PRESENT, [$text]);
+		CElementQuery::waitUntil($this, CElementFilter::TEXT_NOT_PRESENT, [$text]);
 
 		return $this;
 	}
@@ -126,7 +126,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilAttributesPresent($attributes) {
-		CElementQuery::waitUntil($this, CElementQuery::ATTRIBUTES_PRESENT, [$attributes]);
+		CElementQuery::waitUntil($this, CElementFilter::ATTRIBUTES_PRESENT, [$attributes]);
 
 		return $this;
 	}
@@ -139,7 +139,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilAttributesNotPresent($attributes) {
-		CElementQuery::waitUntil($this, CElementQuery::ATTRIBUTES_NOT_PRESENT, [$attributes]);
+		CElementQuery::waitUntil($this, CElementFilter::ATTRIBUTES_NOT_PRESENT, [$attributes]);
 
 		return $this;
 	}
@@ -151,7 +151,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilClickable() {
-		CElementQuery::waitUntil($this, CElementQuery::CLICKABLE);
+		CElementQuery::waitUntil($this, CElementFilter::CLICKABLE);
 
 		return $this;
 	}
@@ -162,7 +162,7 @@ trait WaitableTrait {
 	 * @return $this
 	 */
 	public function waitUntilNotClickable() {
-		CElementQuery::waitUntil($this, CElementQuery::NOT_CLICKABLE);
+		CElementQuery::waitUntil($this, CElementFilter::NOT_CLICKABLE);
 
 		return $this;
 	}
@@ -221,5 +221,12 @@ trait WaitableTrait {
 	 */
 	public function getAttributesNotPresentCondition($attributes) {
 		return $this->getReversedCondition($this->getAttributesPresentCondition($attributes));
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getNotSelectedCondition() {
+		return $this->getReversedCondition($this->getSelectedCondition());
 	}
 }

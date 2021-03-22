@@ -1,0 +1,176 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:27Z'
+  groups:
+    -
+      name: Templates/Modules
+  templates:
+    -
+      template: 'Zabbix agent'
+      name: 'Zabbix agent'
+      description: |
+        Use this template for agents reachable from Zabbix server/proxy (passive mode).
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Modules
+      applications:
+        -
+          name: 'Monitoring agent'
+        -
+          name: Status
+      items:
+        -
+          name: 'Host name of Zabbix agent running'
+          key: agent.hostname
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Monitoring agent'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Zabbix agent ping'
+          key: agent.ping
+          history: 7d
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          applications:
+            -
+              name: 'Monitoring agent'
+          valuemap:
+            name: 'Zabbix agent ping status'
+        -
+          name: 'Version of Zabbix agent running'
+          key: agent.version
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Monitoring agent'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Zabbix agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,agent,available]'
+          history: 7d
+          description: 'Monitoring agent availability status'
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: zabbix.host.available
+          triggers:
+            -
+              expression: '{max({$AGENT.TIMEOUT})}=0'
+              name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              priority: AVERAGE
+              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              manual_close: 'YES'
+      macros:
+        -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 3m
+          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+    -
+      template: 'Zabbix agent active'
+      name: 'Zabbix agent active'
+      description: |
+        Use this template instead of 'Template Module Zabbix agent' for agents running in active mode only.
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Modules
+      applications:
+        -
+          name: 'Monitoring agent'
+        -
+          name: Status
+      items:
+        -
+          name: 'Host name of Zabbix agent running'
+          type: ZABBIX_ACTIVE
+          key: agent.hostname
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Monitoring agent'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Zabbix agent ping'
+          type: ZABBIX_ACTIVE
+          key: agent.ping
+          history: 7d
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'Zabbix agent ping status'
+          triggers:
+            -
+              expression: '{nodata({$AGENT.NODATA_TIMEOUT})}=1'
+              name: 'Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})'
+              priority: AVERAGE
+              description: 'For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.'
+              manual_close: 'YES'
+        -
+          name: 'Version of Zabbix agent running'
+          type: ZABBIX_ACTIVE
+          key: agent.version
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: 'Monitoring agent'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+      macros:
+        -
+          macro: '{$AGENT.NODATA_TIMEOUT}'
+          value: 30m
+          description: 'No data timeout for active agents. Consider to keep it relatively high.'
+  value_maps:
+    -
+      name: zabbix.host.available
+      mappings:
+        -
+          value: '0'
+          newvalue: 'not available'
+        -
+          value: '1'
+          newvalue: available
+        -
+          value: '2'
+          newvalue: unknown
+    -
+      name: 'Zabbix agent ping status'
+      mappings:
+        -
+          value: '1'
+          newvalue: Up

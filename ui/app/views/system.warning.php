@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ $pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'
 	->display();
 
 $buttons = [
-	(new CButton('back', _('Go to dashboard')))
-		->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"'
+	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+		->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"'
 )];
 
 echo '<body lang="'.CWebUser::getLang().'">';

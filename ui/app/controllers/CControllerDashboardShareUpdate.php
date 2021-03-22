@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,13 +46,14 @@ class CControllerDashboardShareUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+				&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 	}
 
 	protected function doAction() {
 		$editable_dashboard = (bool) API::Dashboard()->get([
 			'output' => [],
-			'dashboardids' => $this->getInput('dashboardid'),
+			'dashboardids' => [$this->getInput('dashboardid')],
 			'editable' => true
 		]);
 
@@ -93,9 +94,7 @@ class CControllerDashboardShareUpdate extends CController {
 			$result = false;
 		}
 
-		$response = [
-			'result' => $result
-		];
+		$response = [];
 
 		if (($messages = getMessages($result, $msg_box_title)) !== null) {
 			$response[$result ? 'messages' : 'errors'] = $messages->toString();

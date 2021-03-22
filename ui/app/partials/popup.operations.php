@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,12 @@ $form_list = new CFormList();
 /*
  * Operation type row.
  */
-$form_list->addRow(_('Operation type'), new CComboBox('operationtype'), 'operation-type');
+$select_operationtype = (new CSelect('operationtype'))->setFocusableElementId('operationtype');
+
+$form_list->addRow(new CLabel(_('Operation type'), $select_operationtype->getFocusableElementId()),
+	$select_operationtype,
+	'operation-type'
+);
 
 /*
  * Operation escalation steps row.
@@ -112,16 +117,23 @@ $form_list->addRow(_('Send to users'), (new CDiv(
 /*
  * Operation message media type row.
  */
-$form_list->addRow(_('Default media type'),
-	new CComboBox('operation[opmessage][mediatypeid]', 0, null, [0 => '- '._('All').' -']),
+$select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
+	->setFocusableElementId('operation-opmessage-mediatypeid');
+
+$form_list->addRow(
+	new CLabel(_('Default media type'), $select_opmessage_mediatype_default->getFocusableElementId()),
+	$select_opmessage_mediatype_default,
 	'operation-message-mediatype-default'
 );
 
 /*
  * Operation message media type row (explicit).
  */
-$form_list->addRow(_('Send only to'),
-	new CComboBox('operation[opmessage][mediatypeid]', 0, null, [0 => '- '._('All').' -']),
+$select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
+	->setFocusableElementId('operation-opmessage-mediatypeid');
+
+$form_list->addRow(new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()),
+	$select_opmessage_mediatype,
 	'operation-message-mediatype-only'
 );
 
@@ -182,14 +194,20 @@ $form_list->addRow((new CLabel(_('Target list')))->setAsteriskMark(),
 /*
  * Command type row.
  */
-$form_list->addRow(_('Type'),
-	(new CComboBox('operation[opcommand][type]', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, null, [
+$select_operation_opcommand_type = (new CSelect('operation[opcommand][type]'))
+	->setValue((string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
+	->setFocusableElementId('operation-opcommand-type')
+	->addOptions(CSelect::createOptionsFromArray([
 		ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 		ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
 		ZBX_SCRIPT_TYPE_SSH => _('SSH'),
 		ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
 		ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-	]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	]))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+$form_list->addRow(new CLabel(_('Type'), $select_operation_opcommand_type->getFocusableElementId()),
+	$select_operation_opcommand_type,
 	'operation-command-type'
 );
 
@@ -222,10 +240,15 @@ $form_list->addRow((new CLabel(_('Execute on'), 'operation_opcommand_execute_on'
 /*
  * Command authentication method row.
  */
-$form_list->addRow(_('Authentication method'), (new CComboBox('operation[opcommand][authtype]', null, null, [
-		ITEM_AUTHTYPE_PASSWORD => _('Password'),
-		ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-	]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+$select_operation_opcommand_authtype = (new CSelect('operation[opcommand][authtype]'))
+	->setFocusableElementId('operation-opcommand-authtype')
+	->addOption(new CSelectOption(ITEM_AUTHTYPE_PASSWORD, _('Password')))
+	->addOption(new CSelectOption(ITEM_AUTHTYPE_PUBLICKEY, _('Public key')))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+$form_list->addRow(
+	new CLabel(_('Authentication method'), $select_operation_opcommand_authtype->getFocusableElementId()),
+	$select_operation_opcommand_authtype,
 	'operation-command-authtype'
 );
 
@@ -235,7 +258,8 @@ $form_list->addRow(_('Authentication method'), (new CComboBox('operation[opcomma
 $form_list->addRow((new CLabel(_('User name'), 'operation_opcommand_username'))->setAsteriskMark(),
 	(new CTextBox('operation[opcommand][username]'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired(),
+		->setAriaRequired()
+		->disableAutocomplete(),
 	'operation-command-username'
 );
 
@@ -263,7 +287,8 @@ $form_list->addRow((new CLabel(_('Private key file'), 'operation_opcommand_priva
  * Command password row.
  */
 $form_list->addRow(_('Password'), (new CTextBox('operation[opcommand][password]'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->disableAutocomplete(),
 	'operation-command-password'
 );
 
@@ -272,7 +297,8 @@ $form_list->addRow(_('Password'), (new CTextBox('operation[opcommand][password]'
  */
 $form_list->addRow(_('Key passphrase'), (new CTextBox('operation[opcommand][password]'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setId('opcommand_passphrase'),
+		->setId('opcommand_passphrase')
+		->disableAutocomplete(),
 	'operation-command-passphrase'
 );
 
@@ -346,12 +372,15 @@ $form_list->addRow(new CLabel(_('Inventory mode'), 'operation_opinventory_invent
 /*
  * Conditions type of calculation row.
  */
-$form_list->addRow(_('Type of calculation'), [
-		new CComboBox('operation[evaltype]', CONDITION_EVAL_TYPE_AND_OR, '', [
-			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-			CONDITION_EVAL_TYPE_AND => _('And'),
-			CONDITION_EVAL_TYPE_OR => _('Or')
-		]),
+$select_operation_evaltype = (new CSelect('operation[evaltype]'))
+	->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
+	->setFocusableElementId('operation-evaltype')
+	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
+	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
+	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or')));
+
+$form_list->addRow(new CLabel(_('Type of calculation'), $select_operation_evaltype->getFocusableElementId()), [
+		$select_operation_evaltype,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan())->setId('operation-condition-evaltype-formula')
 	],

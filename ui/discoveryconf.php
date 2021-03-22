@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -289,7 +289,7 @@ if (isset($_REQUEST['form'])) {
 						'key_' => $value['key_'],
 						'snmpv3_contextname' => $value['snmpv3_contextname'],
 						'snmpv3_securityname' => $value['snmpv3_securityname'],
-						'snmpv3_securitylevel' => $value['snmpv3_securitylevel'],
+						'snmpv3_securitylevel' => $value['snmpv3_securitylevel']
 					];
 
 					if ($value['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV

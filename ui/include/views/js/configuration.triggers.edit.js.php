@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,12 @@
 
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
+		$('#description')
+			.on('input keydown paste', function() {
+				$('#event_name').attr('placeholder', $(this).val());
+			})
+			.trigger('input');
+
 		// Refresh field visibility on document load.
 		changeRecoveryMode();
 		changeCorrelationMode();
@@ -66,6 +72,23 @@
 					&& correlation_mode == <?= ZBX_TRIGGER_CORRELATION_TAG ?>
 				);
 		}
+
+		let triggers_initialized = false;
+		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
+			const panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+
+			if (panel.attr('id') === 'triggersTab') {
+				if (triggers_initialized) {
+					return;
+				}
+
+				$('#triggersTab')
+					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+					.textareaFlexible();
+
+				triggers_initialized = true;
+			}
+		});
 	});
 
 	/**

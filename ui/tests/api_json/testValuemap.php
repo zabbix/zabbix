@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -345,11 +345,11 @@ class testValuemap extends CAPITest {
 				'valuemap' => [
 					[
 						'valuemapid' => '19',
-						'name' => 'API valuemap with the same ids1',
+						'name' => 'API valuemap with the same ids1'
 					],
 					[
 						'valuemapid' => '19',
-						'name' => 'API valuemap with the same ids2',
+						'name' => 'API valuemap with the same ids2'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (valuemapid)=(19) already exists.'
@@ -491,7 +491,7 @@ class testValuemap extends CAPITest {
 				'valuemap' => [
 					[
 						'valuemapid' => '19',
-						'name' => 'API valuemap name updated',
+						'name' => 'API valuemap name updated'
 					]
 				],
 				'expected_error' => null
@@ -702,16 +702,16 @@ class testValuemap extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Only super admins can create value maps.'
+				'expected_error' => 'No permissions to call "valuemap.create".'
 			],
 			[
 				'method' => 'valuemap.update',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
-					'name' => 'API value update as zabbix admin',
+					'name' => 'API value update as zabbix admin'
 				],
-				'expected_error' => 'Only super admins can update value maps.'
+				'expected_error' => 'No permissions to call "valuemap.update".'
 			],
 			[
 				'method' => 'valuemap.delete',
@@ -719,7 +719,7 @@ class testValuemap extends CAPITest {
 				'valuemap' => [
 					'20'
 				],
-				'expected_error' => 'Only super admins can delete value maps.'
+				'expected_error' => 'No permissions to call "valuemap.delete".'
 			],
 			[
 				'method' => 'valuemap.create',
@@ -733,16 +733,16 @@ class testValuemap extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Only super admins can create value maps.'
+				'expected_error' => 'No permissions to call "valuemap.create".'
 			],
 			[
 				'method' => 'valuemap.update',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
-					'name' => 'API value update as zabbix user',
+					'name' => 'API value update as zabbix user'
 				],
-				'expected_error' => 'Only super admins can update value maps.'
+				'expected_error' => 'No permissions to call "valuemap.update".'
 			],
 			[
 				'method' => 'valuemap.delete',
@@ -750,7 +750,7 @@ class testValuemap extends CAPITest {
 				'valuemap' => [
 					'20'
 				],
-				'expected_error' => 'Only super admins can delete value maps.'
+				'expected_error' => 'No permissions to call "valuemap.delete".'
 			]
 		];
 	}

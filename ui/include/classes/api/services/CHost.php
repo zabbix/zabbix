@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class CHost extends CHostGeneral {
 	 * @param string|array  $options['selectGraphs']                       Return a "graphs" property with host graphs.
 	 * @param string|array  $options['selectApplications']                 Return an "applications" property with host applications.
 	 * @param string|array  $options['selectMacros']                       Return a "macros" property with host macros.
-	 * @param string|array  $options['selectScreens']                      Return a "screens" property with host screens.
+	 * @param string|array  $options['selectDashboards']                   Return a "dashboards" property with host dashboards.
 	 * @param string|array  $options['selectInterfaces']                   Return an "interfaces" property with host interfaces.
 	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
 	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
@@ -154,7 +154,7 @@ class CHost extends CHostGeneral {
 			'selectGraphs'						=> null,
 			'selectApplications'				=> null,
 			'selectMacros'						=> null,
-			'selectScreens'						=> null,
+			'selectDashboards'					=> null,
 			'selectInterfaces'					=> null,
 			'selectInventory'					=> null,
 			'selectHttpTests'					=> null,
@@ -693,78 +693,110 @@ class CHost extends CHostGeneral {
 
 		$this->validateCreate($hosts);
 
-		$hostids = [];
 		foreach ($hosts as &$host) {
 			// If visible name is not given or empty it should be set to host name.
-			if (!array_key_exists('name', $host) || !trim($host['name'])) {
+			if (!array_key_exists('name', $host) || trim($host['name']) === '') {
 				$host['name'] = $host['host'];
-			}
-
-			$hostid = DB::insert('hosts', [$host]);
-			$hostid = reset($hostid);
-			$host['hostid'] = $hostid;
-			$hostids[] = $hostid;
-			$host['groups'] = zbx_toArray($host['groups']);
-
-			// Save groups. Groups must be added before calling massAdd() for permission validation to work.
-			$groupsToAdd = [];
-			foreach ($host['groups'] as $group) {
-				$groupsToAdd[] = [
-					'hostid' => $hostid,
-					'groupid' => $group['groupid']
-				];
-			}
-			DB::insert('hosts_groups', $groupsToAdd);
-
-			if (array_key_exists('tags', $host) && $host['tags']) {
-				$this->createTags([$hostid => zbx_toArray($host['tags'])]);
-			}
-
-			$options = [
-				'hosts' => $host
-			];
-
-			if (isset($host['templates']) && !is_null($host['templates'])) {
-				$options['templates'] = $host['templates'];
-			}
-
-			if (isset($host['macros']) && !is_null($host['macros'])) {
-				$options['macros'] = $host['macros'];
-			}
-
-			if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
-				$options['interfaces'] = $host['interfaces'];
-			}
-
-			$result = API::Host()->massAdd($options);
-			if (!$result) {
-				self::exception();
-			}
-
-			if (array_key_exists('inventory', $host) && $host['inventory']) {
-				$hostInventory = $host['inventory'];
-				$hostInventory['inventory_mode'] = HOST_INVENTORY_MANUAL;
-			}
-			else {
-				$hostInventory = [];
-			}
-
-			if (array_key_exists('inventory_mode', $host) && $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-				$hostInventory['inventory_mode'] = $host['inventory_mode'];
-			}
-
-			if (array_key_exists('inventory_mode', $hostInventory)
-					&& ($hostInventory['inventory_mode'] == HOST_INVENTORY_MANUAL
-						|| $hostInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
-				$hostInventory['hostid'] = $hostid;
-				DB::insert('host_inventory', [$hostInventory], false);
 			}
 		}
 		unset($host);
 
+		$hosts_groups = [];
+		$hosts_tags = [];
+		$hosts_interfaces = [];
+		$hosts_macros = [];
+		$hosts_inventory = [];
+		$templates_hostids = [];
+
+		$hostids = DB::insert('hosts', $hosts);
+
+		foreach ($hosts as $index => &$host) {
+			$host['hostid'] = $hostids[$index];
+
+			foreach (zbx_toArray($host['groups']) as $group) {
+				$hosts_groups[] = [
+					'hostid' => $host['hostid'],
+					'groupid' => $group['groupid']
+				];
+			}
+
+			if (array_key_exists('tags', $host)) {
+				foreach (zbx_toArray($host['tags']) as $tag) {
+					$hosts_tags[] = ['hostid' => $host['hostid']] + $tag;
+				}
+			}
+
+			if (array_key_exists('interfaces', $host)) {
+				foreach (zbx_toArray($host['interfaces']) as $interface) {
+					$hosts_interfaces[] = ['hostid' => $host['hostid']] + $interface;
+				}
+			}
+
+			if (array_key_exists('macros', $host)) {
+				foreach (zbx_toArray($host['macros']) as $macro) {
+					$hosts_macros[] = ['hostid' => $host['hostid']] + $macro;
+				}
+			}
+
+			if (array_key_exists('templates', $host)) {
+				foreach (zbx_toArray($host['templates']) as $template) {
+					$templates_hostids[$template['templateid']][] = $host['hostid'];
+				}
+			}
+
+			$host_inventory = [];
+			if (array_key_exists('inventory', $host) && $host['inventory']) {
+				$host_inventory = $host['inventory'];
+				$host_inventory['inventory_mode'] = HOST_INVENTORY_MANUAL;
+			}
+
+			if (array_key_exists('inventory_mode', $host) && $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+				$host_inventory['inventory_mode'] = $host['inventory_mode'];
+			}
+
+			if (array_key_exists('inventory_mode', $host_inventory)) {
+				$hosts_inventory[] = ['hostid' => $host['hostid']] + $host_inventory;
+			}
+		}
+		unset($host);
+
+		DB::insertBatch('hosts_groups', $hosts_groups);
+
+		if ($hosts_tags) {
+			DB::insert('host_tag', $hosts_tags);
+		}
+
+		if ($hosts_interfaces) {
+			API::HostInterface()->create($hosts_interfaces);
+		}
+
+		if ($hosts_macros) {
+			API::UserMacro()->create($hosts_macros);
+		}
+
+		while ($templates_hostids) {
+			$templateid = key($templates_hostids);
+			$link_hostids = reset($templates_hostids);
+			$link_templateids = [$templateid];
+			unset($templates_hostids[$templateid]);
+
+			foreach ($templates_hostids as $templateid => $hostids) {
+				if ($link_hostids === $hostids) {
+					$link_templateids[] = $templateid;
+					unset($templates_hostids[$templateid]);
+				}
+			}
+
+			$this->link($link_templateids, $link_hostids);
+		}
+
+		if ($hosts_inventory) {
+			DB::insert('host_inventory', $hosts_inventory, false);
+		}
+
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hosts);
 
-		return ['hostids' => $hostids];
+		return ['hostids' => array_column($hosts, 'hostid')];
 	}
 
 	/**
@@ -1525,7 +1557,7 @@ class CHost extends CHostGeneral {
 		}
 
 		DB::delete('opcommand_hst', [
-			'hostid' => $hostIds,
+			'hostid' => $hostIds
 		]);
 
 		// delete empty operations
@@ -1540,14 +1572,11 @@ class CHost extends CHostGeneral {
 		}
 
 		DB::delete('operations', [
-			'operationid' => $delOperationids,
+			'operationid' => $delOperationids
 		]);
 
-		$hosts = API::Host()->get([
-			'output' => [
-				'hostid',
-				'name'
-			],
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
 			'hostids' => $hostIds,
 			'nopermissions' => true
 		]);
@@ -1562,13 +1591,14 @@ class CHost extends CHostGeneral {
 		DB::delete('hosts', ['hostid' => $hostIds]);
 
 		// TODO: remove info from API
-		foreach ($hosts as $host) {
-			info(_s('Deleted: Host "%1$s".', $host['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
+		foreach ($db_hosts as $db_host) {
+			info(_s('Deleted: Host "%1$s".', $db_host['name']));
 		}
 
 		// remove Monitoring > Latest data toggle profile values related to given hosts
 		DB::delete('profiles', ['idx' => 'web.latest.toggle_other', 'idx2' => $hostIds]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $db_hosts);
 
 		return ['hostids' => $hostIds];
 	}
@@ -1636,43 +1666,48 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// adding screens
-		if ($options['selectScreens'] !== null) {
-			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
-				$screens = API::TemplateScreen()->get([
-					'output' => $this->outputExtend($options['selectScreens'], ['hostid']),
-					'hostids' => $hostids,
-					'nopermissions' => true
+		// Adding dashboards.
+		if ($options['selectDashboards'] !== null) {
+			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
+
+			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
+				$dashboards = API::TemplateDashboard()->get([
+					'output' => $this->outputExtend($options['selectDashboards'], ['templateid']),
+					'templateids' => $templateids
 				]);
+
 				if (!is_null($options['limitSelects'])) {
-					order_result($screens, 'name');
+					order_result($dashboards, 'name');
 				}
 
-				// inherited screens do not have a unique screenid, so we're building a map using array keys
-				$relationMap = new CRelationMap();
-				foreach ($screens as $key => $screen) {
-					$relationMap->addRelation($screen['hostid'], $key);
+				foreach ($result as &$host) {
+					foreach ($hosts_templates[$host['hostid']] as $templateid) {
+						foreach ($dashboards as $dashboard) {
+							if ($dashboard['templateid'] == $templateid) {
+								$host['dashboards'][] = $dashboard;
+							}
+						}
+					}
 				}
-
-				$screens = $this->unsetExtraFields($screens, ['hostid'], $options['selectScreens']);
-				$result = $relationMap->mapMany($result, $screens, 'screens', $options['limitSelects']);
+				unset($host);
 			}
 			else {
-				$screens = API::TemplateScreen()->get([
-					'hostids' => $hostids,
-					'nopermissions' => true,
+				$dashboards = API::TemplateDashboard()->get([
+					'templateids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
 
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['screens'] = 0;
+					$result[$hostid]['dashboards'] = 0;
 
-					foreach ($screens as $screen) {
-						if (bccomp($screen['hostid'], $hostid) == 0) {
-							$result[$hostid]['screens'] += $screen['rowscount'];
+					foreach ($dashboards as $dashboard) {
+						if (in_array($dashboard['templateid'], $hosts_templates[$hostid])) {
+							$result[$hostid]['dashboards'] += $dashboard['rowscount'];
 						}
 					}
+
+					$result[$hostid]['dashboards'] = (string) $result[$hostid]['dashboards'];
 				}
 			}
 		}

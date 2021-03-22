@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ const char	*help_message[] = {
 	"      " ZBX_SECRETS_RELOAD "             Reload secrets from Vault",
 	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
 	"                                 section (historycache, preprocessing, alerting,",
-	"                                 lld, valuecache) or everything if section is",
+	"                                 lld, valuecache, locks) or everything if section is",
 	"                                 not specified",
 	"",
 	"      Log level control targets:",
@@ -248,6 +248,7 @@ char	*CONFIG_DB_TLS_CA_FILE		= NULL;
 char	*CONFIG_DB_TLS_CIPHER		= NULL;
 char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
 char	*CONFIG_EXPORT_DIR		= NULL;
+char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -580,6 +581,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		zbx_free(ch_error);
 		err = 1;
 	}
+
+	if (SUCCEED != 	zbx_validate_export_type(CONFIG_EXPORT_TYPE, NULL))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s", CONFIG_EXPORT_TYPE);
+		err = 1;
+	}
 #if !defined(HAVE_IPV6)
 	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
 #endif
@@ -835,6 +842,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1},
 		{"ExportDir",			&CONFIG_EXPORT_DIR,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"ExportType",			&CONFIG_EXPORT_TYPE,			TYPE_STRING_LIST,
+			PARM_OPT,	0,			0},
 		{"ExportFileSize",		&CONFIG_EXPORT_FILE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{"StartLLDProcessors",		&CONFIG_LLDWORKER_FORKS,		TYPE_INT,
@@ -985,7 +994,7 @@ static void	zbx_main_sigusr_handler(int flags)
 		{
 			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_VALUECACHE) |
 					(1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LLD) |
-					(1 << ZBX_DIAGINFO_ALERTING);
+					(1 << ZBX_DIAGINFO_ALERTING) | (1 << ZBX_DIAGINFO_LOCKS);
 		}
 		else
 			zbx_diaginfo_scope = 1 << scope;
@@ -1345,11 +1354,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	if (SUCCEED == zbx_is_export_enabled())
-	{
-		zbx_history_export_init("main-process", 0);
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_problems_export_init("main-process", 0);
-	}
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
+		zbx_history_export_init("main-process", 0);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+		zbx_trends_export_init("main-process", 0);
+
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
 

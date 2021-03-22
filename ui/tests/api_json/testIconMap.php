@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ class testIconMap extends CAPITest {
 								'iconid' => '2'
 							]
 						]
-					],
+					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(API icon map the same name) already exists.'
 			],
@@ -200,7 +200,7 @@ class testIconMap extends CAPITest {
 			[
 				'iconmap' => [
 					'name' => 'API icon map without mappings',
-					'default_iconid' => '2',
+					'default_iconid' => '2'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "mappings" is missing.'
 			],
@@ -534,7 +534,7 @@ class testIconMap extends CAPITest {
 							'inventory_link' => '2',
 							'expression' => 'the same mapping',
 							'iconid' => '1'
-						],
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/mappings/2": value (inventory_link, expression)=(2, the same mapping) already exists.'
@@ -629,7 +629,7 @@ class testIconMap extends CAPITest {
 				'iconmap' => [[
 					'iconmappingid' => 2,
 					'name' => 'non existent parameter',
-					'default_iconid' => '2',
+					'default_iconid' => '2'
 				]],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "iconmappingid".'
 			],
@@ -721,7 +721,7 @@ class testIconMap extends CAPITest {
 				'iconmap' => [[
 					'iconmapid' => 2,
 					'name' => 'API icon map with empty default_iconid',
-					'default_iconid' => '',
+					'default_iconid' => ''
 				]],
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
@@ -729,7 +729,7 @@ class testIconMap extends CAPITest {
 				'iconmap' => [[
 					'iconmapid' => 2,
 					'name' => 'API icon map with string default_iconid',
-					'default_iconid' => 'abc',
+					'default_iconid' => 'abc'
 				]],
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
@@ -737,7 +737,7 @@ class testIconMap extends CAPITest {
 				'iconmap' => [[
 					'iconmapid' => 2,
 					'name' => '☺',
-					'default_iconid' => '0.0',
+					'default_iconid' => '0.0'
 				]],
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
@@ -745,7 +745,7 @@ class testIconMap extends CAPITest {
 				'iconmap' => [[
 					'iconmapid' => 2,
 					'name' => 'API icon map nonexistent default_iconid',
-					'default_iconid' => '123456',
+					'default_iconid' => '123456'
 				]],
 				'expected_error' => 'Icon with ID "123456" is not available.'
 			],
@@ -960,7 +960,7 @@ class testIconMap extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "iconmap.create".'
 			],
 			[
 				'method' => 'iconmap.update',
@@ -969,13 +969,13 @@ class testIconMap extends CAPITest {
 					'iconmapid' => '2',
 					'name' => 'API iconmap update as zabbix admin'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "iconmap.update".'
 			],
 			[
 				'method' => 'iconmap.delete',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'iconmap' => ['2'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "iconmap.delete".'
 			],
 			[
 				'method' => 'iconmap.create',
@@ -991,22 +991,22 @@ class testIconMap extends CAPITest {
 							]
 					]
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "iconmap.create".'
 			],
 			[
 				'method' => 'iconmap.update',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'iconmap' => [
 					'iconmapid' => '19',
-					'name' => 'API iconmap update as zabbix user',
+					'name' => 'API iconmap update as zabbix user'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "iconmap.update".'
 			],
 			[
 				'method' => 'iconmap.delete',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'iconmap' => ['2'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "iconmap.delete".'
 			]
 		];
 	}

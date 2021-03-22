@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,10 +149,15 @@ $ui_rows = [
 		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'allow_traps_row',
 		'request_method', 'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row',
 		'ssl_key_file_row', 'ssl_cert_file_row', 'ssl_key_password_row', 'trapper_hosts', 'allow_traps'
+	],
+	ITEM_TYPE_SCRIPT => [
+		'parameters_row', 'script_row', 'timeout_row'
 	]
 ];
-foreach ($ui_rows[ITEM_TYPE_HTTPAGENT] as $row) {
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_HTTPAGENT, $row);
+foreach ($ui_rows as $type => $rows) {
+	foreach ($rows as $row) {
+		zbx_subarray_push($this->data['typeVisibility'], $type, $row);
+	}
 }
 
 foreach ($this->data['types'] as $type => $label) {
@@ -218,7 +223,8 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		}
 	}
 
-	function updateItemTestBtn() {
+	function updateItemFormElements() {
+		// test button
 		var testable_item_types = <?= json_encode(CControllerPopupItemTest::getTestableItemTypes($this->data['hostid'])) ?>,
 			type = parseInt(jQuery('#type').val()),
 			key = jQuery('#key').val();
@@ -228,6 +234,20 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		}
 		else {
 			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
+		}
+
+		// delay field
+		if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
+			if (key.substr(0, 8) === 'mqtt.get') {
+				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'delay']) ?>);
+				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'row_delay']) ?>);
+				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'row_flex_intervals']) ?>);
+			}
+			else {
+				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'delay']) ?>);
+				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'row_delay']) ?>);
+				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'row_flex_intervals']) ?>);
+			}
 		}
 	}
 
@@ -257,15 +277,17 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			], true) ?>);
 		}
 
-		$("#key").on('keyup change', updateItemTestBtn);
+		$("#key").on('keyup change', updateItemFormElements);
+
+		$('#parameters_table').dynamicRows({template: '#parameters_table_row'});
 
 		$('#type')
 			.change(function() {
-				// update the interface select with each item type change
-				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
+				var item_interface_types = <?= json_encode(itemTypeInterface()) ?>,
+					interface_ids_by_types = <?= json_encode($interface_ids_by_types) ?>;
 
-				updateItemTestBtn();
-				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())] || null);
+				updateItemFormElements();
+				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt($(this).val()));
 
 				setAuthTypeLabel();
 			})
@@ -273,7 +295,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 
 		$('#test_item').on('click', function() {
 			var step_nums = [];
-			$('select[name^="preprocessing"][name$="[type]"]', $('#preprocessing')).each(function() {
+			$('z-select[name^="preprocessing"][name$="[type]"]', $('#preprocessing')).each(function() {
 				var str = $(this).attr('name');
 				step_nums.push(str.substr(14, str.length - 21));
 			});

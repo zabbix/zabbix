@@ -1,9 +1,9 @@
 
-# Template Net HP Comware HH3C SNMP
+# HP Comware HH3C SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 http://certifiedgeek.weebly.com/blog/hp-comware-snmp-mib-for-cpu-memory-and-temperature
 http://www.h3c.com.hk/products___solutions/technology/system_management/configuration_example/200912/656451_57_0.htm
 
@@ -39,9 +39,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module EtherLike-MIB SNMP |
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|EtherLike-MIB SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 
@@ -77,7 +77,7 @@ No specific Zabbix configuration is required.
 |{#ENT_NAME}: Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {TEMPLATE_NAME:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#ENT_NAME}: Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}].diff()}=1 and {TEMPLATE_NAME:system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#ENT_NAME}: Operating system description has changed |<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</p> |`{TEMPLATE_NAME:system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}].diff()}=1 and {TEMPLATE_NAME:system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|{#MODULE_NAME}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|{#MODULE_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 |{#ENT_NAME}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"psuError"},eq)}=1 or {TEMPLATE_NAME:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"rpsError"},eq)}=1 or {TEMPLATE_NAME:sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"hardwareFaulty"},eq)}=1` |AVERAGE | |
 |{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3` |WARNING |<p>**Depends on**:</p><p>- {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}</p> |
 |{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3` |HIGH | |

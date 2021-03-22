@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,12 +119,26 @@ trait TableTrait {
 	 * @param integer $count	rows count per page
 	 * @param integer $total	total rows count
 	 */
-	public function assertRowCount($count, $total = null) {
+	public function assertTableStats($count, $total = null) {
 		if ($total === null) {
 			$total = $count;
 		}
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
 				$this->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
+	}
+
+	/**
+	 * Get data from chosen column.
+	 *
+	 * @param string $column		Column name, where value should be checked
+	 */
+	public function getTableResult($column) {
+		$table = $this->query('class:list-table')->asTable()->one();
+		$result = [];
+		foreach ($table->getRows() as $row) {
+			$result[] = $row->getColumn($column)->getText();
+		}
+		return $result;
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,17 +91,17 @@ class testCorrelation extends CAPITest {
 			[
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'correlation' => ['99003'],
-				'expected_error'=> 'You do not have permission to perform this operation.'
+				'expected_error'=> 'No permissions to call "correlation.delete".'
 			],
 			[
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'correlation' => ['99003'],
-				'expected_error'=> 'You do not have permission to perform this operation.'
+				'expected_error'=> 'No permissions to call "correlation.delete".'
 			],
 			[
 				'login' => ['user' => 'guest', 'password' => ''],
 				'correlation' => ['99003'],
-				'expected_error'=> 'You do not have permission to perform this operation.'
+				'expected_error'=> 'No permissions to call "correlation.delete".'
 			]
 		];
 	}

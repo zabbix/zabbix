@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,12 +100,7 @@ class testAction extends CAPITest {
 			[
 				'login' => ['user' => 'action-user', 'password' => 'zabbix'],
 				'action' => ['16'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'login' => ['user' => 'action-user', 'password' => 'zabbix'],
-				'action' => ['92'],
-				'expected_error' => null
+				'expected_error' => 'No permissions to call "action.delete".'
 			],
 			[
 				'login' => ['user' => 'action-admin', 'password' => 'zabbix'],
@@ -120,12 +115,7 @@ class testAction extends CAPITest {
 			[
 				'login' => ['user' => 'guest', 'password' => ''],
 				'action' => ['16'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			[
-				'login' => ['user' => 'guest', 'password' => ''],
-				'action' => ['18'],
-				'expected_error' => null
+				'expected_error' => 'No permissions to call "action.delete".'
 			]
 		];
 	}

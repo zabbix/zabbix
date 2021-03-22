@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1518,11 +1518,8 @@ static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
 		switch (token->type)
 		{
 			case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
-				ZBX_FALLTHROUGH;
 			case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
-				ZBX_FALLTHROUGH;
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
-				ZBX_FALLTHROUGH;
 			case ZBX_JSONPATH_TOKEN_CONST_NUM:
 				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->data);
 				break;

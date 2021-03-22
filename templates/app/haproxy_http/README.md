@@ -1,13 +1,13 @@
 
-# Template App HAProxy by HTTP
+# HAProxy by HTTP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor HAProxy by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`Template App HAProxy by HTTP` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/)  with HTTP agent remotely:
+Template `HAProxy by HTTP` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/)  with HTTP agent remotely:
 
 Note that this solution supports https and redirects.
 
@@ -19,7 +19,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Setup [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/).
 
@@ -47,13 +47,13 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$HAPROXY.BACK_ERESP.MAX.WARN} |<p>Maximum of responses with error on BACKEND for trigger expression.</p> |`10` |
-|{$HAPROXY.BACK_QCUR.MAX.WARN} |<p>Maximum number of requests on BACKEND unassigned in queue for trigger expression.</p> |`10` |
-|{$HAPROXY.BACK_QTIME.MAX.WARN} |<p>Maximum of average time spent in queue on BACKEND for trigger expression.</p> |`10s` |
-|{$HAPROXY.BACK_RTIME.MAX.WARN} |<p>Maximum of average BACKEND response time for trigger expression.</p> |`10s` |
+|{$HAPROXY.BACK_ERESP.MAX.WARN} |<p>Maximum of responses with error on Backend for trigger expression.</p> |`10` |
+|{$HAPROXY.BACK_QCUR.MAX.WARN} |<p>Maximum number of requests on Backend unassigned in queue for trigger expression.</p> |`10` |
+|{$HAPROXY.BACK_QTIME.MAX.WARN} |<p>Maximum of average time spent in queue on Backend for trigger expression.</p> |`10s` |
+|{$HAPROXY.BACK_RTIME.MAX.WARN} |<p>Maximum of average Backend response time for trigger expression.</p> |`10s` |
 |{$HAPROXY.FRONT_DREQ.MAX.WARN} |<p>The HAProxy maximum denied requests for trigger expression.</p> |`10` |
 |{$HAPROXY.FRONT_EREQ.MAX.WARN} |<p>The HAProxy maximum number of request errors for trigger expression.</p> |`10` |
-|{$HAPROXY.FRONT_SUTIL.MAX.WARN} |<p>Maximum of session usage percentage on frontend for trigger expression.</p> |`80%` |
+|{$HAPROXY.FRONT_SUTIL.MAX.WARN} |<p>Maximum of session usage percentage on frontend for trigger expression.</p> |`80` |
 |{$HAPROXY.PASSWORD} |<p>The password of the HAProxy stats page.</p> |`` |
 |{$HAPROXY.RESPONSE_TIME.MAX.WARN} |<p>The HAProxy stats page maximum response time in seconds for trigger expression.</p> |`10s` |
 |{$HAPROXY.SERVER_ERESP.MAX.WARN} |<p>Maximum of responses with error on server for trigger expression.</p> |`10` |
@@ -73,10 +73,10 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|BACKEND discovery |<p>Discovery backends</p> |DEPENDENT |haproxy.backend.discovery<p>**Filter**:</p>AND <p>- A: {#SVNAME} MATCHES_REGEX `BACKEND`</p><p>- B: {#MODE} MATCHES_REGEX `http`</p> |
+|Backend discovery |<p>Discovery backends</p> |DEPENDENT |haproxy.backend.discovery<p>**Filter**:</p>AND <p>- A: {#SVNAME} MATCHES_REGEX `BACKEND`</p><p>- B: {#MODE} MATCHES_REGEX `http`</p> |
 |FRONTEND discovery |<p>Discovery frontends</p> |DEPENDENT |haproxy.frontend.discovery<p>**Filter**:</p>AND <p>- A: {#SVNAME} MATCHES_REGEX `FRONTEND`</p><p>- B: {#MODE} MATCHES_REGEX `http`</p> |
 |Servers discovery |<p>Discovery servers</p> |DEPENDENT |haproxy.server.discovery<p>**Filter**:</p>AND <p>- A: {#SVNAME} NOT_MATCHES_REGEX `FRONTEND|BACKEND`</p><p>- B: {#MODE} MATCHES_REGEX `http`</p> |
-|TCP BACKEND discovery |<p>Discovery TCP backends</p> |DEPENDENT |haproxy.backend_tcp.discovery<p>**Filter**:</p>AND <p>- A: {#SVNAME} MATCHES_REGEX `BACKEND`</p><p>- B: {#MODE} MATCHES_REGEX `tcp`</p> |
+|TCP Backend discovery |<p>Discovery TCP backends</p> |DEPENDENT |haproxy.backend_tcp.discovery<p>**Filter**:</p>AND <p>- A: {#SVNAME} MATCHES_REGEX `BACKEND`</p><p>- B: {#MODE} MATCHES_REGEX `tcp`</p> |
 |TCP FRONTEND discovery |<p>Discovery TCP frontends</p> |DEPENDENT |haproxy.frontend_tcp.discovery<p>**Filter**:</p>AND <p>- A: {#SVNAME} MATCHES_REGEX `FRONTEND`</p><p>- B: {#MODE} MATCHES_REGEX `tcp`</p> |
 |TCP Servers discovery |<p>Discovery tcp servers</p> |DEPENDENT |haproxy.server_tcp.discovery<p>**Filter**:</p>AND <p>- A: {#SVNAME} NOT_MATCHES_REGEX `FRONTEND|BACKEND`</p><p>- B: {#MODE} MATCHES_REGEX `tcp`</p> |
 
@@ -85,7 +85,7 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |HAProxy |HAProxy: Version |<p>-</p> |DEPENDENT |haproxy.version<p>**Preprocessing**:</p><p>- REGEX: `HAProxy version ([^,]*), \1`</p><p>⛔️ON_FAIL: `CUSTOM_ERROR -> HAProxy version is not found`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|HAProxy |HAProxy: Uptime |<p>-</p> |DEPENDENT |haproxy.uptime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `try {     var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);     return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1; } catch (error) {     throw "HAProxy uptime is not found : " + error; }`</p> |
+|HAProxy |HAProxy: Uptime |<p>-</p> |DEPENDENT |haproxy.uptime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |HAProxy |HAProxy: Service status |<p>-</p> |SIMPLE |net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |HAProxy |HAProxy: Service response time |<p>-</p> |SIMPLE |net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"] |
 |HAProxy |HAProxy Backend {#PXNAME}: Status |<p>-</p> |DEPENDENT |haproxy.backend.status[{#PXNAME}:{#SVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.pxname == '{#PXNAME}' && @.svname == '{#SVNAME}')].status.first()`</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class testPageDashboardList extends CWebTest {
 
 	public function testPageDashboardList_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
-		$this->assertPageTitle('Dashboards');
+		$this->page->assertTitle('Dashboards');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['', 'Name'], $table->getHeadersText());
 
@@ -141,7 +141,7 @@ class testPageDashboardList extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$start_rows_count = $table->getRows()->count();
-		$this->assertRowCount($start_rows_count);
+		$this->assertTableStats($start_rows_count);
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['fields']);
 		$form->submit();
@@ -150,13 +150,13 @@ class testPageDashboardList extends CWebTest {
 		if ($data['result_count'] !== 0) {
 			$this->assertEquals($data['result_count'], $table->getRows()->count());
 		}
-		$this->assertRowCount($data['result_count']);
+		$this->assertTableStats($data['result_count']);
 		$form->query('button:Reset')->one()->click();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
 	}
 
 	/**
-	 * Check that My and Sharing tags displays corectly in Dashboard Lists for Admin.
+	 * Check that My and Sharing tags displays correctly in Dashboard Lists for Admin.
 	 */
 	public function testPageDashboardList_CheckOwners() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
@@ -191,13 +191,13 @@ class testPageDashboardList extends CWebTest {
 
 		// Delete single Dashboard.
 		$before_rows_count = $table->getRows()->count();
-		$this->assertRowCount($before_rows_count);
+		$this->assertTableStats($before_rows_count);
 		$table->findRow('Name', $dashboard_name, true)->select();
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard deleted');
-		$this->assertRowCount($before_rows_count - 1);
+		$this->assertTableStats($before_rows_count - 1);
 
 		// Check database.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE name='.zbx_dbstr($dashboard_name)));
@@ -210,10 +210,10 @@ class testPageDashboardList extends CWebTest {
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboards deleted');
-		$this->assertRowCount(0);
+		$this->assertTableStats(0);
 
 		// Check database.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE templateid IS NULL'));
 	}
 
 	/**
@@ -226,7 +226,7 @@ class testPageDashboardList extends CWebTest {
 	private function getTagText($table, $column, $color) {
 		$row = $table->findRow('Name', $column, true);
 
-		return $row->query('xpath://span[@class="tag '.$color.'-bg"]')->one()->getText();
+		return $row->query('xpath://span[@class="status-'.$color.'"]')->one()->getText();
 	}
 
 	/**

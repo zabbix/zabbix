@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
 int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 time_t	__wrap_time(time_t *ptr);
+void	__wrap_zbx_timespec(zbx_timespec_t *ts);
 
 void	zbx_vc_set_mode(int mode);
 
@@ -730,8 +731,8 @@ void	zbx_vcmock_set_cache_size(zbx_mock_handle_t hitem, const char *key)
 	{
 		if (ZBX_MOCK_SUCCESS != zbx_mock_string(hmem, &data) || SUCCEED != is_uint64(data, &cache_size))
 			fail_msg("Cannot read \"%s\" parameter", key);
-
-		zbx_vcmock_set_available_mem(cache_size);
+		else
+			zbx_vcmock_set_available_mem(cache_size);
 	}
 }
 
@@ -830,7 +831,7 @@ void	zbx_vcmock_set_time(zbx_mock_handle_t hitem, const char *key)
  * Purpose: returns the mocked current time                                   *
  *                                                                            *
  ******************************************************************************/
-zbx_timespec_t	zbx_vcmock_get_ts()
+zbx_timespec_t	zbx_vcmock_get_ts(void)
 {
 	return vcmock_ts;
 }

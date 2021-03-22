@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
-			'groupids' => getSubGroups($fields['groupids']),
-			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
+			'groupids' => $fields['groupids'],
+			'exclude_groupids' => $fields['exclude_groupids'],
 			'hostids' => $fields['hostids'],
 			'name' => $fields['problem'],
 			'severities' => $fields['severities'],
@@ -47,7 +47,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged'],
 			'show_opdata' => $fields['show_opdata']
-		], true, true);
+		]);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $sortfield, $sortorder);
 
@@ -67,7 +67,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'show' => $fields['show'],
 			'details' => 0,
 			'show_opdata' => $fields['show_opdata']
-		], true, true);
+		]);
 
 		if ($fields['show_tags']) {
 			$data['tags'] = makeTags($data['problems'], true, 'eventid', $fields['show_tags'], $fields['tags'],
@@ -103,7 +103,12 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'problem_ack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE),
 				'problem_unack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE),
 				'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
-			]
+			],
+			'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+			'allowed_change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 		]));
 	}
 

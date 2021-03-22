@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -324,27 +324,18 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
-	 * Filter element collection based on a specified condition and params.
+	 * Filter element collection based on a specified condition and parameters.
 	 *
-	 * @param string $condition    condition to be filtered by
-	 * @param array  $params       condition params
+	 * @param CElementFilter $filter    condition to be filtered by
 	 *
 	 * @return CElementCollection
 	 * @throws Exception
 	 */
-	public function filter($condition, $params = []) {
-		$method = CElementQuery::getConditionCallable($condition);
-
+	public function filter($filter) {
 		$elements = [];
 		foreach ($this->elements as $key => $element) {
-			$callable = call_user_func_array([$element, $method], $params);
-
-			try {
-				if (call_user_func($callable) === true) {
-					$elements[$key] = $element;
-				}
-			} catch (Exception $e) {
-				// Code is not missing here.
+			if ($filter->match($element)) {
+				$elements[$key] = $element;
 			}
 		}
 

@@ -46,8 +46,8 @@ INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9904,400,'One
 INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9905,400,'Two','Offline');
 INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9906,402,'Three','Other');
 INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9907,403,'Four','Unknown');
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
 
 -- host groups
@@ -63,10 +63,16 @@ INSERT INTO hstgrp (groupid,name,internal) VALUES (50011,'API host group delete4
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50014,'API group for host prototype',0);
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NULL,40066);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (8, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (9, 50011, '', 50014, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (108, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (109, 50011, '', 50014, NULL);
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (50015,'API discovery group {#HV.NAME}',0,4);
-INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 8, 'API discovery group {#HV.NAME}');
+INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 108, 'API discovery group {#HV.NAME}');
+-- host prototype for delete
+INSERT INTO hosts (hostid, host, name, status, flags, description, custom_interfaces) VALUES (50015, 'API host prototype for delete {#FSNAME}', 'API host prototype for delete {#FSNAME}', 0, 2, '', 1);
+INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50015,NULL,40066);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (112, 50015, '', 50014, NULL);
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50028,50015,1,2,1,'127.0.0.1','','10050');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (50028, 2, 1, '{$SNMP_COMMUNITY}');
 
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'API user group for update');
@@ -79,9 +85,9 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (19, 'API user group delete3');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (20, 'API user group in actions');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (21, 'API user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (22, 'API user group in configuration');
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-in-one-group', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-in-one-group', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 14, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 15, 6);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 16, 7);
@@ -95,14 +101,14 @@ INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, de
 UPDATE config SET alert_usrgrpid = 22 WHERE configid = 1;
 
 -- users
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'api-user-for-update', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (10, 'api-user-delete', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (11, 'api-user-delete1', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (12, 'api-user-delete2', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (13, 'api-user-action', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (14, 'api-user-map', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (15, 'api-user-screen', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (16, 'api-user-slideshow', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'api-user-for-update', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (10, 'api-user-delete', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (11, 'api-user-delete1', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (12, 'api-user-delete2', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (13, 'api-user-action', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (14, 'api-user-map', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (15, 'api-user-screen', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (16, 'api-user-slideshow', '5fce1b3e34b520afeffb37ce08c7cd66', 0, '15m', 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (12, 14, 9);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (13, 14, 10);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (14, 14, 11);
@@ -117,9 +123,9 @@ INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_st
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (32, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (4, 32, 13);
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (6, 'API map', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 14, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200021, 'API screen', 1, 1, NULL, 15, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200021, 'API screen', 1, 1, 15, 0);
 INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (200004, 'API slide show', 10, 16, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200022, 'API screen for slide show', 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200022, 'API screen for slide show', 1, 1, 1, 0);
 INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200012, 200004, 200022, 0, 0);
 
 -- scripts
@@ -153,7 +159,7 @@ INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, 
 
 -- scripts / inherited hostgroups
 INSERT INTO usrgrp (usrgrpid,name) VALUES (90000,'90000 Eur group write except one');
-INSERT INTO users (userid,alias,passwd,type) VALUES (90000,'90000','5fce1b3e34b520afeffb37ce08c7cd66',2);
+INSERT INTO users (userid,alias,passwd,roleid) VALUES (90000,'90000','5fce1b3e34b520afeffb37ce08c7cd66',2);
 INSERT INTO users_groups (id,usrgrpid,userid) VALUES (90000,90000,90000);
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90020,'90020','90020',0,'');
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (90021,'90021','90021',0,'');
@@ -234,6 +240,40 @@ INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15013, 'Ap
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15013, 15013, 'Api step 1', 1, 'http://api.com', '');
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15014, 15013, 'Api step 2', 2, 'http://api.com', '');
 
+-- web scenario for webitem update testing
+INSERT INTO applications (applicationid,hostid,name,flags) VALUES (15015,50009,'Webtest key_name application',0);
+INSERT INTO applications (applicationid,hostid,name,flags) VALUES (15016,50009,'Webtest key_name application2',0);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid, applicationid) VALUES (15015, 'Webtest key_name', 60, 'Zabbix', 50009, 15015);
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15015, 15015, 'Webstep name 1', 1, 'http://api.com', '');
+INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15016, 15015, 'Webstep name 2', 2, 'http://api.com', '');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150151, 50009, 1, 9, 0,'Download speed for scenario "$1".','web.test.in[Webtest key_name,,bps]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150152, 50009, 1, 9, 3,'Failed step of scenario "$1".','web.test.fail[Webtest key_name]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150153, 50009, 1, 9, 1,'Last error message of scenario "$1".','web.test.error[Webtest key_name]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150154, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 1,bps]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150155, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 1,resp]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150156, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 1]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150157, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 2,bps]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150158, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 2,resp]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150159, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 2]','1m','30d',0,'','',0,'','');
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150151, 15015, 150151, 2);
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150152, 15015, 150152, 3);
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15015, 150153, 4);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150154, 15015, 150154, 2);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150155, 15015, 150155, 1);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150156, 15015, 150156, 0);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150157, 15016, 150157, 2);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150158, 15016, 150158, 1);
+INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150159, 15016, 150159, 0);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150151,15015,150151);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150152,15015,150152);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150153,15015,150153);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150154,15015,150154);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150155,15015,150155);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150156,15015,150156);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150157,15015,150157);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150158,15015,150158);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150159,15015,150159);
+
 -- proxy
 INSERT INTO hosts (hostid, host, status, description) VALUES (99000, 'Api active proxy for delete0', 5, '');
 INSERT INTO hosts (hostid, host, status, description) VALUES (99001, 'Api active proxy for delete1', 5, '');
@@ -273,15 +313,14 @@ INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004
 
 -- autoregistration action
 INSERT INTO usrgrp (usrgrpid, name) VALUES (47, 'User group for action delete');
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (53, 'action-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (53, 'action-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (87, 47, 53);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (88, 47, 54);
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (91, 'API Autoregistration action', 2, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (91, 91, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (91, 0, 'Autoregistration: {HOST.HOST}', 'Host name: {HOST.HOST}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (91, 91, 47);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (92, 'API Action for deleting', 0, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (92, 91, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (92, 0, 'Problem: {EVENT.NAME}', 'Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (92, 92, 47);
@@ -965,121 +1004,121 @@ INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, ol
 
 -- LLD with overrides to delete
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133763,2,'',50009,'Overrides (delete)','overrides.delete','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (101,133763,'override',1,3,'{101} or {102} or {103}',1);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (102,133763,'override 2',2,0,'',1);
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (101,101,8,'{#MACRO1}','d{3}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (102,101,8,'{#MACRO2}','d{2}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (103,101,8,'{#MACRO3}','d{1}$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (101,101,0,3,'8');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (102,101,0,1,'wW');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (103,101,1,8,'^c+$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (104,101,2,2,'123');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (105,101,3,0,'');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (106,102,0,0,'');
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (102,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (103,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (104,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (105,1);
-INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (102,'92d');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (105,1);
-INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (102,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
-INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (103,3);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (101,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (102,0);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (103,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (105,1);
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (101,103,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (102,103,'tag2','value2');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (103,105,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (104,105,'tag2','value2');
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (101,105,10264);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (102,105,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (103,105,50010);
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (102,'36d');
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (106,'5d');
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1001,133763,'override',1,3,'{1001} or {1002} or {1003}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1002,133763,'override 2',2,0,'',1);
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1001,1001,8,'{#MACRO1}','d{3}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1002,1001,8,'{#MACRO2}','d{2}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1003,1001,8,'{#MACRO3}','d{1}$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1001,1001,0,3,'8');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1002,1001,0,1,'wW');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1003,1001,1,8,'^c+$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1004,1001,2,2,'123');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1005,1001,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1006,1002,0,0,'');
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1002,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1003,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1004,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1005,1);
+INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (1002,'92d');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1005,1);
+INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (1002,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
+INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (1003,3);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1001,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1002,0);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1003,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1005,1);
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (1001,1003,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (1002,1003,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (1003,1005,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (1004,1005,'tag2','value2');
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (1001,1005,10264);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (1002,1005,10265);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (1003,1005,50010);
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1002,'36d');
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1006,'5d');
 
 -- LLD with overrides to copy
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133764,2,'',50009,'Overrides (copy)','overrides.copy','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (103,133764,'override',1,3,'{104} or {105} or {106}',1);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (104,133764,'override 2',2,0,'',1);
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (104,103,8,'{#MACRO1}','d{3}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (105,103,8,'{#MACRO2}','d{2}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (106,103,8,'{#MACRO3}','d{1}$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (107,103,0,3,'8');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (108,103,0,1,'wW');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (109,103,1,8,'^c+$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (110,103,2,2,'123');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (111,103,3,0,'');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (112,104,0,0,'');
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (108,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (109,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (110,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (111,1);
-INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (108,'92d');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (111,1);
-INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (108,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
-INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (109,3);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (107,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (108,0);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (109,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (111,1);
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (3,109,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (4,109,'tag2','value2');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (5,111,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (6,111,'tag2','value2');
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (4,111,10264);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (5,111,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (6,111,50010);
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (108,'36d');
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (112,'5d');
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1003,133764,'override',1,3,'{1004} or {1005} or {1006}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1004,133764,'override 2',2,0,'',1);
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1004,1003,8,'{#MACRO1}','d{3}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1005,1003,8,'{#MACRO2}','d{2}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1006,1003,8,'{#MACRO3}','d{1}$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1007,1003,0,3,'8');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1008,1003,0,1,'wW');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1009,1003,1,8,'^c+$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1010,1003,2,2,'123');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1011,1003,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1012,1004,0,0,'');
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1008,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1009,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1010,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1011,1);
+INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (1008,'92d');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1011,1);
+INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (1008,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
+INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (1009,3);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1007,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1008,0);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1009,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1011,1);
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (3,1009,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (4,1009,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (5,1011,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (6,1011,'tag2','value2');
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (4,1011,10264);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (5,1011,10265);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (6,1011,50010);
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1008,'36d');
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1012,'5d');
 
 -- LLD with overrides to update
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133765,2,'',50009,'Overrides (update)','overrides.update','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (105,133765,'override',1,3,'{107} or {108} or {109}',1);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (106,133765,'override 2',2,0,'',1);
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (107,105,8,'{#MACRO1}','d{3}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (108,105,8,'{#MACRO2}','d{2}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (109,105,8,'{#MACRO3}','d{1}$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (113,105,0,3,'8');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (114,105,0,1,'wW');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (115,105,1,8,'^c+$');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (116,105,2,2,'123');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (117,105,3,0,'');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (118,106,0,0,'');
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (114,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (115,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (116,1);
-INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (117,1);
-INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (114,'92d');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (117,1);
-INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (114,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
-INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (115,3);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (113,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (114,0);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (115,1);
-INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (117,1);
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (7,115,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (8,115,'tag2','value2');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (9,117,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10,117,'tag2','value2');
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (7,117,10264);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (8,117,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (9,117,50010);
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (114,'36d');
-INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (118,'5d');
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1005,133765,'override',1,3,'{1007} or {1008} or {1009}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1006,133765,'override 2',2,0,'',1);
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1007,1005,8,'{#MACRO1}','d{3}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1008,1005,8,'{#MACRO2}','d{2}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1009,1005,8,'{#MACRO3}','d{1}$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1013,1005,0,3,'8');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1014,1005,0,1,'wW');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1015,1005,1,8,'^c+$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1016,1005,2,2,'123');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1017,1005,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1018,1006,0,0,'');
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1014,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1015,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1016,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1017,1);
+INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (1014,'92d');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1017,1);
+INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (1014,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
+INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (1015,3);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1013,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1014,0);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1015,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1017,1);
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (7,1015,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (8,1015,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (9,1017,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10,1017,'tag2','value2');
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (7,1017,10264);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (8,1017,10265);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (9,1017,50010);
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1014,'36d');
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1018,'5d');
 
 -- LLD with overrides and template constraint
 INSERT INTO hosts (hostid,proxy_hostid,host,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131001,NULL,'Overrides template constraint',3,0,'',0,0,0,-1,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','',0,0,0,'','Overrides template constaint',0,NULL,'',1,1,'','','','','',1,0);
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (139001,'Overrides',0,0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139201,131001,139001);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',50009,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (107,133766,'Only template operation',1,0,'',0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (108,133766,'Not only template operation',2,0,'',0);
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (119,107,3,0,'');
-INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (120,108,3,0,'');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (120,0);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10,119,131001);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (11,120,131001);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1007,133766,'Only template operation',1,0,'',0);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1008,133766,'Not only template operation',2,0,'',0);
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1019,1007,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1020,1008,3,0,'');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1020,0);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10,1019,131001);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (11,1020,131001);
 
 -- graph portotype
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (139002,'test_graph_prototype',0,0);
@@ -1091,9 +1130,9 @@ INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,st
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133768,2,'',131003,'prototype','a[{#A}]','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133769,2,'',131002,'item','a','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (138003,133768,133767,'',0,0);
-INSERT INTO graphs (graphid,name,width,height,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags,discover) VALUES (1300,'graph_prototype',900,200,0,100,NULL,1,1,0,1,0,0,0,0,0,NULL,NULL,2,0);
-INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (50450,1300,133769,0,1,'F63100',0,2,0);
-INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (50451,1300,133768,0,0,'1A7C11',0,2,0);
+INSERT INTO graphs (graphid,name,width,height,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags,discover) VALUES (9000,'graph_prototype',900,200,0,100,NULL,1,1,0,1,0,0,0,0,0,NULL,NULL,2,0);
+INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (90450,9000,133769,0,1,'F63100',0,2,0);
+INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (90451,9000,133768,0,0,'1A7C11',0,2,0);
 
 -- trigger permissions: BEGIN
 
@@ -1104,7 +1143,7 @@ INSERT INTO hstgrp (groupid, name) VALUES
 (50104, 'test-trigger-permissions-group-W');
 
 INSERT INTO usrgrp (usrgrpid, name) VALUES (50101, 'test-trigger-permissions-user-group');
-INSERT INTO users (userid, alias, passwd, type) VALUES (50101, 'test-trigger-permissions-user', '$2y$10$VKVVejdnWSz08PPa0Xb9g.igAz.iWne3EaxXPX5WF8WsbrrA.lE4K', 1);
+INSERT INTO users (userid, alias, passwd, roleid) VALUES (50101, 'test-trigger-permissions-user', '$2y$10$VKVVejdnWSz08PPa0Xb9g.igAz.iWne3EaxXPX5WF8WsbrrA.lE4K', 1);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (50101, 50101, 50101);
 INSERT INTO rights (rightid, groupid, id, permission) VALUES (50101, 50101, 50102, 0), (50102, 50101, 50103, 2), (50103, 50101, 50104, 3);
 
@@ -1409,9 +1448,9 @@ INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99010
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99012, 'discovered', 'discovered', 0, 4, '');
 INSERT INTO items (itemid, type, hostid, name, key_, delay, history, trends, status, value_type, flags, params, description, posts, headers) VALUES (58735, 2, 99010, 'trap', 'trap', '0', '90d', '0', 0, 4, 1, '', '', '', '');
-INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (10, 99011, 'host group {#VALUE}');
-INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (11, 99011, 50025);
-INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50026, 10, 'host group {#VALUE}');
+INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (110, 99011, 'host group {#VALUE}');
+INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (111, 99011, 50025);
+INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50026, 110, 'host group {#VALUE}');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50020, 99010, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50021, 99012, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50022, 99012, 50026);
@@ -1420,3 +1459,18 @@ INSERT INTO host_discovery (hostid, parent_hostid, host) VALUES (99012, 99011, '
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50026, 99010, 1, 1, 1, '127.0.0.1', '10050');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50027, 99012, 1, 1, 1, '127.0.0.1', '10050');
 INSERT INTO interface_discovery (interfaceid, parent_interfaceid) VALUES (50027, 50026);
+
+-- test trigger validation
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99013, 'Trigger validation test host', 'Trigger validation test host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99014, 'Trigger validation test template', 'Trigger validation test template', 3, '');
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50027, 'Trigger validation test host group', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50023, 99013, 50027);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50024, 99014, 50027);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58736, 99013, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '', '', '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58737, 99014, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '', '', '', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50172, 'test-trigger-1', '{50232}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50232, 50172, 58736, 'last', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50173, 'test-trigger-2', '{50233}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50233, 50173, 58736, 'last', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50174, 'template-trigger', '{50234}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50234, 50174, 58737, 'last', '');

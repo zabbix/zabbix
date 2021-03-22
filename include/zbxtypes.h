@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -213,5 +213,9 @@ zbx_uint128_t;
 
 /* macro to test if a signed value has been assigned to unsigned type (char, short, int, long long) */
 #define ZBX_IS_TOP_BIT_SET(x)	(0 != ((__UINT64_C(1) << ((sizeof(x) << 3) - 1)) & (x)))
+
+#if defined(_WINDOWS)
+	#define localtime_r(x, y)	localtime_s(y, x)
+#endif
 
 #endif
