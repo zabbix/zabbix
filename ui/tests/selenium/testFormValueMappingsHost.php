@@ -136,9 +136,16 @@ class testFormValueMappingsHost extends testFormValueMappings {
 	}
 
 	/**
-	 * Scenario for verifying that value mappings are correctly copied to the clone/ full clone of the host.
+	 * Scenario for verifying that value mappings are correctly copied to the clone of the host.
 	 */
 	public function testFormValueMappingsHost_Clone() {
 		$this->checkClone('host');
+	}
+
+	/**
+	 * Scenario for verifying that value mappings are correctly copied to the full clone of the host.
+	 */
+	public function testFormValueMappingsHost_FullClone() {
+		$this->checkClone('host', 'Full clone');
 	}
 }

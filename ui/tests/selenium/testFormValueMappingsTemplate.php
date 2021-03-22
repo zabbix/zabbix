@@ -140,4 +140,11 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 	public function testFormValueMappingsTemplate_Clone() {
 		$this->checkClone('template');
 	}
+
+	/**
+	 * Scenario for verifying that value mappings are correctly copied to the full clone of the template.
+	 */
+	public function testFormValueMappingsTemplate_FullClone() {
+		$this->checkClone('template', 'Full clone');
+	}
 }

@@ -108,28 +108,28 @@ class testFormValueMappings extends CWebTest {
 	 *
 	 * @param string $source	Entity (host or template) for which the scenario is executed.
 	 */
-	public function checkClone($source) {
-		// Create a clone and a full clone of an existing host/template with value mappings.
-		$hostids = [];
-		foreach(['Clone' => true, 'Full clone' => false] as $action => $login) {
-			$this->openValueMappingTab($source, $login, false);
-			$this->query('button', $action)->one()->click();
-			$form = $this->query('name:'.$source.'sForm')->asForm()->one();
-			$form->getField(ucfirst($source).' name')->fill($action.' Valuemap Test');
-			$form->submit();
+	public function checkClone($source, $action = 'Clone') {
+		// Create a clone and or a full clone of an existing host/template with value mappings.
+//		$hostids = [];
+//		foreach(['Clone' => true, 'Full clone' => false] as $action => $login) {
+		$this->openValueMappingTab($source, true, false);
+		$this->query('button', $action)->one()->click();
+		$form = $this->query('name:'.$source.'sForm')->asForm()->one();
+		$form->getField(ucfirst($source).' name')->fill($action.' Valuemap Test');
+		$form->submit();
 
-			// Get the id of the created host/template clone.
-			$hostids[] = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($action.' Valuemap Test'));
-		}
+		// Get the id of the created host/template clone.
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($action.' Valuemap Test'));
+//		}
 
 		// Check value mappings were copied correctly.
-		foreach ($hostids as $hostid) {
-			$this->page->open($source.'s.php?form=update&'.$source.'id='.$hostid);
-			$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
-			$form->selectTab('Value mapping');
+//		foreach ($hostids as $hostid) {
+		$this->page->open($source.'s.php?form=update&'.$source.'id='.$hostid);
+		$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+		$form->selectTab('Value mapping');
 
-			$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
-		}
+		$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
+//		}
 	}
 
 	public function getValuemapData() {
@@ -331,12 +331,6 @@ class testFormValueMappings extends CWebTest {
 		$this->openValueMappingTab($source);
 
 		// Add a new value mapping or open the value mapping to be updated.
-		if ($action === 'create') {
-			$this->query('name:valuemap_add')->one()->click();
-		}
-		else {
-			$this->query('link', CTestArrayHelper::get($data, 'update valuemap', self::UPDATE_VALUEMAP2))->one()->click();
-		}
 		$this->query(($action === 'create')
 			? 'name:valuemap_add'
 			: 'link:'.CTestArrayHelper::get($data, 'update valuemap', self::UPDATE_VALUEMAP2)
@@ -346,7 +340,7 @@ class testFormValueMappings extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
 
-		$mapping_table = $dialogue->query('id:mappings_table')->asMultifieldTable()->one();
+		$mapping_table = $dialog->query('id:mappings_table')->asMultifieldTable()->one();
 		if (CTestArrayHelper::get($data, 'remove_all')) {
 			$mapping_table->clear();
 		}
@@ -361,6 +355,7 @@ class testFormValueMappings extends CWebTest {
 		}
 		else {
 			// Save the configuration of the host with created/updated value mappings.
+			COverlayDialogElement::ensureNotPresent();
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_GOOD, ucfirst($source).' updated');
 
@@ -440,7 +435,7 @@ class testFormValueMappings extends CWebTest {
 		$dialog->submit()->waitUntilNotVisible();
 		$this->query('button:Update')->one()->click();
 
-		// Check that no changes occured in the database.
+		// Check that no changes occurred in the database.
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
@@ -485,7 +480,7 @@ class testFormValueMappings extends CWebTest {
 		$dialog->submit()->waitUntilNotVisible();
 		$this->query('button:Cancel')->one()->click();
 
-		// Check that no changes occured in the database.
+		// Check that no changes occurred in the database.
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
@@ -537,7 +532,7 @@ class testFormValueMappings extends CWebTest {
 			]
 		];
 
-		// Create a new host/template, popullate the hosthroup but leave the name empty.
+		// Create a new host/template, populate the hosthroup but leave the name empty.
 		$this->page->login()->open($source.'s.php?form=create');
 		$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
 		$form->getField('Groups')->fill('Discovered hosts');
@@ -554,7 +549,7 @@ class testFormValueMappings extends CWebTest {
 		$form->submit();
 		CMessageElement::find()->waitUntilVisible()->one();
 
-		// Check that the value mapping data is still popullated.
+		// Check that the value mapping data is still populated.
 		$this->assertTableData($reference_valuemaps, 'id:valuemap-formlist');
 	}
 }
