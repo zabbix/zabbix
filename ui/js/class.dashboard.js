@@ -972,7 +972,7 @@ class CDashboard extends CBaseComponent {
 
 		data.tab.firstElementChild.classList.add(ZBX_STYLE_DASHBRD_SELECTED_TAB);
 		this._tabs.scrollItemIntoView(data.tab);
-		this._updateNavigationButtons(dashboard_page);
+		this._updateNavigationButtons({dashboard_page});
 	}
 
 	_updateNavigationButtons({dashboard_page = null} = {}) {
