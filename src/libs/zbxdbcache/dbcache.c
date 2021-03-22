@@ -37,6 +37,7 @@
 #include "zbxjson.h"
 #include "zbxhistory.h"
 #include "daemon.h"
+#include "zbxalgo.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -84,6 +85,9 @@ extern int		CONFIG_DOUBLE_PRECISION;
 #define ZBX_DC_FLAGS_NOT_FOR_MODULES	(ZBX_DC_FLAGS_NOT_FOR_HISTORY | ZBX_DC_FLAG_LLD)
 #define ZBX_DC_FLAGS_NOT_FOR_EXPORT	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF)
 
+#define ZBX_HC_PROXYQUEUE_STATE_NORMAL 0
+#define ZBX_HC_PROXYQUEUE_STATE_WAIT 1
+
 typedef struct
 {
 	char		table_name[ZBX_TABLENAME_LEN_MAX];
@@ -101,6 +105,14 @@ static ZBX_DC_IDS	*ids = NULL;
 
 typedef struct
 {
+	zbx_list_t	list;
+	zbx_hashset_t	index;
+	int		state;
+}
+zbx_hc_proxyqueue_t;
+
+typedef struct
+{
 	zbx_hashset_t		trends;
 	ZBX_DC_STATS		stats;
 
@@ -114,6 +126,8 @@ typedef struct
 	int			history_progress_ts;
 
 	unsigned char		db_trigger_queue_lock;
+
+	zbx_hc_proxyqueue_t     proxyqueue;
 }
 ZBX_DC_CACHE;
 
@@ -4421,6 +4435,14 @@ int	init_database_cache(char **error)
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
+		zbx_hashset_create_ext(&(cache->proxyqueue.index), ZBX_HC_SYNC_MAX,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			__hc_index_mem_malloc_func, __hc_index_mem_realloc_func, __hc_index_mem_free_func);
+
+		zbx_list_create_ext(&(cache->proxyqueue.list), __hc_index_mem_malloc_func, __hc_index_mem_free_func);
+
+		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
+
 		if (SUCCEED != (ret = init_trend_cache(error)))
 			goto out;
 	}
@@ -4703,3 +4725,162 @@ void	zbx_db_trigger_queue_unlock(void)
 	cache->db_trigger_queue_lock = 0;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_proxyqueue_peek                                           *
+ *                                                                            *
+ * Purpose: return first proxy in a queue, function assumes that a queue is   *
+ *          not empty                                                         *
+ *                                                                            *
+ * Return value: proxyid at the top a queue                                   *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	zbx_hc_proxyqueue_peek(void)
+{
+	zbx_uint64_t	*p_val;
+
+	if (NULL == cache->proxyqueue.list.head)
+		return 0;
+
+	p_val = (zbx_uint64_t *)(cache->proxyqueue.list.head->data);
+
+	return *p_val;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_proxyqueue_enqueue                                        *
+ *                                                                            *
+ * Purpose: add new proxyid to a queue                                        *
+ *                                                                            *
+ * Parameters: proxyid   - [IN] the proxy id                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid)
+{
+	if (NULL == zbx_hashset_search(&cache->proxyqueue.index, &proxyid))
+	{
+		zbx_uint64_t *ptr;
+
+		ptr = zbx_hashset_insert(&cache->proxyqueue.index, &proxyid, sizeof(proxyid));
+		zbx_list_append(&cache->proxyqueue.list, ptr, NULL);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_proxyqueue_dequeue                                        *
+ *                                                                            *
+ * Purpose: try to dequeue proxyid from a proxy queue                         *
+ *                                                                            *
+ * Parameters: chk_proxyid  - [IN] the proxyid                                *
+ *                                                                            *
+ * Return value: SUCCEED - retrieval successful                               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid)
+{
+	zbx_uint64_t	top_val;
+	void		*rem_val = 0;
+
+	top_val = zbx_hc_proxyqueue_peek();
+
+	if (proxyid != top_val)
+		return FAIL;
+
+	if (FAIL == zbx_list_pop(&cache->proxyqueue.list, &rem_val))
+		return FAIL;
+
+	zbx_hashset_remove_direct(&cache->proxyqueue.index, rem_val);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_proxyqueue_clear                                          *
+ *                                                                            *
+ * Purpose: remove all proxies from proxy priority queue                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_hc_proxyqueue_clear(void)
+{
+	zbx_list_destroy(&cache->proxyqueue.list);
+	zbx_hashset_clear(&cache->proxyqueue.index);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_check_proxy                                               *
+ *                                                                            *
+ * Purpose: check status of a history cache usage, enqueue/dequeue proxy      *
+ *          from priority list and accordingly enable or disable wait mode    *
+ *                                                                            *
+ * Parameters: proxyid   - [IN] the proxyid                                   *
+ *                                                                            *
+ * Return value: SUCCEED - proxy can be processed now                         *
+ *               FAIL    - proxy cannot be processed now, it got enqueued     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
+{
+	double	hc_pused;
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64, __func__, proxyid);
+
+	LOCK_CACHE;
+
+	hc_pused = 100 * (double)(hc_mem->total_size - hc_mem->free_size) / hc_mem->total_size;
+
+	if (20 >= hc_pused)
+	{
+		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
+
+		zbx_hc_proxyqueue_clear();
+
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (ZBX_HC_PROXYQUEUE_STATE_WAIT == cache->proxyqueue.state)
+	{
+		zbx_hc_proxyqueue_enqueue(proxyid);
+
+		if (60 < hc_pused)
+		{
+			ret = FAIL;
+			goto out;
+		}
+
+		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
+	}
+	else
+	{
+		if (80 <= hc_pused)
+		{
+			cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_WAIT;
+			zbx_hc_proxyqueue_enqueue(proxyid);
+
+			ret = FAIL;
+			goto out;
+		}
+	}
+
+	if (0 == zbx_hc_proxyqueue_peek())
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	ret = zbx_hc_proxyqueue_dequeue(proxyid);
+
+out:
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}

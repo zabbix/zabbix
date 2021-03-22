@@ -31,7 +31,7 @@
 
 #include "preprocessing.h"
 #include "preproc_manager.h"
-#include "linked_list.h"
+#include "zbxalgo.h"
 #include "preproc_history.h"
 
 extern unsigned char	process_type, program_type;
