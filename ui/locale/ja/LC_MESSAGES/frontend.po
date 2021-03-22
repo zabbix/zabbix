@@ -20075,7 +20075,7 @@ msgstr "最新値"
 #: app/views/popup.maintenance.period.php:128 include/maintenances.inc.php:109
 msgctxt "week of month"
 msgid "last"
-msgstr "最後"
+msgstr "最終"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:290
 msgid "last() - Last (most recent) T value"
