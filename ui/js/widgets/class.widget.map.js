@@ -39,6 +39,22 @@ class CWidgetMap extends CWidget {
 		this._has_contents = false;
 	}
 
+	_doActivate() {
+		super._doActivate();
+
+		if (this._has_contents && this._state === WIDGET_STATE_ACTIVE) {
+			this._activateContentsEvents();
+		}
+	}
+
+	_doDeactivate() {
+		super._doDeactivate();
+
+		if (this._has_contents) {
+			this._deactivateContentsEvents();
+		}
+	}
+
 	_doDestroy() {
 		super._doDestroy();
 
@@ -127,7 +143,7 @@ class CWidgetMap extends CWidget {
 
 	_processUpdateResponse(response) {
 		if (this._has_contents) {
-			this._unregisterContentEvents();
+			this._deactivateContentsEvents();
 
 			this._has_contents = false;
 		}
@@ -135,6 +151,8 @@ class CWidgetMap extends CWidget {
 		super._processUpdateResponse(response);
 
 		if (response.sysmap_data !== undefined) {
+			this._has_contents = true;
+
 			this._current_sysmapid = response.sysmap_data.current_sysmapid;
 			this._initial_load = false;
 
@@ -144,10 +162,8 @@ class CWidgetMap extends CWidget {
 				this._makeSvgMap(map_options);
 
 				if (this._state === WIDGET_STATE_ACTIVE) {
-					this._registerContentsEvents();
+					this._activateContentsEvents();
 				}
-
-				this._has_contents = true;
 			}
 
 			if (response.sysmap_data.error_msg !== null) {
@@ -175,13 +191,15 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
-	_registerContentsEvents() {
-		this._target.querySelectorAll('[data-previous-map]').forEach((link) => {
-			link.addEventListener('click', this._events.back);
-		});
+	_activateContentsEvents() {
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._target.querySelectorAll('[data-previous-map]').forEach((link) => {
+				link.addEventListener('click', this._events.back);
+			});
+		}
 	}
 
-	_unregisterContentEvents() {
+	_deactivateContentsEvents() {
 		this._target.querySelectorAll('[data-previous-map]').forEach((link) => {
 			link.removeEventListener('click', this._events.back);
 		});
@@ -189,7 +207,7 @@ class CWidgetMap extends CWidget {
 
 	_restartUpdating() {
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._unregisterContentEvents();
+			this._deactivateContentsEvents();
 		}
 
 		this._has_contents = false;

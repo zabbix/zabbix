@@ -42,22 +42,18 @@ class CWidgetNavTree extends CWidget {
 	_doActivate() {
 		super._doActivate();
 
-		if (this._has_contents) {
-			this._registerContentEvents();
-		}
+		this._activateContentsEvents();
 	}
 
 	_doDeactivate() {
-		if (this._has_contents) {
-			this._unregisterContentEvents();
-		}
-
 		super._doDeactivate();
+
+		this._deactivateContentsEvents();
 	}
 
 	announceWidgets(widgets) {
 		super.announceWidgets(widgets);
-		this._unregisterContentEvents();
+		this._deactivateContentsEvents();
 
 		const used_references = [];
 
@@ -89,19 +85,19 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	setEditMode() {
-		this._unregisterContentEvents();
+		this._deactivateContentsEvents();
 		this._removeTree();
 
 		super.setEditMode();
 
 		this._makeTree();
 		this._makeSortable();
-		this._registerContentEvents();
+		this._activateContentsEvents();
 	}
 
 	_processUpdateResponse(response) {
 		if (this._has_contents) {
-			this._unregisterContentEvents();
+			this._deactivateContentsEvents();
 			this._removeTree();
 
 			this._has_contents = false;
@@ -110,6 +106,8 @@ class CWidgetNavTree extends CWidget {
 		super._processUpdateResponse(response);
 
 		if (response.navtree_data !== undefined) {
+			this._has_contents = true;
+
 			this._severity_levels = response.navtree_data.severity_levels;
 			this._navtree = response.navtree_data.navtree;
 			this._navtree_items_opened = response.navtree_data.navtree_items_opened;
@@ -145,11 +143,7 @@ class CWidgetNavTree extends CWidget {
 				}
 			}
 
-			if (this._state === WIDGET_STATE_ACTIVE) {
-				this._registerContentEvents();
-			}
-
-			this._has_contents = true;
+			this._activateContentsEvents();
 		}
 	}
 
@@ -213,10 +207,10 @@ class CWidgetNavTree extends CWidget {
 			},
 
 			copy: () => {
-				this._unregisterContentEvents();
+				this._deactivateContentsEvents();
 				this._setTreeHandlers();
 				this._updateWidgetFields();
-				this._registerContentEvents();
+				this._activateContentsEvents();
 			},
 
 			edit: (e) => {
@@ -232,14 +226,14 @@ class CWidgetNavTree extends CWidget {
 			remove: (e) => {
 				const button = e.target;
 
-				this._unregisterContentEvents();
+				this._deactivateContentsEvents();
 
 				this._target.querySelector(`[data-id="${button.getAttribute('data-id')}"]`).remove();
 				this._setTreeHandlers();
 
 				this._updateWidgetFields();
 
-				this._registerContentEvents();
+				this._activateContentsEvents();
 			},
 
 			select: (e) => {
@@ -279,68 +273,76 @@ class CWidgetNavTree extends CWidget {
 		super._activateEvents();
 
 		this.on(WIDGET_EVENT_COPY, this._events.copy);
-	}
 
-	_deactivateEvents() {
-		super._deactivateEvents();
-
-		this.off(WIDGET_EVENT_COPY, this._events.copy);
-	}
-
-	_registerContentEvents() {
-		if (this._is_edit_mode) {
-			for (const button of this._target.querySelectorAll('.js-button-add-child')) {
-				button.addEventListener('click', this._events.addChild);
-			}
-
-			for (const button of this._target.querySelectorAll('.js-button-add-maps')) {
-				button.addEventListener('click', this._events.addMaps);
-			}
-
-			for (const button of this._target.querySelectorAll('.js-button-edit')) {
-				button.addEventListener('click', this._events.edit);
-			}
-
-			for (const button of this._target.querySelectorAll('.js-button-remove')) {
-				button.addEventListener('click', this._events.remove);
-			}
-		}
-		else {
-			for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
-				link.addEventListener('click', this._events.select);
-			}
-
+		if (!this._is_edit_mode) {
 			for (const widget of this._maps) {
 				widget.on(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
 			}
 		}
 	}
 
-	_unregisterContentEvents() {
-		if (this._is_edit_mode) {
-			for (const button of this._target.querySelectorAll('.js-button-add-child')) {
-				button.removeEventListener('click', this._events.addChild);
-			}
+	_deactivateEvents() {
+		super._deactivateEvents();
 
-			for (const button of this._target.querySelectorAll('.js-button-add-maps')) {
-				button.removeEventListener('click', this._events.addMaps);
-			}
+		this.off(WIDGET_EVENT_COPY, this._events.copy);
 
-			for (const button of this._target.querySelectorAll('.js-button-edit')) {
-				button.removeEventListener('click', this._events.edit);
-			}
-
-			for (const button of this._target.querySelectorAll('.js-button-remove')) {
-				button.removeEventListener('click', this._events.remove);
-			}
-		}
-		else {
-			for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
-				link.removeEventListener('click', this._events.select);
-			}
-
+		if (!this._is_edit_mode) {
 			for (const widget of this._maps) {
 				widget.off(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
+			}
+		}
+	}
+
+	_activateContentsEvents() {
+		if (this._state === WIDGET_STATE_ACTIVE && this._has_contents) {
+			if (this._is_edit_mode) {
+				for (const button of this._target.querySelectorAll('.js-button-add-child')) {
+					button.addEventListener('click', this._events.addChild);
+				}
+
+				for (const button of this._target.querySelectorAll('.js-button-add-maps')) {
+					button.addEventListener('click', this._events.addMaps);
+				}
+
+				for (const button of this._target.querySelectorAll('.js-button-edit')) {
+					button.addEventListener('click', this._events.edit);
+				}
+
+				for (const button of this._target.querySelectorAll('.js-button-remove')) {
+					button.addEventListener('click', this._events.remove);
+				}
+			}
+			else {
+				for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
+					link.addEventListener('click', this._events.select);
+				}
+			}
+		}
+	}
+
+	_deactivateContentsEvents() {
+		if (this._has_contents) {
+			if (this._is_edit_mode) {
+				for (const button of this._target.querySelectorAll('.js-button-add-child')) {
+					button.removeEventListener('click', this._events.addChild);
+				}
+
+				for (const button of this._target.querySelectorAll('.js-button-add-maps')) {
+					button.removeEventListener('click', this._events.addMaps);
+				}
+
+				for (const button of this._target.querySelectorAll('.js-button-edit')) {
+					button.removeEventListener('click', this._events.edit);
+				}
+
+				for (const button of this._target.querySelectorAll('.js-button-remove')) {
+					button.removeEventListener('click', this._events.remove);
+				}
+			}
+			else {
+				for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
+					link.removeEventListener('click', this._events.select);
+				}
 			}
 		}
 	}
@@ -873,7 +875,7 @@ class CWidgetNavTree extends CWidget {
 											return false;
 										}
 										else {
-											this._unregisterContentEvents();
+											this._deactivateContentsEvents();
 											if (item_edit) {
 												const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
 
@@ -937,7 +939,7 @@ class CWidgetNavTree extends CWidget {
 											overlayDialogueDestroy(overlay.dialogueid);
 											this._updateWidgetFields();
 											this._setTreeHandlers();
-											this._registerContentEvents();
+											this._activateContentsEvents();
 										}
 									}
 								});
