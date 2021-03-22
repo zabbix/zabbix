@@ -1,4 +1,4 @@
-.sidebar .server-name, .dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .list-table .action-container .label, .list-table.compact-view .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashbrd-navigation-tabs .csortable-item > div span, .dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .list-table .action-container .label, .list-table.compact-view .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -706,6 +706,8 @@ footer {
       border: 1px solid #9f9f9f;
       border-radius: 2px;
       transition: background-color 0.3s, border-color 0.3s; }
+      .dashbrd-navigation-tabs .csortable-item > div span {
+        max-width: 300px; }
       .dashbrd-navigation-tabs .csortable-item > div button {
         margin: 0 -8px 0 4px; }
       .dashbrd-navigation-tabs .csortable-item > div:not(.selected-tab) button {

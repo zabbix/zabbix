@@ -95,6 +95,11 @@
 				transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
 			}
 
+			span {
+				@extend %overflow-ellipsis;
+				max-width: 300px;
+			}
+
 			button {
 				margin: 0 -8px 0 4px;
 			}
