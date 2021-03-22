@@ -617,6 +617,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.10rc1
 
 New features:
+.......PS. [ZBXNEXT-6503] added protection of Zabbix Server from overloading by proxy data (dgoloscapov, wiper)
 A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
 .........T [ZBXNEXT-5869] added templates "MongoDB node by Zabbix Agent 2" and "MongoDB cluster by Zabbix Agent 2" (ychukina)
 .........T [ZBXNEXT-6507] added Template Power APC UPS by SNMP (mchudinov)
@@ -629,6 +630,9 @@ A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and t
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
 ...G...... [ZBX-19103] fixed device sorting in Zabbix agent 2 smartctl plugin (esneiders)
 A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
 A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
