@@ -48,6 +48,18 @@ type Suffix struct {
 	factor int
 }
 
+var currentConfigPath string
+
+// setCurrentConfigPath sets a path of the current config file.
+func setCurrentConfigPath(path string) {
+	currentConfigPath = path
+}
+
+// GetCurrentConfigPath returns a path of the current config file.
+func GetCurrentConfigPath() string {
+	return currentConfigPath
+}
+
 func validateParameterName(key []byte) (err error) {
 	for i, b := range key {
 		if ('A' > b || b > 'Z') && ('a' > b || b > 'z') && ('0' > b || b > '9') && b != '_' && b != '.' {
@@ -393,6 +405,17 @@ func hasMeta(path string) bool {
 }
 
 func loadInclude(root *Node, path string) (err error) {
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return newIncludeError(root, &path, err.Error())
+	}
+
+	// If a path is relative, pad it with a directory of the current config file
+	if path != absPath {
+		confDir := filepath.Dir(GetCurrentConfigPath())
+		path = filepath.Join(confDir, path)
+	}
+
 	if hasMeta(filepath.Dir(path)) {
 		return newIncludeError(root, &path, "glob pattern is supported only in file names")
 	}
@@ -483,11 +506,11 @@ func parseConfig(root *Node, data []byte) (err error) {
 		if key, value, err = parseLine(line); err != nil {
 			return fmt.Errorf("cannot parse configuration at line %d: %s", num, err.Error())
 		}
+
 		if string(key) == "Include" {
 			if root.level == 10 {
 				return fmt.Errorf("include depth exceeded limits")
 			}
-
 			if err = loadInclude(root, string(value)); err != nil {
 				return
 			}
@@ -569,6 +592,8 @@ func Load(filename string, v interface{}) (err error) {
 	if _, err = buf.ReadFrom(file); err != nil {
 		return fmt.Errorf("cannot load configuration: %s", err.Error())
 	}
+
+	setCurrentConfigPath(filename)
 
 	return Unmarshal(buf.Bytes(), v)
 }
