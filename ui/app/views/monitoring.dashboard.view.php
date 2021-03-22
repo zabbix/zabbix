@@ -60,7 +60,6 @@ $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tab-indicators.js');
 $this->addJsFile('class.sortable.js');
 
-$this->includeJsFile('dashboard/class.dashboard-share.js.php');
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 
 $this->enableLayoutModes();
