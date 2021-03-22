@@ -21,8 +21,7 @@
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
- * @backup dashboard
- * @backup profiles
+ * @backup dashboard, profiles
  */
 class testPageDashboardWidgets extends CWebTest {
 
@@ -40,7 +39,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Opening edit widget form.
 		$form_system_info = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form_system_info->getField('Type')->getValue());
-		$form_system_info->submit();
+		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
 		// Check that widget type isn't changed in frontend and in DB.
 		$this->checkLastSelectedWidgetType();
 
@@ -54,12 +53,12 @@ class testPageDashboardWidgets extends CWebTest {
 			'Show tags' => 'None'
 		];
 		$form_problems->fill($data);
-		$form_problems->submit();
+		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
 		$this->checkLastSelectedWidgetType();
 
 		// Add widget with current default type "Action log".
-		$form_default = $dashboard->addWidget()->asForm();
-		$form_default->submit();
+		$dashboard->addWidget()->asForm();
+		$this->query('xpath://div[@role="dialog"]//button[text()="Add"]')->waitUntilPresent()->one()->click();;
 		// Check if widget was added.
 		$dashboard->getWidget('Action log');
 		$this->checkLastSelectedWidgetType();
@@ -101,24 +100,24 @@ class testPageDashboardWidgets extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->edit();
 		// Opening widget configuration form for new Clock widget.
 		$overlay = $dashboard->addWidget();
-		$form = $overlay->asForm();
-		$form->fill(['Type' => 'Clock']);
-		$form->waitUntilReloaded();
+		$default_form = $overlay->asForm();
+		$default_form->fill(['Type' => 'Clock']);
+		$default_form->waitUntilReloaded();
 		$overlay->close();
 		// Check that widget type is remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
 		// Save edit widget form without changing widget type.
-		$form = $dashboard->getWidget('System information')->edit();
-		$this->assertEquals('System information', $form->getField('Type')->getValue());
-		$form->submit();
+		$sys_info_form = $dashboard->getWidget('System information')->edit();
+		$this->assertEquals('System information', $sys_info_form->getField('Type')->getValue());
+		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
 		$this->page->waitUntilReady();
 		// Check that widget type is still remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
 		// Opening edit widget form and change widget type.
-		$form = $dashboard->getWidget('System information')->edit();
-		$form->fill(['Type' => 'Data overview']);
+		$change_form = $dashboard->getWidget('System information')->edit();
+		$change_form->fill(['Type' => 'Data overview']);
 		$overlay->close();
 		// Check that widget type inherited from previous widget.
 		$this->checkLastSelectedWidgetType('Data overview', 'dataover');
@@ -139,7 +138,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Get dashboard widget element by widget title ('Problem hosts').
 		$widget = $dashboard->getWidget('Problem hosts');
 		// Check refresh interval of widget.
-		$this->assertEquals(60, $widget->getRefreshInterval());
+		$this->assertEquals('1 minute', $widget->getRefreshInterval());
 
 		// Get widget content as table.
 		$table = $widget->getContent()->asTable();

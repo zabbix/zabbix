@@ -176,7 +176,6 @@ class CDashboardElement extends CElement {
 				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Delete')->waitUntilNotVisible();
 
-
 		return $this;
 	}
 
