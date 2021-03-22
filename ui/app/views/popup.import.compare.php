@@ -159,12 +159,16 @@ function rowsToDivs($rows) {
 $output = [
 	'header' => $data['title'],
 	'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
-	'body' => (new CForm())
-		->addClass('import-compare')
-		->addVar('parent_overlayid', $data['parent_overlayid'])
-		->addItem(drawToc($data['diff_toc']))
-		->addItem(drawDiff($data['diff']))
-		->toString(),
+	'body' => (!$data['diff'])
+		? (new CTableInfo())
+				->setNoDataMessage(_('No changes.')) // TODO VM: (?) need a better style
+				->toString()
+		: (new CForm())
+			->addClass('import-compare')
+			->addVar('parent_overlayid', $data['parent_overlayid'])
+			->addItem(drawToc($data['diff_toc']))
+			->addItem(drawDiff($data['diff']))
+			->toString(),
 	'buttons' => [
 		[
 			'title' => _('Import'),
