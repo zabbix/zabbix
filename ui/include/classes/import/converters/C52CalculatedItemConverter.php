@@ -21,9 +21,24 @@
 
 class C52CalculatedItemConverter extends CConverter {
 
+	/**
+	 * Array of time functions.
+	 *
+	 * @var array
+	 */
 	protected $time_functions = ['date', 'dayofmonth', 'dayofweek', 'time', 'now'];
 
+	/**
+	 * Array of group functions.
+	 *
+	 * @var array
+	 */
 	protected $group_functions = ['grpavg', 'grpmax', 'grpmin', 'grpsum'];
+
+	/**
+	 * @var C10TriggerExpression
+	 */
+	protected $parser;
 
 	public function __construct() {
 		$this->parser = new C10TriggerExpression([
@@ -33,6 +48,9 @@ class C52CalculatedItemConverter extends CConverter {
 
 	/**
 	 * Convert calculated item formula to 5.2 syntax.
+	 *
+	 * @param string $formula  Calculated item formula to convert.
+	 * @return string
 	 */
 	public function convert($formula) {
 		$result = $this->parser->parse($formula);
