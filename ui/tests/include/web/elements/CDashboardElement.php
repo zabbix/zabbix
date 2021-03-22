@@ -203,7 +203,7 @@ class CDashboardElement extends CElement {
 	 */
 	public function pasteWidget() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashbrd-paste-widget')->one()->waitUntilClickable()->click(true);
+		$this->getControls()->query('id:dashbrd-add')->asPopupButton()->one()->select('Paste widget');
 
 		return $this;
 	}
