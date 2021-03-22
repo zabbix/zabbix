@@ -131,11 +131,11 @@ class testPageDashboard extends CLegacyWebTest {
 			$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 			$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
 			foreach ($FavouriteGraphs as $FavouriteGraph) {
-				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-container']/div[9]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
-				$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-container']/div[9]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]");
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-container']/div[9]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//div[@class="dashbrd-grid-widget-container"]/div[2]//button[@onclick="rm4favorites(\'graphid\',\''.$FavouriteGraph['value_id'].'\')"]'));
+				$this->zbxTestClickXpathWait('//div[@class="dashbrd-grid-widget-container"]/div[2]//button[@onclick="rm4favorites(\'graphid\',\''.$FavouriteGraph['value_id'].'\')"]');
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@class="dashbrd-grid-widget-container"]/div[2]//button[@onclick="rm4favorites(\'graphid\',\''.$FavouriteGraph['value_id'].'\')"]'));
 			}
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+			$this->zbxTestAssertElementText('//div[@class="dashbrd-grid-widget-container"]//tr[@class="nothing-to-show"]/td', 'No graphs added.');
 			$this->assertEquals(0, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
 		}
 		catch (Exception $e) {
@@ -158,7 +158,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText('//div[@class="dashbrd-grid-container"]/div[8]//a[@href="zabbix.php?action=map.view&sysmapid='.$this->mapTestId.'"]', $this->mapTest);
+		$this->zbxTestAssertElementText('//div[@class="dashbrd-grid-widget-container"]/div[2]//a[@href="zabbix.php?action=map.view&sysmapid='.$this->mapTestId.'"]', $this->mapTest);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx="web.favorite.sysmapids" AND value_id='.$this->mapTestId));
 	}
 
