@@ -4013,7 +4013,7 @@ out:
 	zbx_free(event_session);
 	zbx_xml_free_doc(doc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __func__, zbx_result_string(ret), events->values_num);
 
 	return ret;
 }
@@ -4956,7 +4956,7 @@ out:
 						vmware_mem->free_size, vmware_mem->free_size, vmware->strpool_sz,
 						vmware_mem->total_size);
 			}
-			else
+			else if (0 == evt_pause)
 			{
 				int	level;
 
@@ -4996,9 +4996,15 @@ out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, vmware_mem);
 
-	zbx_snprintf(msg, sizeof(msg), "VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
-			ZBX_FS_UI64 " / " ZBX_FS_UI64, vmware_mem->free_size, vmware->strpool_sz,
-			vmware_mem->total_size);
+	zbx_snprintf(msg, sizeof(msg), "Events:%d DC:%d DS:%d CL:%d HV:%d VM:%d"
+			" VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
+			ZBX_FS_UI64, NULL != service->data ? service->data->events.values_num : 0 ,
+			NULL != service->data ? service->data->datacenters.values_num : 0 ,
+			NULL != service->data ? service->data->datastores.values_num : 0 ,
+			NULL != service->data ? service->data->clusters.values_num : 0 ,
+			NULL != service->data ? service->data->hvs.num_data : 0 ,
+			NULL != service->data ? service->data->vms_index.num_data : 0 ,
+			vmware_mem->free_size, vmware->strpool_sz, vmware_mem->total_size);
 
 	zbx_vmware_unlock();
 
