@@ -990,4 +990,6 @@ void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
+
 #endif
