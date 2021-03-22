@@ -110,8 +110,6 @@ class testFormValueMappings extends CWebTest {
 	 */
 	public function checkClone($source, $action = 'Clone') {
 		// Create a clone and or a full clone of an existing host/template with value mappings.
-//		$hostids = [];
-//		foreach(['Clone' => true, 'Full clone' => false] as $action => $login) {
 		$this->openValueMappingTab($source, true, false);
 		$this->query('button', $action)->one()->click();
 		$form = $this->query('name:'.$source.'sForm')->asForm()->one();
@@ -120,16 +118,13 @@ class testFormValueMappings extends CWebTest {
 
 		// Get the id of the created host/template clone.
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($action.' Valuemap Test'));
-//		}
 
 		// Check value mappings were copied correctly.
-//		foreach ($hostids as $hostid) {
 		$this->page->open($source.'s.php?form=update&'.$source.'id='.$hostid);
 		$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
 		$form->selectTab('Value mapping');
 
 		$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
-//		}
 	}
 
 	public function getValuemapData() {
