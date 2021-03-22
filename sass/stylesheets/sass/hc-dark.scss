@@ -320,6 +320,28 @@ $dashboard-my-bg-color: #e0e0e0;
 	}
 }
 
+.dashbrd-navigation-tabs {
+	.csortable-list {
+		& > .csortable-item:focus:not(:active) {
+			& > div {
+				box-shadow: 0 0 0 2px $blue;
+			}
+		}
+	}
+
+	& .csortable > .csortable-item > div,
+	& .csortable-list > .csortable-item > div:hover {
+		border: 1px solid transparent;
+	}
+
+	& .csortable > .csortable-item > div.selected-tab,
+	& .csortable-list > .csortable-item > div.selected-tab {
+		span {
+			color: $white;
+		}
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
@@ -482,6 +504,7 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
+	dashboard-page-properties: url($sprite-path) no-repeat -165px -618px,
 	iterator-page-previous: url($sprite-path) no-repeat -397px -657px,
 	iterator-page-next: url($sprite-path) no-repeat -395px -623px,
 	widget-action: url($sprite-path) no-repeat -318px -618px,
@@ -496,6 +519,7 @@ $icon-widget-btn: (
 );
 
 // Dynamically generated classes:
+//  .btn-dashboard-page-properties
 //  .btn-iterator-page-previous
 //  .btn-iterator-page-next
 //  .btn-widget-action

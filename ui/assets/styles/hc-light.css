@@ -676,7 +676,8 @@ footer {
   .dashbrd-navigation-tabs .csortable-list {
     display: flex;
     padding: 0;
-    margin: 0; }
+    margin: 0;
+    align-items: center; }
     .dashbrd-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) {
       padding: 0 3.5px 0 3.5px; }
       .dashbrd-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) > div {
@@ -707,18 +708,20 @@ footer {
       border-radius: 2px;
       transition: background-color 0.3s, border-color 0.3s; }
       .dashbrd-navigation-tabs .csortable-item > div span {
-        max-width: 300px; }
+        max-width: 300px;
+        color: #000000; }
       .dashbrd-navigation-tabs .csortable-item > div button {
-        margin: 0 -8px 0 4px; }
+        margin: 0 -9px 0 4px; }
       .dashbrd-navigation-tabs .csortable-item > div:not(.selected-tab) button {
         display: none; }
   .dashbrd-navigation-tabs .csortable > .csortable-item > div, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div:hover {
-    background: #e8f5ff;
-    border: 1px solid #5e5e5e; }
+    background: #f4f4f4;
+    border: 1px solid #c1c1c1; }
   .dashbrd-navigation-tabs .csortable > .csortable-item > div.selected-tab, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div.selected-tab {
-    color: #ffffff;
-    background: #333333;
+    background-color: #333333;
     border: 1px solid transparent; }
+    .dashbrd-navigation-tabs .csortable > .csortable-item > div.selected-tab span, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div.selected-tab span {
+      color: #ffffff; }
 
 .dashbrd-navigation-controls {
   display: flex;
@@ -6218,6 +6221,13 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .menu-user a:hover, .menu-user a:focus {
     border-color: #ffffff; }
 
+.dashbrd-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) > div {
+  box-shadow: 0 0 0 2px #111111; }
+.dashbrd-navigation-tabs .csortable > .csortable-item > div, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div:hover {
+  border: 1px solid #8e8e8e; }
+.dashbrd-navigation-tabs .csortable > .csortable-item > div.selected-tab span, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div.selected-tab span {
+  color: #ffffff; }
+
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
@@ -6262,6 +6272,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .icon-wzrd-action {
   background: transparent url("../img/icon-sprite.svg?20200407") no-repeat -168px -617px;
   margin-top: -16px; }
+
+.btn-dashboard-page-properties {
+  background: url("../img/icon-sprite.svg?20200407") no-repeat -318px -618px; }
 
 .btn-iterator-page-previous {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -244px -657px; }

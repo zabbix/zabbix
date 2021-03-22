@@ -676,7 +676,8 @@ footer {
   .dashbrd-navigation-tabs .csortable-list {
     display: flex;
     padding: 0;
-    margin: 0; }
+    margin: 0;
+    align-items: center; }
     .dashbrd-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) {
       padding: 0 3.5px 0 3.5px; }
       .dashbrd-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) > div {
@@ -707,18 +708,20 @@ footer {
       border-radius: 2px;
       transition: background-color 0.3s, border-color 0.3s; }
       .dashbrd-navigation-tabs .csortable-item > div span {
-        max-width: 300px; }
+        max-width: 300px;
+        color: #1f2c33; }
       .dashbrd-navigation-tabs .csortable-item > div button {
-        margin: 0 -8px 0 4px; }
+        margin: 0 -9px 0 4px; }
       .dashbrd-navigation-tabs .csortable-item > div:not(.selected-tab) button {
         display: none; }
   .dashbrd-navigation-tabs .csortable > .csortable-item > div, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div:hover {
     background: #e8f5ff;
-    border: 1px solid #a6d0f4; }
+    border: 1px solid #82c9ff; }
   .dashbrd-navigation-tabs .csortable > .csortable-item > div.selected-tab, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div.selected-tab {
-    color: #ffffff;
-    background: #768d99;
+    background-color: #768d99;
     border: 1px solid transparent; }
+    .dashbrd-navigation-tabs .csortable > .csortable-item > div.selected-tab span, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div.selected-tab span {
+      color: #ffffff; }
 
 .dashbrd-navigation-controls {
   display: flex;

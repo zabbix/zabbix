@@ -48,6 +48,7 @@
 		display: flex;
 		padding: 0;
 		margin: 0;
+		align-items: center;
 
 		& > .csortable-item:focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
@@ -98,10 +99,11 @@
 			span {
 				@extend %overflow-ellipsis;
 				max-width: 300px;
+				color: $font-color;
 			}
 
 			button {
-				margin: 0 -8px 0 4px;
+				margin: 0 -9px 0 4px;
 			}
 
 			&:not(.selected-tab) {
@@ -114,15 +116,18 @@
 
 	& .csortable > .csortable-item > div,
 	& .csortable-list > .csortable-item > div:hover {
-		background: #e8f5ff;
-		border: 1px solid lighten($blue, 30%);
+		background: $action-hover-color;
+		border: 1px solid darken($action-hover-color, 20%);
 	}
 
 	& .csortable > .csortable-item > div.selected-tab,
 	& .csortable-list > .csortable-item > div.selected-tab {
-		color: $white;
-		background: $ui-bg-selected-color;
+		background-color: $ui-bg-selected-color;
 		border: 1px solid transparent;
+
+		span {
+			color: $font-selected-color;
+		}
 	}
 }
 
