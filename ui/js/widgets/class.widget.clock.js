@@ -23,8 +23,7 @@ class CWidgetClock extends CWidget {
 	_init() {
 		super._init();
 
-		this._time = null;
-		this._time_zone_offset = null;
+		this._time_offset = 0;
 		this._interval_id = null;
 
 		this._has_contents = false;
@@ -48,9 +47,18 @@ class CWidgetClock extends CWidget {
 		this._stopClock();
 
 		if (response.clock_data !== undefined) {
-			this._time = response.clock_data.time;
-			this._time_zone_offset = response.clock_data.time_zone_offset;
 			this._has_contents = true;
+			this._time_offset = 0;
+
+			const now = new Date();
+
+			if (response.clock_data.time !== null) {
+				this._time_offset = now.getTime() - response.clock_data.time * 1000;
+			}
+
+			if (response.clock_data.time_zone_offset !== null) {
+				this._time_offset -= (now.getTimezoneOffset() * 60 + response.clock_data.time_zone_offset) * 1000;
+			}
 
 			this._startClock();
 		}
@@ -76,27 +84,23 @@ class CWidgetClock extends CWidget {
 	}
 
 	_clockHandsRotate() {
-		const now = new Date();
+		const clock_svg = this._target.querySelector('.clock-svg');
 
-		let time_offset = 0;
+		if (clock_svg !== null) {
+			const now = new Date();
 
-		if (this._time !== null) {
-			time_offset = now.getTime() - this._time * 1000;
+			now.setTime(now.getTime() - this._time_offset);
+
+			let h = now.getHours() % 12;
+			let m = now.getMinutes();
+			let s = now.getSeconds();
+
+			if (clock_svg !== null && !clock_svg.classList.contains('disabled')) {
+				this._clockHandRotate(clock_svg.querySelector('.clock-hand-h'), 30 * (h + m / 60 + s / 3600));
+				this._clockHandRotate(clock_svg.querySelector('.clock-hand-m'), 6 * (m + s / 60));
+				this._clockHandRotate(clock_svg.querySelector('.clock-hand-s'), 6 * s);
+			}
 		}
-
-		if (this._time_zone_offset !== null) {
-			time_offset -= (now.getTimezoneOffset() * 60 + this._time_zone_offset) * 1000;
-		}
-
-		now.setTime(now.getTime() - time_offset);
-
-		let h = now.getHours() % 12;
-		let m = now.getMinutes();
-		let s = now.getSeconds();
-
-		this._clockHandRotate(this._target.querySelector('.clock-hand-h'), 30 * (h + m / 60 + s / 3600));
-		this._clockHandRotate(this._target.querySelector('.clock-hand-m'), 6 * (m + s / 60));
-		this._clockHandRotate(this._target.querySelector('.clock-hand-s'), 6 * s);
 	}
 
 	_clockHandRotate(clock_hand, degree) {
