@@ -2624,6 +2624,9 @@ New features:
 A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
 
 Bug fixes:
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
 A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
 A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
 A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
