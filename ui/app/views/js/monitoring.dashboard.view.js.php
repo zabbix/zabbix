@@ -24,6 +24,54 @@
  */
 ?>
 
+<script type="text/x-jquery-tmpl" id="user_group_row_tpl">
+<?= (new CRow([
+	new CCol([
+		(new CTextBox('userGroups[#{usrgrpid}][usrgrpid]', '#{usrgrpid}'))->setAttribute('type', 'hidden'),
+		'#{name}'
+	]),
+	new CCol(
+		(new CRadioButtonList('userGroups[#{usrgrpid}][permission]', PERM_READ))
+			->addValue(_('Read-only'), PERM_READ, 'user_group_#{usrgrpid}_permission_'.PERM_READ)
+			->addValue(_('Read-write'), PERM_READ_WRITE, 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
+			->setModern(true)
+	),
+	(new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('window.dashboard_share.removeUserGroupShares("#{usrgrpid}");')
+			->removeId()
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->setId('user_group_shares_#{usrgrpid}')
+	->toString()
+?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="user_row_tpl">
+<?= (new CRow([
+	new CCol([
+		(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
+		'#{name}'
+	]),
+	new CCol(
+		(new CRadioButtonList('users[#{id}][permission]', PERM_READ))
+			->addValue(_('Read-only'), PERM_READ, 'user_#{id}_permission_'.PERM_READ)
+			->addValue(_('Read-write'), PERM_READ_WRITE, 'user_#{id}_permission_'.PERM_READ_WRITE)
+			->setModern(true)
+	),
+	(new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('window.dashboard_share.removeUserShares("#{id}");')
+			->removeId()
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->setId('user_shares_#{id}')
+	->toString()
+?>
+</script>
+
 <script>
 	function initializeView(dashboard, widget_defaults, has_time_selector, time_period, dynamic, web_layout_mode) {
 
@@ -355,14 +403,140 @@
 	}
 
 	function initializeDashboardShare(data) {
-		window.dashboard_share = new DashboardShare(data);
-		window.dashboard_share.live();
+
+		window.dashboard_share = {
+			submit: (overlay) => {
+				clearMessages();
+
+				const form = overlay.$dialogue.$body[0].querySelector('form');
+
+				const curl = new Curl('zabbix.php', false);
+
+				curl.setArgument('action', 'dashboard.share.update');
+
+				overlay.setLoading();
+
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+					},
+					body: urlEncodeData(getFormFields(form))
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('errors' in response) {
+							throw {html_string: response.errors};
+						}
+
+						overlay.unsetLoading();
+
+						addMessage(response.messages);
+						overlayDialogueDestroy(overlay.dialogueid);
+
+						delete window.dashboard_share;
+					})
+					.catch((error) => {
+						overlay.unsetLoading();
+
+						for (const el of form.parentNode.children) {
+							if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+								el.parentNode.removeChild(el);
+							}
+						}
+
+						const message_box = (typeof error === 'object' && 'html_string' in error)
+							? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
+							: makeMessageBox('bad', [], t('Failed to update dashboard sharing.'), true, false)[0];
+
+						form.parentNode.insertBefore(message_box, form);
+					});
+			},
+
+			removeUserGroupShares: (usrgrpid) => {
+				const element = document.getElementById(`user_group_shares_${usrgrpid}`);
+
+				if (element !== null) {
+					element.remove();
+				}
+			},
+
+			removeUserShares: (userid) => {
+				const element = document.getElementById(`user_shares_${userid}`);
+
+				if (element !== null) {
+					element.remove();
+				}
+			},
+
+			addPopupValues: (list) => {
+				for (let i = 0; i < list.values.length; i++) {
+					const value = list.values[i];
+
+					if (list.object === 'usrgrpid' || list.object === 'userid') {
+						if (value.permission === undefined) {
+							if (document.querySelector('input[name="private"]:checked').value == <?= PRIVATE_SHARING ?>) {
+								value.permission = <?= PERM_READ ?>;
+							}
+							else {
+								value.permission = <?= PERM_READ_WRITE ?>;
+							}
+						}
+					}
+
+					switch (list.object) {
+						case 'private':
+							document
+								.querySelector(`input[name="private"][value="${value}"]`)
+								.checked = true;
+
+							break;
+
+						case 'usrgrpid':
+							if (document.getElementById(`user_group_shares_${value.usrgrpid}`) !== null) {
+								continue;
+							}
+
+							template = new Template(document.getElementById('user_group_row_tpl').innerHTML);
+
+							document.getElementById('user_group_list_footer')
+								.insertAdjacentHTML('beforebegin', template.evaluate(value));
+
+							document
+								.getElementById(`user_group_${value.usrgrpid}_permission_${value.permission}`)
+								.checked = true;
+
+							break;
+
+						case 'userid':
+							if (document.getElementById(`user_shares_${value.id}`) !== null) {
+								continue;
+							}
+
+							template = new Template(document.getElementById('user_row_tpl').innerHTML);
+
+							document.getElementById('user_list_footer')
+								.insertAdjacentHTML('beforebegin', template.evaluate(value));
+
+							document
+								.getElementById(`user_${value.id}_permission_${value.permission}`)
+								.checked = true;
+
+							break;
+					}
+				}
+			}
+		};
+
+		window.dashboard_share.addPopupValues({'object': 'private', 'values': [data.private]});
+		window.dashboard_share.addPopupValues({'object': 'userid', 'values': data.users});
+		window.dashboard_share.addPopupValues({'object': 'usrgrpid', 'values': data.userGroups});
 
 		/**
 		 * @see init.js add.popup event
 		 */
-		window.addPopupValues = function(list) {
-			dashboard_share.addPopupValues(list);
-		}
+		window.addPopupValues = (list) => {
+			window.dashboard_share.addPopupValues(list);
+		};
 	}
 </script>
