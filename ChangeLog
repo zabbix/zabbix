@@ -12,6 +12,9 @@ A.F.I..PS. [ZBXNEXT-6368] moved action operation scripts to global scripts, adde
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 
 Bug fixes:
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
 ..F....... [ZBX-18595] fixed wrong filtering for nested groups in monitoring problems page (gcalenko)
 ...G...... [ZBX-19103] fixed device sorting in Zabbix agent 2 smartctl plugin (esneiders)
 A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
