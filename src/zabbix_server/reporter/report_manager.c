@@ -234,6 +234,9 @@ static void	rm_report_clean(zbx_rm_report_t *report)
  ******************************************************************************/
 static void	rm_job_free(zbx_rm_job_t *job)
 {
+	if (NULL != job->client)
+		zbx_ipc_client_release(job->client);
+
 	zbx_free(job->report_name);
 	zbx_free(job->url);
 	zbx_free(job->cookie);
@@ -2249,6 +2252,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
 			width, height, &params, error)))
 	{
+		zbx_ipc_client_addref(client);
 		job->client = client;
 		zbx_list_append(&manager->job_queue, job, NULL);
 		ret = SUCCEED;
@@ -2288,7 +2292,11 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 	if (NULL != writer->job->client)
 	{
 		/* external test request - forward the response to the requester */
-		zbx_ipc_client_send(writer->job->client, ZBX_IPC_REPORTER_TEST_RESULT, message->data, message->size);
+		if (SUCCEED == zbx_ipc_client_connected(writer->job->client))
+		{
+			zbx_ipc_client_send(writer->job->client, ZBX_IPC_REPORTER_TEST_RESULT, message->data,
+					message->size);
+		}
 		rm_job_free(writer->job);
 	}
 	else
