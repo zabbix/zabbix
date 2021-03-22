@@ -67,7 +67,6 @@ require_once dirname(__FILE__).'/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/testPageReportsNotifications.php';
 require_once dirname(__FILE__).'/testPageReportsTriggerTop.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
-require_once dirname(__FILE__).'/testPageSlideShows.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
@@ -224,7 +223,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsNotifications');
 		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageSearch');
-		$suite->addTestSuite('testPageSlideShows');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
