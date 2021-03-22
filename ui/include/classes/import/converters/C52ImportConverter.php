@@ -75,6 +75,7 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private function convertHosts(array $hosts): array {
+		$parser = new C52CalculatedItemConverter();
 		$tls_fields = array_flip(['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
 			'tls_psk'
 		]);
@@ -89,6 +90,10 @@ class C52ImportConverter extends CConverter {
 							$trigger = $this->convertTrigger($trigger, $host['host'], $item['key']);
 						}
 						unset($trigger);
+					}
+
+					if ($item['type'] === CXmlConstantName::CALCULATED) {
+						$item['params'] = $parser->convert($item['params']);
 					}
 				}
 				unset($item);
@@ -115,6 +120,8 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private function convertTemplates(array $templates): array {
+		$parser = new C52CalculatedItemConverter();
+
 		foreach ($templates as &$template) {
 			if (array_key_exists('items', $template)) {
 				foreach ($template['items'] as &$item) {
@@ -123,6 +130,10 @@ class C52ImportConverter extends CConverter {
 							$trigger = $this->convertTrigger($trigger, $template['host'], $item['key']);
 						}
 						unset($trigger);
+					}
+
+					if ($item['type'] === CXmlConstantName::CALCULATED) {
+						$item['params'] = $parser->convert($item['params']);
 					}
 				}
 				unset($item);
