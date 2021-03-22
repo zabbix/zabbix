@@ -36,7 +36,7 @@ class testDashboardCopyWidgets extends CWebTest {
 	 * Data provider for copying widgets.
 	 */
 	public static function getCopyWidgetsData() {
-		return CDBHelper::getDataProvider('SELECT * FROM widget WHERE dashboardid ='.self::DASHBOARD_ID);
+		return CDBHelper::getDataProvider('SELECT * FROM widget WHERE dashboard_pageid ='.self::DASHBOARD_ID);
 	}
 
 	/**
