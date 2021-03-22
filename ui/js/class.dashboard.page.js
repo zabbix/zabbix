@@ -1045,6 +1045,10 @@ class CDashboardPage extends CBaseComponent {
 
 		this._widget_placeholder_events = {
 			mouseDown: (e) => {
+				if (e.button != 0) {
+					return;
+				}
+
 				if (this._widget_placeholder_pos === null) {
 					return;
 				}
@@ -1358,6 +1362,10 @@ class CDashboardPage extends CBaseComponent {
 
 		this._widget_dragging_events = {
 			mouseDown: (e) => {
+				if (e.button != 0) {
+					return;
+				}
+
 				drag_widget = null;
 
 				for (const widget of this._widgets.keys()) {
@@ -1872,6 +1880,10 @@ class CDashboardPage extends CBaseComponent {
 
 		this._widget_resizing_events = {
 			mouseDown: (e) => {
+				if (e.button != 0) {
+					return;
+				}
+
 				resize_widget = null;
 
 				for (const widget of this._widgets.keys()) {

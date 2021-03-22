@@ -666,6 +666,10 @@ class CSortable extends CBaseComponent {
 			},
 
 			listMouseDown: (e) => {
+				if (e.button != 0) {
+					return;
+				}
+
 				if (!this._is_sorting_enabled) {
 					return;
 				}
