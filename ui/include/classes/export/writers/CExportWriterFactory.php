@@ -24,6 +24,7 @@ class CExportWriterFactory {
 	const YAML = 'yaml';
 	const XML = 'xml';
 	const JSON = 'json';
+	const RAW = 'raw';
 
 	/**
 	 * Get the writer object for specified type.
@@ -45,6 +46,9 @@ class CExportWriterFactory {
 
 			case self::JSON:
 				return new CJsonExportWriter();
+
+			case self::RAW:
+				return new CRawExportWriter();
 
 			default:
 				throw new Exception('Incorrect export writer type.');

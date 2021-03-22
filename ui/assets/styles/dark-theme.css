@@ -3826,6 +3826,9 @@ z-select[disabled] button,
       width: 100%; }
     .overlay-dialogue.modal-popup.modal-popup-generic {
       min-width: 650px; }
+    .overlay-dialogue.modal-popup.modal-popup-fullscreen {
+      width: calc(100vw - 40px);
+      max-width: calc(100vw - 40px); }
   .overlay-dialogue .hintbox-wrap {
     overflow: auto;
     max-height: 240px;
@@ -6162,6 +6165,60 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .overlay-dialogue .valuemap-list-table td {
   vertical-align: top; }
+
+.import-compare {
+  display: flex;
+  max-height: calc(100vh - 190px); }
+  .import-compare .toc {
+    flex: 20%;
+    overflow-y: auto;
+    overflow-x: hidden; }
+    .import-compare .toc .toc-level1-row,
+    .import-compare .toc .toc-level2-row,
+    .import-compare .toc .toc-level3-row {
+      height: 20px;
+      padding: 8px 0;
+      border-bottom: 1px solid #383838; }
+    .import-compare .toc .toc-level1-row .arrow,
+    .import-compare .toc .toc-level2-row .arrow {
+      width: 10px;
+      margin-right: 4px;
+      min-height: auto;
+      padding: 0;
+      background-color: transparent;
+      border: 0; }
+    .import-compare .toc .toc-level1 .toc-level1-row {
+      padding-left: 10px;
+      background-color: #4f4f4f;
+      color: #f2f2f2; }
+    .import-compare .toc .toc-level1 .arrow .arrow-down {
+      border-top-color: #f2f2f2; }
+    .import-compare .toc .toc-level1 .arrow .arrow-up {
+      border-bottom-color: #f2f2f2; }
+    .import-compare .toc .toc-level2 .toc-level2-row {
+      padding-left: 25px; }
+    .import-compare .toc .toc-level2 .arrow .arrow-down {
+      border-top-color: #f2f2f2; }
+    .import-compare .toc .toc-level2 .arrow .arrow-up {
+      border-bottom-color: #f2f2f2; }
+    .import-compare .toc .toc-level3 .toc-level3-row {
+      padding-left: 55px; }
+  .import-compare .diff {
+    flex: 80%;
+    overflow: auto;
+    border: 1px dashed #4f4f4f;
+    background: #0e1012;
+    margin-left: 5px;
+    padding: 4px; }
+    .import-compare .diff .diff-add {
+      background-color: #32453a; }
+    .import-compare .diff .diff-remove {
+      background-color: #433131; }
+    .import-compare .diff pre {
+      width: max-content;
+      min-width: 100%; }
+      .import-compare .diff pre > div {
+        white-space: pre; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }

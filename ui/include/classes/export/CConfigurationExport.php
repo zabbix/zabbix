@@ -84,7 +84,7 @@ class CConfigurationExport {
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps'
+				'verify_host', 'allow_traps', 'uuid'
 			],
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
@@ -92,7 +92,7 @@ class CConfigurationExport {
 				'flags', 'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields',
 				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'parameters'
+				'verify_host', 'allow_traps', 'parameters', 'uuid'
 			],
 			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
@@ -100,7 +100,7 @@ class CConfigurationExport {
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'discover'
+				'verify_host', 'allow_traps', 'discover', 'uuid'
 			]
 		];
 	}
@@ -252,7 +252,7 @@ class CConfigurationExport {
 	 */
 	protected function gatherGroups(array $groupIds) {
 		$this->data['groups'] = API::HostGroup()->get([
-			'output' => ['name'],
+			'output' => ['name', 'uuid'],
 			'groupids' => $groupIds,
 			'preservekeys' => true
 		]);
@@ -265,13 +265,13 @@ class CConfigurationExport {
 	 */
 	protected function gatherTemplates(array $templateids) {
 		$templates = API::Template()->get([
-			'output' => ['host', 'name', 'description'],
-			'selectGroups' => ['groupid', 'name'],
+			'output' => ['host', 'name', 'description', 'uuid'],
+			'selectGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectDashboards' => API_OUTPUT_EXTEND,
+			'selectDashboards' => API_OUTPUT_EXTEND, // TODO VM: (?) why it is requested, if we have gatherTemplateDashboards() ? (Can this row be deleted?)
 			'selectTags' => ['tag', 'value'],
-			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings', 'uuid'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -826,7 +826,7 @@ class CConfigurationExport {
 		$triggers = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
 				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'discover', 'event_name'
+				'discover', 'event_name', 'uuid'
 			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
@@ -895,7 +895,7 @@ class CConfigurationExport {
 		$httptests = API::HttpTest()->get([
 			'output' => ['name', 'hostid', 'applicationid', 'delay', 'retries', 'agent', 'http_proxy', 'variables',
 				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password'
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'uuid'
 			],
 			'selectSteps' => ['no', 'name', 'url', 'query_fields', 'posts', 'variables', 'headers', 'follow_redirects',
 				'retrieve_mode', 'timeout', 'required', 'status_codes'
@@ -1095,7 +1095,7 @@ class CConfigurationExport {
 		$triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
 				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'event_name'
+				'event_name', 'uuid'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],

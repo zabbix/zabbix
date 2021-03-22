@@ -47,6 +47,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 */
 	public function create(array $dashboards): array {
 		$this->validateCreate($dashboards);
+		$this->addUuid($dashboards);
 
 		$ins_dashboards = [];
 
@@ -80,6 +81,17 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @throws APIException if the input is invalid
 	 */
 	abstract protected function validateCreate(array &$dashboards): void;
+
+	/**
+	 * Add UUID for created dashboards. UUID should be added only for templated dashboards.
+	 *
+	 * @param type $dashboards
+	 *
+	 * @return void
+	 */
+	protected function addUuid(array &$dashboards): void {
+		// do nothing
+	}
 
 	/**
 	 * @param array $dashboards

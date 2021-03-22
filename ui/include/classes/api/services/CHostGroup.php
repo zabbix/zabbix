@@ -511,6 +511,11 @@ class CHostGroup extends CApiService {
 	public function create(array $groups) {
 		$this->validateCreate($groups);
 
+		foreach ($groups as &$group) {
+			$group['uuid'] = generateUuidV4();
+		}
+		unset($group);
+
 		$groupids = DB::insertBatch('hstgrp', $groups);
 
 		foreach ($groups as $index => &$group) {

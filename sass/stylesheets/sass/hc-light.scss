@@ -220,6 +220,12 @@ $multiselect-selected-bg-color: #777777;
 $dashboard-shared-bg-color: #555555;
 $dashboard-my-bg-color: #555555;
 
+// Import compare.
+$importcompare-toc-title-color: #ffffff;
+$importcompare-toc-title-bg-color: #333333;
+$importcompare-added-bg-color: transparent;
+$importcompare-removed-bg-color: transparent;
+
 // Important! @import string should come after variables
 @import 'screen.scss';
 

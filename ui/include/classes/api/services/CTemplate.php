@@ -310,7 +310,7 @@ class CTemplate extends CHostGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings,uuid']
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -346,7 +346,8 @@ class CTemplate extends CHostGeneral {
 				'host' => $template['host'],
 				'name' => $template['name'],
 				'description' => isset($template['description']) ? $template['description'] : null,
-				'status' => HOST_STATUS_TEMPLATE
+				'status' => HOST_STATUS_TEMPLATE,
+				'uuid' => generateUuidV4()
 			]]);
 
 			$templateId = reset($newTemplateIds);

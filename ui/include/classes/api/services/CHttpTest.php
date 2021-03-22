@@ -262,6 +262,7 @@ class CHttpTest extends CApiService {
 	 */
 	public function create($httptests) {
 		$this->validateCreate($httptests);
+		$this->addUuid($httptests);
 
 		$httptests = Manager::HttpTest()->persist($httptests);
 
@@ -341,6 +342,29 @@ class CHttpTest extends CApiService {
 		$this->validateAuthParameters($httptests, __FUNCTION__);
 		$this->validateSslParameters($httptests, __FUNCTION__);
 		$this->validateSteps($httptests, __FUNCTION__);
+	}
+
+	/**
+	 * Add UUID for created Web scenarios. UUID should be added only for templated web scenarios.
+	 *
+	 * @param array $httptests
+	 */
+	protected function addUuid(array &$httptests): void {
+		$hostids = array_flip(array_column($httptests, 'hostid'));
+
+		$db_hosts = API::Host()->get([
+			'output' => ['status'],
+			'hostids' => array_keys($hostids),
+			'templated_hosts' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($httptests as &$httptest) {
+			if ($db_hosts[$httptest['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
+				$httptest['uuid'] = generateUuidV4();
+			}
+		}
+		unset($httptest);
 	}
 
 	/**

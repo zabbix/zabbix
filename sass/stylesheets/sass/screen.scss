@@ -4093,6 +4093,11 @@ $form-icon-btn: (
 		&.modal-popup-generic {
 			min-width: 650px;
 		}
+
+		&.modal-popup-fullscreen {
+			width: calc(100vw - 40px);
+			max-width: calc(100vw - 40px);
+		}
 	}
 
 	.hintbox-wrap {
@@ -7489,6 +7494,101 @@ z-select,
 	.valuemap-list-table {
 		td {
 			vertical-align: top;
+		}
+	}
+}
+
+.import-compare {
+	display: flex;
+	max-height: calc(100vh - 190px);
+
+	.toc {
+		flex: 20%;
+		overflow-y: auto;
+		overflow-x: hidden;
+
+		.toc-level1-row,
+		.toc-level2-row,
+		.toc-level3-row {
+			height: 20px;
+			padding: 8px 0;
+			border-bottom: 1px solid $table-border-color;
+		}
+
+		.toc-level1-row,
+		.toc-level2-row {
+			.arrow {
+				width: 10px;
+				margin-right: 4px;
+				min-height: auto;
+				padding: 0;
+				background-color: transparent;
+				border: 0;
+			}
+		}
+
+		.toc-level1 {
+			.toc-level1-row {
+				padding-left: 10px;
+				background-color: $importcompare-toc-title-bg-color;
+				color: $importcompare-toc-title-color;
+			}
+
+			.arrow {
+				.arrow-down {
+					border-top-color: $importcompare-toc-title-color;
+				}
+				.arrow-up {
+					border-bottom-color: $importcompare-toc-title-color;
+				}
+			}
+		}
+
+		.toc-level2 {
+			.toc-level2-row {
+				padding-left: 25px;
+			}
+
+			.arrow {
+				.arrow-down {
+					border-top-color: $font-color;
+				}
+				.arrow-up {
+					border-bottom-color: $font-color;
+				}
+			}
+		}
+
+		.toc-level3 {
+			.toc-level3-row {
+				padding-left: 55px;
+			}
+		}
+	}
+
+	.diff {
+		flex: 80%;
+		overflow: auto;
+		border: 1px dashed $form-border-color;
+		background: $body-bg-color;
+		margin-left: 5px;
+		padding: 4px;
+
+		.diff-add {
+			background-color: $importcompare-added-bg-color;
+		}
+
+		.diff-remove {
+			background-color: $importcompare-removed-bg-color;
+		}
+
+		pre {
+			width: max-content;
+			min-width: 100%;
+
+			> div {
+				white-space: pre;
+			}
 		}
 	}
 }

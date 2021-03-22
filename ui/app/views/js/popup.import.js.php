@@ -55,6 +55,18 @@ function confirmSubmit(overlay) {
 
 function submitPopup(overlay) {
 	const form = document.querySelector('#import-form');
+	const source = form.querySelector('#rules_preset').value;
+
+	if (source === "template") {
+		return openImportComparePopup(overlay);
+	}
+	else {
+		return submitImportPopup(overlay);
+	}
+}
+
+function submitImportPopup(overlay) {
+	const form = document.querySelector('#import-form');
 	const file = form.querySelector('#import_file');
 	const formData = new FormData();
 
@@ -91,6 +103,51 @@ function submitPopup(overlay) {
 			}
 			overlayDialogueDestroy(overlay.dialogueid);
 			location.href = location.href;
+		}
+	});
+}
+
+function openImportComparePopup(overlay) {
+	const form = document.querySelector('#import-form');
+	const file = form.querySelector('#import_file');
+	const formData = new FormData();
+
+	// Remove error message.
+	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
+	// Append import file.
+	formData.append('import_file', file.files.length ? file.files[0] : '');
+	formData.append('parent_overlayid', overlay.dialogueid);
+
+	// Append all checkboxes to form.
+	[...form.querySelectorAll('input[type=checkbox]:checked, input[type=hidden]')].map(
+		(elem) => formData.append(elem.name, elem.value)
+	);
+
+	url = new Curl('zabbix.php', false),
+	url.setArgument('action', 'popup.import.compare');
+
+	fetch(url.getUrl(), {
+		method: 'post',
+		body: formData
+	})
+	.then((response) => response.json())
+	.then((response) => {
+		if ('errors' in response) {
+			overlay.unsetLoading();
+			$(response.errors).insertBefore(form);
+			form.querySelector('#import_file').value = '';
+		}
+		else {
+			overlayDialogue({
+				'title': response.header,
+				'class': 'modal-popup modal-popup-fullscreen',
+				'content': response.body,
+				'buttons': response.buttons,
+				'script_inline': response.script_inline
+			}, overlay.$btn_submit);
+
+			overlay.unsetLoading();
 		}
 	});
 }

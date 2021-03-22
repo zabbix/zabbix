@@ -149,7 +149,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$new_trigger = $tpl_trigger;
-			unset($new_trigger['triggerid'], $new_trigger['templateid']);
+			unset($new_trigger['triggerid'], $new_trigger['templateid'], $new_trigger['uuid']);
 
 			if (array_key_exists($tpl_hostid, $hosts_by_tpl_hostid)) {
 				foreach ($hosts_by_tpl_hostid[$tpl_hostid] as $host) {
@@ -516,7 +516,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$db_hosts = DBselect(
 			'SELECT h.hostid,h.host'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.host', array_keys($hosts)).
+			' WHERE '.dbConditionInt('h.host', array_keys($hosts)). // TODO VM: (?) h.host is hostNAME and is not an integer. It should use dbConditionString.
 				' AND '.dbConditionInt('h.status',
 					[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE]
 				)
@@ -593,6 +593,49 @@ abstract class CTriggerGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_params($error_already_exists, [$description, $db_hosts[0]['name']])
 					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Add UUID only for triggers on templates.
+	 *
+	 * @param type $triggers
+	 */
+	protected function addUuid(&$triggers): void {
+		$expression_data = new CTriggerExpression(['lldmacros' => $this instanceof CTriggerPrototype]);
+
+		$hosts = [];
+		$hosts_per_trigger = [];
+
+		foreach ($triggers as $index => $trigger) {
+			// TODO VM: (?) getting only first host could be enough (as it is not possible to have trigger on host and template simultaneously). But this is safer.
+			// TODO VM: (?) we already have these expressions parsed in checkValues functon. But it will be hard to get host names out from there.
+			$expression_data->parse($trigger['expression']);
+			$expression_hosts = $expression_data->getHosts();
+
+			$expression_data->parse($trigger['recovery_expression']);
+			$recovery_hosts = $expression_data->getHosts();
+
+			$hosts_per_trigger[$index] = array_flip($expression_hosts) + array_flip($recovery_hosts);
+			$hosts += $hosts_per_trigger[$index];
+		}
+
+		$db_templates = DBfetchColumn(DBselect(
+			'SELECT h.host'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionString('h.host', array_keys($hosts)).
+				' AND h.status = ' . HOST_STATUS_TEMPLATE
+		), 'host');
+
+		$db_templates = array_flip($db_templates);
+
+		foreach ($triggers as $index => &$trigger) {
+			foreach (array_keys($hosts_per_trigger[$index]) as $expression_host) {
+				if (array_key_exists($expression_host, $db_templates)) {
+					$trigger['uuid'] = generateUuidV4();
+					break;
 				}
 			}
 		}

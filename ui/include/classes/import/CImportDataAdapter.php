@@ -45,6 +45,10 @@ class CImportDataAdapter {
 		$this->data = $data['zabbix_export'];
 	}
 
+	public function getData() {
+		return $this->data;
+	}
+
 	/**
 	 * Get groups from the imported data.
 	 *

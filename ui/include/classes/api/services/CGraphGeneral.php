@@ -485,7 +485,7 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @param array $graphs
 	 */
-	protected function validateCreate(array $graphs) {
+	protected function validateCreate(array &$graphs) {
 		$colorValidator = new CColorValidator();
 
 		switch (get_class($this)) {
@@ -507,7 +507,7 @@ abstract class CGraphGeneral extends CApiService {
 
 		$read_only_fields = ['templateid', 'flags'];
 
-		foreach ($graphs as $key => $graph) {
+		foreach ($graphs as $key => &$graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_set, $graph['name']);
 
 			$data = array_intersect_key($graph, $api_input_rules['fields']);
@@ -535,6 +535,12 @@ abstract class CGraphGeneral extends CApiService {
 					}
 				}
 
+				// TODO VM: (?) this change required to modify graph in validateCreate. But otherwise, we will need extra host.get calls, one per graph, that are already done here.
+				// UUID should be added only for graphs on template.
+				if ($templatedGraph) {
+					$graph['uuid'] = generateUuidV4();
+				}
+
 				if ($templatedGraph && count($graphHosts) > 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name'])
@@ -558,6 +564,7 @@ abstract class CGraphGeneral extends CApiService {
 			// check graph type and ymin/ymax items
 			$this->checkAxisItems($graph, $templatedGraph);
 		}
+		unset($graph);
 
 		$this->validateHostsAndTemplates($graphs);
 	}

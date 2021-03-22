@@ -239,6 +239,20 @@ class CTemplateDashboard extends CDashboardGeneral {
 	}
 
 	/**
+	 * Add UUID for created dashboards.
+	 *
+	 * @param type $dashboards
+	 *
+	 * @return void
+	 */
+	protected function addUuid(array &$dashboards): void {
+		foreach($dashboards as &$dashboard) {
+			$dashboard['uuid'] = generateUuidV4();
+		}
+		unset($dashboard);
+	}
+
+	/**
 	 * @param array $dashboards
 	 * @param array $db_dashboards
 	 *

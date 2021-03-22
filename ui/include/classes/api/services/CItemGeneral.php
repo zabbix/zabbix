@@ -380,6 +380,11 @@ abstract class CItemGeneral extends CApiService {
 
 			$host = $dbHosts[$fullItem['hostid']];
 
+			// UUID should be added only for items on template.
+			if (!$update && $host['status'] == HOST_STATUS_TEMPLATE) {
+				$item['uuid'] = generateUuidV4();
+			}
+
 			// Validate update interval.
 			if (!in_array($fullItem['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 					&& ($fullItem['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($fullItem['key_'], 'mqtt.get', 8) !== 0)
@@ -1026,6 +1031,8 @@ abstract class CItemGeneral extends CApiService {
 
 				// copying item
 				$new_item = $tpl_item;
+				unset($new_item['uuid']);
+
 				if ($chd_item !== null) {
 					$new_item['itemid'] = $chd_item['itemid'];
 				}

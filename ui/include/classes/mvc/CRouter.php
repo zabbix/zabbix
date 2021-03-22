@@ -160,6 +160,7 @@ class CRouter {
 		'popup.generic'						=> ['CControllerPopupGeneric',						'layout.json',			'popup.generic'],
 		'popup.httpstep'					=> ['CControllerPopupHttpStep',						'layout.json',			'popup.httpstep'],
 		'popup.import'						=> ['CControllerPopupImport',						'layout.json',			'popup.import'],
+		'popup.import.compare'				=> ['CControllerPopupImportCompare',				'layout.json',			'popup.import.compare'],
 		'popup.itemtest.edit'				=> ['CControllerPopupItemTestEdit',					'layout.json',			'popup.itemtestedit.view'],
 		'popup.itemtest.getvalue'			=> ['CControllerPopupItemTestGetValue',				'layout.json',			null],
 		'popup.itemtest.send'				=> ['CControllerPopupItemTestSend',					'layout.json',			null],

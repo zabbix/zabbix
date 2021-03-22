@@ -129,7 +129,16 @@ class CValueMap extends CApiService {
 	 * @return array
 	 */
 	public function create(array $valuemaps) {
-		$this->validateCreate($valuemaps);
+		$this->validateCreate($valuemaps, $db_hosts);
+
+		foreach ($valuemaps as &$valuemap) {
+			// TODO VM: (?) I don't like, how this is implemented.
+			// UUID should be added only for value maps on template.
+			if ($db_hosts[$valuemap['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
+				$valuemap['uuid'] = generateUuidV4();
+			}
+		}
+		unset($valuemap);
 
 		$valuemapids = DB::insertBatch('valuemap', $valuemaps);
 
@@ -310,7 +319,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateCreate(array &$valuemaps) {
+	private function validateCreate(array &$valuemaps, &$db_hosts) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
 			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
@@ -329,7 +338,7 @@ class CValueMap extends CApiService {
 		}
 
 		$db_hosts = API::Host()->get([
-			'output' => [],
+			'output' => ['status'],
 			'hostids' => array_keys($hostids),
 			'templated_hosts' => true,
 			'editable' => true,

@@ -255,6 +255,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($templates as $template) {
 			$result[] = [
+				'uuid' => $template['uuid'],
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
@@ -533,6 +534,7 @@ class CConfigurationExportBuilder {
 			}
 
 			$data = [
+				'uuid' => $discoveryRule['uuid'],
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
@@ -650,6 +652,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($httptests as $httptest) {
 			$result[] = [
+				'uuid' => $httptest['uuid'],
 				'name' => $httptest['name'],
 				'application' => $httptest['application'],
 				'delay' => $httptest['delay'],
@@ -732,6 +735,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($graphs as $graph) {
 			$data = [
+				'uuid' => $graph['uuid'],
 				'name' => $graph['name'],
 				'width' => $graph['width'],
 				'height' => $graph['height'],
@@ -775,6 +779,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($hostPrototypes as $hostPrototype) {
 			$result[] = [
+				'uuid' => $hostPrototype['uuid'],
 				'host' => $hostPrototype['host'],
 				'name' => $hostPrototype['name'],
 				'status' => $hostPrototype['status'],
@@ -870,6 +875,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($triggers as $trigger) {
 			$data = [
+				'uuid' => $trigger['uuid'],
 				'expression' => $trigger['expression'],
 				'recovery_mode' => $trigger['recovery_mode'],
 				'recovery_expression' => $trigger['recovery_expression'],
@@ -970,6 +976,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($groups as $group) {
 			$result[] = [
+				'uuid' => $group['uuid'],
 				'name' => $group['name']
 			];
 		}
@@ -993,6 +1000,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($items as $item) {
 			$data = [
+				'uuid' => $item['uuid'],
 				'name' => $item['name'],
 				'type' => $item['type'],
 				'snmp_oid' => $item['snmp_oid'],
@@ -1284,6 +1292,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($dashboards as $dashboard) {
 			$result[] = [
+				'uuid' => $dashboard['uuid'],
 				'name' => $dashboard['name'],
 				'widgets' => $this->formatWidgets($dashboard['widgets'])
 			];

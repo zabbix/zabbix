@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,23 +19,26 @@
 **/
 
 
-use Symfony\Component\Yaml\Yaml;
-
 /**
- * Class for converting array with export data to YAML format.
+ * @var CView $this
  */
-class CYamlExportWriter extends CExportWriter {
+?>
 
-	/**
-	 * Converts array with export data to YAML format.
-	 * Known issues:
-	 *   - Symfony dumpers second parameter makes the YAML output either too vertical or too horizontal.
-	 *
-	 * @param mixed $input  Input data. Array or string.
-	 *
-	 * @return string
-	 */
-	public function write($input): string {
-		return Yaml::dump($input, 100, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-	}
+jQuery(function($) {
+	$(document).on('click', '.import-compare .toc .arrow', function() {
+		$(this).closest('li').children('.sublist').toggle();
+		$(this).children('span')
+			.toggleClass('arrow-down arrow-up');
+
+		return false;
+	});
+});
+
+function submitImportComparePopup(overlay) {
+	const form = document.querySelector('.import-compare');
+	const parent_overlayid = form.querySelector('#parent_overlayid').value;
+	const parent_overlay = overlays_stack.getById(parent_overlayid);
+
+	parent_overlay.setLoading();
+	submitImportPopup(parent_overlay);
 }

@@ -2548,3 +2548,19 @@ function relativeDateToText($from, $to) {
 
 	return $from.' – '.$to;
 }
+
+/**
+ * Generates UUID version 4.
+ *
+ * @return string
+ */
+function generateUuidV4() {
+	$data = random_bytes(16);
+
+	// Set head of 7th byty to 0100
+	$data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+	// Set head of 9th byte to 10
+	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+	return bin2hex($data);
+}

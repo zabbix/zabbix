@@ -38,7 +38,7 @@ class CHostPrototype extends CHostBase {
 	public function get(array $options) {
 		$hosts_fields = array_keys($this->getTableSchema('hosts')['fields']);
 		$output_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
-			'custom_interfaces'
+			'custom_interfaces', 'uuid'
 		];
 		$link_fields = ['group_prototypeid', 'groupid', 'hostid', 'templateid'];
 		$group_fields = ['group_prototypeid', 'name', 'hostid', 'templateid'];
@@ -304,6 +304,7 @@ class CHostPrototype extends CHostBase {
 	public function create(array $host_prototypes) {
 		// 'templateid' validation happens during linkage.
 		$this->validateCreate($host_prototypes);
+		$this->addUuid($host_prototypes);
 
 		// Merge groups into group prototypes.
 		foreach ($host_prototypes as &$host_prototype) {
@@ -323,6 +324,30 @@ class CHostPrototype extends CHostBase {
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes);
 
 		return ['hostids' => zbx_objectValues($host_prototypes, 'hostid')];
+	}
+
+	/**
+	 * Add UUID only for host prototypes on templates.
+	 *
+	 * @param array $host_prototypes
+	 */
+	protected function addUuid(array &$host_prototypes): void {
+		$ruleids = array_flip(array_column($host_prototypes, 'ruleid'));
+
+		$db_templated_rules = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid, h.status'.
+				' FROM items i, hosts h'.
+				' WHERE '.dbConditionInt('i.itemid', array_keys($ruleids)).
+				' AND i.hostid=h.hostid'.
+				' AND h.status = ' . HOST_STATUS_TEMPLATE
+		), 'itemid');
+
+		foreach ($host_prototypes as &$host_prototype) {
+			if (array_key_exists($host_prototype['ruleid'], $db_templated_rules)) {
+				$host_prototype['uuid'] = generateUuidV4();
+			}
+		}
+		unset($host_prototype);
 	}
 
 	/**
@@ -913,6 +938,7 @@ class CHostPrototype extends CHostBase {
 
 				// copy host prototype
 				$newHostPrototype = $parentHostPrototype;
+				unset($newHostPrototype['uuid']);
 				$newHostPrototype['ruleid'] = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
 				$newHostPrototype['templateid'] = $parentHostPrototype['hostid'];
 
