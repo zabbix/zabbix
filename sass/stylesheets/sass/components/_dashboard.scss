@@ -173,6 +173,18 @@
 
 	// For widget sliding headers to appear over the breadcrumbs.
 	z-index: 3;
+
+	&.reserve-header-lines-1 {
+		margin-top: 2rem;
+	}
+
+	&.reserve-header-lines-2 {
+		margin-top: calc(4rem + 8px);
+	}
+
+	@if $ui-transitions {
+		transition: margin-top .3s;
+	}
 }
 
 .dashbrd {
@@ -186,23 +198,6 @@
 	&:not(.dashbrd-is-multipage) {
 		.dashbrd-toggle-slideshow {
 			display: none;
-		}
-	}
-
-	&.dashbrd-is-multipage,
-	&.dashbrd-is-edit-mode {
-		.dashbrd-grid-container {
-			&.reserve-header-lines-1 {
-				margin-top: 2rem;
-			}
-
-			&.reserve-header-lines-2 {
-				margin-top: calc(4rem + 8px);
-			}
-
-			@if $ui-transitions {
-				transition: margin-top .3s;
-			}
 		}
 	}
 }
