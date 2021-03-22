@@ -136,8 +136,10 @@ class CWidgetIterator extends CWidget {
 	_doDeactivate() {
 		if (this._hasContents()) {
 			for (const widget of this._widgets.values()) {
-				widget.deactivate();
-				this._removeWidgetEventListeners(widget);
+				if (widget._state === WIDGET_STATE_ACTIVE) {
+					widget.deactivate();
+					this._removeWidgetEventListeners(widget);
+				}
 			}
 		}
 
