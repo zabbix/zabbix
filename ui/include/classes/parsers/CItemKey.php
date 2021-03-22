@@ -148,6 +148,19 @@ class CItemKey extends CParser {
 			}
 		}
 
+		if ($this->options['with_filter'] && $data[$p] === '?') {
+			if (substr($data, $p, 2) !== '?[') {
+				$this->errorPos($data, $p);
+				return self::PARSE_FAIL;
+			}
+
+			if (!$this->parseKeyAttributes($data, $p)) {
+				return self::PARSE_FAIL;
+			}
+
+			$p2 = $p;
+		}
+
 		if ($this->options['with_filter'] && substr($data, $p, 2) === '?[') {
 			if (!$this->parseKeyAttributes($data, $p)) {
 				return self::PARSE_FAIL;

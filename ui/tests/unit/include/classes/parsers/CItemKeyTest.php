@@ -1420,6 +1420,28 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 			],
 
 			[
+				'key?', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', '?'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key?[)*10', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', ')*10'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
 				'key?[(]', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
