@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-19 19:57+0200\n"
+"POT-Creation-Date: 2021-03-22 11:46+0200\n"
 "PO-Revision-Date: 2021-02-18 23:23+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -39,9 +39,9 @@ msgstr "\"%1$s\" ожидалось"
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:359
 #: include/classes/api/services/CMaintenance.php:402
-#: include/classes/api/services/CMaintenance.php:590
-#: include/classes/api/services/CMaintenance.php:606
-#: include/classes/api/services/CMaintenance.php:675 maintenance.php:127
+#: include/classes/api/services/CMaintenance.php:592
+#: include/classes/api/services/CMaintenance.php:608
+#: include/classes/api/services/CMaintenance.php:677 maintenance.php:127
 #: maintenance.php:133 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
@@ -244,14 +244,14 @@ msgstr[0] "%1$s неподтвержденная проблема"
 msgstr[1] "%1$s неподтвержденных проблем"
 msgstr[2] "%1$s неподтвержденных проблем"
 
-#: app/views/monitoring.widget.problems.view.php:276
+#: app/views/monitoring.widget.problems.view.php:274
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s widget"
 msgstr "%1$s виджет"
 
 #: app/views/monitoring.widget.problemhosts.view.php:102
-#: app/views/monitoring.widget.problems.view.php:193
+#: app/views/monitoring.widget.problems.view.php:191
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
@@ -400,13 +400,12 @@ msgstr "Доступ запрещен"
 msgid "Access denied!"
 msgstr "Доступ запрещен!"
 
-#: app/views/monitoring.widget.problems.view.php:64
+#: app/views/hint.box.php:77 app/views/monitoring.widget.problems.view.php:64
 #: include/actions.inc.php:157 include/blocks.inc.php:768
 #: include/classes/screens/CScreenHostTriggers.php:230
-#: include/classes/screens/CScreenProblem.php:897
-#: include/classes/screens/CScreenProblem.php:922
-#: include/classes/screens/CScreenProblem.php:1171 include/events.inc.php:250
-#: include/events.inc.php:458
+#: include/classes/screens/CScreenProblem.php:882
+#: include/classes/screens/CScreenProblem.php:907
+#: include/classes/screens/CScreenProblem.php:1156 include/events.inc.php:250
 msgid "Ack"
 msgstr "Подтверждено"
 
@@ -554,10 +553,10 @@ msgstr "Действие обновлено"
 #: app/views/monitoring.dashboard.view.php:97
 #: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:769
 #: include/classes/screens/CScreenHostTriggers.php:230
-#: include/classes/screens/CScreenProblem.php:898
-#: include/classes/screens/CScreenProblem.php:923
-#: include/classes/screens/CScreenProblem.php:1172
-#: include/classes/screens/CScreenProblem.php:1233 include/events.inc.php:251
+#: include/classes/screens/CScreenProblem.php:883
+#: include/classes/screens/CScreenProblem.php:908
+#: include/classes/screens/CScreenProblem.php:1157
+#: include/classes/screens/CScreenProblem.php:1218 include/events.inc.php:251
 #: include/forms.inc.php:1224 include/menu.inc.php:116
 #: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:77
@@ -1214,15 +1213,15 @@ msgid "At least one action is mandatory."
 msgstr "Как минимум одно действие является обязательным."
 
 #: include/classes/api/services/CMaintenance.php:279
-#: include/classes/api/services/CMaintenance.php:704
+#: include/classes/api/services/CMaintenance.php:706
 #: include/views/configuration.maintenance.edit.php:206
 msgid "At least one host group or host must be selected."
 msgstr "Должна быть выбрана по крайней мере одна группа узлов сети или узел сети."
 
 #: include/classes/api/services/CMaintenance.php:373
 #: include/classes/api/services/CMaintenance.php:381
-#: include/classes/api/services/CMaintenance.php:626
-#: include/classes/api/services/CMaintenance.php:634
+#: include/classes/api/services/CMaintenance.php:628
+#: include/classes/api/services/CMaintenance.php:636
 msgid "At least one maintenance period must be created."
 msgstr "Должен быть создан по крайней мере один период обслуживания."
 
@@ -1558,12 +1557,11 @@ msgstr "По шаблону триггера"
 msgid "CERT"
 msgstr "CERT"
 
-#: app/views/monitoring.widget.problems.view.php:95
+#: app/views/hint.box.php:111 app/views/monitoring.widget.problems.view.php:95
 #: include/classes/graph/CSvgGraph.php:1077
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:992
-#: include/classes/screens/CScreenProblem.php:1194 include/events.inc.php:340
-#: include/events.inc.php:538
+#: include/classes/screens/CScreenProblem.php:977
+#: include/classes/screens/CScreenProblem.php:1179 include/events.inc.php:340
 msgid "CLOSING"
 msgstr "ЗАКРЫТИЕ"
 
@@ -2557,7 +2555,7 @@ msgstr "Не удалось построить дерево. Проверьте 
 msgid "Cannot format tree."
 msgstr "Не удалось построить дерево."
 
-#: include/classes/api/services/CTemplate.php:906
+#: include/classes/api/services/CTemplate.php:905
 msgid "Cannot have empty visible template name."
 msgstr "Видимое имя шаблона не может быть пустым."
 
@@ -2577,8 +2575,8 @@ msgstr "Не удалось вставить выражение триггера
 msgid "Cannot link template"
 msgstr "Не удалось присоединить шаблон"
 
-#: include/classes/api/services/CTemplate.php:993
-#: include/classes/api/services/CTemplate.php:1007
+#: include/classes/api/services/CTemplate.php:992
+#: include/classes/api/services/CTemplate.php:1006
 msgid "Cannot link template."
 msgstr "Не удалось присоединить шаблон."
 
@@ -2599,7 +2597,7 @@ msgstr "Не удалось выполнить выход."
 msgid "Cannot mass update host name."
 msgstr "Невозможно массово обновить имя узла сети."
 
-#: include/classes/api/services/CTemplate.php:1131
+#: include/classes/api/services/CTemplate.php:1130
 msgid "Cannot mass update template name."
 msgstr "Невозможно массово обновить имя шаблона."
 
@@ -2607,7 +2605,7 @@ msgstr "Невозможно массово обновить имя шаблон
 msgid "Cannot mass update visible host name."
 msgstr "Невозможно массово обновить видимое имя узла сети."
 
-#: include/classes/api/services/CTemplate.php:1096
+#: include/classes/api/services/CTemplate.php:1095
 msgid "Cannot mass update visible template name."
 msgstr "Невозможно обновить массово видимое имя шаблона."
 
@@ -2718,8 +2716,8 @@ msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Не удалось установить \"templateid\" для комплексного экрана \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1131
-#: include/classes/api/services/CHost.php:2077
-#: include/classes/api/services/CHost.php:2238
+#: include/classes/api/services/CHost.php:2075
+#: include/classes/api/services/CHost.php:2236
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Невозможно задать поля инвентарных данных при отключенной инвентаризации."
 
@@ -2760,8 +2758,8 @@ msgstr "Не удалось отсоединить и очистить груп�
 msgid "Cannot unlink template"
 msgstr "Не удалось отсоединить шаблон"
 
-#: include/classes/api/services/CTemplate.php:958
-#: include/classes/api/services/CTemplate.php:981
+#: include/classes/api/services/CTemplate.php:957
+#: include/classes/api/services/CTemplate.php:980
 msgid "Cannot unlink template."
 msgstr "Не удалось отсоединить шаблон."
 
@@ -2801,7 +2799,7 @@ msgstr "Не удалось обновить \"%1$s\" для шаблонног�
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для шаблонного прототипа графика \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:2215
+#: include/classes/api/services/CHost.php:2213
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Не удалось обновить \"%1$s\" у обнаруженного узла сети \"%2$s\"."
@@ -3040,8 +3038,8 @@ msgstr "Не удалось обновить шаблонные группы э�
 msgid "Cannot update templates"
 msgstr "Не удалось обновить шаблоны"
 
-#: include/classes/api/services/CTemplate.php:857
-#: include/classes/api/services/CTemplate.php:1192
+#: include/classes/api/services/CTemplate.php:856
+#: include/classes/api/services/CTemplate.php:1191
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Не удалось обновить шаблоны для обнаруженного узла сети \"%1$s\"."
@@ -4978,7 +4976,7 @@ msgstr "Удалить триггер?"
 msgid "Delete web scenario?"
 msgstr "Удалить веб-сценарий?"
 
-#: include/classes/api/services/CHost.php:1601
+#: include/classes/api/services/CHost.php:1598
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Удалено: Узел сети \"%1$s\"."
@@ -4988,7 +4986,7 @@ msgstr "Удалено: Узел сети \"%1$s\"."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Прототип узлов сети \"%1$s\" из \"%2$s\"."
 
-#: include/classes/api/services/CTemplate.php:824
+#: include/classes/api/services/CTemplate.php:822
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Удалено: Шаблон \"%1$s\"."
@@ -5582,14 +5580,14 @@ msgstr "Дублирующиеся зависимости в триггере \"
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Дубликат зависимостей в прототипе триггеров \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:2013
-#: include/classes/api/services/CHost.php:2268
+#: include/classes/api/services/CHost.php:2011
+#: include/classes/api/services/CHost.php:2266
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr "Дубликат узла сети. Узел сети с таким же именем узла сети \"%1$s\" уже существует в данных."
 
-#: include/classes/api/services/CHost.php:2020
-#: include/classes/api/services/CHost.php:2288
+#: include/classes/api/services/CHost.php:2018
+#: include/classes/api/services/CHost.php:2286
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr "Дубликат узла сети. Узел сети с таким же видимым именем узла сети \"%1$s\" уже существует в данных."
@@ -5623,11 +5621,11 @@ msgstr "Дубликат usrgrpid \"%1$s\" в группах пользоват�
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Дубликат usrgrpid \"%1$s\" в группах пользователей у комплексного экрана \"%2$s\"."
 
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:767
-#: include/classes/screens/CScreenProblem.php:896
-#: include/classes/screens/CScreenProblem.php:921
-#: include/classes/screens/CScreenProblem.php:1170 include/events.inc.php:249
-#: include/events.inc.php:457 include/views/configuration.action.edit.php:169
+#: app/views/hint.box.php:76 app/views/monitoring.widget.problems.view.php:63
+#: include/blocks.inc.php:767 include/classes/screens/CScreenProblem.php:881
+#: include/classes/screens/CScreenProblem.php:906
+#: include/classes/screens/CScreenProblem.php:1155 include/events.inc.php:249
+#: include/views/configuration.action.edit.php:169
 msgid "Duration"
 msgstr "Длительность"
 
@@ -5799,7 +5797,7 @@ msgstr "Пустой тип условия фильтрации для дейс�
 #: include/classes/api/services/CHost.php:1413
 #: include/classes/api/services/CHostPrototype.php:950
 #: include/classes/api/services/CImage.php:423
-#: include/classes/api/services/CMaintenance.php:533
+#: include/classes/api/services/CMaintenance.php:535
 #: include/classes/api/services/CMap.php:555
 #: include/classes/api/services/CMap.php:581
 #: include/classes/api/services/CMap.php:1022
@@ -6403,7 +6401,7 @@ msgstr "Поле \"%1$s\" не может быть NULL."
 #: include/classes/api/services/CDRule.php:531
 #: include/classes/api/services/CHostGroup.php:983
 #: include/classes/api/services/CHost.php:986
-#: include/classes/api/services/CTemplate.php:885
+#: include/classes/api/services/CTemplate.php:884
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6830,7 +6828,7 @@ msgstr "Градиентная линия"
 #: app/partials/monitoring.latest.view.html.php:241
 #: app/views/monitoring.charts.view.php:56
 #: include/classes/macros/CMacrosResolverGeneral.php:847
-#: include/classes/screens/CScreenProblem.php:1311
+#: include/classes/screens/CScreenProblem.php:1296
 #: include/classes/widgets/CWidgetConfig.php:49
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -7282,7 +7280,7 @@ msgstr "Подсвечивать всю строку"
 #: app/views/monitoring.problem.view.php:100
 #: app/views/popup.acknowledge.edit.php:42 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:852
-#: include/classes/screens/CScreenProblem.php:1316
+#: include/classes/screens/CScreenProblem.php:1301
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:275 include/forms.inc.php:714
@@ -7362,9 +7360,9 @@ msgstr "Выравнивание по горизонтали"
 #: include/classes/screens/CScreenHostTriggers.php:146
 #: include/classes/screens/CScreenHostTriggers.php:192
 #: include/classes/screens/CScreenHttpTest.php:107
-#: include/classes/screens/CScreenProblem.php:892
-#: include/classes/screens/CScreenProblem.php:916
-#: include/classes/screens/CScreenProblem.php:1167
+#: include/classes/screens/CScreenProblem.php:877
+#: include/classes/screens/CScreenProblem.php:901
+#: include/classes/screens/CScreenProblem.php:1152
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:340
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
@@ -7404,8 +7402,8 @@ msgstr "Узел сети \"%1$s\" уже существует."
 
 #: include/classes/api/services/CHostGroup.php:1529
 #: include/classes/api/services/CHost.php:1052
-#: include/classes/api/services/CHost.php:1984
-#: include/classes/api/services/CHost.php:2178
+#: include/classes/api/services/CHost.php:1982
+#: include/classes/api/services/CHost.php:2176
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Узел сети \"%1$s\" не может быть без группы узлов сети."
@@ -7708,17 +7706,17 @@ msgstr "Узел сети обновлен"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Узел сети с ID \"%1$s\" недоступен."
 
-#: include/classes/api/services/CHost.php:2108
-#: include/classes/api/services/CHost.php:2349
-#: include/classes/api/services/CTemplate.php:1157
+#: include/classes/api/services/CHost.php:2106
+#: include/classes/api/services/CHost.php:2347
+#: include/classes/api/services/CTemplate.php:1156
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Узел сети с таким же именем \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHost.php:2114
-#: include/classes/api/services/CHost.php:2356
+#: include/classes/api/services/CHost.php:2112
+#: include/classes/api/services/CHost.php:2354
 #: include/classes/api/services/CTemplate.php:522
-#: include/classes/api/services/CTemplate.php:1122
+#: include/classes/api/services/CTemplate.php:1121
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Узел сети с таким же видимым именем \"%1$s\" уже существует."
@@ -8107,7 +8105,7 @@ msgid "Inaccessible item prototype"
 msgstr "Недоступный прототип элементов данных"
 
 #: app/partials/monitoring.host.view.html.php:92
-#: include/classes/screens/CScreenProblem.php:412
+#: include/classes/screens/CScreenProblem.php:407
 #: include/hostgroups.inc.php:289 include/triggers.inc.php:2185
 #: include/views/configuration.host.list.php:250
 #: include/views/inventory.host.view.php:40
@@ -8450,8 +8448,8 @@ msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Некорректное вычисляемое значение SLA для услуги \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1075
-#: include/classes/api/services/CHost.php:1972
-#: include/classes/api/services/CHost.php:2262
+#: include/classes/api/services/CHost.php:1970
+#: include/classes/api/services/CHost.php:2260
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени узла сети \"%1$s\"."
@@ -8463,7 +8461,7 @@ msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени прокси \"%1$s\"."
 
 #: include/classes/api/services/CTemplate.php:474
-#: include/classes/api/services/CTemplate.php:1167
+#: include/classes/api/services/CTemplate.php:1166
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени шаблона \"%1$s\"."
@@ -8630,8 +8628,8 @@ msgstr "Некорректный индекс изображения."
 #: include/classes/api/services/CAction.php:2923
 #: include/classes/api/services/CAction.php:2935
 #: include/classes/api/services/CHost.php:1058
-#: include/classes/api/services/CHost.php:1966
-#: include/classes/api/services/CHost.php:2164
+#: include/classes/api/services/CHost.php:1964
+#: include/classes/api/services/CHost.php:2162
 #: include/classes/api/services/CImage.php:435
 #: include/classes/api/services/CImage.php:476
 #: include/classes/api/services/CProxy.php:619
@@ -8655,8 +8653,8 @@ msgstr "Указан некорректный параметр DNS \"%1$s\" ин
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr "Указан некорректный порт \"%1$s\" интерфейса."
 
-#: include/classes/api/services/CHost.php:2083
-#: include/classes/api/services/CHost.php:2244
+#: include/classes/api/services/CHost.php:2081
+#: include/classes/api/services/CHost.php:2242
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr "Некорректное поле инвентарных данных \"%1$s\"."
@@ -8758,7 +8756,7 @@ msgid "Incorrect parameters for condition."
 msgstr "Некорректные параметры для условии."
 
 #: include/classes/api/services/CMaintenance.php:325
-#: include/classes/api/services/CMaintenance.php:543
+#: include/classes/api/services/CMaintenance.php:545
 msgid "Incorrect parameters for maintenance."
 msgstr "Некорректные параметры для обслуживания."
 
@@ -8828,8 +8826,8 @@ msgstr "Некорректный порядок сортировки у услу
 msgid "Incorrect source value."
 msgstr "Некорректное значение источника."
 
-#: include/classes/api/services/CHost.php:2055
-#: include/classes/api/services/CHost.php:2210
+#: include/classes/api/services/CHost.php:2053
+#: include/classes/api/services/CHost.php:2208
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Некорректное состояние для узла сети \"%1$s\"."
@@ -9001,7 +8999,7 @@ msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr "Некорректное значение \"%1$s\" для поля целого числа \"%2$s\"."
 
 #: include/classes/api/services/CMaintenance.php:393
-#: include/classes/api/services/CMaintenance.php:659
+#: include/classes/api/services/CMaintenance.php:661
 #: include/classes/db/DB.php:349
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
@@ -9117,20 +9115,20 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CEvent.php:812
 #: include/classes/api/services/CEvent.php:869
 #: include/classes/api/services/CHost.php:1016
-#: include/classes/api/services/CHost.php:1868
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1889
-#: include/classes/api/services/CHost.php:1895
-#: include/classes/api/services/CHost.php:1900
-#: include/classes/api/services/CHost.php:1906
-#: include/classes/api/services/CHost.php:1914
-#: include/classes/api/services/CHost.php:1920
-#: include/classes/api/services/CHost.php:1929
-#: include/classes/api/services/CHost.php:1935
-#: include/classes/api/services/CHost.php:1993
-#: include/classes/api/services/CHost.php:2049
-#: include/classes/api/services/CHost.php:2187
-#: include/classes/api/services/CHost.php:2204
+#: include/classes/api/services/CHost.php:1866
+#: include/classes/api/services/CHost.php:1872
+#: include/classes/api/services/CHost.php:1887
+#: include/classes/api/services/CHost.php:1893
+#: include/classes/api/services/CHost.php:1898
+#: include/classes/api/services/CHost.php:1904
+#: include/classes/api/services/CHost.php:1912
+#: include/classes/api/services/CHost.php:1918
+#: include/classes/api/services/CHost.php:1927
+#: include/classes/api/services/CHost.php:1933
+#: include/classes/api/services/CHost.php:1991
+#: include/classes/api/services/CHost.php:2047
+#: include/classes/api/services/CHost.php:2185
+#: include/classes/api/services/CHost.php:2202
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:209
@@ -9184,8 +9182,8 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CItem.php:827
 #: include/classes/api/services/CItemPrototype.php:979
 #: include/classes/api/services/CItemPrototype.php:987
-#: include/classes/api/services/CMaintenance.php:493
-#: include/classes/api/services/CMaintenance.php:715
+#: include/classes/api/services/CMaintenance.php:495
+#: include/classes/api/services/CMaintenance.php:717
 #: include/classes/api/services/CMapElement.php:85
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
@@ -9315,8 +9313,8 @@ msgstr "Бесконечно"
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
 #: include/blocks.inc.php:763 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:230
-#: include/classes/screens/CScreenProblem.php:891
-#: include/classes/screens/CScreenProblem.php:915
+#: include/classes/screens/CScreenProblem.php:876
+#: include/classes/screens/CScreenProblem.php:900
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.application.list.php:86
 #: include/views/configuration.graph.list.php:127
@@ -10902,8 +10900,8 @@ msgstr "Обслуживание"
 
 #: include/classes/api/services/CMaintenance.php:331
 #: include/classes/api/services/CMaintenance.php:345
-#: include/classes/api/services/CMaintenance.php:577
-#: include/classes/api/services/CMaintenance.php:733
+#: include/classes/api/services/CMaintenance.php:579
+#: include/classes/api/services/CMaintenance.php:735
 #, c-format
 msgid "Maintenance \"%1$s\" already exists."
 msgstr "Обслуживание \"%1$s\" уже существует."
@@ -10913,7 +10911,7 @@ msgstr "Обслуживание \"%1$s\" уже существует."
 msgid "Maintenance \"%1$s\" value cannot be bigger than \"%2$s\"."
 msgstr "Значение \"%1$s\" обслуживания не может быть больше \"%2$s\"."
 
-#: include/classes/api/services/CMaintenance.php:619
+#: include/classes/api/services/CMaintenance.php:621
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "Значение обслуживания \"Активно с\" не может быть больше чем \"Активно до\"."
 
@@ -11097,7 +11095,7 @@ msgstr "Пометить выбранное"
 msgid "Mask"
 msgstr "Маска"
 
-#: include/classes/screens/CScreenProblem.php:1148
+#: include/classes/screens/CScreenProblem.php:1133
 #: include/views/configuration.host.list.php:478
 #: include/views/configuration.item.list.php:261
 #: include/views/configuration.item.prototype.list.php:195
@@ -11335,7 +11333,7 @@ msgid "Message/Command"
 msgstr "Сообщение/Команда"
 
 #: app/views/administration.authentication.edit.php:200
-#: include/classes/screens/CScreenProblem.php:1226
+#: include/classes/screens/CScreenProblem.php:1211
 msgid "Messages"
 msgstr "Сообщения"
 
@@ -11889,17 +11887,17 @@ msgid "Next step"
 msgstr "Далее"
 
 #: app/views/administration.user.list.php:126
-#: app/views/administration.user.list.php:130
-#: app/views/monitoring.widget.problems.view.php:245
+#: app/views/administration.user.list.php:130 app/views/hint.box.php:162
+#: app/views/monitoring.widget.problems.view.php:243
 #: app/views/popup.condition.common.php:662
 #: app/views/popup.lldoperation.php:85 app/views/popup.lldoperation.php:97
 #: include/actions.inc.php:33 include/blocks.inc.php:624
 #: include/blocks.inc.php:702 include/blocks.inc.php:869
 #: include/classes/screens/CScreenHostTriggers.php:271
-#: include/classes/screens/CScreenProblem.php:1114
-#: include/classes/screens/CScreenProblem.php:1254 include/events.inc.php:173
-#: include/events.inc.php:359 include/events.inc.php:591
-#: include/triggers.inc.php:1224 include/triggers.inc.php:1229
+#: include/classes/screens/CScreenProblem.php:1099
+#: include/classes/screens/CScreenProblem.php:1239 include/events.inc.php:173
+#: include/events.inc.php:359 include/triggers.inc.php:1224
+#: include/triggers.inc.php:1229
 #: include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
@@ -12168,8 +12166,8 @@ msgstr "Интерфейс не найден."
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr "Не указан интерфейс для прокси \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:2062
-#: include/classes/api/services/CHost.php:2255
+#: include/classes/api/services/CHost.php:2060
+#: include/classes/api/services/CHost.php:2253
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
 msgstr "Отсутствуют интерфейсы для узла сети \"%1$s\"."
@@ -12236,6 +12234,7 @@ msgstr "Нет прав доступа в систему."
 #: app/controllers/CControllerDashboardView.php:179
 #: app/controllers/CControllerDashboardView.php:215
 #: app/controllers/CControllerExportXml.php:109
+#: app/controllers/CControllerHintBox.php:153
 #: app/controllers/CControllerMenuPopup.php:76
 #: app/controllers/CControllerMenuPopup.php:106
 #: app/controllers/CControllerMenuPopup.php:203
@@ -12306,8 +12305,8 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CHostInterface.php:884
 #: include/classes/api/services/CHost.php:1382
 #: include/classes/api/services/CHost.php:1417
-#: include/classes/api/services/CHost.php:2038
-#: include/classes/api/services/CHost.php:2170
+#: include/classes/api/services/CHost.php:2036
+#: include/classes/api/services/CHost.php:2168
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
@@ -12332,10 +12331,10 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
 #: include/classes/api/services/CMaintenance.php:305
-#: include/classes/api/services/CMaintenance.php:566
-#: include/classes/api/services/CMaintenance.php:648
-#: include/classes/api/services/CMaintenance.php:750
-#: include/classes/api/services/CMaintenance.php:768
+#: include/classes/api/services/CMaintenance.php:568
+#: include/classes/api/services/CMaintenance.php:650
+#: include/classes/api/services/CMaintenance.php:752
+#: include/classes/api/services/CMaintenance.php:770
 #: include/classes/api/services/CMapElement.php:189
 #: include/classes/api/services/CMapElement.php:319
 #: include/classes/api/services/CMap.php:567
@@ -12364,7 +12363,7 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CService.php:1012
 #: include/classes/api/services/CTask.php:425
 #: include/classes/api/services/CTask.php:492
-#: include/classes/api/services/CTemplate.php:847
+#: include/classes/api/services/CTemplate.php:846
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
@@ -13036,8 +13035,8 @@ msgid "Operation type"
 msgstr "Тип операции"
 
 #: app/views/monitoring.widget.problems.view.php:62 include/blocks.inc.php:766
-#: include/classes/screens/CScreenProblem.php:919
-#: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:160
+#: include/classes/screens/CScreenProblem.php:904
+#: include/classes/screens/CScreenProblem.php:1154 include/events.inc.php:160
 #: include/views/configuration.trigger.prototype.edit.php:72
 #: include/views/configuration.trigger.prototype.list.php:56
 #: include/views/configuration.triggers.edit.php:93
@@ -13430,13 +13429,12 @@ msgstr "Расширение PHP xmlwriter отсутствует."
 msgid "POP"
 msgstr "POP"
 
-#: app/views/monitoring.widget.problems.view.php:95 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:1072
+#: app/views/hint.box.php:111 app/views/monitoring.widget.problems.view.php:95
+#: chart5.php:199 include/classes/graph/CSvgGraph.php:1072
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:992
-#: include/classes/screens/CScreenProblem.php:1194 include/events.inc.php:340
-#: include/events.inc.php:538 include/triggers.inc.php:257
-#: include/views/monitoring.overview.items.php:36
+#: include/classes/screens/CScreenProblem.php:977
+#: include/classes/screens/CScreenProblem.php:1179 include/events.inc.php:340
+#: include/triggers.inc.php:257 include/views/monitoring.overview.items.php:36
 #: include/views/monitoring.overview.triggers.php:45
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
@@ -13924,10 +13922,10 @@ msgstr "Уровень привилегий"
 #: app/views/popup.acknowledge.edit.php:33
 #: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:765
 #: include/classes/helpers/CMediatypeHelper.php:45
-#: include/classes/screens/CScreenProblem.php:894
-#: include/classes/screens/CScreenProblem.php:917
-#: include/classes/screens/CScreenProblem.php:1083
-#: include/classes/screens/CScreenProblem.php:1168
+#: include/classes/screens/CScreenProblem.php:879
+#: include/classes/screens/CScreenProblem.php:902
+#: include/classes/screens/CScreenProblem.php:1068
+#: include/classes/screens/CScreenProblem.php:1153
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:61
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:61
 #: include/classes/widgets/forms/CWidgetFormProblems.php:76
@@ -14053,8 +14051,8 @@ msgstr "Свойства"
 
 #: app/controllers/CControllerMenuPopup.php:332
 #: app/controllers/CControllerMenuPopup.php:610
-#: app/controllers/CControllerWidgetUrlView.php:56
-#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:427
+#: app/controllers/CControllerWidgetUrlView.php:56 app/views/hint.box.php:45
+#: include/classes/screens/CScreenUrl.php:70
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "Указанный URL \"%1$s\" ошибочен."
@@ -14181,12 +14179,11 @@ msgstr "Обзор очереди"
 msgid "Queue overview by proxy"
 msgstr "Обзор очереди по прокси"
 
-#: app/views/monitoring.widget.problems.view.php:81
+#: app/views/hint.box.php:97 app/views/monitoring.widget.problems.view.php:81
 #: include/classes/graph/CSvgGraph.php:1068
 #: include/classes/screens/CScreenEvents.php:121
-#: include/classes/screens/CScreenProblem.php:978
-#: include/classes/screens/CScreenProblem.php:1182 include/events.inc.php:345
-#: include/events.inc.php:524
+#: include/classes/screens/CScreenProblem.php:963
+#: include/classes/screens/CScreenProblem.php:1167 include/events.inc.php:345
 msgid "RESOLVED"
 msgstr "РЕШЕНО"
 
@@ -14278,7 +14275,7 @@ msgid "Recipients"
 msgstr "Получатели"
 
 #: app/views/administration.user.edit.php:398
-#: include/classes/screens/CScreenProblem.php:1084
+#: include/classes/screens/CScreenProblem.php:1069
 #: include/views/configuration.item.list.php:173
 #: include/views/configuration.trigger.prototype.list.php:153
 #: include/views/configuration.triggers.list.php:304
@@ -14303,12 +14300,11 @@ msgstr "Синтаксическая ошибка в выражении восс
 msgid "Recovery operations"
 msgstr "Операции восстановления"
 
-#: app/views/monitoring.widget.problems.view.php:53
+#: app/views/hint.box.php:74 app/views/monitoring.widget.problems.view.php:53
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:889
-#: include/classes/screens/CScreenProblem.php:912
-#: include/classes/screens/CScreenProblem.php:1165 include/events.inc.php:246
-#: include/events.inc.php:455
+#: include/classes/screens/CScreenProblem.php:874
+#: include/classes/screens/CScreenProblem.php:897
+#: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:246
 msgid "Recovery time"
 msgstr "Время восстановления"
 
@@ -14700,26 +14696,26 @@ msgstr "Решено"
 
 #: app/views/monitoring.widget.problems.view.php:135
 #: include/classes/screens/CScreenHostTriggers.php:246
-#: include/classes/screens/CScreenProblem.php:1008
+#: include/classes/screens/CScreenProblem.php:993
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "Решено правилом корреляции \"%1$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:138
 #: include/classes/screens/CScreenHostTriggers.php:249
-#: include/classes/screens/CScreenProblem.php:1011
+#: include/classes/screens/CScreenProblem.php:996
 msgid "Resolved by correlation rule."
 msgstr "Решено правилом корреляции."
 
 #: app/views/monitoring.widget.problems.view.php:145
 #: include/classes/screens/CScreenHostTriggers.php:256
-#: include/classes/screens/CScreenProblem.php:1018
+#: include/classes/screens/CScreenProblem.php:1003
 msgid "Resolved by inaccessible user."
 msgstr "Решено недоступным пользователем."
 
 #: app/views/monitoring.widget.problems.view.php:144
 #: include/classes/screens/CScreenHostTriggers.php:255
-#: include/classes/screens/CScreenProblem.php:1017
+#: include/classes/screens/CScreenProblem.php:1002
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "Решено пользователем \"%1$s\"."
@@ -15742,9 +15738,9 @@ msgstr "Не удалось задать LDAP referral значением \"Off\
 #: app/views/popup.lldoperation.php:227 app/views/popup.triggerwizard.php:87
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:275
-#: include/classes/screens/CScreenProblem.php:886
-#: include/classes/screens/CScreenProblem.php:908
-#: include/classes/screens/CScreenProblem.php:1163
+#: include/classes/screens/CScreenProblem.php:871
+#: include/classes/screens/CScreenProblem.php:893
+#: include/classes/screens/CScreenProblem.php:1148
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:70
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:70
 #: include/classes/widgets/forms/CWidgetFormProblems.php:85
@@ -15775,7 +15771,7 @@ msgid "Severity changed"
 msgstr "Важность изменена"
 
 #: include/actions.inc.php:1757
-#: include/classes/screens/CScreenProblem.php:1230
+#: include/classes/screens/CScreenProblem.php:1215
 msgid "Severity changes"
 msgstr "Изменения важности"
 
@@ -16264,7 +16260,7 @@ msgstr "Статистика и доступность кэша записи в 
 #: app/views/administration.module.list.php:77
 #: app/views/administration.usergroup.list.php:49
 #: app/views/administration.usergroup.list.php:77
-#: app/views/administration.user.list.php:107
+#: app/views/administration.user.list.php:107 app/views/hint.box.php:75
 #: app/views/monitoring.host.view.php:139
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:54
@@ -16272,13 +16268,13 @@ msgstr "Статистика и доступность кэша записи в 
 #: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:111
-#: include/classes/screens/CScreenProblem.php:890
-#: include/classes/screens/CScreenProblem.php:914
-#: include/classes/screens/CScreenProblem.php:1166
+#: include/classes/screens/CScreenProblem.php:875
+#: include/classes/screens/CScreenProblem.php:899
+#: include/classes/screens/CScreenProblem.php:1151
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
-#: include/events.inc.php:247 include/events.inc.php:456
-#: include/forms.inc.php:243 include/forms.inc.php:689
+#: include/events.inc.php:247 include/forms.inc.php:243
+#: include/forms.inc.php:689
 #: include/views/administration.auditacts.list.php:67
 #: include/views/configuration.action.list.php:68
 #: include/views/configuration.action.list.php:91
@@ -16619,20 +16615,19 @@ msgstr "Значение тега"
 
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
-#: app/partials/monitoring.host.view.html.php:36
+#: app/partials/monitoring.host.view.html.php:36 app/views/hint.box.php:78
 #: app/views/monitoring.host.view.php:146
 #: app/views/monitoring.problem.view.php:298
 #: app/views/monitoring.widget.problems.view.php:66
 #: app/views/popup.lldoperation.php:240 include/blocks.inc.php:770
-#: include/classes/screens/CScreenProblem.php:868
-#: include/classes/screens/CScreenProblem.php:924
-#: include/classes/screens/CScreenProblem.php:1173
+#: include/classes/screens/CScreenProblem.php:853
+#: include/classes/screens/CScreenProblem.php:909
+#: include/classes/screens/CScreenProblem.php:1158
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:79
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:79
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
-#: include/events.inc.php:234 include/events.inc.php:459
-#: include/views/configuration.host.edit.php:358
+#: include/events.inc.php:234 include/views/configuration.host.edit.php:358
 #: include/views/configuration.host.list.php:170
 #: include/views/configuration.host.list.php:198
 #: include/views/configuration.host.massupdate.php:232
@@ -16694,7 +16689,7 @@ msgstr "Шаблон \"%1$s\" уже существует."
 
 #: include/classes/api/services/CHostGroup.php:1534
 #: include/classes/api/services/CTemplate.php:420
-#: include/classes/api/services/CTemplate.php:1089
+#: include/classes/api/services/CTemplate.php:1088
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Шаблон \"%1$s\" не может быть без группы узлов сети."
@@ -16758,17 +16753,17 @@ msgstr "Шаблон обновлен"
 msgid "Template value"
 msgstr "Значение шаблона"
 
-#: include/classes/api/services/CHost.php:2129
-#: include/classes/api/services/CHost.php:2374
-#: include/classes/api/services/CTemplate.php:1144
+#: include/classes/api/services/CHost.php:2127
+#: include/classes/api/services/CHost.php:2372
+#: include/classes/api/services/CTemplate.php:1143
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Шаблон с таким же именем \"%1$s\" уже существует."
 
-#: include/classes/api/services/CHost.php:2135
-#: include/classes/api/services/CHost.php:2382
+#: include/classes/api/services/CHost.php:2133
+#: include/classes/api/services/CHost.php:2380
 #: include/classes/api/services/CTemplate.php:509
-#: include/classes/api/services/CTemplate.php:1109
+#: include/classes/api/services/CTemplate.php:1108
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Шаблон с таким же видимым именем \"%1$s\" уже существует."
@@ -17080,6 +17075,7 @@ msgstr "До"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:46
 #: app/controllers/CControllerPopupTriggerExpr.php:188
+#: app/views/hint.box.php:62 app/views/hint.box.php:68
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:36
 #: app/views/popup.itemtestedit.view.php:169
@@ -17089,14 +17085,13 @@ msgstr "До"
 #: include/actions.inc.php:1922 include/actions.inc.php:1974
 #: include/blocks.inc.php:745 include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:845
-#: include/classes/screens/CScreenProblem.php:1164
+#: include/classes/screens/CScreenProblem.php:830
+#: include/classes/screens/CScreenProblem.php:1149
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/events.inc.php:168 include/events.inc.php:245
-#: include/events.inc.php:443 include/events.inc.php:449
 #: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.services.edit.php:309
 #: include/views/configuration.services.edit.php:323
@@ -17180,7 +17175,7 @@ msgstr "К"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Чтобы задать интерфейс узла сети выберите один тип элемента данных из всех элементов данных"
 
-#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2526
+#: include/classes/screens/CScreenProblem.php:730 include/func.inc.php:2526
 #: srv_status.php:38
 msgid "Today"
 msgstr "Сегодня"
@@ -18880,7 +18875,7 @@ msgstr "Размер виртуального пространства в бай
 msgid "Visible name"
 msgstr "Видимое имя"
 
-#: include/classes/api/services/CHost.php:2280
+#: include/classes/api/services/CHost.php:2278
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Видимое имя не может быть пустым, если имя узла сети не заполнено."
 
@@ -19113,8 +19108,8 @@ msgstr "Ошибочное имя класса Module.php для модуля р
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Ошибочные поля для зависимости услуги \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1960
-#: include/classes/api/services/CHost.php:2158
+#: include/classes/api/services/CHost.php:1958
+#: include/classes/api/services/CHost.php:2156
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Ошибочные поля для узла сети \"%1$s\"."
@@ -19272,17 +19267,17 @@ msgid "Yearly"
 msgstr "Ежегодно"
 
 #: app/views/administration.user.list.php:124
-#: app/views/administration.valuemap.list.php:82
-#: app/views/monitoring.widget.problems.view.php:245
+#: app/views/administration.valuemap.list.php:82 app/views/hint.box.php:162
+#: app/views/monitoring.widget.problems.view.php:243
 #: app/views/popup.condition.common.php:663
 #: app/views/popup.lldoperation.php:84 app/views/popup.lldoperation.php:96
 #: include/actions.inc.php:32 include/blocks.inc.php:624
 #: include/blocks.inc.php:869
 #: include/classes/screens/CScreenHostTriggers.php:271
-#: include/classes/screens/CScreenProblem.php:1114
-#: include/classes/screens/CScreenProblem.php:1254 include/events.inc.php:173
-#: include/events.inc.php:359 include/events.inc.php:591
-#: include/triggers.inc.php:1223 include/triggers.inc.php:1228
+#: include/classes/screens/CScreenProblem.php:1099
+#: include/classes/screens/CScreenProblem.php:1239 include/events.inc.php:173
+#: include/events.inc.php:359 include/triggers.inc.php:1223
+#: include/triggers.inc.php:1228
 #: include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
@@ -19301,7 +19296,7 @@ msgstr "Ежегодно"
 msgid "Yes"
 msgstr "Да"
 
-#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2520
+#: include/classes/screens/CScreenProblem.php:738 include/func.inc.php:2520
 msgid "Yesterday"
 msgstr "Вчера"
 
@@ -19338,9 +19333,9 @@ msgstr "Вы не указали цели для глобального скри
 #: include/classes/api/services/CHost.php:1007
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
-#: include/classes/api/services/CMaintenance.php:526
-#: include/classes/api/services/CMaintenance.php:957
-#: include/classes/api/services/CMaintenance.php:969
+#: include/classes/api/services/CMaintenance.php:528
+#: include/classes/api/services/CMaintenance.php:949
+#: include/classes/api/services/CMaintenance.php:960
 #: include/classes/api/services/CModule.php:48
 #: include/classes/api/services/CModule.php:142
 #: include/classes/api/services/CModule.php:203
@@ -19352,9 +19347,9 @@ msgstr "Вы не указали цели для глобального скри
 #: include/classes/api/services/CTask.php:244
 #: include/classes/api/services/CTemplate.php:449
 #: include/classes/api/services/CTemplate.php:605
-#: include/classes/api/services/CTemplate.php:642
-#: include/classes/api/services/CTemplate.php:1081
-#: include/classes/api/services/CTemplate.php:1187
+#: include/classes/api/services/CTemplate.php:641
+#: include/classes/api/services/CTemplate.php:1080
+#: include/classes/api/services/CTemplate.php:1186
 #: include/classes/api/services/CUserMacro.php:252
 #: include/classes/api/services/CUserMacro.php:352
 #: include/classes/api/services/CUserMacro.php:447
@@ -19678,7 +19673,7 @@ msgstr ""
 msgid "an empty string is expected"
 msgstr "ожидается пустая строка"
 
-#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1899
 #: include/classes/validators/CApiInputValidator.php:1019
 msgid "an even number of hexadecimal characters is expected"
 msgstr "ожидается четное количество шестнадцатеричных символов"
@@ -19806,8 +19801,8 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:540
 #: include/classes/api/services/CEvent.php:812
-#: include/classes/api/services/CHost.php:1889
-#: include/classes/api/services/CHost.php:1895
+#: include/classes/api/services/CHost.php:1887
+#: include/classes/api/services/CHost.php:1893
 #: include/classes/api/services/CItemGeneral.php:440
 #: include/classes/api/services/CItemGeneral.php:467
 #: include/classes/api/services/CItemGeneral.php:473
@@ -20398,7 +20393,7 @@ msgstr "мин"
 msgid "min() - Minimum value for period T"
 msgstr "min() - Минимальное значение за период Т"
 
-#: include/classes/api/services/CHost.php:1907
+#: include/classes/api/services/CHost.php:1905
 #: include/classes/validators/CApiInputValidator.php:1013
 #, c-format
 msgid "minimum length is %1$s characters"
@@ -20647,10 +20642,10 @@ msgid "short description"
 msgstr "краткое описание"
 
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CHost.php:1914
-#: include/classes/api/services/CHost.php:1920
-#: include/classes/api/services/CHost.php:1929
-#: include/classes/api/services/CHost.php:1935
+#: include/classes/api/services/CHost.php:1912
+#: include/classes/api/services/CHost.php:1918
+#: include/classes/api/services/CHost.php:1927
+#: include/classes/api/services/CHost.php:1933
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:454
@@ -20660,8 +20655,8 @@ msgstr "краткое описание"
 #: include/classes/api/services/CItemGeneral.php:1578
 #: include/classes/api/services/CItemGeneral.php:1606
 #: include/classes/api/services/CItemGeneral.php:2248
-#: include/classes/api/services/CMaintenance.php:493
-#: include/classes/api/services/CMaintenance.php:715
+#: include/classes/api/services/CMaintenance.php:495
+#: include/classes/api/services/CMaintenance.php:717
 #: include/classes/api/services/CMediatype.php:786
 #: include/classes/api/services/CProxy.php:664
 #: include/classes/api/services/CProxy.php:790
@@ -20747,8 +20742,8 @@ msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 #: include/classes/api/services/CDiscoveryRule.php:1594
 #: include/classes/api/services/CDiscoveryRule.php:1951
 #: include/classes/api/services/CDiscoveryRule.php:1959
-#: include/classes/api/services/CHost.php:1994
-#: include/classes/api/services/CHost.php:2188
+#: include/classes/api/services/CHost.php:1992
+#: include/classes/api/services/CHost.php:2186
 #: include/classes/api/services/CHttpTest.php:742
 #: include/classes/api/services/CTemplate.php:430
 #: include/classes/validators/CApiInputValidator.php:942
@@ -20872,8 +20867,8 @@ msgstr "неожиданный текст \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:761
 #: include/classes/api/services/CEvent.php:870
-#: include/classes/api/services/CHost.php:1869
-#: include/classes/api/services/CHost.php:1875
+#: include/classes/api/services/CHost.php:1867
+#: include/classes/api/services/CHost.php:1873
 #: include/classes/api/services/CItemGeneral.php:1239
 #: include/classes/api/services/CItemGeneral.php:1565
 #: include/classes/api/services/CItemGeneral.php:1591
@@ -20981,8 +20976,8 @@ msgstr "значение слишком длинное"
 #: include/classes/api/services/CDiscoveryRule.php:1698
 #: include/classes/api/services/CEvent.php:772
 #: include/classes/api/services/CHost.php:1017
-#: include/classes/api/services/CHost.php:2050
-#: include/classes/api/services/CHost.php:2205
+#: include/classes/api/services/CHost.php:2048
+#: include/classes/api/services/CHost.php:2203
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
