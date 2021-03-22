@@ -60,6 +60,8 @@ zbx_uint64_t	mock_eval_read_rules(const char *path)
 			rules |= ZBX_EVAL_COMPOSE_FUNCTIONID;
 		else if (0 == strcmp(flag, "ZBX_EVAL_PROCESS_ERROR"))
 			rules |= ZBX_EVAL_PROCESS_ERROR;
+		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_COMPOUND_CONST"))
+			rules |= ZBX_EVAL_PARSE_COMPOUND_CONST;
 		else
 			fail_msg("Unsupported flag: %s", flag);
 
