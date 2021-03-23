@@ -5412,14 +5412,7 @@ out:
  *             flags     - [IN] the flags passed to                           *
  *                                  subtitute_discovery_macros() function     *
  *             jp_row    - [IN] discovery data                                *
- *             error     - [OUT] should be not NULL if                        *
- *                               ZBX_MACRO_NUMERIC flag is set                *
- *             error_len - [IN] the size of error buffer                      *
  * cur_token_inside_quote - [IN] used in autoquoting for trigger prototypes   *
- *                                                                            *
- * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
- *               if all discovery macros resolved to numeric values,          *
- *               otherwise FAIL with an error message.                        *
  *                                                                            *
  ******************************************************************************/
 static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
