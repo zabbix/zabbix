@@ -1248,6 +1248,8 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_registerEvents() {
+		let wrapper_scrollbar_width = 0;
+
 		this._events = {
 			editWidgetPropertiesCancel: (e, data) => {
 				if (data.dialogueid === 'widget_properties') {
@@ -1365,6 +1367,19 @@ class CDashboard extends CBaseComponent {
 				this._keepSteadyHeaderLines();
 			},
 
+			gridResize: () => {
+				const wrapper = document.querySelector('.wrapper');
+
+				if (wrapper.offsetWidth > wrapper.clientWidth) {
+					wrapper_scrollbar_width = wrapper.offsetWidth - wrapper.clientWidth;
+
+					this._buttons.next_page.style.marginRight = '0px';
+				}
+				else {
+					this._buttons.next_page.style.marginRight = `${wrapper_scrollbar_width}px`;
+				}
+			},
+
 			timeSelectorRangeUpdate: (e, time_period) => {
 				this._time_period = {
 					from: time_period.from,
@@ -1381,6 +1396,10 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_activateEvents() {
+		if (!this._is_kiosk_mode) {
+			new ResizeObserver(this._events.gridResize).observe(this._containers.grid);
+		}
+
 		if (this._is_kiosk_mode) {
 			window.addEventListener('mousemove', this._events.keepSteadyHeaderLines);
 		}
