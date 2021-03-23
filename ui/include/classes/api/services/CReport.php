@@ -690,7 +690,7 @@ class CReport extends CApiService {
 		}
 
 		$db_reports = $this->get([
-			'output' => [],
+			'output' => ['reportid', 'name'],
 			'reportids' => $reportids,
 			'preservekeys' => true
 		]);
