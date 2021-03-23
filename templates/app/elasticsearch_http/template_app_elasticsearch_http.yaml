@@ -676,7 +676,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              params: 'last(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.flush.total[{#ES.NODE}]) + (last(es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
+              params: 'change(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.flush.total[{#ES.NODE}]) + (change(es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
               description: 'The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.'
               application_prototypes:
                 -
