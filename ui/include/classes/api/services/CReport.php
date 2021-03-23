@@ -220,30 +220,42 @@ class CReport extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		foreach ($reports as $index => &$report) {
+		foreach ($reports as $index => $report) {
 			if ($report['active_till'] > 0 && $report['active_since'] > $report['active_till']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('"%1$s" must be greater than or equal to "%2$s".', 'active_till', 'active_since')
+					_s('"%1$s" must be greater than "%2$s or equal to "%3$s".', 'active_till', 'active_since', 0)
 				);
 			}
 
 			if ($report['active_since'] > 0) {
-				$report['active_since'] = (new DateTime('@'.$report['active_since']))
+				$day_start_timestamp = (new DateTime('@'.$report['active_since']))
 					->setTime(0,0)
 					->getTimestamp();
+
+				if ($report['active_since'] != $day_start_timestamp) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'active_since',
+						_s('must be a timestamp representing the beginning of a particular day (00:00:00).')
+					));
+				}
 			}
 
 			if ($report['active_till'] > 0) {
-				$report['active_till'] = (new DateTime('@'.((string)$report['active_till'])))
+				$day_end_timestamp = (new DateTime('@'.$report['active_till']))
 					->setTime(23,59,59)
 					->getTimestamp();
+
+				if ($report['active_till'] != $day_end_timestamp) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'active_till', _s('must be a timestamp representing the end of a particular day (23:59:59).')
+					));
+				}
 			}
 
 			if (!$report['users'] && !$report['user_groups']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one user or user group must be specified.'));
 			}
 		}
-		unset($report);
 
 		$this->checkDuplicates(array_column($reports, 'name'));
 	}
@@ -370,7 +382,7 @@ class CReport extends CApiService {
 
 		$names = [];
 
-		foreach ($reports as &$report) {
+		foreach ($reports as $report) {
 			$db_report = $db_reports[$report['reportid']];
 
 			if (array_key_exists('name', $report) && $report['name'] !== $db_report['name']) {
@@ -378,30 +390,51 @@ class CReport extends CApiService {
 			}
 
 			$active_since = $db_report['active_since'];
-			if (array_key_exists('active_since', $report) && $report['active_since'] != 0) {
-				$active_since = (new DateTime('@'.$report['active_since']))
+			if (array_key_exists('active_since', $report) && $report['active_since'] > 0) {
+				$day_start_timestamp = (new DateTime('@'.$report['active_since']))
 					->setTime(0,0)
 					->getTimestamp();
+
+				if ($report['active_since'] != $day_start_timestamp) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'active_since',
+						_s('must be a timestamp representing the beginning of a particular day (00:00:00).')
+					));
+				}
+
+				$active_since = $report['active_since'];
 			}
 
 			$active_till = $db_report['active_till'];
-			if (array_key_exists('active_till', $report) && $report['active_till'] != 0) {
-				$active_till = (new DateTime('@'.$report['active_till']))
+			if (array_key_exists('active_till', $report) && $report['active_till'] > 0) {
+				$day_end_timestamp = (new DateTime('@'.$report['active_till']))
 					->setTime(23,59,59)
 					->getTimestamp();
 
+				if ($report['active_till'] != $day_end_timestamp) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'active_till', _s('must be a timestamp representing the end of a particular day (23:59:59).')
+					));
+				}
+
+				$active_till = $report['active_till'];
 			}
 
 			if ($active_till > 0 && $active_since > $active_till) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('"%1$s" must be greater than or equal to "%2$s".', 'active_till', 'active_since')
+					_s('"%1$s" must be greater than "%2$s or equal to "%3$s".', 'active_till', 'active_since', 0)
 				);
 			}
 
-			$report['active_since'] = $active_since;
-			$report['active_till'] = $active_till;
+			$report_users = array_key_exists('users', $report) ? $report['users'] : $db_report['users'];
+			$report_user_groups = array_key_exists('user_groups', $report)
+				? $report['user_groups']
+				: $db_report['user_groups'];
+
+			if (!$report_users && !$report_user_groups) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one user or user group must be specified.'));
+			}
 		}
-		unset($report);
 
 		if ($names) {
 			$this->checkDuplicates($names);
