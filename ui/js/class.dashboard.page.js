@@ -232,6 +232,10 @@ class CDashboardPage extends CBaseComponent {
 		}
 	}
 
+	getDisplayPeriod() {
+		return this._data.display_period;
+	}
+
 	getWidgets() {
 		return [...this._widgets.keys()];
 	}
@@ -300,7 +304,6 @@ class CDashboardPage extends CBaseComponent {
 	findFreePos({width, height}) {
 		const pos = {x: 0, y: 0, width: width, height: height};
 
-		// Go y by row and try to position widget in each space.
 		const max_column = this._max_columns - pos.width;
 		const max_row = this._max_rows - pos.height;
 
@@ -424,14 +427,6 @@ class CDashboardPage extends CBaseComponent {
 		return max_pos;
 	}
 
-	/**
-	 * Check if positions overlap.
-	 *
-	 * @param {object} pos_1
-	 * @param {object} pos_2
-	 *
-	 * @returns {boolean}
-	 */
 	_isPosOverlapping(pos_1, pos_2) {
 		return (
 			pos_1.x < (pos_2.x + pos_2.width) && (pos_1.x + pos_1.width) > pos_2.x
@@ -441,6 +436,16 @@ class CDashboardPage extends CBaseComponent {
 
 	_isPosEqual(pos_1, pos_2) {
 		return (pos_1.x == pos_2.x && pos_1.y == pos_2.y && pos_1.width == pos_2.width && pos_1.height == pos_2.height);
+	}
+
+	isInteracting() {
+		for (const widget of this._widgets.keys()) {
+			if (widget.isInteracting()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	getWidget(unique_id) {
@@ -1553,7 +1558,7 @@ class CDashboardPage extends CBaseComponent {
 				return {axis: 'y', direction: -1};
 			}
 
-			throw new Error('Old source position must not overlap with the target position.');
+			throw new Error('Source position must not overlap with the target position.');
 		};
 
 		const runAway = (widget, axis, direction, {do_squash = true} = {}) => {

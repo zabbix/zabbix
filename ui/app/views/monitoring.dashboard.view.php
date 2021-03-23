@@ -195,7 +195,11 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 							->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
 							->addClass('btn-iterator-page-next')
 							->setEnabled(false),
-						(new CSimpleButton('Start slideshow'))
+						(new CSimpleButton(
+							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+								? _s('Stop slideshow')
+								: _s('Start slideshow')
+						))
 							->addClass(ZBX_STYLE_BTN_ALT)
 							->addClass(ZBX_STYLE_DASHBRD_TOGGLE_SLIDESHOW)
 					])

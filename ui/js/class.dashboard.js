@@ -122,6 +122,12 @@ class CDashboard extends CBaseComponent {
 		this._reserve_header_lines_timeout_id = null;
 		this._is_edit_widget_properties_cancel_subscribed = false;
 
+		this._header_lines_steady_period = 2000;
+
+		this._slideshow_steady_period = 5000;
+		this._slideshow_switch_time = null;
+		this._slideshow_timeout_id = null;
+
 		this._is_unsaved = false;
 
 		if (!this._is_kiosk_mode) {
@@ -133,7 +139,7 @@ class CDashboard extends CBaseComponent {
 		this._clearWarnings();
 
 		this._warning_message_box = makeMessageBox('warning', [], sprintf(
-			t('Cannot add dashboard page: maximum number of %1$d dashboard pages has been reached.'),
+			t('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
 			this._max_dashboard_pages
 		), true, false);
 
@@ -157,6 +163,104 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
+	_isInteracting() {
+		if (this._selected_dashboard_page.isInteracting()) {
+			return true;
+		}
+
+		if (!this._is_kiosk_mode) {
+			const has_aria_expanded = this._tabs
+				.getList()
+				.querySelector('.btn-dashboard-page-properties[aria-expanded="true"]') !== null;
+
+			if (has_aria_expanded) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	_startSlideshow() {
+		if (this._slideshow_timeout_id !== null) {
+			this._stopSlideshow();
+		}
+
+		if (this._buttons.slideshow !== null) {
+			this._buttons.slideshow.textContent = t('Stop slideshow');
+		}
+
+		let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
+
+		if (timeout_ms == 0) {
+			timeout_ms = this._data.display_period * 1000;
+		}
+
+		this._slideshow_switch_time = Date.now() + timeout_ms;
+		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(), timeout_ms);
+	}
+
+	_stopSlideshow() {
+		if (this._slideshow_timeout_id === null) {
+			return;
+		}
+
+		if (this._buttons.slideshow !== null) {
+			this._buttons.slideshow.textContent = t('Start slideshow');
+		}
+
+		clearTimeout(this._slideshow_timeout_id);
+
+		this._slideshow_switch_time = null;
+		this._slideshow_timeout_id = null;
+	}
+
+	_switchSlideshow() {
+		if (this._isInteracting()) {
+			this._slideshow_switch_time = Date.now() + this._slideshow_steady_period;
+			this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(), this._slideshow_steady_period);
+
+			return;
+		}
+
+		const dashboard_pages = [...this._dashboard_pages.keys()];
+		const dashboard_page_index = dashboard_pages.indexOf(this._selected_dashboard_page);
+
+		this._selectDashboardPage(
+			dashboard_pages[dashboard_page_index < dashboard_pages.length - 1 ? dashboard_page_index + 1 : 0]
+		);
+
+		let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
+
+		if (timeout_ms == 0) {
+			timeout_ms = this._data.display_period * 1000;
+		}
+
+		this._slideshow_switch_time = Math.max(Date.now() + this._slideshow_steady_period,
+			timeout_ms + this._slideshow_switch_time
+		);
+
+		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(),
+			this._slideshow_switch_time - Date.now()
+		);
+	}
+
+	_keepSteadySlideshow() {
+		if (this._slideshow_timeout_id === null) {
+			return;
+		}
+
+		if (this._slideshow_switch_time - Date.now() < this._slideshow_steady_period) {
+			clearTimeout(this._slideshow_timeout_id);
+
+			this._slideshow_switch_time = Date.now() + this._slideshow_steady_period;
+
+			this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(),
+				this._slideshow_switch_time - Date.now()
+			);
+		}
+	}
+
 	activate() {
 		if (this._dashboard_pages.size == 0) {
 			throw new Error('Cannot activate dashboard without dashboard pages.');
@@ -172,6 +276,10 @@ class CDashboard extends CBaseComponent {
 
 		if (this._is_edit_mode) {
 			this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+		}
+
+		if (!this._is_edit_mode && this._data.auto_start == 1) {
+			this._startSlideshow();
 		}
 	}
 
@@ -288,6 +396,7 @@ class CDashboard extends CBaseComponent {
 			this._tabs.enableSorting();
 		}
 
+		this._stopSlideshow();
 		this._resetHeaderLines();
 		this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
 
@@ -1228,7 +1337,7 @@ class CDashboard extends CBaseComponent {
 				if (num_lines > 0) {
 					this._containers.grid.classList.add(`reserve-header-lines-${num_lines}`);
 				}
-			}, 2000);
+			}, this._header_lines_steady_period);
 		}
 	}
 
@@ -1249,6 +1358,7 @@ class CDashboard extends CBaseComponent {
 
 	_registerEvents() {
 		let wrapper_scrollbar_width = 0;
+		let interaction_animation_frame = null;
 
 		this._events = {
 			editWidgetPropertiesCancel: (e, data) => {
@@ -1363,8 +1473,33 @@ class CDashboard extends CBaseComponent {
 				this._reserveHeaderLines(e.detail.num_lines);
 			},
 
-			keepSteadyHeaderLines: () => {
-				this._keepSteadyHeaderLines();
+			toggleSlideshow: () => {
+				if (this._is_edit_mode) {
+					return;
+				}
+
+				if (this._slideshow_timeout_id === null) {
+					this._startSlideshow();
+				}
+				else {
+					this._stopSlideshow();
+				}
+			},
+
+			interaction: () => {
+				if (interaction_animation_frame !== null) {
+					cancelAnimationFrame(interaction_animation_frame);
+				}
+
+				interaction_animation_frame = requestAnimationFrame(() => {
+					interaction_animation_frame = null;
+
+					if (this._is_kiosk_mode) {
+						this._keepSteadyHeaderLines();
+					}
+
+					this._keepSteadySlideshow();
+				});
 			},
 
 			gridResize: () => {
@@ -1400,9 +1535,17 @@ class CDashboard extends CBaseComponent {
 			new ResizeObserver(this._events.gridResize).observe(this._containers.grid);
 		}
 
-		if (this._is_kiosk_mode) {
-			window.addEventListener('mousemove', this._events.keepSteadyHeaderLines);
+		if (this._buttons.slideshow !== null
+				&& !this._is_edit_mode
+				&& !this._is_kiosk_mode
+				&& this._dashboard_pages.size > 1) {
+			this._buttons.slideshow.addEventListener('click', this._events.toggleSlideshow);
 		}
+
+		window.addEventListener('mousemove', this._events.interaction);
+		window.addEventListener('mousedown', this._events.interaction);
+		window.addEventListener('keydown', this._events.interaction);
+		window.addEventListener('wheel', this._events.interaction);
 
 		if (this._time_period !== null) {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
