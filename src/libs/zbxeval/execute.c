@@ -1376,6 +1376,8 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 		{
 			switch (token->type)
 			{
+				case ZBX_EVAL_TOKEN_NOP:
+					break;
 				case ZBX_EVAL_TOKEN_VAR_NUM:
 				case ZBX_EVAL_TOKEN_VAR_STR:
 				case ZBX_EVAL_TOKEN_VAR_MACRO:

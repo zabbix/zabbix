@@ -17,15 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
+
 #include "common.h"
+#include "zbxeval.h"
+#include "log.h"
+#include "mock_eval.h"
 
-#ifndef ZABBIX_MOCK_EXPRESSION_EVAL_H
-#define ZABBIX_MOCK_EXPRESSION_EVAL_H
+void	zbx_mock_test_entry(void **state)
+{
+	zbx_eval_context_t	ctx;
+	char			*error = NULL;
 
-zbx_uint64_t	mock_eval_read_rules(const char *path);
-void	mock_eval_read_values(zbx_eval_context_t *ctx, const char *path);
+	ZBX_UNUSED(state);
 
-void	mock_compare_stack(const zbx_eval_context_t *ctx, const char *path);
-void	mock_dump_stack(const zbx_eval_context_t *ctx);
 
-#endif
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"),
+				ZBX_EVAL_PARSE_QUERY_EXPRESSION, &error))
+	{
+		fail_msg("failed to parse expression: %s", error);
+	}
+
+	zbx_eval_prepare_filter(&ctx);
+
+	mock_compare_stack(&ctx, "out.stack");
+
+	zbx_free(error);
+	zbx_eval_clear(&ctx);
+}

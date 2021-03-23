@@ -5,7 +5,9 @@ SERVER_tests = \
 	zbx_eval_compose_expression \
 	zbx_eval_execute \
 	zbx_eval_execute_ext \
-	zbx_eval_get_constant
+	zbx_eval_get_constant \
+	zbx_eval_prepare_filter \
+	zbx_eval_get_group_filter
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -167,5 +169,33 @@ zbx_eval_get_constant_LDADD += @SERVER_LIBS@
 zbx_eval_get_constant_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_eval_get_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_eval_prepare_filter_SOURCES = \
+	zbx_eval_prepare_filter.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_prepare_filter_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_prepare_filter_LDADD += @SERVER_LIBS@
+
+zbx_eval_prepare_filter_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_prepare_filter_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_eval_get_group_filter_SOURCES = \
+	zbx_eval_get_group_filter.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_get_group_filter_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_get_group_filter_LDADD += @SERVER_LIBS@
+
+zbx_eval_get_group_filter_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_get_group_filter_CFLAGS = $(COMMON_COMPILER_FLAGS)
 endif
 

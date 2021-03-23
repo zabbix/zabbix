@@ -306,6 +306,12 @@ out:
 		return FAIL;
 	}
 
+	if (ZBX_EVAL_TOKEN_VAR_NUM == type && 0 == (ctx->rules & ZBX_EVAL_PARSE_VAR_NUM))
+	{
+		*error = zbx_dsprintf(*error, "invalid token starting with \"%s\"", ctx->expression + pos);
+		return FAIL;
+	}
+
 	if (ZBX_EVAL_TOKEN_VAR_NUM == type || ZBX_EVAL_TOKEN_VAR_USERMACRO == type)
 		eval_update_const_variable(ctx, token);
 
@@ -349,18 +355,21 @@ static void	eval_parse_character_token(size_t pos, zbx_token_type_t type, zbx_ev
  ******************************************************************************/
 static void	eval_parse_less_character_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token)
 {
-	switch (ctx->expression[pos + 1])
+	if (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPARE_EQ) && '>' == ctx->expression[pos + 1])
 	{
-		case '>':
-			token->type = ZBX_EVAL_TOKEN_OP_NE;
-			break;
-		case '=':
-			token->type = ZBX_EVAL_TOKEN_OP_LE;
-			break;
-		default:
+		token->type = ZBX_EVAL_TOKEN_OP_NE;
+	}
+	else
+	{
+		if ('=' != ctx->expression[pos + 1])
+		{
 			eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_LT, token);
 			return;
+		}
+
+		token->type = ZBX_EVAL_TOKEN_OP_LE;
 	}
+
 	token->loc.l = pos;
 	token->loc.r = pos + 1;
 }
@@ -472,6 +481,9 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 	tmp = strtod(ctx->expression + pos, &end) * suffix2factor(ctx->expression[pos + len - 1]);
 	if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
+
+	tmp = strtod(ctx->expression + pos, &end) * suffix2factor(ctx->expression[pos + len - 1]);
+	if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
 		return FAIL;
 
 	token->loc.l = pos;
@@ -483,9 +495,9 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_parse_keyword_token                                         *
+ * Function: eval_parse_logic_token                                           *
  *                                                                            *
- * Purpose: parse keyword token                                               *
+ * Purpose: parse logical operation token                                     *
  *                                                                            *
  * Parameters: ctx   - [IN] the evaluation context                            *
  *             pos   - [IN] the starting position                             *
@@ -498,7 +510,7 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
  *           character (whitespace or '(').                                   *
  *                                                                            *
  ******************************************************************************/
-static int	eval_parse_keyword_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token)
+static int	eval_parse_logic_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token)
 {
 	if (0 == strncmp(ctx->expression + pos, "and", 3))
 	{
@@ -680,6 +692,43 @@ static int	eval_parse_period_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_parse_property_token                                        *
+ *                                                                            *
+ * Purpose: parse property token                                              *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *             pos   - [IN] the starting position                             *
+ *             token - [OUT] the parsed token                                 *
+ *                                                                            *
+ * Return value: SUCCEED - token was parsed successfully                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Keywords are 'and', 'or' and 'not', followed by separator        *
+ *           character (whitespace or '(').                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_parse_property_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token)
+{
+	if (0 != (ctx->rules & ZBX_EVAL_PARSE_PROP_TAG) && 0 == strncmp(ctx->expression + pos, "tag", 3))
+	{
+		token->loc.r = pos + 2;
+		token->type = ZBX_EVAL_TOKEN_PROP_TAG;
+	}
+	else if (0 != (ctx->rules & ZBX_EVAL_PARSE_PROP_GROUP) && 0 == strncmp(ctx->expression + pos, "group", 5))
+	{
+		token->loc.r = pos + 4;
+		token->type = ZBX_EVAL_TOKEN_PROP_GROUP;
+	}
+	else
+		return FAIL;
+
+	token->loc.l = pos;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_parse_token                                                 *
  *                                                                            *
  * Purpose: parse token                                                       *
@@ -716,17 +765,31 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			}
 			return eval_parse_constant(ctx, pos, token, error);
 		case '+':
-			eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_ADD, token);
-			return SUCCEED;
-		case '-':
-			if (0 == (ctx->last_token_type & ZBX_EVAL_CLASS_OPERAND))
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_MATH))
 			{
-				if (SUCCEED != eval_parse_number_token(ctx, pos, token))
-					eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_MINUS, token);
+				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_ADD, token);
+				return SUCCEED;
 			}
-			else
-				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_SUB, token);
-			return SUCCEED;
+			break;
+		case '-':
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_VAR))
+			{
+				if (0 == (ctx->last_token_type & ZBX_EVAL_CLASS_OPERAND) &&
+						SUCCEED == eval_parse_number_token(ctx, pos, token))
+				{
+					return SUCCEED;
+				}
+			}
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_MATH))
+			{
+				if (0 == (ctx->last_token_type & ZBX_EVAL_CLASS_OPERAND))
+					eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_MINUS, token);
+				else
+					eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_SUB, token);
+
+				return SUCCEED;
+			}
+			break;
 		case '/':
 			if (ZBX_EVAL_TOKEN_GROUP_OPEN == ctx->last_token_type &&
 					0 != (ctx->rules & ZBX_EVAL_PARSE_ITEM_QUERY))
@@ -745,31 +808,58 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 				func_token->type = ZBX_EVAL_TOKEN_HIST_FUNCTION;
 				return eval_parse_query_token(ctx, pos, token, error);
 			}
-			else
+			else if (0 != (ctx->rules & ZBX_EVAL_PARSE_MATH))
 			{
 				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_DIV, token);
 				return SUCCEED;
 			}
+			break;
 		case '*':
-			eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_MUL, token);
-			return SUCCEED;
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_MATH))
+			{
+				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_MUL, token);
+				return SUCCEED;
+			}
+			break;
 		case '<':
-			eval_parse_less_character_token(ctx, pos, token);
-			return SUCCEED;
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPARE))
+			{
+				eval_parse_less_character_token(ctx, pos, token);
+				return SUCCEED;
+			}
+			break;
 		case '>':
-			eval_parse_greater_character_token(ctx, pos, token);
-			return SUCCEED;
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPARE))
+			{
+				eval_parse_greater_character_token(ctx, pos, token);
+				return SUCCEED;
+			}
+			break;
 		case '=':
-			eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_EQ, token);
-			return SUCCEED;
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPARE_EQ))
+			{
+				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_EQ, token);
+				return SUCCEED;
+			}
+			break;
 		case '(':
-			eval_parse_character_token(pos, ZBX_EVAL_TOKEN_GROUP_OPEN, token);
-			return SUCCEED;
+			if (0 != (ctx->rules & (ZBX_EVAL_PARSE_FUNCTION | ZBX_EVAL_PARSE_GROUP)))
+			{
+				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_GROUP_OPEN, token);
+				return SUCCEED;
+			}
+			break;
 		case ')':
-			eval_parse_character_token(pos, ZBX_EVAL_TOKEN_GROUP_CLOSE, token);
-			return SUCCEED;
+			if (0 != (ctx->rules & (ZBX_EVAL_PARSE_FUNCTION | ZBX_EVAL_PARSE_GROUP)))
+			{
+				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_GROUP_CLOSE, token);
+				return SUCCEED;
+			}
+			break;
 		case '"':
-			return eval_parse_string_token(ctx, pos, token, error);
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_VAR_STR))
+				return eval_parse_string_token(ctx, pos, token, error);
+			break;
 		case '0':
 		case '1':
 		case '2':
@@ -788,7 +878,9 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			}
 			ZBX_FALLTHROUGH;
 		case '.':
-			return eval_parse_constant(ctx, pos, token, error);
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_VAR_NUM))
+				return eval_parse_constant(ctx, pos, token, error);
+			break;
 		case '#':
 			if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type &&
 				ZBX_EVAL_TOKEN_ARG_QUERY == ctx->stack.values[ctx->stack.values_num - 1].type)
@@ -808,16 +900,22 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 		default:
 			if (0 != isalpha((unsigned char)ctx->expression[pos]))
 			{
-				/* keyword must be separated by whitespace or '(', ')', ',' characters */
+				/* logical operation must be separated by whitespace or '(', ')', ',' characters */
 				if ((0 != skip || 0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR) ||
 						ZBX_EVAL_TOKEN_GROUP_CLOSE == ctx->last_token_type))
 				{
-					if (SUCCEED == eval_parse_keyword_token(ctx, pos, token))
+					if (SUCCEED == eval_parse_logic_token(ctx, pos, token))
 						return SUCCEED;
 				}
 
 				if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION) &&
 						SUCCEED == eval_parse_function_token(ctx, pos, token))
+				{
+					return SUCCEED;
+				}
+
+				if (0 != (ctx->rules & ZBX_EVAL_PARSE_PROPERTY) &&
+						SUCCEED == eval_parse_property_token(ctx, pos, token))
 				{
 					return SUCCEED;
 				}
@@ -839,7 +937,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
  *             token - [IN] the token to add                                  *
  *                                                                            *
  ******************************************************************************/
-static void	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token)
+static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token, char **error)
 {
 	if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
 	{
@@ -858,7 +956,53 @@ static void	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *toke
 		token->opt = params;
 	}
 
+	if (0 != (ctx->rules & ZBX_EVAL_PARSE_PROPERTY))
+	{
+		zbx_eval_token_t	*prop = NULL, *value = NULL;
+
+		if (0 != (ctx->stack.values[ctx->stack.values_num - 1].type & ZBX_EVAL_CLASS_PROPERTY))
+		{
+			prop = &ctx->stack.values[ctx->stack.values_num - 1];
+
+			if (2 > ctx->stack.values_num)
+			{
+				*error = zbx_dsprintf(*error, "missing comparison string for property at \"%s\"",
+						ctx->expression + prop->loc.l);
+				return FAIL;
+			}
+		}
+		else
+			value = &ctx->stack.values[ctx->stack.values_num - 1];
+
+		if (2 <= ctx->stack.values_num)
+		{
+			if (0 != (ctx->stack.values[ctx->stack.values_num - 2].type & ZBX_EVAL_CLASS_PROPERTY))
+				prop = &ctx->stack.values[ctx->stack.values_num - 2];
+			else
+				value = &ctx->stack.values[ctx->stack.values_num - 2];
+		}
+
+		if (NULL != prop)
+		{
+			if (NULL == value || ZBX_EVAL_TOKEN_VAR_STR != value->type)
+			{
+				*error = zbx_dsprintf(*error, "invalid value type compared with property at \"%s\"",
+						ctx->expression + prop->loc.l);
+				return FAIL;
+			}
+
+			if (ZBX_EVAL_TOKEN_OP_EQ != token->type && ZBX_EVAL_TOKEN_OP_NE != token->type)
+			{
+				*error = zbx_dsprintf(*error, "invalid operator used with property at \"%s\"",
+						ctx->expression + prop->loc.l);
+				return FAIL;
+			}
+		}
+	}
+
 	zbx_vector_eval_token_append_ptr(&ctx->stack, token);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1000,7 +1144,8 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 				if (ZBX_EVAL_TOKEN_GROUP_OPEN == optoken->type)
 					break;
 
-				eval_append_operator(ctx, optoken);
+				if (FAIL == eval_append_operator(ctx, optoken, error))
+					goto out;
 			}
 
 			if (NULL == optoken)
@@ -1033,7 +1178,8 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 					break;
 				}
 
-				eval_append_operator(ctx, optoken);
+				if (FAIL == eval_append_operator(ctx, optoken, error))
+					goto out;
 			}
 
 			if (NULL == optoken)
@@ -1049,12 +1195,13 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 
 				if (0 != (optoken->type & ZBX_EVAL_CLASS_FUNCTION))
 				{
-					eval_append_operator(ctx, optoken);
+					if (FAIL == eval_append_operator(ctx, optoken, error))
+						goto out;
 					ctx->ops.values_num--;
 				}
 			}
 		}
-		else if (0 != (token.type & ZBX_EVAL_CLASS_OPERAND))
+		else if (0 != (token.type & (ZBX_EVAL_CLASS_OPERAND | ZBX_EVAL_CLASS_PROPERTY)))
 		{
 			if (0 == (ctx->last_token_type & ZBX_EVAL_BEFORE_OPERAND))
 			{
@@ -1095,7 +1242,8 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 				if (ZBX_EVAL_TOKEN_GROUP_OPEN == optoken->type)
 					break;
 
-				eval_append_operator(ctx, optoken);
+				if (FAIL == eval_append_operator(ctx, optoken, error))
+					goto out;
 			}
 
 			zbx_vector_eval_token_append_ptr(&ctx->ops, &token);
@@ -1127,13 +1275,26 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 			goto out;
 		}
 
-		eval_append_operator(ctx, optoken);
+		if (FAIL == eval_append_operator(ctx, optoken, error))
+			goto out;
 	}
 
 	if (0 == ctx->stack.values_num)
 	{
 		*error = zbx_strdup(*error, "empty expression");
 		goto out;
+	}
+
+	if (0 != (ctx->rules & ZBX_EVAL_PARSE_PROPERTY) && 1 == ctx->stack.values_num)
+	{
+		if (0 != (ctx->stack.values[ctx->stack.values_num - 1].type & ZBX_EVAL_CLASS_PROPERTY))
+		{
+			zbx_eval_token_t	*prop = &ctx->stack.values[ctx->stack.values_num - 1];
+
+			*error = zbx_dsprintf(*error, "missing comparison string for property at \"%s\"",
+						ctx->expression + prop->loc.l);
+			goto out;
+		}
 	}
 
 	ret = SUCCEED;
