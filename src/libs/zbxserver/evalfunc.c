@@ -3384,7 +3384,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 			zbx_vector_ptr_destroy(&regexps);
 
 			if (ZBX_REGEXP_MATCH == result)
-				 goto map_value;
+				goto map_value;
 		}
 	}
 
