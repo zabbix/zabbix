@@ -25,8 +25,13 @@
 ?>
 
 function submitScheduledReportSubscription(overlay) {
-	var $form = overlay.$dialogue.find('form');
-	var url = new Curl($form.attr('action'));
+	const $form = overlay.$dialogue.find('form');
+	const url = new Curl($form.attr('action'));
+	const recipient = $('#recipientid').multiSelect('getData');
+
+	if (recipient.length) {
+		$('#recipient_name').val(recipient[0]['name']);
+	}
 
 	fetch(url.getUrl(), {
 		method: 'POST',

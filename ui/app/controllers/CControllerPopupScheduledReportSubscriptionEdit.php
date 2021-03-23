@@ -27,14 +27,16 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'subscriptionid' =>	'id',
-			'recipientid' =>	'id',
-			'recipient_type' =>	'in '.ZBX_REPORT_RECIPIENT_TYPE_USER.','.ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP,
-			'recipient_name' =>	'string',
-			'creator_type' =>	'in '.ZBX_REPORT_CREATOR_TYPE_USER.','.ZBX_REPORT_CREATOR_TYPE_RECIPIENT,
-			'exclude' =>		'in '.ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE,
-			'edit' =>			'in 0,1',
-			'update' =>			'in 1',
+			'recipientid' =>		'id',
+			'old_recipientid' =>	'id',
+			'recipient_type' =>		'in '.ZBX_REPORT_RECIPIENT_TYPE_USER.','.ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP,
+			'recipient_name' =>		'string',
+			'creator_type' =>		'in '.ZBX_REPORT_CREATOR_TYPE_USER.','.ZBX_REPORT_CREATOR_TYPE_RECIPIENT,
+			'exclude' =>			'in '.ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE,
+			'userids' =>			'array',
+			'usrgrpids' =>			'array',
+			'edit' =>				'in 0,1',
+			'update' =>				'in 1',
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateSubscription();
@@ -54,7 +56,7 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 	}
 
 	/**
-	 * Validate subscription to be added.
+	 * Validate subscription to add or update.
 	 *
 	 * @return bool
 	 */
@@ -63,8 +65,25 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 			return true;
 		}
 
-		if (!$this->hasInput('recipientid')) {
+		$recipientid = $this->getInput('recipientid', 0);
+
+		if (!$recipientid) {
 			error(_s('Incorrect value for field "%1$s": %2$s.', _('Recipient'), _('cannot be empty')));
+
+			return false;
+		}
+
+		$recipient_type = $this->getInput('recipient_type', ZBX_REPORT_RECIPIENT_TYPE_USER);
+
+		if (($recipient_type == ZBX_REPORT_RECIPIENT_TYPE_USER
+					&& in_array($recipientid, $this->getInput('userids', [])))
+				|| ($recipient_type == ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP
+					&& in_array($recipientid, $this->getInput('usrgrpids', [])))) {
+			if ($this->getInput('edit', 0) == 1 && $recipientid == $this->getInput('old_recipientid', 0)) {
+				return true;
+			}
+
+			error(_('Recipient already exists.'));
 
 			return false;
 		}
@@ -77,17 +96,17 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 	}
 
 	protected function doAction() {
-		$this->setResponse($this->hasInput('update') ? $this->prepareJsonResponse() : $this->prepareResponse());
+		$this->setResponse($this->hasInput('update') ? $this->prepareJsonResponse() : $this->prepareViewResponse());
 	}
 
 	/**
-	 * Prepare response data to be returned as JSON.
+	 * Prepare response data for the report editing form in JSON format.
 	 *
 	 * @return CControllerResponse
 	 */
 	protected function prepareJsonResponse(): CControllerResponse {
 		$data = [];
-		$this->getInputs($data, ['subscriptionid', 'recipientid', 'recipient_type', 'recipient_name', 'creator_type',
+		$this->getInputs($data, ['recipientid', 'old_recipientid', 'recipient_type', 'recipient_name', 'creator_type',
 			'edit'
 		]);
 
@@ -99,19 +118,21 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 	}
 
 	/**
-	 * Prepare response data to render subscription edit form.
+	 * Prepare response data to render the subscription editing form.
 	 *
 	 * @return CControllerResponse
 	 */
-	protected function prepareResponse(): CControllerResponse {
+	protected function prepareViewResponse(): CControllerResponse {
 		$data = [
 			'action' => $this->getAction(),
 			'edit' => 0,
-			'subscriptionid' => 0,
 			'recipientid' => 0,
+			'old_recipientid' => 0,
 			'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
 			'recipient_name' => '',
-			'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER
+			'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
+			'userids' => [],
+			'usrgrpids' => []
 		];
 		$this->getInputs($data, array_keys($data));
 
@@ -119,34 +140,9 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 			$data['exclude'] = $this->getInput('exclude', ZBX_REPORT_EXCLUDE_USER_FALSE);
 		}
 
-		$data['recipient_ms'] = [];
-
-		if ($data['recipientid'] != 0) {
-			if ($data['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
-				if ($data['recipientid'] != CWebUser::$data['userid']) {
-					$users = API::User()->get([
-						'output' => ['username', 'name', 'surname'],
-						'userids' => $data['recipientid']
-					]);
-
-					$recipient_name = $users ? getUserFullname($users[0]) : _('Inaccessible user');
-				}
-				else {
-					$recipient_name = getUserFullname(CWebUser::$data);
-				}
-			}
-			else {
-				$user_groups = API::UserGroup()->get([
-					'output' => ['name'],
-					'usrgrpids' => $data['recipientid']
-				]);
-
-				$recipient_name = $user_groups ? $user_groups[0]['name'] : _('Inaccessible user group');
-			}
-
-			$data['recipient_name'] = $recipient_name;
-			$data['recipient_ms'] = [['id' => $data['recipientid'], 'name' => $recipient_name]];
-		}
+		$data['recipient_ms'] = ($data['recipientid'] != 0)
+			? [['id' => $data['recipientid'], 'name' => $data['recipient_name']]]
+			: [];
 
 		$data += [
 			'title' => _('Subscription'),

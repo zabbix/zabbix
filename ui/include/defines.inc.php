@@ -1789,6 +1789,8 @@ define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_DESCRIPTION', 'icon-description');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
+define('ZBX_STYLE_ICON_USER', 'icon-user');
+define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');

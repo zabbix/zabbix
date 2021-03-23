@@ -2870,6 +2870,16 @@ z-select[disabled] button,
   .icon-ackn::before {
     background: url("../img/icon-sprite.svg?20200407") no-repeat -45px -693px; }
 
+.icon-user {
+  margin: 0 18px 0 0; }
+  .icon-user::before {
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -338px -45px; }
+
+.icon-user-group {
+  margin: 0 18px 0 0; }
+  .icon-user-group::before {
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -338px -7px; }
+
 .icon-tree-top-bottom, .icon-tree-top-bottom-right, .icon-tree-top-right, .icon-tree-empty {
   margin: 0 12px 0 0; }
   .icon-tree-top-bottom::before, .icon-tree-top-bottom-right::before, .icon-tree-top-right::before, .icon-tree-empty::before {
@@ -2909,7 +2919,7 @@ z-select[disabled] button,
     opacity: 1;
     background-color: transparent; }
 
-.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
+.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-user::before, .icon-user-group::before {
   display: inline-block;
   width: 18px;
   height: 18px;
@@ -6108,6 +6118,12 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .overlay-dialogue .valuemap-list-table td {
   vertical-align: top; }
+
+.subscriptions-table th {
+  color: #cacaca; }
+.subscriptions-table .icon-user, .subscriptions-table .icon-user-group {
+  margin: 0 22px 0 0;
+  line-height: 18px; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }

@@ -28,7 +28,6 @@ $form = (new CForm())
 	->setId('subscription-form')
 	->setName('subscription_form')
 	->addVar('action', $data['action'])
-	->addVar('subscriptionid', $data['subscriptionid'])
 	->addVar('recipient_type', $data['recipient_type'])
 	->addVar('recipient_name', $data['recipient_name'])
 	->addVar('update', 1)
@@ -37,8 +36,20 @@ $form = (new CForm())
 		->removeId()
 	);
 
+if ($data['old_recipientid']) {
+	$form->addVar('old_recipientid', $data['old_recipientid']);
+}
+
 if ($data['edit']) {
 	$form->addVar('edit', $data['edit']);
+}
+
+foreach ($data['userids'] as $index => $userid) {
+	$form->addVar('userids['.$index.']', $userid);
+}
+
+foreach ($data['usrgrpids'] as $index => $usrgrpid) {
+	$form->addVar('usrgrpids['.$index.']', $usrgrpid);
 }
 
 $form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
@@ -87,7 +98,7 @@ $form_grid
 	->addItem([
 		new CLabel(_('Generate report by'), 'creator_type'),
 		(new CFormField(
-			(new CRadioButtonList('creator_type', $data['creator_type']))
+			(new CRadioButtonList('creator_type', (int) $data['creator_type']))
 				->addValue(_('Current user'), ZBX_REPORT_CREATOR_TYPE_USER)
 				->addValue(_('Recipient'), ZBX_REPORT_CREATOR_TYPE_RECIPIENT)
 				->setModern(true)
@@ -98,7 +109,7 @@ if ($data['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
 	$form_grid->addItem([
 		new CLabel(_('Status'), 'exclude'),
 		(new CFormField(
-			(new CRadioButtonList('exclude', $data['exclude']))
+			(new CRadioButtonList('exclude', (int) $data['exclude']))
 				->addValue(_('Include'), ZBX_REPORT_EXCLUDE_USER_FALSE)
 				->addValue(_('Exclude'), ZBX_REPORT_EXCLUDE_USER_TRUE)
 				->setModern(true)

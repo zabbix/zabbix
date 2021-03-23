@@ -35,8 +35,7 @@ class CControllerScheduledReportCreate extends CController {
 			'active_till' =>	'string',
 			'subject' =>		'string',
 			'message' =>		'string',
-			'users' =>			'array',
-			'user_groups' =>	'array',
+			'subscriptions' =>	'array',
 			'description' =>	'db report.description',
 			'status' =>			'db report.status|in '.ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED,
 			'form_refresh' =>	'int32'
@@ -66,7 +65,7 @@ class CControllerScheduledReportCreate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS);
+		return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
 	}
 
 	protected function doAction() {
@@ -87,8 +86,28 @@ class CControllerScheduledReportCreate extends CController {
 		$report['active_till'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_till']) !== false)
 			? (new DateTime($report['active_till']))->getTimestamp()
 			: 0;
-		$report['users'] = $this->getInput('users', []);
-		$report['user_groups'] = $this->getInput('user_groups', []);
+		$report['users'] = [];
+		$report['user_groups'] = [];
+
+		foreach ($this->getInput('subscriptions', []) as $subscription) {
+			if ($subscription['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
+				$report['users'][] = [
+					'userid' => $subscription['recipientid'],
+					'exclude' => $subscription['exclude'],
+					'access_userid' => ($subscription['creator_type'] == ZBX_REPORT_CREATOR_TYPE_USER)
+						? CWebUser::$data['userid']
+						: 0
+				];
+			}
+			else {
+				$report['user_groups'][] = [
+					'usrgrpid' => $subscription['recipientid'],
+					'access_userid' => ($subscription['creator_type'] == ZBX_REPORT_CREATOR_TYPE_USER)
+						? CWebUser::$data['userid']
+						: 0
+				];
+			}
+		}
 
 		$result = API::Report()->create($report);
 

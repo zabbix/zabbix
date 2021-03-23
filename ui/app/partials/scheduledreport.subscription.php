@@ -28,19 +28,21 @@ $table = (new CTable())
 	->addStyle('width: 100%;')
 	->setAriaRequired()
 	->setHeader([_('Recipient'), _('Generate report by'), _('Status'), _('Action')])
-	->setFooter(
-		(new CCol(
-			new CHorList([
-				(new CSimpleButton(_('Add user')))
-					->addClass('js-add-user')
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setEnabled($data['allowed_edit']),
-				(new CSimpleButton(_('Add user group')))
-					->addClass('js-add-user-group')
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setEnabled($data['allowed_edit'])
-			])
-		))->setColSpan(4)
+	->addItem(
+		(new CTag('tfoot', true))->addItem(
+			(new CCol(
+				new CHorList([
+					(new CSimpleButton(_('Add user')))
+						->addClass('js-add-user')
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setEnabled($data['allowed_edit']),
+					(new CSimpleButton(_('Add user group')))
+						->addClass('js-add-user-group')
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setEnabled($data['allowed_edit'])
+				])
+			))->setColSpan(4)
+		)
 	);
 
 (new CDiv($table))
@@ -50,6 +52,5 @@ $table = (new CTable())
 	->show();
 
 $this->includeJsFile('scheduledreport.subscription.js.php', [
-	'users' => $data['users'],
-	'user_groups' => $data['user_groups']
+	'subscriptions' => $data['subscriptions']
 ]);

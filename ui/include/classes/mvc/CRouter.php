@@ -173,7 +173,6 @@ class CRouter {
 		'popup.scheduledreport.create'		=> ['CControllerPopupScheduledReportCreate',		'layout.json',			null],
 		'popup.scheduledreport.edit'		=> ['CControllerPopupScheduledReportEdit',			'layout.json',			'popup.scheduledreport.edit'],
 		'popup.scheduledreport.list'		=> ['CControllerPopupScheduledReportList',			'layout.json',			'popup.scheduledreport.list'],
-		'popup.scheduledreport.subscription.create'	=> ['CControllerPopupScheduledReportSubscriptionCreate',	'layout.json',			null],
 		'popup.scheduledreport.subscription.edit'	=> ['CControllerPopupScheduledReportSubscriptionEdit',		'layout.json',			'popup.scheduledreport.subscription'],
 		'popup.scheduledreport.test'		=> ['CControllerPopupScheduledReportTest',			'layout.json',			'popup.scheduledreport.test'],
 		'popup.scriptexec'					=> ['CControllerPopupScriptExec',					'layout.json',			'popup.scriptexec'],

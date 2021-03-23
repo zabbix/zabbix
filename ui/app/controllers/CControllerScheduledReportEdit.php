@@ -42,8 +42,7 @@ class CControllerScheduledReportEdit extends CController {
 			'active_till' =>	'string',
 			'subject' =>		'string',
 			'message' =>		'string',
-			'users' =>			'array',
-			'user_groups' =>	'array',
+			'subscriptions' =>	'array',
 			'description' =>	'db report.description',
 			'status' =>			'db report.status|in '.ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED,
 			'form_refresh' =>	'int32'
@@ -91,7 +90,7 @@ class CControllerScheduledReportEdit extends CController {
 
 	protected function doAction() {
 		$db_defaults = DB::getDefaults('report');
-
+		$current_user = getUserFullname(CWebUser::$data);
 		$data = [
 			'reportid' => 0,
 			'userid' => CWebUser::$data['userid'],
@@ -106,12 +105,19 @@ class CControllerScheduledReportEdit extends CController {
 			'active_till' => '',
 			'subject' => '',
 			'message' => '',
+			'subscriptions' => [[
+				'recipientid' => CWebUser::$data['userid'],
+				'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
+				'recipient_name' => $current_user,
+				'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
+				'exclude' => ZBX_REPORT_EXCLUDE_USER_FALSE
+			]],
+			'ms_user' => [['id' => CWebUser::$data['userid'], 'name' => $current_user]],
+			'ms_dashboard' => [],
 			'description' => $db_defaults['description'],
 			'status' => $db_defaults['status'],
 			'form_refresh' => 0,
-			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS),
-			'users' => [],
-			'user_groups' => [],
+			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS)
 		];
 
 		if ($this->hasInput('reportid') && !$this->hasInput('form_refresh')) {
@@ -134,40 +140,98 @@ class CControllerScheduledReportEdit extends CController {
 			$data['message'] = $this->report['message'];
 			$data['description'] = $this->report['description'];
 			$data['status'] = $this->report['status'];
-			$data['users'] = $this->report['users'];
-			$data['user_groups'] = $this->report['user_groups'];
+			$data['subscriptions'] = [];
+
+			$userids = ($data['userid'] == CWebUser::$data['userid'])
+				? array_column($this->report['users'], 'userid')
+				: array_unique(array_merge([$data['userid']], array_column($this->report['users'], 'userid')));
+
+			$db_users = API::User()->get([
+				'output' => ['username', 'name', 'surname'],
+				'userids' => $userids,
+				'preservekeys' => true
+			]);
+
+			foreach ($this->report['users'] as $user) {
+				$subscription = [
+					'recipientid' => $user['userid'],
+					'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
+					'recipient_name' => _('Inaccessible user'),
+					'creator_type' => ($user['access_userid'] == CWebUser::$data['userid'])
+						? ZBX_REPORT_CREATOR_TYPE_USER
+						: ZBX_REPORT_CREATOR_TYPE_RECIPIENT,
+					'exclude' => $user['exclude']
+				];
+
+				if (array_key_exists($user['userid'], $db_users)) {
+					$subscription['recipient_name'] = getUserFullname($db_users[$user['userid']]);
+				}
+
+				$data['subscriptions'][] = $subscription;
+			}
+
+			if ($data['userid'] != CWebUser::$data['userid']) {
+				$data['ms_user'] = [[
+					'id' => $data['userid'],
+					'name' => array_key_exists($data['userid'], $db_users)
+						? getUserFullname($db_users[$data['userid']])
+						: _('Inaccessible user')
+				]];
+			}
+
+			$db_usrgrps = API::UserGroup()->get([
+				'output' => ['name'],
+				'usrgrpids' => array_column($this->report['user_groups'], 'usrgrpid'),
+				'preservekeys' => true
+			]);
+
+			foreach ($this->report['user_groups'] as $user_group) {
+				$subscription = [
+					'recipientid' => $user_group['usrgrpid'],
+					'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP,
+					'recipient_name' => _('Inaccessible user group'),
+					'creator_type' => ($user_group['access_userid'] == CWebUser::$data['userid'])
+						? ZBX_REPORT_CREATOR_TYPE_USER
+						: ZBX_REPORT_CREATOR_TYPE_RECIPIENT
+				];
+
+				if (array_key_exists($user_group['usrgrpid'], $db_usrgrps)) {
+					$subscription['recipient_name'] = $db_usrgrps[$user_group['usrgrpid']]['name'];
+				}
+
+				$data['subscriptions'][] = $subscription;
+			}
+
+			CArrayHelper::sort($data['subscriptions'], ['recipient_name']);
 		}
 
-		$this->getInputs($data, ['reportid', 'name', 'period', 'cycle', 'hours', 'minutes', 'active_since',
-			'active_till', 'subject', 'message', 'description', 'status', 'form_refresh'
+		$this->getInputs($data, ['reportid', 'name', 'dashboardid', 'period', 'cycle', 'hours', 'minutes',
+			'active_since', 'active_till', 'subject', 'message', 'description', 'status', 'form_refresh'
 		]);
 
 		if ($data['form_refresh'] != 0) {
 			$data['userid'] = $this->getInput('userid', 0);
-			$data['dashboardid'] = $this->getInput('dashboardid', 0);
 			$data['weekdays'] = array_sum($this->getInput('weekdays', []));
-			$data['users'] = $this->getInput('users', []);
-			$data['user_groups'] = $this->getInput('user_groups', []);
+			$data['subscriptions'] = $this->getInput('subscriptions', []);
+			$data['ms_user'] = [];
+
+			if ($data['userid'] != 0) {
+				if (CWebUser::$data['userid'] != $data['userid']) {
+					$users = API::User()->get([
+						'output' => ['username', 'name', 'surname'],
+						'userids' => $data['userid']
+					]);
+
+					$user_name = $users ? getUserFullname($users[0]) : _('Inaccessible user');
+				}
+				else {
+					$user_name = getUserFullname(CWebUser::$data);
+				}
+
+				$data['ms_user'] = [['id' => $data['userid'], 'name' => $user_name]];
+			}
 		}
 
-		$data['ms_user'] = [];
-		if ($data['userid'] != 0) {
-			if (CWebUser::$data['userid'] != $data['userid']) {
-				$users = API::User()->get([
-					'output' => ['username', 'name', 'surname'],
-					'userids' => $data['userid']
-				]);
-
-				$user_name = $users ? getUserFullname($users[0]) : _('Inaccessible user');
-			}
-			else {
-				$user_name = getUserFullname(CWebUser::$data);
-			}
-
-			$data['ms_user'] = [['id' => $data['userid'], 'name' => $user_name]];
-		}
-
-		$data['ms_dashboard'] = [];
 		if ($data['dashboardid'] != 0) {
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name'],
