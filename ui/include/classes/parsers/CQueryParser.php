@@ -50,7 +50,7 @@ class CQueryParser extends CParser {
 	 */
 	public function __construct(array $options = []) {
 		if (array_key_exists('calculated', $options) && $options['calculated']) {
-			$this->item_key_parser = new CItemKey(['with_filter' => true]);
+			$this->item_key_parser = new CItemKey(['with_filter' => true, 'allow_wildcard' => true]);
 			$this->host_name_parser = new CHostNameParser([
 				'allow_host_all' => true,
 				'allow_host_current' => true

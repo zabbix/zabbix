@@ -55,10 +55,11 @@ class CItemKey extends CParser {
 	 * Supported options:
 	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
 	 *   'with_filter'                  allow additional item key filter
+	 *   'allow_wildcard'               allow * as item key
 	 *
 	 * @var array
 	 */
-	private $options = ['18_simple_checks' => false, 'with_filter' => false];
+	private $options = ['18_simple_checks' => false, 'with_filter' => false, 'allow_wildcard' => false];
 
 	/**
 	 * @param array $options
@@ -99,8 +100,13 @@ class CItemKey extends CParser {
 		$this->parameters = [];
 		$this->errorClear();
 
-		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
-			// Code is not missing here.
+		if ($this->options['allow_wildcard'] && $data[$offset] === '*') {
+			$p = $offset + 1;
+		}
+		else {
+			for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
+				// Code is not missing here.
+			}
 		}
 
 		// is key empty?
