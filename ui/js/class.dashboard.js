@@ -921,15 +921,17 @@ class CDashboard extends CBaseComponent {
 			tab_contents_name.innerHTML = sprintf(t('Page %1$d'), data.index);
 		}
 
-		const properties_button = document.createElement('button');
+		if (this._getDashboardPageActions(dashboard_page).length > 0) {
+			const properties_button = document.createElement('button');
 
-		properties_button.type = 'button';
-		properties_button.title = t('Actions');
-		properties_button.setAttribute('aria-expanded', 'false');
-		properties_button.setAttribute('aria-haspopup', 'true');
-		properties_button.classList.add('btn-dashboard-page-properties');
+			properties_button.type = 'button';
+			properties_button.title = t('Actions');
+			properties_button.setAttribute('aria-expanded', 'false');
+			properties_button.setAttribute('aria-haspopup', 'true');
+			properties_button.classList.add('btn-dashboard-page-properties');
 
-		tab_contents.append(properties_button);
+			tab_contents.append(properties_button);
+		}
 
 		this._tabs.insertItemBefore(tab);
 		this._tabs_dashboard_pages.set(tab, dashboard_page);
@@ -1407,10 +1409,12 @@ class CDashboard extends CBaseComponent {
 		let menu = [];
 		let menu_actions = [];
 
-		menu_actions.push({
-			label: t('S_COPY'),
-			clickCallback: () => this.storeDashboardPageDataCopy(dashboard_page.getDataCopy())
-		});
+		if (this._can_edit_dashboards) {
+			menu_actions.push({
+				label: t('S_COPY'),
+				clickCallback: () => this.storeDashboardPageDataCopy(dashboard_page.getDataCopy())
+			});
+		}
 
 		if (this._is_edit_mode) {
 			menu_actions.push({
@@ -1420,29 +1424,33 @@ class CDashboard extends CBaseComponent {
 			});
 		}
 
-		menu.push({
-			label: t('Actions'),
-			items: menu_actions
-		});
+		if (menu_actions.length > 0) {
+			menu.push({
+				label: t('Actions'),
+				items: menu_actions
+			});
+		}
 
-		menu.push({
-			items: [
-				{
-					label: t('Properties'),
-					clickCallback: () => {
-						if (!this._is_edit_mode) {
-							this.setEditMode({is_internal_call: true});
+		if (this._can_edit_dashboards) {
+			menu.push({
+				items: [
+					{
+						label: t('Properties'),
+						clickCallback: () => {
+							if (!this._is_edit_mode) {
+								this.setEditMode({is_internal_call: true});
+							}
+
+							this.editDashboardPageProperties({
+								name: dashboard_page.getName(),
+								display_period: dashboard_page.getDisplayPeriod(),
+								unique_id: dashboard_page.getUniqueId()
+							});
 						}
-
-						this.editDashboardPageProperties({
-							name: dashboard_page.getName(),
-							display_period: dashboard_page.getDisplayPeriod(),
-							unique_id: dashboard_page.getUniqueId()
-						});
 					}
-				}
-			]
-		});
+				]
+			});
+		}
 
 		return menu;
 	}
