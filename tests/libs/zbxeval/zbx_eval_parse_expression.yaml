@@ -309,6 +309,7 @@ in:
   expression: '{#LLD'
 out:
   result: FAIL
+---
 test case: Succeed '{{#LLD}.function()}'
 in:
   rules: [ZBX_EVAL_PARSE_LLDMACRO]
@@ -317,6 +318,17 @@ out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_LLDMACRO
     token: '{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '1{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '1{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1{{#LLD}.function()}}'
     opt: 0
   result: SUCCEED
 --- # parenthesis
@@ -1329,6 +1341,17 @@ out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#{$MACRO}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,#{{#LLD}.func})'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: 'min(/host/key,#{{#LLD}.func})'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#{{#LLD}.func}', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
   result: SUCCEED
 --- # suffixed numbers
