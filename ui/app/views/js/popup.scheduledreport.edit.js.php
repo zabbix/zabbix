@@ -28,14 +28,14 @@ function submitScheduledReport(overlay) {
 	const $form = overlay.$dialogue.find('form');
 	const url = new Curl($form.attr('action'));
 
-	overlay.$dialogue.find('.msg-bad, .msg-good').remove();
-
 	fetch(url.getUrl(), {
 		method: 'POST',
 		body: new URLSearchParams(new FormData($form.get(0)))
 	})
 		.then(response => response.json())
 		.then(response => {
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
 			if ('errors' in response) {
 				overlay.unsetLoading();
 				$(response.errors).insertBefore($form);

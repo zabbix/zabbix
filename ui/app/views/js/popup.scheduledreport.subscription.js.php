@@ -39,7 +39,7 @@ function submitScheduledReportSubscription(overlay) {
 	})
 		.then(response => response.json())
 		.then(response => {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 			if (response.errors) {
 				document

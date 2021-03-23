@@ -25,9 +25,10 @@
 ?>
 
 <script>
-	const popup_action = 'popup.scheduledreport.subscription.edit';
-	const userids = new Set();
-	const usrgrpids = new Set();
+	var popup_action = 'popup.scheduledreport.subscription.edit';
+	var userids = new Set();
+	var usrgrpids = new Set();
+	var row_num = 0;
 
 	document.querySelectorAll('#subscriptions-table .js-add-user')
 		.forEach((elem) => elem.addEventListener('click', (event) => {
@@ -49,9 +50,7 @@
 			PopUp(popup_action, popup_options, null, event.target);
 		}));
 
-	let row_num = 0;
-
-	class ReportSubscription {
+	var ReportSubscription = class {
 
 		constructor(data, edit = null) {
 			this.data = data;
@@ -109,7 +108,7 @@
 					edit: 1,
 					old_recipientid: this.data.recipientid,
 					userids: Array.from(userids),
-					usrgrpids: Array.from(usrgrpids),
+					usrgrpids: Array.from(usrgrpids)
 				});
 
 				if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
@@ -224,7 +223,7 @@
 		}
 	}
 
-	const subscriptions = <?= json_encode(array_values($data['subscriptions'])) ?>;
+	var subscriptions = <?= json_encode(array_values($data['subscriptions'])) ?>;
 
 	subscriptions.forEach((subscription) => new ReportSubscription(subscription));
 </script>

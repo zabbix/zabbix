@@ -104,7 +104,8 @@ class CControllerDashboardView extends CController {
 			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
 			'allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS),
 			'allowed_manage_reports' => (CWebUser::checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
-				&& CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS))
+				&& CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS)
+			)
 		];
 
 		if (self::hasDynamicWidgets($dashboard['widgets'])) {

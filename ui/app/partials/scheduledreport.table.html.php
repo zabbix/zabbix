@@ -49,14 +49,14 @@ $cycles = [
 	ZBX_REPORT_CYCLE_DAILY => _('Daily'),
 	ZBX_REPORT_CYCLE_WEEKLY => _('Weekly'),
 	ZBX_REPORT_CYCLE_MONTHLY => _('Monthly'),
-	ZBX_REPORT_CYCLE_YEARLY => _('Yearly'),
+	ZBX_REPORT_CYCLE_YEARLY => _('Yearly')
 ];
 
 $periods = [
 	ZBX_REPORT_PERIOD_DAY => _('Previous day'),
 	ZBX_REPORT_PERIOD_WEEK => _('Previous week'),
 	ZBX_REPORT_PERIOD_MONTH => _('Previous month'),
-	ZBX_REPORT_PERIOD_YEAR => _('Previous year'),
+	ZBX_REPORT_PERIOD_YEAR => _('Previous year')
 ];
 
 $now = time();
