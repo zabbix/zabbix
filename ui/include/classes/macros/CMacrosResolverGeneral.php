@@ -58,14 +58,14 @@ class CMacrosResolverGeneral {
 
 		if (($result = $expression_data->parse($expression)) !== false) {
 			foreach ($result->getTokens() as $token) {
-				switch ($token['type']) {
+				switch ($token->type) {
 					case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
 					case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-						$values[] = $token['value'];
+						$values[] = $token->match;
 						break;
 
 					case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-						$values[] = $token['data']['string'];
+						$values[] = $token->data['string'];
 						break;
 				}
 			}
