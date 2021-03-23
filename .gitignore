@@ -167,6 +167,7 @@ tests/libs/zbxeval/zbx_eval_execute_ext
 tests/libs/zbxeval/zbx_eval_get_constant
 tests/libs/zbxeval/zbx_eval_get_group_filter
 tests/libs/zbxeval/zbx_eval_parse_expression
+tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxhistory/zbx_history_get_values

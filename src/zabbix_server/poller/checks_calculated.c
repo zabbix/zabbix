@@ -52,7 +52,8 @@ static zbx_item_query_t	*calcitem_parse_item_query(const char *filter)
 	query = (zbx_item_query_t *)zbx_malloc(NULL, sizeof(zbx_item_query_t));
 	memset(query, 0, sizeof(zbx_item_query_t));
 
-	zbx_eval_parse_query(filter, strlen(filter), query);
+	if (0 == zbx_eval_parse_query(filter, strlen(filter), query))
+		query->key = NULL;
 
 	return query;
 }
@@ -85,7 +86,7 @@ static void	calc_eval_init(zbx_calc_eval_t *eval, DC_ITEM *dc_item, zbx_eval_con
 		query = calcitem_parse_item_query(filters.values[i]);
 		zbx_vector_ptr_append(&eval->itemrefs, query);
 
-		if (ZBX_ITEM_QUERY_SINGLE == query->type)
+		if (NULL == query->filter)
 			query->index = eval->items_num++;
 	}
 
@@ -100,7 +101,7 @@ static void	calc_eval_init(zbx_calc_eval_t *eval, DC_ITEM *dc_item, zbx_eval_con
 		{
 			query = (zbx_item_query_t *)eval->itemrefs.values[i];
 
-			if (ZBX_ITEM_QUERY_SINGLE != query->type)
+			if (NULL != query->filter)
 				continue;
 
 			eval->hostkeys[query->index].host = (NULL == query->host ? dc_item->host.host : query->host);
@@ -302,7 +303,7 @@ static int	calcitem_eval_history(const char *name, size_t len, int args_num, con
 	/* the historical function item query argument is replaced with corresponding itemrefs index */
 	query = (zbx_item_query_t *)eval->itemrefs.values[(int)args[0].data.ui64];
 
-	if (ZBX_ITEM_QUERY_SINGLE == query->type)
+	if (NULL == query->filter)
 		ret = calcitem_eval_single(eval, query, name, len, args_num - 1, args + 1, ts, value, error);
 	else
 		*error = zbx_strdup(NULL, "Cannot evaluate function: multiple item filters are not supported");
@@ -359,9 +360,7 @@ static int	calcitem_eval_common(const char *name, size_t len, int args_num, cons
 	{
 		zbx_item_query_t	query;
 
-		zbx_eval_parse_query(args[0].data.str, strlen(args[0].data.str), &query);
-
-		if (ZBX_ITEM_QUERY_UNKNOWN != query.type)
+		if (0 == zbx_eval_parse_query(args[0].data.str, strlen(args[0].data.str), &query))
 		{
 			zbx_eval_clear_query(&query);
 			*error = zbx_strdup(NULL, "Cannot evaluate function: quoted item query argument");

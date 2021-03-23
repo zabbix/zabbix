@@ -248,12 +248,12 @@ typedef struct
 {
 	char			*host;
 	char			*key;
-	zbx_item_query_type_t	type;
+	char			*filter;
 	int			index;
 }
 zbx_item_query_t;
 
-void	zbx_eval_parse_query(const char *str, size_t len, zbx_item_query_t *query);
+size_t	zbx_eval_parse_query(const char *str, size_t len, zbx_item_query_t *query);
 void	zbx_eval_clear_query(zbx_item_query_t *query);
 
 void	zbx_eval_prepare_filter(zbx_eval_context_t *ctx);

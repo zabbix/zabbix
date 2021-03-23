@@ -26,7 +26,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_parse_filter                                            *
+ * Function: zbx_eval_parse_query                                             *
  *                                                                            *
  * Purpose: parse item query /host/key?[filter] into host, key and filter     *
  *          components                                                        *
@@ -35,24 +35,31 @@
  *             len   - [IN] the query length                                  *
  *             query - [IN] the parsed item query                             *
  *                                                                            *
+ * Return value: The number of parsed characters.                             *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_eval_parse_query(const char *str, size_t len, zbx_item_query_t *query)
+size_t	zbx_eval_parse_query(const char *str, size_t len, zbx_item_query_t *query)
 {
-	const char	*ptr = str, *key;
+	size_t		n;
+	const char	*host, *key, *filter;
 
-	if ('/' != *ptr || NULL == (key = strchr(++ptr, '/')))
+	if (0 == (n = eval_parse_query(str, &host, &key, &filter)) || n != len)
+		return 0;
+
+	query->host = (host != key - 1 ? zbx_substr(host, 0, key - host - 2) : NULL);
+
+	if (NULL != filter)
 	{
-		query->type = ZBX_ITEM_QUERY_UNKNOWN;
-		return;
+		query->key = zbx_substr(key, 0, (filter - key) - 3);
+		query->filter = zbx_substr(filter, 0, (str + len - filter) - 2);
+	}
+	else
+	{
+		query->key = zbx_substr(key, 0, (str + len - key) - 1);
+		query->filter = NULL;
 	}
 
-	if (ptr != key)
-		query->host = zbx_substr(ptr, 0, key - ptr - 1);
-	else
-		query->host = NULL;
-
-	query->key = zbx_substr(key, 1, len - (key - str) - 1);
-	query->type = ZBX_ITEM_QUERY_SINGLE;
+	return n;
 }
 
 /******************************************************************************
@@ -66,6 +73,7 @@ void	zbx_eval_clear_query(zbx_item_query_t *query)
 {
 	zbx_free(query->host);
 	zbx_free(query->key);
+	zbx_free(query->filter);
 }
 
 /******************************************************************************

@@ -576,6 +576,111 @@ static int	eval_parse_function_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_parse_query_filter                                          *
+ *                                                                            *
+ * Purpose: parse item query filter (?[group="xyz"])                          *
+ *                                                                            *
+ * Parameters: ptr - [IN] - the filter to parse                               *
+ *                   [OUT] - a reference to the next character after filter   *
+ *                                                                            *
+ * Return value: SUCCEED - the filter was parsed successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_parse_query_filter(const char **ptr)
+{
+	const char	*filter = *ptr;
+
+	if ('[' != *(++filter))
+		return FAIL;
+
+	filter++;
+
+	while (']' != *filter)
+	{
+		if ('\0' == *filter)
+			return FAIL;
+
+		if ('"' == *filter)
+		{
+			while ('"' != *(++filter))
+			{
+				if ('\0' == *filter)
+					return FAIL;
+
+				if ('\\' == *filter && '\0' == *(++filter))
+					return FAIL;
+			}
+		}
+
+		filter++;
+	}
+
+	*ptr = ++filter;
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_parse_query                                                 *
+ *                                                                            *
+ * Purpose: parse item query /host/key?[filter] into host, key and filter     *
+ *          components                                                        *
+ *                                                                            *
+ * Parameters: str     - [IN] the item query                                  *
+ *             phost   - [OUT] a reference to host or NULL (optional)         *
+ *             pkey    - [OUT] a reference to key                             *
+ *             pfilter - [OUT] a reference to the filter or NULL              *
+ *                                                                            *
+ * Return value: The number of parsed characters, 0 if there was an error     *
+ *                                                                            *
+ ******************************************************************************/
+size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, const char **pfilter)
+{
+	const char	*host = str + 1, *key, *filter, *end;
+
+	key = host;
+
+	if ('*' != *host)
+	{
+		while (SUCCEED == is_hostname_char(*key))
+			key++;
+	}
+	else
+		key++;
+
+	if ('/' != *key)
+		return 0;
+
+	end = ++key;
+
+	if ('*' == *key)
+		end++;
+	else if (SUCCEED != parse_key(&end))
+		return 0;
+
+	if (*end == '?')
+	{
+		filter = end;
+		if (SUCCEED != eval_parse_query_filter(&end))
+			return 0;
+		filter += 2;
+	}
+	else
+		filter = NULL;
+
+	if (NULL != phost)
+	{
+		*phost = host;
+		*pkey = key;
+		*pfilter = filter;
+	}
+
+	return end - str;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_parse_query_token                                           *
  *                                                                            *
  * Purpose: parse history query token                                         *
@@ -594,51 +699,19 @@ static int	eval_parse_function_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
  ******************************************************************************/
 static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
-#define MVAR_HOST_HOST	"{HOST.HOST}"
+	size_t	len;
 
-	const char	*ptr = ctx->expression + pos + 1, *key;
-
-	switch (*ptr)
+	if (0 == (len = eval_parse_query(ctx->expression + pos, NULL, NULL, NULL)))
 	{
-		case '*':
-			ptr++;
-			break;
-		case '{':
-			if (0 == strncmp(ptr, MVAR_HOST_HOST, ZBX_CONST_STRLEN(MVAR_HOST_HOST)))
-				ptr += ZBX_CONST_STRLEN(MVAR_HOST_HOST);
-			break;
-		default:
-			while (SUCCEED == is_hostname_char(*ptr))
-				ptr++;
-	}
-
-	if ('/' != *ptr)
-	{
-		if (ptr == ctx->expression + pos + 1)
-		{
-			*error = zbx_dsprintf(*error, "invalid host name in query starting at \"%s\"", ctx->expression + pos);
-			return FAIL;
-		}
-
-		*error = zbx_dsprintf(*error, "missing item key in query starting at \"%s\"", ctx->expression + pos);
+		*error = zbx_dsprintf(*error, "invalid item query starting at \"%s\"", ctx->expression + pos);
 		return FAIL;
-	}
-
-	key = ++ptr;
-	if (SUCCEED != parse_key(&ptr))
-	{
-		*error = zbx_dsprintf(*error, "invalid item key at \"%s\"", key);
-		return FAIL;
-
 	}
 
 	token->type = ZBX_EVAL_TOKEN_ARG_QUERY;
 	token->loc.l = pos;
-	token->loc.r = ptr - ctx->expression - 1;
+	token->loc.r = pos + len - 1;
 
 	return SUCCEED;
-
-#undef MVAR_HOST_HOST
 }
 
 /******************************************************************************

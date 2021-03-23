@@ -1906,9 +1906,7 @@ static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zb
 	char			err[128];
 	int			ret;
 
-	zbx_eval_parse_query(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1, &query);
-
-	if (ZBX_ITEM_QUERY_UNKNOWN == query.type)
+	if (0 == zbx_eval_parse_query(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1, &query))
 	{
 		*error = zbx_strdup(NULL, "invalid item reference");
 		return FAIL;

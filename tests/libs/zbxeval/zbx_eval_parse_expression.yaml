@@ -1715,6 +1715,53 @@ out:
   - {type: ZBX_EVAL_TOKEN_OP_NE, token: '<>', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   result: SUCCEED
+--- # query filters
+test case: Succeed 'min(/*/key?[group="a"],1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="a"],1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/key?[group="a"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/*/key?[group="a:\"1\""],1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="a:\"1\""],1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/key?[group="a:\"1\""]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/*/key?[group="[]"],1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="[]"],1)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/*/key?[group="[]"]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Fail 'min(/*/key?[group="a",1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="a",1)'
+out:
+  result: FAIL
+---
+test case: Fail 'min(/*/key?[group="a],1)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  expression: 'min(/*/key?[group="a],1)'
+out:
+  result: FAIL
 ...
 
 
