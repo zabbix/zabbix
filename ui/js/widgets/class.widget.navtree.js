@@ -184,6 +184,8 @@ class CWidgetNavTree extends CWidget {
 				}
 
 				window.addPopupValues = (data) => {
+					this._deactivateContentsEvents();
+
 					const root = this._target.querySelector(`.tree-item[data-id="${id}"] > ul.tree-list`);
 
 					for (const item of data.values) {
@@ -206,6 +208,8 @@ class CWidgetNavTree extends CWidget {
 						window.addPopupValues = old_addPopupValues;
 						delete window.old_addPopupValues;
 					}
+
+					this._activateContentsEvents();
 				};
 
 				return PopUp('popup.generic', {
