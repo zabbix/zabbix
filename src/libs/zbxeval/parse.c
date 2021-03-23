@@ -654,9 +654,9 @@ static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_
  ******************************************************************************/
 static int	eval_parse_period_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
-	size_t		offset = pos;
+	size_t	offset = pos;
 
-	for (;0 != ctx->expression[offset]; offset++)
+	for (;'\0' != ctx->expression[offset]; offset++)
 	{
 		if ('{' == ctx->expression[offset] && 0 != (ctx->rules & ZBX_EVAL_PARSE_COMPOUND_CONST))
 		{
