@@ -491,6 +491,8 @@ class CControllerPopupTriggerExpr extends CController {
 		$params = $this->getInput('params', []);
 		$value = $this->getInput('value', 0);
 
+		$item = false;
+
 		// Opening the popup when editing an expression in the trigger constructor.
 		if (($dstfld1 === 'expr_temp' || $dstfld1 === 'recovery_expr_temp') && $expression !== '') {
 			$expression = utf8RawUrlDecode($expression);
@@ -554,7 +556,9 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($fn_name, $this->functions)
 									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
 								$operator = $operator_token->match;
-								$value = $value_token->data['string'];
+								$value = array_key_exists('string', $value_token->data)
+									? $value_token->data['string']
+									: '';
 							}
 							else {
 								break;
