@@ -2664,50 +2664,6 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: wrap_negative_double_suffix                                      *
- *                                                                            *
- * Purpose: wrap a replacement string that represents a negative number in    *
- *          parentheses (for instance, turn "-123.456M" into "(-123.456M)")   *
- *                                                                            *
- * Parameters: replace_to       - [IN/OUT] replacement string                 *
- *             replace_to_alloc - [IN/OUT] number of allocated bytes          *
- *                                                                            *
- ******************************************************************************/
-static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_alloc)
-{
-	size_t	replace_to_len;
-
-	if ('-' != (*replace_to)[0])
-		return;
-
-	replace_to_len = strlen(*replace_to);
-
-	if (NULL != replace_to_alloc && *replace_to_alloc >= replace_to_len + 3)
-	{
-		memmove(*replace_to + 1, *replace_to, replace_to_len);
-	}
-	else
-	{
-		char	*buffer;
-
-		if (NULL != replace_to_alloc)
-			*replace_to_alloc = replace_to_len + 3;
-
-		buffer = (char *)zbx_malloc(NULL, replace_to_len + 3);
-
-		memcpy(buffer + 1, *replace_to, replace_to_len);
-
-		zbx_free(*replace_to);
-		*replace_to = buffer;
-	}
-
-	(*replace_to)[0] = '(';
-	(*replace_to)[replace_to_len + 1] = ')';
-	(*replace_to)[replace_to_len + 2] = '\0';
-}
-
 static const char	*zbx_dobject_status2str(int st)
 {
 	switch (st)
@@ -5466,11 +5422,11 @@ out:
  *               otherwise FAIL with an error message.                        *
  *                                                                            *
  ******************************************************************************/
-static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t error_len, int cur_token_inside_quote)
+static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, int cur_token_inside_quote)
 {
 	char	c, *replace_to = NULL;
-	int	ret = SUCCEED, l ,r;
+	int	l ,r;
 
 	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
@@ -5490,16 +5446,10 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set", *data + l);
 
-		if (0 != (flags & ZBX_TOKEN_NUMERIC))
-		{
-			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + l);
-			ret = FAIL;
-		}
-
 		(*data)[r + 1] = c;
 		zbx_free(replace_to);
 
-		return ret;
+		return;
 	}
 
 	(*data)[r + 1] = c;
@@ -5513,37 +5463,13 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot execute function \"%.*s\"", len,
 					*data + token->data.lld_func_macro.func.l);
 
-			if (0 != (flags & ZBX_TOKEN_NUMERIC))
-			{
-				zbx_snprintf(error, error_len, "unable to execute function \"%.*s\"", len,
-						*data + token->data.lld_func_macro.func.l);
-				ret = FAIL;
-			}
-
 			zbx_free(replace_to);
 
-			return ret;
+			return;
 		}
 	}
 
-	if (0 != (flags & ZBX_TOKEN_NUMERIC))
-	{
-		if (SUCCEED == is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX))
-		{
-			size_t	replace_to_alloc;
-
-			replace_to_alloc = strlen(replace_to) + 1;
-			wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
-		}
-		else
-		{
-			zbx_free(replace_to);
-			zbx_snprintf(error, error_len, "not numeric value in macro \"%.*s\"",
-					(int)(token->loc.r - token->loc.l + 1), *data + token->loc.l);
-			return FAIL;
-		}
-	}
-	else if (0 != (flags & ZBX_TOKEN_JSON))
+	if (0 != (flags & ZBX_TOKEN_JSON))
 	{
 		zbx_json_escape(&replace_to);
 	}
@@ -5617,8 +5543,6 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 				token->loc.r - token->loc.l + 1, replace_to, strlen(replace_to));
 		zbx_free(replace_to);
 	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -5669,14 +5593,14 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
  * Purpose: expand discovery macro in expression macro                        *
  *                                                                            *
  * Parameters: data            - [IN/OUT] the expression containing lld macro *
- *             token           - [IN/OUT] the token with user macro location data   *
- *             jp_row          - [IN] discovery data                                *
- *             lld_macro_paths - [IN] discovery data                                   *
+ *             token           - [IN/OUT] the token with user macro location data*
+ *             jp_row          - [IN] discovery data                          *
+ *             lld_macro_paths - [IN] discovery data                          *
  *             error  - [OUT] error message                                   *
  *             max_error_len - [IN] the size of error buffer                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_expression_macro_token(char **data, zbx_token_t *token,
+static void	process_expression_macro_token(char **data, zbx_token_t *token,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char *error,
 		size_t error_len)
 {
@@ -5709,11 +5633,8 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token,
 		{
 			case ZBX_TOKEN_LLD_MACRO:
 			case ZBX_TOKEN_LLD_FUNC_MACRO:
-				if (FAIL == process_lld_macro_token(data, &cur_token, ZBX_TOKEN_STRING, jp_row,
-						lld_macro_paths, error, error_len, quoted))
-				{
-					return FAIL;
-				}
+				process_lld_macro_token(data, &cur_token, ZBX_TOKEN_STRING, jp_row, lld_macro_paths,
+						quoted);
 				token->loc.r += cur_token.loc.r - tmp_token.loc.r;
 				pos = cur_token.loc.r;
 				break;
@@ -5731,8 +5652,6 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token,
 
 		last_pos = ++pos;
 	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -5835,8 +5754,8 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 			{
 				case ZBX_TOKEN_LLD_MACRO:
 				case ZBX_TOKEN_LLD_FUNC_MACRO:
-					ret = process_lld_macro_token(data, &token, flags, jp_row, lld_macro_paths,
-							error, max_error_len, cur_token_inside_quote);
+					process_lld_macro_token(data, &token, flags, jp_row, lld_macro_paths,
+							cur_token_inside_quote);
 					pos = token.loc.r;
 					break;
 				case ZBX_TOKEN_USER_MACRO:
