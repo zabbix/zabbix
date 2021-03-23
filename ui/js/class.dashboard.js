@@ -505,10 +505,22 @@ class CDashboard extends CBaseComponent {
 					this._new_widget_pos_reserved = this._new_widget_dashboard_page.findFreePos(default_widget_size);
 				}
 				else {
-					this._new_widget_pos_reserved = this._new_widget_dashboard_page.accommodatePos({
+					this._new_widget_pos_reserved = {
 						...default_widget_size,
 						...this._new_widget_pos
-					});
+					};
+
+					this._new_widget_pos_reserved.width = Math.min(this._new_widget_pos_reserved.width,
+						this._max_columns - this._new_widget_pos_reserved.x
+					);
+
+					this._new_widget_pos_reserved.height = Math.min(this._new_widget_pos_reserved.height,
+						this._max_rows - this._new_widget_pos_reserved.y
+					);
+
+					this._new_widget_pos_reserved = this._new_widget_dashboard_page.accommodatePos(
+						this._new_widget_pos_reserved
+					);
 				}
 
 				if (this._new_widget_pos_reserved === null) {
@@ -1022,10 +1034,14 @@ class CDashboard extends CBaseComponent {
 			new_widget_pos = widget.getPosition();
 		}
 		else if (new_widget_pos !== null) {
-			new_widget_pos = dashboard_page.accommodatePos({
+			new_widget_pos = {
 				...new_widget_data.pos,
 				...new_widget_pos
-			});
+			};
+
+			new_widget_pos.width = Math.min(new_widget_pos.width, this._max_columns - new_widget_pos.x);
+			new_widget_pos.height = Math.min(new_widget_pos.height, this._max_rows - new_widget_pos.y);
+			new_widget_pos = dashboard_page.accommodatePos(new_widget_pos);
 		}
 		else {
 			new_widget_pos = dashboard_page.findFreePos(new_widget_data.pos);
