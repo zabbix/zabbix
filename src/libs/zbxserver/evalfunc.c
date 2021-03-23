@@ -25,6 +25,7 @@
 #include "evalfunc.h"
 #include "zbxregexp.h"
 #include "zbxtrends.h"
+#include "../zbxalgo/vectorimpl.h"
 
 typedef enum
 {
@@ -39,6 +40,18 @@ typedef enum
 	ZBX_VALUE_NVALUES
 }
 zbx_value_type_t;
+
+#define ZBX_VALUEMAP_STRING_LEN	64
+
+typedef struct
+{
+	char	value[ZBX_VALUEMAP_STRING_LEN];
+	char	newvalue[ZBX_VALUEMAP_STRING_LEN];
+}
+zbx_valuemaps_t;
+
+ZBX_PTR_VECTOR_DECL(valuemaps_ptr, zbx_valuemaps_t *);
+ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *);
 
 static const char	*zbx_type_string(zbx_value_type_t type)
 {
@@ -3281,6 +3294,11 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __func__, value);
 }
 
+static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
+{
+	zbx_free(valuemap);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: replace_value_by_map                                             *
@@ -3288,6 +3306,7 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
  * Purpose: replace value by mapping value                                    *
  *                                                                            *
  * Parameters: value - value for replacing                                    *
+ *             max_len - maximal length of output value                       *
  *             valuemapid - index of value map                                *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
@@ -3296,36 +3315,141 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
  ******************************************************************************/
 static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*value_esc, *value_tmp;
-	int		ret = FAIL;
+	char				*value_tmp;
+	int				i, ret = FAIL;
+	double				input_value, min, max;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_valuemaps_t			*valuemap = NULL;
+	zbx_vector_valuemaps_ptr_t	valuemaps;
+	zbx_vector_ptr_t		regexps;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __func__, value, valuemapid);
 
 	if (0 == valuemapid)
 		goto clean;
 
-	value_esc = DBdyn_escape_string(value);
+	zbx_vector_valuemaps_ptr_create(&valuemaps);
+
 	result = DBselect(
-			"select newvalue"
+			"select value,newvalue"
 			" from valuemap_mapping"
-			" where valuemapid=" ZBX_FS_UI64
-				" and value" ZBX_SQL_STRCMP,
-			valuemapid, ZBX_SQL_STRVAL_EQ(value_esc));
-	zbx_free(value_esc);
+			" where valuemapid=" ZBX_FS_UI64,
+			valuemapid);
 
-	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+	while (NULL != (row = DBfetch(result)))
 	{
-		del_zeros(row[0]);
+		if (SUCCEED == DBis_null(row[1]))
+			continue;
 
-		value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
+		del_zeros(row[1]);
+
+		valuemap = (zbx_valuemaps_t *)zbx_malloc(NULL, sizeof(zbx_valuemaps_t));
+		zbx_strlcpy_utf8(valuemap->value, row[0], ZBX_VALUEMAP_STRING_LEN);
+		zbx_strlcpy_utf8(valuemap->newvalue, row[1], ZBX_VALUEMAP_STRING_LEN);
+		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
+		valuemap = NULL;
+	}
+
+	DBfree_result(result);
+
+	zbx_vector_valuemaps_ptr_sort(&valuemaps, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	if (FAIL != (i = zbx_vector_valuemaps_ptr_search(&valuemaps, (zbx_valuemaps_t *)value,
+			ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	{
+		goto map_value;
+	}
+
+	for (i = 0; i < valuemaps.values_num; i++)
+	{
+		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+
+		if ('@' == *valuemap->value)
+		{
+			char	*pattern;
+			int	result;
+
+			zbx_vector_ptr_create(&regexps);
+
+			DCget_expressions_by_name(&regexps, valuemap->value + 1);
+
+			pattern = valuemap->value;
+			if (0 == regexps.values_num)
+				pattern++;
+
+			result =  regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
+
+			zbx_regexp_clean_expressions(&regexps);
+			zbx_vector_ptr_destroy(&regexps);
+
+			if (ZBX_REGEXP_MATCH == result)
+				 goto map_value;
+		}
+	}
+
+	if (ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
+	{
+		for (i = 0; i < valuemaps.values_num; i++)
+		{
+			char	threshold_min[ZBX_VALUEMAP_STRING_LEN], threshold_max[ZBX_VALUEMAP_STRING_LEN];
+			double	min, max;
+
+			valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+
+			if (1 == sscanf(valuemap->value, "<%s", threshold_max))
+			{
+				zbx_lrtrim(threshold_max, " ");
+				if (ZBX_INFINITY != (max = evaluate_string_to_double(threshold_max)) &&
+						input_value < max)
+				{
+					goto map_value;
+				}
+			}
+			else if (1 == sscanf(valuemap->value, ">%s", threshold_min))
+			{
+				zbx_lrtrim(threshold_min, " ");
+				if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
+						input_value > min)
+				{
+					goto map_value;
+				}
+			}
+			else if (2 == sscanf(valuemap->value, "%[^:]:%s", threshold_min, threshold_max))
+			{
+				zbx_lrtrim(threshold_max, " ");
+				zbx_lrtrim(threshold_min, " ");
+				if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
+						input_value >= min &&
+						ZBX_INFINITY != (max = evaluate_string_to_double(threshold_max)) &&
+						input_value <= max)
+				{
+					goto map_value;
+				}
+			}
+		}
+	}
+
+	if (FAIL != (i = zbx_vector_valuemaps_ptr_search(&valuemaps, (zbx_valuemaps_t *)"*",
+			ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	{
+		goto map_value;
+	}
+
+map_value:
+	if (0 <= i && i < valuemaps.values_num)
+	{
+		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+
+		value_tmp = zbx_dsprintf(NULL, "%s (%s)", valuemap->newvalue, value);
 		zbx_strlcpy_utf8(value, value_tmp, max_len);
 		zbx_free(value_tmp);
 
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+
+	zbx_vector_valuemaps_ptr_clear_ext(&valuemaps, zbx_valuemaps_free);
+	zbx_vector_valuemaps_ptr_destroy(&valuemaps);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __func__, value);
 
