@@ -244,60 +244,60 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 
 	do
 	{
-		switch (ctx->expression[offset])
+		if ('{'  ==  (ctx->expression[offset]))
 		{
-			case '{':
-				if (SUCCEED != eval_parse_macro(ctx, offset, &tok))
-					break;
+			if (SUCCEED != eval_parse_macro(ctx, offset, &tok))
+				break;
 
-				if (0 == type)
+			if (0 == type)
+			{
+				switch (tok.type)
 				{
-					switch (tok.type)
-					{
-						case ZBX_TOKEN_MACRO:
-						case ZBX_TOKEN_FUNC_MACRO:
-						case ZBX_TOKEN_SIMPLE_MACRO:
-							type = ZBX_EVAL_TOKEN_VAR_MACRO;
-							break;
-						case ZBX_TOKEN_USER_MACRO:
-							type = ZBX_EVAL_TOKEN_VAR_USERMACRO;
-							break;
-						case ZBX_TOKEN_LLD_MACRO:
-						case ZBX_TOKEN_LLD_FUNC_MACRO:
-							type = ZBX_EVAL_TOKEN_VAR_LLDMACRO;
-							break;
-					}
+					case ZBX_TOKEN_MACRO:
+					case ZBX_TOKEN_FUNC_MACRO:
+					case ZBX_TOKEN_SIMPLE_MACRO:
+						type = ZBX_EVAL_TOKEN_VAR_MACRO;
+						break;
+					case ZBX_TOKEN_USER_MACRO:
+						type = ZBX_EVAL_TOKEN_VAR_USERMACRO;
+						break;
+					case ZBX_TOKEN_LLD_MACRO:
+					case ZBX_TOKEN_LLD_FUNC_MACRO:
+						type = ZBX_EVAL_TOKEN_VAR_LLDMACRO;
+						break;
 				}
-				else
-					type = ZBX_EVAL_TOKEN_VAR_NUM;
+			}
+			else
+				type = ZBX_EVAL_TOKEN_VAR_NUM;
 
-				offset = tok.loc.r + 1;
-				continue;
-			case 's':
-			case 'm':
-			case 'h':
-			case 'd':
-			case 'w':
-			case 'K':
-			case 'M':
-			case 'G':
-			case 'T':
-				if (0 != type)
+			offset = tok.loc.r + 1;
+
+			switch (ctx->expression[offset])
+			{
+				case 's':
+				case 'm':
+				case 'h':
+				case 'd':
+				case 'w':
+				case 'K':
+				case 'M':
+				case 'G':
+				case 'T':
 					type = ZBX_EVAL_TOKEN_VAR_NUM;
-				offset++;
-				goto out;
+					offset++;
+					goto out;
+			}
 		}
-
-		if (SUCCEED == eval_parse_number(ctx, offset, &offset))
+		else if (SUCCEED == eval_parse_number(ctx, offset, &offset))
+		{
 			type = ZBX_EVAL_TOKEN_VAR_NUM;
+			offset++;
+		}
 		else
 			break;
-
-		offset++;
 	}
 	while (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPOUND_CONST) &&
 			SUCCEED == eval_is_compound_number_char(ctx->expression[offset]));
-
 out:
 	if (0 == type)
 	{

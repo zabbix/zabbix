@@ -17,6 +17,24 @@ out:
     opt: 0
   result: SUCCEED
 ---
+test case: Succeed '1s'
+in:
+  rules: []
+  expression: '1s'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1s'
+    opt: 0
+  result: SUCCEED
+---
+test case: FAIL 's'
+in:
+  rules: []
+  expression: 's'
+out:
+  result: FAIL
+---
 test case: Succeed '0.1'
 in:
   rules: []
