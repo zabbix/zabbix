@@ -260,7 +260,7 @@ class CDashboardPage extends CBaseComponent {
 			this._grid_min_rows = null;
 		}
 		else if (min_rows !== null) {
-			this._grid_min_rows = Math.max(this._grid_min_rows, min_rows);
+			this._grid_min_rows = Math.max(this._grid_min_rows, Math.min(this._max_rows, min_rows));
 		}
 
 		let num_rows = this._getNumRows();
