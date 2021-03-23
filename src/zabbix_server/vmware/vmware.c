@@ -3576,6 +3576,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
 	zbx_vector_vmware_dsname_reserve(&hv->dsnames, datastores.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): %d datastore are connected to hypervisor \"%s\"", __func__,
+			datastores.values_num, hv->id);
 
 	if (SUCCEED != vmware_service_hv_get_multipath_data(service, easyhandle, id, &details_multipath, error))
 		goto out;
