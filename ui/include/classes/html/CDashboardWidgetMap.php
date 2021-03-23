@@ -134,8 +134,9 @@ class CDashboardWidgetMap extends CDiv {
 			$map_data['map_options'] = $this->sysmap_data;
 		}
 		elseif ($this->error !== null && $this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
-			$error_msg_html = (new CTableInfo())->setNoDataMessage($this->error);
-			$map_data['error_msg'] = addslashes($error_msg_html);
+			$map_data['error_msg'] = (new CTableInfo())
+				->setNoDataMessage($this->error)
+				->toString();
 		}
 
 		return $map_data;

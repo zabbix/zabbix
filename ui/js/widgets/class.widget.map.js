@@ -105,10 +105,13 @@ class CWidgetMap extends CWidget {
 
 	_promiseUpdate() {
 		if (!this._has_contents) {
-			return super._promiseUpdate();
+			if (this._current_sysmapid !== null || this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_MAP) {
+				return super._promiseUpdate();
+			}
 		}
 		else {
 			const curl = new Curl(this._map_svg.options.refresh);
+
 			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {
@@ -166,8 +169,8 @@ class CWidgetMap extends CWidget {
 				}
 			}
 
-			if (response.sysmap_data.error_msg !== null) {
-				jQuery(this._content_body).append(response.sysmap_data.error_msg);
+			if (response.sysmap_data.error_msg !== undefined) {
+				this._content_body.innerHTML = response.sysmap_data.error_msg;
 			}
 		}
 	}

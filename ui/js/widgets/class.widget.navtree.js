@@ -84,6 +84,16 @@ class CWidgetNavTree extends CWidget {
 		}
 	}
 
+	getDataCopy({is_single_copy}) {
+		this._deactivateContentsEvents();
+		this._setTreeHandlers();
+		this._updateWidgetFields();
+		this._activateContentsEvents();
+
+		return super.getDataCopy({is_single_copy});
+	}
+
+
 	setEditMode() {
 		this._deactivateContentsEvents();
 		this._removeTree();
@@ -206,14 +216,7 @@ class CWidgetNavTree extends CWidget {
 				}, null, e.target);
 			},
 
-			copy: () => {
-				this._deactivateContentsEvents();
-				this._setTreeHandlers();
-				this._updateWidgetFields();
-				this._activateContentsEvents();
-			},
-
-			edit: (e) => {
+			editItem: (e) => {
 				const button = e.target;
 
 				const id = button.getAttribute('data-id');
@@ -223,7 +226,7 @@ class CWidgetNavTree extends CWidget {
 				this._itemEditDialog(id, parent, depth, button);
 			},
 
-			remove: (e) => {
+			removeItem: (e) => {
 				const button = e.target;
 
 				this._deactivateContentsEvents();
@@ -272,8 +275,6 @@ class CWidgetNavTree extends CWidget {
 	_activateEvents() {
 		super._activateEvents();
 
-		this.on(WIDGET_EVENT_COPY, this._events.copy);
-
 		if (!this._is_edit_mode) {
 			for (const widget of this._maps) {
 				widget.on(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
@@ -283,8 +284,6 @@ class CWidgetNavTree extends CWidget {
 
 	_deactivateEvents() {
 		super._deactivateEvents();
-
-		this.off(WIDGET_EVENT_COPY, this._events.copy);
 
 		if (!this._is_edit_mode) {
 			for (const widget of this._maps) {
@@ -305,11 +304,11 @@ class CWidgetNavTree extends CWidget {
 				}
 
 				for (const button of this._target.querySelectorAll('.js-button-edit')) {
-					button.addEventListener('click', this._events.edit);
+					button.addEventListener('click', this._events.editItem);
 				}
 
 				for (const button of this._target.querySelectorAll('.js-button-remove')) {
-					button.addEventListener('click', this._events.remove);
+					button.addEventListener('click', this._events.removeItem);
 				}
 			}
 			else {
@@ -332,11 +331,11 @@ class CWidgetNavTree extends CWidget {
 				}
 
 				for (const button of this._target.querySelectorAll('.js-button-edit')) {
-					button.removeEventListener('click', this._events.edit);
+					button.removeEventListener('click', this._events.editItem);
 				}
 
 				for (const button of this._target.querySelectorAll('.js-button-remove')) {
-					button.removeEventListener('click', this._events.remove);
+					button.removeEventListener('click', this._events.removeItem);
 				}
 			}
 			else {
