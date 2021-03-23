@@ -1853,6 +1853,7 @@ function get_item_function_info($expr) {
 		'abs' => $rules['numeric_as_float'],
 		'avg' => $rules['numeric_as_float'],
 		'band' => $rules['integer'],
+		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'date' => $rules['date'],
 		'dayofmonth' => $rules['day_of_month'],
