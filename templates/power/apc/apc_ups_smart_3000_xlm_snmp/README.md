@@ -1,23 +1,22 @@
 
-# APC Smart-UPS SRT SNMP
+# APC Smart-UPS 3000 XLM SNMP
 
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-The template to monitor APC Smart-UPS SRT by Zabbix SNMP agent.
+The template to monitor APC Smart-UPS 3000 XLM by Zabbix SNMP agent.
 
 
 
 This template was tested on:
 
-- APC Smart-UPS SRT 5000
-- APC Smart-UPS SRT 8000
+- APC Smart-UPS 3000 XLM
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
-1\. Create a host for APC Smart-UPS SRT management IP as SNMPv2 interface.
+1\. Create a host for APC Smart-UPS 3000 XLM management IP as SNMPv2 interface.
 
 2\. Link the template to the host.
 
