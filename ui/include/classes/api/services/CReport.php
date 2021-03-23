@@ -223,7 +223,7 @@ class CReport extends CApiService {
 		foreach ($reports as $index => $report) {
 			if ($report['active_till'] > 0 && $report['active_since'] > $report['active_till']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('"%1$s" must be greater than "%2$s or equal to "%3$s".', 'active_till', 'active_since', 0)
+					_s('"%1$s" must be greater than "%2$s" or equal to %3$s.', 'active_till', 'active_since', 0)
 				);
 			}
 
@@ -235,7 +235,7 @@ class CReport extends CApiService {
 				if ($report['active_since'] != $day_start_timestamp) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'active_since',
-						_s('must be a timestamp representing the beginning of a particular day (00:00:00).')
+						_('must be a timestamp representing the beginning of a particular day (00:00:00)')
 					));
 				}
 			}
@@ -247,7 +247,7 @@ class CReport extends CApiService {
 
 				if ($report['active_till'] != $day_end_timestamp) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'active_till', _s('must be a timestamp representing the end of a particular day (23:59:59).')
+						'active_till', _('must be a timestamp representing the end of a particular day (23:59:59)')
 					));
 				}
 			}
@@ -398,7 +398,7 @@ class CReport extends CApiService {
 				if ($report['active_since'] != $day_start_timestamp) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'active_since',
-						_s('must be a timestamp representing the beginning of a particular day (00:00:00).')
+						_('must be a timestamp representing the beginning of a particular day (00:00:00)')
 					));
 				}
 
@@ -413,7 +413,7 @@ class CReport extends CApiService {
 
 				if ($report['active_till'] != $day_end_timestamp) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'active_till', _s('must be a timestamp representing the end of a particular day (23:59:59).')
+						'active_till', _('must be a timestamp representing the end of a particular day (23:59:59)')
 					));
 				}
 
@@ -422,7 +422,7 @@ class CReport extends CApiService {
 
 			if ($active_till > 0 && $active_since > $active_till) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('"%1$s" must be greater than "%2$s or equal to "%3$s".', 'active_till', 'active_since', 0)
+					_s('"%1$s" must be greater than "%2$s" or equal to %3$s.', 'active_till', 'active_since', 0)
 				);
 			}
 
