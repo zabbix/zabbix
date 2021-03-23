@@ -566,13 +566,11 @@ class CReport extends CApiService {
 
 				$upd_report_user = [];
 
-				if (array_key_exists('access_userid', $report_user)
-						&& $report_user['access_userid'] !== $db_report_user['access_userid']) {
-					$upd_report_user['access_userid'] = $report_user['access_userid'];
-				}
-				if (array_key_exists('exclude', $report_user)
-						&& $report_user['exclude'] !== $db_report_user['exclude']) {
-					$upd_report_user['exclude'] = $report_user['exclude'];
+				foreach (['userid', 'access_userid', 'exclude'] as $field_name) {
+					if (array_key_exists($field_name, $report_user)
+							&& $report_user[$field_name] != $db_report_user[$field_name]) {
+						$upd_report_user[$field_name] = $report_user[$field_name];
+					}
 				}
 
 				if ($upd_report_user) {
@@ -587,8 +585,10 @@ class CReport extends CApiService {
 			}
 		}
 
-		foreach ($report_users as $reportid => $report_user) {
-			$ins_report_users[] = ['reportid' => $reportid] + $report_user;
+		foreach ($report_users as $reportid => $users) {
+			foreach ($users as $user) {
+				$ins_report_users[] = ['reportid' => $reportid] + $user;
+			}
 		}
 
 		if ($ins_report_users) {
@@ -640,9 +640,11 @@ class CReport extends CApiService {
 
 				$upd_report_usrgrp = [];
 
-				if (array_key_exists('access_userid', $report_usrgrp)
-						&& $report_usrgrp['access_userid'] !== $db_report_usrgrp['access_userid']) {
-					$upd_report_usrgrp['access_userid'] = $report_usrgrp['access_userid'];
+				foreach (['usrgrpid', 'access_userid'] as $field_name) {
+					if (array_key_exists($field_name, $report_usrgrp)
+							&& $report_usrgrp[$field_name] != $db_report_usrgrp[$field_name]) {
+						$upd_report_usrgrp[$field_name] = $report_usrgrp[$field_name];
+					}
 				}
 
 				if ($upd_report_usrgrp) {
@@ -657,8 +659,10 @@ class CReport extends CApiService {
 			}
 		}
 
-		foreach ($report_usrgrps as $reportid => $report_usrgrp) {
-			$ins_report_usrgrps[] = ['reportid' => $reportid] + $report_usrgrp;
+		foreach ($report_usrgrps as $reportid => $usrgrps) {
+			foreach ($usrgrps as $usrgrp) {
+				$ins_report_usrgrps[] = ['reportid' => $reportid] + $usrgrp;
+			}
 		}
 
 		if ($ins_report_usrgrps) {
