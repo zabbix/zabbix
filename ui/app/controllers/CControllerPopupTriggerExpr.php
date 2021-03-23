@@ -507,28 +507,22 @@ class CControllerPopupTriggerExpr extends CController {
 
 					// Determine param type.
 					$params = $function_token->params_raw['parameters'];
-					if (array_key_exists(0, $params) && !is_array($params[0])
+					if (array_key_exists(0, $params)
 							&& $params[0]->type == CTriggerExprParserResult::TOKEN_TYPE_QUERY) {
 						array_shift($params);
 					}
 
-					$is_num = (array_key_exists(0, $params) && is_array($params[0])
-						&& substr($params[0]['raw'], 0, 1) === '#'
-					);
+					$is_num = (array_key_exists(0, $params) && substr($params[0]->match, 0, 1) === '#');
 
 					if (!in_array($function, ['fuzzytime', 'nodata']) && $is_num) {
 						$param_type = PARAM_TYPE_COUNTS;
-						$params[0]['raw'] = substr($params[0]['raw'], 1);
+						$params[0]->match = substr($params[0]->match, 1);
 					}
 					else {
 						$param_type = PARAM_TYPE_TIME;
 					}
 
-					$params = array_map(function ($param) {
-						return is_array($param)
-							? $param['raw']
-							: $param->match;
-					}, $params);
+					$params = array_column($params, 'match');
 
 					/*
 					 * Try to find an operator, a value and item.
@@ -560,7 +554,7 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($fn_name, $this->functions)
 									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
 								$operator = $operator_token->match;
-								$value = $value_token->match;
+								$value = $value_token->data['string'];
 							}
 							else {
 								break;
@@ -600,10 +594,11 @@ class CControllerPopupTriggerExpr extends CController {
 			$item = reset($item);
 		}
 
-		if ($itemid) {
+		if ($item) {
 			$items = CMacrosResolverHelper::resolveItemNames([$item]);
 			$item = $items[0];
 
+			$itemid = $item['itemid'];
 			$item_value_type = $item['value_type'];
 			$item_key = $item['key_'];
 			$item_host_data = reset($item['hosts']);

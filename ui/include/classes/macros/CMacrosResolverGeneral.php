@@ -388,13 +388,13 @@ class CMacrosResolverGeneral {
 							$function_parameters = [];
 
 							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-								switch ($param_raw['type']) {
+								switch ($param_raw->type) {
 									case CFunctionParser::PARAM_UNQUOTED:
-										$function_parameters[] = $param_raw['raw'];
+										$function_parameters[] = $param_raw->match;
 										break;
 
 									case CFunctionParser::PARAM_QUOTED:
-										$function_parameters[] = CFunctionParser::unquoteParam($param_raw['raw']);
+										$function_parameters[] = CFunctionParser::unquoteParam($param_raw->match);
 										break;
 								}
 							}
@@ -511,13 +511,13 @@ class CMacrosResolverGeneral {
 		$function_parameters = [];
 		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
 			foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-				switch ($param_raw['type']) {
+				switch ($param_raw->type) {
 					case CFunctionParser::PARAM_UNQUOTED:
-						$function_parameters[] = $param_raw['raw'];
+						$function_parameters[] = $param_raw->match;
 						break;
 
 					case CFunctionParser::PARAM_QUOTED:
-						$function_parameters[] = CFunctionParser::unquoteParam($param_raw['raw']);
+						$function_parameters[] = CFunctionParser::unquoteParam($param_raw->match);
 						break;
 				}
 			}
