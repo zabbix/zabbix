@@ -161,10 +161,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 // setDiskFields goes through provided device json map and sets disk_name
 // disk_type and returns the devices in a slice.
 // It returns an error if there is an issue with unmarshal for the provided input JSON map
-func setDiskFields(deviceJsons map[string]string) (out []interface{}, err error) {
+func setDiskFields(deviceJsons map[string]jsonDevice) (out []interface{}, err error) {
 	for k, v := range deviceJsons {
 		b := make(map[string]interface{})
-		if err = json.Unmarshal([]byte(v), &b); err != nil {
+		if err = json.Unmarshal([]byte(v.jsonData), &b); err != nil {
 			return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 

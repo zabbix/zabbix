@@ -24,7 +24,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_events_by_eventids                                       *
+ * Function: zbx_db_get_events_by_eventids                                    *
  *                                                                            *
  * Purpose: get events and flags that indicate what was filled in DB_EVENT    *
  *          structure                                                         *
@@ -32,7 +32,7 @@
  * Parameters: eventids   - [IN] requested event ids                          *
  *             events     - [OUT] the array of events                         *
  *                                                                            *
- * Comments: use 'free_db_event' function to release allocated memory         *
+ * Comments: use 'zbx_db_free_event' function to release allocated memory     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events)
@@ -232,9 +232,9 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_free_event                                                   *
+ * Function: zbx_db_free_event                                                *
  *                                                                            *
- * Purpose: deallocate memory allocated in function 'get_db_events_info'      *
+ * Purpose: deallocate memory allocated in zbx_db_get_events_by_eventids()    *
  *                                                                            *
  * Parameters: event - [IN] event data                                        *
  *                                                                            *

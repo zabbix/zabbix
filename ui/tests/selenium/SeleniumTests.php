@@ -135,6 +135,8 @@ require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormUser.php';
 require_once dirname(__FILE__).'/testFormUserMedia.php';
 require_once dirname(__FILE__).'/testFormUserProfile.php';
+require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
+require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
 require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testFormWebStep.php';
 require_once dirname(__FILE__).'/testFormApplication.php';
@@ -291,6 +293,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUser');
 		$suite->addTestSuite('testFormUserMedia');
 		$suite->addTestSuite('testFormUserProfile');
+		$suite->addTestSuite('testFormValueMappingsHost');
+		$suite->addTestSuite('testFormValueMappingsTemplate');
 		$suite->addTestSuite('testFormWeb');
 		$suite->addTestSuite('testFormWebStep');
 		$suite->addTestSuite('testFormApplication');

@@ -371,6 +371,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 	$hostids = [];
 	$groupids = [];
 	$templateids = [];
+	$scriptids = [];
 
 	foreach ($actions as $i => $action) {
 		$result[$i] = [];
@@ -414,6 +415,8 @@ function getActionOperationDescriptions(array $actions, $type) {
 								$groupids[$host_group['groupid']] = true;
 							}
 						}
+
+						$scriptids[$operation['opcommand']['scriptid']] = true;
 						break;
 
 					case OPERATION_TYPE_GROUP_ADD:
@@ -475,6 +478,8 @@ function getActionOperationDescriptions(array $actions, $type) {
 								$groupids[$host_group['groupid']] = true;
 							}
 						}
+
+						$scriptids[$operation['opcommand']['scriptid']] = true;
 						break;
 				}
 			}
@@ -487,6 +492,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 	$hosts = [];
 	$host_groups = [];
 	$templates = [];
+	$scripts = [];
 
 	if ($media_typeids) {
 		$media_types = API::Mediatype()->get([
@@ -537,6 +543,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 		$templates = API::Template()->get([
 			'output' => ['name'],
 			'templateids' => array_keys($templateids),
+			'preservekeys' => true
+		]);
+	}
+
+	if ($scriptids) {
+		$scripts = API::Script()->get([
+			'output' => ['name'],
+			'scriptids' => array_keys($scriptids),
+			'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
 			'preservekeys' => true
 		]);
 	}
@@ -592,13 +607,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 						break;
 
 					case OPERATION_TYPE_COMMAND:
+						$scriptid = $operation['opcommand']['scriptid'];
+
 						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 							$host_list = [];
 
 							foreach ($operation['opcommand_hst'] as $host) {
 								if ($host['hostid'] == 0) {
 									$result[$i][$j][] = [
-										bold(_('Run remote commands on current host')),
+										bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
 										BR()
 									];
 								}
@@ -610,7 +627,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 							if ($host_list) {
 								order_result($host_list);
 
-								$result[$i][$j][] = bold(_('Run remote commands on hosts').': ');
+								$result[$i][$j][] = bold(
+									_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
+								);
 								$result[$i][$j][] = [implode(', ', $host_list), BR()];
 							}
 						}
@@ -626,7 +645,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 							order_result($host_group_list);
 
-							$result[$i][$j][] = bold(_('Run remote commands on host groups').': ');
+							$result[$i][$j][] = bold(
+								_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
+							);
 							$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
 						}
 						break;
@@ -755,13 +776,15 @@ function getActionOperationDescriptions(array $actions, $type) {
 						break;
 
 					case OPERATION_TYPE_COMMAND:
+						$scriptid = $operation['opcommand']['scriptid'];
+
 						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 							$host_list = [];
 
 							foreach ($operation['opcommand_hst'] as $host) {
 								if ($host['hostid'] == 0) {
 									$result[$i][$j][] = [
-										bold(_('Run remote commands on current host')),
+										bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
 										BR()
 									];
 								}
@@ -773,7 +796,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 							if ($host_list) {
 								order_result($host_list);
 
-								$result[$i][$j][] = bold(_('Run remote commands on hosts').': ');
+								$result[$i][$j][] = bold(
+									_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
+								);
 								$result[$i][$j][] = [implode(', ', $host_list), BR()];
 							}
 						}
@@ -789,7 +814,9 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 							order_result($host_group_list);
 
-							$result[$i][$j][] = bold(_('Run remote commands on host groups').': ');
+							$result[$i][$j][] = bold(
+								_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
+							);
 							$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
 						}
 						break;
@@ -799,102 +826,6 @@ function getActionOperationDescriptions(array $actions, $type) {
 						$result[$i][$j][] = bold(_('Notify all involved'));
 						break;
 				}
-			}
-		}
-	}
-
-	return $result;
-}
-
-/**
- * Gathers action operation script details and returns the HTML items representing action operation with hint.
- *
- * @param array  $operations                      Array of action operations.
- * @param string $operation['operationtype']      Action operation type.
- *                                                Possible values: OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
- *                                                OPERATION_TYPE_ACK_MESSAGE and OPERATION_TYPE_RECOVERY_MESSAGE
- * @param string $operation['opcommand']['type']  Action operation command type.
- *                                                Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
- *                                                ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
- *                                                and ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
- *
- * @return array  Returns an array of action operation hints.
- */
-function getActionOperationHints(array $operations) {
-	$result = [];
-	$scriptids = [];
-	$scripts = [];
-
-	foreach ($operations as $operation) {
-		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
-				&& $operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-			$scriptids[$operation['opcommand']['scriptid']] = true;
-		}
-	}
-
-	if ($scriptids) {
-		$scripts = API::Script()->get([
-			'output' => ['name'],
-			'scriptids' => array_keys($scriptids),
-			'preservekeys' => true
-		]);
-	}
-
-	foreach ($operations as $key => $operation) {
-		$result[$key] = [];
-
-		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
-			switch ($operation['opcommand']['type']) {
-				case ZBX_SCRIPT_TYPE_IPMI:
-					$result[$key][] = [bold(_('Run IPMI command').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
-
-				case ZBX_SCRIPT_TYPE_SSH:
-					$result[$key][] = [bold(_('Run SSH commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
-
-				case ZBX_SCRIPT_TYPE_TELNET:
-					$result[$key][] = [bold(_('Run TELNET commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
-
-				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-					if ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix agent')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					elseif ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY) {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server (proxy)')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					else {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					break;
-
-				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-					$scriptId = $operation['opcommand']['scriptid'];
-
-					if (isset($scripts[$scriptId])) {
-						$result[$key][] = [bold(_('Run global script').': '),
-							italic($scripts[$scriptId]['name'])
-						];
-					}
-					break;
-
-				default:
-					$result[$key][] = [bold(_('Run commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
 			}
 		}
 	}

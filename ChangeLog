@@ -1,12 +1,35 @@
+Changes for 5.4.0rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.4.0beta2
 
 New features:
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
+A.F.I..PS. [ZBXNEXT-6368] moved action operation scripts to global scripts, added manually started scripts on events (Andris, Ivo, vso)
+...G...... [ZBXNEXT-6408] added mongoDB plugin (vadimipatov)
+.........T [ZBXNEXT-5869] added templates "MongoDB node by Zabbix Agent 2" and "MongoDB cluster by Zabbix Agent 2" (ychukina)
+.........T [ZBXNEXT-6507] added Template Power APC UPS by SNMP (mchudinov)
 .........T [ZBXNEXT-6462] added Cisco Catalyst 3750 templates (afayantsev)
 .......PS. [ZBXNEXT-6503] added protection of Zabbix Server from overloading by proxy data (dgoloscapov, wiper)
 .........T [ZBXNEXT-6450] added template NetApp AFF A700 by HTTP (mchudinov)
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 
 Bug fixes:
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
+..F....... [ZBX-18595] fixed wrong filtering for nested groups in monitoring problems page (gcalenko)
+...G...... [ZBX-19103] fixed device sorting in Zabbix agent 2 smartctl plugin (esneiders)
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
+.........T [ZBX-18918] updated deprecated items in "RabbitMQ" template (abakaldin)
+..F....... [ZBX-18894] fixed session_key update for dynamic configid (rlataria)
+.........T [ZBX-18634] changed macro names according to the Guidelines, fixed context macros in Temperature Discovery triggers, added preprocessing into Fan Discovery and Temperature Discovery (mchudinov)
+.........T [ZBX-18620] added {#REPLICA_NAME} macro in items of Non-local database discovery (mchudinov)
 ...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
 .........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
 ....I..... [ZBXNEXT-6474] fixed inconsistent datatypes in oracle DB upgrade patch query (talbergs)
@@ -139,6 +162,11 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.6rc1
 
 New features:
+.......PS. [ZBXNEXT-6503] added protection of Zabbix Server from overloading by proxy data (dgoloscapov, wiper)
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
+...G...... [ZBXNEXT-6408] added mongoDB plugin (vadimipatov)
+.........T [ZBXNEXT-5869] added templates "MongoDB node by Zabbix Agent 2" and "MongoDB cluster by Zabbix Agent 2" (ychukina)
+.........T [ZBXNEXT-6507] added Template Power APC UPS by SNMP (mchudinov)
 .........T [ZBXNEXT-6462] added Cisco Catalyst 3750 templates (afayantsev)
 .........T [ZBXNEXT-6450] added template NetApp AFF A700 by HTTP (mchudinov)
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
@@ -149,6 +177,17 @@ New features:
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
+..F....... [ZBX-18595] fixed wrong filtering for nested groups in monitoring problems page (gcalenko)
+...G...... [ZBX-19103] fixed device sorting in Zabbix agent 2 smartctl plugin (esneiders)
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
+.........T [ZBX-18918] updated deprecated items in "RabbitMQ" template (abakaldin)
+..F....... [ZBX-18894] fixed session_key update for dynamic configid (rlataria)
+.........T [ZBX-18634] changed macro names according to the Guidelines, fixed context macros in Temperature Discovery triggers, added preprocessing into Fan Discovery and Temperature Discovery (mchudinov)
+.........T [ZBX-18620] added {#REPLICA_NAME} macro in items of Non-local database discovery (mchudinov)
 ...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
 .........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
 A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
@@ -592,6 +631,11 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.10rc1
 
 New features:
+.......PS. [ZBXNEXT-6503] added protection of Zabbix Server from overloading by proxy data (dgoloscapov, wiper)
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
+.........T [ZBXNEXT-5869] added templates "MongoDB node by Zabbix Agent 2" and "MongoDB cluster by Zabbix Agent 2" (ychukina)
+.........T [ZBXNEXT-6507] added Template Power APC UPS by SNMP (mchudinov)
+...G...... [ZBXNEXT-6408] added mongoDB plugin (vadimipatov)
 .........T [ZBXNEXT-6462] added Cisco Catalyst 3750 templates (afayantsev)
 .........T [ZBXNEXT-6450] added template NetApp AFF A700 by HTTP (mchudinov)
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
@@ -600,6 +644,15 @@ New features:
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
+...G...... [ZBX-19103] fixed device sorting in Zabbix agent 2 smartctl plugin (esneiders)
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
+.........T [ZBX-18918] updated deprecated items in "RabbitMQ" template (abakaldin)
+.........T [ZBX-18634] changed macro names according to the Guidelines, fixed context macros in Temperature Discovery triggers, added preprocessing into Fan Discovery and Temperature Discovery (mchudinov)
+.........T [ZBX-18620] added {#REPLICA_NAME} macro in items of Non-local database discovery (mchudinov)
 ...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
 .........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
 A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
@@ -2586,8 +2639,14 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.30rc1
 
 New features:
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
 
 Bug fixes:
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
 A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 

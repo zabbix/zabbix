@@ -884,7 +884,7 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param array scripts           Scripts names.
+ * @param array scripts           Script names amd nenu paths.
  * @param {object} trigger_elmnt  UI element which triggered opening of overlay dialogue.
  * @param array hostid            Host ID.
  * @param array eventid           Event ID.
@@ -899,13 +899,17 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 			var item = items.shift();
 
 			if (typeof tree[item] === 'undefined') {
-				tree[item] = {items: {}};
+				tree[item] = {
+					name: item,
+					items: {}
+				};
 			}
 
 			appendTreeItem(tree[item].items, name, items, params);
 		}
 		else {
-			tree[name] = {
+			tree['/' + name] = {
+				name: name,
 				params: params,
 				items: {}
 			};
@@ -917,10 +921,9 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 		var script = scripts[key];
 
 		if (typeof script.scriptid !== 'undefined') {
-			var items = splitPath(script.name),
-				name = (items.length > 0) ? items.pop() : script.name;
+			var items = (script.menu_path.length > 0) ? splitPath(script.menu_path) : [];
 
-			appendTreeItem(tree, name, items, {
+			appendTreeItem(tree, script.name, items, {
 				scriptid: script.scriptid,
 				confirmation: script.confirmation,
 				hostid: hostid,
@@ -929,13 +932,13 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 		}
 	}
 
-	// build menu items from tree
+	// Build menu items from tree.
 	var getMenuPopupScriptItems = function(tree, trigger_elm) {
 		var items = [];
 
 		if (objectSize(tree) > 0) {
-			jQuery.each(tree, function(name, data) {
-				var item = {label: name};
+			jQuery.each(tree, function(key, data) {
+				var item = {label: data.name};
 
 				if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
 					item.items = getMenuPopupScriptItems(data.items, trigger_elm);

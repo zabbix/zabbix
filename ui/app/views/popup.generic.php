@@ -553,53 +553,6 @@ switch ($data['popup_type']) {
 		unset($graph);
 		break;
 
-	case 'scripts':
-		foreach ($data['table_records'] as $script) {
-			$description = new CLink($script['name'], 'javascript:void(0);');
-
-			$check_box = $data['multiselect']
-				? new CCheckBox('scripts['.zbx_jsValue($script[$options['srcfld1']]).']', $script['scriptid'])
-				: null;
-
-			if ($data['multiselect']) {
-				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-					zbx_jsvalue($script['scriptid']).');';
-			}
-			else {
-				$values = [
-					$options['dstfld1'] => $script[$options['srcfld1']],
-					$options['dstfld2'] => $script[$options['srcfld2']]
-				];
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-					zbx_jsvalue($values).');';
-			}
-			$description->onClick($js_action.$js_action_onclick);
-
-			if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {
-				switch ($script['execute_on']) {
-					case ZBX_SCRIPT_EXECUTE_ON_AGENT:
-						$script_execute_on = _('Agent');
-						break;
-					case ZBX_SCRIPT_EXECUTE_ON_SERVER:
-						$script_execute_on = _('Server');
-						break;
-					case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-						$script_execute_on = _('Server (proxy)');
-						break;
-				}
-			}
-			else {
-				$script_execute_on = '';
-			}
-			$table->addRow([
-				$check_box,
-				$description,
-				$script_execute_on
-			]);
-		}
-		unset($data['table_records']);
-		break;
-
 	case 'valuemap_names':
 		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
 

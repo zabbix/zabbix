@@ -355,19 +355,6 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'scripts' => [
-				'title' => _('Global scripts'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'scriptid,name',
-				'form' => [
-					'name' => 'scriptform',
-					'id' => 'scripts'
-				],
-				'table_columns' => [
-					_('Name'),
-					_('Execute on')
-				]
-			],
 			'roles' => [
 				'title' => _('User roles'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -1302,23 +1289,6 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id', 'host' => 'name']);
 				break;
 
-			case 'scripts':
-				$options += [
-					'output' => ['scriptid', 'name', 'type', 'execute_on'],
-					'groupids' => (!$this->hostids && $this->groupids) ? $this->groupids : null
-				];
-
-				if ((!$this->host_preselect_required && $this->hostids)
-						|| (!$this->group_preselect_required || $this->groupids)) {
-					$records = API::Script()->get($options);
-				}
-				else {
-					$records = [];
-				}
-
-				CArrayHelper::sort($records, ['name']);
-				break;
-
 			case 'roles':
 				$options += [
 					'output' => ['roleid', 'name'],
@@ -1329,6 +1299,7 @@ class CControllerPopupGeneric extends CController {
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
 				break;
+
 			case 'api_methods':
 				$user_type = $this->getInput('user_type', USER_TYPE_ZABBIX_USER);
 				$api_methods = CRoleHelper::getApiMethods($user_type);

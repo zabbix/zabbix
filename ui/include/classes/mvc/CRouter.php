@@ -54,7 +54,7 @@ class CRouter {
 	 * @var array
 	 */
 	private $routes = [
-		// action						controller											layout					view
+		// action							controller											layout					view
 		'action.operation.get'				=> ['CControllerActionOperationGet',				'layout.json',			null],
 		'action.operation.validate'			=> ['CControllerActionOperationValidate',			'layout.json',			null],
 		'application.create'				=> ['CControllerApplicationCreate',					null,					null],
@@ -111,6 +111,7 @@ class CRouter {
 		'favourite.delete'					=> ['CControllerFavouriteDelete',					'layout.javascript',	null],
 		'gui.edit'							=> ['CControllerGuiEdit',							'layout.htmlpage',		'administration.gui.edit'],
 		'gui.update'						=> ['CControllerGuiUpdate',							null,					null],
+		'hint.box'							=> ['CControllerHintBox',							'layout.json',			'hint.box'],
 		'host.dashboard.view'				=> ['CControllerHostDashboardView',					'layout.htmlpage',		'monitoring.host.dashboard.view'],
 		'host.view'							=> ['CControllerHostView',							'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'					=> ['CControllerHostViewRefresh',					'layout.json',			'monitoring.host.view.refresh'],
