@@ -192,56 +192,6 @@ class testPageTriggerUrl extends CWebTest {
 
 	/**
 	 * @dataProvider getTriggerLinkData
-	 * Check trigger url in screen item Trigger overview.
-	 */
-	public function testPageTriggerUrl_ScreensTriggerOverview($data) {
-		$name = 'Trigger overview';
-		$this->page->login()->open('screens.php?elementid=200021');
-		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']/../../..')->one()->waitUntilPresent();
-		$table = $screen_item->query('class:list-table')->asTable()->one();
-		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', $data['trigger']);
-
-		// Open trigger context menu.
-		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
-		$this->checkTriggerUrl(true, $data);
-	}
-
-	/**
-	 * @dataProvider getTriggerLinkData
-	 * Check trigger url in screen item Host issues.
-	 */
-	public function testPageTriggerUrl_ScreensHostIssues($data) {
-		$name = 'Host issues';
-		$this->page->login()->open('screens.php?elementid=200021');
-		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']/../../..')->one()->waitUntilPresent();
-		$table = $screen_item->query('class:list-table')->asTable()->one();
-
-		// Find trigger and open trigger overlay.
-		$table->query('link', $data['trigger'])->one()->click();
-		$this->checkTriggerUrl(false, $data, false);
-	}
-
-	/**
-	 * @dataProvider getTriggerLinkData
-	 * Check trigger url in screen item Host group issues.
-	 */
-	public function testPageTriggerUrl_ScreensHostGroupIssues($data) {
-		$name = 'Host issues';
-		$this->page->login()->open('screens.php?elementid=200021');
-		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']/../../..')->one()->waitUntilPresent();
-		$table = $screen_item->query('class:list-table')->asTable()->one();
-
-		// Find trigger and open trigger overlay.
-		$table->query('link', $data['trigger'])->one()->click();
-		$this->checkTriggerUrl(false, $data, false);
-	}
-
-	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Event details page.
 	 */
 	public function testPageTriggerUrl_EventDetails($data) {
