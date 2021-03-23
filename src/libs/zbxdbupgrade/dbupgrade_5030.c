@@ -1350,7 +1350,6 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 					loc = &params->values[index];
 					if ('"' == parameter[loc->l])
 					{
-						loc = &params->values[index];
 						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
 								loc->r - loc->l + 1);
 					}
