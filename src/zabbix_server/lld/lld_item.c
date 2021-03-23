@@ -1969,6 +1969,8 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 			case ZBX_EVAL_TOKEN_VAR_STR:
+			case ZBX_EVAL_TOKEN_VAR_NUM:
+			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 
 				if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err,

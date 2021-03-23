@@ -425,6 +425,8 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *hos
 						hostids, hostids_num, &value, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
+			case ZBX_EVAL_TOKEN_VAR_NUM:
+			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				if (NULL == (ptr = strstr(ctx->expression + token->loc.l, "{$")) ||
 						ptr >= ctx->expression + token->loc.r)
 				{
