@@ -244,7 +244,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 
 	do
 	{
-		if ('{'  ==  (ctx->expression[offset]))
+		if ('{' == (ctx->expression[offset]))
 		{
 			if (SUCCEED != eval_parse_macro(ctx, offset, &tok))
 				break;
