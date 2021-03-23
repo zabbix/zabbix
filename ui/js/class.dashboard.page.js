@@ -821,7 +821,9 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
-			this._resizeGrid(widget.getPosition());
+			const pos = widget.getPosition();
+
+			this._resizeGrid(pos.y + pos.height + this._grid_pad_rows);
 
 			this._dashboard_grid.appendChild(widget.getView());
 			this._activateWidget(widget);
