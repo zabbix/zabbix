@@ -23,11 +23,11 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
-
 $form = (new CForm())
 	->setId('scheduledreport-form')
-	->setName('scheduledreport_form');
+	->setName('scheduledreport_form')
+	->addVar('action', 'popup.scheduledreport.create')
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $form->addItem(new CPartial('scheduledreport.formgrid.html', [
 	'source' => 'popup',
@@ -37,11 +37,13 @@ $form->addItem(new CPartial('scheduledreport.formgrid.html', [
 $output = [
 	'header' => $data['title'],
 	'body' => $form->toString(),
+	'script_inline' => $this->readJsFile('popup.scheduledreport.edit.js.php'),
 	'buttons' => [
 		[
 			'title' => _('Add'),
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => true,
+			'action' => 'return submitScheduledReport(overlay);'
 		]
 	]
 ];

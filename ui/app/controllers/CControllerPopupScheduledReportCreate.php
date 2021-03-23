@@ -22,14 +22,102 @@
 class CControllerPopupScheduledReportCreate extends CController {
 
 	protected function checkInput() {
-		// TODO: Implement checkInput() method.
+		$fields = [
+			'userid' =>			'required|db report.userid',
+			'name' =>			'required|db report.name|not_empty',
+			'dashboardid' =>	'required|db report.dashboardid',
+			'period' =>			'db report.period|in '.implode(',', [ZBX_REPORT_PERIOD_DAY, ZBX_REPORT_PERIOD_WEEK, ZBX_REPORT_PERIOD_MONTH, ZBX_REPORT_PERIOD_YEAR]),
+			'cycle' =>			'db report.cycle|in '.implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY]),
+			'weekdays' =>		'array',
+			'hours' =>			'int32|ge 0|le 23',
+			'minutes' =>		'int32|ge 0|le 59',
+			'active_since' =>	'string',
+			'active_till' =>	'string',
+			'subject' =>		'string',
+			'message' =>		'string',
+			'subscriptions' =>	'array',
+			'description' =>	'db report.description',
+			'status' =>			'db report.status|in '.ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED,
+			'form_refresh' =>	'int32'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+			);
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
-		// TODO: Implement checkPermissions() method.
+		return true;
 	}
 
 	protected function doAction() {
-		// TODO: Implement doAction() method.
+		$report = [];
+
+		$this->getInputs($report, ['userid', 'name', 'dashboardid', 'period', 'cycle', 'active_since', 'active_till',
+			'subject', 'message', 'description', 'status'
+		]);
+
+		$report['weekdays'] = ($report['cycle'] == ZBX_REPORT_CYCLE_DAILY
+				|| $report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY)
+			? array_sum($this->getInput('weekdays', []))
+			: 0;
+		$report['start_time'] = ($this->getInput('hours') * SEC_PER_HOUR) + ($this->getInput('minutes') * SEC_PER_MIN);
+		$report['active_since'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_since']) !== false)
+			? (new DateTime($report['active_since']))->getTimestamp()
+			: 0;
+		$report['active_till'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_till']) !== false)
+			? (new DateTime($report['active_till']))->getTimestamp()
+			: 0;
+		$report['users'] = [];
+		$report['user_groups'] = [];
+
+		foreach ($this->getInput('subscriptions', []) as $subscription) {
+			if ($subscription['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
+				$report['users'][] = [
+					'userid' => $subscription['recipientid'],
+					'exclude' => $subscription['exclude'],
+					'access_userid' => ($subscription['creator_type'] == ZBX_REPORT_CREATOR_TYPE_USER)
+						? CWebUser::$data['userid']
+						: 0
+				];
+			}
+			else {
+				$report['user_groups'][] = [
+					'usrgrpid' => $subscription['recipientid'],
+					'access_userid' => ($subscription['creator_type'] == ZBX_REPORT_CREATOR_TYPE_USER)
+						? CWebUser::$data['userid']
+						: 0
+				];
+			}
+		}
+
+		$result = API::Report()->create($report);
+
+		$output = [];
+
+		if ($result) {
+			$output['title'] = _('Scheduled report created');
+			$messages = CMessageHelper::getMessages();
+
+			if ($messages) {
+				$output['messages'] = array_column($messages, 'message');
+			}
+		}
+		else {
+			$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
+		}
+
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }

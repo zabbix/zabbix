@@ -65,12 +65,17 @@ class CControllerPopupScheduledReportEdit extends CController {
 			'active_till' => '',
 			'subject' => '',
 			'message' => '',
+			'subscriptions' => [[
+				'recipientid' => CWebUser::$data['userid'],
+				'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
+				'recipient_name' => getUserFullname(CWebUser::$data),
+				'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
+				'exclude' => ZBX_REPORT_EXCLUDE_USER_FALSE
+			]],
 			'description' => $db_defaults['description'],
 			'status' => $db_defaults['status'],
 			'form_refresh' => 0,
-			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS),
-			'users' => [],
-			'user_groups' => []
+			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS)
 		];
 
 		$this->getInputs($data, ['name', 'period', 'cycle', 'hours', 'minutes', 'active_since', 'active_till',
@@ -81,6 +86,7 @@ class CControllerPopupScheduledReportEdit extends CController {
 			$data['userid'] = $this->getInput('userid', 0);
 			$data['dashboardid'] = $this->getInput('dashboardid', 0);
 			$data['weekdays'] = array_sum($this->getInput('weekdays', []));
+			$data['subscriptions'] = $this->getInput('subscriptions', []);
 		}
 
 		$data['ms_user'] = [];
