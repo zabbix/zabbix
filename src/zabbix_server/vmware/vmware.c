@@ -3288,7 +3288,7 @@ out:
 static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *service, CURL *easyhandle,
 		const char *hvid, xmlDoc **xdoc, char **error)
 {
-#	define ZBX_POST_HV_MP_DETAILS 									\
+#	define ZBX_POST_HV_MP_DETAILS									\
 		ZBX_POST_VSPHERE_HEADER									\
 		"<ns0:RetrievePropertiesEx>"								\
 			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
@@ -3307,7 +3307,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char	tmp[MAX_STRING_LEN],*hvid_esc;
+	char	tmp[MAX_STRING_LEN], *hvid_esc;
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __func__, hvid);
