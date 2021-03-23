@@ -94,18 +94,19 @@ static void	eval_update_const_variable(zbx_eval_context_t *ctx, zbx_eval_token_t
  *          following a macro                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	eval_is_compound_number_char(char c)
+static int	eval_is_compound_number_char(char c, int pos)
 {
 	if (0 != isdigit((unsigned char)c))
 		return SUCCEED;
 
 	switch (c)
 	{
-		case 'e':
-		case 'E':
 		case '.':
 		case '{':
 			return SUCCEED;
+		case 'e':
+		case 'E':
+			return (0 != pos ? SUCCEED : FAIL);
 	}
 
 	return FAIL;
@@ -244,7 +245,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 
 	do
 	{
-		if ('{'  ==  (ctx->expression[offset]))
+		if ('{' == (ctx->expression[offset]))
 		{
 			if (SUCCEED != eval_parse_macro(ctx, offset, &tok))
 				break;
@@ -288,7 +289,8 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 					goto out;
 			}
 		}
-		else if (SUCCEED == eval_parse_number(ctx, offset, &offset))
+		else if (SUCCEED == eval_parse_number(ctx, offset, &offset) ||
+				SUCCEED == eval_is_compound_number_char(ctx->expression[offset], offset - pos))
 		{
 			type = ZBX_EVAL_TOKEN_VAR_NUM;
 			offset++;
@@ -296,8 +298,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 		else
 			break;
 	}
-	while (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPOUND_CONST) &&
-			SUCCEED == eval_is_compound_number_char(ctx->expression[offset]));
+	while (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPOUND_CONST));
 out:
 	if (0 == type)
 	{
@@ -305,7 +306,7 @@ out:
 		return FAIL;
 	}
 
-	if (ZBX_EVAL_TOKEN_VAR_NUM == type)
+	if (ZBX_EVAL_TOKEN_VAR_NUM == type || ZBX_EVAL_TOKEN_VAR_USERMACRO == type)
 		eval_update_const_variable(ctx, token);
 
 	token->type = type;
