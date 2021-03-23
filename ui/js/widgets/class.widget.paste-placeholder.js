@@ -29,6 +29,6 @@ class CWidgetPastePlaceholder extends CWidget {
 	}
 
 	_promiseUpdate() {
-		return Promise.reject();
+		return Promise.resolve();
 	}
 }
