@@ -4744,7 +4744,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vector_ptr_t	events;
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
-	unsigned char		evt_pause, evt_skip_old;
+	unsigned char		evt_pause = 0, evt_skip_old;
 	zbx_uint64_t		evt_last_key, events_sz = 0;
 	char			msg[MAX_STRING_LEN / 8];
 
@@ -4762,6 +4762,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	zbx_vector_str_create(&hvs);
 	zbx_vector_str_create(&dss);
+
+	zbx_vmware_lock();
+	evt_last_key = service->eventlog.last_key;
+	evt_skip_old = service->eventlog.skip_old;
+	zbx_vmware_unlock();
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -4790,19 +4795,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	zbx_vmware_lock();
-	evt_last_key = service->eventlog.last_key;
-	evt_skip_old = service->eventlog.skip_old;
-
 	if (NULL != service->data && 0 != service->data->events.values_num && 0 == evt_skip_old &&
 			((const zbx_vmware_event_t *)service->data->events.values[0])->key > evt_last_key)
 	{
 		evt_pause = 1;
 	}
-	else
-		evt_pause = 0;
-
-	zbx_vmware_unlock();
 
 	if (SUCCEED != vmware_service_get_hv_ds_dc_list(service, easyhandle, &hvs, &dss, &data->datacenters,
 			&data->error))
