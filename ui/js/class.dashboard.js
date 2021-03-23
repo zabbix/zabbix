@@ -1373,7 +1373,7 @@ class CDashboard extends CBaseComponent {
 				if (wrapper.offsetWidth > wrapper.clientWidth) {
 					wrapper_scrollbar_width = wrapper.offsetWidth - wrapper.clientWidth;
 
-					this._buttons.next_page.style.marginRight = '0px';
+					this._buttons.next_page.style.marginRight = '0';
 				}
 				else {
 					this._buttons.next_page.style.marginRight = `${wrapper_scrollbar_width}px`;
