@@ -81,6 +81,22 @@ abstract class CParser {
 	}
 
 	/**
+	 * Function returns error source and position.
+	 *
+	 * @return array
+	 */
+	public function getErrorDetails(): array {
+		if ($this->error_source === false) {
+			return [];
+		}
+
+		return [
+			$this->error_source,
+			$this->error_pos
+		];
+	}
+
+	/**
 	 * Save error source string and position for later use, when error will be retrieved.
 	 *
 	 * @param string $source

@@ -87,7 +87,10 @@ class CFunctionParser extends CParser {
 	 * @param int     $pos
 	 */
 	public function parse($source, $pos = 0): int {
+		$this->errorClear();
+
 		if ($this->depth > TRIGGER_MAX_FUNCTION_DEPTH) {
+			$this->errorPos($source, $pos);
 			return self::PARSE_FAIL;
 		}
 
@@ -205,6 +208,12 @@ class CFunctionParser extends CParser {
 								$p--;
 							}
 							else {
+								if ($function_parser->getError() !== '') {
+									[$source, $pos] = $function_parser->getErrorDetails();
+									$this->errorPos($source, $pos);
+									break 3;
+								}
+
 								if (!array_key_exists($num, $_parameters)) {
 									$_parameters[$num] = new CFunctionParameterResult([
 										'type' => self::PARAM_UNQUOTED,
