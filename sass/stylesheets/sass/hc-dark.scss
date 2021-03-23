@@ -1349,6 +1349,18 @@ td.inactive-bg {
 	}
 }
 
+.icon-user {
+	&::before {
+		background-position: -379px -46px;
+	}
+}
+
+.icon-user-group {
+	&::before {
+		background-position: -379px -8px;
+	}
+}
+
 .icon-actions-number-red {
 	&::before {
 		background-position: -524px -325px;

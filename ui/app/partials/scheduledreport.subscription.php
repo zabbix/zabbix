@@ -25,6 +25,7 @@
 
 $table = (new CTable())
 	->setId('subscriptions-table')
+	->addClass('subscriptions-table')
 	->addStyle('width: 100%;')
 	->setAriaRequired()
 	->setHeader([_('Recipient'), _('Generate report by'), _('Status'), _('Action')])

@@ -6509,7 +6509,9 @@ svg {
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
 .icon-actions-number-red,
-.icon-description {
+.icon-description,
+.icon-user,
+.icon-user-group {
 	display: inline-block;
 	position: relative;
 	height: 18px;
@@ -6641,6 +6643,30 @@ svg {
 
 	&::before {
 		background-position: -474px -245px;
+	}
+}
+
+.icon-user,
+.icon-user-group {
+	height: 16px;
+	width: 16px;
+	vertical-align: top;
+
+	&::before {
+		height: inherit;
+		width: inherit;
+	}
+}
+
+.icon-user {
+	&::before {
+		background-position: -339px -46px;
+	}
+}
+
+.icon-user-group {
+	&::before {
+		background-position: -339px -8px;
 	}
 }
 
@@ -7490,5 +7516,12 @@ z-select,
 		td {
 			vertical-align: top;
 		}
+	}
+}
+
+.subscriptions-table {
+
+	th {
+		color: $font-alt-color;
 	}
 }
