@@ -137,6 +137,10 @@ class CDashboardElement extends CElement {
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
 			$controls->query('id:dashbrd-cancel')->one()->click(true);
 
+			if (CElementQuery::getPage()->isAlertPresent()) {
+				CElementQuery::getPage()->acceptAlert();
+			}
+
 			if (!$controls->isStalled()) {
 				$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
 			}

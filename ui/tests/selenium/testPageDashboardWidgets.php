@@ -221,7 +221,11 @@ class testPageDashboardWidgets extends CWebTest {
 		$owner->select('test-user');
 		// Change dashboard name.
 		$configuration->getField('Name')->clear()->type('Dashboard create test');
-		$configuration->submit();
+		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
+
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
 
 		$dashboard = CDashboardElement::find()->one();
 		// Check the name of dashboard.
@@ -237,7 +241,11 @@ class testPageDashboardWidgets extends CWebTest {
 		$overlay->waitUntilReady();
 		// Set name of widget.
 		$form->getField('Name')->type('Clock test');
-		$form->submit();
+		$this->query('xpath://div[@role="dialog"]//button[text()="Add"]')->waitUntilPresent()->one()->click();
+
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
 
 		// Check if widget was added.
 		$widget = $dashboard->getWidget('Clock test');
@@ -281,7 +289,11 @@ class testPageDashboardWidgets extends CWebTest {
 		// Change show option.
 		$form->getField('Show')->select('Host groups');
 		// Submit the form.
-		$form->submit();
+		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
+
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
 
 		// Check if widget can be found by a new name.
 		$dashboard->getWidget('New widget name');
