@@ -734,7 +734,7 @@ class CReport extends CApiService {
 				while ($user = DBfetch($users)) {
 					$reportid = $user['reportid'];
 					unset($user['reportid']);
-					$result[$reportid]['users'] = $user;
+					$result[$reportid]['users'][] = $user;
 				}
 			}
 		}
@@ -767,7 +767,7 @@ class CReport extends CApiService {
 				while ($user_group = DBfetch($user_groups)) {
 					$reportid = $user_group['reportid'];
 					unset($user_group['reportid']);
-					$result[$reportid]['user_groups'] = $user_group;
+					$result[$reportid]['user_groups'][] = $user_group;
 				}
 			}
 		}
