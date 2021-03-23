@@ -3071,8 +3071,6 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:pathSet>parent</ns0:pathSet>"				\
 					"<ns0:pathSet>datastore</ns0:pathSet>"				\
 					"<ns0:pathSet>config.virtualNicManagerInfo.netConfig</ns0:pathSet>"\
-					"<ns0:pathSet>config.storageDevice.scsiLun</ns0:pathSet>"	\
-					"<ns0:pathSet>config.storageDevice.multipathInfo</ns0:pathSet>"	\
 					"%s"								\
 				"</ns0:propSet>"							\
 				"<ns0:propSet>"								\
