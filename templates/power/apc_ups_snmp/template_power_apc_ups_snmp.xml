@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-17T12:47:57Z</date>
+   <date>2021-03-23T06:03:21Z</date>
    <groups>
       <group>
          <name>Templates/Power</name>
@@ -37,9 +37,10 @@ Template tooling version used: 0.38</description>
             <item>
                <name>Battery capacity</name>
                <type>SNMP_AGENT</type>
-               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.1.0</snmp_oid>
-               <key>battery.capacity[upsAdvBatteryCapacity]</key>
+               <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.1.0</snmp_oid>
+               <key>battery.capacity[upsHighPrecBatteryCapacity]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -52,10 +53,22 @@ The remaining battery capacity expressed as&#13;
                </applications>
                <preprocessing>
                   <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+                  <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>6h</params>
                   </step>
                </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()} &lt; {$BATTERY.CAPACITY.MIN.WARN}</expression>
+                     <name>Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)</name>
+                     <opdata>Current capacity: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>External battery packs count</name>
@@ -63,6 +76,7 @@ The remaining battery capacity expressed as&#13;
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.5.0</snmp_oid>
                <key>battery.external_packs_count[upsAdvBatteryNumOfBattPacks]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>MIB: PowerNet-MIB&#13;
 The number of external battery packs connected to the UPS. If&#13;
  the UPS does not use smart cells then the agent reports&#13;
@@ -86,6 +100,7 @@ The number of external battery packs connected to the UPS. If&#13;
                <key>battery.last_replace_date[upsBasicBatteryLastReplaceDate]</key>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: PowerNet-MIB&#13;
 The date when the UPS system's batteries were last replaced&#13;
@@ -111,6 +126,7 @@ The date when the UPS system's batteries were last replaced&#13;
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.4.0</snmp_oid>
                <key>battery.replace_indicator[upsAdvBatteryReplaceIndicator]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>MIB: PowerNet-MIB&#13;
 Indicates whether the UPS batteries need replacement.</description>
                <applications>
@@ -142,6 +158,7 @@ Indicates whether the UPS batteries need replacement.</description>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.3.0</snmp_oid>
                <key>battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -169,6 +186,7 @@ The UPS battery run time remaining before battery&#13;
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.1.1.0</snmp_oid>
                <key>battery.status[upsBasicBatteryStatus]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>MIB: PowerNet-MIB&#13;
 The status of the UPS batteries. A batteryLow(3) value&#13;
  indicates the UPS will be unable to sustain the current&#13;
@@ -212,6 +230,7 @@ The status of the UPS batteries. A batteryLow(3) value&#13;
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.2.0</snmp_oid>
                <key>battery.temperature[upsHighPrecBatteryTemperature]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>℃</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -247,6 +266,7 @@ The current internal UPS temperature in Celsius.&#13;
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.4.0</snmp_oid>
                <key>battery.voltage[upsHighPrecBatteryActualVoltage]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>V</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -272,6 +292,7 @@ The actual battery bus voltage in Volts.</description>
                <type>SIMPLE</type>
                <key>icmpping</key>
                <history>1w</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Status</name>
@@ -294,6 +315,7 @@ The actual battery bus voltage in Volts.</description>
                <type>SIMPLE</type>
                <key>icmppingloss</key>
                <history>1w</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <applications>
@@ -321,6 +343,7 @@ The actual battery bus voltage in Volts.</description>
                <type>SIMPLE</type>
                <key>icmppingsec</key>
                <history>1w</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <applications>
@@ -353,6 +376,7 @@ The actual battery bus voltage in Volts.</description>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.3.2.5.0</snmp_oid>
                <key>input.fail[upsAdvInputLineFailCause]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>MIB: PowerNet-MIB&#13;
 The reason for the occurrence of the last transfer to UPS&#13;
 battery power.  The variable is set to:&#13;
@@ -399,6 +423,7 @@ the line voltage.</description>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.3.3.4.0</snmp_oid>
                <key>input.frequency[upsHighPrecInputFrequency]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Hz</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -433,6 +458,7 @@ The current input frequency to the UPS system in Hz.</description>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.3.3.1.0</snmp_oid>
                <key>input.voltage[upsHighPrecInputLineVoltage]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>V</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -467,6 +493,7 @@ The current utility line voltage in VAC.</description>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.4.3.4.0</snmp_oid>
                <key>output.current[upsHighPrecOutputCurrent]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>A</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -493,6 +520,7 @@ The current in amperes drawn by the load on the UPS.</description>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.4.3.3.0</snmp_oid>
                <key>output.load[upsHighPrecOutputLoad]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -529,6 +557,7 @@ of rated capacity.</description>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.4.1.1.0</snmp_oid>
                <key>output.status[upsBasicOutputStatus]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>MIB: PowerNet-MIB&#13;
 The current state of the UPS. If the UPS is unable to&#13;
  determine the state of the UPS this variable is set&#13;
@@ -615,6 +644,7 @@ During self-test most UPSes report onBattery(3) but&#13;
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.4.3.1.0</snmp_oid>
                <key>output.voltage[upsHighPrecOutputVoltage]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>V</units>
                <description>MIB: PowerNet-MIB&#13;
@@ -641,6 +671,7 @@ The output voltage of the UPS system in VAC.</description>
                <key>snmptrap.fallback</key>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>LOG</value_type>
                <description>Item is used to collect all SNMP traps unmatched by other snmptrap items</description>
                <applications>
@@ -658,6 +689,7 @@ The output voltage of the UPS system in VAC.</description>
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The textual identification of the contact person for this managed&#13;
@@ -684,6 +716,7 @@ information is known, the value is the zero-length string.</description>
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 A textual description of the entity. This value should&#13;
@@ -709,6 +742,7 @@ networking software.</description>
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The physical location of this node (e.g., `telephone closet,&#13;
@@ -733,6 +767,7 @@ The physical location of this node (e.g., `telephone closet,&#13;
                <key>system.model[upsBasicIdentModel]</key>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: PowerNet-MIB&#13;
 The UPS model name (e.g. 'APC Smart-UPS 600').</description>
@@ -756,6 +791,7 @@ The UPS model name (e.g. 'APC Smart-UPS 600').</description>
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 An administratively-assigned name for this managed node.By&#13;
@@ -791,6 +827,7 @@ the value is the zero-length string.</description>
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The vendor's authoritative identification of the network management&#13;
@@ -818,6 +855,7 @@ to its `Fred Router'.</description>
                <key>system.sn[upsAdvIdentSerialNumber]</key>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: PowerNet-MIB&#13;
 An 8-character string identifying the serial number of&#13;
@@ -844,6 +882,7 @@ An 8-character string identifying the serial number of&#13;
                <delay>30s</delay>
                <history>2w</history>
                <trends>0d</trends>
+               <status>ENABLED</status>
                <units>uptime</units>
                <description>MIB: SNMPv2-MIB&#13;
 The time (in hundredths of a second) since the network management&#13;
@@ -880,6 +919,7 @@ portion of the system was last re-initialized.</description>
                <type>INTERNAL</type>
                <key>zabbix[host,snmp,available]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Status</name>
@@ -920,6 +960,7 @@ portion of the system was last re-initialized.</description>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.6.0</snmp_oid>
                      <key>battery.external_packs_bad[upsAdvBatteryNumOfBadBattPacks.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: PowerNet-MIB&#13;
 The number of external battery packs connected to the UPS that&#13;
 are defective. If the UPS does not use smart cells then the&#13;
@@ -964,6 +1005,7 @@ agent reports ERROR_NO_SUCH_NAME.</description>
                      <key>battery.estimated_replace_date[upsHighPrecBatteryPackCartridgeReplaceDate.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: PowerNet-MIB&#13;
 The battery cartridge estimated battery replace date.</description>
@@ -986,6 +1028,7 @@ The battery cartridge estimated battery replace date.</description>
                      <key>battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: PowerNet-MIB&#13;
 The battery cartridge health.&#13;
@@ -1031,6 +1074,7 @@ The battery cartridge health.&#13;
                      <key>battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: PowerNet-MIB&#13;
 The battery cartridge status.&#13;
@@ -1059,7 +1103,7 @@ bit 11 FirmwareMismatch</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{regexp("^(0{16})$")}=1</expression>
+                           <expression>{regexp("^(0{16})$")}=0</expression>
                            <name>{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay</name>
                            <opdata>Current bit set: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
@@ -1085,6 +1129,7 @@ bit 11 FirmwareMismatch</description>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>℃</units>
                      <description>MIB: PowerNet-MIB&#13;
@@ -1120,6 +1165,7 @@ The battery pack temperature in Celsius.</description>
                      <key>system.sn[upsHighPrecBatteryPackSerialNumber.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: PowerNet-MIB&#13;
 The battery pack serial number.</description>
@@ -1152,6 +1198,7 @@ The battery pack serial number.</description>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.1.7.1.1</snmp_oid>
                      <key>external.sensor.humidity[uioSensorStatusHumidity.1.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>MIB: PowerNet-MIB&#13;
@@ -1176,6 +1223,7 @@ The sensor's current humidity reading - a relative humidity&#13;
                      <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.1.9.1.1</snmp_oid>
                      <key>external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: PowerNet-MIB&#13;
 The alarm status of the sensor. Possible values:&#13;
 uioNormal                 (1),&#13;
@@ -1223,6 +1271,7 @@ sensorStatusNotApplicable (4)</description>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.1.6.1.1</snmp_oid>
                      <key>external.sensor.temperature[uioSensorStatusTemperatureDegC.1.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>℃</units>
                      <description>MIB: PowerNet-MIB&#13;
@@ -1282,6 +1331,7 @@ The sensor's current temperature reading in Celsius.&#13;
                      <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.2.7.1.1</snmp_oid>
                      <key>external.sensor.humidity[uioSensorStatusHumidity.2.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>MIB: PowerNet-MIB&#13;
@@ -1306,6 +1356,7 @@ The sensor's current humidity reading - a relative humidity&#13;
                      <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.2.9.1.1</snmp_oid>
                      <key>external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: PowerNet-MIB&#13;
 The alarm status of the sensor. Possible values:&#13;
 uioNormal                 (1),&#13;
@@ -1353,6 +1404,7 @@ sensorStatusNotApplicable (4)</description>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.25.1.2.2.6.1.1</snmp_oid>
                      <key>external.sensor.temperature[uioSensorStatusTemperatureDegC.2.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>℃</units>
                      <description>MIB: PowerNet-MIB&#13;
@@ -1412,6 +1464,7 @@ The sensor's current temperature reading in Celsius.&#13;
                      <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.2.3.1.6.1.1.{#PHASEINDEX}</snmp_oid>
                      <key>phase.input.current[upsPhaseInputCurrent.1.1.{#PHASEINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>A</units>
                      <description>MIB: PowerNet-MIB&#13;
@@ -1439,6 +1492,7 @@ The input current in 0.1 amperes, or -0.1 if it's&#13;
                      <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.2.3.1.3.1.1.{#PHASEINDEX}</snmp_oid>
                      <key>phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>V</units>
                      <description>MIB: PowerNet-MIB&#13;
@@ -1467,8 +1521,110 @@ The input voltage in VAC, or -1 if it's unsupported&#13;
                </item_prototypes>
                <host_prototypes/>
             </discovery_rule>
+            <discovery_rule>
+               <name>Output phases discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#PHASEINDEX},1.3.6.1.4.1.318.1.1.1.9.3.3.1.2.1.1]</snmp_oid>
+               <key>output.phases.discovery</key>
+               <delay>1h</delay>
+               <description>The output phase identifier. OID upsPhaseOutputPhaseIndex.1.1</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#PHASEINDEX}: Phase output current</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.3.3.1.4.1.1.{#PHASEINDEX}</snmp_oid>
+                     <key>phase.output.current[upsPhaseOutputCurrent.1.1.{#PHASEINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>A</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The output current in 0.1 amperes drawn&#13;
+ by the load on the UPS, or -1 if it's unsupported&#13;
+ by this UPS.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#PHASEINDEX}: Phase output load, %</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.3.3.1.10.1.1.{#PHASEINDEX}</snmp_oid>
+                     <key>phase.output.load.percent[upsPhaseOutputPercentLoad.1.1.{#PHASEINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The percentage of the UPS load capacity in VA at&#13;
+ redundancy @ (n + x) presently being used on this&#13;
+ output phase, or -1 if it's unsupported by this UPS.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#PHASEINDEX}: Phase output voltage</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.318.1.1.1.9.3.3.1.3.1.1.{#PHASEINDEX}</snmp_oid>
+                     <key>phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>V</units>
+                     <description>MIB: PowerNet-MIB&#13;
+The output voltage in VAC, or -1 if it's unsupported&#13;
+ by this UPS.</description>
+                     <applications>
+                        <application>
+                           <name>General</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min({$TIME.PERIOD})} &gt; {$UPS.INPUT_VOLT.MAX.WARN} or {max({$TIME.PERIOD})} &lt; {$UPS.INPUT_VOLT.MIN.WARN}</expression>
+                           <name>{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})</name>
+                           <opdata>Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
          </discovery_rules>
          <macros>
+            <macro>
+               <macro>{$BATTERY.CAPACITY.MIN.WARN}</macro>
+               <value>50</value>
+               <description>Minimum battery capacity percentage for trigger expression.</description>
+            </macro>
             <macro>
                <macro>{$BATTERY.TEMP.MAX.WARN}</macro>
                <value>55</value>
@@ -1736,7 +1892,7 @@ The input voltage in VAC, or -1 if it's unsupported&#13;
                <color>1A7C11</color>
                <item>
                   <host>Template Power APC UPS SNMP</host>
-                  <key>battery.capacity[upsAdvBatteryCapacity]</key>
+                  <key>battery.capacity[upsHighPrecBatteryCapacity]</key>
                </item>
             </graph_item>
          </graph_items>
