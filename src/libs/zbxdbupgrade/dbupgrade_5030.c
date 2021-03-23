@@ -23,6 +23,7 @@
 #include "dbupgrade.h"
 #include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "sysinfo.h"
 
 /*
  * 5.4 development database patches
@@ -2879,6 +2880,134 @@ static int	DBpatch_5030083(void)
 	return ret;
 }
 
+static int	dbpatch_aggregate2formula(const AGENT_REQUEST *request, char **str, size_t *str_alloc,
+		size_t *str_offset, char **error)
+{
+	char	*ptr, *esc;
+
+	if (3 > request->nparam)
+	{
+		*error = zbx_strdup(NULL, "invalid number of parameters");
+		return FAIL;
+	}
+
+	if (0 == strcmp(request->key, "grpavg"))
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "avg");
+	}
+	else if (0 == strcmp(request->key, "grpmax"))
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "max");
+	}
+	else if (0 == strcmp(request->key, "grpmin"))
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "min");
+	}
+	else if (0 == strcmp(request->key, "grpsum"))
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, "sum");
+	}
+	else
+	{
+		*error = zbx_dsprintf(NULL, "unknown group function \"%s\"", request->key);
+		return FAIL;
+	}
+
+	zbx_snprintf_alloc(str, str_alloc, str_offset, "(%s_foreach(/*/%s?[", request->params[2],
+			request->params[1]);
+
+	for (ptr = strtok(request->params[0], ","); NULL != ptr; ptr = strtok(NULL, ","))
+	{
+		if ('[' != (*str)[*str_offset - 1])
+			zbx_strcpy_alloc(str, str_alloc, str_offset, " or ");
+
+		zabbix_log(LOG_LEVEL_DEBUG, "ptr:%s", ptr);
+		esc = zbx_dyn_escape_string(ptr, "\\\"");
+		zabbix_log(LOG_LEVEL_DEBUG, "esc:%s", esc);
+
+		zbx_snprintf_alloc(str, str_alloc, str_offset, "group=\"%s\"", esc);
+		zbx_free(esc);
+	}
+
+	zbx_chrcpy_alloc(str, str_alloc, str_offset, ']');
+	if (4 == request->nparam)
+	{
+		zbx_snprintf_alloc(str, str_alloc, str_offset, ",%s", request->params[3]);
+	}
+	zbx_strcpy_alloc(str, str_alloc, str_offset, "))");
+
+	if (ITEM_PARAM_LEN < zbx_strlen_utf8(*str))
+	{
+		*error = zbx_strdup(NULL, "resulting formula is too long");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030084(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_vector_ptr_t	functions;
+	int			ret = SUCCEED;
+	char			*sql = NULL, *params = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset;
+
+	zbx_vector_ptr_create(&functions);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* ITEM_TYPE_AGGREGATE = 8 */
+	result = DBselect("select i.itemid,key_"
+			" from items i"
+			" where i.type=8");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		AGENT_REQUEST	request;
+		char		*error = NULL, *esc;
+		int		ret_formula;
+
+		params_offset = 0;
+
+		init_request(&request);
+		parse_item_key(row[1], &request);
+
+		ret_formula = dbpatch_aggregate2formula(&request, &params, &params_alloc, &params_offset, &error);
+		free_request(&request);
+
+		if (FAIL == ret_formula)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert aggregate checks item \"%s\": %s", row[0], error);
+			zbx_free(error);
+			continue;
+		}
+
+		esc = DBdyn_escape_field("items", "params", params);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items set type=15,params='%s' where itemid=%s;\n", esc, row[0]);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(params);
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -2969,5 +3098,6 @@ DBPATCH_ADD(5030080, 0, 1)
 DBPATCH_ADD(5030081, 0, 1)
 DBPATCH_ADD(5030082, 0, 1)
 DBPATCH_ADD(5030083, 0, 1)
+DBPATCH_ADD(5030084, 0, 1)
 
 DBPATCH_END()
