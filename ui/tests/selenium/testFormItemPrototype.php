@@ -1104,7 +1104,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid=133800');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype updated');
@@ -2079,7 +2079,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&context=host&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&context=host&parent_discoveryid=133800');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];

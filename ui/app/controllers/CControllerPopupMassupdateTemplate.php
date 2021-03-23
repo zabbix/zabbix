@@ -23,10 +23,6 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstract {
 
-	protected function init() {
-		$this->disableSIDvalidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'ids' => 'required|array_id',

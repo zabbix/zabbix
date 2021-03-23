@@ -905,8 +905,9 @@ class testPageMonitoringHosts extends CWebTest {
 						'Configuration',
 						'Detect operating system',
 						'Ping',
-						'Reboot',
-						'Selenium script',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -925,7 +926,9 @@ class testPageMonitoringHosts extends CWebTest {
 						'Configuration',
 						'Detect operating system',
 						'Ping',
-						'Selenium script',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -944,7 +947,9 @@ class testPageMonitoringHosts extends CWebTest {
 						'Configuration',
 						'Detect operating system',
 						'Ping',
-						'Selenium script',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -963,8 +968,9 @@ class testPageMonitoringHosts extends CWebTest {
 						'Configuration',
 						'Detect operating system',
 						'Ping',
-						'Reboot',
-						'Selenium script',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
 						'Traceroute'
 					]
 				]

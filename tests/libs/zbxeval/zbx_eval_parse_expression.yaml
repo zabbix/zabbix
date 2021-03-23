@@ -17,6 +17,24 @@ out:
     opt: 0
   result: SUCCEED
 ---
+test case: Succeed '1s'
+in:
+  rules: []
+  expression: '1s'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1s'
+    opt: 0
+  result: SUCCEED
+---
+test case: FAIL 's'
+in:
+  rules: []
+  expression: 's'
+out:
+  result: FAIL
+---
 test case: Succeed '0.1'
 in:
   rules: []
@@ -226,6 +244,64 @@ in:
   expression: '{$MACRO:"context:\"context\"}'
 out:
   result: FAIL
+---
+test case: Fail '{$MACRO}1'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
+  expression: '{$MACRO}1'
+out:
+  result: FAIL
+---
+test case: Succeed '{$MACRO}1'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: '{$MACRO}1'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{$MACRO}1'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '1{$MACRO}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: '1{$MACRO}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1{$MACRO}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{$USER}{$MACRO}'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: '{$USER}{$MACRO}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{$USER}{$MACRO}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{$MACRO}s'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: '{$MACRO}s'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{$MACRO}s'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{$MACRO}x'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: '{$MACRO}x'
+out:
+  result: FAIL
 --- # LLD macros
 test case: Succeed '{#LLD}'
 in:
@@ -251,6 +327,7 @@ in:
   expression: '{#LLD'
 out:
   result: FAIL
+---
 test case: Succeed '{{#LLD}.function()}'
 in:
   rules: [ZBX_EVAL_PARSE_LLDMACRO]
@@ -261,6 +338,57 @@ out:
     token: '{{#LLD}.function()}}'
     opt: 0
   result: SUCCEED
+---
+test case: Succeed '1{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '1{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '.{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '.{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '.{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{{#LLD}.function()}.{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '{{#LLD}.function()}.{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{{#LLD}.function()}.{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{{#LLD}.function()}e{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '{{#LLD}.function()}e{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{{#LLD}.function()}e{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed 'e{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: 'e{{#LLD}.function()}'
+out:
+  result: FAIL  
 --- # parenthesis
 test case: Fail '()'
 in:
@@ -1201,7 +1329,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
   result: SUCCEED
 ---
@@ -1226,7 +1354,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '5m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '5m', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
   result: SUCCEED
 ---
@@ -1237,22 +1365,66 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '5m:now-1h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '5m:now-1h', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
   result: SUCCEED
---- # time variables
-test case: Succeed '1w + 2d + 3h + 4m + 5s'
+---
+test case: Succeed 'min(/host/key,#10)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'min(/host/key,#10)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#10', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,{$MACRO})'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  expression: 'min(/host/key,{$MACRO})'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '{$MACRO}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,#{$MACRO})'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: 'min(/host/key,#{$MACRO})'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#{$MACRO}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+---
+test case: Succeed 'min(/host/key,#{{#LLD}.func})'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: 'min(/host/key,#{{#LLD}.func})'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#{{#LLD}.func}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'min', opt: 2}
+  result: SUCCEED
+--- # suffixed numbers
+test case: Succeed '1w + 2G + 3h + 4K + 5s'
 in:
   rules: [ZBX_EVAL_PARSE_CONST_INDEX]
-  expression: '1w + 2d + 3h + 4m + 5s '
+  expression: '1w + 2G + 3h + 4K + 5s '
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1w', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2d', opt: 1}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '2G', opt: 1}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '3h', opt: 2}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4m', opt: 3}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '4K', opt: 3}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '5s', opt: 4}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
@@ -1353,7 +1525,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '#1', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
   result: SUCCEED
 ---
@@ -1364,7 +1536,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
@@ -1377,12 +1549,12 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/Trapper/trap[1]', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '5m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '5m', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1h"', opt: 0}
   - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1"', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
@@ -1446,7 +1618,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/host/key', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_ARG_TIME, token: '#1:now-1h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#1:now-1h', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'last', opt: 2}
   result: SUCCEED
 ...

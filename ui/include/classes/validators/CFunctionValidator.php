@@ -151,6 +151,12 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $value_types_all
 			],
+			'change' => [
+				'args' => [
+					['type' => 'query', 'mandat' => 0x01]
+				],
+				'value_types' => $value_types_all
+			],
 			'date' => [
 				'args' => $args_ignored,
 				'value_types' => $value_types_all
@@ -205,7 +211,7 @@ class CFunctionValidator extends CValidator {
 			'logeventid' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
-					['type' => 'str', 'mandat' => 0x01]
+					['type' => 'str', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_log
 			],
@@ -480,7 +486,7 @@ class CFunctionValidator extends CValidator {
 		$time_shift = $param[1];
 
 		$is_sec_num_valid = ((!($mandat & 0x01) && $sec_num === '') || $this->validateSecNum($sec_num));
-		$is_time_shift_valid = (!($mandat & 0x02) || $this->validatePeriodShift($time_shift));
+		$is_time_shift_valid = ((!($mandat & 0x02) && $time_shift === '') || $this->validatePeriodShift($time_shift));
 
 		return ($is_sec_num_valid && $is_time_shift_valid);
 	}
@@ -518,11 +524,11 @@ class CFunctionValidator extends CValidator {
 			}
 		}
 
-		if (($mandat & 0x02) && !$this->validatePeriodShift($period_shift)) {
+		if (($mandat & 0x02) && !$this->validateTrendPeriods($period, $period_shift)) {
 			return $this->isMacro($period_shift);
 		}
 
-		return $this->validateTrendPeriods($period, $period_shift);
+		return true;
 	}
 
 	/**
@@ -624,7 +630,13 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateStringFunction(string $param): bool {
-		return ($this->isMacro($param) || preg_match('/^(iregexp|regexp|like)$/', $param));
+		if ($this->isMacro($param)) {
+			return true;
+		}
+		else {
+			$param = (substr($param, 0, 1) === '"' && substr($param, -1) === '"') ? substr($param, 1, -1) : $param;
+			return in_array($param, ['iregexp', 'regexp', 'like']);
+		}
 	}
 
 	/**
@@ -652,8 +664,7 @@ class CFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain time range value with precision and multiple of an hour.
-	 * Examples: now/h, now/w, now/M, now/y
+	 * Validate trigger function parameter which must contain time range value with precision.
 	 *
 	 * @param string $param
 	 *
@@ -665,17 +676,13 @@ class CFunctionValidator extends CValidator {
 		if ($relative_time_parser->parse($param) == CParser::PARSE_SUCCESS) {
 			$tokens = $relative_time_parser->getTokens();
 
-			foreach ($tokens as $token) {
-				if ($token['type'] === CRelativeTimeParser::ZBX_TOKEN_PRECISION && $token['suffix'] === 'm') {
-					return false;
-				}
-			}
+			$offset_tokens = array_filter($tokens, function ($token) {
+				return ($token['type'] ==  CRelativeTimeParser::ZBX_TOKEN_OFFSET);
+			});
 
-			foreach ($tokens as $token) {
-				if ($token['type'] === CRelativeTimeParser::ZBX_TOKEN_PRECISION
-						&& $relative_time_parser->getDateTime(true)->getTimestamp() % SEC_PER_HOUR === 0) {
-					return true;
-				}
+			if (($offset_token = reset($offset_tokens)) !== false
+					&& $offset_token['sign'] === '-' && (int) $offset_token['value'] > 0) {
+				return true;
 			}
 		}
 

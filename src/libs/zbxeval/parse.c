@@ -88,80 +88,230 @@ static void	eval_update_const_variable(zbx_eval_context_t *ctx, zbx_eval_token_t
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_parse_macro                                                 *
+ * Function: eval_is_compound_number_char                                     *
  *                                                                            *
- * Purpose: parse stand-alone macro token                                     *
+ * Purpose: check if the character can be a part of a compound number         *
+ *          following a macro                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_is_compound_number_char(char c, int pos)
+{
+	if (0 != isdigit((unsigned char)c))
+		return SUCCEED;
+
+	switch (c)
+	{
+		case '.':
+		case '{':
+			return SUCCEED;
+		case 'e':
+		case 'E':
+			return (0 != pos ? SUCCEED : FAIL);
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_parse_functionid                                            *
+ *                                                                            *
+ * Purpose: parse functionid token ({<functionid>})                           *
  *                                                                            *
  * Parameters: ctx   - [IN] the evaluation context                            *
  *             pos   - [IN] the starting position                             *
  *             token - [OUT] the parsed token                                 *
- *             error - [OUT] the error message in the case of failure         *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: Stand-alone macro tokens are either expression operands or       *
- *           function arguments. If macro is embedded in other token (string  *
- *           variable, user macro context etc), then this macro is not parsed *
- *           separately and is stored within the other token.                 *
- *                                                                            *
  ******************************************************************************/
-static int	eval_parse_macro(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
+static int	eval_parse_functionid(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token)
 {
 	zbx_token_t	tok;
 
-	if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTIONID) &&
-			SUCCEED == zbx_token_parse_objectid(ctx->expression, ctx->expression + pos, &tok))
+	if (SUCCEED == zbx_token_parse_objectid(ctx->expression, ctx->expression + pos, &tok))
 	{
 		token->type = ZBX_EVAL_TOKEN_FUNCTIONID;
 		token->opt = ctx->functionid_index++;
-	}
-	else if (0 != (ctx->rules & ZBX_EVAL_PARSE_MACRO) &&
-			SUCCEED == zbx_token_parse_macro(ctx->expression, ctx->expression + pos, &tok))
-	{
-		token->type = ZBX_EVAL_TOKEN_VAR_MACRO;
-	}
-	else if (0 != (ctx->rules & ZBX_EVAL_PARSE_USERMACRO) && '$' == ctx->expression[pos + 1] &&
-			SUCCEED == zbx_token_parse_user_macro(ctx->expression, ctx->expression + pos, &tok))
-	{
-		token->type = ZBX_EVAL_TOKEN_VAR_USERMACRO;
-		eval_update_const_variable(ctx, token);
-	}
-	else if (0 != (ctx->rules & ZBX_EVAL_PARSE_LLDMACRO) && '#' == ctx->expression[pos + 1] &&
-			SUCCEED == zbx_token_parse_lld_macro(ctx->expression, ctx->expression + pos, &tok))
-	{
-		token->type = ZBX_EVAL_TOKEN_VAR_LLDMACRO;
-	}
-	else if ('{' == ctx->expression[pos + 1] && SUCCEED == zbx_token_parse_nested_macro(ctx->expression,
-			ctx->expression + pos, &tok))
-	{
-		switch (tok.type)
-		{
-			case ZBX_TOKEN_FUNC_MACRO:
-				if (0 != (ctx->rules & ZBX_EVAL_PARSE_MACRO))
-				{
-					token->type = ZBX_EVAL_TOKEN_VAR_MACRO;
-					eval_update_const_variable(ctx, token);
-				}
-				break;
-			case ZBX_TOKEN_SIMPLE_MACRO:
-				if (0 != (ctx->rules & ZBX_EVAL_PARSE_MACRO))
-					token->type = ZBX_EVAL_TOKEN_VAR_MACRO;
-				break;
-			case ZBX_TOKEN_LLD_FUNC_MACRO:
-				if (0 != (ctx->rules & ZBX_EVAL_PARSE_LLDMACRO))
-					token->type = ZBX_EVAL_TOKEN_VAR_LLDMACRO;
-				break;
-		}
+		token->loc = tok.loc;
+		return SUCCEED;
 	}
 
-	if (0 == token->type)
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_parse_macro                                                 *
+ *                                                                            *
+ * Purpose: parse macro                                                       *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *             pos   - [IN] the starting position                             *
+ *             tok   - [OUT] the parsed token                                 *
+ *                                                                            *
+ * Return value: SUCCEED - token was parsed successfully                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_parse_macro(zbx_eval_context_t *ctx, int pos, zbx_token_t *tok)
+{
+	if (0 != (ctx->rules & ZBX_EVAL_PARSE_MACRO) &&
+			SUCCEED == zbx_token_parse_macro(ctx->expression, ctx->expression + pos, tok))
+	{
+		return SUCCEED;
+	}
+	else if (0 != (ctx->rules & ZBX_EVAL_PARSE_USERMACRO) && '$' == ctx->expression[pos + 1] &&
+			SUCCEED == zbx_token_parse_user_macro(ctx->expression, ctx->expression + pos, tok))
+	{
+		return SUCCEED;
+	}
+	else if (0 != (ctx->rules & ZBX_EVAL_PARSE_LLDMACRO) && '#' == ctx->expression[pos + 1] &&
+			SUCCEED == zbx_token_parse_lld_macro(ctx->expression, ctx->expression + pos, tok))
+	{
+		return SUCCEED;
+	}
+	else if ('{' == ctx->expression[pos + 1] && SUCCEED == zbx_token_parse_nested_macro(ctx->expression,
+			ctx->expression + pos, tok))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_parse_number                                                *
+ *                                                                            *
+ * Purpose: parse numeric value                                               *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *             pos   - [IN] the starting position                             *
+ *             tok   - [OUT] the parsed token                                 *
+ *                                                                            *
+ * Return value: SUCCEED - token was parsed successfully                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_parse_number(zbx_eval_context_t *ctx, size_t pos, size_t *pos_r)
+{
+	int		len, offset = 0;
+	char		*end;
+	double		tmp;
+
+	if ('-' == ctx->expression[pos])
+		offset++;
+
+	if (FAIL == zbx_suffixed_number_parse(ctx->expression + pos + offset, &len))
+		return FAIL;
+
+	len += offset;
+
+	tmp = strtod(ctx->expression + pos, &end) * suffix2factor(ctx->expression[pos + len - 1]);
+	if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
+		return FAIL;
+
+	*pos_r = pos + len - 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_parse_constant                                              *
+ *                                                                            *
+ * Purpose: parse constant value                                              *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *             pos   - [IN] the starting position                             *
+ *             token - [OUT] the parsed token                                 *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - token was parsed successfully                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: A constant is a number or macro depending on parsing rules.      *
+ *           Number can be a compound value, consisting of several macros     *
+ *           digits etc.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
+{
+	zbx_token_t		tok;
+	size_t			offset = pos;
+	zbx_token_type_t	type = 0;
+
+	do
+	{
+		if ('{' == (ctx->expression[offset]))
+		{
+			if (SUCCEED != eval_parse_macro(ctx, offset, &tok))
+				break;
+
+			if (0 == type)
+			{
+				switch (tok.type)
+				{
+					case ZBX_TOKEN_MACRO:
+					case ZBX_TOKEN_FUNC_MACRO:
+					case ZBX_TOKEN_SIMPLE_MACRO:
+						type = ZBX_EVAL_TOKEN_VAR_MACRO;
+						break;
+					case ZBX_TOKEN_USER_MACRO:
+						type = ZBX_EVAL_TOKEN_VAR_USERMACRO;
+						break;
+					case ZBX_TOKEN_LLD_MACRO:
+					case ZBX_TOKEN_LLD_FUNC_MACRO:
+						type = ZBX_EVAL_TOKEN_VAR_LLDMACRO;
+						break;
+				}
+			}
+			else
+				type = ZBX_EVAL_TOKEN_VAR_NUM;
+
+			offset = tok.loc.r + 1;
+
+			switch (ctx->expression[offset])
+			{
+				case 's':
+				case 'm':
+				case 'h':
+				case 'd':
+				case 'w':
+				case 'K':
+				case 'M':
+				case 'G':
+				case 'T':
+					type = ZBX_EVAL_TOKEN_VAR_NUM;
+					offset++;
+					goto out;
+			}
+		}
+		else if (SUCCEED == eval_parse_number(ctx, offset, &offset) ||
+				SUCCEED == eval_is_compound_number_char(ctx->expression[offset], offset - pos))
+		{
+			type = ZBX_EVAL_TOKEN_VAR_NUM;
+			offset++;
+		}
+		else
+			break;
+	}
+	while (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPOUND_CONST));
+out:
+	if (0 == type)
 	{
 		*error = zbx_dsprintf(*error, "invalid token starting with \"%s\"", ctx->expression + pos);
 		return FAIL;
 	}
 
-	token->loc = tok.loc;
+	if (ZBX_EVAL_TOKEN_VAR_NUM == type || ZBX_EVAL_TOKEN_VAR_USERMACRO == type)
+		eval_update_const_variable(ctx, token);
+
+	token->type = type;
+	token->loc.l = pos;
+	token->loc.r = offset - 1;
 
 	return SUCCEED;
 }
@@ -497,17 +647,27 @@ static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_
  *           to specify the history range in format <period>[:<timeshift>]    *
  *                                                                            *
  ******************************************************************************/
-static int	eval_parse_time_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
+static int	eval_parse_period_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
-	const char	*ptr = ctx->expression + pos;
+	size_t	offset = pos;
 
-	for (;0 != *ptr; ptr++)
+	for (;'\0' != ctx->expression[offset]; offset++)
 	{
-		if (',' == *ptr || ')' == *ptr || SUCCEED == is_whitespace(*ptr))
+		if ('{' == ctx->expression[offset] && 0 != (ctx->rules & ZBX_EVAL_PARSE_COMPOUND_CONST))
 		{
-			token->type = ZBX_EVAL_TOKEN_ARG_TIME;
+			zbx_token_t	tok;
+
+			if (SUCCEED == eval_parse_macro(ctx, offset, &tok))
+				offset = tok.loc.r;
+			continue;
+
+		}
+		if (',' == ctx->expression[offset] || ')' == ctx->expression[offset] ||
+				SUCCEED == is_whitespace(ctx->expression[offset]))
+		{
+			token->type = ZBX_EVAL_TOKEN_ARG_PERIOD;
 			token->loc.l = pos;
-			token->loc.r = ptr - ctx->expression - 1;
+			token->loc.r = offset - 1;
 			zbx_variant_set_none(&token->value);
 
 			return SUCCEED;
@@ -543,7 +703,18 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 	switch (ctx->expression[pos])
 	{
 		case '{':
-			return eval_parse_macro(ctx, pos, token, error);
+			if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type &&
+				ZBX_EVAL_TOKEN_ARG_QUERY == ctx->stack.values[ctx->stack.values_num - 1].type)
+			{
+				return eval_parse_period_token(ctx, pos, token, error);
+			}
+
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTIONID) &&
+					SUCCEED == eval_parse_functionid(ctx, pos, token))
+			{
+				return SUCCEED;
+			}
+			return eval_parse_constant(ctx, pos, token, error);
 		case '+':
 			eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_ADD, token);
 			return SUCCEED;
@@ -613,21 +784,16 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type &&
 				ZBX_EVAL_TOKEN_ARG_QUERY == ctx->stack.values[ctx->stack.values_num - 1].type)
 			{
-				return eval_parse_time_token(ctx, pos, token, error);
+				return eval_parse_period_token(ctx, pos, token, error);
 			}
 			ZBX_FALLTHROUGH;
 		case '.':
-			if (FAIL == eval_parse_number_token(ctx, pos, token))
-			{
-				*error = zbx_dsprintf(*error, "invalid numeric value at \"%s\"", ctx->expression + pos);
-				return FAIL;
-			}
-			return SUCCEED;
+			return eval_parse_constant(ctx, pos, token, error);
 		case '#':
 			if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type &&
 				ZBX_EVAL_TOKEN_ARG_QUERY == ctx->stack.values[ctx->stack.values_num - 1].type)
 			{
-				return eval_parse_time_token(ctx, pos, token, error);
+				return eval_parse_period_token(ctx, pos, token, error);
 			}
 			break;
 		case ',':

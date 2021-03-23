@@ -75,9 +75,10 @@ class C52TriggerExpressionConverter extends CConverter {
 	 * Converts trigger expression to new syntax.
 	 *
 	 * @param array  $trigger_data
-	 * @param string $trigger_data['expression']
-	 * @param string $trigger_data['host']        (optional)
-	 * @param string $trigger_data['item']        (optional)
+	 * @param string $trigger_data['expression']           (optional)
+	 * @param string $trigger_data['recovery_expression']  (optional)
+	 * @param string $trigger_data['host']                 (optional)
+	 * @param string $trigger_data['item']                 (optional)
 	 *
 	 * @return string
 	 */
@@ -85,28 +86,40 @@ class C52TriggerExpressionConverter extends CConverter {
 		$this->item = array_key_exists('item', $trigger_data) ? $trigger_data['item'] : null;
 		$this->host = (array_key_exists('host', $trigger_data) && $this->item) ? $trigger_data['host'] : null;
 
-		if (($this->parser->parse($trigger_data['expression'])) !== false) {
+		$extra_expressions = [];
+
+		if (array_key_exists('recovery_expression', $trigger_data) && $trigger_data['recovery_expression'] !== ''
+				&& ($this->parser->parse($trigger_data['recovery_expression'])) !== false) {
 			$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO);
 			$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
 			$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
 			$this->wrap_subexpressions = ($parts['type'] === 'operator');
-			$this->convertExpressionParts($trigger_data['expression'], [$parts], $extra_expr);
+			$this->convertExpressionParts($trigger_data['recovery_expression'], [$parts], $extra_expressions);
+		}
 
-			$extra_expr = array_filter($extra_expr);
+		if (array_key_exists('expression', $trigger_data) && $trigger_data['expression'] !== ''
+				&& ($this->parser->parse($trigger_data['expression'])) !== false) {
+			$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO);
+			$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
+			$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
+			$this->wrap_subexpressions = ($parts['type'] === 'operator');
+			$this->convertExpressionParts($trigger_data['expression'], [$parts], $extra_expressions);
 
-			if ($extra_expr) {
+			$extra_expressions = array_filter($extra_expressions);
+			if ($extra_expressions) {
+				$extra_expressions = array_keys(array_flip($extra_expressions));
+
 				$trigger_data['expression'] = '('.$trigger_data['expression'].')';
 
-				$extra_expr = array_keys(array_flip($extra_expr));
-				$extra_expr = array_reverse($extra_expr);
-				$trigger_data['expression'] .= ' or '.implode(' or ', $extra_expr).'';
+				$extra_expressions = array_reverse($extra_expressions);
+				$trigger_data['expression'] .= ' or '.implode(' or ', $extra_expressions);
 			}
 		}
 
-		return $trigger_data['expression'];
+		return array_intersect_key($trigger_data, array_flip(['recovery_expression', 'expression']));
 	}
 
-	private function convertExpressionParts(string &$expression, array $expression_elements, ?array &$extra_expr = []) {
+	private function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr) {
 		for ($i = count($expression_elements) - 1; $i >= 0; $i--) {
 			$part = $expression_elements[$i];
 
@@ -119,7 +132,7 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 	}
 
-	private function convertSingleExpressionPart(string &$expression, array $expression_element, &$extra_expr) {
+	private function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
 		$expression_data = new C10TriggerExpression(['allow_func_only' => true]);
 
 		if (($expression_data->parse($expression_element['expression'])) !== false) {
@@ -161,10 +174,6 @@ class C52TriggerExpressionConverter extends CConverter {
 		switch ($fn['functionName']) {
 			case 'abschange':
 				$new_expression = sprintf('abs(last(%1$s,1)-last(%1$s,2))', $query);
-				break;
-
-			case 'change':
-				$new_expression = sprintf('(last(%1$s,1)-last(%1$s,2))', $query);
 				break;
 
 			case 'delta':

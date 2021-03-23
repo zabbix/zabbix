@@ -26,219 +26,1284 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testScripts extends CAPITest {
 
-	public static function script_create() {
+	public static function script_create_data_invalid() {
 		return [
-			// Check script command.
-			[
+			// Check script type.
+			'Test missing type' => [
 				'script' => [
 					'name' => 'API create script',
-					'type' => 0
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
+			],
+			'Test invalid type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => '',
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			'Test invalid type (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => 'abc',
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			'Test invalid type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => 999999,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK
+					]).'.'
+			],
+			// Check script command.
+			'Test missing command' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "command" is missing.'
 			],
-			[
+			'Test empty command' => [
 				'script' => [
 					'name' => 'API create script',
-					'type' => 0,
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
 			],
 			// Check script name.
-			[
+			'Test missing name' => [
 				'script' => [
-					'type' => 0,
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
 			],
-			[
+			'Test empty name' => [
 				'script' => [
 					'name' => '',
-					'type' => 0,
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server'
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			[
-				'script' => [
-					'name' => 'API/Script/',
-					'type' => 0,
-					'command' => 'reboot server'
-				],
-				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
-			],
-			[
+			'Test existing name' => [
 				'script' => [
 					'name' => 'Ping',
-					'type' => 0,
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server'
 				],
 				'expected_error' => 'Script "Ping" already exists.'
 			],
-			[
-				'script' => [
-					'name' => 'Ping/test',
-					'type' => 0,
-					'command' => 'reboot server'
-				],
-				'expected_error' => 'Script menu path "Ping/test" already used in script name "Ping".'
-			],
-			[
+			'Test duplicate name' => [
 				'script' => [
 					[
 						'name' => 'Scripts with the same name',
-						'type' => 0,
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server'
 					],
 					[
 						'name' => 'Scripts with the same name',
-						'type' => 0,
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
 			],
-			[
+			// Check script scope.
+			'Test invalid scope (empty)' => [
 				'script' => [
-					[
-						'name' => 'test',
-						'type' => 0,
-						'command' => 'reboot server'
-					],
-					[
-						'name' => 'test/test/test test',
-						'type' => 0,
-						'command' => 'reboot server'
-					]
-				],
-				'expected_error' => 'Script menu path "test/test/test test" already used in script name "test".'
-			],
-			[
-				'script' => [
-					[
-						'name' => 'test/test',
-						'type' => 0,
-						'command' => 'reboot server'
-					],
-					[
-						'name' => 'test',
-						'type' => 0,
-						'command' => 'reboot server'
-					]
-				],
-				'expected_error' => 'Script name "test" already used in menu path for script "test/test".'
-			],
-			// Check type.
-			[
-				'script' => [
-					'name' => 'API empty type',
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
-					'type' => ''
+					'scope' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/scope": an integer is expected.'
 			],
-			[
+			'Test invalid scope (string)' => [
 				'script' => [
-					'name' => 'API type string',
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
-					'type' => 'abc'
+					'scope' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/scope": an integer is expected.'
 			],
-			[
+			'Test invalid scope' => [
 				'script' => [
-					'name' => 'API invalid type',
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
-					'type' => '1.1'
+					'scope' => 0
 				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
 			],
-			[
+			// Check script menu path.
+			'Test invalid menu_path for host scope' => [
 				'script' => [
-					'name' => 'Validate script type',
-					'type' => 8
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 5.'
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
 			],
-			// Webhook script validation.
-			[
+			'Test invalid menu_path for event scope' => [
 				'script' => [
-					[
-						'name' => 'Webhook validate script',
-						'type' => 5,
-						'command' => ''
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test unexpected menu_path for action scope (default)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			'Test unexpected menu_path for action scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'menu_path' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			'Test unexpected menu_path for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			// Check script host access.
+			'Test unexpected host_access for action scope (default, string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'host_access' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test unexpected host_access for action scope (default, int)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
+			],
+			'Test unexpected host_access for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
+			],
+			'Test invalid host_access for host scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for host scope (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'host_access' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access host scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
+			],
+			'Test invalid host_access for event scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for event scope (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'host_access' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access event scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
+			],
+			// Check script user group.
+			'Test unexpected usrgrpid for action scope (default, string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'usrgrpid' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test unexpected usrgrpid for action scope (default, int)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'usrgrpid' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
+			'Test unexpected usrgrpid for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'usrgrpid' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
+			'Test invalid usrgrpid for host scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for host scope (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'usrgrpid' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for host scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			'Test invalid usrgrpid for host scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for event scope (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'usrgrpid' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for event scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			// Check script confirmation.
+			'Test unexpected confirmation for action scope (default)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'confirmation' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
+			],
+			'Test unexpected confirmation for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'confirmation' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
+			],
+			// Check script host group.
+			'Test invalid host group (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'groupid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
+			],
+			'Test invalid host group (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'groupid' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
+			],
+			'Test invalid host group' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'groupid' => 999999
+				],
+				'expected_error' => 'Host group with ID "999999" is not available.'
+			],
+			// Check unexpected fields in script.
+			'Test unexpected field' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'unexpected_field' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "unexpected_field".'
+			],
+			// Check script execute_on.
+			'Test invalid execute_on (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'execute_on' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
+			],
+			'Test invalid execute_on (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'execute_on' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
+			],
+			'Test invalid execute_on' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'execute_on' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
+						ZBX_SCRIPT_EXECUTE_ON_PROXY
+					]).'.'
+			],
+			'Test unexpected execute_on field for IPMI type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'execute_on' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
+			],
+			'Test unexpected execute_on field for IPMI type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+			],
+			'Test unexpected execute_on field for SSH type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+			],
+			'Test unexpected execute_on field for Telnet type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_TELNET,
+					'command' => 'reboot server',
+					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+			],
+			'Test unexpected execute_on field for Javascript type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+			],
+			// Check script port.
+			'Test invalid port (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'port' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+			],
+			'Test invalid port' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'port' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.
+					ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
+			],
+			'Test unexpected port field for custom script type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'port' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+			],
+			'Test unexpected port field for custom script type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'port' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+			],
+			'Test unexpected port field for IPMI type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'port' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+			],
+			'Test unexpected port field for Javascript type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'port' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+			],
+			// Check script auth type.
+			'Test invalid authtype (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'authtype' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+			],
+			'Test invalid authtype (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'authtype' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+			],
+			'Test invalid authtype' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'authtype' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
+					implode(', ', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]).'.'
+			],
+			'Test unexpected authtype field for custom script type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'authtype' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+			],
+			'Test unexpected authtype field for custom script type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'authtype' => ITEM_AUTHTYPE_PASSWORD
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+			],
+			'Test unexpected authtype field for IPMI type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'authtype' => ITEM_AUTHTYPE_PASSWORD
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+			],
+			'Test unexpected authtype field for Telnet type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_TELNET,
+					'command' => 'reboot server',
+					'authtype' => ITEM_AUTHTYPE_PASSWORD
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+			],
+			'Test unexpected authtype field for Javascript type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'authtype' => ITEM_AUTHTYPE_PASSWORD
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+			],
+			// Check script username.
+			'Test missing username for SSH type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "username" is missing.'
+			],
+			'Test missing username for Telnet type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_TELNET,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "username" is missing.'
+			],
+			'Test empty username for SSH type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'username' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
+			],
+			'Test empty username for Telnet type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_TELNET,
+					'command' => 'reboot server',
+					'username' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
+			],
+			'Test unexpected username field for custom script type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'username' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+			],
+			'Test unexpected username field for custom script type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'username' => 'John'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+			],
+			'Test unexpected username field for IPMI type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'username' => 'John'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+			],
+			'Test unexpected username field for Javascript type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'username' => 'John'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+			],
+			// Check script password.
+			'Test unexpected password field for custom script type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'password' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+			],
+			'Test unexpected password field for custom script type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'password' => 'psswd'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+			],
+			'Test unexpected password field for IPMI type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'password' => 'psswd'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+			],
+			'Test unexpected password field for Javascript type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'password' => 'psswd'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+			],
+			// Check script public key.
+			'Test missing publickey' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'username' => 'John',
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "publickey" is missing.'
+			],
+			'Test empty publickey' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'username' => 'John',
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+					'publickey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/publickey": cannot be empty.'
+			],
+			'Test unexpected publickey field for custom script type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'publickey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for custom script type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for IPMI type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for Telnet type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_TELNET,
+					'command' => 'reboot server',
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for Javascript type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			// Check script private key.
+			'Test missing privatekey' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'username' => 'John',
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "privatekey" is missing.'
+			],
+			'Test empty privatekey' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'username' => 'John',
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+					'publickey' => 'secretpubkey',
+					'privatekey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/privatekey": cannot be empty.'
+			],
+			'Test unexpected privatekey field for custom script type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'privatekey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for custom script type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'privatekey' => 'secretprivkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for IPMI type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'privatekey' => 'secretprivkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for Telnet type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_TELNET,
+					'command' => 'reboot server',
+					'privatekey' => 'secretprivkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for Javascript type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'privatekey' => 'secretprivkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			// Check script timeout.
+			'Test invalid timeout' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'timeout' => '100'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-'.SEC_PER_MIN.'.'
+			],
+			'Test unsupported macros in timeout' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'timeout' => '{$MACRO}'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout": a time unit is expected.'
+			],
+			'Test unexpected timeout field for custom script type (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'timeout' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			'Test unexpected timeout field for custom script type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'timeout' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			'Test unexpected timeout field for IPMI type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'timeout' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			'Test unexpected timeout field for SSH type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'timeout' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			'Test unexpected timeout field for Telnet type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_TELNET,
+					'command' => 'reboot server',
+					'timeout' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			// Check script parameters.
+			'Test invalid parameters' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'parameters' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters": an array is expected.'
+			],
+			'Test missing name in parameters' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'parameters' => [[]]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "name" is missing.'
+			],
+			'Test empty name in parameters' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'parameters' => [[
+						'name' => ''
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+			],
+			'Test missing value in parameters' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'reboot server',
+					'parameters' => [[
+						'name' => 'param1'
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "value" is missing.'
+			],
+			'Test duplicate parameters' => [
+				'script' => [
+					'name' => 'Webhook validation with params',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'Script command',
+					'parameters' => [
+						[
+							'name' => 'param1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'param1',
+							'value' => 'value1'
+						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/parameters/2": value (name)=(param1) already exists.'
 			],
-			[
+			'Test unexpected parameters field for custom script type (empty)' => [
 				'script' => [
-					[
-						'name' => '',
-						'type' => 5,
-						'command' => 'Script command'
-					]
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'parameters' => []
 				],
-				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
 			],
-			[
+			'Test unexpected parameters field for custom script type (empty sub-params)' => [
 				'script' => [
-					'name' => 'Webhook validate script',
-					'type' => 5
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'parameters' => [[]]
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "command" is missing.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
 			],
-			[
+			'Test unexpected parameters field for custom script type (string)' => [
 				'script' => [
-					'type' => 5,
-					'command' => 'Script command'
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'parameters' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/parameters": an array is expected.'
 			],
-			// Check successful creation of script.
-			[
+			'Test unexpected parameters field for custom script type' => [
 				'script' => [
-					[
-						'name' => 'Webhook create script',
-						'type' => 5,
-						'command' => 'Script command'
-					]
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'parameters' => [[
+						'name' => 'param1',
+						'value' => 'value1'
+					]]
 				],
-				'expected_error' => null
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
 			],
-			[
+			'Test unexpected parameters field for IPMI type' => [
 				'script' => [
-					[
-						'name' => 'Webhook with params',
-						'type' => 5,
-						'command' => 'Script command',
-						'parameters' => []
-					]
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_IPMI,
+					'command' => 'reboot server',
+					'parameters' => [[
+						'name' => 'param1',
+						'value' => 'value1'
+					]]
 				],
-				'expected_error' => null
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
 			],
-			[
+			'Test unexpected parameters field for SSH type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'command' => 'reboot server',
+					'parameters' => [[
+						'name' => 'param1',
+						'value' => 'value1'
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			],
+			'Test unexpected parameters field for Telnet type' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_TELNET,
+					'command' => 'reboot server',
+					'parameters' => [[
+						'name' => 'param1',
+						'value' => 'value1'
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			]
+		];
+	}
+
+	public static function script_create_data_valid() {
+		return [
+			'Test successful UTF-8 name' => [
 				'script' => [
 					[
 						'name' => 'Апи скрипт создан утф-8',
-						'type' => 0,
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server 1'
 					]
 				],
 				'expected_error' => null
 			],
-			[
+			'Test successful multiple scripts' => [
 				'script' => [
 					[
 						'name' => 'API create one script',
-						'type' => 0,
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server 1'
 					],
 					[
 						'name' => 'æų',
-						'type' => 0,
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'æų'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful menu path for host scope (empty)' => [
+				'script' => [
+					[
+						'name' => 'API create script (menu path test 1)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => ''
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful menu path for event scope (empty)' => [
+				'script' => [
+					[
+						'name' => 'API create script (menu path test 2)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+						'menu_path' => ''
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful menu path (empty root)' => [
+				'script' => [
+					[
+						'name' => 'API create script (menu path test 3)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => '/'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful menu path (preceding slash)' => [
+				'script' => [
+					[
+						'name' => 'API create script (menu path test 4)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => '/folder1/folder2'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful menu path (trailing slash)' => [
+				'script' => [
+					[
+						'name' => 'API create script (menu path test 5)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'folder1/folder2/'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful menu path (preceding and trailing slash)' => [
+				'script' => [
+					[
+						'name' => 'API create script (menu path test 6)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => '/folder1/folder2/'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful menu path (no slash)' => [
+				'script' => [
+					[
+						'name' => 'API create script (menu path test 7)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'folder1/folder2'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful custom script with random non-default parameters' => [
+				'script' => [
+					[
+						'name' => 'API create custom script with random non-default parameters',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
+						'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+						'description' => 'custom event script that executes on server for all user groups and Zabbix servers host group with write permissions',
+						'usrgrpid' => 0,
+						'groupid' => 4,
+						'host_access' => PERM_READ_WRITE,
+						'confirmation' => 'confirmation text',
+						'menu_path' => 'folder1/folder2'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH script with random non-default parameters' => [
+				'script' => [
+					[
+						'name' => 'API create SSH script with random non-default parameters',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'description' =>
+							'SSH host script for Zabbix administrators and all host groups with write permissions',
+						'usrgrpid' => 7,
+						'groupid' => 0,
+						'host_access' => PERM_READ_WRITE,
+						'confirmation' => 'confirmation text',
+						'port' => '{$MACRO}',
+						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+						'username' => 'John',
+						'password' => 'Ada',
+						'publickey' => 'secret_public_key',
+						'privatekey' => 'secret_private_key',
+						'menu_path' => 'folder1/folder2'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Telnet script with random non-default parameters' => [
+				'script' => [
+					[
+						'name' => 'API create Telnet script with random non-default parameters',
+						'type' => ZBX_SCRIPT_TYPE_TELNET,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+						'description' => 'Telnet event script for Zabbix administrators and Zabbix servers host groups with write permissions',
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'host_access' => PERM_READ_WRITE,
+						'confirmation' => 'confirmation text',
+						'port' => 456,
+						'username' => 'John',
+						'password' => 'Ada',
+						'menu_path' => 'folder1/folder2'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Javascript script with random non-default parameters' => [
+				'script' => [
+					[
+						'name' => 'API create Javascript script with random non-default parameters',
+						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+						'description' => 'Javascript event script with for Zabbix administrators and Zabbix servers host groups with write permissions',
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'host_access' => PERM_READ_WRITE,
+						'confirmation' => 'confirmation text',
+						'timeout' => '10',
+						'menu_path' => 'folder1/folder2',
+						'parameters' => [
+							[
+								'name' => '!@#$%^&*()_+<>,.\/',
+								'value' => '!@#$%^&*()_+<>,.\/'
+							],
+							[
+								'name' => str_repeat('n', 255),
+								'value' => str_repeat('v', 2048)
+							],
+							[
+								'name' => '{$MACRO:A}',
+								'value' => '{$MACRO:A}'
+							],
+							[
+								'name' => '{$USERMACRO}',
+								'value' => ''
+							],
+							[
+								'name' => '{HOST.HOST}',
+								'value' => '{EVENT.NAME}'
+							],
+							[
+								'name' => 'Имя',
+								'value' => 'Значение'
+							]
+						]
 					]
 				],
 				'expected_error' => null
@@ -431,62 +1496,64 @@ class testScripts extends CAPITest {
 				]
 			],
 			// Get scripts parameters.
-			[
+			'Test get scripts parameters' => [
 				'params' => [
 					'__auth' => ['Admin', 'zabbix'],
 					'output' => ['parameters'],
-					'scriptids' => 200
+					'scriptids' => 59
 				],
 				'expect' => [
 					'error' => null,
 					'result_keys' => ['parameters'],
 					'parameters' => [
 						[
-							'name' => 'parameter 1',
+							'name' => 'param 1',
 							'value' => 'value 1'
 						],
 						[
-							'name' => 'parameter 2',
+							'name' => 'param 2',
 							'value' => 'value 2'
 						]
 					]
 				]
 			],
 			// Filter webhooks.
-			[
+			'Test filter webhooks' => [
 				'params' => [
 					'__auth' => ['Admin', 'zabbix'],
 					'output' => [ 'scriptid', 'parameters'],
-					'filter' => ['type' => 5]
+					'scriptids' => [59, 60],
+					'filter' => ['type' => ZBX_SCRIPT_TYPE_WEBHOOK]
 				],
 				'expect' => [
 					'error' => null,
-					'has.scriptid' => ['200'],
-					'!has.scriptid' => ['201'],
+					'has.scriptid' => ['59'],
+					'!has.scriptid' => ['60'],
 					'result_keys' => ['scriptid', 'parameters'],
 					'parameters' => [
 						[
-							'name' => 'parameter 1',
+							'name' => 'param 1',
 							'value' => 'value 1'
 						],
 						[
-							'name' => 'parameter 2',
+							'name' => 'param 2',
 							'value' => 'value 2'
 						]
 					]
 				]
 			],
 			// Filter IPMI.
-			[
+			'Test filter IPMI' => [
 				'params' => [
 					'__auth' => ['Admin', 'zabbix'],
 					'output' => ['scriptid'],
-					'filter' => ['type' => 1]
+					'scriptids' => [59, 60],
+					'filter' => ['type' => ZBX_SCRIPT_TYPE_IPMI]
 				],
 				'expect' => [
 					'error' => null,
-					'has.scriptid' => ['201'],
-					'!has.scriptid' => ['200'],
+					'has.scriptid' => ['60'],
+					'!has.scriptid' => ['59'],
 					'result_keys' => ['scriptid']
 				]
 			]
@@ -494,8 +1561,8 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	* @dataProvider script_get
-	*/
+	 * @dataProvider script_get
+	 */
 	public function testScripts_Get($params, $expect) {
 		if (array_key_exists('__auth', $params)) {
 			$this->authorize($params['__auth'][0], $params['__auth'][1]);
@@ -574,282 +1641,1871 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	* @dataProvider script_create
-	*/
-	public function testScripts_Create($script, $expected_error) {
-		$result = $this->call('script.create', $script, $expected_error);
+	 * @dataProvider script_create_data_invalid
+	 * @dataProvider script_create_data_valid
+	 */
+	public function testScript_Create(array $scripts, $expected_error) {
+		$result = $this->call('script.create', $scripts, $expected_error);
+
+		// Accept single and multiple scripts just like API method. Work with multi-dimensional array in result.
+		if (!array_key_exists(0, $scripts)) {
+			$scripts = zbx_toArray($scripts);
+		}
 
 		if ($expected_error === null) {
-			foreach ($result['result']['scriptids'] as $key => $id) {
-				$dbResultUser = DBSelect('select * from scripts where scriptid='.zbx_dbstr($id));
-				$dbRowUser = DBFetch($dbResultUser);
-				$this->assertEquals($dbRowUser['name'], $script[$key]['name']);
-				$this->assertEquals($dbRowUser['command'], $script[$key]['command']);
-				$this->assertEquals($dbRowUser['host_access'], 2);
-				$this->assertEquals($dbRowUser['usrgrpid'], 0);
-				$this->assertEquals($dbRowUser['groupid'], 0);
-				$this->assertEquals($dbRowUser['description'], '');
-				$this->assertEquals($dbRowUser['confirmation'], '');
-				$this->assertEquals($dbRowUser['type'], $script[$key]['type']);
-				$this->assertEquals($dbRowUser['execute_on'], 2);
+			foreach ($result['result']['scriptids'] as $num => $id) {
+				$db_script = CDBHelper::getRow(
+					'SELECT s.scriptid,s.name,s.command,s.host_access,s.usrgrpid,s.groupid,s.description,'.
+							's.confirmation,s.type,s.execute_on,s.timeout,s.scope,s.port,s.authtype,s.username,'.
+							's.password,s.publickey,s.privatekey,s.menu_path'.
+					' FROM scripts s'.
+					' WHERE s.scriptid='.zbx_dbstr($id)
+				);
+
+				$db_script_parameters = CDBHelper::getAll(
+					'SELECT sp.script_paramid,sp.name,sp.value'.
+					' FROM script_param sp'.
+					' WHERE sp.scriptid='.zbx_dbstr($id)
+				);
+
+				// Required fields.
+				$this->assertNotEmpty($db_script['name']);
+				$this->assertSame($db_script['name'], $scripts[$num]['name']);
+				$this->assertEquals($db_script['type'], $scripts[$num]['type']);
+				$this->assertNotEmpty($db_script['command']);
+				$this->assertSame($db_script['command'], $scripts[$num]['command']);
+
+				// Check scope.
+				if (array_key_exists('scope', $scripts[$num])) {
+					$this->assertEquals($db_script['scope'], $scripts[$num]['scope']);
+				}
+				else {
+					$this->assertEquals($db_script['scope'], DB::getDefault('scripts', 'scope'));
+				}
+
+				// Check menu path.
+				if ($db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+					$this->assertEmpty($db_script['menu_path']);
+					$this->assertSame($db_script['usrgrpid'], '0');
+					$this->assertEquals($db_script['host_access'], DB::getDefault('scripts', 'host_access'));
+					$this->assertEmpty($db_script['confirmation']);
+				}
+				else {
+					// Check menu path.
+					if (array_key_exists('menu_path', $scripts[$num])) {
+						$this->assertSame($db_script['menu_path'], $scripts[$num]['menu_path']);
+					}
+					else {
+						$this->assertEmpty($db_script['menu_path']);
+					}
+
+					// Check user group.
+					if (array_key_exists('usrgrpid', $scripts[$num])) {
+						$this->assertSame($db_script['usrgrpid'], strval($scripts[$num]['usrgrpid']));
+					}
+					else {
+						// Despite the default in DB is NULL, getting value from DB gets us 0 as string.
+						$this->assertSame($db_script['usrgrpid'], '0');
+					}
+
+					// Check host access.
+					if (array_key_exists('host_access', $scripts[$num])) {
+						$this->assertEquals($db_script['host_access'], $scripts[$num]['host_access']);
+					}
+					else {
+						$this->assertEquals($db_script['host_access'], DB::getDefault('scripts', 'host_access'));
+					}
+
+					// Check confirmation.
+					if (array_key_exists('confirmation', $scripts[$num])) {
+						$this->assertSame($db_script['confirmation'], $scripts[$num]['confirmation']);
+					}
+					else {
+						$this->assertEmpty($db_script['confirmation']);
+					}
+				}
+
+				// Optional common fields for all script types.
+				if (array_key_exists('groupid', $scripts[$num])) {
+					$this->assertSame($db_script['groupid'], strval($scripts[$num]['groupid']));
+				}
+				else {
+					// Despite the default in DB is NULL, getting value from DB gets us 0 as string.
+					$this->assertSame($db_script['groupid'], '0');
+				}
+
+				if (array_key_exists('description', $scripts[$num])) {
+					$this->assertSame($db_script['description'], $scripts[$num]['description']);
+				}
+				else {
+					$this->assertEmpty($db_script['description']);
+				}
+
+				if ($scripts[$num]['type']) {
+					switch ($scripts[$num]['type']) {
+						case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+							// Check execute on.
+							if (array_key_exists('execute_on', $scripts[$num])) {
+								$this->assertEquals($db_script['execute_on'], $scripts[$num]['execute_on']);
+							}
+							else {
+								$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
+							}
+
+							// Check other fields.
+							$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
+							$this->assertEmpty($db_script['port']);
+							$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
+							$this->assertEmpty($db_script['username']);
+							$this->assertEmpty($db_script['password']);
+							$this->assertEmpty($db_script['publickey']);
+							$this->assertEmpty($db_script['privatekey']);
+							$this->assertEmpty($db_script_parameters);
+							break;
+
+						case ZBX_SCRIPT_TYPE_IPMI:
+							$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
+							$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
+							$this->assertEmpty($db_script['port']);
+							$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
+							$this->assertEmpty($db_script['username']);
+							$this->assertEmpty($db_script['password']);
+							$this->assertEmpty($db_script['publickey']);
+							$this->assertEmpty($db_script['privatekey']);
+							$this->assertEmpty($db_script_parameters);
+							break;
+
+						case ZBX_SCRIPT_TYPE_SSH:
+							// Check username.
+							$this->assertNotEmpty($db_script['username']);
+							$this->assertSame($db_script['username'], $scripts[$num]['username']);
+
+							// Check port.
+							if (array_key_exists('port', $scripts[$num])) {
+								$this->assertSame($db_script['port'], strval($scripts[$num]['port']));
+							}
+							else {
+								$this->assertEmpty($db_script['port']);
+							}
+
+							// Check auth type.
+							if (array_key_exists('authtype', $scripts[$num])) {
+								$this->assertEquals($db_script['authtype'], $scripts[$num]['authtype']);
+
+								if ($scripts[$num]['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
+									$this->assertNotEmpty($db_script['publickey']);
+									$this->assertNotEmpty($db_script['privatekey']);
+									$this->assertSame($db_script['publickey'], $scripts[$num]['publickey']);
+									$this->assertSame($db_script['privatekey'], $scripts[$num]['privatekey']);
+								}
+								else {
+									$this->assertEmpty($db_script['publickey']);
+									$this->assertEmpty($db_script['privatekey']);
+								}
+							}
+							else {
+								$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
+								$this->assertEmpty($db_script['publickey']);
+								$this->assertEmpty($db_script['privatekey']);
+							}
+
+							// Check password.
+							if (array_key_exists('password', $scripts[$num])) {
+								$this->assertSame($db_script['password'], $scripts[$num]['password']);
+							}
+							else {
+								$this->assertEmpty($db_script['password']);
+							}
+
+							// Check other fields.
+							$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
+							$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
+							$this->assertEmpty($db_script_parameters);
+							break;
+
+						case ZBX_SCRIPT_TYPE_TELNET:
+							// Check username.
+							$this->assertNotEmpty($db_script['username']);
+							$this->assertSame($db_script['username'], $scripts[$num]['username']);
+
+							// Check password.
+							if (array_key_exists('password', $scripts[$num])) {
+								$this->assertSame($db_script['password'], $scripts[$num]['password']);
+							}
+							else {
+								$this->assertEmpty($db_script['password']);
+							}
+
+							// Check port.
+							if (array_key_exists('port', $scripts[$num])) {
+								$this->assertSame($db_script['port'], strval($scripts[$num]['port']));
+							}
+							else {
+								$this->assertEmpty($db_script['port']);
+							}
+
+							// Check other fields.
+							$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
+							$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
+							$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
+							$this->assertEmpty($db_script['publickey']);
+							$this->assertEmpty($db_script['privatekey']);
+							$this->assertEmpty($db_script_parameters);
+							break;
+
+						case ZBX_SCRIPT_TYPE_WEBHOOK:
+							// Check timeout.
+							if (array_key_exists('timeout', $scripts[$num])) {
+								$this->assertSame($db_script['timeout'], $scripts[$num]['timeout']);
+							}
+							else {
+								$this->assertSame($db_script['timeout'], DB::getDefault('scripts', 'timeout'));
+							}
+
+							// Check parameters.
+							if (array_key_exists('parameters', $scripts[$num])) {
+								if ($scripts[$num]['parameters']) {
+									// Check newly added parameters.
+									$this->assertNotEmpty($db_script_parameters);
+
+									foreach ($scripts[$num]['parameters'] as $sp_num => $parameter) {
+										$db_script_parameter = CDBHelper::getRow(
+											'SELECT sp.script_paramid,sp.name,sp.value'.
+											' FROM script_param sp'.
+											' WHERE sp.scriptid='.zbx_dbstr($id).
+												' AND sp.name='.zbx_dbstr($parameter['name'])
+										);
+
+										$this->assertNotEmpty($db_script_parameter['name']);
+										$this->assertSame($db_script_parameter['name'], $parameter['name']);
+										$this->assertSame($db_script_parameter['value'], $parameter['value']);
+									}
+								}
+								else {
+									// Check that parameters are removed.
+									$this->assertEmpty($db_script_parameters);
+								}
+							}
+							else {
+								// Check that parameters not even added.
+								$this->assertEmpty($db_script_parameters);
+							}
+
+							// Check other fields.
+							$this->assertEquals($db_script['execute_on'], DB::getDefault('scripts', 'execute_on'));
+							$this->assertEmpty($db_script['port']);
+							$this->assertEquals($db_script['authtype'], DB::getDefault('scripts', 'authtype'));
+							$this->assertEmpty($db_script['username']);
+							$this->assertEmpty($db_script['password']);
+							$this->assertEmpty($db_script['publickey']);
+							$this->assertEmpty($db_script['privatekey']);
+							break;
+					}
+				}
 			}
 		}
 	}
 
-	public static function script_update() {
+	public static function script_update_data_invalid() {
 		return [
-			// Check script id.
-			[
+			// Check script ID.
+			'Test missing ID' => [
 				'script' => [[
 					'name' => 'API updated script',
 					'command' => 'reboot'
 				]],
 				'expected_error' => 'Invalid parameter "/1": the parameter "scriptid" is missing.'
 			],
-			[
+			'Test empty ID' => [
 				'script' => [[
+					'scriptid' => '',
 					'name' => 'API updated script',
-					'command' => 'reboot',
-					'scriptid' => ''
+					'command' => 'reboot'
 				]],
 				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
 			],
-			[
+			'Test invalid ID (string)' => [
 				'script' => [[
+					'scriptid' => 'abc',
 					'name' => 'API updated script',
-					'command' => 'reboot',
-					'scriptid' => 'abc'
+					'command' => 'reboot'
 				]],
 				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
 			],
-			[
+			'Test invalid ID (decimal)' => [
 				'script' => [[
+					'scriptid' => '1.1',
 					'name' => 'API updated script',
-					'command' => 'reboot',
-					'scriptid' => '1.1'
+					'command' => 'reboot'
 				]],
 				'expected_error' => 'Invalid parameter "/1/scriptid": a number is expected.'
 			],
-			[
+			'Test invalid ID (non-existent)' => [
 				'script' => [[
+					'scriptid' => 123456,
 					'name' => 'API updated script',
-					'command' => 'reboot',
-					'scriptid' => '123456'
+					'command' => 'reboot'
 				]],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			[
+			'Test same ID' => [
 				'script' => [
 					[
-						'scriptid' => '6',
+						'scriptid' => 15,
 						'name' => 'Scripts with the same id 1'
 					],
 					[
-						'scriptid' => '6',
+						'scriptid' => 15,
 						'name' => 'Scripts with the same id 2'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (scriptid)=(6) already exists.'
-			],
-			// Check script command.
-			[
-				'script' => [[
-					'scriptid' => '6',
-					'name' => 'API updated script',
-					'command' => ''
-				]],
-				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/2": value (scriptid)=(15) already exists.'
 			],
 			// Check script name.
-			[
+			'Test empty name' => [
 				'script' => [[
-					'scriptid' => '6',
-					'name' => '',
-					'command' => 'reboot server'
+					'scriptid' => 15,
+					'name' => ''
 				]],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			[
+			'Test existing name' => [
 				'script' => [[
-					'scriptid' => '6',
-					'name' => 'API/Update/',
-					'command' => 'reboot server'
-				]],
-				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
-			],
-			[
-				'script' => [[
-					'scriptid' => '6',
-					'name' => 'Ping',
-					'command' => 'reboot server'
+					'scriptid' => 15,
+					'name' => 'Ping'
 				]],
 				'expected_error' => 'Script "Ping" already exists.'
 			],
-			[
-				'script' => [[
-					'scriptid' => '6',
-					'name' => 'Ping/test',
-					'command' => 'reboot server'
-				]],
-				'expected_error' => 'Script menu path "Ping/test" already used in script name "Ping".'
-			],
-			[
+			'Test same name' => [
 				'script' => [
 					[
-						'scriptid' => '6',
-						'name' => 'Scripts with the same name',
-						'command' => 'reboot server'
+						'scriptid' => 15,
+						'name' => 'Scripts with the same name'
 					],
 					[
-						'scriptid' => '7',
-						'name' => 'Scripts with the same name',
-						'command' => 'reboot server'
+						'scriptid' => 16,
+						'name' => 'Scripts with the same name'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
 			],
-			[
-				'script' => [
-					[
-						'scriptid' => '6',
-						'name' => 'test'
-					],
-					[
-						'scriptid' => '7',
-						'name' => 'test/test/test test'
-					]
-				],
-				'expected_error' => 'Script menu path "test/test/test test" already used in script name "test".'
-			],
-			[
-				'script' => [
-					[
-						'scriptid' => '6',
-						'name' => 'test/test'
-					],
-					[
-						'scriptid' => '7',
-						'name' => 'test'
-					]
-				],
-				'expected_error' => 'Script name "test" already used in menu path for script "test/test".'
-			],
-			// Check type.
-			[
-				'script' => [
-					[
-						'scriptid' => '6',
-						'name' => 'API empty type',
-						'command' => 'reboot server',
-						'type' => ''
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
-			],
-			[
-				'script' => [
-					[
-						'scriptid' => '6',
-						'name' => 'API type string',
-						'command' => 'reboot server',
-						'type' => 'abc'
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
-			],
-			[
-				'script' => [
-					[
-						'scriptid' => '6',
-						'name' => 'API invalid type',
-						'command' => 'reboot server',
-						'type' => '1.1'
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
-			],
-			[
-				'script' => [
-					[
-						'scriptid' => '6',
-						'name' => 'Validate script type',
-						'type' => 8
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 5.'
-			],
-			// Webhook script validation.
-			[
-				'script' => [
-					[
-						'scriptid' => '6',
-						'name' => 'Webhook validate script',
-						'type' => 5,
-						'command' => ''
-					]
-				],
+			// Check script command.
+			'Test empty command' => [
+				'script' => [[
+					'scriptid' => 15,
+					'command' => ''
+				]],
 				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
 			],
-			[
+			// Check script type.
+			'Test invalid type (empty)' => [
 				'script' => [
-					[
-						'name' => '',
-						'scriptid' => '6',
-						'type' => 5,
-						'command' => 'Script command'
-					]
+					'scriptid' => 15,
+					'type' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
-			// Check successful creation of script.
-			[
+			'Test invalid type (string)' => [
+				'script' => [
+					'scriptid' => 15,
+					'type' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+			],
+			'Test invalid type' => [
+				'script' => [
+					'scriptid' => 15,
+					'type' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
+						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK
+					]).'.'
+			],
+			// Check script scope.
+			'Test invalid scope (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/scope": an integer is expected.'
+			],
+			'Test invalid scope (string)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/scope": an integer is expected.'
+			],
+			'Test invalid scope' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
+			],
+			'Test scope change assigned to action' => [
+				'script' => [
+					'scriptid' => 11,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST
+				],
+				'expected_error' => 'Cannot update script scope. Script "API script in action" is used in action "API action with script".'
+			],
+			// Check script menu path.
+			'Test invalid menu_path for host scope' => [
+				'script' => [
+					'scriptid' => 16,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test invalid menu_path for event scope' => [
+				'script' => [
+					'scriptid' => 17,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test invalid menu_path for host scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test invalid menu_path for event scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test unexpected menu_path for action scope (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'menu_path' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			'Test unexpected menu_path for action scope' => [
+				'script' => [
+					'scriptid' => 15,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			'Test unexpected menu_path for action scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 16,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			// Check script host access.
+			'Test unexpected host_access for action scope (string)' => [
+				'script' => [
+					'scriptid' => 15,
+					'host_access' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test unexpected host_access for action scope (int)' => [
+				'script' => [
+					'scriptid' => 15,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
+			],
+			'Test unexpected host_access for action scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 16,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
+			],
+			'Test invalid host_access for host scope (empty)' => [
+				'script' => [
+					'scriptid' => 16,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for host scope (string)' => [
+				'script' => [
+					'scriptid' => 16,
+					'host_access' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for host scope' => [
+				'script' => [
+					'scriptid' => 16,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
+			],
+			'Test invalid host_access for host scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
+			],
+			'Test invalid host_access for event scope (empty)' => [
+				'script' => [
+					'scriptid' => 17,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for event scope (string)' => [
+				'script' => [
+					'scriptid' => 17,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for event scope' => [
+				'script' => [
+					'scriptid' => 17,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
+			],
+			'Test invalid host_access for event scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.
+					implode(', ', [PERM_READ, PERM_READ_WRITE]).'.'
+			],
+			// Check script user group.
+			'Test unexpected usrgrpid for action scope (string)' => [
+				'script' => [
+					'scriptid' => 15,
+					'usrgrpid' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test unexpected usrgrpid for action scope (int)' => [
+				'script' => [
+					'scriptid' => 15,
+					'usrgrpid' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
+			'Test unexpected usrgrpid for action scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 16,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
+			'Test invalid usrgrpid for host scope (empty)' => [
+				'script' => [
+					'scriptid' => 16,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for host scope (string)' => [
+				'script' => [
+					'scriptid' => 16,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for host scope' => [
+				'script' => [
+					'scriptid' => 16,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			'Test invalid usrgrpid for host scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			'Test invalid usrgrpid for event scope (empty)' => [
+				'script' => [
+					'scriptid' => 17,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for event scope (string)' => [
+				'script' => [
+					'scriptid' => 17,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for event scope' => [
+				'script' => [
+					'scriptid' => 17,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			'Test invalid usrgrpid for event scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			// Check script confirmation.
+			'Test unexpected confirmation for action scope' => [
+				'script' => [
+					'scriptid' => 15,
+					'confirmation' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
+			],
+			'Test unexpected confirmation for action scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 16,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'confirmation' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
+			],
+			// Check script host group.
+			'Test invalid host group (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'groupid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
+			],
+			'Test invalid host group (string)' => [
+				'script' => [
+					'scriptid' => 15,
+					'groupid' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
+			],
+			'Test invalid host group' => [
+				'script' => [
+					'scriptid' => 15,
+					'groupid' => 999999
+				],
+				'expected_error' => 'Host group with ID "999999" is not available.'
+			],
+			// Check unexpected fields in script.
+			'Test unexpected field' => [
+				'script' => [
+					'scriptid' => 15,
+					'unexpected_field' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "unexpected_field".'
+			],
+			// Check script execute_on.
+			'Test invalid execute_on (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'execute_on' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
+			],
+			'Test invalid execute_on (string)' => [
+				'script' => [
+					'scriptid' => 15,
+					'execute_on' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
+			],
+			'Test invalid execute_on' => [
+				'script' => [
+					'scriptid' => 15,
+					'execute_on' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of '.
+					implode(', ', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
+						ZBX_SCRIPT_EXECUTE_ON_PROXY
+					]).'.'
+			],
+			'Test unexpected execute_on field for IPMI type (empty)' => [
+				'script' => [
+					'scriptid' => 20,
+					'execute_on' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
+			],
+			'Test unexpected execute_on field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+			],
+			'Test unexpected execute_on field for SSH type' => [
+				'script' => [
+					'scriptid' => 21,
+					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+			],
+			'Test unexpected execute_on field for Telnet type' => [
+				'script' => [
+					'scriptid' => 23,
+					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+			],
+			'Test unexpected execute_on field for Javascript type' => [
+				'script' => [
+					'scriptid' => 24,
+					'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "execute_on".'
+			],
+			// Check script port.
+			'Test invalid port (string)' => [
+				'script' => [
+					'scriptid' => 21,
+					'port' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+			],
+			'Test invalid port' => [
+				'script' => [
+					'scriptid' => 21,
+					'port' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/port": value must be one of '.
+					ZBX_MIN_PORT_NUMBER.'-'.ZBX_MAX_PORT_NUMBER.'.'
+			],
+			'Test unexpected port field for custom script type (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'port' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+			],
+			'Test unexpected port field for custom script type' => [
+				'script' => [
+					'scriptid' => 15,
+					'port' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+			],
+			'Test unexpected port field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'port' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+			],
+			'Test unexpected port field for Javascript type' => [
+				'script' => [
+					'scriptid' => 24,
+					'port' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "port".'
+			],
+			// Check script auth type.
+			'Test invalid authtype (empty)' => [
+				'script' => [
+					'scriptid' => 21,
+					'authtype' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+			],
+			'Test invalid authtype (string)' => [
+				'script' => [
+					'scriptid' => 21,
+					'authtype' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+			],
+			'Test invalid authtype' => [
+				'script' => [
+					'scriptid' => 21,
+					'authtype' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
+					implode(', ', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]).'.'
+			],
+			'Test unexpected authtype field for custom script type (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'authtype' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/authtype": an integer is expected.'
+			],
+			'Test unexpected authtype field for custom script type' => [
+				'script' => [
+					'scriptid' => 15,
+					'authtype' => ITEM_AUTHTYPE_PASSWORD
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+			],
+			'Test unexpected authtype field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'authtype' => ITEM_AUTHTYPE_PASSWORD
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+			],
+			'Test unexpected authtype field for Telnet type' => [
+				'script' => [
+					'scriptid' => 23,
+					'authtype' => ITEM_AUTHTYPE_PASSWORD
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+			],
+			'Test unexpected authtype field for Javascript type' => [
+				'script' => [
+					'scriptid' => 24,
+					'authtype' => ITEM_AUTHTYPE_PASSWORD
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "authtype".'
+			],
+			// Check script username.
+			'Test empty username for SSH type' => [
+				'script' => [
+					'scriptid' => 21,
+					'username' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
+			],
+			'Test empty username for Telnet type' => [
+				'script' => [
+					'scriptid' => 23,
+					'username' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
+			],
+			'Test unexpected username field for custom script type (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'username' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+			],
+			'Test unexpected username field for custom script type' => [
+				'script' => [
+					'scriptid' => 15,
+					'username' => 'John'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+			],
+			'Test unexpected username field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'username' => 'John'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+			],
+			'Test unexpected username field for Javascript type' => [
+				'script' => [
+					'scriptid' => 24,
+					'username' => 'John'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "username".'
+			],
+			// Check script password.
+			'Test unexpected password field for custom script type (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'password' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+			],
+			'Test unexpected password field for custom script type' => [
+				'script' => [
+					'scriptid' => 15,
+					'password' => 'psswd'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+			],
+			'Test unexpected password field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'password' => 'psswd'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+			],
+			'Test unexpected password field for Javascript type' => [
+				'script' => [
+					'scriptid' => 24,
+					'password' => 'psswd'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "password".'
+			],
+			// Check script public key.
+			'Test empty publickey' => [
+				'script' => [
+					'scriptid' => 22,
+					'publickey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/publickey": cannot be empty.'
+			],
+			'Test unexpected publickey for SSH password type' => [
+				'script' => [
+					'scriptid' => 21,
+					'publickey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for custom script type (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'publickey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for custom script type' => [
+				'script' => [
+					'scriptid' => 15,
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for Telnet type' => [
+				'script' => [
+					'scriptid' => 23,
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test unexpected publickey field for Javascript type' => [
+				'script' => [
+					'scriptid' => 24,
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			// Check script private key.
+			'Test empty privatekey' => [
+				'script' => [
+					'scriptid' => 22,
+					'privatekey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/privatekey": cannot be empty.'
+			],
+			'Test unexpected privatekey for SSH password type' => [
+				'script' => [
+					'scriptid' => 21,
+					'privatekey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for custom script type (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'privatekey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for custom script type' => [
+				'script' => [
+					'scriptid' => 15,
+					'privatekey' => 'secretprivkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'privatekey' => 'secretprivkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for Telnet type' => [
+				'script' => [
+					'scriptid' => 23,
+					'privatekey' => 'secretprivkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			'Test unexpected privatekey field for Javascript type' => [
+				'script' => [
+					'scriptid' => 24,
+					'privatekey' => 'secretprivkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "privatekey".'
+			],
+			// Check script timeout.
+			'Test invalid timeout' => [
+				'script' => [
+					'scriptid' => 24,
+					'timeout' => '100'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-'.SEC_PER_MIN.'.'
+			],
+			'Test unsupported macros in timeout' => [
+				'script' => [
+					'scriptid' => 24,
+					'timeout' => '{$MACRO}'
+				],
+				'expected_error' => 'Invalid parameter "/1/timeout": a time unit is expected.'
+			],
+			'Test unexpected timeout field for custom script type (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'timeout' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			'Test unexpected timeout field for custom script type' => [
+				'script' => [
+					'scriptid' => 15,
+					'timeout' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			'Test unexpected timeout field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'timeout' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			'Test unexpected timeout field for SSH type' => [
+				'script' => [
+					'scriptid' => 21,
+					'timeout' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			'Test unexpected timeout field for Telnet type' => [
+				'script' => [
+					'scriptid' => 23,
+					'timeout' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "timeout".'
+			],
+			// Check script parameters.
+			'Test invalid parameters' => [
+				'script' => [
+					'scriptid' => 25,
+					'parameters' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters": an array is expected.'
+			],
+			'Test missing name in parameters' => [
+				'script' => [
+					'scriptid' => 25,
+					'parameters' => [[]]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "name" is missing.'
+			],
+			'Test empty name in parameters' => [
+				'script' => [
+					'scriptid' => 25,
+					'parameters' => [[
+						'name' => ''
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+			],
+			'Test missing value in parameters' => [
+				'script' => [
+					'scriptid' => 25,
+					'parameters' => [[
+						'name' => 'param x'
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "value" is missing.'
+			],
+			'Test unexpected parameters field for custom script type (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'parameters' => []
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			],
+			'Test unexpected parameters field for custom script type (empty sub-params)' => [
+				'script' => [
+					'scriptid' => 15,
+					'parameters' => [[]]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			],
+			'Test unexpected parameters field for custom script type (string)' => [
+				'script' => [
+					'scriptid' => 15,
+					'parameters' => ''
+				],
+				// Must be changed in future if CApiInputValidator is improved.
+				'expected_error' => 'Invalid parameter "/1/parameters": an array is expected.'
+			],
+			'Test unexpected parameters field for custom script type' => [
+				'script' => [
+					'scriptid' => 15,
+					'parameters' => [[
+						'name' => 'param1',
+						'value' => 'value1'
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			],
+			'Test unexpected parameters field for IPMI type' => [
+				'script' => [
+					'scriptid' => 20,
+					'parameters' => [[
+						'name' => 'param1',
+						'value' => 'value1'
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			],
+			'Test unexpected parameters field for SSH type' => [
+				'script' => [
+					'scriptid' => 21,
+					'parameters' => [[
+						'name' => 'param1',
+						'value' => 'value1'
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			],
+			'Test unexpected parameters field for Telnet type' => [
+				'script' => [
+					'scriptid' => 23,
+					'parameters' => [[
+						'name' => 'param1',
+						'value' => 'value1'
+					]]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			],
+			// Check required fields on type change. (Changing Custom to IPMI or Javascript does not require any other required fields).
+			'Test custom change to SSH (missing username)' => [
+				'script' => [
+					'scriptid' => 15,
+					'type' => ZBX_SCRIPT_TYPE_SSH
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "username" is missing.'
+			],
+			'Test custom change to SSH (empty username)' => [
+				'script' => [
+					'scriptid' => 15,
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'username' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/username": cannot be empty.'
+			],
+			'Test custom change to SSH (unexpected publickey, empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'username' => 'John',
+					'publickey' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test custom change to SSH (unexpected publickey)' => [
+				'script' => [
+					'scriptid' => 15,
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'username' => 'John',
+					'publickey' => 'secretpubkey'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "publickey".'
+			],
+			'Test custom change to SSH (missing publickey)' => [
+				'script' => [
+					'scriptid' => 15,
+					'type' => ZBX_SCRIPT_TYPE_SSH,
+					'username' => 'John',
+					'authtype' => ITEM_AUTHTYPE_PUBLICKEY
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "publickey" is missing.'
+			],
+			'Test custom change to Telnet (missing username)' => [
+				'script' => [
+					'scriptid' => 15,
+					'type' => ZBX_SCRIPT_TYPE_TELNET
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "username" is missing.'
+			]
+		];
+	}
+
+	public static function script_update_data_valid() {
+		return [
+			'Test successful custom script update without changes' => [
 				'script' => [
 					[
-						'scriptid' => '6',
-						'name' => 'Webhook update script',
-						'type' => 5,
-						'command' => 'Script command'
+						'scriptid' => 6
 					]
 				],
 				'expected_error' => null
 			],
-			[
+			'Test successful multiple custom script updates' => [
 				'script' => [
 					[
-						'scriptid' => '6',
-						'name' => 'Webhook update script with params',
-						'type' => 5,
-						'command' => 'Script command',
+						'scriptid' => 6,
+						'name' => 'API script custom execute on agent (action scope) updated',
+						'command' => 'reboot server 1'
+					],
+					[
+						'scriptid' => 7,
+						'name' => 'API script custom execute on agent (host scope) updated',
+						'command' => 'reboot server 2'
+					]
+				],
+				'expected_error' => null
+			],
+			// Check existing script field updates.
+			'Test successful custom script update' => [
+				'script' => [
+					[
+						'scriptid' => 15,
+						'name' => 'Апи скрипт обнавлён утф-8',
+						'command' => 'reboot',
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
+						'groupid' => 4,
+						'description' => 'Check successful update'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful custom script update with menu path' => [
+				'script' => [
+					[
+						'scriptid' => 16,
+						'name' => 'API custom script update with menu path',
+						'command' => 'reboot',
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update',
+						'confirmation' => 'Do you want to reboot it?',
+						'menu_path' => '/root/folder1/'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful IPMI update' => [
+				'script' => [
+					[
+						'scriptid' => 20,
+						'name' => 'API script IPMI update',
+						'command' => 'reboot',
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update',
+						'confirmation' => 'Do you want to reboot it?'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH update with password' => [
+				'script' => [
+					[
+						'scriptid' => 21,
+						'name' => 'API script SSH password update',
+						'command' => 'reboot',
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update',
+						'confirmation' => 'Do you want to reboot it?',
+						'port' => '{$MACRO}',
+						'username' => 'Jill',
+						'password' => 'Barry'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH update with public key' => [
+				'script' => [
+					[
+						'scriptid' => 22,
+						'name' => 'API script SSH public key update',
+						'command' => 'reboot',
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update',
+						'confirmation' => 'Do you want to reboot it?',
+						'port' => '{$MACRO}',
+						'username' => 'Jill',
+						'password' => 'Barry',
+						'publickey' => 'updatedpubkey',
+						'privatekey' => 'updatedprivkey'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH update and authtype change to password' => [
+				'script' => [
+					[
+						// "username" and "password" and the rest of fields that are not given are left unchanged, but publickey and privatekey should be cleared.
+						'scriptid' => 22,
+						'authtype' => ITEM_AUTHTYPE_PASSWORD,
+						'name' => 'API script SSH public key update and change to password'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH update and authtype change to public key' => [
+				'script' => [
+					[
+						// Fields that are not given, are not changed, but publickey and privatekey are not added.
+						'scriptid' => 21,
+						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+						'name' => 'API script SSH password update and change to public key',
+						'publickey' => 'updatedpubkey',
+						'privatekey' => 'updatedprivkey'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Telnet update' => [
+				'script' => [
+					[
+						'scriptid' => 23,
+						'name' => 'API script Telnet update',
+						'command' => 'reboot',
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update',
+						'confirmation' => 'Do you want to reboot it?',
+						'port' => '{$MACRO}',
+						'username' => 'Barry'
+					]
+				],
+				'expected_error' => null
+			],
+			// Check Javascript parameter changes add, remove and update.
+			'Test successful Javascript update by adding parameters' => [
+				'script' => [
+					[
+						'scriptid' => 24,
+						'name' => 'API script Webhook no params updated with params',
+						'command' => 'reboot',
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update',
+						'confirmation' => 'Do you want to reboot it?',
+						'parameters' => [
+							[
+								'name' => 'param1',
+								'value' => 'value1'
+							],
+							[
+								'name' => 'param2',
+								'value' => 'value2'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Javascript update by removing parameters' => [
+				'script' => [
+					[
+						'scriptid' => 25,
+						'name' => 'API script Webhook with params updated but no more params',
+						'command' => 'reboot',
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update',
+						'confirmation' => 'Do you want to reboot it?',
 						'parameters' => []
 					]
 				],
 				'expected_error' => null
 			],
-			// Check successful script update.
-			[
+			'Test successful Javascript update by changing parameters' => [
 				'script' => [
 					[
-						'scriptid' => '6',
-						'type' => 0,
-						'name' => 'Апи скрипт обновлён утф-8',
-						'command' => 'reboot server'
+						'scriptid' => 26,
+						'name' => 'API script Webhook with params to change updated with new params',
+						'command' => 'reboot',
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update',
+						'confirmation' => 'Do you want to reboot it?',
+						'parameters' => [
+							[
+								'name' => 'new_param_1',
+								'value' => 'new_value_1'
+							]
+						]
 					]
 				],
 				'expected_error' => null
 			],
-			[
+			// Check custom script type change and new parameters. "execute_on" must reset to default.
+			'Test successful custom script type change to IPMI' => [
 				'script' => [
 					[
-						'scriptid' => '6',
-						'type' => 0,
-						'name' => 'API updated one script',
-						'command' => 'reboot server 1'
-					],
+						// Fields that are not given should stay the same, but execute_on should change to default.
+						'scriptid' => 27,
+						'name' => 'API script custom changed to IPMI',
+						'type' => ZBX_SCRIPT_TYPE_IPMI
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful custom script type change to SSH with password' => [
+				'script' => [
 					[
-						'scriptid' => '7',
-						'type' => 1,
-						'name' => 'API updated two script',
-						'command' => 'reboot server 2'
+						'scriptid' => 28,
+						'name' => 'API script custom changed to SSH with password',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful custom script type change to SSH with public key' => [
+				'script' => [
+					[
+						'scriptid' => 29,
+						'name' => 'API script custom changed to SSH with public key',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456,
+						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+						'publickey' => 'newsecretepublickey',
+						'privatekey' => 'newsecreteprivatekey'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful custom script type change to Telnet' => [
+				'script' => [
+					[
+						'scriptid' => 30,
+						'name' => 'API script custom changed to Telnet',
+						'type' => ZBX_SCRIPT_TYPE_TELNET,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful custom script type change to Javascript' => [
+				'script' => [
+					[
+						'scriptid' => 31,
+						'name' => 'API script custom changed to Javascript',
+						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+						'timeout' => '60s',
+						'parameters' => [
+							[
+								'name' => 'username',
+								'value' => 'Admin'
+							],
+							[
+								'name' => 'password',
+								'value' => 'zabbix'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Check IPMI type change and new parameters. Just check if new fields are properly written to DB.
+			'Test successful IPMI type change to custom script' => [
+				'script' => [
+					[
+						'scriptid' => 32,
+						'name' => 'API script IPMI changed to custom script (with execute on agent)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful IPMI type change to SSH with password' => [
+				'script' => [
+					[
+						'scriptid' => 33,
+						'name' => 'API script IPMI changed to SSH with password',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful IPMI type change to SSH with public key' => [
+				'script' => [
+					[
+						'scriptid' => 34,
+						'name' => 'API script IPMI changed to SSH with public key',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456,
+						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+						'publickey' => 'newsecretepublickey',
+						'privatekey' => 'newsecreteprivatekey'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful IPMI type change to Telnet' => [
+				'script' => [
+					[
+						'scriptid' => 35,
+						'name' => 'API script IPMI changed to Telnet',
+						'type' => ZBX_SCRIPT_TYPE_TELNET,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful IPMI type change to Javascript' => [
+				'script' => [
+					[
+						'scriptid' => 36,
+						'name' => 'API script IPMI changed to Javascript',
+						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+						'timeout' => '60s',
+						'parameters' => [
+							[
+								'name' => 'username',
+								'value' => 'Admin'
+							],
+							[
+								'name' => 'password',
+								'value' => 'zabbix'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Check SSH type change and new parameters. "username", "password" and "port" can remain for Telnet, but "publickey" and "privatekey" must be removed.
+			'Test successful SSH with password type change to custom script' => [
+				'script' => [
+					[
+						'scriptid' => 37,
+						'name' => 'API script SSH with password changed to custom script (with execute on agent)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH with password type change to IPMI' => [
+				'script' => [
+					[
+						'scriptid' => 38,
+						'name' => 'API script SSH with password changed to IPMI',
+						'type' => ZBX_SCRIPT_TYPE_IPMI
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH with password type change to Telnet' => [
+				'script' => [
+					[
+						'scriptid' => 39,
+						'name' => 'API script SSH with password changed to Telnet',
+						'type' => ZBX_SCRIPT_TYPE_TELNET,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH with password type change to Javascript' => [
+				'script' => [
+					[
+						'scriptid' => 40,
+						'name' => 'API script SSH with password changed to Javascript',
+						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+						'timeout' => '60s',
+						'parameters' => [
+							[
+								'name' => 'username',
+								'value' => 'Admin'
+							],
+							[
+								'name' => 'password',
+								'value' => 'zabbix'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH with public key type change to custom script' => [
+				'script' => [
+					[
+						'scriptid' => 41,
+						'name' => 'API script SSH with public key changed to custom script (with execute on agent)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH with public key type change to IPMI' => [
+				'script' => [
+					[
+						'scriptid' => 42,
+						'name' => 'API script SSH with public key changed to IPMI',
+						'type' => ZBX_SCRIPT_TYPE_IPMI
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH with public key type change to Telnet' => [
+				'script' => [
+					[
+						'scriptid' => 43,
+						'name' => 'API script SSH with public key changed to Telnet',
+						'type' => ZBX_SCRIPT_TYPE_TELNET,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful SSH with public key type change to Javascript' => [
+				'script' => [
+					[
+						'scriptid' => 44,
+						'name' => 'API script SSH with public key changed to Javascript',
+						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+						'timeout' => '60s',
+						'parameters' => [
+							[
+								'name' => 'username',
+								'value' => 'Admin'
+							],
+							[
+								'name' => 'password',
+								'value' => 'zabbix'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Check Telnet type change and new parameters. "username", "password" and "port" can remain for SSH, and other fields should be properly written to DB.
+			'Test successful Telnet type change to custom script' => [
+				'script' => [
+					[
+						'scriptid' => 45,
+						'name' => 'API script Telnet changed to custom script (with execute on agent)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Telnet type change to SSH with password' => [
+				'script' => [
+					[
+						'scriptid' => 46,
+						'name' => 'API script Telnet changed to SSH with password',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Telnet type change to SSH with public key' => [
+				'script' => [
+					[
+						'scriptid' => 47,
+						'name' => 'API script Telnet changed to SSH with public key',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456,
+						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+						'publickey' => 'newsecretepublickey',
+						'privatekey' => 'newsecreteprivatekey'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Telnet type change to IPMI' => [
+				'script' => [
+					[
+						'scriptid' => 48,
+						'name' => 'API script Telnet changed to IPMI',
+						'type' => ZBX_SCRIPT_TYPE_IPMI
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Telnet type change to Javascript' => [
+				'script' => [
+					[
+						'scriptid' => 49,
+						'name' => 'API script Telnet changed to Javascript',
+						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+						'timeout' => '60s',
+						'parameters' => [
+							[
+								'name' => 'username',
+								'value' => 'Admin'
+							],
+							[
+								'name' => 'password',
+								'value' => 'zabbix'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Check Javascript type change and new parameters. "parameters" should be removed and other fields should be properly written to DB.
+			'Test successful Javascript type change to custom script' => [
+				'script' => [
+					[
+						'scriptid' => 50,
+						'name' => 'API script Javascript changed to custom script (with execute on agent)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Javascript type change to SSH with password' => [
+				'script' => [
+					[
+						'scriptid' => 51,
+						'name' => 'API script Javascript changed to SSH with password',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Javascript type change to SSH with public key' => [
+				'script' => [
+					[
+						'scriptid' => 52,
+						'name' => 'API script Javascript changed to SSH with public key',
+						'type' => ZBX_SCRIPT_TYPE_SSH,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456,
+						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+						'publickey' => 'newsecretepublickey',
+						'privatekey' => 'newsecreteprivatekey'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Javascript type change to IPMI' => [
+				'script' => [
+					[
+						'scriptid' => 53,
+						'name' => 'API script Javascript changed to IPMI',
+						'type' => ZBX_SCRIPT_TYPE_IPMI
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful Javascript type change to Telnet' => [
+				'script' => [
+					[
+						'scriptid' => 54,
+						'name' => 'API script Javascript changed to Telnet',
+						'type' => ZBX_SCRIPT_TYPE_TELNET,
+						'username' => 'Admin',
+						'password' => 'zabbix',
+						'port' => 456
+					]
+				],
+				'expected_error' => null
+			],
+			// Check scope field update.
+			'Test successful parameter update of host scope' => [
+				'script' => [
+					[
+						'scriptid' => 56,
+						'menu_path' => '/new_folder1/new_folder2/',
+						'usrgrpid' => 7,
+						'confirmation' => 'confirmation text updated',
+						'host_access' => PERM_READ_WRITE
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful parameter update of event scope' => [
+				'script' => [
+					[
+						'scriptid' => 57,
+						'menu_path' => '/new_folder1/new_folder2/',
+						'usrgrpid' => 7,
+						'confirmation' => 'confirmation text updated',
+						'host_access' => PERM_READ_WRITE
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful parameter update of action scope (scope change)' => [
+				'script' => [
+					[
+						'scriptid' => 55,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => '/new_folder1/new_folder2/',
+						'usrgrpid' => 7,
+						'confirmation' => 'confirmation text updated',
+						'host_access' => PERM_READ_WRITE
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful parameter reset when scope changes to action' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'scope' => ZBX_SCRIPT_SCOPE_ACTION
 					]
 				],
 				'expected_error' => null
@@ -858,346 +3514,451 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	* @dataProvider script_update
-	*/
-	public function testScripts_Update($scripts, $expected_error) {
-		$result = $this->call('script.update', $scripts, $expected_error);
-
+	 * @dataProvider script_update_data_invalid
+	 * @dataProvider script_update_data_valid
+	 */
+	public function testScript_Update($scripts, $expected_error) {
 		if ($expected_error === null) {
-			foreach ($result['result']['scriptids'] as $key => $id) {
-				$dbResult = DBSelect('select * from scripts where scriptid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $scripts[$key]['name']);
-				$this->assertEquals($dbRow['command'], $scripts[$key]['command']);
-				$this->assertEquals($dbRow['host_access'], 2);
-				$this->assertEquals($dbRow['usrgrpid'], 0);
-				$this->assertEquals($dbRow['groupid'], 0);
-				$this->assertEquals($dbRow['description'], '');
-				$this->assertEquals($dbRow['confirmation'], '');
-				$this->assertEquals($dbRow['execute_on'], 2);
-				$this->assertEquals($dbRow['type'], array_key_exists('type', $scripts[$key]) ? $scripts[$key]['type'] : 0);
+			// Before updating, collect old scripts and script parameters for Javascript type.
+			$scriptids = [];
+
+			if (array_key_exists(0, $scripts)) {
+				foreach ($scripts as $script) {
+					$scriptids[$script['scriptid']] = true;
+				}
 			}
-		}
-		else {
+			else {
+				$scriptids[$scripts['scriptid']] = true;
+			}
+
+			$db_scripts = CDBHelper::getAll(
+				'SELECT s.scriptid,s.name,s.command,s.type,s.host_access,s.usrgrpid,s.groupid,s.description,'.
+					's.confirmation,s.type,s.execute_on,s.timeout,s.scope,s.port,s.authtype,s.username,s.password,'.
+					's.publickey,s.privatekey,s.menu_path'.
+				' FROM scripts s'.
+				' WHERE '.dbConditionId('s.scriptid', array_keys($scriptids)).
+				' ORDER BY s.scriptid ASC'
+			);
+			$db_scripts = zbx_toHash($db_scripts, 'scriptid');
+
+			$webhook_scriptids = [];
+			$db_scripts_parameters = [];
+
+			foreach ($db_scripts as $db_script) {
+				if ($db_script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+					$webhook_scriptids[$db_script['scriptid']] = true;
+				}
+			}
+
+			if ($webhook_scriptids) {
+				$db_scripts_parameters = CDBHelper::getAll(
+					'SELECT sp.script_paramid,sp.scriptid,sp.name,sp.value'.
+					' FROM script_param sp'.
+					' WHERE '.dbConditionId('sp.scriptid', array_keys($webhook_scriptids)).
+					' ORDER BY sp.script_paramid ASC'
+				);
+			}
+
+			$this->call('script.update', $scripts, $expected_error);
+
+			$db_upd_scripts = CDBHelper::getAll(
+				'SELECT s.scriptid,s.name,s.command,s.type,s.host_access,s.usrgrpid,s.groupid,s.description,'.
+					's.confirmation,s.type,s.execute_on,s.timeout,s.scope,s.port,s.authtype,s.username,s.password,'.
+					's.publickey,s.privatekey,s.menu_path'.
+				' FROM scripts s'.
+				' WHERE '.dbConditionId('s.scriptid', array_keys($scriptids)).
+				' ORDER BY s.scriptid ASC'
+			);
+			$db_upd_scripts = zbx_toHash($db_upd_scripts, 'scriptid');
+
+			$webhook_scriptids = [];
+			$db_upd_scripts_parameters = [];
+
+			foreach ($db_upd_scripts as $db_script) {
+				if ($db_script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+					$webhook_scriptids[$db_script['scriptid']] = true;
+				}
+			}
+
+			if ($webhook_scriptids) {
+				$db_upd_scripts_parameters = CDBHelper::getAll(
+					'SELECT sp.script_paramid,sp.scriptid,sp.name,sp.value'.
+					' FROM script_param sp'.
+					' WHERE '.dbConditionId('sp.scriptid', array_keys($webhook_scriptids)).
+					' ORDER BY sp.script_paramid ASC'
+				);
+			}
+
+			// Accept single and multiple scripts just like API method. Work with multi-dimensional array in result.
+			if (!array_key_exists(0, $scripts)) {
+				$scripts = zbx_toArray($scripts);
+			}
+
+			// Compare records from DB before and after API call.
 			foreach ($scripts as $script) {
-				if (array_key_exists('name', $script) && $script['name'] !== 'Ping'){
-					$this->assertEquals(0, CDBHelper::getCount('select * from scripts where name='.zbx_dbstr($script['name'])));
+				// Old record and parameters.
+				$db_script = $db_scripts[$script['scriptid']];
+				$db_script['parameters'] = [];
+
+				foreach ($db_scripts_parameters as $db_script_parameter) {
+					if (bccomp($db_script_parameter['scriptid'], $script['scriptid']) == 0) {
+						$db_script['parameters'][] = [
+							'name' => $db_script_parameter['name'],
+							'value' => $db_script_parameter['value']
+						];
+
+						CTestArrayHelper::usort($db_script['parameters'], ['name']);
+					}
+				}
+
+				// New record and parameters.
+				$db_upd_script = $db_upd_scripts[$script['scriptid']];
+				$db_upd_script['parameters'] = [];
+
+				foreach ($db_upd_scripts_parameters as $db_upd_script_parameter) {
+					if (bccomp($db_upd_script_parameter['scriptid'], $script['scriptid']) == 0) {
+						$db_upd_script['parameters'][] = [
+							'name' => $db_upd_script_parameter['name'],
+							'value' => $db_upd_script_parameter['value']
+						];
+
+						CTestArrayHelper::usort($db_upd_script['parameters'], ['name']);
+					}
+				}
+
+				// Check name.
+				$this->assertNotEmpty($db_upd_script['name']);
+				if (array_key_exists('name', $script)) {
+					$this->assertSame($db_upd_script['name'], $script['name']);
+				}
+				else {
+					$this->assertSame($db_script['name'], $db_upd_script['name']);
+				}
+
+				// Check type.
+				if (array_key_exists('type', $script)) {
+					$this->assertEquals($db_upd_script['type'], $script['type']);
+
+					if ($db_script['type'] != $db_upd_script['type']) {
+						switch ($db_upd_script['type']) {
+							case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+								// Check execute on.
+								if (array_key_exists('execute_on', $script)) {
+									$this->assertEquals($db_upd_script['execute_on'], $script['execute_on']);
+								}
+								else {
+									$this->assertEquals($db_upd_script['execute_on'],
+										DB::getDefault('scripts', 'execute_on')
+									);
+								}
+
+								// Check other fields.
+								$this->assertSame($db_upd_script['timeout'], DB::getDefault('scripts', 'timeout'));
+								$this->assertEmpty($db_upd_script['port']);
+								$this->assertEquals($db_upd_script['authtype'], DB::getDefault('scripts', 'authtype'));
+								$this->assertEmpty($db_upd_script['username']);
+								$this->assertEmpty($db_upd_script['password']);
+								$this->assertEmpty($db_upd_script['publickey']);
+								$this->assertEmpty($db_upd_script['privatekey']);
+								$this->assertEmpty($db_upd_script['parameters']);
+								break;
+
+							case ZBX_SCRIPT_TYPE_IPMI:
+								$this->assertEquals($db_upd_script['execute_on'],
+									DB::getDefault('scripts', 'execute_on')
+								);
+								$this->assertSame($db_upd_script['timeout'], DB::getDefault('scripts', 'timeout'));
+								$this->assertEmpty($db_upd_script['port']);
+								$this->assertEquals($db_upd_script['authtype'], DB::getDefault('scripts', 'authtype'));
+								$this->assertEmpty($db_upd_script['username']);
+								$this->assertEmpty($db_upd_script['password']);
+								$this->assertEmpty($db_upd_script['publickey']);
+								$this->assertEmpty($db_upd_script['privatekey']);
+								$this->assertEmpty($db_upd_script['parameters']);
+								break;
+
+							case ZBX_SCRIPT_TYPE_SSH:
+								// Check username.
+								$this->assertNotEmpty($db_upd_script['username']);
+								if (array_key_exists('username', $script)) {
+									$this->assertSame($db_upd_script['username'], $script['username']);
+								}
+								else {
+									$this->assertSame($db_script['username'], $db_upd_script['username']);
+								}
+
+								// Check Port.
+								if (array_key_exists('port', $script)) {
+									$this->assertSame($db_upd_script['port'], strval($script['port']));
+								}
+								else {
+									$this->assertSame($db_script['port'], $db_upd_script['port']);
+								}
+
+								// Check auth type.
+								if (array_key_exists('authtype', $script)) {
+									$this->assertEquals($db_upd_script['authtype'], $script['authtype']);
+
+									if ($script['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
+										// Check public and private keys.
+										$this->assertNotEmpty($db_upd_script['publickey']);
+										$this->assertNotEmpty($db_upd_script['privatekey']);
+
+										// Check public key.
+										if (array_key_exists('publickey', $script)) {
+											$this->assertSame($db_upd_script['publickey'], $script['publickey']);
+										}
+										else {
+											$this->assertSame($db_script['publickey'], $db_upd_script['publickey']);
+										}
+
+										// Check private key.
+										if (array_key_exists('privatekey', $script)) {
+											$this->assertSame($db_upd_script['privatekey'], $script['privatekey']);
+										}
+										else {
+											$this->assertSame($db_script['privatekey'], $db_upd_script['privatekey']);
+										}
+									}
+									else {
+										// Check password type.
+										$this->assertEmpty($db_script['publickey']);
+										$this->assertEmpty($db_script['privatekey']);
+									}
+								}
+								else {
+									$this->assertEquals($db_script['authtype'], $db_upd_script['authtype']);
+
+									if ($db_script['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
+										$this->assertNotEmpty($db_upd_script['publickey']);
+										$this->assertNotEmpty($db_upd_script['privatekey']);
+										$this->assertSame($db_script['publickey'], $db_upd_script['publickey']);
+										$this->assertSame($db_script['privatekey'], $db_upd_script['privatekey']);
+									}
+									else {
+										$this->assertEmpty($db_script['publickey']);
+										$this->assertEmpty($db_script['privatekey']);
+									}
+								}
+
+								// Check password.
+								if (array_key_exists('password', $script)) {
+									$this->assertSame($db_upd_script['password'], $script['password']);
+								}
+								else {
+									$this->assertSame($db_script['password'], $db_upd_script['password']);
+								}
+
+								// Check other fields.
+								$this->assertEquals($db_upd_script['execute_on'],
+									DB::getDefault('scripts', 'execute_on')
+								);
+								$this->assertSame($db_upd_script['timeout'], DB::getDefault('scripts', 'timeout'));
+								$this->assertEmpty($db_upd_script['parameters']);
+								break;
+
+							case ZBX_SCRIPT_TYPE_TELNET:
+								// Check username.
+								$this->assertNotEmpty($db_upd_script['username']);
+								if (array_key_exists('username', $script)) {
+									$this->assertSame($db_upd_script['username'], $script['username']);
+								}
+								else {
+									$this->assertSame($db_script['username'], $db_upd_script['username']);
+								}
+
+								// Check password.
+								if (array_key_exists('password', $script)) {
+									$this->assertSame($db_upd_script['password'], $script['password']);
+								}
+								else {
+									$this->assertSame($db_script['password'], $db_upd_script['password']);
+								}
+
+								// Check port.
+								if (array_key_exists('port', $script)) {
+									$this->assertSame($db_upd_script['port'], strval($script['port']));
+								}
+								else {
+									$this->assertSame($db_script['port'], $db_upd_script['port']);
+								}
+
+								// Check other fields.
+								$this->assertEquals($db_upd_script['execute_on'],
+									DB::getDefault('scripts', 'execute_on')
+								);
+								$this->assertSame($db_upd_script['timeout'], DB::getDefault('scripts', 'timeout'));
+								$this->assertEquals($db_upd_script['authtype'], DB::getDefault('scripts', 'authtype'));
+								$this->assertEmpty($db_upd_script['publickey']);
+								$this->assertEmpty($db_upd_script['privatekey']);
+								$this->assertEmpty($db_upd_script['parameters']);
+								break;
+
+							case ZBX_SCRIPT_TYPE_WEBHOOK:
+								// Check timeout.
+								if (array_key_exists('timeout', $script)) {
+									$this->assertSame($db_upd_script['timeout'], $script['timeout']);
+								}
+								else {
+									$this->assertSame($db_script['timeout'], $db_upd_script['timeout']);
+								}
+
+								// Check parameters.
+								if (array_key_exists('parameters', $script)) {
+									if ($script['parameters']) {
+										$this->assertNotEmpty($db_upd_script['parameters']);
+
+										foreach ($script['parameters'] as $sp_num => $parameter) {
+											$db_upd_script_parameter = CDBHelper::getRow(
+												'SELECT sp.script_paramid,sp.name,sp.value'.
+												' FROM script_param sp'.
+												' WHERE sp.scriptid='.zbx_dbstr($script['scriptid']).
+													' AND sp.name='.zbx_dbstr($parameter['name'])
+											);
+
+											$this->assertNotEmpty($db_upd_script_parameter['name']);
+											$this->assertSame($db_upd_script_parameter['name'], $parameter['name']);
+											$this->assertSame($db_upd_script_parameter['value'], $parameter['value']);
+										}
+									}
+									else {
+										$this->assertEmpty($db_upd_script['parameters']);
+									}
+								}
+								else {
+									$this->assertEmpty($db_upd_script['parameters']);
+								}
+
+								// Check other fields.
+								$this->assertEquals($db_upd_script['execute_on'],
+									DB::getDefault('scripts', 'execute_on')
+								);
+								$this->assertEmpty($db_upd_script['port']);
+								$this->assertEquals($db_upd_script['authtype'], DB::getDefault('scripts', 'authtype'));
+								$this->assertEmpty($db_upd_script['username']);
+								$this->assertEmpty($db_upd_script['password']);
+								$this->assertEmpty($db_upd_script['publickey']);
+								$this->assertEmpty($db_upd_script['privatekey']);
+								break;
+						}
+					}
+				}
+				else {
+					$this->assertEquals($db_script['type'], $db_upd_script['type']);
+
+					// Check parameters if type stays the same.
+					if (array_key_exists('parameters', $script)) {
+						// Javascript type.
+						if ($script['parameters']) {
+							// Check newly added parameters.
+							$this->assertNotEmpty($db_upd_script['parameters']);
+
+							foreach ($script['parameters'] as $sp_num => $parameter) {
+								$db_upd_script_parameter = CDBHelper::getRow(
+									'SELECT sp.script_paramid,sp.name,sp.value'.
+									' FROM script_param sp'.
+									' WHERE sp.scriptid='.zbx_dbstr($script['scriptid']).
+										' AND sp.name='.zbx_dbstr($parameter['name'])
+								);
+
+								$this->assertNotEmpty($db_upd_script_parameter['name']);
+								$this->assertSame($db_upd_script_parameter['name'], $parameter['name']);
+								$this->assertSame($db_upd_script_parameter['value'], $parameter['value']);
+							}
+						}
+						else {
+							// Check that parameters are removed.
+							$this->assertEmpty($db_upd_script['parameters']);
+						}
+					}
+					else {
+						// Javascript type or other script type. Can be empty or the same as before.
+						$this->assertEquals($db_script['parameters'], $db_upd_script['parameters']);
+					}
+				}
+
+				// Check command.
+				$this->assertNotEmpty($db_upd_script['command']);
+				if (array_key_exists('command', $script)) {
+					$this->assertSame($db_upd_script['command'], $script['command']);
+				}
+				else {
+					$this->assertSame($db_script['command'], $db_upd_script['command']);
+				}
+
+				// Check scope.
+				if (array_key_exists('scope',$script)) {
+					$this->assertEquals($db_upd_script['scope'], $script['scope']);
+				}
+				else {
+					$this->assertEquals($db_script['scope'], $db_upd_script['scope']);
+				}
+
+				// Check scope dependent fields.
+				if ($db_upd_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+					$this->assertEmpty($db_upd_script['menu_path']);
+					$this->assertSame($db_upd_script['usrgrpid'], '0');
+					$this->assertEquals($db_upd_script['host_access'], DB::getDefault('scripts', 'host_access'));
+					$this->assertEmpty($db_upd_script['confirmation']);
+				}
+				else {
+					// Check menu path.
+					if (array_key_exists('menu_path', $script)) {
+						$this->assertSame($db_upd_script['menu_path'], $script['menu_path']);
+					}
+					else {
+						$this->assertSame($db_script['menu_path'], $db_upd_script['menu_path']);
+					}
+
+					// Check user group.
+					if (array_key_exists('usrgrpid', $script)) {
+						$this->assertSame($db_upd_script['usrgrpid'], strval($script['usrgrpid']));
+					}
+					else {
+						$this->assertSame($db_script['usrgrpid'], $db_upd_script['usrgrpid']);
+					}
+
+					// Check host_access.
+					if (array_key_exists('host_access', $script)) {
+						$this->assertEquals($db_upd_script['host_access'], $script['host_access']);
+					}
+					else {
+						$this->assertEquals($db_script['host_access'], $db_upd_script['host_access']);
+					}
+
+					// Check confirmation.
+					if (array_key_exists('confirmation', $script)) {
+						$this->assertSame($db_upd_script['confirmation'], $script['confirmation']);
+					}
+					else {
+						$this->assertSame($db_script['confirmation'], $db_upd_script['confirmation']);
+					}
+				}
+
+				// Check host group.
+				if (array_key_exists('groupid', $script)) {
+					$this->assertSame($db_upd_script['groupid'], strval($script['groupid']));
+				}
+				else {
+					$this->assertSame($db_script['groupid'], $db_upd_script['groupid']);
+				}
+
+				// Check description.
+				if (array_key_exists('description', $script)) {
+					$this->assertSame($db_upd_script['description'], $script['description']);
+				}
+				else {
+					$this->assertSame($db_script['description'], $db_upd_script['description']);
 				}
 			}
 		}
-	}
-
-	public static function script_properties() {
-		return [
-			// Check host_access.
-			[
-				'script' => [
-					'name' => 'API empty host_access',
-					'type' => 0,
-					'command' => 'reboot server',
-					'host_access' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API host_access string',
-					'type' => 0,
-					'command' => 'reboot server',
-					'host_access' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API invalid host_access',
-					'type' => 0,
-					'command' => 'reboot server',
-					'host_access' => '0'
-				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of 2, 3.'
-			],
-			[
-				'script' => [
-					'name' => 'API invalid host_access ',
-					'type' => 0,
-					'command' => 'reboot server',
-					'host_access' => '1'
-				],
-				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of 2, 3.'
-			],
-			// Check usrgrpid.
-			[
-				'script' => [
-					'name' => 'API empty usrgrpid',
-					'type' => 0,
-					'command' => 'reboot server',
-					'usrgrpid' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API usrgrpid string',
-					'type' => 0,
-					'command' => 'reboot server',
-					'usrgrpid' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API invalid usrgrpid',
-					'type' => 0,
-					'command' => 'reboot server',
-					'usrgrpid' => '1.1'
-				],
-				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API nonexistent usrgrpid ',
-					'type' => 0,
-					'command' => 'reboot server',
-					'usrgrpid' => '123456'
-				],
-				'expected_error' => 'User group with ID "123456" is not available.'
-			],
-			// Check groupid.
-			[
-				'script' => [
-					'name' => 'API empty groupid',
-					'type' => 0,
-					'command' => 'reboot server',
-					'groupid' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API groupid string',
-					'type' => 0,
-					'command' => 'reboot server',
-					'groupid' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API invalid groupid',
-					'type' => 0,
-					'command' => 'reboot server',
-					'groupid' => '1.1'
-				],
-				'expected_error' => 'Invalid parameter "/1/groupid": a number is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API nonexistent groupid',
-					'type' => 0,
-					'command' => 'reboot server',
-					'groupid' => '123456'
-				],
-				'expected_error' => 'Host group with ID "123456" is not available.'
-			],
-			// Check execute_on.
-			[
-				'script' => [
-					'name' => 'API empty execute_on',
-					'type' => 0,
-					'command' => 'reboot server',
-					'execute_on' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API execute_on string',
-					'type' => 0,
-					'command' => 'reboot server',
-					'execute_on' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API invalid execute_on',
-					'type' => 0,
-					'command' => 'reboot server',
-					'execute_on' => '1.1'
-				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
-			],
-			[
-				'script' => [
-					'name' => 'API nonexistent execute_on',
-					'type' => 0,
-					'command' => 'reboot server',
-					'execute_on' => '3'
-				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": value must be one of 0, 1, 2.'
-			],
-			[
-				'script' => [
-					'name' => 'API IPMI execute_on agent',
-					'command' => 'reboot server',
-					'type' => '1',
-					'execute_on' => '0'
-				],
-				'expected_error' => 'Only scripts of type "Script" can be executed by agent.'
-			],
-			// Webhook parameters.
-			[
-				'script' => [
-					'name' => 'Webhook validation with params',
-					'type' => 5,
-					'command' => 'Script command',
-					'parameters' => [
-						[
-							'name' => 'param1',
-							'value' => 'value1'
-						],
-						[
-							'name' => 'param1',
-							'value' => 'value1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/parameters/2": value (name)=(param1) already exists.'
-			],
-			[
-				'script' => [
-					'name' => 'Webhook validation with params',
-					'type' => 5,
-					'command' => 'Script command',
-					'parameters' => [
-						[
-							'name' => '',
-							'value' => 'value1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
-			],
-			[
-				'script' => [
-					'name' => 'Webhook validation with params',
-					'type' => 5,
-					'command' => 'Script command',
-					'parameters' => [
-						[
-							'value' => 'value1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "name" is missing.'
-			],
-			[
-				'script' => [
-					'name' => 'Webhook validation with params',
-					'type' => 5,
-					'command' => 'Script command',
-					'parameters' => [
-						[
-							'name' => 'name1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "value" is missing.'
-			],
-			// Check successfully creation and update with all properties.
-			[
-				'script' => [
-						'name' => 'API script with all properties',
-						'command' => 'reboot agent',
-						'host_access' => '3',
-						'usrgrpid' => '13',
-						'groupid' => '50005',
-						'description' => 'Check successfully creation or update with all properties',
-						'confirmation' => 'Do you want to reboot it?',
-						'type' => '0',
-						'execute_on' => '0'
-				],
-				'expected_error' => null
-			],
-			[
-				'script' => [
-					'name' => 'Create webhook script with params',
-					'type' => 5,
-					'command' => 'Script command',
-					'host_access' => '3',
-					'usrgrpid' => '13',
-					'groupid' => '50005',
-					'description' => 'Check successfully creation or update with all properties',
-					'confirmation' => 'Do you want to reboot it?',
-					'execute_on' => '1',
-					'parameters' => [
-						[
-							'name' => '!@#$%^&*()_+<>,.\/',
-							'value' => '!@#$%^&*()_+<>,.\/'
-						],
-						[
-							'name' => str_repeat('n', 255),
-							'value' => str_repeat('v', 2048)
-						],
-						[
-							'name' => '{$MACRO:A}',
-							'value' => '{$MACRO:A}'
-						],
-						[
-							'name' => '{$USERMACRO}',
-							'value' => ''
-						],
-						[
-							'name' => '{HOST.HOST}',
-							'value' => '{EVENT.NAME}'
-						],
-						[
-							'name' => 'Имя',
-							'value' => 'Значение'
-						]
-					]
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	/**
-	* @dataProvider script_properties
-	*/
-	public function testScripts_NotRequiredProperties($script, $expected_error) {
-		$methods = ['script.create', 'script.update'];
-
-		foreach ($methods as $method) {
-			if ($method == 'script.update') {
-				$script['scriptid'] = '6';
-				$script['name'] = 'Update '.$script['name'];
-			}
-			$result = $this->call($method, $script, $expected_error);
-
-			if ($expected_error === null) {
-				$dbResult = DBSelect('select * from scripts where scriptid='.
-						zbx_dbstr($result['result']['scriptids'][0])
-				);
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $script['name']);
-				$this->assertEquals($dbRow['command'], $script['command']);
-				$this->assertEquals($dbRow['host_access'], $script['host_access']);
-				$this->assertEquals($dbRow['usrgrpid'], $script['usrgrpid']);
-				$this->assertEquals($dbRow['groupid'], $script['groupid']);
-				$this->assertEquals($dbRow['description'], $script['description']);
-				$this->assertEquals($dbRow['confirmation'], $script['confirmation']);
-				$this->assertEquals($dbRow['type'], $script['type']);
-				$this->assertEquals($dbRow['execute_on'], $script['execute_on']);
-			}
-			else {
-				$this->assertEquals(0, CDBHelper::getCount('select * from scripts where name='.zbx_dbstr($script['name'])));
-			}
+		else {
+			// Call method and make sure it really returns the error.
+			$this->call('script.update', $scripts, $expected_error);
 		}
 	}
 
-	public static function script_delete() {
+	public static function script_delete_data_invalid() {
 		return [
 			// Check script id.
 			[
@@ -1224,7 +3985,12 @@ class testScripts extends CAPITest {
 			[
 				'script' => ['11'],
 				'expected_error' => 'Cannot delete scripts. Script "API script in action" is used in action operation "API action with script".'
-			],
+			]
+		];
+	}
+
+	public static function script_delete_data_valid() {
+		return [
 			// Successfully delete scripts.
 			[
 				'script' => ['8'],
@@ -1238,14 +4004,21 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	* @dataProvider script_delete
-	*/
-	public function testScripts_Delete($script, $expected_error) {
+	 * @dataProvider script_delete_data_invalid
+	 * @dataProvider script_delete_data_valid
+	 */
+	public function testScript_Delete($script, $expected_error) {
 		$result = $this->call('script.delete', $script, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($result['result']['scriptids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount('select * from scripts where scriptid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount(
+					'SELECT s.scriptid FROM scripts s WHERE s.scriptid='.zbx_dbstr($id)
+				));
+				// Regardless of script type, script params must not exist after delete.
+				$this->assertEquals(0, CDBHelper::getCount(
+					'SELECT sp.script_paramid FROM script_param sp WHERE sp.scriptid='.zbx_dbstr($id)
+				));
 			}
 		}
 	}
@@ -1302,7 +4075,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			// Check host id.
+			// Check host ID.
 			[
 				'script' => [
 					'scriptid' => '1'
@@ -1344,6 +4117,22 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
+			// Check event ID.
+			[
+				'script' => [
+					'scriptid' => '1',
+					'hostid' => '10084',
+					'eventid' => '123456'
+				],
+				'expected_error' => 'Invalid parameter "/": unexpected parameter "eventid".'
+			],
+			[
+				'script' => [
+					'scriptid' => '1',
+					'eventid' => '0'
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
 			// Check script peremissions for host group. Host belongs to the host group that hasn't permission to execute current script
 			[
 				'script' => [
@@ -1356,8 +4145,8 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	* @dataProvider script_execute
-	*/
+	 * @dataProvider script_execute
+	 */
 	public function testScripts_Execute($script, $expected_error) {
 		$result = $this->call('script.execute', $script, $expected_error);
 
@@ -1470,8 +4259,8 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	* @dataProvider script_permissions
-	*/
+	 * @dataProvider script_permissions
+	 */
 	public function testScripts_UserPermissions($method, $login, $params, $expected_error) {
 		$this->authorize($login['user'], $login['password']);
 		$this->call($method, $params, $expected_error);

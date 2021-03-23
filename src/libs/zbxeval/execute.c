@@ -1384,7 +1384,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_ARG_QUERY:
-				case ZBX_EVAL_TOKEN_ARG_TIME:
+				case ZBX_EVAL_TOKEN_ARG_PERIOD:
 					if (SUCCEED != eval_execute_push_value(ctx, token, &output, error))
 						goto out;
 					break;

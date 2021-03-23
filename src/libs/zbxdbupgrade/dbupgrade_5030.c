@@ -21,7 +21,7 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
-#include "log.h"
+#include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
 
 /*
@@ -950,6 +950,709 @@ static int	DBpatch_5030056(void)
 	return SUCCEED;
 }
 
+/* Patches and helper functions for ZBXNEXT-6368 */
+
+static int	is_valid_opcommand_type(const char *type_str, const char *scriptid)
+{
+#define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4	/* not used after upgrade */
+	unsigned int	type;
+
+	if (SUCCEED != is_uint31(type_str, &type))
+		return FAIL;
+
+	switch (type)
+	{
+		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+		case ZBX_SCRIPT_TYPE_IPMI:
+		case ZBX_SCRIPT_TYPE_SSH:
+		case ZBX_SCRIPT_TYPE_TELNET:
+			if (SUCCEED == DBis_null(scriptid))
+				return SUCCEED;
+			else
+				return FAIL;
+		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
+			if (FAIL == DBis_null(scriptid))
+				return SUCCEED;
+			else
+				return FAIL;
+		default:
+			return FAIL;
+	}
+#undef ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+}
+
+static int	validate_types_in_opcommand(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	if (NULL == (result = DBselect("select operationid,type,scriptid from opcommand")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'opcommand'", __func__);
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (SUCCEED != is_valid_opcommand_type(row[1], row[2]))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "%s(): invalid record in table \"opcommand\": operationid: %s"
+					" type: %s scriptid: %s", __func__, row[0], row[1],
+					(SUCCEED == DBis_null(row[2])) ? "value is NULL" : row[2]);
+			ret = FAIL;
+			break;
+		}
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030057(void)
+{
+	return validate_types_in_opcommand();
+}
+
+static int	DBpatch_5030058(void)
+{
+	const ZBX_FIELD	field = {"scope", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030059(void)
+{
+	const ZBX_FIELD	field = {"port", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030060(void)
+{
+	const ZBX_FIELD	field = {"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030061(void)
+{
+	const ZBX_FIELD	field = {"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030062(void)
+{
+	const ZBX_FIELD	field = {"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030063(void)
+{
+	const ZBX_FIELD	field = {"publickey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030064(void)
+{
+	const ZBX_FIELD	field = {"privatekey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030065(void)
+{
+	const ZBX_FIELD	field = {"menu_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5030066 (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: set value for 'scripts' table column 'scope' for existing global  *
+ *          scripts                                                           *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ * Comments: 'scope' is set only for scripts which are NOT used in any action *
+ *           operation. Otherwise the 'scope' default value is used, no need  *
+ *           to modify it.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5030066(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update scripts set scope=%d"
+			" where scriptid not in ("
+			"select distinct scriptid"
+			" from opcommand"
+			" where scriptid is not null)", ZBX_SCRIPT_SCOPE_HOST))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static char	*zbx_rename_host_macros(const char *command)
+{
+	char	*p1, *p2, *p3, *p4, *p5, *p6, *p7;
+
+	p1 = string_replace(command, "{HOST.CONN}", "{HOST.TARGET.CONN}");
+	p2 = string_replace(p1, "{HOST.DNS}", "{HOST.TARGET.DNS}");
+	p3 = string_replace(p2, "{HOST.HOST}", "{HOST.TARGET.HOST}");
+	p4 = string_replace(p3, "{HOST.IP}", "{HOST.TARGET.IP}");
+	p5 = string_replace(p4, "{HOST.NAME}", "{HOST.TARGET.NAME}");
+	p6 = string_replace(p5, "{HOSTNAME}", "{HOST.TARGET.NAME}");
+	p7 = string_replace(p6, "{IPADDRESS}", "{HOST.TARGET.IP}");
+
+	zbx_free(p1);
+	zbx_free(p2);
+	zbx_free(p3);
+	zbx_free(p4);
+	zbx_free(p5);
+	zbx_free(p6);
+
+	return p7;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5030067 (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: rename some {HOST.*} macros to {HOST.TARGET.*} in existing global *
+ *          scripts which are used in actions                                 *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5030067(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	if (NULL == (result = DBselect("select scriptid,command"
+			" from scripts"
+			" where scriptid in (select distinct scriptid from opcommand where scriptid is not null)")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'scripts'", __func__);
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char	*command, *command_esc;
+		int	rc;
+
+		command_esc = DBdyn_escape_field("scripts", "command", (command = zbx_rename_host_macros(row[1])));
+
+		zbx_free(command);
+
+		rc = DBexecute("update scripts set command='%s' where scriptid=%s", command_esc, row[0]);
+
+		zbx_free(command_esc);
+
+		if (ZBX_DB_OK > rc)
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_split_name  (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: helper function to split script name into menu_path and name      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                name - [IN] old name                                        *
+ *           menu_path - [OUT] menu path part, must be deallocated by caller  *
+ *   name_without_path - [OUT] name, DO NOT deallocate in caller              *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_split_name(const char *name, char **menu_path, const char **name_without_path)
+{
+	char	*p;
+
+	if (NULL == (p = strrchr(name, '/')))
+		return;
+
+	/* do not split if '/' is found at the beginning or at the end */
+	if (name == p || '\0' == *(p + 1))
+		return;
+
+	*menu_path = zbx_strdup(*menu_path, name);
+
+	p = *menu_path + (p - name);
+	*p = '\0';
+	*name_without_path = p + 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_make_script_name_unique  (part of ZBXNEXT-6368)              *
+ *                                                                            *
+ * Purpose: helper function to assist in making unique script names           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *            name - [IN] proposed name, to be tried first                    *
+ *          suffix - [IN/OUT] numeric suffix to start from                    *
+ *     unique_name - [OUT] unique name, must be deallocated by caller         *
+ *                                                                            *
+ * Return value: SUCCEED - unique name found, FAIL - DB error                 *
+ *                                                                            *
+ * Comments: pass initial suffix=0 to get "script ABC", "script ABC 2",       *
+ *           "script ABC 3", ... .                                            *
+ *           Pass initial suffix=1 to get "script ABC 1", "script ABC 2",     *
+ *           "script ABC 3", ... .                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_make_script_name_unique(const char *name, int *suffix, char **unique_name)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql, *try_name = NULL, *try_name_esc = NULL;
+
+	while (1)
+	{
+		if (0 == *suffix)
+		{
+			try_name = zbx_strdup(NULL, name);
+			(*suffix)++;
+		}
+		else
+			try_name = zbx_dsprintf(try_name, "%s %d", name, *suffix);
+
+		(*suffix)++;
+
+		try_name_esc = DBdyn_escape_string(try_name);
+
+		sql = zbx_dsprintf(NULL, "select scriptid from scripts where name='%s'", try_name_esc);
+
+		zbx_free(try_name_esc);
+
+		if (NULL == (result = DBselectN(sql, 1)))
+		{
+			zbx_free(try_name);
+			zbx_free(sql);
+			zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'scripts'", __func__);
+			return FAIL;
+		}
+
+		zbx_free(sql);
+
+		if (NULL == (row = DBfetch(result)))
+		{
+			*unique_name = try_name;
+			DBfree_result(result);
+			return SUCCEED;
+		}
+
+		DBfree_result(result);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5030068 (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: split script name between 'menu_path' and 'name' columns for      *
+ *          existing global scripts                                           *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5030068(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	if (NULL == (result = DBselect("select scriptid,name"
+			" from scripts")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'scripts'", __func__);
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		const char	*scriptid = row[0];
+		const char	*name = row[1];
+		const char	*name_without_path;
+		char		*menu_path = NULL, *menu_path_esc = NULL;
+		char		*name_without_path_unique = NULL, *name_esc = NULL;
+		int		rc, suffix = 0;
+
+		zbx_split_name(name, &menu_path, &name_without_path);
+
+		if (NULL == menu_path)
+			continue;
+
+		if (SUCCEED != zbx_make_script_name_unique(name_without_path, &suffix, &name_without_path_unique))
+		{
+			zbx_free(menu_path);
+			ret = FAIL;
+			break;
+		}
+
+		menu_path_esc = DBdyn_escape_string(menu_path);
+		name_esc = DBdyn_escape_string(name_without_path_unique);
+
+		rc = DBexecute("update scripts set menu_path='%s',name='%s' where scriptid=%s",
+				menu_path_esc, name_esc, scriptid);
+
+		zbx_free(name_esc);
+		zbx_free(menu_path_esc);
+		zbx_free(name_without_path_unique);
+		zbx_free(menu_path);
+
+		if (ZBX_DB_OK > rc)
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+typedef struct
+{
+	char	*command;
+	char	*username;
+	char	*password;
+	char	*publickey;
+	char	*privatekey;
+	char	*type;
+	char	*execute_on;
+	char	*port;
+	char	*authtype;
+}
+zbx_opcommand_parts_t;
+
+typedef struct
+{
+	size_t		size;
+	char		*record;
+	zbx_uint64_t	scriptid;
+}
+zbx_opcommand_rec_t;
+
+ZBX_VECTOR_DECL(opcommands, zbx_opcommand_rec_t)
+ZBX_VECTOR_IMPL(opcommands, zbx_opcommand_rec_t)
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_pack_record (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: helper function, packs parts of remote command into one memory    *
+ *          chunk for efficient storing and comparing                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *           parts - [IN] structure with all remote command components        *
+ *   packed_record - [OUT] memory chunk with packed data. Must be deallocated *
+ *                   by caller.                                               *
+ *                                                                            *
+ * Return value: size of memory chunk with the packed remote command          *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	zbx_pack_record(const zbx_opcommand_parts_t *parts, char **packed_record)
+{
+	size_t	size;
+	char	*p, *p_end;
+
+	size = strlen(parts->command) + strlen(parts->username) + strlen(parts->password) + strlen(parts->publickey) +
+			strlen(parts->privatekey) + strlen(parts->type) + strlen(parts->execute_on) +
+			strlen(parts->port) + strlen(parts->authtype) + 9; /* 9 terminating '\0' bytes for 9 parts */
+
+	*packed_record = (char *)zbx_malloc(*packed_record, size);
+	p = *packed_record;
+	p_end = *packed_record + size;
+
+	p += zbx_strlcpy(p, parts->command, size) + 1;
+	p += zbx_strlcpy(p, parts->username, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->password, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->publickey, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->privatekey, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->type, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->execute_on, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->port, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->authtype, (size_t)(p_end - p)) + 1;
+
+	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_duplicate (part of ZBXNEXT-6368)                       *
+ *                                                                            *
+ * Purpose: checking if this remote command is a new one or a duplicate one   *
+ *          and storing the assigned new global script id                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      opcommands - [IN] vector used for checking duplicates                 *
+ *           parts - [IN] structure with all remote command components        *
+ *           index - [OUT] index of vector element used to store information  *
+ *                   about the remote command (either a new one or            *
+ *                   an existing one)                                         *
+ *                                                                            *
+ * Return value: IS_NEW for new elements, IS_DUPLICATE for elements already   *
+ *               seen                                                         *
+ *                                                                            *
+ ******************************************************************************/
+#define IS_NEW		0
+#define IS_DUPLICATE	1
+
+static int	zbx_check_duplicate(zbx_vector_opcommands_t *opcommands,
+		const zbx_opcommand_parts_t *parts, int *index)
+{
+	char			*packed_record = NULL;
+	size_t			size;
+	zbx_opcommand_rec_t	elem;
+	int			i;
+
+	size = zbx_pack_record(parts, &packed_record);
+
+	for (i = 0; i < opcommands->values_num; i++)
+	{
+		if (size == opcommands->values[i].size &&
+				0 == memcmp(opcommands->values[i].record, packed_record, size))
+		{
+			zbx_free(packed_record);
+			*index = i;
+			return IS_DUPLICATE;
+		}
+	}
+
+	elem.size = size;
+	elem.record = packed_record;
+	elem.scriptid = 0;
+	zbx_vector_opcommands_append(opcommands, elem);
+	*index = opcommands->values_num - 1;
+
+	return IS_NEW;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5030069   (part of ZBXNEXT-6368)                         *
+ *                                                                            *
+ * Purpose: migrate remote commands from table 'opcommand' to table 'scripts' *
+ *          and convert them into global scripts                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5030069(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = SUCCEED, i, suffix = 1;
+	zbx_vector_opcommands_t	opcommands;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	zbx_vector_opcommands_create(&opcommands);
+
+	if (NULL == (result = DBselect("select command,username,password,publickey,privatekey,type,execute_on,port,"
+			"authtype,operationid"
+			" from opcommand"
+			" where scriptid is null"
+			" order by command,username,password,publickey,privatekey,type,execute_on,port,authtype")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'opcommand'", __func__);
+		zbx_vector_opcommands_destroy(&opcommands);
+
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char			*operationid;
+		int			index;
+		zbx_opcommand_parts_t	parts;
+
+		parts.command = row[0];
+		parts.username = row[1];
+		parts.password = row[2];
+		parts.publickey = row[3];
+		parts.privatekey = row[4];
+		parts.type = row[5];
+		parts.execute_on = row[6];
+		parts.port = row[7];
+		parts.authtype = row[8];
+		operationid = row[9];
+
+		if (IS_NEW == zbx_check_duplicate(&opcommands, &parts, &index))
+		{
+			char		*script_name = NULL, *script_name_esc;
+			char		*command_esc, *port_esc, *username_esc;
+			char		*password_esc, *publickey_esc, *privatekey_esc;
+			zbx_uint64_t	scriptid, type, execute_on, authtype, operationid_num;
+			int		rc;
+
+			if (SUCCEED != zbx_make_script_name_unique("Script", &suffix, &script_name))
+			{
+				ret = FAIL;
+				break;
+			}
+
+			scriptid = DBget_maxid("scripts");
+
+			ZBX_DBROW2UINT64(type, parts.type);
+			ZBX_DBROW2UINT64(execute_on, parts.execute_on);
+			ZBX_DBROW2UINT64(authtype, parts.authtype);
+			ZBX_DBROW2UINT64(operationid_num, operationid);
+
+			script_name_esc = DBdyn_escape_string(script_name);
+			command_esc = DBdyn_escape_string(parts.command);
+			port_esc = DBdyn_escape_string(parts.port);
+			username_esc = DBdyn_escape_string(parts.username);
+			password_esc = DBdyn_escape_string(parts.password);
+			publickey_esc = DBdyn_escape_string(parts.publickey);
+			privatekey_esc = DBdyn_escape_string(parts.privatekey);
+
+			zbx_free(script_name);
+
+			rc = DBexecute("insert into scripts (scriptid,name,command,description,type,execute_on,scope,"
+					"port,authtype,username,password,publickey,privatekey) values ("
+					ZBX_FS_UI64 ",'%s','%s',''," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',"
+					ZBX_FS_UI64 ",'%s','%s','%s','%s')",
+					scriptid, script_name_esc, command_esc, type, execute_on,
+					ZBX_SCRIPT_SCOPE_ACTION, port_esc, authtype,
+					username_esc, password_esc, publickey_esc, privatekey_esc);
+
+			zbx_free(privatekey_esc);
+			zbx_free(publickey_esc);
+			zbx_free(password_esc);
+			zbx_free(username_esc);
+			zbx_free(port_esc);
+			zbx_free(command_esc);
+			zbx_free(script_name_esc);
+
+			if (ZBX_DB_OK > rc || ZBX_DB_OK > DBexecute("update opcommand set scriptid=" ZBX_FS_UI64
+						" where operationid=" ZBX_FS_UI64, scriptid, operationid_num))
+			{
+				ret = FAIL;
+				break;
+			}
+
+			opcommands.values[index].scriptid = scriptid;
+		}
+		else	/* IS_DUPLICATE */
+		{
+			zbx_uint64_t	scriptid;
+
+			/* link to a previously migrated script */
+			scriptid = opcommands.values[index].scriptid;
+
+			if (ZBX_DB_OK > DBexecute("update opcommand set scriptid=" ZBX_FS_UI64
+					" where operationid=%s", scriptid, operationid))
+			{
+				ret = FAIL;
+				break;
+			}
+		}
+	}
+
+	DBfree_result(result);
+
+	for (i = 0; i < opcommands.values_num; i++)
+		zbx_free(opcommands.values[i].record);
+
+	zbx_vector_opcommands_destroy(&opcommands);
+
+	return ret;
+}
+#undef IS_NEW
+#undef IS_DUPLICATE
+
+static int	DBpatch_5030070(void)
+{
+	const ZBX_FIELD field = {"scriptid", NULL, "scripts","scriptid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("opcommand", &field);
+}
+
+static int	DBpatch_5030071(void)
+{
+	return DBdrop_field("opcommand", "execute_on");
+}
+
+static int	DBpatch_5030072(void)
+{
+	return DBdrop_field("opcommand", "port");
+}
+
+static int	DBpatch_5030073(void)
+{
+	return DBdrop_field("opcommand", "authtype");
+}
+
+static int	DBpatch_5030074(void)
+{
+	return DBdrop_field("opcommand", "username");
+}
+
+static int	DBpatch_5030075(void)
+{
+	return DBdrop_field("opcommand", "password");
+}
+
+static int	DBpatch_5030076(void)
+{
+	return DBdrop_field("opcommand", "publickey");
+}
+
+static int	DBpatch_5030077(void)
+{
+	return DBdrop_field("opcommand", "privatekey");
+}
+
+static int	DBpatch_5030078(void)
+{
+	return DBdrop_field("opcommand", "command");
+}
+
+static int	DBpatch_5030079(void)
+{
+	return DBdrop_field("opcommand", "type");
+}
+
+static int	DBpatch_5030080(void)
+{
+	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_remote_command", &field, &old_field);
+}
+/*  end of ZBXNEXT-6368 patches */
+
 /* trigger function conversion to new syntax */
 
 #define ZBX_DBPATCH_FUNCTION_UPDATE_NAME		0x01
@@ -1204,7 +1907,7 @@ static void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int ext
 	char	*str  = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
 
-	dbpatch_update_function(function, "last", "", ZBX_DBPATCH_FUNCTION_UPDATE);
+	dbpatch_update_function(function, "last", "$", ZBX_DBPATCH_FUNCTION_UPDATE);
 
 	if (0 == extended)
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '(');
@@ -1796,7 +2499,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	return SUCCEED;
 }
 
-static int	DBpatch_5030057(void)
+static int	DBpatch_5030081(void)
 {
 	int			i, ret = SUCCEED;
 	DB_ROW			row;
@@ -1849,6 +2552,10 @@ static int	DBpatch_5030057(void)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"delete from functions where functionid=" ZBX_FS_UI64 ";\n",
 							func->functionid);
+
+					if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+						break;
+
 					continue;
 				}
 
@@ -1872,9 +2579,12 @@ static int	DBpatch_5030057(void)
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where functionid=" ZBX_FS_UI64
 						";\n", func->functionid);
+
+				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					break;
 			}
 
-			if (0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE))
+			if (SUCCEED == ret && 0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE))
 			{
 				delim = ' ';
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set");
@@ -1899,15 +2609,17 @@ static int	DBpatch_5030057(void)
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64
 						";\n", trigger.triggerid);
+
+				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					break;
 			}
 		}
 
 		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
 		dbpatch_trigger_clear(&trigger);
 
-		if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != ret)
 			break;
-
 	}
 
 	DBfree_result(result);
@@ -1931,7 +2643,7 @@ static int	DBpatch_5030057(void)
 	return ret;
 }
 
-static int	DBpatch_5030058(void)
+static int	DBpatch_5030082(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -2045,7 +2757,7 @@ static char	*dbpatch_formula_to_expression(const char *calchost, zbx_uint64_t it
 	return exp;
 }
 
-static int	DBpatch_5030059(void)
+static int	DBpatch_5030083(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -2233,5 +2945,29 @@ DBPATCH_ADD(5030056, 0, 1)
 DBPATCH_ADD(5030057, 0, 1)
 DBPATCH_ADD(5030058, 0, 1)
 DBPATCH_ADD(5030059, 0, 1)
+DBPATCH_ADD(5030060, 0, 1)
+DBPATCH_ADD(5030061, 0, 1)
+DBPATCH_ADD(5030062, 0, 1)
+DBPATCH_ADD(5030063, 0, 1)
+DBPATCH_ADD(5030064, 0, 1)
+DBPATCH_ADD(5030065, 0, 1)
+DBPATCH_ADD(5030066, 0, 1)
+DBPATCH_ADD(5030067, 0, 1)
+DBPATCH_ADD(5030068, 0, 1)
+DBPATCH_ADD(5030069, 0, 1)
+DBPATCH_ADD(5030070, 0, 1)
+DBPATCH_ADD(5030071, 0, 1)
+DBPATCH_ADD(5030072, 0, 1)
+DBPATCH_ADD(5030073, 0, 1)
+DBPATCH_ADD(5030074, 0, 1)
+DBPATCH_ADD(5030075, 0, 1)
+DBPATCH_ADD(5030076, 0, 1)
+DBPATCH_ADD(5030077, 0, 1)
+DBPATCH_ADD(5030078, 0, 1)
+DBPATCH_ADD(5030079, 0, 1)
+DBPATCH_ADD(5030080, 0, 1)
+DBPATCH_ADD(5030081, 0, 1)
+DBPATCH_ADD(5030082, 0, 1)
+DBPATCH_ADD(5030083, 0, 1)
 
 DBPATCH_END()

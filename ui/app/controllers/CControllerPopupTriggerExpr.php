@@ -273,6 +273,11 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
+			'change' => [
+				'description' => _('change() - Difference between last and previous value'),
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
 			'count' => [
 				'description' => _('count() - Number of successfully retrieved values V (which fulfill operator O) for period T'),
 				'params' => $this->param3SecVal,

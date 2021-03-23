@@ -21,10 +21,6 @@
 
 class CControllerRegExDelete extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'regexids' => 'required | array_db regexps.regexpid'
