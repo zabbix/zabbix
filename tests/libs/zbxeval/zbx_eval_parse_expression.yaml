@@ -245,7 +245,7 @@ in:
 out:
   result: FAIL
 ---
-test case: Succeed '{$MACRO}1'
+test case: Fail '{$MACRO}1'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$MACRO}1'
@@ -360,6 +360,35 @@ out:
     token: '.{{#LLD}.function()}}'
     opt: 0
   result: SUCCEED
+---
+test case: Succeed '{{#LLD}.function()}.{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '{{#LLD}.function()}.{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{{#LLD}.function()}.{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed '{{#LLD}.function()}e{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: '{{#LLD}.function()}e{{#LLD}.function()}'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '{{#LLD}.function()}e{{#LLD}.function()}}'
+    opt: 0
+  result: SUCCEED
+---
+test case: Succeed 'e{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO]
+  expression: 'e{{#LLD}.function()}'
+out:
+  result: FAIL  
 --- # parenthesis
 test case: Fail '()'
 in:
