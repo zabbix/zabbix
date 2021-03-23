@@ -322,7 +322,7 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger prototype configuration form tab data.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=33800&form=create',
+					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&form=create',
 					'form' => 'name:triggersForm',
 					'tabs' => [
 						[
