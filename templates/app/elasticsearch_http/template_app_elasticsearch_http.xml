@@ -828,7 +828,7 @@ This is the actual amount of free disk space the Elasticsearch node can utilize.
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ms</units>
-                     <params>last(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.flush.total[{#ES.NODE}]) + (last(es.node.indices.flush.total[{#ES.NODE}]) = 0) )</params>
+                     <params>change(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.flush.total[{#ES.NODE}]) + (change(es.node.indices.flush.total[{#ES.NODE}]) = 0) )</params>
                      <description>The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.</description>
                      <application_prototypes>
                         <application_prototype>
