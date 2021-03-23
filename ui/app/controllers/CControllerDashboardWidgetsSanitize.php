@@ -30,7 +30,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 	protected function checkInput() {
 		$fields = [
 			'templateid' => 'db dashboard.templateid',
-			'widgets' => 'required|array'
+			'widgets' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,7 +40,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 				: CWidgetConfig::CONTEXT_DASHBOARD;
 
-			foreach ($this->getInput('widgets') as $widget) {
+			foreach ($this->getInput('widgets', []) as $widget) {
 				$validator = new CNewValidator($widget, [
 					'type' => 'required|string',
 					'fields' => 'required|json'
