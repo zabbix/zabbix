@@ -37,8 +37,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
-			'groupids' => getSubGroups($fields['groupids']),
-			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
+			'groupids' => $fields['groupids'],
+			'exclude_groupids' => $fields['exclude_groupids'],
 			'hostids' => $fields['hostids'],
 			'name' => $fields['problem'],
 			'severities' => $fields['severities'],
@@ -47,7 +47,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged'],
 			'show_opdata' => $fields['show_opdata']
-		], true, true);
+		]);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $sortfield, $sortorder);
 
@@ -67,7 +67,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'show' => $fields['show'],
 			'details' => 0,
 			'show_opdata' => $fields['show_opdata']
-		], true, true);
+		]);
 
 		if ($fields['show_tags']) {
 			$data['tags'] = makeTags($data['problems'], true, 'eventid', $fields['show_tags'], $fields['tags'],

@@ -125,23 +125,30 @@ abstract class CHostBase extends CApiService {
 		);
 		$linked = [];
 		while ($row = DBfetch($res)) {
-			if (!isset($linked[$row['hostid']])) {
-				$linked[$row['hostid']] = [];
-			}
-			$linked[$row['hostid']][$row['templateid']] = 1;
+			$linked[$row['templateid']][$row['hostid']] = true;
 		}
 
 		// add template linkages, if problems rollback later
 		$hostsLinkageInserts = [];
-		foreach ($targetIds as $targetid) {
-			foreach ($templateIds as $templateid) {
-				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+
+		foreach ($templateIds as $templateid) {
+			$linked_targets = array_key_exists($templateid, $linked) ? $linked[$templateid] : [];
+
+			foreach ($targetIds as $targetid) {
+				if (array_key_exists($targetid, $linked_targets)) {
 					continue;
 				}
+
 				$hostsLinkageInserts[] = ['hostid' => $targetid, 'templateid' => $templateid];
 			}
 		}
-		DB::insert('hosts_templates', $hostsLinkageInserts);
+
+		if ($hostsLinkageInserts) {
+			self::checkCircularLinkage($hostsLinkageInserts);
+			self::checkDoubleLinkage($hostsLinkageInserts);
+
+			DB::insertBatch('hosts_templates', $hostsLinkageInserts);
+		}
 
 		// check if all trigger templates are linked to host.
 		// we try to find template that is not linked to hosts ($targetids)
@@ -155,56 +162,9 @@ abstract class CHostBase extends CApiService {
 			' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.dbConditionInt('ht.hostid', $targetIds).')'.
 			' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.dbConditionInt('ii.hostid', $templateIds). ')';
 		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
+			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Trigger has items from template "%1$s" that is not linked to host.', $dbNotLinkedTpl['host'])
 			);
-		}
-
-		// check template linkage circularity
-		$res = DBselect(
-			'SELECT ht.hostid,ht.templateid'.
-				' FROM hosts_templates ht,hosts h'.
-				' WHERE ht.hostid=h.hostid '.
-				' AND h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
-		);
-
-		// build linkage graph and prepare list for $rootList generation
-		$graph = [];
-		$hasParentList = [];
-		$hasChildList = [];
-		$all = [];
-		while ($row = DBfetch($res)) {
-			if (!isset($graph[$row['hostid']])) {
-				$graph[$row['hostid']] = [];
-			}
-			$graph[$row['hostid']][] = $row['templateid'];
-			$hasParentList[$row['templateid']] = $row['templateid'];
-			$hasChildList[$row['hostid']] = $row['hostid'];
-			$all[$row['templateid']] = $row['templateid'];
-			$all[$row['hostid']] = $row['hostid'];
-		}
-
-		// get list of templates without parents
-		$rootList = [];
-		foreach ($hasChildList as $parentId) {
-			if (!isset($hasParentList[$parentId])) {
-				$rootList[] = $parentId;
-			}
-		}
-
-		// search cycles and double linkages in rooted parts of graph
-		$visited = [];
-		foreach ($rootList as $root) {
-			$path = [];
-
-			// raise exception on cycle or double linkage
-			$this->checkCircularAndDoubleLinkage($graph, $root, $path, $visited);
-		}
-
-		// there is still possible cycles without root
-		if (count($visited) < count($all)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
 		return $hostsLinkageInserts;
@@ -247,59 +207,167 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Searches for cycles and double linkages in graph.
+	 * Searches for circular linkages for specific template.
 	 *
-	 * @throw APIException rises exception if cycle or double linkage is found
+	 * @param array  $links[<templateid>][<hostid>]  The list of linkages.
+	 * @param string $templateid                     ID of the template to check circular linkages.
+	 * @param array  $hostids[<hostid>]
 	 *
-	 * @param array $graph - array with keys as parent ids and values as arrays with child ids
-	 * @param int $current - cursor for recursive DFS traversal, starting point for algorithm
-	 * @param array $path - should be passed empty array for DFS
-	 * @param array $visited - there will be stored visited graph node ids
-	 *
-	 * @return boolean
+	 * @throws APIException if circular linkage is found.
 	 */
-	protected function checkCircularAndDoubleLinkage($graph, $current, &$path, &$visited) {
-		if (isset($path[$current])) {
-			if ($path[$current] == 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
-			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Template cannot be linked to another template more than once even through other templates.'));
-			}
-		}
-		$path[$current] = 1;
-		$visited[$current] = 1;
-
-		if (isset($graph[$current])) {
-			foreach ($graph[$current] as $next) {
-				$this->checkCircularAndDoubleLinkage($graph, $next, $path, $visited);
-			}
+	private static function checkTemplateCircularLinkage(array $links, $templateid, array $hostids) {
+		if (array_key_exists($templateid, $hostids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
-		$path[$current] = 2;
-
-		return false;
+		foreach ($hostids as $hostid => $foo) {
+			if (array_key_exists($hostid, $links)) {
+				self::checkTemplateCircularLinkage($links, $templateid, $links[$hostid]);
+			}
+		}
 	}
 
 	/**
-	 * Creates new tags.
+	 * Searches for circular linkages.
 	 *
-	 * @param array  $create_tags
-	 * @param int    $create_tags[<hostid>]
-	 * @param string $create_tags[<hostid>][]['tag']
-	 * @param string $create_tags[<hostid>][]['value']
+	 * @param array  $host_templates
+	 * @param string $host_templates[]['templateid']
+	 * @param string $host_templates[]['hostid']
 	 */
-	protected function createTags(array $create_tags): void {
-		$create = [];
+	private static function checkCircularLinkage(array $host_templates) {
+		$links = [];
 
-		foreach ($create_tags as $hostid => $tags) {
-			foreach ($tags as $tag) {
-				$create[] = ['hostid' => $hostid] + $tag;
+		foreach ($host_templates as $host_template) {
+			$links[$host_template['templateid']][$host_template['hostid']] = true;
+		}
+
+		$templateids = array_keys($links);
+		$_templateids = $templateids;
+
+		do {
+			$result = DBselect(
+				'SELECT ht.templateid,ht.hostid'.
+				' FROM hosts_templates ht'.
+				' WHERE '.dbConditionId('ht.hostid', $_templateids)
+			);
+
+			$_templateids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['templateid'], $links)) {
+					$_templateids[$row['templateid']] = true;
+				}
+
+				$links[$row['templateid']][$row['hostid']] = true;
+			}
+
+			$_templateids = array_keys($_templateids);
+		}
+		while ($_templateids);
+
+		foreach ($templateids as $templateid) {
+			self::checkTemplateCircularLinkage($links, $templateid, $links[$templateid]);
+		}
+	}
+
+	/**
+	 * Searches for double linkages.
+	 *
+	 * @param array  $links[<hostid>][<templateid>]  The list of linked template IDs by host ID.
+	 * @param string $hostid
+	 *
+	 * @throws APIException if double linkage is found.
+	 *
+	 * @return array  An array of the linked templates for the selected host.
+	 */
+	private static function checkTemplateDoubleLinkage(array $links, $hostid) {
+		$templateids = $links[$hostid];
+
+		foreach ($links[$hostid] as $templateid => $foo) {
+			if (array_key_exists($templateid, $links)) {
+				$_templateids = self::checkTemplateDoubleLinkage($links, $templateid);
+
+				if (array_intersect_key($templateids, $_templateids)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Template cannot be linked to another template more than once even through other templates.')
+					);
+				}
+
+				$templateids += $_templateids;
 			}
 		}
 
-		if ($create) {
-			DB::insert('host_tag', $create);
+		return $templateids;
+	}
+
+	/**
+	 * Searches for double linkages.
+	 *
+	 * @param array  $host_templates
+	 * @param string $host_templates[]['templateid']
+	 * @param string $host_templates[]['hostid']
+	 */
+	private static function checkDoubleLinkage(array $host_templates) {
+		$links = [];
+		$templateids = [];
+		$hostids = [];
+
+		foreach ($host_templates as $host_template) {
+			$links[$host_template['hostid']][$host_template['templateid']] = true;
+			$templateids[$host_template['templateid']] = true;
+			$hostids[$host_template['hostid']] = true;
+		}
+
+		$_hostids = array_keys($hostids);
+
+		do {
+			$result = DBselect(
+				'SELECT ht.hostid'.
+				' FROM hosts_templates ht'.
+				' WHERE '.dbConditionId('ht.templateid', $_hostids)
+			);
+
+			$_hostids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['hostid'], $hostids)) {
+					$_hostids[$row['hostid']] = true;
+				}
+
+				$hostids[$row['hostid']] = true;
+			}
+
+			$_hostids = array_keys($_hostids);
+		}
+		while ($_hostids);
+
+		$_templateids = array_keys($templateids + $hostids);
+		$templateids = [];
+
+		do {
+			$result = DBselect(
+				'SELECT ht.templateid,ht.hostid'.
+				' FROM hosts_templates ht'.
+				' WHERE '.dbConditionId('hostid', $_templateids)
+			);
+
+			$_templateids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['templateid'], $templateids)) {
+					$_templateids[$row['templateid']] = true;
+				}
+
+				$templateids[$row['templateid']] = true;
+				$links[$row['hostid']][$row['templateid']] = true;
+			}
+
+			$_templateids = array_keys($_templateids);
+		}
+		while ($_templateids);
+
+		foreach ($hostids as $hostid => $foo) {
+			self::checkTemplateDoubleLinkage($links, $hostid);
 		}
 	}
 
