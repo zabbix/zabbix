@@ -1898,13 +1898,102 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **filter,
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_query_filter_macros                                   *
+ *                                                                            *
+ * Purpose: substitute lld macros in calculated item query filter             *
+ *                                                                            *
+ * Parameters: filter          - [IN/OUT] the filter                          *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             error           - [OUT] the error message                      *
+ *                                                                            *
+ *  Return value: SUCCEED - the macros were expanded successfully.            *
+ *                FAIL    - otherwise.                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_query_filter_macros(char **filter, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+{
+	char			*errmsg = NULL, err[128], *new_filter = NULL;
+	int			i, ret = FAIL;
+	zbx_eval_context_t	ctx;
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, *filter,
+			ZBX_EVAL_PARSE_QUERY_EXPRESSION | ZBX_EVAL_COMPOSE_QUOTE | ZBX_EVAL_PARSE_LLDMACRO, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot parse item query filter: %s", errmsg);
+		zbx_free(errmsg);
+		goto out;
+	}
+
+	for (i = 0; i < ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx.stack.values[i];
+		char			*value;
+
+		switch (token->type)
+		{
+			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
+			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+			case ZBX_EVAL_TOKEN_VAR_STR:
+			case ZBX_EVAL_TOKEN_VAR_NUM:
+			case ZBX_EVAL_TOKEN_ARG_PERIOD:
+				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+
+				if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err,
+						sizeof(err)))
+				{
+					*error = zbx_strdup(NULL, err);
+					zbx_free(value);
+
+					goto clean;
+				}
+				break;
+			default:
+				continue;
+		}
+
+		zbx_variant_set_str(&token->value, value);
+	}
+
+	zbx_eval_compose_expression(&ctx, &new_filter);
+	zbx_free(*filter);
+	*filter = new_filter;
+
+	ret = SUCCEED;
+clean:
+	zbx_eval_clear(&ctx);
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_item_query_macros                                     *
+ *                                                                            *
+ * Purpose: substitute lld macros in calculated item query                    *
+ *                                                                            *
+ * Parameters: ctx             - [IN] the calculated item formula             *
+ *             token           - [IN] the item query token                    *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             itemquery       - [OUT] the item query with expanded macros    *
+ *             error           - [OUT] the error message                      *
+ *                                                                            *
+ *  Return value: SUCCEED - the macros were expanded successfully.            *
+ *                FAIL    - otherwise.                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_item_query_macros(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **itemquery,
 		char **error)
 {
 	zbx_item_query_t	query;
 	char			err[128];
-	int			ret;
+	int			ret = FAIL;
+	size_t			itemquery_alloc = 0, itemquery_offset = 0;
 
 	if (0 == zbx_eval_parse_query(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1, &query))
 	{
@@ -1912,14 +2001,26 @@ static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zb
 		return FAIL;
 	}
 
-	if (SUCCEED == (ret = substitute_key_macros(&query.key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
-			err, sizeof(err))))
+	if (SUCCEED != substitute_key_macros(&query.key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
+			err, sizeof(err)))
 	{
-		*filter = zbx_dsprintf(NULL, "/%s/%s", ZBX_NULL2EMPTY_STR(query.host), query.key);
-	}
-	else
 		*error = zbx_strdup(NULL, err);
+		goto out;
+	}
 
+	if (NULL != query.filter && SUCCEED != substitute_query_filter_macros(&query.filter, jp_row, lld_macro_paths,
+			error))
+	{
+		goto out;
+	}
+
+	zbx_snprintf_alloc(itemquery, &itemquery_alloc, &itemquery_offset, "/%s/%s", ZBX_NULL2EMPTY_STR(query.host),
+			query.key);
+	if (NULL != query.filter)
+		zbx_snprintf_alloc(itemquery, &itemquery_alloc, &itemquery_offset, "?[%s]", query.filter);
+
+	ret = SUCCEED;
+out:
 	zbx_eval_clear_query(&query);
 
 	return ret;
@@ -1953,12 +2054,12 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
 	for (i = 0; i < ctx.stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx.stack.values[i];
-		char			*value, err[128];
+		char			*value = NULL, err[128];
 
 		switch(token->type)
 		{
 			case ZBX_EVAL_TOKEN_ARG_QUERY:
-				if (FAIL == substitute_item_filter_macros(&ctx, token, jp_row, lld_macro_paths, &value,
+				if (FAIL == substitute_item_query_macros(&ctx, token, jp_row, lld_macro_paths, &value,
 						error))
 				{
 					goto clean;
