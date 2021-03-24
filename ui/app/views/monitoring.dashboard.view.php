@@ -101,7 +101,7 @@ $widget = (new CWidget())
 		(new CList())
 			->setId('dashboard-control')
 			->addItem($main_filter_form)
-			->addItem((new CTag('nav', true, [
+			->addItem((new CTag('nav', true,
 				(new CList())
 					->addItem(
 						(new CButton('dashboard-edit', _('Edit dashboard')))
@@ -120,7 +120,7 @@ $widget = (new CWidget())
 							))
 					)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-			]))->setAttribute('aria-label', _('Content controls')))
+			))->setAttribute('aria-label', _('Content controls')))
 			->addItem((new CListItem(
 				(new CTag('nav', true, new CList([
 					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
@@ -201,6 +201,7 @@ $dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
 if (count($data['dashboard']['pages']) > 1) {
 	$dashboard->addClass(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE);
 }
+
 if ($data['dashboard']['dashboardid'] === null) {
 	$dashboard->addClass(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 }
