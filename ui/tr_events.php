@@ -180,11 +180,11 @@ $event_tab = (new CDiv([
 		))
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
 			->setHeader(_('Actions'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state')
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID),
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID),
 		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST, make_small_eventlist($event, $allowed)))
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
 			->setHeader(_('Event list [previous 20]'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state')
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
 	])
 ]))
 	->addClass(ZBX_STYLE_COLUMNS)

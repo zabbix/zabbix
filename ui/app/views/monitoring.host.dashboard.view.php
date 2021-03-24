@@ -109,28 +109,28 @@ if (count($data['dashboard']['pages']) > 1
 	$widget
 		->addItem(
 			(new CDiv())
-				->addClass(ZBX_STYLE_DASHBRD)
+				->addClass(ZBX_STYLE_DASHBOARD)
 				->addItem(
 					(new CDiv())
-						->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
-						->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
+						->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION)
+						->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_TABS))
 						->addItem(
 							(new CDiv())
-								->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+								->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 								->addItem([
 									(new CSimpleButton())
-										->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+										->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
 										->addClass('btn-iterator-page-previous')
 										->setEnabled(false),
 									(new CSimpleButton())
-										->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+										->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
 										->addClass('btn-iterator-page-next')
 										->setEnabled(false),
 									(new CSimpleButton('Start slideshow'))->addClass(ZBX_STYLE_BTN_ALT)
 								])
 						)
 				)
-				->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
+				->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID))
 		)
 		->show();
 

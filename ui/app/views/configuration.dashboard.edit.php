@@ -50,7 +50,7 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 		->addItem((new CListItem([
 			(new CTag('nav', true, [
 				new CList([
-					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
+					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem((new CButton('dashbrd-add-widget', _('Add')))->addClass(ZBX_STYLE_BTN_ALT))
@@ -65,33 +65,33 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 				])
 			]))
 				->setAttribute('aria-label', _('Content controls'))
-				->addClass(ZBX_STYLE_DASHBRD_EDIT)
+				->addClass(ZBX_STYLE_DASHBOARD_EDIT)
 		])))
 	)
 	->setNavigation(getHostNavigation('dashboards', $data['dashboard']['templateid']))
 	->addItem(
 		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBRD)
+			->addClass(ZBX_STYLE_DASHBOARD)
 			->addItem(
 				(new CDiv())
-					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
-					->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
+					->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION)
+					->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_TABS))
 					->addItem(
 						(new CDiv())
-							->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+							->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 							->addItem([
 								(new CSimpleButton())
-									->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+									->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
 									->addClass('btn-iterator-page-previous')
 									->setEnabled(false),
 								(new CSimpleButton())
-									->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+									->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
 									->addClass('btn-iterator-page-next')
 									->setEnabled(false)
 							])
 					)
 			)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID))
 	)
 	->show();
 

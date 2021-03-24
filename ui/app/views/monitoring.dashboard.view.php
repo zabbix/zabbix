@@ -124,7 +124,7 @@ $widget = (new CWidget())
 			->addItem((new CListItem([
 				(new CTag('nav', true, [
 					new CList([
-						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
+						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
 						(new CList())
 							->addClass(ZBX_STYLE_BTN_SPLIT)
 							->addItem((new CButton('dashbrd-add-widget',
@@ -141,7 +141,7 @@ $widget = (new CWidget())
 					])
 				]))
 					->setAttribute('aria-label', _('Content controls'))
-					->addClass(ZBX_STYLE_DASHBRD_EDIT)
+					->addClass(ZBX_STYLE_DASHBOARD_EDIT)
 			]))->addStyle('display: none'))
 	)
 	->setNavigation((new CList())->addItem(new CBreadcrumbs([
@@ -169,30 +169,30 @@ if ($data['has_time_selector']) {
 	);
 }
 
-$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBRD);
+$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
 
 if (count($data['dashboard']['pages']) > 1) {
-	$dashboard->addClass(ZBX_STYLE_DASHBRD_IS_MULTIPAGE);
+	$dashboard->addClass(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE);
 }
 if ($data['dashboard']['dashboardid'] === null) {
-	$dashboard->addClass(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+	$dashboard->addClass(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 }
 
 if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 	$dashboard->addItem(
 		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
+			->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION)
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_TABS))
 			->addItem(
 				(new CDiv())
-					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+					->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 					->addItem([
 						(new CSimpleButton())
-							->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+							->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
 							->addClass('btn-iterator-page-previous')
 							->setEnabled(false),
 						(new CSimpleButton())
-							->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+							->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
 							->addClass('btn-iterator-page-next')
 							->setEnabled(false),
 						(new CSimpleButton(
@@ -201,13 +201,13 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 								: _s('Start slideshow')
 						))
 							->addClass(ZBX_STYLE_BTN_ALT)
-							->addClass(ZBX_STYLE_DASHBRD_TOGGLE_SLIDESHOW)
+							->addClass(ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW)
 					])
 			)
 	);
 }
 
-$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID));
+$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
 
 $widget
 	->addItem($dashboard)

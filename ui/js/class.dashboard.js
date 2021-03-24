@@ -18,11 +18,11 @@
 **/
 
 
-const ZBX_STYLE_DASHBRD_IS_MULTIPAGE = 'dashbrd-is-multipage';
-const ZBX_STYLE_DASHBRD_IS_EDIT_MODE = 'dashbrd-is-edit-mode';
-const ZBX_STYLE_DASHBRD_NAVIGATION_IS_SCROLLABLE = 'is-scrollable';
-const ZBX_STYLE_DASHBRD_SELECTED_TAB = 'selected-tab';
-const ZBX_STYLE_DASHBRD_POSITIONING = 'dashbrd-positioning';
+const ZBX_STYLE_DASHBOARD_IS_MULTIPAGE = 'dashbrd-is-multipage';
+const ZBX_STYLE_DASHBOARD_IS_EDIT_MODE = 'dashbrd-is-edit-mode';
+const ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE = 'is-scrollable';
+const ZBX_STYLE_DASHBOARD_SELECTED_TAB = 'selected-tab';
+const ZBX_STYLE_DASHBOARD_POSITIONING = 'dashbrd-positioning';
 
 const DASHBOARD_STATE_INITIAL = 'initial';
 const DASHBOARD_STATE_ACTIVE = 'active';
@@ -275,7 +275,7 @@ class CDashboard extends CBaseComponent {
 		this._announceWidgets();
 
 		if (this._is_edit_mode) {
-			this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+			this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 		}
 
 		if (!this._is_edit_mode && this._data.auto_start == 1) {
@@ -398,7 +398,7 @@ class CDashboard extends CBaseComponent {
 
 		this._stopSlideshow();
 		this._resetHeaderLines();
-		this._target.classList.add(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 
 		if (is_internal_call) {
 			this.fire(DASHBOARD_EVENT_EDIT);
@@ -874,7 +874,7 @@ class CDashboard extends CBaseComponent {
 			this._addTab(dashboard_page);
 		}
 
-		this._target.classList.toggle(ZBX_STYLE_DASHBRD_IS_MULTIPAGE, this._dashboard_pages.size > 1);
+		this._target.classList.toggle(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE, this._dashboard_pages.size > 1);
 
 		if (dashboard_pageid === null) {
 			this._is_unsaved = true;
@@ -919,7 +919,7 @@ class CDashboard extends CBaseComponent {
 
 		this._announceWidgets();
 
-		this._target.classList.toggle(ZBX_STYLE_DASHBRD_IS_MULTIPAGE, this._dashboard_pages.size > 1);
+		this._target.classList.toggle(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE, this._dashboard_pages.size > 1);
 
 		this._is_unsaved = true;
 	}
@@ -1087,19 +1087,19 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_selectTab(dashboard_page) {
-		this._tabs.getList().querySelectorAll(`.${ZBX_STYLE_DASHBRD_SELECTED_TAB}`).forEach((el) => {
-			el.classList.remove(ZBX_STYLE_DASHBRD_SELECTED_TAB);
+		this._tabs.getList().querySelectorAll(`.${ZBX_STYLE_DASHBOARD_SELECTED_TAB}`).forEach((el) => {
+			el.classList.remove(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 		})
 
 		const data = this._dashboard_pages.get(dashboard_page);
 
-		data.tab.firstElementChild.classList.add(ZBX_STYLE_DASHBRD_SELECTED_TAB);
+		data.tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 		this._tabs.scrollItemIntoView(data.tab);
 		this._updateNavigationButtons({dashboard_page});
 	}
 
 	_updateNavigationButtons({dashboard_page = null} = {}) {
-		this._containers.navigation.classList.toggle(ZBX_STYLE_DASHBRD_NAVIGATION_IS_SCROLLABLE,
+		this._containers.navigation.classList.toggle(ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE,
 			this._tabs.isScrollable()
 		);
 
