@@ -121,28 +121,26 @@ $widget = (new CWidget())
 					)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			]))->setAttribute('aria-label', _('Content controls')))
-			->addItem((new CListItem([
-				(new CTag('nav', true, [
-					new CList([
-						(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
-						(new CList())
-							->addClass(ZBX_STYLE_BTN_SPLIT)
-							->addItem((new CButton('dashboard-add-widget',
-								[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
-							))->addClass(ZBX_STYLE_BTN_ALT))
-							->addItem(
-								(new CButton('dashboard-add', '&#8203;'))
-									->addClass(ZBX_STYLE_BTN_ALT)
-									->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
-							),
-						(new CButton('dashboard-save', _('Save changes'))),
-						(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
-						''
-					])
-				]))
+			->addItem((new CListItem(
+				(new CTag('nav', true, new CList([
+					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
+					(new CList())
+						->addClass(ZBX_STYLE_BTN_SPLIT)
+						->addItem((new CButton('dashboard-add-widget',
+							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
+						))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem(
+							(new CButton('dashboard-add', '&#8203;'))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+						),
+					(new CButton('dashboard-save', _('Save changes'))),
+					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
+					''
+				])))
 					->setAttribute('aria-label', _('Content controls'))
 					->addClass(ZBX_STYLE_DASHBOARD_EDIT)
-			]))->addStyle('display: none'))
+			))->addStyle('display: none'))
 	)
 	->setKioskModeControls(
 		(count($data['dashboard']['pages']) > 1)
@@ -246,15 +244,15 @@ $widget
 	->addItem($dashboard)
 	->show();
 
-(new CScriptTag(
-	'initializeView('.
-		json_encode($data['dashboard']).','.
-		json_encode($data['widget_defaults']).','.
-		json_encode($data['has_time_selector']).','.
-		json_encode($data['time_period']).','.
-		json_encode($data['dynamic']).','.
-		json_encode($web_layout_mode).
-	');'
-))
+(new CScriptTag('
+	initializeView(
+		'.json_encode($data['dashboard']).',
+		'.json_encode($data['widget_defaults']).',
+		'.json_encode($data['has_time_selector']).',
+		'.json_encode($data['time_period']).',
+		'.json_encode($data['dynamic']).',
+		'.json_encode($web_layout_mode).'
+	);
+'))
 	->setOnDocumentReady()
 	->show();

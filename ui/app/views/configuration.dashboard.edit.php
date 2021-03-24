@@ -27,13 +27,15 @@ $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
-$this->addJsFile('class.dashboard.widget.iterator.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.clock.js');
 $this->addJsFile('class.widget.graph.js');
+$this->addJsFile('class.widget.graph-prototype.js');
 $this->addJsFile('class.widget.map.js');
 $this->addJsFile('class.widget.navtree.js');
+$this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.widget.problems.js');
 $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');
@@ -43,17 +45,19 @@ $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('configuration.dashboard.edit.js.php');
 
-(new CWidget())
+$widget = (new CWidget())
 	->setTitle(_('Dashboards'))
-	->setControls((new CList())
-		->setId('dashboard-control')
-		->addItem((new CListItem([
-			(new CTag('nav', true, [
-				new CList([
+	->setControls(
+		(new CList())
+			->setId('dashboard-control')
+			->addItem(
+				(new CTag('nav', true, new CList([
 					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem((new CButton('dashboard-add-widget', _('Add')))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem((new CButton('dashboard-add-widget',
+							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
+						))->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
@@ -62,45 +66,54 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
 					''
-				])
-			]))
-				->setAttribute('aria-label', _('Content controls'))
-				->addClass(ZBX_STYLE_DASHBOARD_EDIT)
-		])))
-	)
-	->setNavigation(getHostNavigation('dashboards', $data['dashboard']['templateid']))
-	->addItem(
-		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBOARD)
-			->addItem(
-				(new CDiv())
-					->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION)
-					->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_TABS))
-					->addItem(
-						(new CDiv())
-							->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
-							->addItem([
-								(new CSimpleButton())
-									->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-									->addClass('btn-iterator-page-previous')
-									->setEnabled(false),
-								(new CSimpleButton())
-									->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-									->addClass('btn-iterator-page-next')
-									->setEnabled(false)
-							])
-					)
+				])))
+					->setAttribute('aria-label', _('Content controls'))
+					->addClass(ZBX_STYLE_DASHBOARD_EDIT)
 			)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID))
 	)
+	->setNavigation(getHostNavigation('dashboards', $data['dashboard']['templateid']));
+
+$dashboard = (new CDiv())
+	->addClass(ZBX_STYLE_DASHBOARD)
+	->addClass(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
+
+if (count($data['dashboard']['pages']) > 1) {
+	$dashboard->addClass(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE);
+}
+
+$dashboard->addItem(
+	(new CDiv())
+		->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION)
+		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_TABS))
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
+				->addItem([
+					(new CSimpleButton())
+						->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
+						->addClass('btn-iterator-page-previous')
+						->setEnabled(false),
+					(new CSimpleButton())
+						->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
+						->addClass('btn-iterator-page-next')
+						->setEnabled(false)
+				])
+		)
+);
+
+$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
+
+$widget
+	->addItem($dashboard)
 	->show();
 
-(new CScriptTag(
-	'initializeView('.
-		json_encode($data['dashboard']).','.
-		json_encode($data['widget_defaults']).','.
-		json_encode($data['page']).
-	');'
-))
+(new CScriptTag('
+	initializeView(
+		'.json_encode($data['dashboard']).',
+		'.json_encode($data['widget_defaults']).',
+		'.json_encode($data['time_period']).',
+		'.json_encode($data['page']).'
+	);
+'))
 	->setOnDocumentReady()
 	->show();

@@ -306,8 +306,8 @@ class CDashboard extends CBaseComponent {
 		const data = {
 			dashboardid: this._data.dashboardid ?? undefined,
 			name: this._data.name,
-			userid: this._data.userid,
-			templateid: this._data.dashboardid ?? undefined,
+			userid: this._data.userid ?? undefined,
+			templateid: this._data.templateid ?? undefined,
 			display_period: this._data.display_period,
 			auto_start: this._data.auto_start,
 			pages: []
@@ -487,6 +487,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_promiseApplyProperties(properties) {
+		properties.template = this._data.templateid !== null ? 1 : undefined;
 		properties.name = properties.name.trim();
 
 		const curl = new Curl('zabbix.php', false);

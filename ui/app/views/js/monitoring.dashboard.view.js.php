@@ -248,9 +248,6 @@
 
 						location.replace(response.redirect);
 					}
-					else if ('errors' in response) {
-						addMessage(response.errors);
-					}
 				})
 				.catch((error) => {
 					if (typeof error === 'object' && 'html_string' in error) {
