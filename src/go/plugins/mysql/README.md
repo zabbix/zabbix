@@ -23,11 +23,11 @@ available for connection and configure monitoring.
 ## Configuration
 Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the required parameters.
 
-**Plugins.Mysql.CallTimeout** — The maximum time in seconds for waiting when a request has to be done.  
+**Plugins.Mysql.CallTimeout** — The maximum amount of time in seconds to wait for a request to be done.  
 *Default value:* equals the global Timeout configuration parameter.    
 *Limits:* 1-30
 
-**Plugins.Mysql.Timeout** — The maximum time in seconds for waiting when a connection has to be established.  
+**Plugins.Mysql.Timeout** — The maximum amount of time in seconds to wait for a connection to be established.  
 *Default value:* equals the global Timeout configuration parameter.    
 *Limits:* 1-30
 

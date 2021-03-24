@@ -37,11 +37,11 @@ type Session struct {
 }
 
 type PluginOptions struct {
-	// ConnectTimeout is the maximum time in seconds for waiting when a connection has to be established.
+	// ConnectTimeout is The maximum amount of time in seconds to wait for a connection to be established.
 	// Default value equals to the global timeout.
 	ConnectTimeout int `conf:"optional,range=1:30"`
 
-	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
+	// CallTimeout is The maximum amount of time in seconds to wait for a request to be done.
 	// Default value equals to the global agent timeout.
 	CallTimeout int `conf:"optional,range=1:30"`
 
