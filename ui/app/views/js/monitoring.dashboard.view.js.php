@@ -330,7 +330,8 @@
 					position: {
 						of: e.target,
 						my: 'left top',
-						at: 'left bottom'
+						at: 'left bottom',
+						within: '.wrapper'
 					}
 				});
 			},
