@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-04T16:06:13Z'
+  date: '2021-03-24T11:46:42Z'
   groups:
     -
       name: Templates/Databases
@@ -9,6 +9,12 @@ zabbix_export:
       template: 'TiDB by HTTP'
       name: 'TiDB by HTTP'
       description: |
+        The template to monitor TiDB server of TiDB cluster by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        Don't forget to change the macros {$TIDB.URL}, {$TIDB.PORT}. 
+        
+        Template `TiDB by HTTP` — collects metrics by HTTP agent from PD /metrics endpoint and from monitoring API.
+        
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
         Template tooling version used: 0.38
@@ -88,12 +94,16 @@ zabbix_export:
               parameters:
                 - '$[?(@.name=="tidb_domain_load_schema_total && @.labels.type == "failed"")].value.first()'
               error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: tidb.get_metrics
           triggers:
             -
-              expression: '{min(5m)}>{$TIDB.SHEMA_LOAD_ERRORS.MAX.WARN}'
-              name: 'TiDB: Too many schema lease errors (over {$TIDB.SHEMA_LOAD_ERRORS.MAX.WARN} for 5m)'
+              expression: '{min(5m)}>{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}'
+              name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN} for 5m)'
               priority: AVERAGE
         -
           name: 'TiDB: Load schema total, rate'
@@ -111,6 +121,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name=="tidb_domain_load_schema_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: tidb.get_metrics
         -
@@ -129,6 +143,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name=="tidb_server_execute_error_total")].value.sum()'
+              error_handler: DISCARD_VALUE
             -
               type: CHANGE_PER_SECOND
               parameters:
@@ -142,10 +157,16 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get TiDB instance metrics.'
           applications:
             -
               name: 'Zabbix raw items'
           preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
             -
               type: PROMETHEUS_TO_JSON
               parameters:
@@ -158,9 +179,17 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get TiDB instance status info.'
           applications:
             -
               name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"status": "0"}'
           url: '{$TIDB.URL}:{$TIDB.PORT}/status'
         -
           name: 'TiDB: Goroutine count'
@@ -432,7 +461,7 @@ zabbix_export:
           master_item:
             key: tidb.get_metrics
         -
-          name: 'TiDB: Schema lease "cahnge" errors, rate'
+          name: 'TiDB: Schema lease "change" errors, rate'
           type: DEPENDENT
           key: tidb.session_schema_lease_error.change.rate
           delay: '0'
@@ -450,6 +479,10 @@ zabbix_export:
               parameters:
                 - '$[?(@.name=="tidb_session_schema_lease_error_total && @.labels.type == "change"")].value.first()'
               error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: tidb.get_metrics
         -
@@ -471,12 +504,16 @@ zabbix_export:
               parameters:
                 - '$[?(@.name=="tidb_session_schema_lease_error_total && @.labels.type == "outdate"")].value.first()'
               error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: tidb.get_metrics
           triggers:
             -
-              expression: '{min(5m)}>{$TIDB.SHEMA_LEASE_ERRORS.MAX.WARN}'
-              name: 'TiDB: Too many schema lease errors (over {$TIDB.SHEMA_LEASE_ERRORS.MAX.WARN} for 5m)'
+              expression: '{min(5m)}>{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}'
+              name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN} for 5m)'
               priority: AVERAGE
               description: 'The latest schema information is not reloaded in TiDB within one lease.'
         -
@@ -501,6 +538,38 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+        -
+          name: 'TiDB: Status'
+          type: DEPENDENT
+          key: tidb.status
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Status of PD instance.'
+          applications:
+            -
+              name: 'TiDB node'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: tidb.get_status
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'TiDB: Instance is not responding'
+              priority: AVERAGE
         -
           name: 'TiDB: Server connections'
           type: DEPENDENT
@@ -600,7 +669,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          units: Opm
+          units: Ops
           description: 'The number of DDL tasks that are waiting.'
           applications:
             -
@@ -736,6 +805,7 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.kv_ops.discovery
           delay: '0'
+          description: 'Discovery KV specific metrics.'
           item_prototypes:
             -
               name: 'TiDB: KV Commands: {#TYPE}, rate'
@@ -772,10 +842,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -786,9 +856,10 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.qps.discovery
           delay: '0'
+          description: 'Discovery QPS specific metrics.'
           item_prototypes:
             -
-              name: 'TiDB: Server query "ok": {#TYPE}, rate'
+              name: 'TiDB: Server query "Error": {#TYPE}, rate'
               type: DEPENDENT
               key: 'tidb.server_query.error.rate[{#TYPE}]'
               delay: '0'
@@ -811,7 +882,7 @@ zabbix_export:
               master_item:
                 key: tidb.get_metrics
             -
-              name: 'TiDB: Server query "ok": {#TYPE}, rate'
+              name: 'TiDB: Server query "OK": {#TYPE}, rate'
               type: DEPENDENT
               key: 'tidb.server_query.ok.rate[{#TYPE}]'
               delay: '0'
@@ -844,17 +915,18 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  var data = JSON.parse(value),
-                    lookup = {},
-                    result =[];
-                  for (var item, i = 0; item = data[i++];) {
-                    var type = item.labels.type;
-                      if (!(type in lookup)) {
-                        lookup[type] = 1;
-                        result.push({ "{#TYPE}": type});
-                            }
-                      }
-                    return JSON.stringify(result);
+                  var lookup = {},
+                  result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                  var type = item.labels.type;
+                  if (!(lookup[type])) {
+                  lookup[type] = 1;
+                  result.push({ "{#TYPE}": type });
+                  }
+                  })
+                  
+                  return JSON.stringify(result);
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -865,6 +937,7 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.statement.discover
           delay: '0'
+          description: 'Discovery statement specific metrics.'
           item_prototypes:
             -
               name: 'TiDB: SQL statements: {#TYPE}, rate'
@@ -900,10 +973,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -914,6 +987,7 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tikvclient_backoff.discovery
           delay: '0'
+          description: 'Discovery KV backoff specific metrics.'
           item_prototypes:
             -
               name: 'TiDB: KV backoff: {#TYPE}, rate'
@@ -951,10 +1025,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -965,6 +1039,7 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tikvclient_gc_action.discovery
           delay: '0'
+          description: 'Discovery GC action results metrics.'
           item_prototypes:
             -
               name: 'TiDB: GC action result: {#TYPE}, rate'
@@ -993,6 +1068,7 @@ zabbix_export:
                 -
                   expression: '{min(5m)}>{$TIDB.GC_ACTIONS.ERRORS.MAX.WARN}'
                   name: 'TiDB: Too many failed GC-related operations (over {$TIDB.GC_ACTIONS.ERRORS.MAX.WARN} in 5m)'
+                  discover: NO_DISCOVER
                   priority: WARNING
           master_item:
             key: tidb.get_metrics
@@ -1007,10 +1083,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1018,7 +1094,7 @@ zabbix_export:
                 - 1h
           overrides:
             -
-              name: trigger
+              name: 'Failed GC-related operations trigger'
               step: '1'
               filter:
                 conditions:
@@ -1038,6 +1114,7 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tikvclient_lock_resolver_action.discovery
           delay: '0'
+          description: 'Discovery lock resolves specific metrics.'
           item_prototypes:
             -
               name: 'TiDB: Lock resolves: {#TYPE}, rate'
@@ -1074,10 +1151,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1113,17 +1190,17 @@ zabbix_export:
           value: '50'
           description: 'Maximum number of region related errors'
         -
-          macro: '{$TIDB.SHEMA_LEASE_ERRORS.MAX.WARN}'
+          macro: '{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}'
           value: '0'
           description: 'Maximum number of schema lease errors'
         -
-          macro: '{$TIDB.SHEMA_LOAD_ERRORS.MAX.WARN}'
+          macro: '{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}'
           value: '1'
           description: 'Maximum number of load schema errors'
         -
           macro: '{$TIDB.TIME_JUMP_BACK.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of of times that the operating system rewinds every second'
+          description: 'Maximum number of times that the operating system rewinds every second'
         -
           macro: '{$TIDB.URL}'
           value: localhost
@@ -1185,3 +1262,13 @@ zabbix_export:
           item:
             host: 'TiDB by HTTP'
             key: tidb.server_query.error.rate
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

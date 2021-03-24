@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-04T16:06:51Z'
+  date: '2021-03-24T11:46:47Z'
   groups:
     -
       name: Templates/Databases
@@ -9,6 +9,12 @@ zabbix_export:
       template: 'TiDB PD by HTTP'
       name: 'TiDB PD by HTTP'
       description: |
+        The template to monitor PD server of TiDB cluster by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        Don't forget to change the macros {$PD.URL}, {$PD.PORT}.
+        
+        Template `TiDB PD by HTTP` — collects metrics by HTTP agent from PD /metrics endpoint and from monitoring API.
+        
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
         Template tooling version used: 0.38
@@ -17,9 +23,9 @@ zabbix_export:
           name: Templates/Databases
       applications:
         -
-          name: 'PD node'
+          name: 'PD instance'
         -
-          name: 'TIDB cluster'
+          name: 'TiDB cluster'
         -
           name: 'Zabbix raw items'
       items:
@@ -30,10 +36,16 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get TiDB PD instance metrics.'
           applications:
             -
               name: 'Zabbix raw items'
           preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
             -
               type: PROMETHEUS_TO_JSON
               parameters:
@@ -46,9 +58,17 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get TiDB PD instance status info.'
           applications:
             -
               name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"status": "0"}'
           url: '{$PD.URL}:{$PD.PORT}/pd/api/v1/status'
         -
           name: 'PD: GRPC Commands total, rate'
@@ -60,7 +80,7 @@ zabbix_export:
           description: 'The rate at which gRPC commands are completed.'
           applications:
             -
-              name: 'PD node'
+              name: 'PD instance'
           preprocessing:
             -
               type: JSONPATH
@@ -74,6 +94,38 @@ zabbix_export:
           master_item:
             key: pd.get_metrics
         -
+          name: 'PD: Status'
+          type: DEPENDENT
+          key: pd.status
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Status of PD instance.'
+          applications:
+            -
+              name: 'PD instance'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: pd.get_status
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'PD: Instance is not responding'
+              priority: AVERAGE
+        -
           name: 'PD: Uptime'
           type: DEPENDENT
           key: pd.uptime
@@ -84,7 +136,7 @@ zabbix_export:
           description: 'The runtime of each PD instance.'
           applications:
             -
-              name: 'PD node'
+              name: 'PD instance'
           preprocessing:
             -
               type: JSONPATH
@@ -117,7 +169,7 @@ zabbix_export:
           description: 'Version of the PD instance.'
           applications:
             -
-              name: 'PD node'
+              name: 'PD instance'
           preprocessing:
             -
               type: JSONPATH
@@ -142,9 +194,10 @@ zabbix_export:
           type: DEPENDENT
           key: pd.cluster.discovery
           delay: '0'
+          description: 'Discovery cluster specific metrics.'
           item_prototypes:
             -
-              name: 'TIDB cluster: Number of regions'
+              name: 'TiDB cluster: Number of regions'
               type: DEPENDENT
               key: 'pd.cluster_status.leader_count[{#SINGLETON}]'
               delay: '0'
@@ -152,7 +205,7 @@ zabbix_export:
               description: 'The total count of cluster Regions.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -161,7 +214,7 @@ zabbix_export:
               master_item:
                 key: pd.get_metrics
             -
-              name: 'TIDB cluster: Current peer count'
+              name: 'TiDB cluster: Current peer count'
               type: DEPENDENT
               key: 'pd.cluster_status.region_count[{#SINGLETON}]'
               delay: '0'
@@ -169,7 +222,7 @@ zabbix_export:
               description: 'The current count of all cluster peers.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -178,7 +231,7 @@ zabbix_export:
               master_item:
                 key: pd.get_metrics
             -
-              name: 'TIDB cluster: Storage capacity'
+              name: 'TiDB cluster: Storage capacity'
               type: DEPENDENT
               key: 'pd.cluster_status.storage_capacity[{#SINGLETON}]'
               delay: '0'
@@ -188,7 +241,7 @@ zabbix_export:
               description: 'The total storage capacity for this TiDB cluster.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -201,7 +254,7 @@ zabbix_export:
               master_item:
                 key: pd.get_metrics
             -
-              name: 'TIDB cluster: Storage size'
+              name: 'TiDB cluster: Storage size'
               type: DEPENDENT
               key: 'pd.cluster_status.storage_size[{#SINGLETON}]'
               delay: '0'
@@ -211,7 +264,7 @@ zabbix_export:
               description: 'The storage size that is currently used by the TiDB cluster.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -220,7 +273,7 @@ zabbix_export:
               master_item:
                 key: pd.get_metrics
             -
-              name: 'TIDB cluster: Disconnect stores'
+              name: 'TiDB cluster: Disconnect stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_disconnected[{#SINGLETON}]'
               delay: '0'
@@ -228,7 +281,7 @@ zabbix_export:
               description: 'The count of disconnected stores.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -243,11 +296,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{last()}>0'
-                  name: 'TIDB cluster: There are disconnected TiKV nodes'
+                  name: 'TiDB cluster: There are disconnected TiKV nodes'
                   priority: WARNING
                   description: 'PD does not receive a TiKV heartbeat within 20 seconds. Normally a TiKV heartbeat comes in every 10 seconds.'
             -
-              name: 'TIDB cluster: Down stores'
+              name: 'TiDB cluster: Down stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_down[{#SINGLETON}]'
               delay: '0'
@@ -255,7 +308,7 @@ zabbix_export:
               description: 'The count of down stores.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -270,11 +323,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{last()}>0'
-                  name: 'TIDB cluster: There are offline TiKV nodes'
+                  name: 'TiDB cluster: There are offline TiKV nodes'
                   priority: AVERAGE
                   description: 'PD has not received a TiKV heartbeat for a long time.'
             -
-              name: 'TIDB cluster: Lowspace stores'
+              name: 'TiDB cluster: Lowspace stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_low_space[{#SINGLETON}]'
               delay: '0'
@@ -282,7 +335,7 @@ zabbix_export:
               description: 'The count of low space stores.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -297,18 +350,18 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{last()}>0'
-                  name: 'TIDB cluster: There are low space TiKV nodes'
+                  name: 'TiDB cluster: There are low space TiKV nodes'
                   priority: AVERAGE
                   description: 'Indicates that there is no sufficient space on the TiKV node.'
             -
-              name: 'TIDB cluster: Offline stores'
+              name: 'TiDB cluster: Offline stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_offline[{#SINGLETON}]'
               delay: '0'
               history: 7d
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -321,7 +374,7 @@ zabbix_export:
               master_item:
                 key: pd.get_metrics
             -
-              name: 'TIDB cluster: Tombstone stores'
+              name: 'TiDB cluster: Tombstone stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_tombstone[{#SINGLETON}]'
               delay: '0'
@@ -329,7 +382,7 @@ zabbix_export:
               description: 'The count of tombstone stores.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -342,7 +395,7 @@ zabbix_export:
               master_item:
                 key: pd.get_metrics
             -
-              name: 'TIDB cluster: Unhealth stores'
+              name: 'TiDB cluster: Unhealth stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_unhealth[{#SINGLETON}]'
               delay: '0'
@@ -350,7 +403,7 @@ zabbix_export:
               description: 'The count of unhealthy stores.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -363,7 +416,7 @@ zabbix_export:
               master_item:
                 key: pd.get_metrics
             -
-              name: 'TIDB cluster: Normal stores'
+              name: 'TiDB cluster: Normal stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_up[{#SINGLETON}]'
               delay: '0'
@@ -371,7 +424,7 @@ zabbix_export:
               description: 'The count of healthy storage instances.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -386,12 +439,12 @@ zabbix_export:
           trigger_prototypes:
             -
               expression: '{TiDB PD by HTTP:pd.cluster_status.storage_size[{#SINGLETON}].min(5m)}/{TiDB PD by HTTP:pd.cluster_status.storage_capacity[{#SINGLETON}].last()}*100>{$PD.STORAGE_USAGE.MAX.WARN}'
-              name: 'TIDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
+              name: 'TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
               priority: WARNING
               description: 'Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.'
           graph_prototypes:
             -
-              name: 'TIDB cluster: Storage Usage[{#SINGLETON}]'
+              name: 'TiDB cluster: Storage Usage[{#SINGLETON}]'
               graph_items:
                 -
                   color: 1A7C11
@@ -426,6 +479,7 @@ zabbix_export:
           type: DEPENDENT
           key: pd.grpc_command.discovery
           delay: '0'
+          description: 'Discovery grpc commands specific metrics.'
           item_prototypes:
             -
               name: 'PD: GRPC Commands: {#GRPC_METHOD}, rate'
@@ -437,7 +491,7 @@ zabbix_export:
               description: 'The rate per command type at which gRPC commands are completed.'
               applications:
                 -
-                  name: 'PD node'
+                  name: 'PD instance'
               preprocessing:
                 -
                   type: JSONPATH
@@ -456,21 +510,23 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name == "grpc_server_handling_seconds_count")]'
+              error_handler: DISCARD_VALUE
             -
               type: JAVASCRIPT
               parameters:
                 - |
-                  var data = JSON.parse(value),
-                    lookup = {},
-                    result =[];
-                  for (var item, i = 0; item = data[i++];) {
-                    var grpc_method = item.labels.grpc_method;
-                      if (!(grpc_method in lookup)) {
-                        lookup[grpc_method] = 1;
-                        result.push({ "{#GRPC_METHOD}": grpc_method});
-                            }
-                      }
-                    return JSON.stringify(result);
+                  var lookup = {},
+                  result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                  var grpc_method = item.labels.grpc_method;
+                  if (!(lookup[grpc_method])) {
+                  lookup[grpc_method] = 1;
+                  result.push({ "{#GRPC_METHOD}": grpc_method });
+                  }
+                  })
+                  
+                  return JSON.stringify(result);
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -481,6 +537,7 @@ zabbix_export:
           type: DEPENDENT
           key: pd.region.discovery
           delay: '0'
+          description: 'Discovery region specific metrics.'
           item_prototypes:
             -
               name: 'PD: Region heartbeat: error, rate'
@@ -584,21 +641,23 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name == "pd_scheduler_region_heartbeat")]'
+              error_handler: DISCARD_VALUE
             -
               type: JAVASCRIPT
               parameters:
                 - |
-                  var data = JSON.parse(value),
-                    lookup = {},
-                    result =[];
-                  for (var item, i = 0; item = data[i++];) {
-                    var address = item.labels.address;
-                      if (!(address in lookup)) {
-                        lookup[address] = 1;
-                        result.push({ "{#STORE_ADDRESS}": address});
-                            }
-                      }
-                    return JSON.stringify(result);
+                  var lookup = {},
+                  result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                  var address = item.labels.address;
+                  if (!(lookup[address])) {
+                  lookup[address] = 1;
+                  result.push({ "{#STORE_ADDRESS}": address });
+                  }
+                  })
+                  
+                  return JSON.stringify(result);
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -609,9 +668,10 @@ zabbix_export:
           type: DEPENDENT
           key: pd.region_labels.discovery
           delay: '0'
+          description: 'Discovery region labels specific metrics.'
           item_prototypes:
             -
-              name: 'TIDB cluster: Regions label: {#TYPE}'
+              name: 'TiDB cluster: Regions label: {#TYPE}'
               type: DEPENDENT
               key: 'pd.region_labels[{#TYPE}]'
               delay: '0'
@@ -620,7 +680,7 @@ zabbix_export:
               description: 'The number of Regions in different label levels.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -635,15 +695,16 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name == "pd_regions_label_level")]'
+              error_handler: DISCARD_VALUE
             -
               type: JAVASCRIPT
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -654,9 +715,10 @@ zabbix_export:
           type: DEPENDENT
           key: pd.region_status.discovery
           delay: '0'
+          description: 'Discovery region status specific metrics.'
           item_prototypes:
             -
-              name: 'TIDB cluster: Regions status: {#TYPE}'
+              name: 'TiDB cluster: Regions status: {#TYPE}'
               type: DEPENDENT
               key: 'pd.region_status[{#TYPE}]'
               delay: '0'
@@ -665,7 +727,7 @@ zabbix_export:
               description: 'The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -676,12 +738,14 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>0'
-                  name: 'TIDB cluster: There are unresponsive peers'
+                  name: 'TiDB cluster: There are unresponsive peers'
+                  discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Regions with an unresponsive peer reported by the Raft leader.'
                 -
                   expression: '{min(5m)}>{$PD.MISS_REGION.MAX.WARN}'
-                  name: 'TIDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
+                  name: 'TiDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
+                  discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.'
           master_item:
@@ -691,15 +755,16 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name == "pd_regions_status")]'
+              error_handler: DISCARD_VALUE
             -
               type: JAVASCRIPT
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -707,7 +772,7 @@ zabbix_export:
                 - 1h
           overrides:
             -
-              name: miss_region_trigger
+              name: 'Too many missed regions trigger'
               step: '1'
               filter:
                 conditions:
@@ -723,7 +788,7 @@ zabbix_export:
                   status: ENABLED
                   discover: DISCOVER
             -
-              name: unresponsive_trigger
+              name: 'Unresponsive peers trigger'
               step: '2'
               filter:
                 conditions:
@@ -743,9 +808,10 @@ zabbix_export:
           type: DEPENDENT
           key: pd.scheduler.discovery
           delay: '0'
+          description: 'Discovery scheduler specific metrics.'
           item_prototypes:
             -
-              name: 'TIDB cluster: Scheduler status: {#KIND}'
+              name: 'TiDB cluster: Scheduler status: {#KIND}'
               type: DEPENDENT
               key: 'pd.scheduler[{#KIND}]'
               delay: '0'
@@ -754,7 +820,7 @@ zabbix_export:
               description: 'The current running schedulers.'
               applications:
                 -
-                  name: 'TIDB cluster'
+                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -771,15 +837,16 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name == "pd_scheduler_status" && @.labels.type == "allow")]'
+              error_handler: DISCARD_VALUE
             -
               type: JAVASCRIPT
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#KIND}": item.labels.kind,
-                       }})
-                   return JSON.stringify({"data": output})
+                  return {
+                  "{#KIND}": item.labels.kind,
+                  }})
+                  return JSON.stringify({"data": output})
                   
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -802,3 +869,13 @@ zabbix_export:
           macro: '{$PD.URL}'
           value: localhost
           description: 'PD server URL'
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
