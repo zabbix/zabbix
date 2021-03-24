@@ -1170,8 +1170,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$token_length = $token->length;
 			}
 			else {
-				$token_pos = $token['pos'];
-				$token_length = $token['length'];
+				$token_pos = $token->pos;
+				$token_length = $token->length;
 			}
 
 			if ($pos_left != $token_pos) {

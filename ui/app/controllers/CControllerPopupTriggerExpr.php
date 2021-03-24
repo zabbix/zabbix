@@ -491,6 +491,8 @@ class CControllerPopupTriggerExpr extends CController {
 		$params = $this->getInput('params', []);
 		$value = $this->getInput('value', 0);
 
+		$item = false;
+
 		// Opening the popup when editing an expression in the trigger constructor.
 		if (($dstfld1 === 'expr_temp' || $dstfld1 === 'recovery_expr_temp') && $expression !== '') {
 			$expression = utf8RawUrlDecode($expression);
@@ -507,28 +509,22 @@ class CControllerPopupTriggerExpr extends CController {
 
 					// Determine param type.
 					$params = $function_token->params_raw['parameters'];
-					if (array_key_exists(0, $params) && !is_array($params[0])
+					if (array_key_exists(0, $params)
 							&& $params[0]->type == CTriggerExprParserResult::TOKEN_TYPE_QUERY) {
 						array_shift($params);
 					}
 
-					$is_num = (array_key_exists(0, $params) && is_array($params[0])
-						&& substr($params[0]['raw'], 0, 1) === '#'
-					);
+					$is_num = (array_key_exists(0, $params) && substr($params[0]->match, 0, 1) === '#');
 
 					if (!in_array($function, ['fuzzytime', 'nodata']) && $is_num) {
 						$param_type = PARAM_TYPE_COUNTS;
-						$params[0]['raw'] = substr($params[0]['raw'], 1);
+						$params[0]->match = substr($params[0]->match, 1);
 					}
 					else {
 						$param_type = PARAM_TYPE_TIME;
 					}
 
-					$params = array_map(function ($param) {
-						return is_array($param)
-							? $param['raw']
-							: $param->match;
-					}, $params);
+					$params = array_column($params, 'match');
 
 					/*
 					 * Try to find an operator, a value and item.
@@ -560,7 +556,9 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($fn_name, $this->functions)
 									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
 								$operator = $operator_token->match;
-								$value = $value_token->match;
+								$value = array_key_exists('string', $value_token->data)
+									? $value_token->data['string']
+									: '';
 							}
 							else {
 								break;
@@ -600,10 +598,11 @@ class CControllerPopupTriggerExpr extends CController {
 			$item = reset($item);
 		}
 
-		if ($itemid) {
+		if ($item) {
 			$items = CMacrosResolverHelper::resolveItemNames([$item]);
 			$item = $items[0];
 
+			$itemid = $item['itemid'];
 			$item_value_type = $item['value_type'];
 			$item_key = $item['key_'];
 			$item_host_data = reset($item['hosts']);
@@ -635,6 +634,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'params' => $params,
 			'paramtype' => $param_type,
 			'item_description' => $description,
+			'item_required' => !in_array($function, getStandaloneFunctions()),
 			'functions' => $this->functions,
 			'function' => $function,
 			'operator' => $operator,
@@ -675,7 +675,29 @@ class CControllerPopupTriggerExpr extends CController {
 		// Create and validate trigger expression before inserting it into textarea field.
 		if ($this->getInput('add', false)) {
 			try {
-				if ($data['item_description']) {
+				if (in_array($function, getStandaloneFunctions())) {
+					$data['expression'] = sprintf('%s()%s%s',
+						$function,
+						$operator,
+						CTriggerExpression::quoteString($data['value'])
+					);
+
+					// Validate trigger expression.
+					$trigger_expression = new CTriggerExpression();
+
+					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
+						// Validate trigger function.
+						$trigger_function_validator = new CFunctionValidator();
+
+						if (!$trigger_function_validator->validate($result->getTokens()[0])) {
+							error($trigger_function_validator->getError());
+						}
+					}
+					else {
+						error($trigger_expression->error);
+					}
+				}
+				elseif ($data['item_description']) {
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {
@@ -702,24 +724,15 @@ class CControllerPopupTriggerExpr extends CController {
 						$quoted_params[] = quoteFunctionParam($param);
 					}
 
-					if (in_array($function, ['date', 'dayofmonth', 'dayofweek', 'now', 'time'])) {
-						$data['expression'] = sprintf('%s()%s%s',
-							$function,
-							$operator,
-							CTriggerExpression::quoteString($data['value'])
-						);
-					}
-					else {
-						$fn_params = rtrim(implode(',', $quoted_params), ',');
-						$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
-							$function,
-							$item_host_data['host'],
-							$data['item_key'],
-							($fn_params === '') ? '' : ','.$fn_params,
-							$operator,
-							CTriggerExpression::quoteString($data['value'])
-						);
-					}
+					$fn_params = rtrim(implode(',', $quoted_params), ',');
+					$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
+						$function,
+						$item_host_data['host'],
+						$data['item_key'],
+						($fn_params === '') ? '' : ','.$fn_params,
+						$operator,
+						CTriggerExpression::quoteString($data['value'])
+					);
 
 					// Validate trigger expression.
 					$trigger_expression = new CTriggerExpression();

@@ -361,17 +361,13 @@ class CFunctionValidator extends CValidator {
 				continue;
 			}
 
-			$param = ($fn->params_raw['parameters'][$num] instanceof CParserResult)
-					? $fn->params_raw['parameters'][$num]->match
-					: $fn->params_raw['parameters'][$num]['raw'];
-
-			if (($arg['mandat'] & 0x02) && strstr($param, ':') === false) {
+			if (($arg['mandat'] & 0x02) && strstr($fn->params_raw['parameters'][$num]->match, ':') === false) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					_('Mandatory parameter is missing.'));
 				return false;
 			}
 
-			if (!$this->validateParameter($param, $arg)) {
+			if (!$this->validateParameter($fn->params_raw['parameters'][$num]->match, $arg)) {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
 				);

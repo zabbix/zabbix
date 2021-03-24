@@ -130,10 +130,10 @@ class CMathFunctionValidator extends CValidator {
 			elseif ($param instanceof CFunctionParserResult) {
 				continue;
 			}
-			elseif (!$this->user_macro_parser->parse($param['raw'])
-					&& $this->number_parser->parse($param['raw'])
-					&& $this->checkString($param['raw'])
-					&& (!$this->lldmacros || $this->lld_macro_parser->parse($param['raw']))) {
+			elseif (!$this->user_macro_parser->parse($param->match)
+					&& $this->number_parser->parse($param->match)
+					&& $this->checkString($param->match)
+					&& (!$this->lldmacros || $this->lld_macro_parser->parse($param->match))) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
 				return false;
 			}

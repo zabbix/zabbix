@@ -180,16 +180,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					foreach ($result->getTokens() as $token) {
 						switch ($token->type) {
 							case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-								$texts_support_user_macros[] = $token['value'];
+								$texts_support_user_macros[] = $token->match;
 								break;
 
 							case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-								$texts_support_lld_macros[] = $token['value'];
+								$texts_support_lld_macros[] = $token->match;
 								break;
 
 							case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-								$texts_support_user_macros[] = $token['data']['string'];
-								$texts_support_lld_macros[] = $token['data']['string'];
+								$texts_support_user_macros[] = $token->data['string'];
+								$texts_support_lld_macros[] = $token->data['string'];
 								break;
 						}
 					}

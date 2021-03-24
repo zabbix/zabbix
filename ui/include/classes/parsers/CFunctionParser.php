@@ -87,7 +87,10 @@ class CFunctionParser extends CParser {
 	 * @param int     $pos
 	 */
 	public function parse($source, $pos = 0): int {
+		$this->errorClear();
+
 		if ($this->depth > TRIGGER_MAX_FUNCTION_DEPTH) {
+			$this->errorPos($source, $pos);
 			return self::PARSE_FAIL;
 		}
 
@@ -164,11 +167,11 @@ class CFunctionParser extends CParser {
 								// Not overwrite previous empty parameter.
 								$num++;
 							}
-							$_parameters[$num] = [
+							$_parameters[$num] = new CFunctionParameterResult([
 								'type' => self::PARAM_UNQUOTED,
-								'raw' => '',
+								'match' => '',
 								'pos' => $p
-							];
+							]);
 							break;
 
 						case ')':
@@ -176,11 +179,11 @@ class CFunctionParser extends CParser {
 							break;
 
 						case '"':
-							$_parameters[$num] = [
+							$_parameters[$num] = new CFunctionParameterResult([
 								'type' => self::PARAM_QUOTED,
-								'raw' => $source[$p],
+								'match' => $source[$p],
 								'pos' => $p
-							];
+							]);
 							$state = self::STATE_QUOTED;
 							break;
 
@@ -205,15 +208,21 @@ class CFunctionParser extends CParser {
 								$p--;
 							}
 							else {
+								if ($function_parser->getError() !== '') {
+									[$source, $pos] = $function_parser->getErrorDetails();
+									$this->errorPos($source, $pos);
+									break 3;
+								}
+
 								if (!array_key_exists($num, $_parameters)) {
-									$_parameters[$num] = [
+									$_parameters[$num] = new CFunctionParameterResult([
 										'type' => self::PARAM_UNQUOTED,
-										'raw' => $source[$p],
+										'match' => $source[$p],
 										'pos' => $p
-									];
+									]);
 								}
 								else {
-									$_parameters[$num]['raw'] .= $source[$p];
+									$_parameters[$num]->match .= $source[$p];
 								}
 
 								$state = self::STATE_UNQUOTED;
@@ -254,13 +263,13 @@ class CFunctionParser extends CParser {
 							break;
 
 						default:
-							$_parameters[$num]['raw'] .= $source[$p];
+							$_parameters[$num]->match .= $source[$p];
 					}
 					break;
 
 				// a quoted parameter
 				case self::STATE_QUOTED:
-					$_parameters[$num]['raw'] .= $source[$p];
+					$_parameters[$num]->match .= $source[$p];
 
 					if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
 						$state = self::STATE_END;
@@ -359,12 +368,12 @@ class CFunctionParser extends CParser {
 				if ($param instanceof CParserResult) {
 					return $param->match;
 				}
-				elseif ($param['type'] == self::PARAM_UNQUOTED) {
+				elseif ($param->type == self::PARAM_UNQUOTED) {
 					// return parameter without any changes
-					return $param['raw'];
+					return $param->match;
 				}
-				elseif ($param['type'] == self::PARAM_QUOTED) {
-					return self::unquoteParam($param['raw']);
+				elseif ($param->type == self::PARAM_QUOTED) {
+					return self::unquoteParam($param->match);
 				}
 			}
 		}

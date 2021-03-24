@@ -40,8 +40,8 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				'{Trapper:trap[1].abschange()} > 10'.
 				' and {Trapper:trap[1].abschange()} <> "{20727}"',
 
-				'abs(last(/Trapper/trap[1],1)-last(/Trapper/trap[1],2)) > 10'.
-				' and abs(last(/Trapper/trap[1],1)-last(/Trapper/trap[1],2)) <> "{20727}"'
+				'abs(change(/Trapper/trap[1])) > 10'.
+				' and abs(change(/Trapper/trap[1])) <> "{20727}"'
 			],
 			[
 				'{Trapper:trap[1].avg(30m)} > 0'.

@@ -1727,16 +1727,18 @@ abstract class CTriggerGeneral extends CApiService {
 				: ['expression'];
 
 			foreach ($expression_fields as $expr_field) {
-				usort($triggers_function_occurances[$tnum][$expr_field], function ($a, $b) {
-					return $a['pos'] <=> $b['pos'];
-				});
+				if (array_key_exists($expr_field, $triggers_function_occurances[$tnum])) {
+					usort($triggers_function_occurances[$tnum][$expr_field], function ($a, $b) {
+						return $a['pos'] <=> $b['pos'];
+					});
 
-				for ($i = count($triggers_function_occurances[$tnum][$expr_field])-1; $i>=0; $i--) {
-					$occurance = $triggers_function_occurances[$tnum][$expr_field][$i];
-					$trigger[$expr_field] = substr_replace($trigger[$expr_field],
-						'{'.$triggers_functions[$tnum][$occurance['match']]['functionid'].'}', $occurance['pos'],
-						$occurance['length']
-					);
+					for ($i = count($triggers_function_occurances[$tnum][$expr_field])-1; $i>=0; $i--) {
+						$occurance = $triggers_function_occurances[$tnum][$expr_field][$i];
+						$trigger[$expr_field] = substr_replace($trigger[$expr_field],
+							'{'.$triggers_functions[$tnum][$occurance['match']]['functionid'].'}', $occurance['pos'],
+							$occurance['length']
+						);
+					}
 				}
 
 				if (mb_strlen($trigger[$expr_field]) > $max_length[$expr_field]) {

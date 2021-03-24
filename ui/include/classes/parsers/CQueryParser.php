@@ -82,7 +82,7 @@ class CQueryParser extends CParser {
 		$pos++;
 
 		if ($this->host_name_parser->parse($source, $pos) == self::PARSE_FAIL) {
-			[$source, $pos] = $this->host_name_parser->errorPosArray();
+			[$source, $pos] = $this->host_name_parser->getErrorDetails();
 			$this->errorPos($source, $pos);
 
 			return CParser::PARSE_FAIL;
@@ -97,7 +97,7 @@ class CQueryParser extends CParser {
 		$pos++;
 
 		if ($this->item_key_parser->parse($source, $pos) == self::PARSE_FAIL) {
-			[$source, $pos] = $this->item_key_parser->errorPosArray();
+			[$source, $pos] = $this->item_key_parser->getErrorDetails();
 			$this->errorPos($source, $pos);
 
 			return CParser::PARSE_FAIL;
