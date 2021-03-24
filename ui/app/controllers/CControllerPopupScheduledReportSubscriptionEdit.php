@@ -35,8 +35,8 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 			'exclude' =>			'in '.ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE,
 			'userids' =>			'array',
 			'usrgrpids' =>			'array',
-			'edit' =>				'in 0,1',
-			'update' =>				'in 1'
+			'edit' =>				'in 1',
+			'update' =>				'in 1',
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateSubscription();

@@ -25,30 +25,9 @@
 ?>
 
 <script>
-	var popup_action = 'popup.scheduledreport.subscription.edit';
+	var row_num = 0;
 	var userids = new Set();
 	var usrgrpids = new Set();
-	var row_num = 0;
-
-	document.querySelectorAll('#subscriptions-table .js-add-user')
-		.forEach((elem) => elem.addEventListener('click', (event) => {
-			const popup_options = {
-				recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>,
-				userids: Array.from(userids)
-			};
-
-			PopUp(popup_action, popup_options, null, event.target);
-		}));
-
-	document.querySelectorAll('#subscriptions-table .js-add-user-group')
-		.forEach((elem) => elem.addEventListener('click', (event) => {
-			const popup_options = {
-				recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP ?>,
-				usrgrpids: Array.from(usrgrpids)
-			};
-
-			PopUp(popup_action, popup_options, null, event.target);
-		}));
 
 	var ReportSubscription = class {
 
@@ -69,12 +48,14 @@
 			if (edit instanceof Element) {
 				if (this.data.recipientid != this.data.old_recipientid) {
 					if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
-						userids.delete(this.data.old_recipientid);
-						userids.add(this.data.recipientid);
+						userids
+							.add(this.data.recipientid)
+							.delete(this.data.old_recipientid);
 					}
 					else {
-						usrgrpids.delete(this.data.old_recipientid);
-						usrgrpids.add(this.data.recipientid);
+						usrgrpids
+							.add(this.data.recipientid)
+							.delete(this.data.old_recipientid);
 					}
 				}
 
@@ -115,7 +96,7 @@
 					popup_options.exclude = link.parentNode.parentNode.querySelector('[name*=exclude]').value;
 				}
 
-				PopUp(popup_action, popup_options, null, event.target)
+				PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
 			});
 
 			cell.appendChild(icon);
@@ -136,7 +117,7 @@
 			else {
 				const span = document.createElement('span');
 
-				span.innerHTML = <?= json_encode(_('Recipient')) ?>;;
+				span.innerHTML = <?= json_encode(_('Recipient')) ?>;
 				span.classList.add('<?= ZBX_STYLE_GREY ?>');
 
 				cell.appendChild(span);
@@ -194,7 +175,7 @@
 			const btn = document.createElement('button');
 
 			btn.type = 'button';
-			btn.classList.add('btn-link');
+			btn.classList.add('<?= ZBX_STYLE_BTN_LINK ?>');
 			btn.innerHTML = <?= json_encode(_('Remove')) ?>;
 			btn.addEventListener('click', () => {
 				if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
@@ -221,9 +202,46 @@
 
 			return input;
 		}
+
+		static initializeNewUserPopup() {
+			const elem = document.querySelector('#subscriptions-table .js-add-user:not(:disabled)');
+
+			if (!elem) {
+				return;
+			}
+
+			elem.addEventListener('click', (event) => {
+				const popup_options = {
+					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>,
+					userids: Array.from(userids)
+				};
+
+				PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
+			});
+		}
+
+		static initializeNewUserGroupPopup() {
+			const elem = document.querySelector('#subscriptions-table .js-add-user-group:not(:disabled)');
+
+			if (!elem) {
+				return;
+			}
+
+			elem.addEventListener('click', (event) => {
+				const popup_options = {
+					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP ?>,
+					usrgrpids: Array.from(usrgrpids)
+				};
+
+				PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
+			});
+		}
 	}
 
 	var subscriptions = <?= json_encode(array_values($data['subscriptions'])) ?>;
 
 	subscriptions.forEach((subscription) => new ReportSubscription(subscription));
+
+	ReportSubscription.initializeNewUserPopup();
+	ReportSubscription.initializeNewUserGroupPopup();
 </script>

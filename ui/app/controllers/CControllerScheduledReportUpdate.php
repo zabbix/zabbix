@@ -48,9 +48,10 @@ class CControllerScheduledReportUpdate extends CController {
 		if (!$ret) {
 			switch ($error) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'scheduledreport.edit')
-						->setArgument('reportid', $this->getInput('reportid'))
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'scheduledreport.edit')
+							->setArgument('reportid', $this->getInput('reportid'))
 					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update scheduled report'));
@@ -123,17 +124,19 @@ class CControllerScheduledReportUpdate extends CController {
 		$result = API::Report()->update($report);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'scheduledreport.list')
-				->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'scheduledreport.list')
+					->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_('Scheduled report updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'scheduledreport.edit')
-				->setArgument('reportid', $this->getInput('reportid'))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'scheduledreport.edit')
+					->setArgument('reportid', $this->getInput('reportid'))
 			);
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update scheduled report'));

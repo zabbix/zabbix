@@ -95,18 +95,7 @@ class CReport extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$sql_parts = [
-			'select'	=> ['report' => 'r.reportid'],
-			'from'		=> ['report' => 'report r'],
-			'where'		=> [],
-			'order'		=> [],
-			'group'		=> []
-		];
-
-		// reportids
-		if ($options['reportids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('r.reportid', $options['reportids']);
-		}
+		$sql_parts = $this->createSelectQueryParts($this->tableName(), $this->tableAlias(), $options);
 
 		// expired
 		if ($options['expired'] !== null) {
@@ -114,19 +103,6 @@ class CReport extends CApiService {
 				? '(r.active_till>0 AND r.active_till<'.time().')'
 				: '(r.active_till=0 OR r.active_till>='.time().')';
 		}
-
-		// filter
-		if ($options['filter'] !== null) {
-			$this->dbFilter('report r', $options, $sql_parts);
-		}
-
-		// search
-		if ($options['search'] !== null) {
-			zbx_db_search('report r', $options, $sql_parts);
-		}
-
-		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 
 		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
@@ -220,7 +196,7 @@ class CReport extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		foreach ($reports as $index => $report) {
+		foreach ($reports as $report) {
 			if ($report['active_till'] > 0 && $report['active_since'] > $report['active_till']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('"%1$s" must be greater than "%2$s" or equal to %3$s.', 'active_till', 'active_since', 0)
@@ -473,9 +449,9 @@ class CReport extends CApiService {
 
 		$db_report_params = ($method === 'update')
 			? DB::select('report_param', [
-				'output' => ['reportparamid', 'reportid', 'name', 'value'],
-				'filter' => ['reportid' => array_keys($report_params)]
-			])
+					'output' => ['reportparamid', 'reportid', 'name', 'value'],
+					'filter' => ['reportid' => array_keys($report_params)]
+				])
 			: [];
 
 		$ins_report_params = [];
@@ -483,7 +459,7 @@ class CReport extends CApiService {
 		$del_reportparamids = [];
 
 		foreach ($db_report_params as $db_report_param) {
-			if ($report_params[$db_report_param['reportid']]) {
+			if (array_key_exists($db_report_param['reportid'], $report_params)) {
 				$report_param = array_shift($report_params[$db_report_param['reportid']]);
 
 				$upd_report_param = [];
@@ -551,9 +527,9 @@ class CReport extends CApiService {
 
 		$db_report_users = ($method === 'update')
 			? DB::select('report_user', [
-				'output' => ['reportuserid', 'reportid', 'userid', 'access_userid', 'exclude'],
-				'filter' => ['reportid' => array_keys($report_users)]
-			])
+					'output' => ['reportuserid', 'reportid', 'userid', 'access_userid', 'exclude'],
+					'filter' => ['reportid' => array_keys($report_users)]
+				])
 			: [];
 
 		$ins_report_users = [];
@@ -561,7 +537,7 @@ class CReport extends CApiService {
 		$del_reportuserids = [];
 
 		foreach ($db_report_users as $db_report_user) {
-			if ($report_users[$db_report_user['reportid']]) {
+			if (array_key_exists($db_report_user['reportid'], $report_users)) {
 				$report_user = array_shift($report_users[$db_report_user['reportid']]);
 
 				$upd_report_user = [];
@@ -625,9 +601,9 @@ class CReport extends CApiService {
 
 		$db_report_usrgrps = ($method === 'update')
 			? DB::select('report_usrgrp', [
-				'output' => ['reportusrgrpid', 'reportid', 'usrgrpid', 'access_userid'],
-				'filter' => ['reportid' => array_keys($report_usrgrps)]
-			])
+					'output' => ['reportusrgrpid', 'reportid', 'usrgrpid', 'access_userid'],
+					'filter' => ['reportid' => array_keys($report_usrgrps)]
+				])
 			: [];
 
 		$ins_report_usrgrps = [];
@@ -635,7 +611,7 @@ class CReport extends CApiService {
 		$del_reportusrgrpids = [];
 
 		foreach ($db_report_usrgrps as $db_report_usrgrp) {
-			if ($report_usrgrps[$db_report_usrgrp['reportid']]) {
+			if (array_key_exists($db_report_usrgrp['reportid'], $report_usrgrps)) {
 				$report_usrgrp = array_shift($report_usrgrps[$db_report_usrgrp['reportid']]);
 
 				$upd_report_usrgrp = [];
@@ -713,7 +689,7 @@ class CReport extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$reportids = array_keys($result);
 
-		// adding email subject and message
+		// Adding email subject and message.
 		$fields_by_name = [];
 		if ($this->outputIsRequested('subject', $options['output'])) {
 			$fields_by_name['subject'] = 'subject';
@@ -735,7 +711,6 @@ class CReport extends CApiService {
 				' FROM report_param rp'.
 				' WHERE '.dbConditionInt('rp.reportid', $reportids)
 			);
-
 			while ($param = DBfetch($params)) {
 				if (array_key_exists($param['name'], $fields_by_name)) {
 					$result[$param['reportid']][$fields_by_name[$param['name']]] = $param['value'];
@@ -743,7 +718,7 @@ class CReport extends CApiService {
 			}
 		}
 
-		// adding users
+		// Adding users.
 		if ($options['selectUsers'] !== null && $options['selectUsers'] !== API_OUTPUT_COUNT) {
 			if ($options['selectUsers'] === API_OUTPUT_EXTEND) {
 				$options['selectUsers'] = $this->user_output_fields;
@@ -767,7 +742,6 @@ class CReport extends CApiService {
 					' FROM report_user ru'.
 					' WHERE '.dbConditionInt('reportid', $reportids)
 				);
-
 				while ($user = DBfetch($users)) {
 					$reportid = $user['reportid'];
 					unset($user['reportid']);
@@ -776,7 +750,7 @@ class CReport extends CApiService {
 			}
 		}
 
-		// adding user groups
+		// Adding user groups.
 		if ($options['selectUserGroups'] !== null && $options['selectUserGroups'] !== API_OUTPUT_COUNT) {
 			if ($options['selectUserGroups'] === API_OUTPUT_EXTEND) {
 				$options['selectUserGroups'] = $this->usrgrp_output_fields;
@@ -800,7 +774,6 @@ class CReport extends CApiService {
 					' FROM report_usrgrp rug'.
 					' WHERE '.dbConditionInt('reportid', $reportids)
 				);
-
 				while ($user_group = DBfetch($user_groups)) {
 					$reportid = $user_group['reportid'];
 					unset($user_group['reportid']);

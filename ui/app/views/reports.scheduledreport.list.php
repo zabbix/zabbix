@@ -67,7 +67,10 @@ $widget = (new CWidget())
 		])
 	);
 
-$form = (new CForm())->setName('scheduledreport_form');
+$form = (new CForm())
+	->setId('scheduledreport-form')
+	->setName('scheduledreport-form');
+
 $form->addItem([
 		new CPartial('scheduledreport.table.html', [
 			'source' => $form->getName(),

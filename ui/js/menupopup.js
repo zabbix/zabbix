@@ -681,18 +681,17 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 		dashboardid: options.dashboardid
 	};
 
-	// dashboard actions
+	// Dashboard actions.
 	if (options.allowed_edit) {
-		let url_create = new Curl('zabbix.php', false);
-		let url_clone = new Curl('zabbix.php', false);
-		let url_delete = new Curl('zabbix.php', false);
-
+		const url_create = new Curl('zabbix.php', false);
 		url_create.setArgument('action', 'dashboard.view');
 		url_create.setArgument('new', '1');
 
+		const url_clone = new Curl('zabbix.php', false);
 		url_clone.setArgument('action', 'dashboard.view');
 		url_clone.setArgument('source_dashboardid', options.dashboardid);
 
+		const url_delete = new Curl('zabbix.php', false);
 		url_delete.setArgument('action', 'dashboard.delete');
 		url_delete.setArgument('dashboardids', [options.dashboardid]);
 
@@ -733,7 +732,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 		});
 	}
 
-	// report actions
+	// Report actions.
 	if (options.allowed_manage_reports) {
 		sections.push({
 			label: options.allowed_edit ? null: t('Actions'),

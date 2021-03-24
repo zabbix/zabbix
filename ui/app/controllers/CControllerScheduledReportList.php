@@ -133,7 +133,7 @@ class CControllerScheduledReportList extends CController {
 			unset($report);
 		}
 
-		$page_num = getRequest('page', 1);
+		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('scheduledreport.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['reports'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())

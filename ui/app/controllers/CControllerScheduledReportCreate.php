@@ -47,8 +47,8 @@ class CControllerScheduledReportCreate extends CController {
 		if (!$ret) {
 			switch ($error) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'scheduledreport.edit')
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))->setArgument('action', 'scheduledreport.edit')
 					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot create scheduled report'));
@@ -114,16 +114,17 @@ class CControllerScheduledReportCreate extends CController {
 		$result = API::Report()->create($report);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'scheduledreport.list')
-				->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'scheduledreport.list')
+					->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_('Scheduled report added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'scheduledreport.edit')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'scheduledreport.edit')
 			);
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot add scheduled report'));

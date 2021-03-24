@@ -31,7 +31,7 @@ $widget = (new CWidget())->setTitle(_('Scheduled reports'));
 
 $form = (new CForm())
 	->setId('scheduledreport-form')
-	->setName('scheduledreport_form')
+	->setName('scheduledreport-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['reportid'] != 0) {

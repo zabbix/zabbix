@@ -25,12 +25,12 @@
 
 $table = (new CTableInfo())
 	->setHeader([
-		($data['source'] === 'scheduledreport_form')
+		($data['source'] === 'scheduledreport-form')
 			? (new CColHeader((new CCheckBox('all_scheduledreports'))
 				->onClick("checkAll('".$data['source']."', 'all_scheduledreports', 'reportids');")
 			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
-		($data['source'] === 'scheduledreport_form')
+		($data['source'] === 'scheduledreport-form')
 			? make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'scheduledreport.list')
@@ -90,7 +90,7 @@ foreach ($data['reports'] as $report) {
 		$status_class = ZBX_STYLE_GREEN;
 	}
 
-	$status = ($data['source'] === 'scheduledreport_form' && $data['allowed_edit'])
+	$status = ($data['source'] === 'scheduledreport-form' && $data['allowed_edit'])
 		? (new CLink($status_name, (new CUrl('zabbix.php'))
 			->setArgument('action', ($report['status'] == ZBX_REPORT_STATUS_DISABLED)
 				? 'scheduledreport.enable'
@@ -105,7 +105,7 @@ foreach ($data['reports'] as $report) {
 	$status->addClass($status_class);
 
 	$table->addRow([
-		($data['source'] === 'scheduledreport_form')
+		($data['source'] === 'scheduledreport-form')
 			? new CCheckBox('reportids['.$report['reportid'].']', $report['reportid'])
 			: null,
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),

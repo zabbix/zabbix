@@ -33,13 +33,19 @@
 
 <script>
 	(() => {
-		document.querySelector('#cycle').addEventListener('change', (event) => {
-			const show_weekdays = (event.target.value == <?= ZBX_REPORT_CYCLE_DAILY ?>
-					|| event.target.value == <?= ZBX_REPORT_CYCLE_WEEKLY ?>);
+		document
+			.querySelector('#cycle')
+			.addEventListener('change', (event) => {
+				const show_weekdays = (event.target.value == <?= ZBX_REPORT_CYCLE_DAILY ?>
+						|| event.target.value == <?= ZBX_REPORT_CYCLE_WEEKLY ?>);
 
-			document.querySelectorAll('#weekdays-label, #weekdays').forEach((elem) => {
-				elem.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_weekdays);
+				document
+					.querySelectorAll('#weekdays-label, #weekdays')
+					.forEach(
+						(elem) => elem
+							.classList
+							.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_weekdays)
+					);
 			});
-		});
 	})();
 </script>

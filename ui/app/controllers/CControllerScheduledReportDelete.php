@@ -53,9 +53,10 @@ class CControllerScheduledReportDelete extends CController {
 
 		$result = API::Report()->delete($reportids);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'scheduledreport.list')
-			->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'scheduledreport.list')
+				->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
 		);
 
 		$deleted = count($reportids);

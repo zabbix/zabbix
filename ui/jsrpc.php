@@ -612,9 +612,7 @@ switch ($data['method']) {
 				]);
 
 				if ($dashboards) {
-					CArrayHelper::sort($dashboards, [
-						['field' => 'name', 'order' => ZBX_SORT_UP]
-					]);
+					CArrayHelper::sort($dashboards, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
 					if (array_key_exists('limit', $data)) {
 						$dashboards = array_slice($dashboards, 0, $data['limit']);

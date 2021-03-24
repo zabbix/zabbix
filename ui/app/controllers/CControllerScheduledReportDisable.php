@@ -60,9 +60,10 @@ class CControllerScheduledReportDisable extends CController {
 
 		$result = API::Report()->update($reports);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'scheduledreport.list')
-			->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'scheduledreport.list')
+				->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
 		);
 
 		$updated = count($reports);
