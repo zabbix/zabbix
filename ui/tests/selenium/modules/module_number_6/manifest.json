@@ -3,7 +3,7 @@
 	"id": "6",
 	"name": "шестой модуль",
 	"author": "Работник Заббикса",
-	"description": "Удалить \"Reports\" и \"Maps\" из меню верхнего уровня;.",
+	"description": "Удалить \"Reports\" и \"Maps\" из меню верхнего уровня.",
 	"version": "бета 2",
 	"namespace": "Example_F",
 	"url": ""
