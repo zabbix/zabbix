@@ -634,6 +634,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'params' => $params,
 			'paramtype' => $param_type,
 			'item_description' => $description,
+			'item_required' => !in_array($function, getStandaloneFunctions()),
 			'functions' => $this->functions,
 			'function' => $function,
 			'operator' => $operator,
@@ -674,7 +675,29 @@ class CControllerPopupTriggerExpr extends CController {
 		// Create and validate trigger expression before inserting it into textarea field.
 		if ($this->getInput('add', false)) {
 			try {
-				if ($data['item_description']) {
+				if (in_array($function, getStandaloneFunctions())) {
+					$data['expression'] = sprintf('%s()%s%s',
+						$function,
+						$operator,
+						CTriggerExpression::quoteString($data['value'])
+					);
+
+					// Validate trigger expression.
+					$trigger_expression = new CTriggerExpression();
+
+					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
+						// Validate trigger function.
+						$trigger_function_validator = new CFunctionValidator();
+
+						if (!$trigger_function_validator->validate($result->getTokens()[0])) {
+							error($trigger_function_validator->getError());
+						}
+					}
+					else {
+						error($trigger_expression->error);
+					}
+				}
+				elseif ($data['item_description']) {
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {
@@ -701,24 +724,15 @@ class CControllerPopupTriggerExpr extends CController {
 						$quoted_params[] = quoteFunctionParam($param);
 					}
 
-					if (in_array($function, ['date', 'dayofmonth', 'dayofweek', 'now', 'time'])) {
-						$data['expression'] = sprintf('%s()%s%s',
-							$function,
-							$operator,
-							CTriggerExpression::quoteString($data['value'])
-						);
-					}
-					else {
-						$fn_params = rtrim(implode(',', $quoted_params), ',');
-						$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
-							$function,
-							$item_host_data['host'],
-							$data['item_key'],
-							($fn_params === '') ? '' : ','.$fn_params,
-							$operator,
-							CTriggerExpression::quoteString($data['value'])
-						);
-					}
+					$fn_params = rtrim(implode(',', $quoted_params), ',');
+					$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
+						$function,
+						$item_host_data['host'],
+						$data['item_key'],
+						($fn_params === '') ? '' : ','.$fn_params,
+						$operator,
+						CTriggerExpression::quoteString($data['value'])
+					);
 
 					// Validate trigger expression.
 					$trigger_expression = new CTriggerExpression();
