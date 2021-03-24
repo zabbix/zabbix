@@ -976,13 +976,13 @@ class CDashboard extends CBaseComponent {
 	}
 
 	selectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		if (this.isSlideshowStarted()) {
+		if (this._isSlideshowStarted()) {
 			this._keepSteadySlideshow();
 		}
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
-				if (this.isSlideshowStarted()) {
+				if (this._isSlideshowStarted()) {
 					this._startSlideshow();
 				}
 			});
