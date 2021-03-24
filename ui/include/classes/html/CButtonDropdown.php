@@ -60,6 +60,8 @@ class CButtonDropdown extends CButton {
 	public function __construct(string $name, $value = null, array $items = [], string $caption = '') {
 		parent::__construct($name, $caption);
 
+		$this->setId($this->getId().'_button');
+
 		$this->dropdown_value = $value;
 		$this->dropdown_items = $items;
 
