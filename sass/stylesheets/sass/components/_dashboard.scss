@@ -1,4 +1,4 @@
-.dashbrd-edit {
+.dashboard-edit {
 	background-color: $ui-bg-color;
 	box-shadow: 0 0 0 4px $ui-bg-color;
 	display: inline-block;
@@ -25,14 +25,14 @@
 				padding: 0;
 			}
 
-			.btn-dashbrd-conf {
+			.btn-dashboard-conf {
 				vertical-align: middle;
 			}
 		}
 	}
 }
 
-.dashbrd-navigation-tabs {
+.dashboard-navigation-tabs {
 	// Compensate 2px padding of tabs.
 	margin: -2px 10px -2px 0;
 	overflow: hidden;
@@ -131,31 +131,31 @@
 	}
 }
 
-.dashbrd-navigation-controls {
+.dashboard-navigation-controls {
 	display: flex;
 	flex-shrink: 0;
 
 	button {
 		margin-left: 10px;
 
-		&.dashbrd-previous-page,
-		&.dashbrd-next-page {
+		&.dashboard-previous-page,
+		&.dashboard-next-page {
 			display: none;
 			margin: 0;
 		}
 	}
 }
 
-.dashbrd-navigation {
+.dashboard-navigation {
 	display: flex;
 	margin-top: 10px;
 	padding-bottom: 2px;
 
 	&.is-scrollable {
-		.dashbrd-navigation-controls {
+		.dashboard-navigation-controls {
 			button {
-				&.dashbrd-previous-page,
-				&.dashbrd-next-page {
+				&.dashboard-previous-page,
+				&.dashboard-next-page {
 					display: inline-block;
 				}
 			}
@@ -167,7 +167,7 @@
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
-.dashbrd-grid-container {
+.dashboard-grid-container {
 	position: relative;
 	margin: 0 -4px -4px -4px;
 
@@ -187,29 +187,29 @@
 	}
 }
 
-.dashbrd {
-	&:not(.dashbrd-is-multipage):not(.dashbrd-is-edit-mode) {
-		.dashbrd-navigation {
+.dashboard {
+	&:not(.dashboard-is-multipage):not(.dashboard-is-edit-mode) {
+		.dashboard-navigation {
 			display: none;
 		}
 	}
 
-	&.dashbrd-is-edit-mode,
-	&:not(.dashbrd-is-multipage) {
-		.dashbrd-toggle-slideshow {
+	&.dashboard-is-edit-mode,
+	&:not(.dashboard-is-multipage) {
+		.dashboard-toggle-slideshow {
 			display: none;
 		}
 	}
 }
 
-.dashbrd-grid-widget-blocker {
+.dashboard-grid-widget-blocker {
 	position: relative;
 	width: 100%;
 	height: 100%;
 	z-index: 998; // Below the new widget placeholder.
 }
 
-.dashbrd-grid-new-widget-placeholder {
+.dashboard-grid-new-widget-placeholder {
 	box-sizing: border-box;
 	display: flex;
 	height: 200px;
@@ -220,9 +220,9 @@
 	cursor: pointer;
 	user-select: none;
 
-	.dashbrd-grid-widget-new-box,
-	.dashbrd-grid-widget-set-position,
-	.dashbrd-grid-widget-set-size {
+	.dashboard-grid-widget-new-box,
+	.dashboard-grid-widget-set-position,
+	.dashboard-grid-widget-set-size {
 		background-color: rgba($ui-bg-color, .7);
 		border: 1px dashed $form-border-color;
 		box-shadow: 2px 2px 6px $action-shadow-color;
@@ -231,12 +231,12 @@
 		overflow: hidden;
 	}
 
-	.dashbrd-grid-widget-set-size {
+	.dashboard-grid-widget-set-size {
 		background: darken($body-bg-color, 6%);
 		box-shadow: inset 2px 2px 6px $action-shadow-color;
 	}
 
-	.dashbrd-grid-new-widget-label {
+	.dashboard-grid-new-widget-label {
 		$icon-height: 28px;
 
 		position: absolute;
@@ -268,10 +268,10 @@
 	&.disabled {
 		opacity: 1;
 
-		.dashbrd-grid-widget-new-box {
+		.dashboard-grid-widget-new-box {
 			background-color: rgba($ui-bg-color, .7);
 
-			.dashbrd-grid-new-widget-label::before {
+			.dashboard-grid-new-widget-label::before {
 				background: url($sprite-path) no-repeat -122px -284px;
 			}
 		}
@@ -282,15 +282,15 @@
 	}
 }
 
-.dashbrd-grid-widget-set-size {
-	.dashbrd-grid-new-widget-label {
+.dashboard-grid-widget-set-size {
+	.dashboard-grid-new-widget-label {
 		&::before {
 			background: url($sprite-path) no-repeat -345px -888px;
 		}
 	}
 }
 
-.dashbrd-grid-widget-container {
+.dashboard-grid-widget-container {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -302,7 +302,7 @@
 	flex-direction: column;
 }
 
-.dashbrd-grid-widget-head {
+.dashboard-grid-widget-head {
 	position: absolute;
 	top: .25rem;
 	left: .25rem;
@@ -344,12 +344,12 @@
 	}
 }
 
-.dashbrd-grid-widget-actions {
+.dashboard-grid-widget-actions {
 	opacity: 0;
 	transition: opacity .2s ease-out;
 }
 
-.dashbrd-grid-widget-content {
+.dashboard-grid-widget-content {
 	flex-grow: 1;
 	margin-top: 2rem;
 	box-sizing: border-box;
@@ -365,11 +365,11 @@
 		border: 0;
 
 		th {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 
 		td {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 
 		tbody tr {
@@ -396,7 +396,7 @@
 	}
 }
 
-.dashbrd-grid-widget-mask {
+.dashboard-grid-widget-mask {
 	position: absolute;
 	top: .25rem;
 	left: .25rem;
@@ -405,23 +405,23 @@
 	display: none;
 }
 
-.dashbrd-grid-widget {
+.dashboard-grid-widget {
 	position: absolute;
 
-	&.dashbrd-grid-widget-hidden-header {
-		.dashbrd-grid-widget-head {
+	&.dashboard-grid-widget-hidden-header {
+		.dashboard-grid-widget-head {
 			height: 0;
 			transition: height .3s, margin-top .3s, box-shadow .3s;
 		}
 
-		.dashbrd-grid-widget-content {
+		.dashboard-grid-widget-content {
 			margin-top: 0;
 			height: 100%;
 			padding-top: 8px;
 		}
 
-		&.dashbrd-grid-widget-focus {
-			.dashbrd-grid-widget-head {
+		&.dashboard-grid-widget-focus {
+			.dashboard-grid-widget-head {
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
@@ -430,28 +430,28 @@
 		}
 	}
 
-	&.dashbrd-grid-widget-focus {
-		.dashbrd-grid-widget-actions {
+	&.dashboard-grid-widget-focus {
+		.dashboard-grid-widget-actions {
 			opacity: 1;
 		}
 	}
 
 	&.ui-resizable-resizing.resizing-top {
-		.dashbrd-grid-widget-container {
+		.dashboard-grid-widget-container {
 			top: auto;
 			bottom: 0;
 		}
 	}
 
 	&.ui-resizable-resizing.resizing-left {
-		.dashbrd-grid-widget-container {
+		.dashboard-grid-widget-container {
 			left: auto;
 			right: 0;
 		}
 	}
 }
 
-.dashbrd-grid-iterator-container {
+.dashboard-grid-iterator-container {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -459,7 +459,7 @@
 	height: 100%;
 }
 
-.dashbrd-grid-iterator-head {
+.dashboard-grid-iterator-head {
 	position: absolute;
 	top: .25rem;
 	left: .25rem;
@@ -499,7 +499,7 @@
 		}
 	}
 
-	.dashbrd-grid-iterator-pager {
+	.dashboard-grid-iterator-pager {
 		margin: 0 10px;
 		height: 2rem;
 		display: none;
@@ -507,19 +507,19 @@
 		flex-shrink: 0; // IE11 fix.
 		align-items: center;
 
-		.dashbrd-grid-iterator-pager-info {
+		.dashboard-grid-iterator-pager-info {
 			margin: 2px .5em 0;
 			white-space: nowrap;
 			color: widget-head-font-color($font-color);
 		}
 	}
 
-	&.pager-visible .dashbrd-grid-iterator-pager {
+	&.pager-visible .dashboard-grid-iterator-pager {
 		display: flex;
 	}
 }
 
-.dashbrd-grid-iterator-content {
+.dashboard-grid-iterator-content {
 	// To catch vertical resize events correctly.
 	position: absolute;
 	top: 0;
@@ -533,7 +533,7 @@
 	transition: margin-top .3s ease-out;
 }
 
-.dashbrd-grid-iterator-placeholder {
+.dashboard-grid-iterator-placeholder {
 	position: absolute;
 	display: flex;
 
@@ -547,7 +547,7 @@
 	}
 }
 
-.dashbrd-grid-iterator-too-small {
+.dashboard-grid-iterator-too-small {
 	position: absolute;
 	top: .25rem;
 	left: .25rem;
@@ -567,7 +567,7 @@
 	}
 }
 
-.dashbrd-grid-iterator-mask {
+.dashboard-grid-iterator-mask {
 	position: absolute;
 	top: .25rem;
 	left: .25rem;
@@ -576,23 +576,23 @@
 	display: none;
 }
 
-.dashbrd-grid-iterator {
+.dashboard-grid-iterator {
 	position: absolute;
 
 	&.iterator-too-small {
-		.dashbrd-grid-iterator-too-small {
+		.dashboard-grid-iterator-too-small {
 			display: flex;
 		}
 
-		.dashbrd-grid-iterator-content {
+		.dashboard-grid-iterator-content {
 			display: none;
 		}
 	}
 
-	&.dashbrd-grid-iterator-focus {
+	&.dashboard-grid-iterator-focus {
 		z-index: 5;
 
-		.dashbrd-grid-iterator-head {
+		.dashboard-grid-iterator-head {
 			margin-top: -2rem;
 			height: 2rem;
 			box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
@@ -602,8 +602,8 @@
 			transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out;
 		}
 
-		&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
-			.dashbrd-grid-iterator-head {
+		&.dashboard-grid-iterator-hidden-header.iterator-double-header {
+			.dashboard-grid-iterator-head {
 				margin-top: calc(-4rem - 8px);
 				height: calc(4rem + 8px);
 			}
@@ -611,21 +611,21 @@
 	}
 
 	&.ui-resizable-resizing.resizing-top {
-		.dashbrd-grid-iterator-container {
+		.dashboard-grid-iterator-container {
 			top: auto;
 			bottom: 0;
 		}
 	}
 
 	&.ui-resizable-resizing.resizing-left {
-		.dashbrd-grid-iterator-container {
+		.dashboard-grid-iterator-container {
 			left: auto;
 			right: 0;
 		}
 	}
 
 	&.iterator-alt-content {
-		.dashbrd-grid-iterator-content {
+		.dashboard-grid-iterator-content {
 			position: absolute;
 			top: .25rem;
 			left: .25rem;
@@ -641,11 +641,11 @@
 					border: 0;
 
 					th {
-						@extend %dashbrd-widget-td;
+						@extend %dashboard-widget-td;
 					}
 
 					td {
-						@extend %dashbrd-widget-td;
+						@extend %dashboard-widget-td;
 					}
 
 					tbody tr {
@@ -669,25 +669,25 @@
 	}
 }
 
-.dashbrd.dashbrd-is-edit-mode {
-	.dashbrd-grid-widget-actions {
+.dashboard.dashboard-is-edit-mode {
+	.dashboard-grid-widget-actions {
 		opacity: 1;
 	}
 
-	&.dashbrd-positioning {
+	&.dashboard-positioning {
 		// No lazy transitions while dragging or resizing.
 
-		.dashbrd-grid-widget {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
+		.dashboard-grid-widget {
+			&.dashboard-grid-widget-hidden-header {
+				.dashboard-grid-widget-head {
 					transition: none;
 				}
 			}
 		}
 
-		.dashbrd-grid-iterator {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
+		.dashboard-grid-iterator {
+			&.dashboard-grid-widget-hidden-header {
+				.dashboard-grid-widget-head {
 					transition: none;
 				}
 			}
@@ -695,27 +695,27 @@
 
 		// No widget interactivity while dragging or resizing.
 
-		.dashbrd-grid-widget-mask {
+		.dashboard-grid-widget-mask {
 			display: block;
 		}
 
-		.dashbrd-grid-iterator-mask {
+		.dashboard-grid-iterator-mask {
 			display: block;
 		}
 	}
 
-	.dashbrd-grid-widget {
+	.dashboard-grid-widget {
 		.ui-resizable-handle {
 			visibility: hidden;
 		}
 
-		&.dashbrd-grid-widget-focus .ui-resizable-handle {
+		&.dashboard-grid-widget-focus .ui-resizable-handle {
 			visibility: visible;
 		}
 
 		&.ui-resizable-resizing {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
+			&.dashboard-grid-widget-hidden-header {
+				.dashboard-grid-widget-head {
 					margin-top: 0;
 					height: 0;
 					box-shadow: none;
@@ -728,8 +728,8 @@
 				visibility: hidden;
 			}
 
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
+			&.dashboard-grid-widget-hidden-header {
+				.dashboard-grid-widget-head {
 					margin-top: -2rem;
 					height: 2rem;
 					box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
@@ -754,27 +754,27 @@
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
 			}
 
-			.dashbrd-grid-widget-head {
+			.dashboard-grid-widget-head {
 				border-color: darken($ui-border-color, 6%);
 			}
 
-			.dashbrd-grid-widget-content {
+			.dashboard-grid-widget-content {
 				border-color: darken($ui-border-color, 6%);
 			}
 		}
 	}
 
-	.dashbrd-grid-iterator {
+	.dashboard-grid-iterator {
 		.ui-resizable-handle {
 			visibility: hidden;
 		}
 
-		&.dashbrd-grid-iterator-focus .ui-resizable-handle {
+		&.dashboard-grid-iterator-focus .ui-resizable-handle {
 			visibility: visible;
 		}
 
 		&.ui-resizable-resizing {
-			.dashbrd-grid-iterator-head {
+			.dashboard-grid-iterator-head {
 				margin-top: 0;
 				height: 0;
 				box-shadow: none;
@@ -787,15 +787,15 @@
 				visibility: hidden;
 			}
 
-			.dashbrd-grid-iterator-head {
+			.dashboard-grid-iterator-head {
 				margin-top: -2rem;
 				height: 2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
 				opacity: .5;
 			}
 
-			&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
-				.dashbrd-grid-iterator-head {
+			&.dashboard-grid-iterator-hidden-header.iterator-double-header {
+				.dashboard-grid-iterator-head {
 					margin-top: calc(-4rem - 8px);
 					height: calc(4rem + 8px);
 				}
@@ -818,34 +818,34 @@
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
 			}
 
-			.dashbrd-grid-iterator-head {
+			.dashboard-grid-iterator-head {
 				border-color: darken($ui-border-color, 6%);
 			}
 
-			.dashbrd-grid-iterator-content {
-				.dashbrd-grid-widget {
-					.dashbrd-grid-widget-head {
+			.dashboard-grid-iterator-content {
+				.dashboard-grid-widget {
+					.dashboard-grid-widget-head {
 						border-color: darken($ui-border-color, 6%);
 					}
 
-					.dashbrd-grid-widget-content {
+					.dashboard-grid-widget-content {
 						border-color: darken($ui-border-color, 6%);
 					}
 				}
 
-				.dashbrd-grid-iterator-placeholder > div {
+				.dashboard-grid-iterator-placeholder > div {
 					border-color: darken($ui-border-color, 6%);
 				}
 			}
 
-			.dashbrd-grid-iterator-mask {
+			.dashboard-grid-iterator-mask {
 				border: 1px solid darken($ui-border-color, 8%);
 				border-top: 0;
 			}
 		}
 	}
 
-	.dashbrd-grid-widget-placeholder {
+	.dashboard-grid-widget-placeholder {
 		position: absolute;
 		z-index: 999;
 
@@ -875,18 +875,18 @@
 .new-widget {
 	animation: zoom-in-out .2s linear;
 }
-.dashbrd-widget-placeholder {
+.dashboard-widget-placeholder {
 	border-color: darken($body-bg-color, 6%) !important;
 	background-color: darken($body-bg-color, 6%) !important;
 }
 
-.dashbrd-widget-draggable {
+.dashboard-widget-draggable {
 	border-color: $action-border-color !important;
 	border-bottom-color: darken($action-border-color, 1%) !important;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 }
 
-.dashbrd-widget {
+.dashboard-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background-color: $ui-bg-color;
@@ -896,11 +896,11 @@
 		border: 0;
 
 		th {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 
 		td {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 
 		tbody tr {
@@ -916,12 +916,12 @@
 		margin: 0 10px;
 	}
 
-	&.dashbrd-widget-fluid {
+	&.dashboard-widget-fluid {
 		margin-right: 0;
 	}
 }
 
-%dashbrd-widget-td {
+%dashboard-widget-td {
 	&:first-child {
 		padding-left: 10px;
 	}
@@ -931,7 +931,7 @@
 	}
 }
 
-.dashbrd-widget-head {
+.dashboard-widget-head {
 	position: relative;
 	padding: 8px 60px 8px 10px;
 
@@ -967,7 +967,7 @@
 	}
 }
 
-.dashbrd-widget-foot {
+.dashboard-widget-foot {
 	text-align: right;
 	color: $font-alt-color;
 	margin: 0 10px;
@@ -978,7 +978,7 @@
 	}
 }
 
-.dashbrd-widget-graph-link {
+.dashboard-widget-graph-link {
 	display: block;
 
 	&:link {
@@ -986,8 +986,8 @@
 	}
 }
 
-.dashbrd-grid-widget-content,
-.dashbrd-grid-iterator-content {
+.dashboard-grid-widget-content,
+.dashboard-grid-iterator-content {
 	&.is-loading::before {
 		margin: calc(.25rem + 1px);
 	}
@@ -1014,7 +1014,7 @@
 
 .wrapper.layout-kioskmode {
 
-	.dashbrd-navigation {
+	.dashboard-navigation {
 		display: none;
 	}
 }

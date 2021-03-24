@@ -46,21 +46,21 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setControls((new CList())
-		->setId('dashbrd-control')
+		->setId('dashboard-control')
 		->addItem((new CListItem([
 			(new CTag('nav', true, [
 				new CList([
-					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
+					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem((new CButton('dashbrd-add-widget', _('Add')))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem((new CButton('dashboard-add-widget', _('Add')))->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
-							(new CButton('dashbrd-add', '&#8203;'))
+							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
 						),
-					(new CButton('dashbrd-save', _('Save changes'))),
-					(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
+					(new CButton('dashboard-save', _('Save changes'))),
+					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
 					''
 				])
 			]))

@@ -99,19 +99,19 @@ $widget = (new CWidget())
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
 		(new CList())
-			->setId('dashbrd-control')
+			->setId('dashboard-control')
 			->addItem($main_filter_form)
 			->addItem((new CTag('nav', true, [
 				(new CList())
 					->addItem(
-						(new CButton('dashbrd-edit', _('Edit dashboard')))
+						(new CButton('dashboard-edit', _('Edit dashboard')))
 							->setEnabled($data['dashboard']['can_edit_dashboards'] && $data['dashboard']['editable'])
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
 						(new CButton('', '&nbsp;'))
 							->addClass(ZBX_STYLE_BTN_ACTION)
-							->setId('dashbrd-actions')
+							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
 							->setEnabled($data['dashboard']['can_edit_dashboards'])
 							->setAttribute('aria-haspopup', true)
@@ -124,19 +124,19 @@ $widget = (new CWidget())
 			->addItem((new CListItem([
 				(new CTag('nav', true, [
 					new CList([
-						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
+						(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
 						(new CList())
 							->addClass(ZBX_STYLE_BTN_SPLIT)
-							->addItem((new CButton('dashbrd-add-widget',
+							->addItem((new CButton('dashboard-add-widget',
 								[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
 							))->addClass(ZBX_STYLE_BTN_ALT))
 							->addItem(
-								(new CButton('dashbrd-add', '&#8203;'))
+								(new CButton('dashboard-add', '&#8203;'))
 									->addClass(ZBX_STYLE_BTN_ALT)
 									->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
 							),
-						(new CButton('dashbrd-save', _('Save changes'))),
-						(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
+						(new CButton('dashboard-save', _('Save changes'))),
+						(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
 						''
 					])
 				]))

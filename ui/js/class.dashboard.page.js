@@ -1120,18 +1120,18 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_blockWidgetInteraction() {
-		if (this._dashboard_grid.querySelector('.dashbrd-grid-widget-blocker') !== null) {
+		if (this._dashboard_grid.querySelector('.dashboard-grid-widget-blocker') !== null) {
 			return;
 		}
 
 		const widget_blocker = document.createElement('div');
 
-		widget_blocker.classList.add('dashbrd-grid-widget-blocker');
+		widget_blocker.classList.add('dashboard-grid-widget-blocker');
 		this._dashboard_grid.prepend(widget_blocker);
 	}
 
 	_unblockWidgetInteraction() {
-		const widget_blocker = this._dashboard_grid.querySelector('.dashbrd-grid-widget-blocker');
+		const widget_blocker = this._dashboard_grid.querySelector('.dashboard-grid-widget-blocker');
 
 		if (widget_blocker !== null) {
 			widget_blocker.remove();
@@ -1204,7 +1204,7 @@ class CDashboardPage extends CBaseComponent {
 	_initWidgetDragging() {
 		const widget_helper = document.createElement('div');
 
-		widget_helper.classList.add('dashbrd-grid-widget-placeholder');
+		widget_helper.classList.add('dashboard-grid-widget-placeholder');
 		widget_helper.append(document.createElement('div'));
 
 		let move_animation_frame = null;

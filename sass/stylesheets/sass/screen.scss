@@ -878,7 +878,7 @@ form {
 	vertical-align: top;
 
 	&:last-child {
-		.dashbrd-widget {
+		.dashboard-widget {
 			margin: 0 0 10px;
 		}
 	}
@@ -2452,12 +2452,12 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashbrd-conf {
+.btn-dashboard-conf {
 	background: url($sprite-path) no-repeat -42px -619px;
-	@extend %btn-dashbrd;
+	@extend %btn-dashboard;
 }
 
-.btn-dashbrd-normal {
+.btn-dashboard-normal {
 	box-shadow: 1px 1px 2px $action-shadow-color;
 	position: fixed;
 	right: 45px;
@@ -2478,7 +2478,7 @@ $icon-widget-btn: (
 	@extend %btn-widget-defaults;
 }
 
-%btn-dashbrd {
+%btn-dashboard {
 	width: 24px;
 	height: 24px;
 	@extend %btn-widget-defaults;
@@ -2675,17 +2675,17 @@ $form-icon-btn: (
 }
 
 .drag-icon,
-.ui-draggable .dashbrd-widget-head,
-.dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
-.dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
+.ui-draggable .dashboard-widget-head,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-head,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-head {
 	@extend %cursor-drag;
 }
 
 .ui-draggable {
 	.drag-icon,
-	.dashbrd-widget-head,
-	.dashbrd-grid-widget-head,
-	.dashbrd-grid-iterator-head {
+	.dashboard-widget-head,
+	.dashboard-grid-widget-head,
+	.dashboard-grid-iterator-head {
 		@extend %cursor-dragging;
 	}
 }
@@ -3141,11 +3141,11 @@ $form-icon-btn: (
 		border: 0;
 
 		th {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 
 		td {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 	}
 
@@ -3164,7 +3164,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.dashbrd-widget-head {
+	.dashboard-widget-head {
 		margin: -10px -10px 6px;
 	}
 
@@ -3539,7 +3539,7 @@ $form-icon-btn: (
 .notif {
 	width: 250px;
 
-	.dashbrd-widget-head {
+	.dashboard-widget-head {
 		margin: -11px 0 7px -9px;
 		padding: 0;
 

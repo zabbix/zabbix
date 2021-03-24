@@ -320,7 +320,7 @@ $dashboard-my-bg-color: #e0e0e0;
 	}
 }
 
-.dashbrd-navigation-tabs {
+.dashboard-navigation-tabs {
 	.csortable-list {
 		& > .csortable-item:focus:not(:active) {
 			& > div {
@@ -346,59 +346,59 @@ $dashboard-my-bg-color: #e0e0e0;
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
-.dashbrd-grid-new-widget-placeholder {
-	.dashbrd-grid-widget-new-box,
-	.dashbrd-grid-widget-set-position,
-	.dashbrd-grid-widget-set-size {
+.dashboard-grid-new-widget-placeholder {
+	.dashboard-grid-widget-new-box,
+	.dashboard-grid-widget-set-position,
+	.dashboard-grid-widget-set-size {
 		box-shadow: none;
 		border-color: $font-color;
 		background-color: transparent;
 	}
 
-	.dashbrd-grid-widget-set-size {
+	.dashboard-grid-widget-set-size {
 		border: 2px dashed $font-color;
 		box-shadow: none;
 		background: darken($body-bg-color, 6%);
 	}
 
-	.dashbrd-grid-new-widget-label {
+	.dashboard-grid-new-widget-label {
 		&::before {
 			background: url($sprite-path) no-repeat -269px -888px;
 		}
 	}
 }
 
-.dashbrd-grid-widget-set-size {
-	.dashbrd-grid-new-widget-label {
+.dashboard-grid-widget-set-size {
+	.dashboard-grid-new-widget-label {
 		&::before {
 			background: url($sprite-path) no-repeat -457px -888px;
 		}
 	}
 }
 
-.dashbrd-grid-widget {
-	&.dashbrd-grid-widget-hidden-header {
-		&.dashbrd-grid-widget-focus {
-			.dashbrd-grid-widget-head {
+.dashboard-grid-widget {
+	&.dashboard-grid-widget-hidden-header {
+		&.dashboard-grid-widget-focus {
+			.dashboard-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}
 	}
 }
 
-.dashbrd-grid-iterator {
-	&.dashbrd-grid-iterator-focus {
-		.dashbrd-grid-iterator-head {
+.dashboard-grid-iterator {
+	&.dashboard-grid-iterator-focus {
+		.dashboard-grid-iterator-head {
 			box-shadow: 0 -6px 8px -2px #000000;
 		}
 	}
 }
 
-.dashbrd.dashbrd-is-edit-mode {
-	.dashbrd-grid-widget {
+.dashboard.dashboard-is-edit-mode {
+	.dashboard-grid-widget {
 		&.ui-draggable-dragging {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
+			&.dashboard-grid-widget-hidden-header {
+				.dashboard-grid-widget-head {
 					box-shadow: 0 -6px 8px -2px #000000;
 				}
 			}
@@ -412,9 +412,9 @@ $dashboard-my-bg-color: #e0e0e0;
 		}
 	}
 
-	.dashbrd-grid-iterator {
+	.dashboard-grid-iterator {
 		&.ui-draggable-dragging {
-			.dashbrd-grid-iterator-head {
+			.dashboard-grid-iterator-head {
 				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}
@@ -425,13 +425,13 @@ $dashboard-my-bg-color: #e0e0e0;
 				box-shadow: 0 4px 20px 2px #000000;
 			}
 
-			.dashbrd-grid-iterator-mask {
+			.dashboard-grid-iterator-mask {
 				border: 0;
 			}
 		}
 	}
 
-	.dashbrd-grid-widget-placeholder > div {
+	.dashboard-grid-widget-placeholder > div {
 		background-color: lighten($ui-bg-color, 12%) !important;
 	}
 }
@@ -538,7 +538,7 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashbrd-conf {
+.btn-dashboard-conf {
 	background: url($sprite-path) no-repeat -354px -619px !important;
 }
 
@@ -872,7 +872,7 @@ a.link-action {
 	color: lighten($alt-yellow, 10%);
 }
 
-.dashbrd-widget-graph-link {
+.dashboard-widget-graph-link {
 	&:focus {
 		&::after {
 			background: $blue;

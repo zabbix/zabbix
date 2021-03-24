@@ -24,11 +24,11 @@ const WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
 const WIDGET_PLACEHOLDER_STATE_KIOSK_MODE = 3;
 const WIDGET_PLACEHOLDER_STATE_READONLY = 4;
 
-const ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashbrd-grid-new-widget-placeholder';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashbrd-grid-widget-new-box';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX_LABEL = 'dashbrd-grid-new-widget-label';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashbrd-grid-widget-set-size';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_POSITIONING = 'dashbrd-grid-widget-set-position';
+const ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-grid-new-widget-placeholder';
+const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-grid-widget-new-box';
+const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX_LABEL = 'dashboard-grid-new-widget-label';
+const ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-grid-widget-set-size';
+const ZBX_STYLE_WIDGET_PLACEHOLDER_POSITIONING = 'dashboard-grid-widget-set-position';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN = 'hidden';
 
 /**

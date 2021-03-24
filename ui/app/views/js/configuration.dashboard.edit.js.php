@@ -63,23 +63,23 @@
 			ZABBIX.Dashboard.activate();
 
 			document
-				.getElementById('dashbrd-config')
+				.getElementById('dashboard-config')
 				.addEventListener('click', () => openProperties());
 
 			document
-				.getElementById('dashbrd-add-widget')
+				.getElementById('dashboard-add-widget')
 				.addEventListener('click', (e) => ZABBIX.Dashboard.addNewWidget(e.target));
 
 			document
-				.getElementById('dashbrd-add')
+				.getElementById('dashboard-add')
 				.addEventListener('click', events.addClick);
 
 			document
-				.getElementById('dashbrd-save')
+				.getElementById('dashboard-save')
 				.addEventListener('click', () => save());
 
 			document
-				.getElementById('dashbrd-cancel')
+				.getElementById('dashboard-cancel')
 				.addEventListener('click', (e) => {
 					cancelEditing();
 					e.preventDefault();
@@ -164,7 +164,7 @@
 		};
 
 		const updateBusy = () => {
-			document.getElementById('dashbrd-save').disabled = is_busy || is_busy_saving;
+			document.getElementById('dashboard-save').disabled = is_busy || is_busy_saving;
 		};
 
 		const cancelEditing = () => {

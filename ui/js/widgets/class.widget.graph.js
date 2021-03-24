@@ -125,7 +125,7 @@ class CWidgetGraph extends CWidget {
 			this._flickerfreescreen = this._content_body.querySelector('.flickerfreescreen');
 			this._flickerfreescreen.id = 'flickerfreescreen_graph_' + this._unique_id;
 
-			this._flickerfreescreen_container = this._flickerfreescreen.querySelector('.dashbrd-widget-graph-link');
+			this._flickerfreescreen_container = this._flickerfreescreen.querySelector('.dashboard-widget-graph-link');
 			this._flickerfreescreen_container.id = 'graph_container_' + this._unique_id;
 
 			if (this._graph_url !== null && this.isEditMode()) {

@@ -204,7 +204,7 @@ class CDashboardPage extends CBaseComponent {
 			scroll: true,
 			scrollSensitivity: this._options['widget-height'],
 			start: () => {
-				this._$target.addClass('dashbrd-positioning');
+				this._$target.addClass('dashboard-positioning');
 
 				this._data.calculated = {
 					'left-max': this._$target.width() - widget.getView().width(),
@@ -254,7 +254,7 @@ class CDashboardPage extends CBaseComponent {
 				this._options['rows'] = this._options['rows_actual'];
 				this._resizeDashboardGrid(this._options['rows_actual']);
 
-				this._$target.removeClass('dashbrd-positioning');
+				this._$target.removeClass('dashboard-positioning');
 			}
 		});
 	}
@@ -284,7 +284,7 @@ class CDashboardPage extends CBaseComponent {
 				this._doLeaveWidgetsExcept(widget);
 				widget.enter();
 
-				this._$target.addClass('dashbrd-positioning');
+				this._$target.addClass('dashboard-positioning');
 
 				const handle_class = e.currentTarget.className;
 				this._data.resizing_top = handle_class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null;
@@ -380,7 +380,7 @@ class CDashboardPage extends CBaseComponent {
 					}
 				}
 
-				this._$target.removeClass('dashbrd-positioning');
+				this._$target.removeClass('dashboard-positioning');
 			}
 		});
 	}
@@ -984,7 +984,7 @@ class CDashboardPage extends CBaseComponent {
 	updateWidgetConfigDialogue() {
 		const $body = this._data.dialogue.body;
 		const $footer = $('.overlay-dialogue-footer', this._data.dialogue.div);
-		const $header = $('.dashbrd-widget-head', this._data.dialogue.div);
+		const $header = $('.dashboard-widget-head', this._data.dialogue.div);
 		const $form = $('form', $body);
 		const widget = this._data.dialogue.widget; // Widget currently being edited.
 		const url = new Curl('zabbix.php');

@@ -25,14 +25,14 @@ class CWidgetIterator extends CWidget {
 
 		this._css_classes = {
 			...this._css_classes,
-			actions: 'dashbrd-grid-iterator-actions',
-			container: 'dashbrd-grid-iterator-container',
-			content: 'dashbrd-grid-iterator-content',
-			focus: 'dashbrd-grid-iterator-focus',
-			head: 'dashbrd-grid-iterator-head',
-			hidden_header: 'dashbrd-grid-iterator-hidden-header',
-			mask: 'dashbrd-grid-iterator-mask',
-			root: 'dashbrd-grid-iterator'
+			actions: 'dashboard-grid-iterator-actions',
+			container: 'dashboard-grid-iterator-container',
+			content: 'dashboard-grid-iterator-content',
+			focus: 'dashboard-grid-iterator-focus',
+			head: 'dashboard-grid-iterator-head',
+			hidden_header: 'dashboard-grid-iterator-hidden-header',
+			mask: 'dashboard-grid-iterator-mask',
+			root: 'dashboard-grid-iterator'
 		};
 
 		this._widgets = new Map();
@@ -418,7 +418,7 @@ class CWidgetIterator extends CWidget {
 		const placeholder = document.createElement('div');
 
 		placeholder.appendChild(document.createElement('div'));
-		placeholder.classList.add('dashbrd-grid-iterator-placeholder');
+		placeholder.classList.add('dashboard-grid-iterator-placeholder');
 
 		for (let index = this._widgets.size; index < this._grid_pos.length; index++) {
 			const placeholder_clone = placeholder.cloneNode(true);
@@ -491,7 +491,7 @@ class CWidgetIterator extends CWidget {
 		this._target.style.minHeight = null;
 
 		this._pager = document.createElement('div');
-		this._pager.classList.add('dashbrd-grid-iterator-pager');
+		this._pager.classList.add('dashboard-grid-iterator-pager');
 
 		this._button_previous_page = document.createElement('button');
 		this._button_previous_page.type = 'button';
@@ -500,7 +500,7 @@ class CWidgetIterator extends CWidget {
 		this._pager.appendChild(this._button_previous_page);
 
 		this._pager_stats = document.createElement('span');
-		this._pager_stats.classList.add('dashbrd-grid-iterator-pager-info');
+		this._pager_stats.classList.add('dashboard-grid-iterator-pager-info');
 		this._pager.appendChild(this._pager_stats);
 
 		this._button_next_page = document.createElement('button');
@@ -512,7 +512,7 @@ class CWidgetIterator extends CWidget {
 		this._content_header.insertBefore(this._pager, this._actions);
 
 		this._too_small = document.createElement('div');
-		this._too_small.classList.add('dashbrd-grid-iterator-too-small');
+		this._too_small.classList.add('dashboard-grid-iterator-too-small');
 
 		const too_small_content = document.createElement('div');
 
@@ -549,7 +549,7 @@ class CWidgetIterator extends CWidget {
 			},
 
 			iteratorEnter: (e) => {
-				if (e.target.closest('.dashbrd-grid-iterator-placeholder') !== null) {
+				if (e.target.closest('.dashboard-grid-iterator-placeholder') !== null) {
 					this._target.classList.remove('iterator-double-header');
 				}
 			},

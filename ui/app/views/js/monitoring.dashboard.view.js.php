@@ -139,7 +139,7 @@
 				}
 				else {
 					document
-						.getElementById('dashbrd-edit')
+						.getElementById('dashboard-edit')
 						.addEventListener('click', () => {
 							ZABBIX.Dashboard.setEditMode();
 							edit();
@@ -171,29 +171,29 @@
 			clearMessages();
 
 			document
-				.querySelectorAll('#dashbrd-control > li')
+				.querySelectorAll('#dashboard-control > li')
 				.forEach((el) => {
 					el.style.display = (el.nextElementSibling === null) ? '' : 'none';
 				});
 
 			document
-				.getElementById('dashbrd-config')
+				.getElementById('dashboard-config')
 				.addEventListener('click', () => ZABBIX.Dashboard.editProperties());
 
 			document
-				.getElementById('dashbrd-add-widget')
+				.getElementById('dashboard-add-widget')
 				.addEventListener('click', () => ZABBIX.Dashboard.addNewWidget());
 
 			document
-				.getElementById('dashbrd-add')
+				.getElementById('dashboard-add')
 				.addEventListener('click', events.addClick);
 
 			document
-				.getElementById('dashbrd-save')
+				.getElementById('dashboard-save')
 				.addEventListener('click', () => save());
 
 			document
-				.getElementById('dashbrd-cancel')
+				.getElementById('dashboard-cancel')
 				.addEventListener('click', (e) => {
 					cancelEditing();
 					e.preventDefault();
@@ -265,7 +265,7 @@
 		};
 
 		const updateBusy = () => {
-			document.getElementById('dashbrd-save').disabled = is_busy || is_busy_saving;
+			document.getElementById('dashboard-save').disabled = is_busy || is_busy_saving;
 		};
 
 		const cancelEditing = () => {

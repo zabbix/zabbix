@@ -350,8 +350,8 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 		$dashboard->save();
 		$this->page->removeFocus();
 		sleep(1);
-		$screenshot_area = $this->query('class:dashbrd-grid-container')->one();
-		$screenshot_area->query('xpath:.//div[contains(@class, "dashbrd-grid-iterator-focus")]')->waitUntilNotVisible();
+		$screenshot_area = $this->query('class:dashboard-grid-container')->one();
+		$screenshot_area->query('xpath:.//div[contains(@class, "dashboard-grid-iterator-focus")]')->waitUntilNotVisible();
 		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
 	}
 
@@ -416,7 +416,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 						(CTestArrayHelper::get($data['fields'], 'Columns') && CTestArrayHelper::get($data['fields'], 'Rows'))
 						? $data['fields']['Columns'] * $data['fields']['Rows']
 						: 2;
-				$placeholders_count = $widget->query('class:dashbrd-grid-iterator-placeholder')->count();
+				$placeholders_count = $widget->query('class:dashboard-grid-iterator-placeholder')->count();
 				$this->assertEquals($expected_placeholders_count, $placeholders_count);
 				// Check Dynamic item setting on Dashboard.
 				if (CTestArrayHelper::get($data['fields'], 'Dynamic item')) {

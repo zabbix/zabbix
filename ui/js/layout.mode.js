@@ -32,7 +32,7 @@ jQuery(function($) {
 			});
 		});
 
-		if ($layout_mode_btn.hasClass('btn-dashbrd-normal')) {
+		if ($layout_mode_btn.hasClass('btn-dashboard-normal')) {
 			$(window).on('mousemove keyup scroll', function() {
 				clearTimeout($layout_mode_btn.data('timer'));
 				$layout_mode_btn

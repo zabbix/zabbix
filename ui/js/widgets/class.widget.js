@@ -93,14 +93,14 @@ class CWidget extends CBaseComponent {
 
 	_init() {
 		this._css_classes = {
-			actions: 'dashbrd-grid-widget-actions',
-			container: 'dashbrd-grid-widget-container',
-			content: 'dashbrd-grid-widget-content',
-			focus: 'dashbrd-grid-widget-focus',
-			head: 'dashbrd-grid-widget-head',
-			hidden_header: 'dashbrd-grid-widget-hidden-header',
-			mask: 'dashbrd-grid-widget-mask',
-			root: 'dashbrd-grid-widget',
+			actions: 'dashboard-grid-widget-actions',
+			container: 'dashboard-grid-widget-container',
+			content: 'dashboard-grid-widget-content',
+			focus: 'dashboard-grid-widget-focus',
+			head: 'dashboard-grid-widget-head',
+			hidden_header: 'dashboard-grid-widget-hidden-header',
+			mask: 'dashboard-grid-widget-mask',
+			root: 'dashboard-grid-widget',
 			resize_handle: 'ui-resizable-handle'
 		};
 
