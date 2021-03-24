@@ -459,7 +459,7 @@ class CReport extends CApiService {
 		$del_reportparamids = [];
 
 		foreach ($db_report_params as $db_report_param) {
-			if (array_key_exists($db_report_param['reportid'], $report_params)) {
+			if ($report_params[$db_report_param['reportid']]) {
 				$report_param = array_shift($report_params[$db_report_param['reportid']]);
 
 				$upd_report_param = [];
@@ -537,7 +537,7 @@ class CReport extends CApiService {
 		$del_reportuserids = [];
 
 		foreach ($db_report_users as $db_report_user) {
-			if (array_key_exists($db_report_user['reportid'], $report_users)) {
+			if ($report_users[$db_report_user['reportid']]) {
 				$report_user = array_shift($report_users[$db_report_user['reportid']]);
 
 				$upd_report_user = [];
@@ -611,7 +611,7 @@ class CReport extends CApiService {
 		$del_reportusrgrpids = [];
 
 		foreach ($db_report_usrgrps as $db_report_usrgrp) {
-			if (array_key_exists($db_report_usrgrp['reportid'], $report_usrgrps)) {
+			if ($report_usrgrps[$db_report_usrgrp['reportid']]) {
 				$report_usrgrp = array_shift($report_usrgrps[$db_report_usrgrp['reportid']]);
 
 				$upd_report_usrgrp = [];
