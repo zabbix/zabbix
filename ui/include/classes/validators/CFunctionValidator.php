@@ -135,8 +135,8 @@ class CFunctionValidator extends CValidator {
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
 					['type' => 'scale', 'mandat' => 0x01],
-					['type' => 'str', 'mandat' => 0x00],
-					['type' => 'operation', 'mandat' => 0x00]
+					['type' => 'operation', 'mandat' => 0x00],
+					['type' => 'str', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_all
 			],
