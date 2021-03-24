@@ -258,6 +258,36 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: calcitem_eval_multi                                              *
+ *                                                                            *
+ * Purpose: evaluate historical function for multiple items (aggregate checks)*
+ *                                                                            *
+ * Parameters: eval     - [IN] the evaluation data                            *
+ *             ref      - [IN] the item reference (host, key ..)              *
+ *             name     - [IN] the function name (not zero terminated)        *
+ *             len      - [IN] the function name length                       *
+ *             args_num - [IN] the number of function arguments               *
+ *             args     - [IN] an array of the function arguments.            *
+ *             data     - [IN] the caller data used for function evaluation   *
+ *             ts       - [IN] the function execution time                    *
+ *             value    - [OUT] the function return value                     *
+ *             error    - [OUT] the error message if function failed          *
+ *                                                                            *
+ * Return value: SUCCEED - the function was executed successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	calcitem_eval_multi(zbx_calc_eval_t *eval, zbx_item_query_t *query, const char *name, size_t len,
+		int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+{
+
+	*error = zbx_strdup(NULL, "Not implemented");
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: calcitem_eval_history                                            *
  *                                                                            *
  * Purpose: evaluate historical function                                      *
@@ -303,10 +333,16 @@ static int	calcitem_eval_history(const char *name, size_t len, int args_num, con
 	/* the historical function item query argument is replaced with corresponding itemrefs index */
 	query = (zbx_item_query_t *)eval->itemrefs.values[(int)args[0].data.ui64];
 
+	if (NULL == query->key)
+	{
+		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid item query filter");
+		goto out;
+	}
+
 	if (NULL == query->filter)
 		ret = calcitem_eval_single(eval, query, name, len, args_num - 1, args + 1, ts, value, error);
 	else
-		*error = zbx_strdup(NULL, "Cannot evaluate function: multiple item filters are not supported");
+		ret = calcitem_eval_multi(eval, query, name, len, args_num - 1, args + 1, ts, value, error);
 
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:%s", __func__, zbx_result_string(ret),

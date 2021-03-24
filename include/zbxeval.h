@@ -117,8 +117,9 @@
 
 /* expression composition rules */
 
-#define ZBX_EVAL_COMPOSE_LLD			__UINT64_C(0x00010000)
-#define ZBX_EVAL_COMPOSE_FUNCTIONID		__UINT64_C(0x00020000)
+#define ZBX_EVAL_COMPOSE_LLD			__UINT64_C(0x01000000)
+#define ZBX_EVAL_COMPOSE_FUNCTIONID		__UINT64_C(0x02000000)
+#define ZBX_EVAL_COMPOSE_QUOTE			__UINT64_C(0x04000000)
 
 /* expression evaluation rules */
 

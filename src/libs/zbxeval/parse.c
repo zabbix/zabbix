@@ -1057,7 +1057,9 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 
 		if (NULL != prop)
 		{
-			if (NULL == value || ZBX_EVAL_TOKEN_VAR_STR != value->type)
+			if (NULL == value || (ZBX_EVAL_TOKEN_VAR_STR != value->type &&
+					ZBX_EVAL_TOKEN_VAR_USERMACRO != value->type &&
+					ZBX_EVAL_TOKEN_VAR_LLDMACRO != value->type))
 			{
 				*error = zbx_dsprintf(*error, "invalid value type compared with property at \"%s\"",
 						ctx->expression + prop->loc.l);
