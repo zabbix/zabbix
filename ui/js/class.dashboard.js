@@ -181,7 +181,7 @@ class CDashboard extends CBaseComponent {
 		return false;
 	}
 
-	isSlideshowStarted() {
+	_isSlideshowStarted() {
 		return this._slideshow_timeout_id !== null;
 	}
 
