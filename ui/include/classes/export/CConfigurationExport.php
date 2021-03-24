@@ -147,7 +147,9 @@ class CConfigurationExport {
 			}
 
 			if ($this->data['templates']) {
-				$this->builder->buildTemplates($schema['rules']['templates'], $this->data['templates'], $simple_triggers);
+				$this->builder->buildTemplates($schema['rules']['templates'], $this->data['templates'],
+					$simple_triggers
+				);
 			}
 
 			if ($this->data['hosts']) {
@@ -343,13 +345,13 @@ class CConfigurationExport {
 	protected function gatherTemplateDashboards(array $templates) {
 		$dashboards = API::TemplateDashboard()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectWidgets' => API_OUTPUT_EXTEND,
+			'selectPages' => API_OUTPUT_EXTEND,
 			'templateids' => array_keys($templates),
 			'preservekeys' => true
 		]);
 
 		foreach ($dashboards as $dashboard) {
-			$dashboard['widgets'] = $this->prepareDashboardWidgets($dashboard['widgets']);
+			$dashboard['pages'] = $this->prepareDashboardPages($dashboard['pages']);
 
 			$templates[$dashboard['templateid']]['dashboards'][] = $dashboard;
 		}
@@ -358,32 +360,34 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get dashboard widgets related objects from database.
+	 * Get dashboard pages' related objects from database.
 	 *
-	 * @param array $widgets
+	 * @param array $dashboard_pages
 	 *
 	 * @return array
 	 */
-	protected function prepareDashboardWidgets(array $widgets): array {
+	protected function prepareDashboardPages(array $dashboard_pages): array {
 		$hostids = [];
 		$itemids = [];
 		$graphids = [];
 
 		// Collect ids.
-		foreach ($widgets as $widget) {
-			foreach ($widget['fields'] as $field) {
-				switch ($field['type']) {
-					case ZBX_WIDGET_FIELD_TYPE_HOST:
-						$hostids[$field['value']] = true;
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_ITEM:
-					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-						$itemids[$field['value']] = true;
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-						$graphids[$field['value']] = true;
-						break;
+		foreach ($dashboard_pages as $dashboard_page) {
+			foreach ($dashboard_page['widgets'] as $widget) {
+				foreach ($widget['fields'] as $field) {
+					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_HOST:
+							$hostids[$field['value']] = true;
+							break;
+						case ZBX_WIDGET_FIELD_TYPE_ITEM:
+						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+							$itemids[$field['value']] = true;
+							break;
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+							$graphids[$field['value']] = true;
+							break;
+					}
 				}
 			}
 		}
@@ -393,27 +397,30 @@ class CConfigurationExport {
 		$graphs = $this->getGraphsReferences(array_keys($graphids));
 
 		// Replace ids.
-		foreach ($widgets as &$widget) {
-			foreach ($widget['fields'] as &$field) {
-				switch ($field['type']) {
-					case ZBX_WIDGET_FIELD_TYPE_HOST:
-						$field['value'] = $hosts[$field['value']];
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_ITEM:
-					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-						$field['value'] = $items[$field['value']];
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-						$field['value'] = $graphs[$field['value']];
-						break;
+		foreach ($dashboard_pages as &$dashboard_page) {
+			foreach ($dashboard_page['widgets'] as &$widget) {
+				foreach ($widget['fields'] as &$field) {
+					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_HOST:
+							$field['value'] = $hosts[$field['value']];
+							break;
+						case ZBX_WIDGET_FIELD_TYPE_ITEM:
+						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+							$field['value'] = $items[$field['value']];
+							break;
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+							$field['value'] = $graphs[$field['value']];
+							break;
+					}
 				}
+				unset($field);
 			}
-			unset($field);
+			unset($widget);
 		}
-		unset($widget);
+		unset($dashboard_page);
 
-		return $widgets;
+		return $dashboard_pages;
 	}
 
 	/**

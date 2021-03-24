@@ -416,23 +416,27 @@ class CConfigurationImport {
 			foreach ($dashboards as $dashboard) {
 				$templateDashboardsRefs[$dashboard['name']] = $dashboard['name'];
 
-				if ($dashboard['widgets']) {
-					foreach ($dashboard['widgets'] as $widget) {
-						foreach ($widget['fields'] as $field) {
-							$value = $field['value'];
+				if ($dashboard['pages']) {
+					foreach ($dashboard['pages'] as $dashboard_page) {
+						if ($dashboard_page['widgets']) {
+							foreach ($dashboard_page['widgets'] as $widget) {
+								foreach ($widget['fields'] as $field) {
+									$value = $field['value'];
 
-							switch ($field['type']) {
-								case ZBX_WIDGET_FIELD_TYPE_ITEM:
-								case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-									$hostsRefs[$value['host']] = $value['host'];
-									$itemsRefs[$value['host']][$value['key']] = $value['key'];
-									break;
+									switch ($field['type']) {
+										case ZBX_WIDGET_FIELD_TYPE_ITEM:
+										case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+											$hostsRefs[$value['host']] = $value['host'];
+											$itemsRefs[$value['host']][$value['key']] = $value['key'];
+											break;
 
-								case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-								case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-									$hostsRefs[$value['host']] = $value['host'];
-									$graphsRefs[$value['host']][$value['name']] = $value['name'];
-									break;
+										case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+										case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+											$hostsRefs[$value['host']] = $value['host'];
+											$graphsRefs[$value['host']][$value['name']] = $value['name'];
+											break;
+									}
+								}
 							}
 						}
 					}
