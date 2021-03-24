@@ -173,7 +173,7 @@ class C52TriggerExpressionConverter extends CConverter {
 
 		switch ($fn['functionName']) {
 			case 'abschange':
-				$new_expression = sprintf('abs(last(%1$s,1)-last(%1$s,2))', $query);
+				$new_expression = sprintf('abs(change(%1$s))', $query);
 				break;
 
 			case 'delta':
