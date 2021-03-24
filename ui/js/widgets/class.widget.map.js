@@ -30,6 +30,7 @@ class CWidgetMap extends CWidget {
 
 		this._map_svg = null;
 
+		this._source_type = this._fields.source_type || WIDGET_SYSMAP_SOURCETYPE_MAP;
 		this._filter_widget = null;
 
 		this._previous_maps = [];
@@ -72,7 +73,7 @@ class CWidgetMap extends CWidget {
 			this._filter_widget.off(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
 		}
 
-		if (this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+		if (this._source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			for (const widget of widgets) {
 				if (widget instanceof CWidgetNavTree
 						&& widget._fields.reference === this._fields.filter_widget_reference) {
@@ -105,7 +106,7 @@ class CWidgetMap extends CWidget {
 
 	_promiseUpdate() {
 		if (!this._has_contents) {
-			if (this._current_sysmapid !== null || this._fields.source_type == WIDGET_SYSMAP_SOURCETYPE_MAP) {
+			if (this._current_sysmapid !== null || this._source_type == WIDGET_SYSMAP_SOURCETYPE_MAP) {
 				return super._promiseUpdate();
 			}
 		}
@@ -233,7 +234,7 @@ class CWidgetMap extends CWidget {
 
 		jQuery('.menu-popup').menuPopup('close', null);
 
-		if (this._state == WIDGET_STATE_ACTIVE) {
+		if (this._state === WIDGET_STATE_ACTIVE) {
 			this._restartUpdating();
 		}
 	}
