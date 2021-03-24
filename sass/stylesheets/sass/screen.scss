@@ -2463,31 +2463,6 @@ $icon-widget-btn: (
 	@extend %btn-dashboard;
 }
 
-.header-kioskmode-controls {
-	position: fixed;
-	top: 5px;
-	right: 45px;
-	z-index: 1010;
-	display: flex;
-	transition: opacity 1s ease-out;
-
-	&.hidden {
-		opacity: 0;
-	}
-
-	& > li > ul {
-		margin-right: 10px;
-	}
-
-	ul {
-		display: flex;
-
-		li {
-			margin-right: 10px;
-		}
-	}
-}
-
 .btn-dashboard-normal {
 	box-shadow: 1px 1px 2px $action-shadow-color;
 }
