@@ -1097,10 +1097,14 @@ void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs)
 			continue;
 
 		if (ZBX_VARIANT_STR == token->value.type)
+		{
 			zbx_vector_str_append(refs, token->value.data.str);
+			zbx_variant_set_none(&token->value);
+		}
 		else
 			zbx_vector_str_append(refs, zbx_substr(ctx->expression, token->loc.l, token->loc.r));
 
+		zbx_variant_clear(&token->value);
 		zbx_variant_set_ui64(&token->value, refs->values_num - 1);
 	}
 }
