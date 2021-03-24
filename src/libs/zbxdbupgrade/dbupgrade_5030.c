@@ -1916,10 +1916,10 @@ zbx_db_widget_t;
 #define POS_EMPTY	(127)
 #define POS_TAKEN	(1)
 
-ZBX_VECTOR_DECL(scitem_dim2, zbx_screen_item_dim_t);
-ZBX_VECTOR_IMPL(scitem_dim2, zbx_screen_item_dim_t);
-ZBX_VECTOR_DECL(char2, char);
-ZBX_VECTOR_IMPL(char2, char);
+ZBX_VECTOR_DECL(scitem_dim2, zbx_screen_item_dim_t)
+ZBX_VECTOR_IMPL(scitem_dim2, zbx_screen_item_dim_t)
+ZBX_VECTOR_DECL(char2, char)
+ZBX_VECTOR_IMPL(char2, char)
 
 #define SKIP_EMPTY(vector,index)	if (POS_EMPTY == vector->values[index]) continue
 
@@ -3574,7 +3574,9 @@ static int	DBpatch_5030105(void)
 			"'web.slides.hostid', "
 			"'web.slides.rf_rate.hat_slides', "
 			"'web.favorite.screenids')"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
