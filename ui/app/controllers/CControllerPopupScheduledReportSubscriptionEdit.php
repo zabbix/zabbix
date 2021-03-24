@@ -36,7 +36,7 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 			'userids' =>			'array',
 			'usrgrpids' =>			'array',
 			'edit' =>				'in 1',
-			'update' =>				'in 1',
+			'update' =>				'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateSubscription();
