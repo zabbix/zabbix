@@ -181,13 +181,22 @@ class CDashboard extends CBaseComponent {
 		return false;
 	}
 
+	isSlideshowStarted() {
+		return this._slideshow_timeout_id !== null;
+	}
+
 	_startSlideshow() {
 		if (this._slideshow_timeout_id !== null) {
-			this._stopSlideshow();
+			clearTimeout(this._slideshow_timeout_id);
 		}
 
 		if (this._buttons.slideshow !== null) {
-			this._buttons.slideshow.textContent = t('Stop slideshow');
+			this._buttons.slideshow.classList.remove('slideshow-state-stopped');
+			this._buttons.slideshow.classList.add('slideshow-state-started');
+
+			if (this._buttons.slideshow.title !== '') {
+				this._buttons.slideshow.title = t('Stop slideshow');
+			}
 		}
 
 		let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
@@ -206,7 +215,12 @@ class CDashboard extends CBaseComponent {
 		}
 
 		if (this._buttons.slideshow !== null) {
-			this._buttons.slideshow.textContent = t('Start slideshow');
+			this._buttons.slideshow.classList.remove('slideshow-state-started');
+			this._buttons.slideshow.classList.add('slideshow-state-stopped');
+
+			if (this._buttons.slideshow.title !== '') {
+				this._buttons.slideshow.title = t('Start slideshow');
+			}
 		}
 
 		clearTimeout(this._slideshow_timeout_id);
@@ -226,23 +240,24 @@ class CDashboard extends CBaseComponent {
 		const dashboard_pages = [...this._dashboard_pages.keys()];
 		const dashboard_page_index = dashboard_pages.indexOf(this._selected_dashboard_page);
 
-		this._selectDashboardPage(
+		this._promiseSelectDashboardPage(
 			dashboard_pages[dashboard_page_index < dashboard_pages.length - 1 ? dashboard_page_index + 1 : 0]
-		);
+		)
+			.then(() => {
+				let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
 
-		let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
+				if (timeout_ms == 0) {
+					timeout_ms = this._data.display_period * 1000;
+				}
 
-		if (timeout_ms == 0) {
-			timeout_ms = this._data.display_period * 1000;
-		}
+				this._slideshow_switch_time = Math.max(Date.now() + this._slideshow_steady_period,
+					timeout_ms + this._slideshow_switch_time
+				);
 
-		this._slideshow_switch_time = Math.max(Date.now() + this._slideshow_steady_period,
-			timeout_ms + this._slideshow_switch_time
-		);
-
-		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(),
-			this._slideshow_switch_time - Date.now()
-		);
+				this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(),
+					this._slideshow_switch_time - Date.now()
+				);
+			});
 	}
 
 	_keepSteadySlideshow() {
@@ -270,7 +285,7 @@ class CDashboard extends CBaseComponent {
 
 		this._activateEvents();
 
-		this._selectDashboardPage(this._dashboard_pages.keys().next().value);
+		this.selectDashboardPage(this._dashboard_pages.keys().next().value);
 
 		this._announceWidgets();
 
@@ -583,7 +598,7 @@ class CDashboard extends CBaseComponent {
 						widgets: []
 					});
 
-					this._selectDashboardPage(dashboard_page);
+					this.selectDashboardPage(dashboard_page);
 				}
 			});
 	}
@@ -892,7 +907,7 @@ class CDashboard extends CBaseComponent {
 			if (this._is_kiosk_mode) {
 				for (const select_dashboard_page of this._dashboard_pages.keys()) {
 					if (select_dashboard_page !== dashboard_page) {
-						this._selectDashboardPage(select_dashboard_page);
+						this.selectDashboardPage(select_dashboard_page);
 						break;
 					}
 				}
@@ -901,7 +916,7 @@ class CDashboard extends CBaseComponent {
 				const tabs = [...this._tabs.getList().children];
 				const tab_index = tabs.indexOf(this._dashboard_pages.get(dashboard_page).tab);
 
-				this._selectDashboardPage(
+				this.selectDashboardPage(
 					this._tabs_dashboard_pages.get(tabs[tab_index > 0 ? tab_index - 1 : tab_index + 1])
 				);
 			}
@@ -960,20 +975,43 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
-	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		if (this._is_kiosk_mode) {
-			this._doSelectDashboardPage(dashboard_page);
+	selectDashboardPage(dashboard_page, {is_async = false} = {}) {
+		if (this.isSlideshowStarted()) {
+			this._keepSteadySlideshow();
 		}
-		else {
-			this._selectTab(dashboard_page);
 
-			if (is_async) {
-				setTimeout(() => this._doSelectDashboardPage(dashboard_page), this._async_timeout_ms);
+		this._promiseSelectDashboardPage(dashboard_page, {is_async})
+			.then(() => {
+				if (this.isSlideshowStarted()) {
+					this._startSlideshow();
+				}
+			});
+	}
+
+	_promiseSelectDashboardPage(dashboard_page, {is_async = false} = {}) {
+		return new Promise((resolve) => {
+			if (this._is_kiosk_mode) {
+				this._doSelectDashboardPage(dashboard_page);
+
+				resolve();
 			}
 			else {
-				this._doSelectDashboardPage(dashboard_page);
+				this._selectTab(dashboard_page);
+
+				if (is_async) {
+					setTimeout(() => {
+						this._doSelectDashboardPage(dashboard_page);
+
+						resolve();
+					}, this._async_timeout_ms);
+				}
+				else {
+					this._doSelectDashboardPage(dashboard_page);
+
+					resolve();
+				}
 			}
-		}
+		});
 	}
 
 	_doSelectDashboardPage(dashboard_page) {
@@ -1261,7 +1299,7 @@ class CDashboard extends CBaseComponent {
 					widgets: widgets
 				});
 
-				this._selectDashboardPage(dashboard_page, {is_async: true});
+				this.selectDashboardPage(dashboard_page, {is_async: true});
 			})
 			.catch((error) => {
 				clearMessages();
@@ -1502,6 +1540,24 @@ class CDashboard extends CBaseComponent {
 				});
 			},
 
+			kioskModePreviousPageClick: () => {
+				const dashboard_pages = [...this._dashboard_pages.keys()];
+				const dashboard_page_index = dashboard_pages.indexOf(this._selected_dashboard_page);
+
+				this.selectDashboardPage(
+					dashboard_pages[dashboard_page_index > 0 ? dashboard_page_index - 1 : dashboard_pages.length - 1]
+				);
+			},
+
+			kioskModeNextPageClick: () => {
+				const dashboard_pages = [...this._dashboard_pages.keys()];
+				const dashboard_page_index = dashboard_pages.indexOf(this._selected_dashboard_page);
+
+				this.selectDashboardPage(
+					dashboard_pages[dashboard_page_index < dashboard_pages.length - 1 ? dashboard_page_index + 1 : 0]
+				);
+			},
+
 			gridResize: () => {
 				const wrapper = document.querySelector('.wrapper');
 
@@ -1535,10 +1591,7 @@ class CDashboard extends CBaseComponent {
 			new ResizeObserver(this._events.gridResize).observe(this._containers.grid);
 		}
 
-		if (this._buttons.slideshow !== null
-				&& !this._is_edit_mode
-				&& !this._is_kiosk_mode
-				&& this._dashboard_pages.size > 1) {
+		if (this._buttons.slideshow !== null && !this._is_edit_mode && this._dashboard_pages.size > 1) {
 			this._buttons.slideshow.addEventListener('click', this._events.toggleSlideshow);
 		}
 
@@ -1546,6 +1599,16 @@ class CDashboard extends CBaseComponent {
 		window.addEventListener('mousedown', this._events.interaction);
 		window.addEventListener('keydown', this._events.interaction);
 		window.addEventListener('wheel', this._events.interaction);
+
+		if (this._is_kiosk_mode) {
+			if (this._buttons.previous_page !== null) {
+				this._buttons.previous_page.addEventListener('click', this._events.kioskModePreviousPageClick);
+			}
+
+			if (this._buttons.next_page !== null) {
+				this._buttons.next_page.addEventListener('click', this._events.kioskModeNextPageClick);
+			}
+		}
 
 		if (this._time_period !== null) {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
@@ -1634,7 +1697,7 @@ class CDashboard extends CBaseComponent {
 					const dashboard_page = this._tabs_dashboard_pages.get(tab);
 
 					if (dashboard_page !== this._selected_dashboard_page) {
-						this._selectDashboardPage(dashboard_page, {is_async: true});
+						this.selectDashboardPage(dashboard_page, {is_async: true});
 					}
 					else if (e.target.classList.contains('btn-dashboard-page-properties')) {
 						jQuery(e.target).menuPopup(this._getDashboardPageActions(dashboard_page), new jQuery.Event(e));
@@ -1650,7 +1713,7 @@ class CDashboard extends CBaseComponent {
 						const dashboard_page = this._tabs_dashboard_pages.get(tab);
 
 						if (dashboard_page !== this._selected_dashboard_page) {
-							this._selectDashboardPage(dashboard_page, {is_async: true});
+							this.selectDashboardPage(dashboard_page, {is_async: true});
 						}
 						else if (e.target.classList.contains('btn-dashboard-page-properties')) {
 							jQuery(e.target).menuPopup(this._getDashboardPageActions(dashboard_page),
@@ -1664,13 +1727,13 @@ class CDashboard extends CBaseComponent {
 			previousPageClick: () => {
 				const tab = this._dashboard_pages.get(this._selected_dashboard_page).tab;
 
-				this._selectDashboardPage(this._tabs_dashboard_pages.get(tab.previousElementSibling), {is_async:true});
+				this.selectDashboardPage(this._tabs_dashboard_pages.get(tab.previousElementSibling), {is_async: true});
 			},
 
 			nextPageClick: () => {
 				const tab = this._dashboard_pages.get(this._selected_dashboard_page).tab;
 
-				this._selectDashboardPage(this._tabs_dashboard_pages.get(tab.nextElementSibling), {is_async: true});
+				this.selectDashboardPage(this._tabs_dashboard_pages.get(tab.nextElementSibling), {is_async: true});
 			}
 		}
 

@@ -2063,7 +2063,11 @@ $icon-btn: (
 	add-fav: $btn-bg-color url($sprite-path) no-repeat -7px -295px,
 	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
 	action: $btn-bg-color url($sprite-path) no-repeat -7px -367px,
-	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px
+	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -7px -329px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -7px -295px,
+	dashboard-kioskmode-previous-page: $btn-bg-color url($sprite-path) no-repeat -398px -657px,
+	dashboard-kioskmode-next-page: $btn-bg-color url($sprite-path) no-repeat -396px -624px
 );
 
 // Dynamically generated classes:
@@ -2072,7 +2076,9 @@ $icon-btn: (
 //  .btn-add-fav
 //  .btn-remove-fav
 //  .btn-action
-//  .btn-info
+//  .btn-dashboard-kioskmode-toggle-slideshow
+//  .btn-dashboard-kioskmode-previous-page
+//  .btn-dashboard-kioskmode-next-page
 @each $icon-btn, $bgimage in $icon-btn {
 	.btn-#{$icon-btn} {
 		background: $bgimage;
@@ -2457,18 +2463,33 @@ $icon-widget-btn: (
 	@extend %btn-dashboard;
 }
 
-.btn-dashboard-normal {
-	box-shadow: 1px 1px 2px $action-shadow-color;
+.header-kioskmode-controls {
 	position: fixed;
-	right: 45px;
 	top: 5px;
-	opacity: 1;
+	right: 45px;
 	z-index: 1010;
+	display: flex;
 	transition: opacity 1s ease-out;
 
 	&.hidden {
 		opacity: 0;
 	}
+
+	& > li > ul {
+		margin-right: 10px;
+	}
+
+	ul {
+		display: flex;
+
+		li {
+			margin-right: 10px;
+		}
+	}
+}
+
+.btn-dashboard-normal {
+	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
 %btn-widget {

@@ -383,6 +383,21 @@ header {
     white-space: nowrap; }
     header .header-controls label {
       line-height: 24px; }
+  header .header-kioskmode-controls {
+    position: fixed;
+    top: 5px;
+    right: 45px;
+    z-index: 1010;
+    display: flex;
+    transition: opacity 1s ease-out; }
+    header .header-kioskmode-controls.hidden {
+      opacity: 0; }
+    header .header-kioskmode-controls > li > ul {
+      margin-right: 10px; }
+    header .header-kioskmode-controls ul {
+      display: flex; }
+      header .header-kioskmode-controls ul li {
+        margin-right: 10px; }
   header .header-z-select {
     max-width: 600px; }
   header a.link-action {
@@ -643,6 +658,14 @@ footer {
     position: absolute; }
     .csortable.csortable-dragging .csortable-item.csortable-dragging {
       display: none; }
+
+.header-kioskmode-controls .dashboard-kioskmode-controls li {
+  margin-right: 6px; }
+
+.dashboard-toggle-slideshow.slideshow-state-started .slideshow-state-stopped, .dashboard-toggle-slideshow.slideshow-state-stopped .slideshow-state-started,
+.dashboard-kioskmode-toggle-slideshow.slideshow-state-started .slideshow-state-stopped,
+.dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped .slideshow-state-started {
+  display: none; }
 
 .dashboard-edit {
   background-color: #ffffff;
@@ -3262,6 +3285,18 @@ button {
 .btn-info {
   background: #0275b8 url("../img/icon-sprite.svg?20200407") no-repeat -7px -403px; }
 
+.btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-started {
+  background: #0275b8 url("../img/icon-sprite.svg?20200407") no-repeat -7px -329px; }
+
+.btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped {
+  background: #0275b8 url("../img/icon-sprite.svg?20200407") no-repeat -7px -295px; }
+
+.btn-dashboard-kioskmode-previous-page {
+  background: #0275b8 url("../img/icon-sprite.svg?20200407") no-repeat -398px -657px; }
+
+.btn-dashboard-kioskmode-next-page {
+  background: #0275b8 url("../img/icon-sprite.svg?20200407") no-repeat -396px -624px; }
+
 .btn-dashboard-page-properties {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -318px -618px; }
 
@@ -3520,16 +3555,24 @@ button {
 .btn-dashboard-conf {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -619px; }
 
-.btn-dashboard-normal {
-  box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5);
+.header-kioskmode-controls {
   position: fixed;
-  right: 45px;
   top: 5px;
-  opacity: 1;
+  right: 45px;
   z-index: 1010;
+  display: flex;
   transition: opacity 1s ease-out; }
-  .btn-dashboard-normal.hidden {
+  .header-kioskmode-controls.hidden {
     opacity: 0; }
+  .header-kioskmode-controls > li > ul {
+    margin-right: 10px; }
+  .header-kioskmode-controls ul {
+    display: flex; }
+    .header-kioskmode-controls ul li {
+      margin-right: 10px; }
+
+.btn-dashboard-normal {
+  box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5); }
 
 .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   width: 24px;
@@ -3550,7 +3593,7 @@ button {
     background-color: transparent;
     opacity: .25; }
 
-.btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-cal, .icon-wzrd-action, .drag-icon {
+.btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-started, .btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped, .btn-dashboard-kioskmode-previous-page, .btn-dashboard-kioskmode-next-page, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
   height: auto;
   padding: 0; }

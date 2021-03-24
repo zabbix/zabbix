@@ -1,3 +1,19 @@
+.header-kioskmode-controls {
+	.dashboard-kioskmode-controls {
+		li {
+			margin-right: 6px;
+		}
+	}
+}
+
+.dashboard-toggle-slideshow,
+.dashboard-kioskmode-toggle-slideshow {
+	&.slideshow-state-started .slideshow-state-stopped,
+	&.slideshow-state-stopped .slideshow-state-started {
+		display: none;
+	}
+}
+
 .dashboard-edit {
 	background-color: $ui-bg-color;
 	box-shadow: 0 0 0 4px $ui-bg-color;

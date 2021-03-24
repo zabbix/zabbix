@@ -144,6 +144,35 @@ $widget = (new CWidget())
 					->addClass(ZBX_STYLE_DASHBOARD_EDIT)
 			]))->addStyle('display: none'))
 	)
+	->setKioskModeControls(
+		(count($data['dashboard']['pages']) > 1)
+			? (new CList())
+				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
+						->setTitle(_('Previous page'))
+				)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
+						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+							? _s('Stop slideshow')
+							: _s('Start slideshow')
+						)
+						->addClass(
+							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+								? 'slideshow-state-started'
+								: 'slideshow-state-stopped'
+						)
+				)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
+						->setTitle(_('Previous page'))
+				)
+			: null
+	)
 	->setNavigation((new CList())->addItem(new CBreadcrumbs([
 		(new CSpan())->addItem(new CLink(_('All dashboards'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list')
@@ -195,13 +224,17 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 							->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
 							->addClass('btn-iterator-page-next')
 							->setEnabled(false),
-						(new CSimpleButton(
-							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
-								? _s('Stop slideshow')
-								: _s('Start slideshow')
-						))
+						(new CSimpleButton([
+							(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
+							(new CSpan(_s('Stop slideshow')))->addClass('slideshow-state-started')
+						]))
 							->addClass(ZBX_STYLE_BTN_ALT)
 							->addClass(ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW)
+							->addClass(
+								($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+									? 'slideshow-state-started'
+									: 'slideshow-state-stopped'
+							)
 					])
 			)
 	);
