@@ -203,6 +203,7 @@ class CWidgetNavTree extends CWidget {
 					tree_item.classList.add('opened');
 
 					this._setTreeHandlers();
+					this._updateWidgetFields();
 
 					if (typeof old_addPopupValues === 'function') {
 						window.addPopupValues = old_addPopupValues;
