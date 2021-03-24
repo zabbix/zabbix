@@ -3550,7 +3550,30 @@ static int	DBpatch_5030104(void)
 
 static int	DBpatch_5030105(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.favorite.screenids'"))
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+			"'web.favorite.screenids', "
+			"'web.screenconf.filter.active', "
+			"'web.screenconf.filter_name', "
+			"'web.screenconf.php.sort', "
+			"'web.screenconf.php.sortorder', "
+			"'web.screens.elementid', "
+			"'web.screens.filter.active', "
+			"'web.screens.filter.from', "
+			"'web.screens.filter.to', "
+			"'web.screens.hostid', "
+			"'web.screens.tr_groupid', "
+			"'web.screens.tr_hostid', "
+			"'web.slideconf.filter.active', "
+			"'web.slideconf.filter_name', "
+			"'web.slideconf.php.sort', "
+			"'web.slideconf.php.sortorder', "
+			"'web.slides.elementid', "
+			"'web.slides.filter.active', "
+			"'web.slides.filter.from', "
+			"'web.slides.filter.to', "
+			"'web.slides.hostid', "
+			"'web.slides.rf_rate.hat_slides', "
+			"'web.favorite.screenids')"))
 		return FAIL;
 
 	return SUCCEED;
