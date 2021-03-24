@@ -802,7 +802,7 @@ static int DBpatch_reference_name(char **ref_name)
 	int		i = 0, j, ret = FAIL;
 	char		name[REFERENCE_MAX_LEN + 1];
 	const char	*pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	DB_RESULT	result = NULL;;
+	DB_RESULT	result = NULL;
 	DB_ROW		row;
 
 	name[REFERENCE_MAX_LEN] = '\0';
