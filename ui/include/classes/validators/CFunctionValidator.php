@@ -350,13 +350,13 @@ class CFunctionValidator extends CValidator {
 				continue;
 			}
 
-			if (($arg['mandat'] & 0x02) && strstr($fn->params_raw['parameters'][$num]->match, ':') === false) {
+			if (($arg['mandat'] & 0x02) && strstr($fn->params_raw['parameters'][$num]->getValue(), ':') === false) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					_('Mandatory parameter is missing.'));
 				return false;
 			}
 
-			if (!$this->validateParameter($fn->params_raw['parameters'][$num]->match, $arg)) {
+			if (!$this->validateParameter($fn->params_raw['parameters'][$num]->getValue(), $arg)) {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
 				);
@@ -619,7 +619,6 @@ class CFunctionValidator extends CValidator {
 			return true;
 		}
 		else {
-			$param = (substr($param, 0, 1) === '"' && substr($param, -1) === '"') ? substr($param, 1, -1) : $param;
 			return in_array($param, ['iregexp', 'regexp', 'like']);
 		}
 	}
