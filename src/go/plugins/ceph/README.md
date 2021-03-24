@@ -31,7 +31,7 @@ connection time, any redirects, and reading the response body.
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Ceph.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+**Plugins.Ceph.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 

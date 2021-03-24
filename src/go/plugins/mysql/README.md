@@ -31,7 +31,7 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 *Default value:* equals the global Timeout configuration parameter.    
 *Limits:* 1-30
 
-**Plugins.Mysql.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+**Plugins.Mysql.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 

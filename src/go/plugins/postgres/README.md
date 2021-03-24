@@ -32,7 +32,7 @@ The Zabbix Agent's configuration file is used to configure plugins.
 **Plugins.Postgres.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
 *Default value:* — (the feature is disabled by default)
 
-**Plugins.Postgres.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+**Plugins.Postgres.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
