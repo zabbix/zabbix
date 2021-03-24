@@ -566,7 +566,7 @@ class CFunctionValidator extends CValidator {
 
 		return preg_match('/^#\d+$/', $param)
 			? (substr($param, 1) > 0)
-			: ($this->validateSecValue($param) && $param > 0);
+			: ($this->validateSecValue($param) && $param >= 0);
 	}
 
 	/**
