@@ -122,7 +122,7 @@ class CDashboardElement extends CElement {
 		$this->checkIfEditable();
 		$this->getControls()->query('id:dashbrd-add-widget')->one()->click();
 
-		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
+		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
 				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
 	}
 
@@ -136,6 +136,10 @@ class CDashboardElement extends CElement {
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
 			$controls->query('id:dashbrd-cancel')->one()->click(true);
+
+			if (CElementQuery::getPage()->isAlertPresent()) {
+				CElementQuery::getPage()->acceptAlert();
+			}
 
 			if (!$controls->isStalled()) {
 				$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
@@ -176,7 +180,6 @@ class CDashboardElement extends CElement {
 				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Delete')->waitUntilNotVisible();
 
-
 		return $this;
 	}
 
@@ -203,7 +206,7 @@ class CDashboardElement extends CElement {
 	 */
 	public function pasteWidget() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashbrd-paste-widget')->one()->waitUntilClickable()->click(true);
+		$this->getControls()->query('id:dashbrd-add')->asPopupButton()->one()->select('Paste widget');
 
 		return $this;
 	}

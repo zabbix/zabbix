@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:12Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -30,13 +30,13 @@ zabbix_export:
               expression: '{max(#3)}=0'
               name: 'SMTP service is down on {HOST.NAME}'
               priority: AVERAGE
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
+      valuemaps:
         -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up

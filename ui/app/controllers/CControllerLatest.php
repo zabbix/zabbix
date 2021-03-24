@@ -159,9 +159,10 @@ abstract class CControllerLatest extends CController {
 		if ($select_items) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-					'value_type', 'units', 'valuemapid', 'description', 'state', 'error'
+					'value_type', 'units', 'description', 'state', 'error'
 				],
 				'selectApplications' => ['applicationid'],
+				'selectValueMap' => ['mappings'],
 				'itemids' => array_keys($select_items),
 				'webitems' => true,
 				'preservekeys' => true

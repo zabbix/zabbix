@@ -234,6 +234,13 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
+.dashbrd-navigation-tabs {
+	& .csortable > .csortable-item > div,
+	& .csortable-list > .csortable-item > div:hover {
+		border: 1px solid transparent;
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
@@ -257,7 +264,7 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
+.dashbrd.dashbrd-is-edit-mode {
 	.dashbrd-grid-widget {
 		&.ui-draggable-dragging {
 			&.dashbrd-grid-widget-hidden-header {

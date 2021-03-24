@@ -267,41 +267,46 @@ function getMenuPopupHost(options, trigger_elmnt) {
  * Get menu popup submap map element section data.
  *
  * @param {array}  options['sysmapid']
- * @param {int}    options['severity_min']     (optional)
- * @param {int}    options['widget_uniqueid']  (optional)
- * @param {array}  options['urls']             (optional)
+ * @param {int}    options['severity_min']    (optional)
+ * @param {int}    options['is_widget']       (optional)
+ * @param {array}  options['urls']            (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
  *
  * @return array
  */
 function getMenuPopupMapElementSubmap(options) {
-	var sections = [],
-		submap_url;
+	const sections = [];
+	const item = {label: t('Submap')};
 
-	if (typeof options.widget_uniqueid !== 'undefined') {
-		submap_url = new Curl('javascript: navigateToSubmap(' + options.sysmapid +
-			', "' + options.widget_uniqueid + '");', false);
+	if (options.unique_id !== undefined) {
+		item.clickCallback = ()=> {
+			ZABBIX.Dashboard.getDashboardPages().forEach((page) => {
+				const widget = page.getWidget(options.unique_id);
+
+				if (widget !== null) {
+					widget.navigateToSubmap(options.sysmapid);
+				}
+			});
+		};
 	}
 	else {
 		if (!options.allowed_ui_maps) {
 			return [];
 		}
 
-		submap_url = new Curl('zabbix.php', false);
+		const submap_url = new Curl('zabbix.php', false);
 		submap_url.setArgument('action', 'map.view');
 		submap_url.setArgument('sysmapid', options.sysmapid);
 		if (typeof options.severity_min !== 'undefined') {
 			submap_url.setArgument('severity_min', options.severity_min);
 		}
+		item.url = submap_url.getUrl();
 	}
 
 	sections.push({
 		label: t('Go to'),
-		items: [{
-			label: t('Submap'),
-			url: submap_url.getUrl()
-		}]
+		items: [item]
 	});
 
 	// urls
@@ -436,229 +441,6 @@ function getMenuPopupMapElementImage(options) {
 	}
 
 	return [];
-}
-
-/**
- * Get menu popup refresh section data.
- *
- * @param {integer}  options['widgetid']	 Widget ID.
- * @param {string}   options['widgetName']   Widget name.
- * @param {string}   options['currentRate']  Current rate value.
- * @param {bool}     options['multiplier']   Multiplier or time mode.
- * @param {array}    options['params']       Url parameters (optional).
- * @param {callback} options['callback']     Callback function on success (optional).
- * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
- *
- * @return array
- */
-function getMenuPopupRefresh(options, trigger_elmnt) {
-	var items = [],
-		params = (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
-		intervals = options.multiplier
-			? {
-				'x0.25': 'x0.25',
-				'x0.5': 'x0.5',
-				'x1': 'x1',
-				'x1.5': 'x1.5',
-				'x2': 'x2',
-				'x3': 'x3',
-				'x4': 'x4',
-				'x5': 'x5'
-			}
-			: {
-				0: t('No refresh'),
-				10: t('10 seconds'),
-				30: t('30 seconds'),
-				60: t('1 minute'),
-				120: t('2 minutes'),
-				600: t('10 minutes'),
-				900: t('15 minutes')
-			};
-
-	jQuery.each(intervals, function(value, label) {
-		var item = {
-			label: label,
-			data: {
-				value: value
-			},
-			clickCallback: function() {
-				var $obj = jQuery(this),
-					currentRate = $obj.data('value');
-
-				// it is a quick solution for slide refresh multiplier, should be replaced with slide.refresh or similar
-				if (options.multiplier) {
-					sendAjaxData('slides.php', {
-						data: jQuery.extend({}, params, {
-							widgetName: options.widgetName,
-							widgetRefreshRate: currentRate
-						}),
-						dataType: 'script',
-						success: function() {
-							// Set new refresh rate as current in slideshow controls.
-							trigger_elmnt.data('menu-popup').data.currentRate = currentRate;
-						}
-					});
-
-					jQuery('a', $obj.closest('.menu-popup')).each(function() {
-						var link = jQuery(this);
-
-						if (link.data('value') == currentRate) {
-							link
-								.addClass('selected')
-								.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
-						}
-						else {
-							link
-								.removeClass('selected')
-								.attr('aria-label', link.data('aria-label'));
-						}
-					});
-
-					$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
-				}
-				else {
-					var url = new Curl('zabbix.php');
-					url.setArgument('action', 'dashboard.widget.rfrate');
-
-					jQuery.ajax({
-						url: url.getUrl(),
-						method: 'POST',
-						dataType: 'json',
-						data: {
-							'widgetid': options.widgetid,
-							'rf_rate': currentRate
-						}
-					})
-						.then(function() {
-							jQuery('a', $obj.closest('.menu-popup')).each(function() {
-								var link = jQuery(this);
-
-								if (link.data('value') == currentRate) {
-									link
-										.addClass('selected')
-										.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
-								}
-								else {
-									link
-										.removeClass('selected')
-										.attr('aria-label', link.data('aria-label'));
-								}
-							});
-
-							// Set new refresh rate as current in widget controls.
-							trigger_elmnt.data('menu-popup').data.currentRate = currentRate;
-
-							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
-
-							ZABBIX.Dashboard.setWidgetRefreshRate(options.widgetid, parseInt(currentRate));
-						})
-						.fail(function() {
-							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
-							// TODO: gentle message about failed saving of widget refresh rate
-						});
-				}
-			}
-		};
-
-		if (value == options.currentRate) {
-			item.selected = true;
-		}
-
-		items[items.length] = item;
-	});
-
-	return [{
-		label: options.multiplier ? t('Refresh interval multiplier') : t('Refresh interval'),
-		items: items
-	}];
-}
-
-/**
- * Get menu popup widget actions data.
- *
- * @param {string}   options['currentRate']      Current rate value.
- * @param {bool}     options['multiplier']       Multiplier or time mode.
- * @param {callback} options['callback']         Callback function on success (optional).
- * @param {string}   options['widget_uniqueid']  Widget instance unique id.
- * @param {object}   trigger_elmnt               UI element which triggered opening of overlay dialogue.
- *
- * @return array
- */
-function getMenuPopupWidgetActions(options, trigger_elmnt) {
-	var dashboard_data = ZABBIX.Dashboard.getDashboardData(),
-		editMode = ZABBIX.Dashboard.isEditMode(),
-		widget = ZABBIX.Dashboard.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
-		widgetid = widget.widgetid,
-		loading = (!widget.isReady() || widget.content_body.find('.is-loading').length > 0),
-		widget_actions = [],
-		menu;
-
-	options.widgetid = widgetid;
-	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt);
-
-	// Do not show "Copy" action for host dashboards.
-	if (ZABBIX.Dashboard.getOptions()['allowed_edit']
-			&& (dashboard_data.dashboard.templateid === null || dashboard_data.dashboard.dynamic_hostid === null)) {
-		widget_actions.push({
-			label: t('S_COPY'),
-			clickCallback: function() {
-				ZABBIX.Dashboard.copyWidget(widget);
-				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			}
-		});
-	}
-
-	if (editMode) {
-		widget_actions.push({
-			label: t('S_PASTE'),
-			disabled: (ZABBIX.Dashboard.getCopiedWidget() === null),
-			clickCallback: function() {
-				ZABBIX.Dashboard.pasteWidget(widget, widget.pos);
-				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			}
-		});
-
-		widget_actions.push({
-			label: t('Delete'),
-			clickCallback: function() {
-				ZABBIX.Dashboard.deleteWidget(widget);
-				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			}
-		});
-	}
-
-	if ('download' in options && !editMode) {
-		widget_actions.push({
-			label: t('Download image'),
-			disabled: loading || !options.download,
-			clickCallback: function() {
-				var svg = widget['content_body'].find('svg').first();
-
-				if (svg.length) {
-					downloadSvgImage(svg, 'graph.png');
-				}
-				else {
-					downloadPngImage(widget['content_body'].find('img').first(), 'graph.png');
-				}
-
-				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			},
-			refreshCallback: function(widget) {
-				if (widget['widgetid'] == widgetid && options.download) {
-					this.disabled = !widget.isReady();
-				}
-			}
-		});
-	}
-
-	if (widget_actions.length) {
-		menu.unshift({
-			label: t('Actions'),
-			items: widget_actions
-		});
-	}
-
-	return menu;
 }
 
 /**
@@ -1102,7 +884,7 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param array scripts           Scripts names.
+ * @param array scripts           Script names amd nenu paths.
  * @param {object} trigger_elmnt  UI element which triggered opening of overlay dialogue.
  * @param array hostid            Host ID.
  * @param array eventid           Event ID.
@@ -1117,13 +899,17 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 			var item = items.shift();
 
 			if (typeof tree[item] === 'undefined') {
-				tree[item] = {items: {}};
+				tree[item] = {
+					name: item,
+					items: {}
+				};
 			}
 
 			appendTreeItem(tree[item].items, name, items, params);
 		}
 		else {
-			tree[name] = {
+			tree['/' + name] = {
+				name: name,
 				params: params,
 				items: {}
 			};
@@ -1135,10 +921,9 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 		var script = scripts[key];
 
 		if (typeof script.scriptid !== 'undefined') {
-			var items = splitPath(script.name),
-				name = (items.length > 0) ? items.pop() : script.name;
+			var items = (script.menu_path.length > 0) ? splitPath(script.menu_path) : [];
 
-			appendTreeItem(tree, name, items, {
+			appendTreeItem(tree, script.name, items, {
 				scriptid: script.scriptid,
 				confirmation: script.confirmation,
 				hostid: hostid,
@@ -1147,13 +932,13 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 		}
 	}
 
-	// build menu items from tree
+	// Build menu items from tree.
 	var getMenuPopupScriptItems = function(tree, trigger_elm) {
 		var items = [];
 
 		if (objectSize(tree) > 0) {
-			jQuery.each(tree, function(name, data) {
-				var item = {label: name};
+			jQuery.each(tree, function(key, data) {
+				var item = {label: data.name};
 
 				if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
 					item.items = getMenuPopupScriptItems(data.items, trigger_elm);
@@ -1179,36 +964,6 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 	};
 
 	return getMenuPopupScriptItems(tree, trigger_elmnt);
-}
-
-/**
- * Create menu for dashboard widget area selector.
- *
- * @param {object} area_selected  Area in which new widget will be created.
- *
- * @returns {array}
- */
-function getDashboardWidgetActionMenu(area_selected) {
-	return [{
-		items: [{
-			label: t('Add widget'),
-			clickCallback: function() {
-				ZABBIX.Dashboard.addNewWidget(null, area_selected);
-			}
-		}, {
-			label: t('Paste widget'),
-			clickCallback: function() {
-				var widget_dims = {
-					x: area_selected.x,
-					y: area_selected.y,
-					width: area_selected.width,
-					height: area_selected.height
-				};
-
-				ZABBIX.Dashboard.pasteWidget(null, widget_dims);
-			}
-		}]
-	}];
 }
 
 jQuery(function($) {
@@ -1296,9 +1051,21 @@ jQuery(function($) {
 					 * Please note that click event is also triggered by hitting spacebar on the keyboard,
 					 * in which case the number of mouse clicks (stored in event.originalEvent.detail) will be zero.
 					 */
-					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
+					of: (['click', 'mouseup', 'mousedown'].includes(event.type) && event.originalEvent.detail)
+						? event
+						: event.target,
 					my: 'left top',
-					at: 'left bottom'
+					at: 'left bottom',
+					using: (pos, data) => {
+						let max_left = data.horizontal === 'left'
+							? document.querySelector('.wrapper').clientWidth
+							: document.querySelector('.wrapper').clientWidth - data.element.width;
+
+						pos.left = Math.max(0, Math.min(max_left, pos.left));
+
+						data.element.element[0].style.top = `${pos.top}px`;
+						data.element.element[0].style.left = `${pos.left}px`;
+					}
 				}
 			}, defaultOptions, options || {});
 
@@ -1326,6 +1093,7 @@ jQuery(function($) {
 
 			$menu_popup.data('menu_popup', options);
 
+			$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}));
 			$('.wrapper').append($menu_popup);
 
 			// Position the menu (before hiding).
@@ -1371,6 +1139,7 @@ jQuery(function($) {
 					$(overlay['element']).attr({'aria-expanded': 'false'});
 				}
 
+				menu_popup.prev().remove();
 				menu_popup.remove();
 
 				// Call menu close callback function.

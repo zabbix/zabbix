@@ -113,7 +113,7 @@ class CControllerAuditLogList extends CController {
 
 		if ($data['userids']) {
 			$users = API::User()->get([
-				'output' => ['userid', 'alias', 'name', 'surname'],
+				'output' => ['userid', 'username', 'name', 'surname'],
 				'userids' => $data['userids']
 			]);
 
@@ -134,12 +134,12 @@ class CControllerAuditLogList extends CController {
 
 		if (!$users) {
 			$users = API::User()->get([
-				'output' => ['userid', 'alias'],
+				'output' => ['userid', 'username'],
 				'userids' => array_column($data['auditlogs'], 'userid', 'userid')
 			]);
 		}
 
-		$data['users'] = array_column($users, 'alias', 'userid');
+		$data['users'] = array_column($users, 'username', 'userid');
 
 		natsort($data['actions']);
 		natsort($data['resources']);
@@ -201,10 +201,8 @@ class CControllerAuditLogList extends CController {
 			AUDIT_RESOURCE_VALUE_MAP => _('Value map'),
 			AUDIT_RESOURCE_IT_SERVICE => _('Service'),
 			AUDIT_RESOURCE_MAP => _('Map'),
-			AUDIT_RESOURCE_SCREEN => _('Screen'),
 			AUDIT_RESOURCE_SCENARIO => _('Web scenario'),
 			AUDIT_RESOURCE_DISCOVERY_RULE => _('Discovery rule'),
-			AUDIT_RESOURCE_SLIDESHOW => _('Slide show'),
 			AUDIT_RESOURCE_PROXY => _('Proxy'),
 			AUDIT_RESOURCE_REGEXP => _('Regular expression'),
 			AUDIT_RESOURCE_MAINTENANCE => _('Maintenance'),

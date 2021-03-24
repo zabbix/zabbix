@@ -24,7 +24,7 @@ class CControllerPopupImport extends CController {
 	protected function checkInput() {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'in host,template,mediatype,valuemap,screen,map',
+			'rules_preset' => 'in host,template,mediatype,valuemap,map',
 			'rules' => 'array'
 		];
 
@@ -51,13 +51,9 @@ class CControllerPopupImport extends CController {
 			case 'map' :
 				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
 
-			case 'screen':
-				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
-
 			case 'host':
 			case 'template':
 			case 'mediatype':
-			case 'valuemap':
 				return ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN);
 
 			default:
@@ -78,11 +74,10 @@ class CControllerPopupImport extends CController {
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
 		];
 
 		// Adjust defaults for given rule preset, if specified.
@@ -99,7 +94,7 @@ class CControllerPopupImport extends CController {
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
 
 			case 'template':
@@ -117,15 +112,11 @@ class CControllerPopupImport extends CController {
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
 
 			case 'mediatype':
 				$rules['mediaTypes'] = ['updateExisting' => false, 'createMissing' => true];
-				break;
-
-			case 'valuemap':
-				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 				break;
 
 			case 'map':
@@ -134,13 +125,6 @@ class CControllerPopupImport extends CController {
 					'createMissing' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
 				];
 				$rules['images'] = ['updateExisting' => false, 'createMissing' => true];
-				break;
-
-			case 'screen':
-				$rules['screens'] = [
-					'updateExisting' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS),
-					'createMissing' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
-				];
 				break;
 		}
 
@@ -198,7 +182,6 @@ class CControllerPopupImport extends CController {
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
 				'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
-				'allowed_edit_screens' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS),
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

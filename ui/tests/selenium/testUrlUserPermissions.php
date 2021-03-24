@@ -592,15 +592,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'zabbix.php?action=valuemap.list',
-				'title' =>	'Configuration of value mapping',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => false
-				]
-			]],
-			[[
 				'url' => 'zabbix.php?action=trigdisplay.edit',
 				'title' =>	'Configuration of trigger displaying options',
 				'users' => [

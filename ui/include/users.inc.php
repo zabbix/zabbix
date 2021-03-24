@@ -141,10 +141,10 @@ function granted2update_group($userGroupIds) {
 }
 
 /**
- * Gets user full name in format "alias (name surname)". If both name and surname exist, returns translated string.
+ * Gets user full name in format "username (name surname)". If both name and surname exist, returns translated string.
  *
  * @param array  $userData
- * @param string $userData['alias']
+ * @param string $userData['username']
  * @param string $userData['name']
  * @param string $userData['surname']
  *
@@ -153,7 +153,9 @@ function granted2update_group($userGroupIds) {
 function getUserFullname($userData) {
 	if (!zbx_empty($userData['surname'])) {
 		if (!zbx_empty($userData['name'])) {
-			return $userData['alias'].' '._xs('(%1$s %2$s)', 'user fullname', $userData['name'], $userData['surname']);
+			return $userData['username'].' '._xs('(%1$s %2$s)', 'user fullname', $userData['name'],
+				$userData['surname']
+			);
 		}
 
 		$fullname = $userData['surname'];
@@ -162,7 +164,7 @@ function getUserFullname($userData) {
 		$fullname = zbx_empty($userData['name']) ? '' : $userData['name'];
 	}
 
-	return zbx_empty($fullname) ? $userData['alias'] : $userData['alias'].' ('.$fullname.')';
+	return zbx_empty($fullname) ? $userData['username'] : $userData['username'].' ('.$fullname.')';
 }
 
 /**

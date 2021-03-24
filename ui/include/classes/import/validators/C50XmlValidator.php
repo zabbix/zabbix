@@ -337,6 +337,16 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	];
 
 	/**
+	 * Legacy screen resource types.
+	 */
+	private const SCREEN_RESOURCE_TYPE_GRAPH = 0;
+	private const SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH = 1;
+	private const SCREEN_RESOURCE_TYPE_PLAIN_TEXT = 3;
+	private const SCREEN_RESOURCE_TYPE_CLOCK = 7;
+	private const SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH = 19;
+	private const SCREEN_RESOURCE_TYPE_LLD_GRAPH = 20;
+
+	/**
 	 * Get validation rules schema.
 	 *
 	 * @return array
@@ -395,9 +405,9 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 								'contextname' =>			['type' => XML_STRING, 'default' => ''],
 								'securityname' =>			['type' => XML_STRING, 'default' => ''],
 								'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-								'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+								'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA1 => CXmlConstantName::SHA]],
 								'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-								'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+								'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => [CXmlConstantValue::SNMPV3_DES => CXmlConstantName::DES, CXmlConstantValue::SNMPV3_AES128 => CXmlConstantName::AES]],
 								'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
 								'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 							]],
@@ -1631,36 +1641,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 					]]
 				]]
 			]],
-			'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
-				'screen' =>					['type' => XML_ARRAY, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'hsize' =>					['type' => XML_STRING | XML_REQUIRED],
-					'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
-					'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
-						'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
-							// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_validate' method.
-							'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-							// The tag 'style' should be validated before the 'resource' because it is used in 'ex_validate' method.
-							'style' =>					['type' => XML_STRING | XML_REQUIRED],
-							'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
-							'width' =>					['type' => XML_STRING | XML_REQUIRED],
-							'height' =>					['type' => XML_STRING | XML_REQUIRED],
-							'x' =>						['type' => XML_STRING | XML_REQUIRED],
-							'y' =>						['type' => XML_STRING | XML_REQUIRED],
-							'colspan' =>				['type' => XML_STRING | XML_REQUIRED],
-							'rowspan' =>				['type' => XML_STRING | XML_REQUIRED],
-							'elements' =>				['type' => XML_STRING | XML_REQUIRED],
-							'valign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'halign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
-							'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
-							'url' =>					['type' => XML_STRING | XML_REQUIRED],
-							'application' =>			['type' => XML_STRING | XML_REQUIRED],
-							'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]]
-				]]
-			]],
 			'images' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'image', 'rules' => [
 				'image' =>					['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -1941,46 +1921,26 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 	public function validateScreenItemResource($data, array $parent_data = null, $path) {
 		if (zbx_is_int($parent_data['resourcetype'])) {
 			switch ($parent_data['resourcetype']) {
-				case SCREEN_RESOURCE_GRAPH:
-				case SCREEN_RESOURCE_LLD_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_LLD_GRAPH:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
 						'name' =>			['type' => XML_STRING | XML_REQUIRED],
 						'host' =>			['type' => XML_STRING | XML_REQUIRED]
 					]];
 					break;
 
-				case SCREEN_RESOURCE_CLOCK:
+				case self::SCREEN_RESOURCE_TYPE_CLOCK:
 					if ($parent_data['style'] != TIME_TYPE_HOST) {
 						return $data;
 					}
 					// break; is not missing here
 
-				case SCREEN_RESOURCE_SIMPLE_GRAPH:
-				case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-				case SCREEN_RESOURCE_PLAIN_TEXT:
+				case self::SCREEN_RESOURCE_TYPE_SIMPLE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_LLD_SIMPLE_GRAPH:
+				case self::SCREEN_RESOURCE_TYPE_PLAIN_TEXT:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
 						'key' =>			['type' => XML_STRING | XML_REQUIRED],
 						'host' =>			['type' => XML_STRING | XML_REQUIRED]
-					]];
-					break;
-
-				case SCREEN_RESOURCE_MAP:
-				case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-				case SCREEN_RESOURCE_DATA_OVERVIEW:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>			['type' => XML_STRING | XML_REQUIRED]
-					]];
-					break;
-
-				case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>			['type' => XML_STRING]
-					]];
-					break;
-
-				case SCREEN_RESOURCE_HOST_TRIGGERS:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'host' =>			['type' => XML_STRING]
 					]];
 					break;
 

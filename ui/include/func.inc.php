@@ -1251,7 +1251,7 @@ function zbx_str2links($text) {
 				if ($pos != $start) {
 					$result[] = mb_substr($line, $start, $pos - $start);
 				}
-				$result[] = new CLink(CHTML::encode($match), $match);
+				$result[] = new CLink(CHtml::encode($match), $match);
 				$start = $pos + mb_strlen($match);
 			}
 		}
@@ -1510,7 +1510,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			$data = [
 				'header' => _('Access denied'),
 				'messages' => [
-					_s('You are logged in as "%1$s".', CWebUser::$data['alias']).' '._('You have no permissions to access this page.'),
+					_s('You are logged in as "%1$s".',
+						CWebUser::$data['username']).' '._('You have no permissions to access this page.'
+					),
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => []

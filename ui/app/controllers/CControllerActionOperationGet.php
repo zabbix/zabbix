@@ -121,16 +121,7 @@ class CControllerActionOperationGet extends CController {
 				'inventory_mode' => (string) HOST_INVENTORY_MANUAL
 			],
 			'opcommand' => [
-				'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-				'scriptid' => '0',
-				'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_AGENT,
-				'port' => '',
-				'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
-				'username' => '',
-				'password' => '',
-				'publickey' => '',
-				'privatekey' => '',
-				'command' => ''
+				'scriptid' => '0'
 			]
 		];
 	}
@@ -145,7 +136,7 @@ class CControllerActionOperationGet extends CController {
 	 * @return array  Each of fields is nullable, meaning given operation may not have particular configuration domain.
 	 */
 	private function popupConfig(array $operation, int $eventsource, int $recovery): array {
-		$operation_type = $this->popupConfigOperationType($operation, $eventsource, $recovery);
+		$operation_types = $this->popupConfigOperationTypes($operation, $eventsource, $recovery);
 		$operation_steps = $this->popupConfigOperationSteps($operation, $eventsource, $recovery);
 		$operation_message = $this->popupConfigOperationMessage($operation, $eventsource);
 		$operation_command = $this->popupConfigOperationCommand($operation, $eventsource);
@@ -153,7 +144,7 @@ class CControllerActionOperationGet extends CController {
 		$operation_condition = $this->popupConfigOperationCondition($operation, $eventsource, $recovery);
 
 		return [
-			'operation_type' => $operation_type,
+			'operation_types' => $operation_types,
 			'operation_steps' => $operation_steps,
 			'operation_message' => $operation_message,
 			'operation_command' => $operation_command,
@@ -171,19 +162,54 @@ class CControllerActionOperationGet extends CController {
 	 *
 	 * @return array
 	 */
-	private function popupConfigOperationType(array $operation, int $eventsource, int $recovery): array {
+	private function popupConfigOperationTypes(array $operation, int $eventsource, int $recovery): array {
 		$operation_type_options = [];
+		$scripts_allowed = false;
 
+		// First determine if scripts are allowed for this action type.
 		foreach (getAllowedOperations($eventsource)[$recovery] as $operation_type) {
+			if ($operation_type == OPERATION_TYPE_COMMAND) {
+				$scripts_allowed = true;
+
+				break;
+			}
+		}
+
+		// Then remove Remote command from dropdown list.
+		foreach (getAllowedOperations($eventsource)[$recovery] as $operation_type) {
+			if ($operation_type == OPERATION_TYPE_COMMAND) {
+				continue;
+			}
+
 			$operation_type_options[] = [
-				'value' => $operation_type,
+				'value' => 'cmd['.$operation_type.']',
 				'name' => operation_type2str($operation_type)
 			];
 		}
 
+		if ($scripts_allowed) {
+			$db_scripts = API::Script()->get([
+				'output' => ['name', 'scriptid'],
+				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
+				'sortfield' => 'name',
+				'sortorder' => ZBX_SORT_UP
+			]);
+
+			if ($db_scripts) {
+				foreach ($db_scripts as $db_script) {
+					$operation_type_options[] = [
+						'value' => 'scriptid['.$db_script['scriptid'].']',
+						'name' => $db_script['name']
+					];
+				}
+			}
+		}
+
 		return [
 			'options' => $operation_type_options,
-			'selected' => $operation['operationtype']
+			'selected' => ($operation['opcommand']['scriptid'] == 0)
+				? 'cmd['.$operation['operationtype'].']'
+				: 'scriptid['.$operation['opcommand']['scriptid'].']'
 		];
 	}
 
@@ -232,10 +258,10 @@ class CControllerActionOperationGet extends CController {
 			$users = [];
 			if ($operation['opmessage_usr']) {
 				$db_users = API::User()->get([
-					'output' => ['userid', 'alias', 'name', 'surname'],
+					'output' => ['userid', 'username', 'name', 'surname'],
 					'userids' => array_column($operation['opmessage_usr'], 'userid')
 				]);
-				CArrayHelper::sort($db_users, ['alias']);
+				CArrayHelper::sort($db_users, ['username']);
 
 				foreach ($db_users as $db_user) {
 					$users[] = [
@@ -287,31 +313,10 @@ class CControllerActionOperationGet extends CController {
 			}
 
 			$operation_command = [
-				'type' => $operation['opcommand']['type'],
 				'current_host' => $current_host,
-				'execute_on' => $operation['opcommand']['execute_on'],
-				'command' => $operation['opcommand']['command'],
-				'username' => $operation['opcommand']['username'],
-				'password' => $operation['opcommand']['password'],
-				'privatekey' => $operation['opcommand']['privatekey'],
-				'publickey' => $operation['opcommand']['publickey'],
-				'port' => $operation['opcommand']['port'],
-				'authtype' => $operation['opcommand']['authtype'],
-				'global_script' => ['scriptid' => '0', 'name' => ''],
 				'hosts' => [],
 				'groups' => []
 			];
-
-			if ($operation['opcommand']['scriptid']) {
-				$db_scrpt = API::Script()->get([
-					'output' => ['name', 'scriptid'],
-					'scriptids' => (array) $operation['opcommand']['scriptid']
-				]);
-
-				if ($db_scrpt) {
-					$operation_command['global_script'] = $db_scrpt[0];
-				}
-			}
 
 			if ($hostids) {
 				$operation_command['hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([

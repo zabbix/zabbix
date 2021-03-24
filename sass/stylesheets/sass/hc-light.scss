@@ -297,6 +297,28 @@ $dashboard-my-bg-color: #555555;
 	}
 }
 
+.dashbrd-navigation-tabs {
+	.csortable-list {
+		& > .csortable-item:focus:not(:active) {
+			& > div {
+				box-shadow: 0 0 0 2px $blue;
+			}
+		}
+	}
+
+	& .csortable > .csortable-item > div,
+	& .csortable-list > .csortable-item > div:hover {
+		border: 1px solid darken($action-hover-color, 40%);
+	}
+
+	& .csortable > .csortable-item > div.selected-tab,
+	& .csortable-list > .csortable-item > div.selected-tab {
+		span {
+			color: $white;
+		}
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
@@ -330,7 +352,7 @@ $dashboard-my-bg-color: #555555;
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
+.dashbrd.dashbrd-is-edit-mode {
 	.dashbrd-grid-iterator {
 		&.ui-resizable-resizing,
 		&.ui-draggable-dragging {
@@ -383,6 +405,7 @@ $form-icon-btn: (
 }
 
 $icon-widget-btn: (
+	dashboard-page-properties: url($sprite-path) no-repeat -318px -618px,
 	iterator-page-previous: url($sprite-path) no-repeat -244px -657px,
 	iterator-page-next: url($sprite-path) no-repeat -242px -623px,
 	widget-action: url($sprite-path) no-repeat -165px -618px,
@@ -397,6 +420,7 @@ $icon-widget-btn: (
 );
 
 // Dynamically generated classes:
+//  .btn-dashboard-page-properties
 //  .btn-iterator-page-previous
 //  .btn-iterator-page-next
 //  .btn-widget-action

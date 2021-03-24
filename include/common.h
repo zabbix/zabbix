@@ -324,11 +324,19 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* item snmpv3 authentication protocol */
 #define ITEM_SNMPV3_AUTHPROTOCOL_MD5		0
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA		1
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA1		1
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA224		2
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA256		3
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA384		4
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA512		5
 
 /* item snmpv3 privacy protocol */
 #define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES		1
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES128		1
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES192		2
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES256		3
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES192C	4
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES256C	5
 
 /* condition evaluation types */
 #define CONDITION_EVAL_TYPE_AND_OR		0
@@ -829,8 +837,11 @@ zbx_script_t;
 #define ZBX_SCRIPT_TYPE_IPMI		1
 #define ZBX_SCRIPT_TYPE_SSH		2
 #define ZBX_SCRIPT_TYPE_TELNET		3
-#define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4
 #define ZBX_SCRIPT_TYPE_WEBHOOK		5
+
+#define ZBX_SCRIPT_SCOPE_ACTION	1
+#define ZBX_SCRIPT_SCOPE_HOST	2
+#define ZBX_SCRIPT_SCOPE_EVENT	4
 
 #define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
@@ -893,7 +904,8 @@ while (0)
 														\
 do														\
 {														\
-	zbx_error("ERROR [file:%s,line:%d] Something impossible has just happened.", __FILE__, __LINE__);	\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s] Something impossible has just happened.",    \
+			__FILE__, __func__, ZABBIX_REVISION);							\
 	zbx_backtrace();											\
 }														\
 while (0)

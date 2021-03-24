@@ -201,15 +201,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 */
-	public function buildScreens(array $screens) {
-		$this->data['screens'] = $this->formatScreens($screens);
-	}
-
-	/**
 	 * Format media types.
 	 *
 	 * @param array $schema       Tag schema from validation class.
@@ -219,18 +210,6 @@ class CConfigurationExportBuilder {
 		$media_types = $this->formatMediaTypes($media_types);
 
 		$this->data['media_types'] = $this->build($schema, $media_types, 'media_types');
-	}
-
-	/**
-	 * Format valuemaps.
-	 *
-	 * @param array $schema     Tag schema from validation class.
-	 * @param array $valuemaps  Export data.
-	 */
-	public function buildValueMaps(array $schema, array $valuemaps) {
-		$valuemaps = $this->formatValueMaps($valuemaps);
-
-		$this->data['value_maps'] = $this->build($schema, $valuemaps, 'value_maps');
 	}
 
 	/**
@@ -278,7 +257,8 @@ class CConfigurationExportBuilder {
 				'macros' => $this->formatMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'dashboards' => $this->formatDashboards($template['dashboards']),
-				'tags' => $this->formatTags($template['tags'])
+				'tags' => $this->formatTags($template['tags']),
+				'valuemaps' => $this->formatValueMaps($template['valuemaps'])
 			];
 		}
 
@@ -319,7 +299,8 @@ class CConfigurationExportBuilder {
 				'macros' => $this->formatMacros($host['macros']),
 				'inventory_mode' => $host['inventory_mode'],
 				'inventory' => $this->formatHostInventory($host['inventory']),
-				'tags' => $this->formatTags($host['tags'])
+				'tags' => $this->formatTags($host['tags']),
+				'valuemaps' => $this->formatValueMaps($host['valuemaps'])
 			];
 		}
 
@@ -397,28 +378,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format mappings.
-	 *
-	 * @param array $mappings
-	 *
-	 * @return array
-	 */
-	protected function formatMappings(array $mappings) {
-		$result = [];
-
-		CArrayHelper::sort($mappings, ['value']);
-
-		foreach ($mappings as $mapping) {
-			$result[] = [
-				'value' => $mapping['value'],
-				'newvalue' => $mapping['newvalue']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format media types.
 	 *
 	 * @param array $media_types
@@ -488,10 +447,8 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($valuemaps, ['name']);
 
 		foreach ($valuemaps as $valuemap) {
-			$result[] = [
-				'name' => $valuemap['name'],
-				'mappings' => $this->formatMappings($valuemap['mappings'])
-			];
+			CArrayHelper::sort($valuemap['mappings'], ['value']);
+			$result[] = $valuemap;
 		}
 
 		return $result;
@@ -1199,30 +1156,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 *
-	 * @return array
-	 */
-	protected function formatScreens(array $screens) {
-		$result = [];
-
-		CArrayHelper::sort($screens, ['name']);
-
-		foreach ($screens as $screen) {
-			$result[] = [
-				'name' => $screen['name'],
-				'hsize' => $screen['hsize'],
-				'vsize' => $screen['vsize'],
-				'screen_items' => $this->formatScreenItems($screen['screenitems'])
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format trigger dependencies.
 	 *
 	 * @param array $dependencies
@@ -1261,43 +1194,6 @@ class CConfigurationExportBuilder {
 			$result[] = [
 				'tag' => $tag['tag'],
 				'value' => $tag['value']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format screen items.
-	 *
-	 * @param array $screenItems
-	 *
-	 * @return array
-	 */
-	protected function formatScreenItems(array $screenItems) {
-		$result = [];
-
-		CArrayHelper::sort($screenItems, ['y', 'x']);
-
-		foreach ($screenItems as $screenItem) {
-			$result[] = [
-				'resourcetype' => $screenItem['resourcetype'],
-				'width' => $screenItem['width'],
-				'height' => $screenItem['height'],
-				'x' => $screenItem['x'],
-				'y' => $screenItem['y'],
-				'colspan' => $screenItem['colspan'],
-				'rowspan' => $screenItem['rowspan'],
-				'elements' => $screenItem['elements'],
-				'valign' => $screenItem['valign'],
-				'halign' => $screenItem['halign'],
-				'style' => $screenItem['style'],
-				'url' => $screenItem['url'],
-				'dynamic' => $screenItem['dynamic'],
-				'sort_triggers' => $screenItem['sort_triggers'],
-				'resource' => $screenItem['resourceid'],
-				'max_columns' => $screenItem['max_columns'],
-				'application' => $screenItem['application']
 			];
 		}
 

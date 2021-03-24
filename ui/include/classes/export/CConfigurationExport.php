@@ -55,11 +55,9 @@ class CConfigurationExport {
 			'hosts' => [],
 			'templates' => [],
 			'groups' => [],
-			'screens' => [],
 			'images' => [],
 			'maps' => [],
-			'mediaTypes' => [],
-			'valueMaps' => []
+			'mediaTypes' => []
 		];
 
 		$this->options = array_merge($this->options, $options);
@@ -72,11 +70,9 @@ class CConfigurationExport {
 			'triggerPrototypes' => [],
 			'graphs' => [],
 			'graphPrototypes' => [],
-			'screens' => [],
 			'images' => [],
 			'maps' => [],
-			'mediaTypes' => [],
-			'valueMaps' => []
+			'mediaTypes' => []
 		];
 
 		$this->dataFields = [
@@ -166,10 +162,6 @@ class CConfigurationExport {
 				$this->builder->buildGraphs($schema['rules']['graphs'], $this->data['graphs']);
 			}
 
-			if ($this->data['screens']) {
-				$this->builder->buildScreens($this->data['screens']);
-			}
-
 			if ($this->data['images']) {
 				$this->builder->buildImages($this->data['images']);
 			}
@@ -180,10 +172,6 @@ class CConfigurationExport {
 
 			if ($this->data['mediaTypes']) {
 				$this->builder->buildMediaTypes($schema['rules']['media_types'], $this->data['mediaTypes']);
-			}
-
-			if ($this->data['valueMaps']) {
-				$this->builder->buildValueMaps($schema['rules']['value_maps'], $this->data['valueMaps']);
 			}
 
 			return $this->writer->write($this->builder->getExport());
@@ -203,11 +191,6 @@ class CConfigurationExport {
 			$this->gatherGroups($options['groups']);
 		}
 
-		// Gather value maps before items if possible.
-		if ($options['valueMaps']) {
-			$this->gatherValueMaps($options['valueMaps']);
-		}
-
 		if ($options['templates']) {
 			$this->gatherTemplates($options['templates']);
 		}
@@ -219,10 +202,6 @@ class CConfigurationExport {
 		if ($options['templates'] || $options['hosts']) {
 			$this->gatherGraphs($options['hosts'], $options['templates']);
 			$this->gatherTriggers($options['hosts'], $options['templates']);
-		}
-
-		if ($options['screens']) {
-			$this->gatherScreens($options['screens']);
 		}
 
 		if ($options['maps']) {
@@ -282,6 +261,7 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -326,6 +306,7 @@ class CConfigurationExport {
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'hostids' => $hostIds,
 			'preservekeys' => true
 		]);
@@ -567,23 +548,9 @@ class CConfigurationExport {
 		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
-		if ($this->data['valueMaps']) {
-			/*
-			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
-			 * value map IDs that should not be selected again.
-			 */
-
-			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
-				if (array_key_exists($valuemapid, $valuemapids)) {
-					unset($valuemapids[$valuemapid]);
-				}
-			}
-		}
-
 		if ($valuemapids) {
-			$this->data['valueMaps'] += API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
-				'selectMappings' => ['value', 'newvalue'],
+			$db_valuemaps = API::ValueMap()->get([
+				'output' => ['name'],
 				'valuemapids' => array_keys($valuemapids),
 				'preservekeys' => true
 			]);
@@ -593,7 +560,7 @@ class CConfigurationExport {
 			$item['valuemap'] = [];
 
 			if ($item['valuemapid'] != 0) {
-				$item['valuemap'] = ['name' => $this->data['valueMaps'][$item['valuemapid']]['name']];
+				$item['valuemap'] = ['name' => $db_valuemaps[$item['valuemapid']]['name']];
 			}
 		}
 		unset($item);
@@ -811,23 +778,9 @@ class CConfigurationExport {
 		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
-		if ($this->data['valueMaps']) {
-			/*
-			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
-			 * value map IDs that should not be selected again.
-			 */
-
-			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
-				if (array_key_exists($valuemapid, $valuemapids)) {
-					unset($valuemapids[$valuemapid]);
-				}
-			}
-		}
-
 		if ($valuemapids) {
-			$this->data['valueMaps'] += API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
-				'selectMappings' => ['value', 'newvalue'],
+			$db_valuemaps = API::ValueMap()->get([
+				'output' => ['name'],
 				'valuemapids' => array_keys($valuemapids),
 				'preservekeys' => true
 			]);
@@ -837,7 +790,7 @@ class CConfigurationExport {
 			$item_prototype['valuemap'] = [];
 
 			if ($item_prototype['valuemapid'] != 0) {
-				$item_prototype['valuemap']['name'] = $this->data['valueMaps'][$item_prototype['valuemapid']]['name'];
+				$item_prototype['valuemap']['name'] = $db_valuemaps[$item_prototype['valuemapid']]['name'];
 			}
 
 			$items[$item_prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $item_prototype;
@@ -1275,22 +1228,6 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get screens for export from database.
-	 *
-	 * @param array $screenIds
-	 */
-	protected function gatherScreens(array $screenIds) {
-		$screens = API::Screen()->get([
-			'screenids' => $screenIds,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
-		]);
-
-		$this->prepareScreenExport($screens);
-		$this->data['screens'] = $screens;
-	}
-
-	/**
 	 * Get value maps for export builder from database.
 	 *
 	 * @param array $valuemapids
@@ -1304,112 +1241,6 @@ class CConfigurationExport {
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
 		]);
-	}
-
-	/**
-	 * Change screen elements real database resource id to unique field references.
-	 *
-	 * @param array $exportScreens
-	 */
-	protected function prepareScreenExport(array &$exportScreens) {
-		$sysmapIds = [];
-		$groupIds = [];
-		$hostIds = [];
-		$graphIds = [];
-		$itemIds = [];
-
-		// gather element ids that must be substituted
-		foreach ($exportScreens as $screen) {
-			foreach ($screen['screenitems'] as $screenItem) {
-				if ($screenItem['resourceid'] != 0) {
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOST_INFO:
-						case SCREEN_RESOURCE_TRIGGER_INFO:
-						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$groupIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$hostIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$graphIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$sysmapIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_CLOCK:
-							if ($screenItem['style'] == TIME_TYPE_HOST) {
-								$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							}
-							break;
-					}
-				}
-			}
-		}
-
-		$sysmaps = $this->getMapsReferences($sysmapIds);
-		$groups = $this->getGroupsReferences($groupIds);
-		$hosts = $this->getHostsReferences($hostIds);
-		$graphs = $this->getGraphsReferences($graphIds);
-		$items = $this->getItemsReferences($itemIds);
-
-		foreach ($exportScreens as &$screen) {
-			unset($screen['screenid']);
-
-			foreach ($screen['screenitems'] as &$screenItem) {
-				if ($screenItem['resourceid'] != 0) {
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOST_INFO:
-						case SCREEN_RESOURCE_TRIGGER_INFO:
-						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$screenItem['resourceid'] = $groups[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$screenItem['resourceid'] = $hosts[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$screenItem['resourceid'] = $graphs[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$screenItem['resourceid'] = $items[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$screenItem['resourceid'] = $sysmaps[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_CLOCK:
-							if ($screenItem['style'] == TIME_TYPE_HOST) {
-								$screenItem['resourceid'] = $items[$screenItem['resourceid']];
-							}
-							break;
-					}
-				}
-			}
-			unset($screenItem);
-		}
-		unset($screen);
 	}
 
 	/**

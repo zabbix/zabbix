@@ -32,13 +32,15 @@ $severity_min = getRequest('severity_min');
 if (!zbx_ctype_digit($severity_min)) {
 	$severity_min = null;
 }
-$map_data = CMapHelper::get(getRequest('sysmapid'), ['severity_min' => $severity_min]);
+$map_data = CMapHelper::get(getRequest('sysmapid'), ['severity_min' => $severity_min,
+	'unique_id' => getRequest('unique_id')]
+);
 
 if (hasRequest('uniqueid')) {
 	// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
 	foreach ($map_data['elements'] as &$element) {
 		$actions = json_decode($element['actions'], true);
-		$actions['data']['widget_uniqueid'] = getRequest('uniqueid');
+		$actions['data']['unique_id'] = getRequest('unique_id');
 		$element['actions'] = json_encode($actions);
 	}
 	unset($element);

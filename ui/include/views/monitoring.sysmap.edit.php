@@ -351,7 +351,7 @@ foreach ($data['sysmap']['userGroups'] as $user_group) {
 	];
 }
 
-$js_insert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $user_groups]).');';
+$js_insert = 'window.addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $user_groups]).');';
 
 // User sharing table.
 $user_shares_table = (new CTable())
@@ -388,7 +388,7 @@ foreach ($data['sysmap']['users'] as $user) {
 	];
 }
 
-$js_insert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
+$js_insert .= 'window.addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
 
 zbx_add_post_js($js_insert);
 

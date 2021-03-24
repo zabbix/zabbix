@@ -32,11 +32,6 @@
 	}
 }
 
-.dashbrd-navigation {
-	display: flex;
-	margin: 10px 0 8px 0;
-}
-
 .dashbrd-navigation-tabs {
 	// Compensate 2px padding of tabs.
 	margin: -2px 10px -2px 0;
@@ -53,6 +48,7 @@
 		display: flex;
 		padding: 0;
 		margin: 0;
+		align-items: center;
 
 		& > .csortable-item:focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
@@ -77,6 +73,9 @@
 		outline: none;
 
 		& > div {
+			display: flex;
+			align-items: center;
+
 			min-height: 22px;
 			line-height: 22px;
 			box-sizing: border-box;
@@ -96,20 +95,39 @@
 			@if $ui-transitions {
 				transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
 			}
+
+			span {
+				@extend %overflow-ellipsis;
+				max-width: 300px;
+				color: $font-color;
+			}
+
+			button {
+				margin: 0 -9px 0 4px;
+			}
+
+			&:not(.selected-tab) {
+				button {
+					display: none;
+				}
+			}
 		}
 	}
 
 	& .csortable > .csortable-item > div,
 	& .csortable-list > .csortable-item > div:hover {
-		background: #e8f5ff;
-		border: 1px solid lighten($blue, 30%);
+		background: $action-hover-color;
+		border: 1px solid darken($action-hover-color, 20%);
 	}
 
 	& .csortable > .csortable-item > div.selected-tab,
 	& .csortable-list > .csortable-item > div.selected-tab {
-		color: $white;
-		background: $ui-bg-selected-color;
+		background-color: $ui-bg-selected-color;
 		border: 1px solid transparent;
+
+		span {
+			color: $font-selected-color;
+		}
 	}
 }
 
@@ -128,16 +146,67 @@
 	}
 }
 
+.dashbrd-navigation {
+	display: flex;
+	margin-top: 10px;
+	padding-bottom: 2px;
+
+	&.is-scrollable {
+		.dashbrd-navigation-controls {
+			button {
+				&.dashbrd-previous-page,
+				&.dashbrd-next-page {
+					display: inline-block;
+				}
+			}
+		}
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
 .dashbrd-grid-container {
 	position: relative;
-	margin: -4px;
+	margin: 0 -4px -4px -4px;
 
 	// For widget sliding headers to appear over the breadcrumbs.
 	z-index: 3;
+
+	&.reserve-header-lines-1 {
+		margin-top: 2rem;
+	}
+
+	&.reserve-header-lines-2 {
+		margin-top: calc(4rem + 8px);
+	}
+
+	@if $ui-transitions {
+		transition: margin-top .3s;
+	}
+}
+
+.dashbrd {
+	&:not(.dashbrd-is-multipage):not(.dashbrd-is-edit-mode) {
+		.dashbrd-navigation {
+			display: none;
+		}
+	}
+
+	&.dashbrd-is-edit-mode,
+	&:not(.dashbrd-is-multipage) {
+		.dashbrd-toggle-slideshow {
+			display: none;
+		}
+	}
+}
+
+.dashbrd-grid-widget-blocker {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	z-index: 998; // Below the new widget placeholder.
 }
 
 .dashbrd-grid-new-widget-placeholder {
@@ -149,6 +218,7 @@
 	z-index: 999;
 	color: $font-alt-color;
 	cursor: pointer;
+	user-select: none;
 
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
@@ -534,8 +604,8 @@
 
 		&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
 			.dashbrd-grid-iterator-head {
-				margin-top: -4rem;
-				height: 4rem;
+				margin-top: calc(-4rem - 8px);
+				height: calc(4rem + 8px);
 			}
 		}
 	}
@@ -599,7 +669,7 @@
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
+.dashbrd.dashbrd-is-edit-mode {
 	.dashbrd-grid-widget-actions {
 		opacity: 1;
 	}
@@ -726,8 +796,8 @@
 
 			&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
 				.dashbrd-grid-iterator-head {
-					margin-top: -4rem;
-					height: 4rem;
+					margin-top: calc(-4rem - 8px);
+					height: calc(4rem + 8px);
 				}
 			}
 		}

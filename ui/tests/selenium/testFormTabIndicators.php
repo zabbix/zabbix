@@ -84,6 +84,12 @@ class testFormTabIndicators extends CWebTest {
 							'table_selector' => 'id:tbl_macros',
 							'field_type' => 'multifield_table',
 							'count' => 3
+						],
+						[
+							'name' => 'Value mapping',
+							'entries' => ['1st value mapping', '2nd value mapping', '3rd value mapping'],
+							'field_type' => 'value_mapping',
+							'count' => 3
 						]
 					]
 				]
@@ -164,6 +170,12 @@ class testFormTabIndicators extends CWebTest {
 								'old_value' => 'No encryption'
 							],
 							'field_type' => 'general_field'
+						],
+						[
+							'name' => 'Value mapping',
+							'entries' => ['1st value mapping', '2nd value mapping', '3rd value mapping'],
+							'field_type' => 'value_mapping',
+							'count' => 3
 						]
 					]
 				]
@@ -322,7 +334,7 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger prototype configuration form tab data.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=33800&context=host&form=create',
+					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&context=host&form=create',
 					'form' => 'name:triggersForm',
 					'tabs' => [
 						[
@@ -945,6 +957,21 @@ class testFormTabIndicators extends CWebTest {
 				else {
 					for ($i = 0; $i < $tab['new_entries']; $i++) {
 						$form->query($tab['button'])->one()->click();
+					}
+				}
+				break;
+
+			case 'value_mapping':
+				if ($action === USER_ACTION_REMOVE) {
+					$form->query('xpath://table[@id="valuemap-table"]//button[text()="Remove"]')->all()->click();
+				}
+				else {
+					foreach ($tab['entries'] as $field_value) {
+						$form->query('id:valuemap_add')->one()->click();
+						$valuemap_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+						$valuemap_form->query('xpath:.//input[@type="text"]')->all()->fill($field_value);
+						$valuemap_form->submit();
+						COverlayDialogElement::ensureNotPresent();
 					}
 				}
 				break;

@@ -32,11 +32,20 @@ if (array_key_exists('error', $data)) {
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.dashboard.js');
-$this->addJsFile('class.dashboard.loader.js');
 $this->addJsFile('class.dashboard.page.js');
-$this->addJsFile('class.dashboard.widget.js');
-$this->addJsFile('class.dashboard.widget.iterator.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
+$this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.clock.js');
+$this->addJsFile('class.widget.graph.js');
+$this->addJsFile('class.widget.graph-prototype.js');
+$this->addJsFile('class.widget.map.js');
+$this->addJsFile('class.widget.navtree.js');
+$this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget.problems.js');
+$this->addJsFile('class.widget.problemsbysv.js');
+$this->addJsFile('class.widget.svggraph.js');
+$this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
@@ -45,16 +54,12 @@ $this->addJsFile('class.cverticalaccordion.js');
 $this->addJsFile('class.crangecontrol.js');
 $this->addJsFile('colorpicker.js');
 $this->addJsFile('class.csvggraph.js');
-$this->addJsFile('csvggraphwidget.js');
-$this->addJsFile('class.cclock.js');
 $this->addJsFile('class.cnavtree.js');
-$this->addJsFile('class.mapWidget.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tab-indicators.js');
 $this->addJsFile('class.sortable.js');
 
-$this->includeJsFile('dashboard/class.dashboard-share.js.php');
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 
 $this->enableLayoutModes();
@@ -100,7 +105,7 @@ $widget = (new CWidget())
 				(new CList())
 					->addItem(
 						(new CButton('dashbrd-edit', _('Edit dashboard')))
-							->setEnabled($data['dashboard']['allowed_edit'] && $data['dashboard']['editable'])
+							->setEnabled($data['dashboard']['can_edit_dashboards'] && $data['dashboard']['editable'])
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
@@ -108,7 +113,7 @@ $widget = (new CWidget())
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashbrd-actions')
 							->setTitle(_('Actions'))
-							->setEnabled($data['dashboard']['allowed_edit'])
+							->setEnabled($data['dashboard']['can_edit_dashboards'])
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
 								$data['dashboard']['editable']
@@ -122,7 +127,9 @@ $widget = (new CWidget())
 						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
 						(new CList())
 							->addClass(ZBX_STYLE_BTN_SPLIT)
-							->addItem((new CButton('dashbrd-add-widget', _('Add')))->addClass(ZBX_STYLE_BTN_ALT))
+							->addItem((new CButton('dashbrd-add-widget',
+								[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
+							))->addClass(ZBX_STYLE_BTN_ALT))
 							->addItem(
 								(new CButton('dashbrd-add', '&#8203;'))
 									->addClass(ZBX_STYLE_BTN_ALT)
@@ -151,50 +158,67 @@ $widget = (new CWidget())
 			->addClass(ZBX_STYLE_SELECTED)
 	])));
 
-if ($data['time_selector'] !== null) {
+if ($data['has_time_selector']) {
 	$widget->addItem(
 		(new CFilter(new CUrl()))
-			->setProfile($data['time_selector']['profileIdx'], $data['time_selector']['profileIdx2'])
+			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['time_selector']['from'], $data['time_selector']['to'],
+			->addTimeSelector($data['time_period']['from'], $data['time_period']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 	);
 }
 
-$widget
-	->addItem(
+$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBRD);
+
+if (count($data['dashboard']['pages']) > 1) {
+	$dashboard->addClass(ZBX_STYLE_DASHBRD_IS_MULTIPAGE);
+}
+if ($data['dashboard']['dashboardid'] === null) {
+	$dashboard->addClass(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+}
+
+if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+	$dashboard->addItem(
 		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBRD)
+			->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
 			->addItem(
 				(new CDiv())
-					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
-					->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
-					->addItem(
-						(new CDiv())
-							->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
-							->addItem([
-								(new CSimpleButton())
-									->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
-									->addClass('btn-iterator-page-previous')
-									->setEnabled(false),
-								(new CSimpleButton())
-									->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
-									->addClass('btn-iterator-page-next')
-									->setEnabled(false),
-								(new CSimpleButton('Start slideshow'))->addClass(ZBX_STYLE_BTN_ALT)
-							])
-					)
+					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+					->addItem([
+						(new CSimpleButton())
+							->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+							->addClass('btn-iterator-page-previous')
+							->setEnabled(false),
+						(new CSimpleButton())
+							->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+							->addClass('btn-iterator-page-next')
+							->setEnabled(false),
+						(new CSimpleButton(
+							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+								? _s('Stop slideshow')
+								: _s('Start slideshow')
+						))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->addClass(ZBX_STYLE_DASHBRD_TOGGLE_SLIDESHOW)
+					])
 			)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
-	)
+	);
+}
+
+$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID));
+
+$widget
+	->addItem($dashboard)
 	->show();
 
 (new CScriptTag(
 	'initializeView('.
 		json_encode($data['dashboard']).','.
 		json_encode($data['widget_defaults']).','.
-		json_encode($data['time_selector']).','.
+		json_encode($data['has_time_selector']).','.
+		json_encode($data['time_period']).','.
 		json_encode($data['dynamic']).','.
 		json_encode($web_layout_mode).
 	');'

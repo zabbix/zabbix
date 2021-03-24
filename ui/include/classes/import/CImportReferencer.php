@@ -39,7 +39,6 @@ class CImportReferencer {
 	protected $graphs = [];
 	protected $iconMaps = [];
 	protected $maps = [];
-	protected $screens = [];
 	protected $templateDashboards = [];
 	protected $macros = [];
 	protected $proxies = [];
@@ -56,7 +55,6 @@ class CImportReferencer {
 	protected $graphsRefs;
 	protected $iconMapsRefs;
 	protected $mapsRefs;
-	protected $screensRefs;
 	protected $templateDashboardsRefs;
 	protected $macrosRefs;
 	protected $proxiesRefs;
@@ -194,16 +192,17 @@ class CImportReferencer {
 	/**
 	 * Get value map id by vale map name.
 	 *
+	 * @param string $hostid
 	 * @param string $name
 	 *
 	 * @return string|bool
 	 */
-	public function resolveValueMap($name) {
+	public function resolveValueMap($hostid, $name) {
 		if ($this->valueMapsRefs === null) {
 			$this->selectValueMaps();
 		}
 
-		return isset($this->valueMapsRefs[$name]) ? $this->valueMapsRefs[$name] : false;
+		return isset($this->valueMapsRefs[$hostid][$name]) ? $this->valueMapsRefs[$hostid][$name] : false;
 	}
 
 	/**
@@ -271,21 +270,6 @@ class CImportReferencer {
 		}
 
 		return isset($this->mapsRefs[$name]) ? $this->mapsRefs[$name] : false;
-	}
-
-	/**
-	 * Get screen id by name.
-	 *
-	 * @param string $name
-	 *
-	 * @return string|bool
-	 */
-	public function resolveScreen($name) {
-		if ($this->screensRefs === null) {
-			$this->selectScreens();
-		}
-
-		return isset($this->screensRefs[$name]) ? $this->screensRefs[$name] : false;
 	}
 
 	/**
@@ -507,22 +491,17 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add value map association with valuemap ID.
-	 *
-	 * @param string $name
-	 * @param string $valuemapid
-	 */
-	public function addValueMapRef($name, $valuemapid) {
-		$this->valueMapsRefs[$name] = $valuemapid;
-	}
-
-	/**
 	 * Add value map names that need association with a database value map ID.
 	 *
 	 * @param array $valueMaps
 	 */
 	public function addValueMaps(array $valueMaps) {
-		$this->valueMaps = array_unique(array_merge($this->valueMaps, $valueMaps));
+		foreach ($valueMaps as $host => $valuemap_names) {
+			if (!array_key_exists($host, $this->valueMaps)) {
+				$this->valueMaps[$host] = [];
+			}
+			$this->valueMaps[$host] = array_unique(array_merge($this->valueMaps[$host], $valuemap_names));
+		}
 	}
 
 	/**
@@ -610,18 +589,9 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add screens names that need association with a database screen id.
+	 * Add templated dashboard names that need association with a database dashboard id.
 	 *
-	 * @param array $screens
-	 */
-	public function addScreens(array $screens) {
-		$this->screens = array_unique(array_merge($this->screens, $screens));
-	}
-
-	/**
-	 * Add templated screen names that need association with a database screen id.
-	 *
-	 * @param array $screens
+	 * @param array $dashboards
 	 */
 	public function addTemplateDashboards(array $dashboards) {
 		$this->templateDashboards = array_unique(array_merge($this->templateDashboards, $dashboards));
@@ -788,8 +758,8 @@ class CImportReferencer {
 			$this->hostsRefs = [];
 			// fetch only normal hosts, discovered hosts must not be imported
 			$dbHosts = API::Host()->get([
-				'filter' => ['host' => $this->hosts],
 				'output' => ['hostid', 'host'],
+				'filter' => ['host' => $this->hosts],
 				'preservekeys' => true,
 				'templated_hosts' => true
 			]);
@@ -875,14 +845,25 @@ class CImportReferencer {
 	protected function selectValueMaps() {
 		if ($this->valueMaps) {
 			$this->valueMapsRefs = [];
+			$sql_where = [];
 
-			$valuemaps = API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
-				'filter' => ['name' => $this->valueMaps]
-			]);
+			foreach ($this->valueMaps as $host => $valuemap_names) {
+				$hostid = $this->resolveHostOrTemplate($host);
+				if ($hostid) {
+					$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
+						dbConditionString('vm.name', $valuemap_names).')';
+				}
+			}
 
-			foreach ($valuemaps as $valuemap) {
-				$this->valueMapsRefs[$valuemap['name']] = $valuemap['valuemapid'];
+			if ($sql_where) {
+				$db_valuemaps = DBselect(
+					'SELECT vm.valuemapid,vm.hostid,vm.name'.
+					' FROM valuemap vm'.
+					' WHERE '.implode(' OR ', $sql_where)
+				);
+				while ($valuemap = DBfetch($db_valuemaps)) {
+					$this->valueMapsRefs[$valuemap['hostid']][$valuemap['name']] = $valuemap['valuemapid'];
+				}
 			}
 
 			$this->valueMaps = [];
@@ -1007,25 +988,6 @@ class CImportReferencer {
 			}
 
 			$this->maps = [];
-		}
-	}
-
-	/**
-	 * Select screen ids for previously added screen names.
-	 */
-	protected function selectScreens() {
-		if (!empty($this->screens)) {
-			$this->screensRefs = [];
-
-			$db_screens = API::Screen()->get([
-				'filter' => ['name' => $this->screens],
-				'output' => ['screenid', 'name']
-			]);
-			foreach ($db_screens as $db_screen) {
-				$this->screensRefs[$db_screen['name']] = $db_screen['screenid'];
-			}
-
-			$this->screens = [];
 		}
 	}
 

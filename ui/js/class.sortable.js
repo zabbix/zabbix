@@ -42,8 +42,8 @@ class CSortable extends CBaseComponent {
 		drag_scroll_delay_short = 150,
 		drag_scroll_delay_long = 400,
 		wheel_step = 100,
-		connect = true
-	} = {}) {
+		do_activate = true
+	}) {
 		super(target);
 
 		this._is_vertical = is_vertical;
@@ -55,45 +55,45 @@ class CSortable extends CBaseComponent {
 		this._init();
 		this._registerEvents();
 
-		if (connect) {
-			this.connect();
+		if (do_activate) {
+			this.activate();
 		}
 	}
 
 	/**
-	 * Connect the interactive functionality.
+	 * Activate the interactive functionality.
 	 *
 	 * @returns {CSortable}
 	 */
-	connect() {
-		if (this._is_connected) {
-			throw Error('Instance already connected.');
+	activate() {
+		if (this._is_activated) {
+			throw Error('Instance already activated.');
 		}
 
 		this._fixListPos();
 
-		this._connectEvents();
+		this._activateEvents();
 
-		this._is_connected = true;
+		this._is_activated = true;
 
 		return this;
 	}
 
 	/**
-	 * Disconnect the interactive functionality.
+	 * Deactivate the interactive functionality.
 	 *
 	 * @returns {CSortable}
 	 */
-	disconnect() {
-		if (!this._is_connected) {
-			throw Error('Instance already disconnected.');
+	deactivate() {
+		if (!this._is_activated) {
+			throw Error('Instance already deactivated.');
 		}
 
 		this._cancelDragging();
 
-		this._disconnectEvents();
+		this._deactivateEvents();
 
-		this._is_connected = false;
+		this._is_activated = false;
 
 		return this;
 	}
@@ -130,7 +130,7 @@ class CSortable extends CBaseComponent {
 	 * @returns {boolean}
 	 */
 	isScrollable() {
-		return !this._isEqualPos(this._getListPosMax(), 0);
+		return !this._isPosEqual(this._getListPosMax(), 0);
 	}
 
 	/**
@@ -204,14 +204,14 @@ class CSortable extends CBaseComponent {
 
 		this._list.classList.add(ZBX_STYLE_SORTABLE_LIST);
 
-		this._list_pos = -parseFloat(window.getComputedStyle(this._list).getPropertyValue(
+		this._list_pos = -parseFloat(getComputedStyle(this._list).getPropertyValue(
 			this._is_vertical ? 'top' : 'left'
 		));
 
 		this._drag_item = null;
 		this._drag_scroll_timeout = null;
 
-		this._is_connected = false;
+		this._is_activated = false;
 	}
 
 	/**
@@ -382,7 +382,7 @@ class CSortable extends CBaseComponent {
 	_startDragScrolling(direction) {
 		if (this._drag_scroll_timeout === null) {
 			this._drag_scroll_tick = 0;
-			this._drag_scroll_timeout = window.setTimeout(() => {
+			this._drag_scroll_timeout = setTimeout(() => {
 				this._dragScroll(direction);
 			}, this._getDragScrollDelay(0));
 		}
@@ -442,7 +442,7 @@ class CSortable extends CBaseComponent {
 			}
 		}
 
-		this._drag_scroll_timeout = window.setTimeout(() => this._dragScroll(direction),
+		this._drag_scroll_timeout = setTimeout(() => this._dragScroll(direction),
 			this._getDragScrollDelay(++this._drag_scroll_tick)
 		);
 	}
@@ -452,7 +452,7 @@ class CSortable extends CBaseComponent {
 	 */
 	_endDragScrolling() {
 		if (this._drag_scroll_timeout !== null) {
-			window.clearTimeout(this._drag_scroll_timeout);
+			clearTimeout(this._drag_scroll_timeout);
 			this._drag_scroll_timeout = null;
 		}
 	}
@@ -479,7 +479,7 @@ class CSortable extends CBaseComponent {
 				this._list.querySelector(`.${ZBX_STYLE_SORTABLE_DRAGGING}`)
 			);
 
-			this._target.dispatchEvent(new Event('_dragcancel'));
+			this.fire('_dragcancel');
 		}
 	}
 
@@ -527,7 +527,7 @@ class CSortable extends CBaseComponent {
 	 * @param {number} pos  Position in decimal pixels.
 	 */
 	_setListPos(pos) {
-		if (this._isEqualPos(pos, this._list_pos)) {
+		if (this._isPosEqual(pos, this._list_pos)) {
 			return;
 		}
 
@@ -609,7 +609,7 @@ class CSortable extends CBaseComponent {
 	 *
 	 * @returns {boolean}
 	 */
-	_isEqualPos(pos_1, pos_2) {
+	_isPosEqual(pos_1, pos_2) {
 		return (Math.abs(pos_1 - pos_2) < 0.001);
 	}
 
@@ -637,7 +637,7 @@ class CSortable extends CBaseComponent {
 				}
 			},
 
-			targetScroll: (e) => {
+			targetScroll: () => {
 				// Prevent browsers from automatically scrolling focusable elements into view.
 				this._target[this._is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
 			},
@@ -658,7 +658,7 @@ class CSortable extends CBaseComponent {
 				wheel_pos = this._is_vertical ? e.clientY : e.clientX;
 
 				if (wheel_request === null) {
-					wheel_request = window.requestAnimationFrame(() => {
+					wheel_request = requestAnimationFrame(() => {
 						this._wheel(wheel_direction, wheel_pos);
 						wheel_request = null;
 					});
@@ -666,6 +666,10 @@ class CSortable extends CBaseComponent {
 			},
 
 			listMouseDown: (e) => {
+				if (e.button != 0) {
+					return;
+				}
+
 				if (!this._is_sorting_enabled) {
 					return;
 				}
@@ -696,7 +700,7 @@ class CSortable extends CBaseComponent {
 				// Save initial mouse position.
 				mouse_down_pos = this._is_vertical ? e.clientY : e.clientX;
 
-				this._target.removeEventListener('wheel', this._events.wheel);
+				this.off('wheel', this._events.wheel);
 				window.addEventListener('mousemove', this._events.windowMouseMove);
 				window.addEventListener('mouseup', this._events.windowMouseUp);
 				window.addEventListener('wheel', this._events.wheel, {passive: false});
@@ -715,7 +719,7 @@ class CSortable extends CBaseComponent {
 				mouse_move_pos = this._is_vertical ? e.clientY : e.clientX;
 
 				if (mouse_move_request === null) {
-					mouse_move_request = window.requestAnimationFrame(() => {
+					mouse_move_request = requestAnimationFrame(() => {
 						this._drag(mouse_move_pos);
 						mouse_move_request = null;
 					});
@@ -731,7 +735,7 @@ class CSortable extends CBaseComponent {
 					this._endDragging();
 
 					end_dragging_after_transitions = (transitions_set.size > 0
-						|| !this._isEqualPos(this._list_pos, prev_list_pos));
+						|| !this._isPosEqual(this._list_pos, prev_list_pos));
 
 					if (!end_dragging_after_transitions) {
 						this._endDraggingAfterTransitions();
@@ -744,14 +748,14 @@ class CSortable extends CBaseComponent {
 				prevent_clicks = false;
 
 				if (mouse_move_request !== null) {
-					window.cancelAnimationFrame(mouse_move_request);
+					cancelAnimationFrame(mouse_move_request);
 					mouse_move_request = null;
 				}
 
 				window.removeEventListener('mousemove', this._events.windowMouseMove);
 				window.removeEventListener('mouseup', this._events.windowMouseUp);
 				window.removeEventListener('wheel', this._events.wheel);
-				this._target.addEventListener('wheel', this._events.wheel, {passive: false});
+				this.on('wheel', this._events.wheel, {passive: false});
 			},
 
 			listKeyDown: (e) => {
@@ -818,7 +822,7 @@ class CSortable extends CBaseComponent {
 				}
 			},
 
-			listResize: (e) => {
+			listResize: () => {
 				this._fixListPos();
 			},
 
@@ -830,7 +834,7 @@ class CSortable extends CBaseComponent {
 			},
 		};
 
-		this._connectEvents = () => {
+		this._activateEvents = () => {
 			prevent_clicks = false;
 			mouse_down_item = null;
 			mouse_move_request = null;
@@ -838,10 +842,10 @@ class CSortable extends CBaseComponent {
 			end_dragging_after_transitions = false;
 			transitions_set = new Set();
 
-			this._target.addEventListener('click', this._events.targetClick);
-			this._target.addEventListener('scroll', this._events.targetScroll);
-			this._target.addEventListener('wheel', this._events.wheel, {passive: false});
-			this._target.addEventListener('_dragcancel', this._events._cancelDragging);
+			this.on('click', this._events.targetClick);
+			this.on('scroll', this._events.targetScroll);
+			this.on('wheel', this._events.wheel, {passive: false});
+			this.on('_dragcancel', this._events._cancelDragging);
 			this._list.addEventListener('mousedown', this._events.listMouseDown);
 			this._list.addEventListener('keydown', this._events.listKeyDown);
 			this._list.addEventListener('focusin', this._events.listFocusIn);
@@ -852,26 +856,26 @@ class CSortable extends CBaseComponent {
 			list_resize_observer.observe(this._list);
 		};
 
-		this._disconnectEvents = () => {
+		this._deactivateEvents = () => {
 			if (wheel_request !== null) {
-				window.cancelAnimationFrame(wheel_request);
+				cancelAnimationFrame(wheel_request);
 			}
 
 			if (end_dragging_after_transitions) {
 				this._endDraggingAfterTransitions();
 			}
 
-			this._target.removeEventListener('click', this._events.targetClick);
-			this._target.removeEventListener('scroll', this._events.targetScroll);
-			this._target.removeEventListener('wheel', this._events.wheel);
-			this._target.removeEventListener('_dragcancel', this._events._cancelDragging);
+			this.off('click', this._events.targetClick);
+			this.off('scroll', this._events.targetScroll);
+			this.off('wheel', this._events.wheel);
+			this.off('_dragcancel', this._events._cancelDragging);
 			this._list.removeEventListener('mousedown', this._events.listMouseDown);
 			this._list.removeEventListener('keydown', this._events.listKeyDown);
 			this._list.removeEventListener('focusin', this._events.listFocusIn);
 			this._list.removeEventListener('transitionrun', this._events.listRunTransition);
 			this._list.removeEventListener('transitionend', this._events.listEndTransition);
 
-			// Connected by mousedown event handler.
+			// Added by mousedown event handler.
 			window.removeEventListener('mousemove', this._events.windowMouseMove);
 			window.removeEventListener('mouseup', this._events.windowMouseUp);
 			window.removeEventListener('wheel', this._events.wheel);

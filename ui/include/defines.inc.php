@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.4.0alpha2');
+define('ZABBIX_VERSION',		'5.4.0rc1');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030065);
+define('ZABBIX_DB_VERSION',		5030107);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -84,8 +84,11 @@ define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
 define('ZBX_SCRIPT_TYPE_TELNET',		3);
-define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
 define('ZBX_SCRIPT_TYPE_WEBHOOK',		5);
+
+define('ZBX_SCRIPT_SCOPE_ACTION', 0x1);
+define('ZBX_SCRIPT_SCOPE_HOST', 0x2);
+define('ZBX_SCRIPT_SCOPE_EVENT', 0x4);
 
 define('ZBX_SEARCH_TYPE_STRICT',	0);
 define('ZBX_SEARCH_TYPE_PATTERN',	1);
@@ -230,10 +233,8 @@ define('AUDIT_RESOURCE_IMAGE',				16);
 define('AUDIT_RESOURCE_VALUE_MAP',			17);
 define('AUDIT_RESOURCE_IT_SERVICE',			18);
 define('AUDIT_RESOURCE_MAP',				19);
-define('AUDIT_RESOURCE_SCREEN',				20);
 define('AUDIT_RESOURCE_SCENARIO',			22);
 define('AUDIT_RESOURCE_DISCOVERY_RULE',		23);
-define('AUDIT_RESOURCE_SLIDESHOW',			24);
 define('AUDIT_RESOURCE_SCRIPT',				25);
 define('AUDIT_RESOURCE_PROXY',				26);
 define('AUDIT_RESOURCE_MAINTENANCE',		27);
@@ -550,11 +551,19 @@ define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',		2);
 define('ITEM_AUTHTYPE_PASSWORD',	0);
 define('ITEM_AUTHTYPE_PUBLICKEY',	1);
 
-define('ITEM_AUTHPROTOCOL_MD5', 0);
-define('ITEM_AUTHPROTOCOL_SHA', 1);
+define('ITEM_SNMPV3_AUTHPROTOCOL_MD5',		0);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA1',		1);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA224',	2);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA256',	3);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA384',	4);
+define('ITEM_SNMPV3_AUTHPROTOCOL_SHA512',	5);
 
-define('ITEM_PRIVPROTOCOL_DES', 0);
-define('ITEM_PRIVPROTOCOL_AES', 1);
+define('ITEM_SNMPV3_PRIVPROTOCOL_DES',		0);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES128',	1);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES192',	2);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES256',	3);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES192C',	4);
+define('ITEM_SNMPV3_PRIVPROTOCOL_AES256C',	5);
 
 define('ITEM_LOGTYPE_INFORMATION',		1);
 define('ITEM_LOGTYPE_WARNING',			2);
@@ -745,34 +754,12 @@ define('CONDITION_EVAL_TYPE_EXPRESSION', 	3);
 define('SCREEN_RESOURCE_GRAPH',				0);
 define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
 define('SCREEN_RESOURCE_MAP',				2);
-define('SCREEN_RESOURCE_PLAIN_TEXT',		3);
-define('SCREEN_RESOURCE_HOST_INFO',		4);
-define('SCREEN_RESOURCE_TRIGGER_INFO',		5);
-define('SCREEN_RESOURCE_SERVER_INFO',		6);
-define('SCREEN_RESOURCE_CLOCK',				7);
-define('SCREEN_RESOURCE_SCREEN',			8); // Not supported since Zabbix 4.4.
-define('SCREEN_RESOURCE_TRIGGER_OVERVIEW',	9);
-define('SCREEN_RESOURCE_DATA_OVERVIEW',		10);
-define('SCREEN_RESOURCE_URL',				11);
-define('SCREEN_RESOURCE_ACTIONS',			12);
-define('SCREEN_RESOURCE_EVENTS',			13);
-define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
-define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
-define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
-// used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
-define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
-define('SCREEN_RESOURCE_LLD_GRAPH',			20);
-// used in Monitoring > Web > Details (httpdetails.php)
 define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
-// used in Monitoring > Discovery
 define('SCREEN_RESOURCE_DISCOVERY',			22);
-// used in Monitoring > Web
 define('SCREEN_RESOURCE_HTTPTEST',			23);
-// used in Monitoring > Problems
 define('SCREEN_RESOURCE_PROBLEM',			24);
 
-define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
 define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',		2);
 define('SCREEN_SORT_TRIGGERS_TIME_ASC',				3);
@@ -793,17 +780,7 @@ define('SCREEN_MODE_EDIT',		1);
 define('SCREEN_MODE_SLIDESHOW',		2);
 define('SCREEN_MODE_JS',		3);
 
-define('SCREEN_SIMPLE_ITEM',	0);
-define('SCREEN_DYNAMIC_ITEM',	1);
-
 define('SCREEN_REFRESH_RESPONSIVENESS',	10);
-
-define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
-define('SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT', 3);
-define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
-
-define('SCREEN_MIN_SIZE', 1);
-define('SCREEN_MAX_SIZE', 100);
 
 // default, minimum and maximum number of lines for dashboard widgets
 define('ZBX_DEFAULT_WIDGET_LINES', 25);
@@ -1321,7 +1298,7 @@ define('API_FLOATS',				13);
 define('API_UINTS64',				14);
 // specific types
 define('API_HG_NAME',				15);
-define('API_SCRIPT_NAME',			16);
+define('API_SCRIPT_MENU_PATH',		16);
 define('API_USER_MACRO',			17);
 define('API_TIME_PERIOD',			18);
 define('API_REGEX',					19);
@@ -1343,6 +1320,8 @@ define('API_DNS',					34);
 define('API_PORT',					35);
 define('API_TRIGGER_EXPRESSION',	36);
 define('API_EVENT_NAME',			37);
+define('API_JSONRPC_PARAMS',		38);
+define('API_JSONRPC_ID',			39);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1411,6 +1390,8 @@ define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		300);
 define('ZBX_TEXTAREA_MACRO_INHERITED_WIDTH',	180);
 define('ZBX_TEXTAREA_TAG_WIDTH',				250);
 define('ZBX_TEXTAREA_TAG_VALUE_WIDTH',			300);
+define('ZBX_TEXTAREA_MAPPING_VALUE_WIDTH',		250);
+define('ZBX_TEXTAREA_MAPPING_NEWVALUE_WIDTH',	250);
 define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
 define('ZBX_TEXTAREA_FILTER_SMALL_WIDTH',		150);
 define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
@@ -1439,6 +1420,7 @@ define('ZBX_ACTION_ADD',		0);
 define('ZBX_ACTION_REPLACE',	1);
 define('ZBX_ACTION_REMOVE',		2);
 define('ZBX_ACTION_REMOVE_ALL', 3);
+define('ZBX_ACTION_RENAME',		4);
 
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
@@ -1450,7 +1432,6 @@ define('WIDGET_DATA_OVER',			'dataover');
 define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
-define('WIDGET_FAV_SCREENS',		'favscreens');
 define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
@@ -1485,8 +1466,6 @@ define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
 define('WIDGET_SEARCH_HOSTS',			'search_hosts');
 define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
 define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
-// slideshow
-define('WIDGET_SLIDESHOW',				'hat_slides');
 
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
@@ -1616,6 +1595,7 @@ define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
 define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
 define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
 define('TAB_INDICATOR_PERMISSIONS', 'permissions');
+define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
@@ -1635,7 +1615,6 @@ define('ZBX_STYLE_BTN_BACK_MAP', 'btn-back-map');
 define('ZBX_STYLE_BTN_BACK_MAP_CONTAINER', 'btn-back-map-container');
 define('ZBX_STYLE_BTN_BACK_MAP_CONTENT', 'btn-back-map-content');
 define('ZBX_STYLE_BTN_BACK_MAP_ICON', 'btn-back-map-icon');
-define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
 define('ZBX_STYLE_BTN_DASHBRD_NORMAL', 'btn-dashbrd-normal');
@@ -1683,6 +1662,8 @@ define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
 define('ZBX_STYLE_COMPACT_VIEW', 'compact-view');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
 define('ZBX_STYLE_DASHBRD', 'dashbrd');
+define('ZBX_STYLE_DASHBRD_IS_MULTIPAGE', 'dashbrd-is-multipage');
+define('ZBX_STYLE_DASHBRD_IS_EDIT_MODE', 'dashbrd-is-edit-mode');
 define('ZBX_STYLE_DASHBRD_GRID', 'dashbrd-grid-container');
 define('ZBX_STYLE_DASHBRD_NAVIGATION', 'dashbrd-navigation');
 define('ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS', 'dashbrd-navigation-controls');
@@ -1832,7 +1813,8 @@ define('ZBX_STYLE_REMOVE_BTN', 'remove-btn');
 define('ZBX_STYLE_RIGHT', 'right');
 define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
-define('ZBX_STYLE_SCREEN_TABLE', 'screen-table');
+define('ZBX_STYLE_VALUEMAP_LIST_TABLE', 'valuemap-list-table');
+define('ZBX_STYLE_VALUEMAP_CHECKBOX', 'valuemap-checkbox');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_FORM_SEARCH', 'form-search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');

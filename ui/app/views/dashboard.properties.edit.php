@@ -28,6 +28,9 @@ $form = (new CForm())
 	->setName('dashboard_properties_form')
 	->addItem(getMessages());
 
+// Submit button is needed to enable submit event on Enter on inputs.
+$form->addItem((new CInput('submit', 'dashboard_properties_submit'))->addStyle('display: none;'));
+
 $form_list = new CFormList();
 
 $script_inline = '';
@@ -89,9 +92,7 @@ $output = [
 			'title' => _('Apply'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'document.dispatchEvent('.
-				'new CustomEvent(DASHBOARD_EVENT_APPLY_PROPERTIES, {detail: {overlay: overlay}})'.
-			');'
+			'action' => 'ZABBIX.Dashboard.applyProperties();'
 		]
 	]
 ];

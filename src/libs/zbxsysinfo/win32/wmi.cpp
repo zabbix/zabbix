@@ -213,15 +213,13 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 		zbx_vector_wmi_instance_t *wmi_values, char **error)
 {
 	int	ret = SYSINFO_RET_FAIL;
-	VARIANT	*vtProp = NULL;
-	ULONG	obj_num = 0;
+	VARIANT	*vtProp;
 	HRESULT	hres = S_OK;
 
 	while (pEnumerator && SUCCEEDED(hres))
 	{
 		IWbemClassObject	*pclsObj;
 		ULONG			uReturn = 0;
-		HRESULT			hres;
 		zbx_vector_wmi_prop_t	*inst_val = NULL;
 
 		hres = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
@@ -232,6 +230,9 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 			*error = zbx_strdup(*error, "WMI query timeout.");
 			return ret;
 		}
+
+		if (WBEM_S_FALSE == hres && 0 == uReturn)
+			return SYSINFO_RET_OK;
 
 		if (FAILED(hres) || 0 == uReturn)
 			return ret;
@@ -245,15 +246,15 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 			break;
 		}
 
-		inst_val = (zbx_vector_wmi_prop_t*) zbx_malloc(NULL, sizeof(zbx_vector_wmi_prop_t));
+		inst_val = (zbx_vector_wmi_prop_t*)zbx_malloc(NULL, sizeof(zbx_vector_wmi_prop_t));
 		zbx_vector_wmi_prop_create(inst_val);
 		zbx_vector_wmi_instance_append(wmi_values, inst_val);
 
-		while( !( FAILED(hres) || WBEM_S_NO_MORE_DATA == hres ))
+		while (!(FAILED(hres) || WBEM_S_NO_MORE_DATA == hres))
 		{
 			zbx_wmi_prop_t	prop = {NULL, NULL};
 
-			vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
+			vtProp = (VARIANT*)zbx_malloc(NULL, sizeof(VARIANT));
 			VariantInit(vtProp);
 			hres = pclsObj->Next(0, &prop.name, vtProp, 0, 0);
 
@@ -867,7 +868,7 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
 	struct zbx_json	j;
 	int		inst_i, prop_i, ret = SYSINFO_RET_OK;
 
-	zbx_json_initarray(&j, wmi_values->values_num * wmi_values->values[0]->values_num * 50);
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	for (inst_i = 0; inst_i < wmi_values->values_num && SYSINFO_RET_OK == ret; inst_i++)
 	{

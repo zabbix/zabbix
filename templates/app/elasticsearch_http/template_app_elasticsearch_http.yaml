@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:00Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -243,7 +243,6 @@ zabbix_export:
                   var state = ['green', 'yellow', 'red'];
                   
                   return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1783,6 +1782,31 @@ zabbix_export:
         -
           macro: '{$ELASTICSEARCH.USERNAME}'
           description: 'The username of the Elasticsearch.'
+      valuemaps:
+        -
+          name: 'ES cluster state'
+          mappings:
+            -
+              value: '0'
+              newvalue: green
+            -
+              value: '1'
+              newvalue: yellow
+            -
+              value: '2'
+              newvalue: red
+            -
+              value: '255'
+              newvalue: unknown
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '({Elasticsearch Cluster by HTTP:es.nodes.fs.total_in_bytes.last()}-{Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()})/({Elasticsearch Cluster by HTTP:es.cluster.number_of_data_nodes.last()}-1)>{Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()}'
@@ -1834,28 +1858,3 @@ zabbix_export:
           item:
             host: 'Elasticsearch Cluster by HTTP'
             key: es.cluster.task_max_waiting_in_queue
-  value_maps:
-    -
-      name: 'ES cluster state'
-      mappings:
-        -
-          value: '0'
-          newvalue: green
-        -
-          value: '1'
-          newvalue: yellow
-        -
-          value: '2'
-          newvalue: red
-        -
-          value: '255'
-          newvalue: unknown
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

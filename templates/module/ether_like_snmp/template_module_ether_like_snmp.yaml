@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-22T17:00:18Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -103,16 +103,16 @@ zabbix_export:
                       });
                   });
                   return JSON.stringify(data);
-  value_maps:
-    -
-      name: 'EtherLike-MIB::dot3StatsDuplexStatus'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: unknown
-        -
-          value: '2'
-          newvalue: halfDuplex
-        -
-          value: '3'
-          newvalue: fullDuplex
+          name: 'EtherLike-MIB::dot3StatsDuplexStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: halfDuplex
+            -
+              value: '3'
+              newvalue: fullDuplex
