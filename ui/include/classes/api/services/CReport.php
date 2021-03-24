@@ -111,8 +111,8 @@ class CReport extends CApiService {
 		// expired
 		if ($options['expired'] !== null) {
 			$sql_parts['where'][] = $options['expired']
-				? '(r.active_till>0 AND r.active_till<'.strtotime('tomorrow UTC').')'
-				: '(r.active_till=0 OR r.active_till>='.strtotime('tomorrow UTC').')';
+				? '(r.active_till>0 AND r.active_till<'.time().')'
+				: '(r.active_till=0 OR r.active_till>='.time().')';
 		}
 
 		// filter

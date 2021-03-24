@@ -74,10 +74,12 @@ class CControllerPopupScheduledReportCreate extends CController {
 			: 0;
 		$report['start_time'] = ($this->getInput('hours') * SEC_PER_HOUR) + ($this->getInput('minutes') * SEC_PER_MIN);
 		$report['active_since'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_since']) !== false)
-			? (new DateTime($report['active_since']))->getTimestamp()
+			? (new DateTime($report['active_since'], new DateTimeZone('UTC')))->getTimestamp()
 			: 0;
 		$report['active_till'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_till']) !== false)
-			? (new DateTime($report['active_till']))->getTimestamp()
+			? (new DateTime($report['active_till'], new DateTimeZone('UTC')))
+				->setTime(23,59,59)
+				->getTimestamp()
 			: 0;
 		$report['users'] = [];
 		$report['user_groups'] = [];

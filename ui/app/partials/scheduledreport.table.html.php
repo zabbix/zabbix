@@ -81,7 +81,9 @@ foreach ($data['reports'] as $report) {
 		$status_name = _('Expired');
 		$status_class = ZBX_STYLE_GREY;
 
-		$info_icons[] = makeWarningIcon(_s('Expired at %1$s.', zbx_date2str(DATE_TIME_FORMAT, $report['active_till'])));
+		$info_icons[] = makeWarningIcon(_s('Expired on %1$s.',
+			(new DateTime('@'.$report['active_till']))->format(DATE_FORMAT))
+		);
 	}
 	else {
 		$status_name = _('Enabled');
