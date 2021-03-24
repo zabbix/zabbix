@@ -2166,7 +2166,7 @@ out:
  *             ts        - [IN] the requested period end timestamp            *
  *                                                                            *
  ******************************************************************************/
-static void	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_record_t *values, int seconds,
+static void	vch_item_get_values_by_time(const zbx_vc_item_t *item, zbx_vector_history_record_t *values, int seconds,
 		const zbx_timespec_t *ts)
 {
 	int		index, now;
