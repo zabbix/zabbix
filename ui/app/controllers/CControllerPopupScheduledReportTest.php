@@ -76,8 +76,22 @@ class CControllerPopupScheduledReportTest extends CController {
 
 		$result = $server->testReport($params, CSessionHelper::getId());
 
+		$data = [
+			'title' => _('Test report generating'),
+			'messages' => null,
+			'results' => [],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
+
 		if ($result) {
 			$msg_title = null;
+
+			if (is_array($result) && array_key_exists('results', $result)) {
+				$data['results'] = $result['results'];
+			}
+
 			info(_('Report generating test successful.'));
 		}
 		else {
@@ -85,15 +99,8 @@ class CControllerPopupScheduledReportTest extends CController {
 			error($server->getError());
 		}
 
-		$data = [
-			'title' => _('Test report generating'),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		];
-
-		if (($messages = getMessages($result, $msg_title)) !== null) {
-			$data['messages'] = $messages->toString();
+		if (($messages = getMessages((bool) $result, $msg_title)) !== null) {
+			$data['messages'] = $messages;
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

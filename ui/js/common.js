@@ -386,7 +386,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
 
-				if (action === 'popup.scriptexec') {
+				if (action === 'popup.scriptexec' || action === 'popup.scheduledreport.test') {
 					buttons.push({
 						'title': t('Ok'),
 						'cancel': true,

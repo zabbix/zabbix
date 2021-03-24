@@ -23,9 +23,45 @@
  * @var CView $this
  */
 
+$form = (new CForm())->addItem($data['messages']);
+
+if ($data['results']) {
+	$emails_sent = [];
+	$emails_not_sent = [];
+
+	foreach ($data['results'] as $result) {
+		if ($result['status'] == 0) {
+			$emails_sent[] = $result['recipient'];
+		}
+		else {
+			$emails_not_sent[] = $result['recipient'];
+		}
+	}
+
+	$results = '';
+
+	if ($emails_sent) {
+		$results .= _s('Report was successfully sent to: %1$s.', implode(', ', $emails_sent));
+	}
+
+	if ($emails_not_sent) {
+		if ($emails_sent) {
+			$results .= "\n\n";
+		}
+
+		$results .= _s('Report sending failed for: %1$s.', implode(', ', $emails_not_sent));
+	}
+
+	$form->addItem((new CTextArea('', $results))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->addClass('active-readonly')
+		->setReadonly(true)
+	);
+}
+
 $output = [
 	'header' => $data['title'],
-	'body' => $data['messages'],
+	'body' => $form->toString(),
 	'buttons' => null
 ];
 
