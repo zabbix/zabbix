@@ -1,20 +1,23 @@
 
-# APC UPS SNMP
+# APC Smart-UPS 2200 RM SNMP
 
 ## Overview
 
 For Zabbix version: 5.2 and higher  
-The template to monitor APC UPS Symmetra LX by Zabbix SNMP agent.
+The template to monitor APC Smart-UPS 2200 RM by Zabbix SNMP agent.
+Note: please, use the latest version of the firmware for your NMC in order for the template to work correctly.
 
 
 
 This template was tested on:
 
-- APC UPS Symmetra LX (without external batteries)
+- APC Smart-UPS 2200 RM
 
 ## Setup
 
-1\. Create a host for APC UPS Symmetra LX management IP as SNMPv2 interface.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+
+1\. Create a host for APC Smart-UPS 2200 RM management IP as SNMPv2 interface.
 
 2\. Link the template to the host.
 
@@ -30,6 +33,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$BATTERY.CAPACITY.MIN.WARN} |<p>Minimum battery capacity percentage for trigger expression.</p> |`50` |
 |{$BATTERY.TEMP.MAX.WARN} |<p>Maximum battery temperature for trigger expression.</p> |`55` |
 |{$ICMP.LOSS.WARN} |<p>-</p> |`20` |
 |{$ICMP.RESPONSE_TIME.WARN} |<p>-</p> |`0.15` |
@@ -50,6 +54,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Input phases discovery |<p>The input phase identifier. OID upsPhaseInputPhaseIndex.1.1</p> |SNMP |input.phases.discovery |
+|Output phases discovery |<p>The output phase identifier. OID upsPhaseOutputPhaseIndex.1.1</p> |SNMP |output.phases.discovery |
 |External battery packs discovery | |SNMP |battery.packs.discovery<p>**Filter**:</p>AND <p>- A: {#CARTRIDGE_STATUS} NOT_MATCHES_REGEX `^$`</p> |
 |External bad battery packs discovery |<p>Discovery of the number of external defective battery packs.</p> |SNMP |battery.packs.bad.discovery |
 |External sensor port 1 discovery |<p>uioSensorStatusTable</p> |SNMP |external.sensor1.discovery |
@@ -62,7 +67,7 @@ There are no template links in this template.
 |General |Model |<p>MIB: PowerNet-MIB</p><p>The UPS model name (e.g. 'APC Smart-UPS 600').</p> |SNMP |system.model[upsBasicIdentModel]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |Serial number |<p>MIB: PowerNet-MIB</p><p>An 8-character string identifying the serial number of</p><p> the UPS internal microprocessor.  This number is set at</p><p> the factory.  NOTE: This number does NOT correspond to</p><p> the serial number on the rear of the UPS.</p> |SNMP |system.sn[upsAdvIdentSerialNumber]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |Battery status |<p>MIB: PowerNet-MIB</p><p>The status of the UPS batteries. A batteryLow(3) value</p><p> indicates the UPS will be unable to sustain the current</p><p> load, and its services will be lost if power is not restored.</p><p> The amount of run time in reserve at the time of low battery</p><p> can be configured by the upsAdvConfigLowBatteryRunTime.</p><p> A batteryInFaultCondition(4)value indicates that a battery</p><p> installed has an internal error condition.</p> |SNMP |battery.status[upsBasicBatteryStatus]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|General |Battery capacity |<p>MIB: PowerNet-MIB</p><p>The remaining battery capacity expressed as</p><p> percentage of full capacity.</p> |SNMP |battery.capacity[upsAdvBatteryCapacity]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|General |Battery capacity |<p>MIB: PowerNet-MIB</p><p>The remaining battery capacity expressed as</p><p> percentage of full capacity.</p> |SNMP |battery.capacity[upsHighPrecBatteryCapacity]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |Battery runtime remaining |<p>MIB: PowerNet-MIB</p><p>The UPS battery run time remaining before battery</p><p> exhaustion.</p> |SNMP |battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |Battery voltage |<p>MIB: PowerNet-MIB</p><p>The actual battery bus voltage in Volts.</p> |SNMP |battery.voltage[upsHighPrecBatteryActualVoltage]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |Battery last replace date |<p>MIB: PowerNet-MIB</p><p>The date when the UPS system's batteries were last replaced</p><p> in mm/dd/yy (or yyyy) format. For Smart-UPS models, this value</p><p> is originally set at the factory. When the UPS batteries</p><p> are replaced, this value should be reset by the administrator.</p><p> For Symmetra PX 250/500 this OID is read-only and is configurable in the local display only.</p> |SNMP |battery.last_replace_date[upsBasicBatteryLastReplaceDate]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -84,6 +89,9 @@ There are no template links in this template.
 |General |System description |<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p> |SNMP |system.descr[sysDescr.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |{#PHASEINDEX}: Phase input voltage |<p>MIB: PowerNet-MIB</p><p>The input voltage in VAC, or -1 if it's unsupported</p><p> by this UPS.</p> |SNMP |phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |{#PHASEINDEX}: Phase input current |<p>MIB: PowerNet-MIB</p><p>The input current in 0.1 amperes, or -0.1 if it's</p><p> unsupported by this UPS.</p> |SNMP |phase.input.current[upsPhaseInputCurrent.1.1.{#PHASEINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|General |{#PHASEINDEX}: Phase output voltage |<p>MIB: PowerNet-MIB</p><p>The output voltage in VAC, or -1 if it's unsupported</p><p> by this UPS.</p> |SNMP |phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|General |{#PHASEINDEX}: Phase output current |<p>MIB: PowerNet-MIB</p><p>The output current in 0.1 amperes drawn</p><p> by the load on the UPS, or -1 if it's unsupported</p><p> by this UPS.</p> |SNMP |phase.output.current[upsPhaseOutputCurrent.1.1.{#PHASEINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|General |{#PHASEINDEX}: Phase output load, % |<p>MIB: PowerNet-MIB</p><p>The percentage of the UPS load capacity in VA at</p><p> redundancy @ (n + x) presently being used on this</p><p> output phase, or -1 if it's unsupported by this UPS.</p> |SNMP |phase.output.load.percent[upsPhaseOutputPercentLoad.1.1.{#PHASEINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status |<p>MIB: PowerNet-MIB</p><p>The battery cartridge status.</p><p>bit 0 Disconnected</p><p>bit 1 Overvoltage</p><p>bit 2 NeedsReplacement</p><p>bit 3 OvertemperatureCritical</p><p>bit 4 Charger</p><p>bit 5 TemperatureSensor</p><p>bit 6 BusSoftStart</p><p>bit 7 OvertemperatureWarning</p><p>bit 8 GeneralError</p><p>bit 9 Communication</p><p>bit 10 DisconnectedFrame</p><p>bit 11 FirmwareMismatch</p> |SNMP |battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery temperature |<p>MIB: PowerNet-MIB</p><p>The battery pack temperature in Celsius.</p> |SNMP |battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |General |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Serial number |<p>MIB: PowerNet-MIB</p><p>The battery pack serial number.</p> |SNMP |system.sn[upsHighPrecBatteryPackSerialNumber.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -108,6 +116,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Battery has an internal error condition |<p>A battery installed has an internal error condition.</p> |`{TEMPLATE_NAME:battery.status[upsBasicBatteryStatus].last()}=4` |AVERAGE | |
 |Battery is Low |<p>The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.</p> |`{TEMPLATE_NAME:battery.status[upsBasicBatteryStatus].last()}=3` |AVERAGE | |
+|Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%) | |`{TEMPLATE_NAME:battery.capacity[upsHighPrecBatteryCapacity].last()} < {$BATTERY.CAPACITY.MIN.WARN}` |HIGH | |
 |Battery needs replacement |<p>A battery installed has an internal error condition.</p> |`{TEMPLATE_NAME:battery.replace_indicator[upsAdvBatteryReplaceIndicator].last()}=2` |HIGH | |
 |Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:battery.temperature[upsHighPrecBatteryTemperature].min({$TIME.PERIOD})} > {$BATTERY.TEMP.MAX.WARN}` |HIGH | |
 |Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:input.voltage[upsHighPrecInputLineVoltage].min({$TIME.PERIOD})} > 0 and ({TEMPLATE_NAME:input.voltage[upsHighPrecInputLineVoltage].min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {TEMPLATE_NAME:input.voltage[upsHighPrecInputLineVoltage].max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN})` |HIGH | |
@@ -126,7 +135,8 @@ There are no template links in this template.
 |UPS is Hardware Failure Bypass | |`{TEMPLATE_NAME:output.status[upsBasicOutputStatus].last()}=10` |AVERAGE | |
 |System name has changed (new name: {ITEM.VALUE}) |<p>System name has changed. Ack to close.</p> |`{TEMPLATE_NAME:system.name.diff()}=1 and {TEMPLATE_NAME:system.name.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}].min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {TEMPLATE_NAME:phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}].max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN}` |HIGH | |
-|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay |<p>The battery cartridge status:</p><p>bit 0 Disconnected</p><p>bit 1 Overvoltage</p><p>bit 2 NeedsReplacement</p><p>bit 3 OvertemperatureCritical</p><p>bit 4 Charger</p><p>bit 5 TemperatureSensor</p><p>bit 6 BusSoftStart</p><p>bit 7 OvertemperatureWarning</p><p>bit 8 GeneralError</p><p>bit 9 Communication</p><p>bit 10 DisconnectedFrame</p><p>bit 11 FirmwareMismatch</p> |`{TEMPLATE_NAME:battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}].regexp("^(0{16})$")}=1` |WARNING | |
+|{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}].min({$TIME.PERIOD})} > {$UPS.INPUT_VOLT.MAX.WARN} or {TEMPLATE_NAME:phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}].max({$TIME.PERIOD})} < {$UPS.INPUT_VOLT.MIN.WARN}` |HIGH | |
+|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay |<p>The battery cartridge status:</p><p>bit 0 Disconnected</p><p>bit 1 Overvoltage</p><p>bit 2 NeedsReplacement</p><p>bit 3 OvertemperatureCritical</p><p>bit 4 Charger</p><p>bit 5 TemperatureSensor</p><p>bit 6 BusSoftStart</p><p>bit 7 OvertemperatureWarning</p><p>bit 8 GeneralError</p><p>bit 9 Communication</p><p>bit 10 DisconnectedFrame</p><p>bit 11 FirmwareMismatch</p> |`{TEMPLATE_NAME:battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}].regexp("^(0{16})$")}=0` |WARNING | |
 |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD}) | |`{TEMPLATE_NAME:battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}].min({$TIME.PERIOD})} > {$BATTERY.TEMP.MAX.WARN}` |HIGH | |
 |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay |<p>The battery cartridge health.</p><p>  bit 0 Battery lifetime okay</p><p>  bit 1 Battery lifetime near end, order replacement cartridge</p><p>  bit 2 Battery lifetime exceeded, replace battery</p><p>  bit 3 Battery lifetime near end acknowledged, order replacement cartridge</p><p>  bit 4 Battery lifetime exceeded acknowledged, replace battery</p><p>  bit 5 Battery measured lifetime near end, order replacement cartridge</p><p>  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</p> |`{TEMPLATE_NAME:battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}].regexp("^(0)[0|1]{15}$")}=1` |WARNING | |
 |{#EXTERNAL_SENSOR1_NAME}: Sensor has status Not Applicable |<p>The external sensor does not work or is not connected.</p> |`{TEMPLATE_NAME:external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}].last()}=4` |INFO | |
