@@ -5,6 +5,7 @@
 
 For Zabbix version: 5.0 and higher  
 The template to monitor APC Smart-UPS 3000 XLM by Zabbix SNMP agent.
+Note: please, use the latest version of the firmware for your NMC in order for the template to work correctly.
 
 
 
