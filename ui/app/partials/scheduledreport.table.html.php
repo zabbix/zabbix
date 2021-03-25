@@ -108,7 +108,7 @@ foreach ($data['reports'] as $report) {
 		($data['source'] === 'scheduledreport-form')
 			? new CCheckBox('reportids['.$report['reportid'].']', $report['reportid'])
 			: null,
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$report['owner'],
 		$cycles[$report['cycle']],
 		$periods[$report['period']],
