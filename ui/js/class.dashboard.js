@@ -1154,14 +1154,14 @@ class CDashboard extends CBaseComponent {
 		return 'U' + (this._unique_id_index++).toString(36).toUpperCase().padStart(6, '0');
 	}
 
-	storeWidgetDataCopy(data) {
+	_storeDashboardObject(data) {
 		localStorage.setItem('dashboard.clipboard', JSON.stringify({
-			type: DASHBOARD_CLIPBOARD_TYPE_WIDGET,
-			data: data
+			zbx_session_name: window.ZBX_SESSION_NAME,
+			data
 		}));
 	}
 
-	getStoredWidgetDataCopy() {
+	_getStoredDashboardObject() {
 		let clipboard = localStorage.getItem('dashboard.clipboard');
 
 		if (clipboard === null) {
@@ -1170,11 +1170,34 @@ class CDashboard extends CBaseComponent {
 
 		clipboard = JSON.parse(clipboard);
 
-		if (clipboard.type !== DASHBOARD_CLIPBOARD_TYPE_WIDGET) {
+		if (clipboard.zbx_session_name !== window.ZBX_SESSION_NAME) {
 			return null;
 		}
 
-		return (clipboard.data.dashboard.templateid === this._data.templateid) ? clipboard.data : null;
+		return clipboard.data;
+	}
+
+	storeWidgetDataCopy(widget_data) {
+		this._storeDashboardObject({
+			type: DASHBOARD_CLIPBOARD_TYPE_WIDGET,
+			data: widget_data
+		});
+	}
+
+	getStoredWidgetDataCopy() {
+		const data = this._getStoredDashboardObject();
+
+		if (data === null || data.type !== DASHBOARD_CLIPBOARD_TYPE_WIDGET) {
+			return null;
+		}
+
+		const widget_data = data.data;
+
+		if (widget_data.dashboard.templateid !== this._data.templateid) {
+			return null;
+		}
+
+		return widget_data;
 	}
 
 	pasteWidget(new_widget_data, {widget = null, new_widget_pos = null} = {}) {
@@ -1246,27 +1269,27 @@ class CDashboard extends CBaseComponent {
 			.finally(() => this._deleteBusyCondition(busy_condition));
 	}
 
-	storeDashboardPageDataCopy(data) {
-		localStorage.setItem('dashboard.clipboard', JSON.stringify({
+	storeDashboardPageDataCopy(dashboard_page_data) {
+		this._storeDashboardObject({
 			type: DASHBOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE,
-			data: data
-		}));
+			data: dashboard_page_data
+		});
 	}
 
 	getStoredDashboardPageDataCopy() {
-		let clipboard = localStorage.getItem('dashboard.clipboard');
+		const data = this._getStoredDashboardObject();
 
-		if (clipboard === null) {
+		if (data === null || data.type !== DASHBOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE) {
 			return null;
 		}
 
-		clipboard = JSON.parse(clipboard);
+		const dashboard_page_data = data.data;
 
-		if (clipboard.type !== DASHBOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE) {
+		if (dashboard_page_data.dashboard.templateid !== this._data.templateid) {
 			return null;
 		}
 
-		return (clipboard.data.dashboard.templateid === this._data.templateid) ? clipboard.data : null;
+		return dashboard_page_data;
 	}
 
 	pasteDashboardPage(new_dashboard_page_data) {
