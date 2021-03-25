@@ -85,7 +85,7 @@
 
 			link.innerHTML = this.data.recipient_name;
 			link.href = 'javascript:void(0);';
-			link.classList.add('<?= ZBX_STYLE_WORDWRAP ?>');
+			link.setAttribute('title', this.data.recipient_name);
 			link.addEventListener('click', (event) => {
 				const popup_options = Object.assign(this.data, {
 					edit: 1,
@@ -112,19 +112,20 @@
 
 		createCreatorCell() {
 			const cell = document.createElement('td');
+			const span = document.createElement('span');
 
 			if (this.data.creator_type == <?= ZBX_REPORT_CREATOR_TYPE_USER ?>) {
-				cell.innerHTML = <?= json_encode(getUserFullname(CWebUser::$data)) ?>;
+				const creator_name = <?= json_encode(getUserFullname(CWebUser::$data)) ?>;
+
+				span.innerHTML = creator_name;
+				span.setAttribute('title', creator_name);
 			}
 			else {
-				const span = document.createElement('span');
-
 				span.innerHTML = <?= json_encode(_('Recipient')) ?>;
 				span.classList.add('<?= ZBX_STYLE_GREY ?>');
-
-				cell.appendChild(span);
 			}
 
+			cell.appendChild(span);
 			cell.appendChild(this.createHiddenInput('[creator_type]', this.data.creator_type));
 
 			return cell;

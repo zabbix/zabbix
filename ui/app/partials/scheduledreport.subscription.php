@@ -25,10 +25,16 @@
 
 $table = (new CTable())
 	->setId('subscriptions-table')
+	->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 	->addClass('subscriptions-table')
 	->addStyle('width: 100%;')
 	->setAriaRequired()
-	->setHeader([_('Recipient'), _('Generate report by'), _('Status'), _('Action')])
+	->setHeader([
+		(new CColHeader(_('Recipient')))->setWidth('40%'),
+		(new CColHeader(_('Generate report by')))->setWidth('35%'),
+		_('Status'),
+		_('Action')
+	])
 	->addItem(
 		(new CTag('tfoot', true))->addItem(
 			(new CCol(
@@ -49,7 +55,7 @@ $table = (new CTable())
 (new CDiv($table))
 	->setId('subscriptions')
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->show();
 
 $this->includeJsFile('scheduledreport.subscription.js.php', [
