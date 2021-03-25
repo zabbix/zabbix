@@ -459,8 +459,10 @@ class C52TriggerExpressionConverter extends CConverter {
 					case '"':
 						// Skip any previously found tokens starting with brace or double quote.
 						foreach ($this->parser->result->getTokens() as $expression_token) {
-							if ($expression_token['pos'] == $i) {
-								$i += $expression_token['length'] - 1;
+							$expr_endpos = $expression_token['pos'] + $expression_token['length'];
+
+							if ($expression_token['pos'] >= $i && $i < $expr_endpos) {
+								$i = $expr_endpos;
 								break;
 							}
 						}
