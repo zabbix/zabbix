@@ -111,7 +111,7 @@ class CItemKey extends CParser {
 
 		// is key empty?
 		if ($p == $offset) {
-			$this->errorPos(substr($data, $offset), 0);
+			$this->errorPos($data, $offset);
 
 			return self::PARSE_FAIL;
 		}
@@ -152,17 +152,16 @@ class CItemKey extends CParser {
 				$this->parameters[] = $_parameters;
 				$p = $p2;
 			}
-			else {
-				$this->errorPos($data, $p2);
-				return self::PARSE_FAIL;
-			}
 		}
 
 		if ($this->options['with_filter'] && $data[$p] === '?') {
-			if (substr($data, $p, 2) !== '?[') {
+			$p++;
+
+			if (!isset($data[$p]) || $data[$p] !== '[') {
 				$this->errorPos($data, $p);
 				return self::PARSE_FAIL;
 			}
+			$p++;
 
 			if (!$this->parseKeyAttributes($data, $p)) {
 				return self::PARSE_FAIL;
@@ -178,7 +177,7 @@ class CItemKey extends CParser {
 			return self::PARSE_SUCCESS;
 		}
 
-		$this->errorPos(substr($data, $offset), $p2 - $offset);
+		$this->errorPos($data, $p2);
 
 		return self::PARSE_SUCCESS_CONT;
 	}
@@ -325,7 +324,6 @@ class CItemKey extends CParser {
 	 */
 	public function parseKeyAttributes($source, &$pos) {
 		$attributes = [];
-		$pos += 2;
 		$level = 0;
 		$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 		$logical_parser = new CSetParser(['and', 'or']);
