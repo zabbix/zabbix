@@ -3938,6 +3938,10 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 
 	do
 	{
+		/* handle midnight startup times */
+		if (0 == tm->tm_sec && 0 == tm->tm_min && 0 == tm->tm_hour)
+			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+
 		switch (cycle)
 		{
 			case ZBX_REPORT_CYCLE_YEARLY:

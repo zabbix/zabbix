@@ -1752,6 +1752,4 @@ int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
 		const char *timezone);
 
-
-
 #endif

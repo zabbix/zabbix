@@ -166,7 +166,48 @@ in:
 out:
   reports:
     - 2021-03-12 11:00:00 +02:00
-    - 2021-03-13 1:00:00 +02:00
+    - 2021-03-13 11:00:00 +02:00
     - 2021-03-14 11:00:00 +02:00
     - 2021-03-15 11:00:00 +02:00
+---
+test case: Daily reports for day (3)
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-25 15:17:24 +02:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  start_time: 00:00:00
+out:
+  reports:
+    - 2021-03-26 00:00:00 +02:00
+    - 2021-03-27 00:00:00 +02:00
+    - 2021-03-28 00:00:00 +02:00
+---
+test case: Daily reports for day (4)
+in:
+  timezone: :Europe/Riga
+  now: 2021-03-12 10:00:00 +02:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  start_time: 10:00:00
+out:
+  reports:
+    - 2021-03-13 10:00:00 +02:00
+    - 2021-03-14 10:00:00 +02:00
+    - 2021-03-15 10:00:00 +02:00
+---
+test case: Daily reports for day (5)
+in:
+  timezone: :Etc/UTC
+  now: 2021-03-12 00:00:00 +0:00
+  cycle: ZBX_REPORT_CYCLE_DAILY
+  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  start_time: 10:00:00
+out:
+  reports:
+    - 2021-03-12 10:00:00 +0:00
+    - 2021-03-13 10:00:00 +0:00
+    - 2021-03-14 10:00:00 +0:00
+    - 2021-03-15 10:00:00 +0:00
 ...
+
