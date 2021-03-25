@@ -49,7 +49,7 @@ class CDashboardElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEmpty() {
-		return ($this->query('xpath:.//div[@class="dashboard-grid-new-widget-placeholder"]')->one(false)->isValid());
+		return ($this->query('xpath:.//div[@class="dashboard-widget-placeholder"]')->one(false)->isValid());
 	}
 
 	/**

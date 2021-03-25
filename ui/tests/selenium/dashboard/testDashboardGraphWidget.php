@@ -36,7 +36,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.

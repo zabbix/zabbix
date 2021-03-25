@@ -33,7 +33,7 @@ class CWidgetElement extends CElement {
 	 * @return integer
 	 */
 	public function getRefreshInterval() {
-		$this->query('xpath://button[@class="btn-widget-action"]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath:.//button[@class="btn-widget-action"]')->waitUntilPresent()->one()->click(true);
 		$selected = $this->query('xpath://ul[@role="menu"]//a[contains(@aria-label, "selected")]')->one();
 		$aria_label = explode(', ', $selected->getAttribute('aria-label'), 3);
 
