@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,14 +34,7 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		$type_fields = [
-			INTERFACE_TYPE_AGENT => 'available',
-			INTERFACE_TYPE_SNMP => 'snmp_available',
-			INTERFACE_TYPE_JMX => 'jmx_available',
-			INTERFACE_TYPE_IPMI => 'ipmi_available'
-		];
-
-		$interface_types = array_keys($type_fields);
+		$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
 
 		// Sanitize non-existing interface types.
 		$fields['interface_type'] = array_values(array_intersect($interface_types, $fields['interface_type']));
@@ -52,28 +45,34 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 
 		$hosts_total = array_fill_keys($interface_types, 0);
 		$hosts_count = array_fill_keys($interface_types, [
-			HOST_AVAILABLE_UNKNOWN => 0,
-			HOST_AVAILABLE_TRUE => 0,
-			HOST_AVAILABLE_FALSE => 0
+			INTERFACE_AVAILABLE_UNKNOWN => 0,
+			INTERFACE_AVAILABLE_TRUE => 0,
+			INTERFACE_AVAILABLE_FALSE => 0
 		]);
 
 		$db_hosts = API::Host()->get([
-			'output' => ['available', 'snmp_available', 'jmx_available', 'ipmi_available'],
-			'selectInterfaces' => ['interfaceid', 'type'],
+			'output' => [],
+			'selectInterfaces' => ['type', 'available'],
 			'groupids' => $groupids,
 			'filter' => ($fields['maintenance'] == HOST_MAINTENANCE_STATUS_OFF)
 				? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
 				: ['status' => HOST_STATUS_MONITORED]
 		]);
+		$availability_priority = [INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_UNKNOWN, INTERFACE_AVAILABLE_TRUE];
 
 		foreach ($db_hosts as $host) {
-			$interfaces = [];
-			foreach ($host['interfaces'] as $val) {
-				$interfaces[$val['type']] = true;
+			$host_interfaces = array_fill_keys($interface_types, []);
+
+			foreach ($host['interfaces'] as $interface) {
+				$host_interfaces[$interface['type']][] = $interface['available'];
 			}
 
-			foreach (array_keys($interfaces) as $type) {
-				$hosts_count[$type][$host[$type_fields[$type]]]++;
+			$host_interfaces = array_filter($host_interfaces);
+
+			foreach ($host_interfaces as $type => $interfaces) {
+				$interfaces_availability = array_intersect($availability_priority, $interfaces);
+				$available = reset($interfaces_availability);
+				$hosts_count[$type][$available]++;
 				$hosts_total[$type]++;
 			}
 		}

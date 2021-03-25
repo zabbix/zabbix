@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 **/
 
 package com.zabbix.gateway;
+
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -58,7 +59,7 @@ class ZabbixJMXConnectorFactory
 		}
 	}
 
-	static JMXConnector connect(final JMXServiceURL url, final HashMap<String, String[]> env) throws IOException
+	static JMXConnector connect(final JMXServiceURL url, final HashMap<String, Object> env) throws IOException
 	{
 		logger.debug("connecting to JMX agent at '{}'", url);
 

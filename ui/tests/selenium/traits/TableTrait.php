@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,13 +85,13 @@ trait TableTrait {
 	 * @param array   $rows        data array to be match with result in table
 	 * @param string  $field       table column name
 	 */
-	public function assertTableDataColumn($rows = [], $field = 'Name') {
+	public function assertTableDataColumn($rows = [], $field = 'Name', $selector = 'class:list-table') {
 		$data = [];
 		foreach ($rows as $row) {
 			$data[] = [$field => $row];
 		}
 
-		$this->assertTableData($data);
+		$this->assertTableData($data, $selector);
 	}
 
 	/**
@@ -126,5 +126,19 @@ trait TableTrait {
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
 				$this->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
+	}
+
+	/**
+	 * Get data from chosen column.
+	 *
+	 * @param string $column		Column name, where value should be checked
+	 */
+	private function getTableResult($column) {
+		$table = $this->query('class:list-table')->asTable()->one();
+		$result = [];
+		foreach ($table->getRows() as $row) {
+			$result[] = $row->getColumn($column)->getText();
+		}
+		return $result;
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,6 +108,7 @@ char	*CONFIG_DB_TLS_CA_FILE		= NULL;
 char	*CONFIG_DB_TLS_CIPHER		= NULL;
 char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
 char	*CONFIG_EXPORT_DIR		= NULL;
+char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;

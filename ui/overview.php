@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,11 +110,7 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-// overview type
-if (hasRequest('type')) {
-	CProfile::update('web.overview.type', getRequest('type'), PROFILE_TYPE_INT);
-}
-$type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
+$type = getRequest('type', SHOW_TRIGGERS);
 
 // overview style
 if (hasRequest('view_style')) {

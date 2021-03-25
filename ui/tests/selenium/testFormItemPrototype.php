@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -511,12 +511,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$host_name = array_key_exists('host', $data) ? $data['host'] : $data['template'];
 
 		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($host_name));
-		$dbRow = DBfetch($dbResult);
+		$host_info = DBfetch($dbResult);
 
-		$this->assertNotEquals($dbRow, null);
+		$this->assertNotEquals($host_info, null);
 
-		$hostid = $dbRow['hostid'];
-		$status = $dbRow['status'];
+		$hostid = $host_info['hostid'];
+		$status = $host_info['status'];
 
 		if (isset($data['key'])) {
 			$dbResult = DBselect(
@@ -525,13 +525,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 				' WHERE hostid='.$hostid.
 					' AND key_='.zbx_dbstr($data['key'])
 			);
-			$dbRow = DBfetch($dbResult);
+			$template_info = DBfetch($dbResult);
 
-			$this->assertNotEquals($dbRow, null);
+			$this->assertNotEquals($template_info, null);
 
-			$itemid = $dbRow['itemid'];
-			if (0 != $dbRow['templateid'])
-				$templateid = $dbRow['templateid'];
+			$itemid = $template_info['itemid'];
+			if (0 != $template_info['templateid'])
+				$templateid = $template_info['templateid'];
 		}
 
 		if ($status == HOST_STATUS_TEMPLATE) {
@@ -667,7 +667,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.
-									$host_interface['ip'].' : '.$host_interface['port'].'"]');
+									$host_interface['ip'].':'.$host_interface['port'].'"]');
 						}
 					}
 					else {
@@ -934,25 +934,67 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('trends');
 		}
 
-		$this->zbxTestTextPresent(['Show value', 'show value mappings']);
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
+			$this->zbxTestTextPresent('Value mapping');
+			$valuemap_field = $this->query('name:itemForm')->asForm()->one()->getField('Value mapping');
 			if (!isset($templateid)) {
-				$this->zbxTestDropdownAssertSelected('valuemapid', 'As is');
+				$this->assertEquals([], $valuemap_field->getValue());
 
-				$options = ['As is'];
-				$result = DBselect('SELECT name FROM valuemaps');
-				while ($row = DBfetch($result)) {
-					$options[] = $row['name'];
+				$db_valuemap = [];
+				$valuemap_result = DBselect('SELECT name FROM valuemap WHERE hostid='.$host_info['hostid']);
+				while ($row = DBfetch($valuemap_result)) {
+					$db_valuemap[] = $row['name'];
 				}
-				$this->zbxTestDropdownHasOptions('valuemapid', $options);
+				$db_mappings = CDBHelper::getAll('SELECT vm.name, m.value, m.newvalue FROM valuemap vm INNER JOIN'.
+						' valuemap_mapping m ON m.valuemapid = vm.valuemapid WHERE vm.hostid='.$host_info['hostid']);
+
+				$valuemap_field->edit();
+				$valuemap_overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				if ($db_valuemap !== []) {
+					$this->assertEquals('Value mapping', $valuemap_overlay->getTitle());
+					$valuemap_table = $valuemap_overlay->query('class:list-table')->one()->asTable();
+					$this->assertEquals(['Name', 'Mapping'], $valuemap_table->getHeadersText());
+
+					$expected_count = (count($db_valuemap) > 3) ? 3 : count($db_valuemap);
+					$table_rows = $valuemap_table->getRows();
+					$this->assertEquals($expected_count, $table_rows->count());
+					foreach($table_rows as $value_mapping) {
+						$valuemap_name = ltrim($value_mapping->getColumn('Name')->getText(), $host_name.': ');
+						$this->assertTrue(in_array($valuemap_name, $db_valuemap));
+
+						$mappings = [];
+						$i = 0;
+						foreach ($db_mappings as $db_mapping) {
+							$mappings_text = $value_mapping->getColumn('Mapping')->getText();
+
+							if ($db_mapping['name'] === $valuemap_name) {
+								$mappings_text = $value_mapping->getColumn('Mapping')->getText();
+								$i++;
+								// Only the first three mappings are displayed in the form for each value mapping
+								if ($i < 4) {
+									$this->assertTrue(str_contains($mappings_text, $db_mapping['value'].' ⇒ '.$db_mapping['newvalue']));
+								}
+								else {
+									$this->assertTrue(str_contains($mappings_text, '…'));
+
+									break;
+								}
+							}
+						}
+					}
+				}
+				else {
+					$this->assertEquals('No data found.', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
+				}
+				$valuemap_overlay->close();
 			}
 			else {
-				$this->zbxTestAssertVisibleId('valuemapid');
-				$this->zbxTestAssertAttribute("//z-select[@id='valuemapid']", 'readonly');
+				$this->assertTrue($valuemap_field->isValid());
+				$this->assertFalse($valuemap_field->isEnabled());
 			}
 		}
 		else {
-			$this->zbxTestAssertNotVisibleXpath('//z-select[@name="valuemapid"]');
+			$this->assertFalse($this->query('xpath://label[text()="Value mapping"]/../..')->one()->isDisplayed());
 		}
 
 		if ($type == 'Zabbix trapper') {
@@ -1025,9 +1067,9 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$itemid);
 			$itemsPreproc = DBfetchArray($dbResult);
 			foreach ($itemsPreproc as $itemPreproc) {
-				// The array of allowed types must be synced with CItemPrototype::$supported_preprocessing_types.
+				// The array of allowed types must be synced with CItemPrototype::SUPPORTED_PREPROCESSING_TYPES.
 				$preprocessing_type = get_preprocessing_types($itemPreproc['type'], false,
-					CItemPrototype::$supported_preprocessing_types
+					CItemPrototype::SUPPORTED_PREPROCESSING_TYPES
 				);
 				$this->zbxTestAssertAttribute("//z-select[@id='preprocessing_".($itemPreproc['step']-1)."_type']", 'readonly');
 				$this->zbxTestDropdownAssertSelected("preprocessing_".($itemPreproc['step']-1)."_type", $preprocessing_type);
@@ -1062,7 +1104,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid=133800');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype updated');
@@ -2037,7 +2079,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&context=host&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&context=host&parent_discoveryid=133800');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];

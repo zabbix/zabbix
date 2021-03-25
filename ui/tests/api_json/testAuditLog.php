@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -780,7 +780,7 @@ class testAuditLog extends CAPITest {
 				'$expected_result' => null,
 				'expected_error' => 'Invalid parameter "/filter/resourcetype/1": value must be one of 0, 2, 3, 4, 5,'.
 					' 6, 7, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,'.
-					' 34, 35, 36, 37, 38, 39, 40, 41, 42, 43.'
+					' 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 45.'
 			],
 			// Filter validation - ip.
 			[

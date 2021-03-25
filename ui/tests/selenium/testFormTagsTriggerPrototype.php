@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ class testFormTagsTriggerPrototype extends testFormTags {
 
 	public $update_name = 'Trigger prototype with tags for updating';
 	public $clone_name = 'Trigger prototype with tags for cloning';
-	public $link = 'trigger_prototypes.php?parent_discoveryid=33800&context=host';
-	public $saved_link = 'trigger_prototypes.php?form=update&context=host&parent_discoveryid=33800&triggerid=';
+	public $link = 'trigger_prototypes.php?parent_discoveryid=133800&context=host';
+	public $saved_link = 'trigger_prototypes.php?form=update&context=host&parent_discoveryid=133800&triggerid=';
 	public $new_name = 'Cloned Trigger prototype {#KEY}';
 
 	/**

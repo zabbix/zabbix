@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -216,6 +216,17 @@ $divTabs->addTab('macroTab', _('Macros'),
 			'readonly' => $data['readonly']
 		]), 'macros_container'),
 	TAB_INDICATOR_MACROS
+);
+
+// Value mapping.
+$divTabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
+	new CPartial('configuration.valuemap', [
+		'source' => 'template',
+		'valuemaps' => $data['valuemaps'],
+		'readonly' => $data['readonly'],
+		'form' => 'template'
+	])),
+	TAB_INDICATOR_VALUEMAPS
 );
 
 // footer

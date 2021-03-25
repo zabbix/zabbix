@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,7 +109,8 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern'],
 						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30']
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30'],
+						['type' => 'XML to JSON']
 					]
 				]
 			],
@@ -129,6 +130,8 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test1'],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test2'],
+						['type' => 'XML to JSON'],
+						['type' => 'XML to JSON'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern1'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern2'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],

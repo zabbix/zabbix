@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -203,12 +203,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$problem_link = [
 		(new CLinkAction($problem['name']))
-			->setHint(
-				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-					'triggerid' => $trigger['triggerid']], $eventid, $allowed, $show_timeline, $data['fields']['show_tags'],
-					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority']
-				)
-			)
+			->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']))
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], getSeverityName($problem['severity'])
 			))
@@ -281,8 +276,13 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
 		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata : null,
-		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
-			->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(
+			(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
+				->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $eventid, $show_timeline,
+					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
+					$data['fields']['tag_priority']
+				))
+		))->addClass(ZBX_STYLE_NOWRAP),
 		$problem_update_link,
 		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
 			$data['data']['users']

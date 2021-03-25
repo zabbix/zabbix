@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,17 +32,15 @@ class CItemPrototype extends CItemGeneral {
 	 * Define a set of supported pre-processing rules.
 	 *
 	 * @var array
-	 *
-	 * 5.6 would allow this to be defined constant.
 	 */
-	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_TRIM, ZBX_PREPROC_RTRIM,
+	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_TRIM, ZBX_PREPROC_RTRIM,
 		ZBX_PREPROC_LTRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_DELTA_VALUE,
 		ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
 		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
 		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
 		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
+		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON
 	];
 
 	public function __construct() {
@@ -99,6 +97,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectGraphs'					=> null,
 			'selectDiscoveryRule'			=> null,
 			'selectPreprocessing'			=> null,
+			'selectValueMap'				=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -108,6 +107,7 @@ class CItemPrototype extends CItemGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -285,7 +285,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
@@ -306,6 +306,24 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options) {
+		// Validate input parameters.
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -773,14 +791,14 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		$db_items = $this->get([
-			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
+			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode', 'value_type'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['type', 'authtype',
-			'master_itemid'
+			'master_itemid', 'value_type'
 		]);
 
 		$this->validateDependentItems($items);
@@ -869,6 +887,13 @@ class CItemPrototype extends CItemGeneral {
 
 				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
 					$item['timeout'] = $defaults['timeout'];
+				}
+			}
+
+			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				if ($item['value_type'] != $db_items[$item['itemid']]['value_type']) {
+					// Reset valuemapid when value_type is LOG or TEXT.
+					$item['valuemapid'] = 0;
 				}
 			}
 		}
@@ -1013,6 +1038,10 @@ class CItemPrototype extends CItemGeneral {
 		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+			}
+
+			if ($options['selectValueMap'] !== null) {
+				$sqlParts = $this->addQuerySelect('i.valuemapid', $sqlParts);
 			}
 		}
 

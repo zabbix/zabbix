@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,8 +74,8 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 	public function testFormAdministrationGeneralGUI_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$this->assertPageTitle('Configuration of GUI');
-		$this->assertPageHeader('GUI');
+		$this->page->assertTitle('Configuration of GUI');
+		$this->page->assertHeader('GUI');
 
 		$limits = [
 			'search_limit' => 6,
@@ -932,7 +932,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Limit for search and filter results' => '2'
 					],
 					'link' => 'templates.php?filter_name=cisco',
-					'row_count' => 2,
+					'row_count' => 2
 				]
 			],
 			[
@@ -941,7 +941,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max number of columns and rows in overview tables' => '5'
 					],
 					'link' => 'overview.php',
-					'row_count' => 6,		// Plus 1 info row in table.
+					'row_count' => 6		// Plus 1 info row in table.
 				]
 			],
 			[
@@ -1012,8 +1012,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			case 'Max period for time selector':
 				$this->query('id:from')->one()->fill('now-5y');
 				$this->query('button:Apply')->one()->click();
-				$this->assertEquals('Maximum time period to display is 366 days.',
-				$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
+				// Days count for the case when current or past year is leap year.
+				$days_count = (new DateTime())->diff((new DateTime())->sub(new DateInterval('P1Y')))->days;
+				$this->assertEquals('Maximum time period to display is '.$days_count.' days.',
+						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
 				break;
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ class CApiServiceFactory extends CRegistryFactory {
 		'task' => CTask::class,
 		'template' => CTemplate::class,
 		'templatedashboard' => CTemplateDashboard::class,
+		'token' => CToken::class,
 		'trend' => CTrend::class,
 		'trigger' => CTrigger::class,
 		'triggerprototype' => CTriggerPrototype::class,

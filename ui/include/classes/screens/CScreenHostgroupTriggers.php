@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ class CScreenHostgroupTriggers extends CScreenHostTriggers {
 				(new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-			$params['groupids'] = $this->screenitem['resourceid'];
+			$params['groupids'] = [$this->screenitem['resourceid']];
 		}
 		else {
 			$groupid = getRequest('tr_groupid', CProfile::get('web.screens.tr_groupid', 0));
@@ -114,7 +114,7 @@ class CScreenHostgroupTriggers extends CScreenHostTriggers {
 			}
 
 			if ($groupid != 0) {
-				$params['groupids'] = $groupid;
+				$params['groupids'] = [$groupid];
 			}
 			if ($hostid != 0) {
 				$params['hostids'] = $hostid;

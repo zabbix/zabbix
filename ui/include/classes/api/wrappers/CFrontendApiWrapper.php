@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,11 +54,11 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 * If the API call has been unsuccessful - add an error message and return false, instead of an array.
 	 *
 	 * @param string 	$method
-	 * @param mixed 	$params
+	 * @param array 	$params
 	 *
 	 * @return mixed
 	 */
-	protected function callMethod($method, $params) {
+	protected function callMethod($method, array $params) {
 		API::setWrapper();
 		$response = parent::callMethod($method, $params);
 		API::setWrapper($this);

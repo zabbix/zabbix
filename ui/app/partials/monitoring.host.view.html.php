@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,12 +57,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 		}
 	}
 
-	$host_interface = '';
-	if ($interface !== null) {
-		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-		$host_interface .= $interface['port'] ? NAME_DELIMITER.$interface['port'] : '';
-	}
-
 	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
 
 	$total_problem_count = 0;
@@ -99,8 +93,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$table->addRow([
 		[$host_name, $maintenance_icon],
-		(new CCol($host_interface))->addClass(ZBX_STYLE_NOWRAP),
-		getHostAvailabilityTable($host),
+		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_NOWRAP),
+		getHostAvailabilityTable($host['interfaces']),
 		$host['tags'],
 		$problems_div,
 		($host['status'] == HOST_STATUS_MONITORED)

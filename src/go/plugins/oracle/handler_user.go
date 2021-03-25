@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,21 +26,12 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyUser = "oracle.user.info"
-
-const userMaxParams = 1
-
-func UserHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func userHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var userinfo string
 
 	username := conn.WhoAmI()
-
-	if len(params) > userMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
-
-	if len(params) == 1 {
-		username = params[0]
+	if params["Username"] != "" {
+		username = params["Username"]
 	}
 
 	row, err := conn.QueryRow(ctx, `

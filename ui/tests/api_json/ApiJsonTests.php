@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 **/
 
 
+require_once dirname(__FILE__).'/testJSONRPC.php';
 require_once dirname(__FILE__).'/testAPIInfo.php';
 require_once dirname(__FILE__).'/testAction.php';
 require_once dirname(__FILE__).'/testApplication.php';
@@ -41,8 +42,11 @@ require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testTriggers.php';
 require_once dirname(__FILE__).'/testTriggerPermissions.php';
+require_once dirname(__FILE__).'/testTriggerValidation.php';
 require_once dirname(__FILE__).'/testTaskCreate.php';
+require_once dirname(__FILE__).'/testTagFiltering.php';
 require_once dirname(__FILE__).'/testTemplateImport.php';
+require_once dirname(__FILE__).'/testToken.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
@@ -56,6 +60,7 @@ class ApiJsonTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
+		$suite->addTestSuite('testJSONRPC');
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testApplication');
@@ -79,8 +84,11 @@ class ApiJsonTests {
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testTriggers');
 		$suite->addTestSuite('testTriggerPermissions');
+		$suite->addTestSuite('testTriggerValidation');
 		$suite->addTestSuite('testTaskCreate');
+		$suite->addTestSuite('testTagFiltering');
 		$suite->addTestSuite('testTemplateImport');
+		$suite->addTestSuite('testToken');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');
 		$suite->addTestSuite('testUsers');

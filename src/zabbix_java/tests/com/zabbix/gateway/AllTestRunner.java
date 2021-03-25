@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ public class AllTestRunner
 		String[] testClasses = new String[]
 		{
 			"IntegerValidatorTest",
-			"ZabbixItemTest"
+			"ZabbixItemTest",
+			"JMXTest"
 		};
 
 		for (int i = 0; i < testClasses.length; i++)

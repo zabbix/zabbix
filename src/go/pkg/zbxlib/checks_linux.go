@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,8 +74,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.NET_DNS)
 	case "net.dns.record":
 		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
-	case "proc.mem":
-		cfunc = unsafe.Pointer(C.PROC_MEM)
 	case "proc.num":
 		cfunc = unsafe.Pointer(C.PROC_NUM)
 	case "system.boottime":
@@ -102,8 +100,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_MACADDR)
 	case "system.sw.os":
 		cfunc = unsafe.Pointer(C.SYSTEM_SW_OS)
-	case "system.sw.packages":
-		cfunc = unsafe.Pointer(C.SYSTEM_SW_PACKAGES)
 	case "system.swap.in":
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_IN)
 	case "system.swap.out":
@@ -112,8 +108,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
 	case "vfs.dir.size":
 		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
-	case "vm.memory.size":
-		cfunc = unsafe.Pointer(C.VM_MEMORY_SIZE)
 	}
 	return
 }

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:04Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -448,6 +448,16 @@ zabbix_export:
                   value:
                     name: 'Nginx: Connections per second'
                     host: 'Nginx by Zabbix agent'
+      valuemaps:
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
       name: 'Nginx: Connections by state'
@@ -519,13 +529,3 @@ zabbix_export:
           item:
             host: 'Nginx by Zabbix agent'
             key: nginx.requests.total.rate
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

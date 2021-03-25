@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -224,7 +224,7 @@ try {
 
 	if (CSessionHelper::has('saml_data')) {
 		$saml_data = CSessionHelper::get('saml_data');
-		CWebUser::$data = API::getApiService('user')->loginByAlias($saml_data['username_attribute'],
+		CWebUser::$data = API::getApiService('user')->loginByUsername($saml_data['username_attribute'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);

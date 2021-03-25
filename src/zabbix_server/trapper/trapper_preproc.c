@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,13 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "preproc.h"
-#include "trapper_preproc.h"
 #include "../preprocessor/preproc_history.h"
+
+#include "trapper_auth.h"
+#include "trapper_preproc.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1
 
@@ -42,7 +43,7 @@ extern int	CONFIG_DOUBLE_PRECISION;
  *             values_num   - [OUT] the number of values                      *
  *             value_type   - [OUT] the value type                            *
  *             steps        - [OUT] the preprocessing steps                   *
- *             single       - [OUT] the single tag                            *
+ *             single     - [OUT] is preproc step single                      *
  *             state        - [OUT] the item state                            *
  *             bypass_first - [OUT] the flag to bypass first step             *
  *             error      - [OUT] the error message                           *
@@ -63,8 +64,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 	size_t			size;
 	zbx_timespec_t		ts_now;
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, buffer, sizeof(buffer), NULL) ||
-			SUCCEED != DBget_user_by_active_session(buffer, &user) || USER_TYPE_ZABBIX_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,6 @@ extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern char	*CONFIG_SOURCE_IP;
 
-int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_parse *jp);
+int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp);
 
 #endif

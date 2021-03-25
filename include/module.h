@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ typedef struct
 	char		*text;
 	char		*msg;		/* possible error message */
 	zbx_log_t	*log;
-	int	 	type;		/* flags: see AR_* above */
+	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 }
 AGENT_RESULT;

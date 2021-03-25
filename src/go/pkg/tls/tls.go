@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -961,10 +961,11 @@ func describeCiphersuites(context unsafe.Pointer) (desc string) {
 }
 
 type tlsConn struct {
-	conn    net.Conn
-	tls     unsafe.Pointer
-	buf     []byte
-	timeout time.Duration
+	conn          net.Conn
+	tls           unsafe.Pointer
+	buf           []byte
+	timeout       time.Duration
+	shiftDeadline bool
 }
 
 func (c *tlsConn) Error() (err error) {
@@ -987,6 +988,12 @@ func (c *tlsConn) ready() bool {
 func (c *tlsConn) flushTLS() (err error) {
 	for {
 		if cn := C.tls_recv((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
+			if c.shiftDeadline {
+				if err = c.conn.SetWriteDeadline(time.Now().Add(c.timeout)); err != nil {
+					return
+				}
+			}
+
 			if _, err = c.conn.Write(c.buf[:cn]); err != nil {
 				return
 			}
@@ -998,10 +1005,11 @@ func (c *tlsConn) flushTLS() (err error) {
 
 // Note, don't use flushTLS() and recvTLS() concurrently
 func (c *tlsConn) recvTLS() (err error) {
-
 	var n int
-	if err = c.conn.SetDeadline(time.Now().Add(c.timeout)); err != nil {
-		return
+	if c.shiftDeadline {
+		if err = c.conn.SetReadDeadline(time.Now().Add(c.timeout)); err != nil {
+			return
+		}
 	}
 	if n, err = c.conn.Read(c.buf); err != nil {
 		return
@@ -1125,19 +1133,11 @@ func (c *Client) Read(b []byte) (n int, err error) {
 	}
 }
 
-// NewClient(connection, tlsConfig, timeoutDuration)
-func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
-	if len(args) == 0 || args[0] == nil {
-		return nc, nil
-	}
+func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bool) (conn net.Conn, err error) {
 	if !supported {
 		return nil, errors.New(SupportedErrMsg())
 	}
-	var cfg *Config
-	var ok bool
-	if cfg, ok = args[0].(*Config); !ok {
-		return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
-	}
+
 	if cfg.Connect == ConnUnencrypted {
 		return nc, nil
 	}
@@ -1155,21 +1155,14 @@ func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		context = pskContext
 	}
 
-	var timeout time.Duration
-	if len(args) > 1 {
-		if timeout, ok = args[1].(time.Duration); !ok {
-			return nil, fmt.Errorf("invalid timeout parameter of type %T", args)
-		}
-	} else {
-		timeout = 3 * time.Second
-	}
-
+	// for TLS we overwrite the timeoutMode and force it to move on every read or write
 	c := &Client{
 		tlsConn: tlsConn{
-			conn:    nc,
-			buf:     make([]byte, 4096),
-			tls:     unsafe.Pointer(C.tls_new_client(C.SSL_CTX_LP(context), cUser, cSecret)),
-			timeout: timeout,
+			conn:          nc,
+			buf:           make([]byte, 4096),
+			tls:           unsafe.Pointer(C.tls_new_client(C.SSL_CTX_LP(context), cUser, cSecret)),
+			timeout:       timeout,
+			shiftDeadline: shiftDeadline,
 		},
 	}
 	runtime.SetFinalizer(c, func(c *Client) { C.tls_free((*C.tls_t)(c.tls)) })
@@ -1227,6 +1220,7 @@ func (s *Server) Write(b []byte) (n int, err error) {
 	if cRet <= 0 {
 		return 0, s.Error()
 	}
+
 	return len(b), s.flushTLS()
 }
 
@@ -1248,18 +1242,9 @@ func (s *Server) Read(b []byte) (n int, err error) {
 	}
 }
 
-// NewServer(connection, tlsConfig, pendingbufer, timeoutSeconds)
-func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
-	if len(args) == 0 || args[0] == nil {
-		return nc, nil
-	}
+func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration, shiftDeadline bool) (conn net.Conn, err error) {
 	if !supported {
 		return nil, errors.New(SupportedErrMsg())
-	}
-	var cfg *Config
-	var ok bool
-	if cfg, ok = args[0].(*Config); !ok {
-		return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
 	}
 
 	var cUser, cSecret *C.char
@@ -1278,21 +1263,14 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		context = defaultContext
 	}
 
-	var timeout time.Duration
-	if len(args) > 2 {
-		if timeout, ok = args[2].(time.Duration); !ok {
-			return nil, fmt.Errorf("invalid timeout parameter of type %T", args)
-		}
-	} else {
-		timeout = 3 * time.Second
-	}
-
+	// for TLS we overwrite the timeoutMode and force it to move on every read or write
 	s := &Server{
 		tlsConn: tlsConn{
-			conn:    nc,
-			buf:     make([]byte, 4096),
-			tls:     unsafe.Pointer(C.tls_new_server(C.SSL_CTX_LP(context), cUser, cSecret)),
-			timeout: timeout,
+			conn:          nc,
+			buf:           make([]byte, 4096),
+			tls:           unsafe.Pointer(C.tls_new_server(C.SSL_CTX_LP(context), cUser, cSecret)),
+			timeout:       timeout,
+			shiftDeadline: shiftDeadline,
 		},
 	}
 	runtime.SetFinalizer(s, func(s *Server) { C.tls_free((*C.tls_t)(s.tls)) })
@@ -1301,13 +1279,7 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		return nil, s.Error()
 	}
 
-	if len(args) > 1 {
-		if b, ok := args[1].([]byte); !ok {
-			return nil, fmt.Errorf("invalid pending buffer parameter of type %T", args)
-		} else {
-			C.tls_send((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
-		}
-	}
+	C.tls_send((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 
 	if err = s.checkConnection(); err != nil {
 		s.conn.Close()

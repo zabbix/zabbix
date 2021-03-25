@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,9 @@
 #define MACRO_TYPE_ITEM_TAG		0x01000000
 #define MACRO_TYPE_EVENT_NAME		0x02000000	/* event name in trigger configuration */
 #define MACRO_TYPE_EXPRESSION		0x04000000	/* macros in expression macro */
+#define MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x08000000
+#define MACRO_TYPE_SCRIPT_NORMAL	0x10000000
+#define MACRO_TYPE_SCRIPT_RECOVERY	0x20000000
 
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
@@ -62,15 +65,15 @@ void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);
 int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error);
 
-int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen);
+int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type,
+		char *error, int maxerrlen);
 
-int	substitute_simple_macros_unmasked(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen);
+int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type,
+		char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 
@@ -108,5 +111,4 @@ void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
-
 #endif

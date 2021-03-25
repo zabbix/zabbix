@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,6 @@ function mediatypeTestSend(overlay) {
 
 			if (typeof ret.messages !== 'undefined') {
 				jQuery(ret.messages).insertBefore($form);
-				$form.parent().find('.msg-bad .link-action').click();
 			}
 
 			if ('response' in ret) {
@@ -108,7 +107,7 @@ function openLogPopup(opener) {
 	overlayDialogue({
 		'title': <?= json_encode(_('Media type test log')) ?>,
 		'content': $content,
-		'class': 'modal-popup modal-popup-generic mediatypetest-modal',
+		'class': 'modal-popup modal-popup-generic debug-modal',
 		'footer': $footer,
 		'buttons': [
 			{

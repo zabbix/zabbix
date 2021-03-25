@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,29 +19,29 @@
 
 #include "common.h"
 
-#include "comms.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxserver.h"
 #include "dbcache.h"
 #include "proxy.h"
 #include "zbxself.h"
 
-#include "trapper.h"
 #include "active.h"
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
 #include "../alerter/alerter_protocol.h"
-#include "trapper_preproc.h"
-#include "trapper_expressions_evaluate.h"
 
 #include "daemon.h"
 #include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "zbxipcservice.h"
-#include "trapper_item_test.h"
 #include "../poller/checks_snmp.h"
+
+#include "trapper_auth.h"
+#include "trapper_preproc.h"
+#include "trapper_expressions_evaluate.h"
+#include "trapper_item_test.h"
+#include "trapper.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -320,7 +320,7 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
 static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
-	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
+	char			type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_user_t		user;
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
@@ -329,8 +329,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
-			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -350,8 +349,8 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		{
 			request_type = ZBX_GET_QUEUE_DETAILS;
 
-			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str), NULL) ||
-					FAIL == is_uint31(limit_str, &limit))
+			if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_LIMIT, limit_str, sizeof(limit_str),
+					NULL) || FAIL == is_uint31(limit_str, &limit))
 			{
 				zbx_send_response(sock, ret, "Unsupported limit value.", CONFIG_TIMEOUT);
 				goto out;
@@ -387,7 +386,8 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 				{
 					zbx_queue_stats_t	data = {.id = id};
 
-					stats = (zbx_queue_stats_t *)zbx_hashset_insert(&queue_stats, &data, sizeof(data));
+					stats = (zbx_queue_stats_t *)zbx_hashset_insert(&queue_stats, &data,
+							sizeof(data));
 				}
 				queue_stats_update(stats, now - item->nextcheck);
 			}
@@ -412,7 +412,8 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 				{
 					zbx_queue_stats_t	data = {.id = id};
 
-					stats = (zbx_queue_stats_t *)zbx_hashset_insert(&queue_stats, &data, sizeof(data));
+					stats = (zbx_queue_stats_t *)zbx_hashset_insert(&queue_stats, &data,
+							sizeof(data));
 				}
 				queue_stats_update(stats, now - item->nextcheck);
 			}
@@ -470,22 +471,19 @@ out:
  * Parameters:  sock  - [IN] the request socket                               *
  *              jp    - [IN] the request data                                 *
  *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
  ******************************************************************************/
 static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			ret = FAIL, errcode;
-	char			tmp[ZBX_MAX_UINT64_LEN + 1], sessionid[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
+	char			tmp[ZBX_MAX_UINT64_LEN + 1], *sendto = NULL, *subject = NULL,
 				*message = NULL, *error = NULL, *params = NULL, *value = NULL, *debug = NULL;
 	zbx_uint64_t		mediatypeid;
 	size_t			string_alloc;
 	struct zbx_json		json;
 	struct zbx_json_parse	jp_data, jp_params;
-	unsigned char		*data = NULL,smtp_security, smtp_verify_peer, smtp_verify_host,
+	unsigned char		*data = NULL, smtp_security, smtp_verify_peer, smtp_verify_host,
 				smtp_authentication, content_type, *response = NULL;
 	zbx_uint32_t		size;
 	zbx_user_t		user;
@@ -495,8 +493,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
-			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		error = zbx_strdup(NULL, "Permission denied.");
 		goto fail;
@@ -941,13 +938,12 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zbx_user_t	user;
 	int		ret = FAIL, request_type = ZBX_GET_STATUS_UNKNOWN;
-	char		type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
+	char		type[MAX_STRING_LEN];
 	struct zbx_json	json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
-			SUCCEED != DBget_user_by_active_session(sessionid, &user))
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -976,12 +972,14 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	switch (request_type)
 	{
 		case ZBX_GET_STATUS_PING:
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 			zbx_json_close(&json);
 			break;
 		case ZBX_GET_STATUS_FULL:
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 			status_stats_export(&json, user.type);
 			zbx_json_close(&json);
@@ -1225,7 +1223,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 					zbx_trapper_item_test(sock, &jp);
 			}
 			else
-				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer, value);
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
+					value);
+			}
 		}
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */

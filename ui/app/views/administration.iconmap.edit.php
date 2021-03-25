@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,7 +138,8 @@ if ($data['iconmapid'] != 0) {
 			(new CSimpleButton(_('Clone')))->setId('clone'),
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.delete')
-					->setArgument('iconmapid', $data['iconmapid']),
+					->setArgument('iconmapid', $data['iconmapid'])
+					->setArgumentSID(),
 				_('Delete icon map?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

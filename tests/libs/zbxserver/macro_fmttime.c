@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	handle;
 
 	ZBX_UNUSED(state);
+
+	if (0 != setenv("TZ", zbx_mock_get_parameter_string("in.timezone"), 1))
+		fail_msg("Cannot set 'TZ' environment variable: %s", zbx_strerror(errno));
 
 	handle = zbx_mock_get_parameter_handle("in");
 	zbx_vcmock_set_time(handle, "time");

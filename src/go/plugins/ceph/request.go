@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ type cephResponse struct {
 }
 
 // request makes an http request to Ceph RESTful API Module with a given command and extra parameters.
-func request(ctx context.Context, client *http.Client, uri, cmd string, extraParams map[string]string) ([]byte, error) {
+func request(ctx context.Context, client *http.Client, uri, cmd string, args map[string]string) ([]byte, error) {
 	var resp cephResponse
 
 	params := map[string]string{
@@ -49,7 +49,7 @@ func request(ctx context.Context, client *http.Client, uri, cmd string, extraPar
 		"format": "json",
 	}
 
-	for k, v := range extraParams {
+	for k, v := range args {
 		params[k] = v
 	}
 
@@ -58,7 +58,7 @@ func request(ctx context.Context, client *http.Client, uri, cmd string, extraPar
 		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", uri, bytes.NewBuffer(requestBody))
+	req, err := http.NewRequestWithContext(ctx, "POST", uri+"/request?wait=1", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, zbxerr.New(err.Error())
 	}
@@ -106,12 +106,13 @@ type response struct {
 
 // asyncRequest makes asynchronous https requests to Ceph RESTful API Module for each metric's command and sends
 // results to the channel.
-func asyncRequest(ctx context.Context, cancel context.CancelFunc, client *http.Client, uri string, m metric) <-chan *response {
-	ch := make(chan *response, len(m.commands))
+func asyncRequest(ctx context.Context, cancel context.CancelFunc, client *http.Client,
+	uri string, meta metricMeta) <-chan *response {
+	ch := make(chan *response, len(meta.commands))
 
-	for _, cmd := range m.commands {
+	for _, cmd := range meta.commands {
 		go func(cmd string) {
-			data, err := request(ctx, client, uri, cmd, m.params)
+			data, err := request(ctx, client, uri, cmd, meta.args)
 			if err != nil {
 				cancel()
 				ch <- &response{cmd, nil, err}

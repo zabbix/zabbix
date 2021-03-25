@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ import (
 	"os"
 	"strconv"
 	"syscall"
+
+	"zabbix.com/pkg/procfs"
 )
 
 func read2k(filename string) (data []byte, err error) {
@@ -44,29 +46,7 @@ func read2k(filename string) (data []byte, err error) {
 	return
 }
 
-func readAll(filename string) (data []byte, err error) {
-	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
-	if err != nil {
-		return
-	}
-	defer syscall.Close(fd)
-	var buf bytes.Buffer
-	b := make([]byte, 2048)
-	for {
-		var n int
-		if n, err = syscall.Read(fd, b); err != nil {
-			return
-		}
-		if n == 0 {
-			return buf.Bytes(), nil
-		}
-		if _, err = buf.Write(b[:n]); err != nil {
-			return
-		}
-	}
-}
-
-func (p *Plugin) getProcessName(pid string) (name string, err error) {
+func getProcessName(pid string) (name string, err error) {
 	var data []byte
 	if data, err = read2k("/proc/" + pid + "/stat"); err != nil {
 		return
@@ -81,7 +61,7 @@ func (p *Plugin) getProcessName(pid string) (name string, err error) {
 	return string(data[left+1 : right]), nil
 }
 
-func (p *Plugin) getProcessUserID(pid string) (userid int64, err error) {
+func getProcessUserID(pid string) (userid int64, err error) {
 	var fi os.FileInfo
 	if fi, err = os.Stat("/proc/" + pid); err != nil {
 		return
@@ -89,9 +69,9 @@ func (p *Plugin) getProcessUserID(pid string) (userid int64, err error) {
 	return int64(fi.Sys().(*syscall.Stat_t).Uid), nil
 }
 
-func (p *Plugin) getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err error) {
+func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err error) {
 	var data []byte
-	if data, err = readAll("/proc/" + pid + "/cmdline"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/cmdline"); err != nil {
 		return
 	}
 
@@ -146,7 +126,7 @@ func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 	}
 }
 
-func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
+func getProcesses(flags int) (processes []*procInfo, err error) {
 	var entries []os.FileInfo
 	f, err := os.Open("/proc")
 	if err != nil {
@@ -169,20 +149,20 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 		}
 		info := &procInfo{pid: pid}
 		if flags&procInfoName != 0 {
-			if info.name, tmperr = p.getProcessName(entries[0].Name()); tmperr != nil {
-				p.Debugf("cannot get process %s name: %s", entries[0].Name(), tmperr)
+			if info.name, tmperr = getProcessName(entries[0].Name()); tmperr != nil {
+				impl.Debugf("cannot get process %s name: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoUser != 0 {
-			if info.userid, tmperr = p.getProcessUserID(entries[0].Name()); tmperr != nil {
-				p.Debugf("cannot get process %s user id: %s", entries[0].Name(), tmperr)
+			if info.userid, tmperr = getProcessUserID(entries[0].Name()); tmperr != nil {
+				impl.Debugf("cannot get process %s user id: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoCmdline != 0 {
-			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(entries[0].Name(), flags); tmperr != nil {
-				p.Debugf("cannot get process %s command line: %s", entries[0].Name(), tmperr)
+			if info.arg0, info.cmdline, tmperr = getProcessCmdline(entries[0].Name(), flags); tmperr != nil {
+				impl.Debugf("cannot get process %s command line: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,10 +23,6 @@
  * Controller to delete tab filter by idx and idx2.
  */
 class CControllerPopupTabFilterDelete extends CController {
-
-	protected function init() {
-		$this->disableSIDValidation();
-	}
 
 	protected function checkInput() {
 		$rules = [

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ class CControllerUsergroupList extends CController {
 			'active_tab' => CProfile::get('web.usergroup.filter.active', 1),
 			'usergroups' => API::UserGroup()->get([
 				'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
-				'selectUsers' => ['userid', 'alias', 'name', 'surname', 'gui_access', 'users_status'],
+				'selectUsers' => ['userid', 'username', 'name', 'surname', 'gui_access', 'users_status'],
 				'search' => ['name' => ($filter['name'] !== '') ? $filter['name'] : null],
 				'filter' => ['users_status' => ($filter['user_status'] != -1) ? $filter['user_status'] : null],
 				'sortfield' => $sort_field,
@@ -104,7 +104,7 @@ class CControllerUsergroupList extends CController {
 		);
 
 		foreach ($data['usergroups'] as &$usergroup) {
-			CArrayHelper::sort($usergroup['users'], ['alias']);
+			CArrayHelper::sort($usergroup['users'], ['username']);
 
 			$usergroup['user_cnt'] = count($usergroup['users']);
 			if ($usergroup['user_cnt'] > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {

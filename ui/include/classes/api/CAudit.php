@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ class CAudit {
 		AUDIT_RESOURCE_ACTION => 				['actionid', 'name', 'actions'],
 		AUDIT_RESOURCE_APPLICATION =>			['applicationid', 'name', 'applications'],
 		AUDIT_RESOURCE_AUTHENTICATION =>		['configid', null, 'config'],
+		AUDIT_RESOURCE_AUTH_TOKEN =>			['tokenid', 'name', 'token'],
 		AUDIT_RESOURCE_AUTOREGISTRATION =>		['configid', null, 'config'],
 		AUDIT_RESOURCE_CORRELATION =>			['correlationid', 'name', 'correlation'],
 		AUDIT_RESOURCE_DASHBOARD =>				['dashboardid', 'name', 'dashboard'],
@@ -44,15 +45,17 @@ class CAudit {
 		AUDIT_RESOURCE_ITEM =>					['itemid', 'name', 'items'],
 		AUDIT_RESOURCE_ITEM_PROTOTYPE =>		['itemid', 'name', 'items'],
 		AUDIT_RESOURCE_MACRO =>					['globalmacroid', 'macro', 'globalmacro'],
+		AUDIT_RESOURCE_MAINTENANCE =>			['maintenanceid', 'name', 'maintenances'],
 		AUDIT_RESOURCE_MEDIA_TYPE =>			['mediatypeid', 'name', 'media_type'],
 		AUDIT_RESOURCE_MODULE =>				['moduleid', 'id', 'module'],
 		AUDIT_RESOURCE_PROXY =>					['proxyid', 'host', 'hosts'],
 		AUDIT_RESOURCE_SCENARIO =>				['httptestid', 'name', 'httptest'],
 		AUDIT_RESOURCE_SCRIPT =>				['scriptid', 'name', 'scripts'],
 		AUDIT_RESOURCE_SETTINGS =>				['configid', null, 'config'],
+		AUDIT_RESOURCE_TEMPLATE =>				['templateid', 'name', 'hosts'],
 		AUDIT_RESOURCE_TRIGGER =>				['triggerid', 'description', 'triggers'],
 		AUDIT_RESOURCE_TRIGGER_PROTOTYPE =>		['triggerid', 'description', 'triggers'],
-		AUDIT_RESOURCE_USER =>					['userid', 'alias', 'users'],
+		AUDIT_RESOURCE_USER =>					['userid', 'username', 'users'],
 		AUDIT_RESOURCE_USER_GROUP =>			['usrgrpid', 'name', 'usrgrp'],
 		AUDIT_RESOURCE_VALUE_MAP =>				['valuemapid', 'name', 'valuemaps'],
 		AUDIT_RESOURCE_TEMPLATE_DASHBOARD =>	['dashboardid', 'name', 'dashboard']
@@ -102,6 +105,9 @@ class CAudit {
 			],
 			'media_type' => [
 				'fields' => ['passwd' => true]
+			],
+			'token' => [
+				'fields' => ['token' => true]
 			],
 			'users' => [
 				'fields' => ['passwd' => true]

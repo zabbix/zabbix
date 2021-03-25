@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ class CScreenActions extends CScreenBase {
 
 		$db_users = $userids
 			? API::User()->get([
-				'output' => ['userid', 'alias', 'name', 'surname'],
+				'output' => ['userid', 'username', 'name', 'surname'],
 				'userids' => array_keys($userids),
 				'preservekeys' => true
 			])

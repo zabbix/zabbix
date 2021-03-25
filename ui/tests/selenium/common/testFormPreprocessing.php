@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -689,6 +689,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Left trim', 'parameter_1' => 'def'],
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'XML to JSON'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
 						['type' => 'Boolean to decimal'],
@@ -746,6 +747,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
 						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
+						['type' => 'XML to JSON'],
+						['type' => 'XML to JSON'],
 						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
 						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
 						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
@@ -1969,6 +1972,10 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'Prometheus to JSON',
 						'parameter_1' => 'metric',
 						'on_fail' => true
+					],
+					[
+						'type' => 'XML to JSON',
+						'on_fail' => true
 					]
 				],
 				'label' => $label,
@@ -2282,6 +2289,12 @@ abstract class testFormPreprocessing extends CWebTest {
 							'parameter_1' => 'path',
 							'on_fail' => true,
 							'error_handler' => 'Set value to',
+							'error_handler_params' => 'Custom_text'
+						],
+						[
+							'type' => 'XML to JSON',
+							'on_fail' => true,
+							'error_handler' => 'Set error to',
 							'error_handler_params' => 'Custom_text'
 						],
 						[

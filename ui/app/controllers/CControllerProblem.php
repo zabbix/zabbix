@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,9 +72,7 @@ abstract class CControllerProblem extends CController {
 		$range_time_parser->parse($filter['to']);
 		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
-		$data = CScreenProblem::getData($filter, [
-			'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
-		]);
+		$data = CScreenProblem::getData($filter);
 
 		return count($data['problems']);
 	}

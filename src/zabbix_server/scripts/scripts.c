@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,9 @@
 #include "log.h"
 #include "zbxtasks.h"
 #include "scripts.h"
+#include "zbxjson.h"
+#include "zbxembed.h"
+#include "../events.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -189,38 +192,7 @@ fail:
 	return ret;
 }
 
-static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script, zbx_uint64_t *groupid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	result = DBselect(
-			"select type,execute_on,command,groupid,host_access"
-			" from scripts"
-			" where scriptid=" ZBX_FS_UI64,
-			scriptid);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UCHAR(script->type, row[0]);
-		ZBX_STR2UCHAR(script->execute_on, row[1]);
-		script->command = zbx_strdup(script->command, row[2]);
-		script->command_orig = zbx_strdup(script->command_orig, row[2]);
-		ZBX_DBROW2UINT64(*groupid, row[3]);
-		ZBX_STR2UCHAR(script->host_access, row[4]);
-		ret = SUCCEED;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-static int	check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
+int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
 	DB_RESULT		result;
 	int			ret = SUCCEED;
@@ -261,14 +233,14 @@ exit:
 	return ret;
 }
 
-static int	check_user_permissions(zbx_uint64_t userid, const DC_HOST *host, zbx_script_t *script)
+int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, zbx_script_t *script)
 {
 	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
-			__func__, userid, host->hostid, script->scriptid);
+			__func__, userid, hostid, script->scriptid);
 
 	result = DBselect(
 		"select null"
@@ -280,7 +252,7 @@ static int	check_user_permissions(zbx_uint64_t userid, const DC_HOST *host, zbx_
 		" group by hg.hostid"
 		" having min(r.permission)>%d"
 			" and max(r.permission)>=%d",
-		host->hostid,
+		hostid,
 		userid,
 		PERM_DENY,
 		script->host_access);
@@ -313,47 +285,70 @@ void	zbx_script_clean(zbx_script_t *script)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_script_prepare                                               *
+ * Function: zbx_webhook_params_pack_json                                     *
  *                                                                            *
- * Purpose: prepares user script                                              *
+ * Purpose: pack webhook script parameters into JSON                          *
  *                                                                            *
- * Parameters: host          - [IN] the host the script will be executed on   *
- *             script        - [IN/OUT] the script to prepare                 *
- *             user          - [IN] the user executing script (can be NULL)   *
- *             error         - [OUT] the error message output buffer          *
- *             mas_error_len - [IN] the size of error message output buffer   *
- *                                                                            *
- * Return value:  SUCCEED - the script has been prepared successfully         *
- *                FAIL    - otherwise, error contains error message           *
- *                                                                            *
- * Comments: This function prepares script for execution by loading global    *
- *           script/expanding macros.                                         *
- *           Prepared scripts must be always freed with zbx_script_clean()    *
- *           function.                                                        *
+ * Parameters: params      - [IN] vector of pairs of pointers to parameter    *
+ *                                names and values                            *
+ *             params_json - [OUT] JSON string                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, char *error,
-		size_t max_error_len)
+void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **params_json)
 {
-	int		ret = FAIL;
-	zbx_uint64_t	groupid, userid;
-	zbx_uint64_t	*p_userid = NULL;
+	struct zbx_json	json_data;
+	int		i;
+
+	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < params->values_num; i++)
+	{
+		zbx_ptr_pair_t	pair = params->values[i];
+
+		zbx_json_addstring(&json_data, pair.first, pair.second, ZBX_JSON_TYPE_STRING);
+	}
+
+	zbx_json_close(&json_data);
+	*params_json = zbx_strdup(*params_json, json_data.buffer);
+	zbx_json_free(&json_data);
+}
+
+/***********************************************************************************
+ *                                                                                 *
+ * Function: zbx_script_prepare                                                    *
+ *                                                                                 *
+ * Purpose: prepares user script                                                   *
+ *                                                                                 *
+ * Parameters: script        - [IN] the script to prepare                          *
+ *             host          - [IN] the host the script will be executed on        *
+ *             error         - [OUT] the error message buffer                      *
+ *             max_error_len - [IN] the size of error message output buffer        *
+ *                                                                                 *
+ * Return value:  SUCCEED - the script has been prepared successfully              *
+ *                FAIL    - otherwise, error contains error message                *
+ *                                                                                 *
+ * Comments: This function prepares script for execution by loading global         *
+ *           script/expanding macros (except in script body).                      *
+ *           Prepared scripts must be always freed with zbx_script_clean()         *
+ *           function.                                                             *
+ *                                                                                 *
+ ***********************************************************************************/
+int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len)
+{
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	switch (script->type)
 	{
-		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
-			break;
 		case ZBX_SCRIPT_TYPE_SSH:
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
 					&script->publickey, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
 					&script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
 			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
 					&script->port, MACRO_TYPE_COMMON, NULL, 0);
 
 			if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
@@ -362,67 +357,15 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
 					NULL, &script->username, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
 					NULL, &script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
-		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
-			{
-				zbx_strlcpy(error, "Unknown script identifier.", max_error_len);
-				goto out;
-			}
-			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
-			{
-				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
-						max_error_len);
-				goto out;
-			}
-			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
-				SUCCEED != check_user_permissions(user->userid, host, script))
-			{
-				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
-						max_error_len);
-				goto out;
-			}
-
-			if (user != NULL)
-			{
-				/* zbx_script_prepare() receives 'user' as const-pointer but */
-				/* substitute_simple_macros() takes 'userid' as non-const pointer. */
-				/* Make a copy to preserve const-correctness. */
-				userid = user->userid;
-				p_userid = &userid;
-			}
-
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host, NULL,
-					NULL, NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
-			{
-				goto out;
-			}
-
-			/* expand macros in command_orig used for non-secure logging */
-			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, p_userid, NULL, host, NULL, NULL,
-					NULL, NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error, max_error_len))
-			{
-				/* script command_orig is a copy of script command - if the script command  */
-				/* macro substitution succeeded, then it will succeed also for command_orig */
-				THIS_SHOULD_NEVER_HAPPEN;
-			}
-
-			/* DBget_script_by_scriptid() may overwrite script type with anything but global script... */
-			if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				goto out;
-			}
-
-			/* ...therefore this recursion is no more than two layers deep */
-			if (FAIL == zbx_script_prepare(script, host, user, error, max_error_len))
-				goto out;
-
+		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
 			break;
+		case ZBX_SCRIPT_TYPE_WEBHOOK:
 		case ZBX_SCRIPT_TYPE_IPMI:
 			break;
 		default:
@@ -438,17 +381,72 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBfetch_webhook_params                                           *
+ *                                                                            *
+ * Purpose: fetch webhook parameters                                          *
+ *                                                                            *
+ * Parameters:  scriptid  - [IN] the id of script to be executed              *
+ *              params    - [OUT] parameters name-value pairs                 *
+ *              error     - [IN/OUT] the error message                        *
+ *              error_len - [IN] the maximum error length                     *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
+{
+	int		ret = SUCCEED;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_ptr_pair_t	pair;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64, __func__, scriptid);
+
+	result = DBselect("select name,value from script_param where scriptid=" ZBX_FS_UI64, scriptid);
+
+	if (NULL == result)
+	{
+		zbx_strlcpy(error, "Database error, cannot get webhook script parameters.", error_len);
+		ret = FAIL;
+		goto out;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		pair.first = zbx_strdup(NULL, row[0]);
+		pair.second = zbx_strdup(NULL, row[1]);
+		zbx_vector_ptr_pair_append(params, pair);
+	}
+
+	DBfree_result(result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_script_execute                                               *
  *                                                                            *
  * Purpose: executing user scripts or remote commands                         *
+ *                                                                            *
+ * Parameters:  script         - [IN] the script to be executed               *
+ *              host           - [IN] the host the script will be executed on *
+ *              params         - [IN] parameters for the script               *
+ *              result         - [OUT] the result of a script execution       *
+ *              error          - [OUT] the error reported by the script       *
+ *              max_error_len  - [IN] the maximum error length                *
+ *              debug          - [OUT] the debug data (optional)              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, char *error,
-		size_t max_error_len)
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const char *params, char **result,
+		char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -458,6 +456,10 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 
 	switch (script->type)
 	{
+		case ZBX_SCRIPT_TYPE_WEBHOOK:
+			ret = zbx_es_execute_command(script->command, params, script->timeout, result, error,
+					max_error_len, debug);
+			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)
 			{

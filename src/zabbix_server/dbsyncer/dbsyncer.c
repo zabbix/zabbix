@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,11 +123,14 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	zbx_unblock_signals(&orig_mask);
 
-	if (SUCCEED == zbx_is_export_enabled())
-	{
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 		zbx_history_export_init("history-syncer", process_num);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+		zbx_trends_export_init("history-syncer", process_num);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_problems_export_init("history-syncer", process_num);
-	}
 
 	for (;;)
 	{

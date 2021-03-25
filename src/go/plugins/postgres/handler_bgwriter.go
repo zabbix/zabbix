@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,17 +21,18 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresBgwriter = "pgsql.bgwriter"
-)
-
-// bgwriterHandler executes select  with statistics from pg_stat_bgwriter and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) bgwriterHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+// bgwriterHandler executes select  with statistics from pg_stat_bgwriter
+// and returns JSON if all is OK or nil otherwise.
+func bgwriterHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
 	var bgwriterJSON string
+
 	query := `
   SELECT row_to_json (T)
     FROM (
@@ -47,15 +48,20 @@ func (p *Plugin) bgwriterHandler(conn *postgresConn, key string, params []string
             , buffers_backend_fsync
             , buffers_alloc
           FROM pg_catalog.pg_stat_bgwriter
-          ) T ;`
-	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&bgwriterJSON)
+		  ) T ;`
+
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&bgwriterJSON)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return bgwriterJSON, nil

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1089,7 +1089,7 @@ class CEvent extends CApiService {
 				$acknowledges = DBFetchArrayAssoc(DBselect(self::createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 
 				// if the user data is requested via extended output or specified fields, join the users table
-				$userFields = ['alias', 'name', 'surname'];
+				$userFields = ['username', 'name', 'surname'];
 				$requestUserData = [];
 				foreach ($userFields as $userField) {
 					if ($this->outputIsRequested($userField, $options['select_acknowledges'])) {

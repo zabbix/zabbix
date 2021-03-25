@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2025,65 +2025,76 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'8388608T'
 			],
 			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'Detect operating system',
-				'/1/name',
-				'Detect operating system'
-			],
-			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'folder1/folder2\/',
-				'/1/name',
-				'folder1/folder2\/'
-			],
-			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'Detect operating system+',
-				'/1/name',
-				'Invalid parameter "/1/name": value is too long.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'',
-				'/1/name',
-				'Invalid parameter "/1/name": cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'a/b/c/',
-				'/1/name',
-				'Invalid parameter "/1/name": directory or script name cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'a/'.'/c',
-				'/1/name',
-				'Invalid parameter "/1/name": directory or script name cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
+				['type' => API_SCRIPT_MENU_PATH],
 				[],
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
 			],
 			[
-				['type' => API_SCRIPT_NAME],
+				['type' => API_SCRIPT_MENU_PATH],
 				true,
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
 			],
 			[
-				['type' => API_SCRIPT_NAME],
+				['type' => API_SCRIPT_MENU_PATH],
 				null,
-				'/1/name',
-				'Invalid parameter "/1/name": a character string is expected.'
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
 			],
 			[
-				['type' => API_SCRIPT_NAME],
-				// broken UTF-8 byte sequence
-				'Detect '."\xd1".'perating system',
-				'/1/name',
-				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
+				['type' => API_SCRIPT_MENU_PATH],
+				'folder1/'.'/folder2',
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'',
+				'/1/menu_path',
+				''
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/',
+				'/1/menu_path',
+				'/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/\/'.'/',
+				'/1/menu_path',
+				'/folder1/\/'.'/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'folder1/',
+				'/1/menu_path',
+				'folder1/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1',
+				'/1/menu_path',
+				'/folder1'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/',
+				'/1/menu_path',
+				'/folder1/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/folder2',
+				'/1/menu_path',
+				'/folder1/folder2'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/folder2/',
+				'/1/menu_path',
+				'/folder1/folder2/'
 			],
 			[
 				['type' => API_USER_MACRO, 'length' => 8],
@@ -3489,6 +3500,198 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'65536',
 				'/1/port',
 				'Invalid parameter "/1/port": value must be one of 0-65535.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				null,
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/expression',
+				'Invalid parameter "/1/expression": cannot be empty.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				[],
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'length' => 10],
+				'{host:item.last()} = 0',
+				'/1/expression',
+				'Invalid parameter "/1/expression": value is too long.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last() = 0',
+				'/1/expression',
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from "{host:item.last() = 0".'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'9 and 1',
+				'/1/expression',
+				'Invalid parameter "/1/expression": trigger expression must contain at least one host:key reference.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = {#LLD_MACRO}',
+				'/1/expression',
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#LLD_MACRO}".'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
+				'{host:item.last()} = {#LLD_MACRO}',
+				'/1/expression',
+				'{host:item.last()} = {#LLD_MACRO}'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = 0',
+				'/1/expression',
+				'{host:item.last()} = 0'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = {$USER_MACRO}',
+				'/1/expression',
+				'{host:item.last()} = {$USER_MACRO}'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'',
+				'/1/expression',
+				''
+			],
+			[
+				['type' => API_EVENT_NAME],
+				null,
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": a character string is expected.'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				[],
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": a character string is expected.'
+			],
+			[
+				['type' => API_EVENT_NAME, 'length' => 10],
+				'12345678901',
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": value is too long.'
+			],
+			[
+				['type' => API_EVENT_NAME, 'length' => 10],
+				'1234567890',
+				'/1/event_name',
+				'1234567890'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last() = 0}',
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": incorrect syntax near "{host:item.last() = 0}".'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?9 and 1}',
+				'/1/event_name',
+				'event name {?9 and 1}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last()} = 0}',
+				'/1/event_name',
+				'event name {?{host:item.last()} = 0}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last()} = {$USER_MACRO}}',
+				'/1/event_name',
+				'event name {?{host:item.last()} = {$USER_MACRO}}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'',
+				'/1/event_name',
+				''
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				[],
+				'/params',
+				[]
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				1,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				true,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'23',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				null,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				[],
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'id',
+				'/id',
+				'id'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				1,
+				'/id',
+				1
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				true,
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'23',
+				'/id',
+				'23'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				null,
+				'/id',
+				null
 			]
 		];
 	}

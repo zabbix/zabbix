@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 	if (typeof options.scripts !== 'undefined') {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, options.hostid, trigger_elmnt)
+			items: getMenuPopupScriptData(options.scripts, trigger_elmnt, options.hostid)
 		});
 	}
 
@@ -827,6 +827,14 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
+	// scripts
+	if (typeof options.scripts !== 'undefined') {
+		sections.push({
+			label: t('Scripts'),
+			items: getMenuPopupScriptData(options.scripts, trigger_elmnt, null, options.eventid)
+		});
+	}
+
 	return sections;
 }
 
@@ -1096,13 +1104,14 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param array scripts           Scripts names.
- * @param array hostId            Host ID.
+ * @param array scripts           Script names amd nenu paths.
  * @param {object} trigger_elmnt  UI element which triggered opening of overlay dialogue.
+ * @param array hostid            Host ID.
+ * @param array eventid           Event ID.
  *
  * @returns array
  */
-function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
+function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 	var tree = {};
 
 	var appendTreeItem = function(tree, name, items, params) {
@@ -1110,13 +1119,17 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 			var item = items.shift();
 
 			if (typeof tree[item] === 'undefined') {
-				tree[item] = {items: {}};
+				tree[item] = {
+					name: item,
+					items: {}
+				};
 			}
 
 			appendTreeItem(tree[item].items, name, items, params);
 		}
 		else {
-			tree[name] = {
+			tree['/' + name] = {
+				name: name,
 				params: params,
 				items: {}
 			};
@@ -1128,33 +1141,37 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 		var script = scripts[key];
 
 		if (typeof script.scriptid !== 'undefined') {
-			var items = splitPath(script.name),
-				name = (items.length > 0) ? items.pop() : script.name;
+			var items = (script.menu_path.length > 0) ? splitPath(script.menu_path) : [];
 
-			appendTreeItem(tree, name, items, {
-				hostId: hostId,
-				scriptId: script.scriptid,
-				confirmation: script.confirmation
+			appendTreeItem(tree, script.name, items, {
+				scriptid: script.scriptid,
+				confirmation: script.confirmation,
+				hostid: hostid,
+				eventid: eventid
 			});
 		}
 	}
 
-	// build menu items from tree
+	// Build menu items from tree.
 	var getMenuPopupScriptItems = function(tree, trigger_elm) {
 		var items = [];
 
 		if (objectSize(tree) > 0) {
-			jQuery.each(tree, function(name, data) {
-				var item = {label: name};
+			jQuery.each(tree, function(key, data) {
+				var item = {label: data.name};
 
 				if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
 					item.items = getMenuPopupScriptItems(data.items, trigger_elm);
 				}
 
-				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
+				if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
 					item.clickCallback = function(e) {
-						jQuery(this).closest('.menu-popup-top').menuPopup('close', trigger_elm, false);
-						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
+						jQuery(this)
+							.closest('.menu-popup-top')
+							.menuPopup('close', trigger_elm, false);
+						executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
+							data.params.eventid
+						);
 						cancelEvent(e);
 					};
 				}

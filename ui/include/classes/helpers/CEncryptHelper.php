@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,10 +114,12 @@ class CEncryptHelper {
 	 * @return boolean
 	 */
 	public static function updateKey(string $key): bool {
+		$db_config = DB::select('config', ['output' => ['configid']])[0];
+
 		return DBexecute(
 			'UPDATE config'.
 			' SET session_key='.zbx_dbstr($key).
-			' WHERE '.dbConditionInt('configid', [1])
+			' WHERE '.dbConditionInt('configid', [$db_config['configid']])
 		);
 	}
 }

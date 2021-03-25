@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ function schedule2str($timeperiod) {
 				case 2: $every = _x('second', 'adjective'); break;
 				case 3: $every = _('third'); break;
 				case 4: $every = _('fourth'); break;
-				case 5: $every = _('last'); break;
+				case 5: $every = _x('last', 'week of month'); break;
 			}
 
 			$str = _s('At %1$s:%2$s on %3$s %4$s of every %5$s',

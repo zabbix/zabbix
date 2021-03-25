@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,7 +270,7 @@ class CProfiler {
 	 * @param array  $params
 	 * @param array  $result
 	 */
-	public function profileApiCall($class, $method, $params, $result) {
+	public function profileApiCall($class, $method, array $params, $result) {
 		$backtrace = debug_backtrace();
 
 		// Use the file name and line number from the first call to the API wrapper object.

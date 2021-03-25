@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 						['type' => 'XML XPath', 'parameter_1' => 'path'],
 						['type' => 'JSONPath', 'parameter_1' => 'path'],
 						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'XML to JSON'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Simple change'],
 						['type' => 'Change per second'],
@@ -305,7 +306,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
 						['type' => 'Change per second'],
-						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false]
+						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false],
+						['type' => 'XML to JSON']
 					],
 					'action' => 'Test'
 				]

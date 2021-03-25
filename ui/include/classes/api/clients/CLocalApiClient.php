@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,12 +52,12 @@ class CLocalApiClient extends CApiClient {
 	 *
 	 * @param string 	$requestApi			API name
 	 * @param string 	$requestMethod		API method
-	 * @param mixed 	$params				API parameters
+	 * @param array 	$params				API parameters
 	 * @param string	$auth				Authentication token
 	 *
 	 * @return CApiClientResponse
 	 */
-	public function callMethod($requestApi, $requestMethod, $params, $auth) {
+	public function callMethod($requestApi, $requestMethod, array $params, $auth) {
 		global $DB;
 
 		$api = strtolower($requestApi);
@@ -67,7 +67,7 @@ class CLocalApiClient extends CApiClient {
 
 		// check API
 		if (!$this->isValidApi($api)) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+			$response->errorCode = ZBX_API_ERROR_NO_METHOD;
 			$response->errorMessage = _s('Incorrect API "%1$s".', $requestApi);
 
 			return $response;
@@ -75,18 +75,8 @@ class CLocalApiClient extends CApiClient {
 
 		// check method
 		if (!$this->isValidMethod($api, $method)) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+			$response->errorCode = ZBX_API_ERROR_NO_METHOD;
 			$response->errorMessage = _s('Incorrect method "%1$s.%2$s".', $requestApi, $requestMethod);
-
-			return $response;
-		}
-
-		// check params
-		if (!is_array($params)) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
-			$response->errorMessage = _s('Cannot call method "%1$s.%2$s" without parameters.', $requestApi,
-				$requestMethod
-			);
 
 			return $response;
 		}
@@ -174,10 +164,82 @@ class CLocalApiClient extends CApiClient {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
 		}
 
+		if (strlen($auth) == 64) {
+			return $this->tokenAuthentication($auth);
+		}
+
 		$user = $this->serviceFactory->getObject('user')->checkAuthentication(['sessionid' => $auth]);
 		if (array_key_exists('debug_mode', $user)) {
 			$this->debug = $user['debug_mode'];
 		}
+	}
+
+	/**
+	 * Authenticates user based on token.
+	 *
+	 * @param string $auth_token
+	 *
+	 * @throws APIException
+	 */
+	protected function tokenAuthentication(string $auth_token) {
+		$api_tokens = DB::select('token', [
+			'output' => ['userid', 'expires_at', 'tokenid'],
+			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
+		]);
+
+		if (!$api_tokens) {
+			usleep(10000);
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
+		}
+
+		[['expires_at' => $expires_at, 'userid' => $userid, 'tokenid' => $tokenid]] = $api_tokens;
+
+		if ($expires_at != 0 && $expires_at < time()) {
+			throw new APIException(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
+		}
+
+		[['roleid' => $roleid, 'username' => $username]] = DB::select('users', [
+			'output' => ['roleid', 'username'],
+			'userids' => $userid
+		]);
+
+		[$type] = DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type');
+
+		$db_usrgrps = DBselect(
+			'SELECT g.debug_mode,g.users_status'.
+			' FROM usrgrp g,users_groups ug'.
+			' WHERE g.usrgrpid=ug.usrgrpid'.
+				' AND ug.userid='.$userid
+		);
+
+		$debug_mode = GROUP_DEBUG_MODE_DISABLED;
+		while ($db_usrgrp = DBfetch($db_usrgrps)) {
+			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
+			}
+
+			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+				$debug_mode = GROUP_DEBUG_MODE_ENABLED;
+				break;
+			}
+		}
+
+		CApiService::$userData = [
+			'userid' => $userid,
+			'username' => $username,
+			'type' => $type,
+			'roleid' => $roleid,
+			'userip' => CWebUser::getIp(),
+			'sessionid' => $auth_token,
+			'debug_mode' => $debug_mode
+		];
+
+		$this->debug = ($debug_mode == GROUP_DEBUG_MODE_ENABLED);
+
+		DB::update('token', [
+			'values' => ['lastaccess' => time()],
+			'where' => ['tokenid' => $tokenid]
+		]);
 	}
 
 	/**

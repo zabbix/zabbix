@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 	/**
 	 * Discovery rule "testFormDiscoveryRule" id used in test.
 	 */
-	const DISCOVERY_RULE_ID = 33800;
+	const DISCOVERY_RULE_ID = 133800;
 
 	/**
 	 * Item prototype "testFormItemReuse" id used in test belong to discovery rule "testFormDiscoveryRule".
@@ -78,7 +78,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 
 		// Check table headers.
 		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type', 'Discover'],
-				$this->getTextOfElements("//thead/tr/th[not(@class)]")
+				$this->getTextOfElements('//form[@name="graphForm"]//thead/tr/th[not(@class)]')
 		);
 
 		// Check graph prototype number in breadcrumb.

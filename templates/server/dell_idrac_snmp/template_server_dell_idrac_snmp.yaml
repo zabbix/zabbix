@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:12:39Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -1035,202 +1035,202 @@ zabbix_export:
         -
           macro: '{$VDISK_WARN_STATUS:"degraded"}'
           value: '4'
-  value_maps:
-    -
-      name: 'IDRAC-MIB-SMIv2::batteryState'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: Unknown
+          name: 'IDRAC-MIB-SMIv2::batteryState'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: Ready
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Degraded
+            -
+              value: '5'
+              newvalue: Missing
+            -
+              value: '6'
+              newvalue: Charging
+            -
+              value: '7'
+              newvalue: 'Below threshold'
         -
-          value: '2'
-          newvalue: Ready
+          name: 'IDRAC-MIB-SMIv2::BooleanType'
+          mappings:
+            -
+              value: '0'
+              newvalue: ok
+            -
+              value: '1'
+              newvalue: failed
         -
-          value: '3'
-          newvalue: Failed
+          name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '5'
+              newvalue: critical
+            -
+              value: '6'
+              newvalue: nonRecoverable
         -
-          value: '4'
-          newvalue: Degraded
+          name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '5'
+              newvalue: critical
+            -
+              value: '6'
+              newvalue: nonRecoverable
         -
-          value: '5'
-          newvalue: Missing
+          name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: HDD
+            -
+              value: '3'
+              newvalue: SSD
         -
-          value: '6'
-          newvalue: Charging
+          name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCriticalUpper
+            -
+              value: '5'
+              newvalue: criticalUpper
+            -
+              value: '6'
+              newvalue: nonRecoverableUpper
+            -
+              value: '7'
+              newvalue: nonCriticalLower
+            -
+              value: '8'
+              newvalue: criticalLower
+            -
+              value: '9'
+              newvalue: nonRecoverableLower
+            -
+              value: '10'
+              newvalue: failed
         -
-          value: '7'
-          newvalue: 'Below threshold'
-    -
-      name: 'IDRAC-MIB-SMIv2::BooleanType'
-      mappings:
+          name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: RAID-0
+            -
+              value: '3'
+              newvalue: RAID-1
+            -
+              value: '4'
+              newvalue: RAID-5
+            -
+              value: '5'
+              newvalue: RAID-6
+            -
+              value: '6'
+              newvalue: RAID-10
+            -
+              value: '7'
+              newvalue: RAID-50
+            -
+              value: '8'
+              newvalue: RAID-60
+            -
+              value: '9'
+              newvalue: 'Concatenated RAID 1'
+            -
+              value: '10'
+              newvalue: 'Concatenated RAID 5'
         -
-          value: '0'
-          newvalue: ok
+          name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Not applicable'
+            -
+              value: '2'
+              newvalue: Reconstructing
+            -
+              value: '3'
+              newvalue: Resynching
+            -
+              value: '4'
+              newvalue: Initializing
+            -
+              value: '5'
+              newvalue: 'Background init'
         -
-          value: '1'
-          newvalue: failed
-    -
-      name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
-      mappings:
+          name: 'IDRAC-MIB-SMIv2::virtualDiskState'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: Online
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Degraded
         -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: unknown
-        -
-          value: '3'
-          newvalue: ok
-        -
-          value: '4'
-          newvalue: nonCritical
-        -
-          value: '5'
-          newvalue: critical
-        -
-          value: '6'
-          newvalue: nonRecoverable
-    -
-      name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: unknown
-        -
-          value: '3'
-          newvalue: ok
-        -
-          value: '4'
-          newvalue: nonCritical
-        -
-          value: '5'
-          newvalue: critical
-        -
-          value: '6'
-          newvalue: nonRecoverable
-    -
-      name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
-      mappings:
-        -
-          value: '1'
-          newvalue: Unknown
-        -
-          value: '2'
-          newvalue: HDD
-        -
-          value: '3'
-          newvalue: SSD
-    -
-      name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: unknown
-        -
-          value: '3'
-          newvalue: ok
-        -
-          value: '4'
-          newvalue: nonCriticalUpper
-        -
-          value: '5'
-          newvalue: criticalUpper
-        -
-          value: '6'
-          newvalue: nonRecoverableUpper
-        -
-          value: '7'
-          newvalue: nonCriticalLower
-        -
-          value: '8'
-          newvalue: criticalLower
-        -
-          value: '9'
-          newvalue: nonRecoverableLower
-        -
-          value: '10'
-          newvalue: failed
-    -
-      name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
-      mappings:
-        -
-          value: '1'
-          newvalue: Other
-        -
-          value: '2'
-          newvalue: RAID-0
-        -
-          value: '3'
-          newvalue: RAID-1
-        -
-          value: '4'
-          newvalue: RAID-5
-        -
-          value: '5'
-          newvalue: RAID-6
-        -
-          value: '6'
-          newvalue: RAID-10
-        -
-          value: '7'
-          newvalue: RAID-50
-        -
-          value: '8'
-          newvalue: RAID-60
-        -
-          value: '9'
-          newvalue: 'Concatenated RAID 1'
-        -
-          value: '10'
-          newvalue: 'Concatenated RAID 5'
-    -
-      name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
-      mappings:
-        -
-          value: '1'
-          newvalue: 'Not applicable'
-        -
-          value: '2'
-          newvalue: Reconstructing
-        -
-          value: '3'
-          newvalue: Resynching
-        -
-          value: '4'
-          newvalue: Initializing
-        -
-          value: '5'
-          newvalue: 'Background init'
-    -
-      name: 'IDRAC-MIB-SMIv2::virtualDiskState'
-      mappings:
-        -
-          value: '1'
-          newvalue: Unknown
-        -
-          value: '2'
-          newvalue: Online
-        -
-          value: '3'
-          newvalue: Failed
-        -
-          value: '4'
-          newvalue: Degraded
-    -
-      name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
-      mappings:
-        -
-          value: '1'
-          newvalue: 'Write Through'
-        -
-          value: '2'
-          newvalue: 'Write Back'
-        -
-          value: '3'
-          newvalue: 'Force Write Back'
+          name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Write Through'
+            -
+              value: '2'
+              newvalue: 'Write Back'
+            -
+              value: '3'
+              newvalue: 'Force Write Back'

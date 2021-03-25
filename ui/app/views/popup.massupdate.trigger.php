@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
-	->cleanItems()
 	->setId('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.massupdate.trigger')

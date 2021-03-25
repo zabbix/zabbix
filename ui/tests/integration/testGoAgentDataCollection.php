@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -237,7 +237,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'vfs.dev.write[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 20
+			'threshold' => 100
 		],
 		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
@@ -299,7 +299,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'vfs.fs.size[/tmp,free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 16384
+			'threshold' => 262144
 		],
 		[
 			'key' => 'vm.memory.size[free]',
@@ -435,8 +435,8 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	 */
 	public function testGoAgentDataCollection_checkDataCollection() {
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'enabling Zabbix agent checks on host "'.
-					$component.'": host became available', false
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'enabling Zabbix agent checks on host "'.$component.'": interface became available', false
 			);
 		}
 

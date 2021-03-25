@@ -20,7 +20,7 @@ Metrics are collected by JMX.
 
 1. Enable and configure JMX access to Apache ActiveMQ.
  See documentation for [instructions](https://activemq.apache.org/jmx.html).
-2. Set values in host macros {$ACTIVEMQ.USERNAME}, {$ACTIVEMQ.PASSWORD}, {$ACTIVEMQ.PORT} and {$ACTIVEMQ.HTTP.PORT}.
+2. Set values in host macros {$ACTIVEMQ.USERNAME}, {$ACTIVEMQ.PASSWORD} and {$ACTIVEMQ.PORT}.
 
 
 ## Zabbix configuration

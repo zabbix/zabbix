@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -547,8 +547,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		// If module adds single or multiple menu entries, open each corresponding view, check view header and URL.
 		$top_entry = CTestArrayHelper::get($module, 'top_menu_entry', 'Monitoring');
 
+		$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
 		foreach ($module['menu_entries'] as $entry) {
-			$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
 			sleep(1);
 			$this->query($xpath.$entry['name'].'"]')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
@@ -564,10 +564,10 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 * If enabling the module removes a menu entry, the function checks that it is back after disabling the module.
 	 */
 	private function assertModuleDisabled($module) {
-		$xpath = 'xpath://ul[@class="menu-main"]//a[text()="';
+		$xpath = 'xpath://ul[@class="menu-main"]//li/a[text()="';
 		// If module removes a menu entry or top level menu entry, check that entries are back after disabling the module.
 		if (CTestArrayHelper::get($module, 'remove', false)) {
-			$this->assertEquals(1, $this->query($xpath.$module['menu_entry'].'"]')->count());
+			$this->assertEquals(2, $this->query($xpath.$module['menu_entry'].'"]')->count());
 			if (array_key_exists('top_menu_entry', $module)) {
 				$this->assertEquals(1, $this->query($xpath.$module['top_menu_entry'].'"]')->count());
 			}

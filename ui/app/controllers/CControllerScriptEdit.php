@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,17 +29,30 @@ class CControllerScriptEdit extends CController {
 		$fields = [
 			'scriptid' =>				'db scripts.scriptid',
 			'name' =>					'db scripts.name',
-			'type' =>					'db scripts.type        |in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI,
-			'execute_on' =>				'db scripts.execute_on  |in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER.','.ZBX_SCRIPT_EXECUTE_ON_PROXY,
+			'scope' =>					'db scripts.scope| in '.implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
+			'type' =>					'db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK]),
+			'execute_on' =>				'db scripts.execute_on|in '.implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]),
+			'menu_path' =>				'db scripts.menu_path',
+			'authtype' =>				'db scripts.authtype|in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'username' =>				'db scripts.username',
+			'password' =>				'db scripts.password',
+			'publickey' =>				'db scripts.publickey',
+			'privatekey' =>				'db scripts.privatekey',
+			'passphrase' =>				'db scripts.password',
+			'port' =>					'db scripts.port',
 			'command' =>				'db scripts.command',
 			'commandipmi' =>			'db scripts.command',
+			'parameters' =>				'array',
+			'script' => 				'db scripts.command',
+			'timeout' => 				'db media_type.timeout',
 			'description' =>			'db scripts.description',
-			'host_access' =>			'db scripts.host_access |in '.PERM_READ.','.PERM_READ_WRITE,
+			'host_access' =>			'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
 			'groupid' =>				'db scripts.groupid',
 			'usrgrpid' =>				'db scripts.usrgrpid',
-			'hgstype' =>				'                        in 0,1',
+			'hgstype' =>				'in 0,1',
 			'confirmation' =>			'db scripts.confirmation',
-			'enable_confirmation' =>	'                        in 1'
+			'enable_confirmation' =>	'in 1',
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -68,73 +81,107 @@ class CControllerScriptEdit extends CController {
 	}
 
 	protected function doAction() {
-		// default values
+		// Default values.
 		$data = [
 			'sid' => $this->getUserSID(),
 			'scriptid' => 0,
 			'name' => '',
-			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+			'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+			'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
+			'menu_path' => '',
+			'authtype' => ITEM_AUTHTYPE_PASSWORD,
+			'username' => '',
+			'password' => '',
+			'passphrase' => '',
+			'publickey' => '',
+			'privatekey' => '',
+			'port' => '',
 			'command' => '',
 			'commandipmi' => '',
+			'parameters' => [],
+			'script' => '',
+			'timeout' => DB::getDefault('scripts', 'timeout'),
 			'description' => '',
 			'usrgrpid' => 0,
 			'groupid' => 0,
 			'host_access' => PERM_READ,
 			'confirmation' => '',
-			'enable_confirmation' => 0,
-			'hgstype' => 0
+			'enable_confirmation' => false,
+			'hgstype' => 0,
+			'actions' => []
 		];
 
-		// get values from the dabatase
+		// Get values from the dabatase.
 		if ($this->hasInput('scriptid')) {
 			$scripts = API::Script()->get([
-				'output' => ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
-					'groupid', 'host_access', 'confirmation'
+				'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
+					'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username',
+					'password', 'publickey', 'privatekey', 'menu_path', 'parameters'
 				],
-				'scriptids' => $this->getInput('scriptid')
+				'scriptids' => $this->getInput('scriptid'),
+				'selectActions' => []
 			]);
-			$script = $scripts[0];
 
-			$data['scriptid'] = $script['scriptid'];
-			$data['name'] = $script['name'];
-			$data['type'] = $script['type'];
-			$data['execute_on'] = $script['execute_on'];
-			$data['command'] = ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) ? $script['command'] : '';
-			$data['commandipmi'] = ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $script['command'] : '';
-			$data['description'] = $script['description'];
-			$data['usrgrpid'] = $script['usrgrpid'];
-			$data['groupid'] = $script['groupid'];
-			$data['host_access'] = $script['host_access'];
-			$data['confirmation'] = $script['confirmation'];
-			$data['enable_confirmation'] = ($script['confirmation'] !== '');
-			$data['hgstype'] = ($script['groupid'] != 0) ? 1 : 0;
+			if ($scripts) {
+				$script = $scripts[0];
+
+				$data['scriptid'] = $script['scriptid'];
+				$data['name'] = $script['name'];
+				$data['command'] = ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+						|| $script['type'] == ZBX_SCRIPT_TYPE_SSH
+						|| $script['type'] == ZBX_SCRIPT_TYPE_TELNET)
+					? $script['command']
+					: '';
+				$data['commandipmi'] = ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $script['command'] : '';
+				$data['script'] = ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) ? $script['command'] : '';
+				$data['host_access'] = $script['host_access'];
+				$data['usrgrpid'] = $script['usrgrpid'];
+				$data['hgstype'] = ($script['groupid'] != 0) ? 1 : 0;
+				$data['groupid'] = $script['groupid'];
+				$data['description'] = $script['description'];
+				$data['enable_confirmation'] = ($script['confirmation'] !== '');
+				$data['confirmation'] = $script['confirmation'];
+				$data['type'] = $script['type'];
+				$data['execute_on'] = $script['execute_on'];
+				$data['timeout'] = $script['timeout'];
+				$data['scope'] = $script['scope'];
+				$data['authtype'] = $script['authtype'];
+				$data['username'] = $script['username'];
+				$data['password'] = ($script['authtype'] == ITEM_AUTHTYPE_PASSWORD) ? $script['password'] : '';
+				$data['passphrase'] = ($script['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) ? $script['password'] : '';
+				$data['publickey'] = $script['publickey'];
+				$data['privatekey'] = $script['privatekey'];
+				$data['port'] = $script['port'];
+				$data['menu_path'] = $script['menu_path'];
+				$data['parameters'] = $script['parameters'];
+				$data['actions'] = $script['actions'];
+			}
 		}
 
-		// overwrite with input variables
-		$this->getInputs($data, [
-			'name',
-			'type',
-			'execute_on',
-			'command',
-			'commandipmi',
-			'description',
-			'usrgrpid',
-			'groupid',
-			'host_access',
-			'confirmation',
-			'enable_confirmation',
-			'hgstype'
+		// Overwrite with input variables.
+		$this->getInputs($data, ['name', 'command', 'commandipmi', 'script', 'host_access', 'usrgrpid', 'hgstype',
+			'groupid', 'description', 'enable_confirmation', 'confirmation', 'type', 'execute_on', 'timeout', 'scope',
+			'port', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'passphrase', 'menu_path',
+			'parameters'
 		]);
 
-		// get host group
+		if ($this->hasInput('form_refresh') && array_key_exists('name', $data['parameters'])
+				&& array_key_exists('value', $data['parameters'])) {
+			$data['parameters'] = array_map(function ($name, $value) {
+					return compact('name', 'value');
+				}, $data['parameters']['name'], $data['parameters']['value']
+			);
+		}
+
+		// Get host group.
 		if ($data['groupid'] == 0) {
 			$data['hostgroup'] = null;
 		}
 		else {
 			$hostgroups = API::HostGroup()->get([
-				'groupids' => [$data['groupid']],
-				'output' => ['groupid', 'name']
+				'output' => ['groupid', 'name'],
+				'groupids' => [$data['groupid']]
 			]);
 			$hostgroup = $hostgroups[0];
 
@@ -144,7 +191,7 @@ class CControllerScriptEdit extends CController {
 			];
 		}
 
-		// get list of user groups
+		// Get list of user groups.
 		$usergroups = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name']
 		]);

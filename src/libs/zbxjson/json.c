@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1294,4 +1294,9 @@ int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct
 out:
 	zbx_jsonpath_clear(&jsonpath);
 	return ret;
+}
+
+zbx_json_type_t	zbx_json_valuetype(const char *p)
+{
+	return __zbx_json_type(p);
 }

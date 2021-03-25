@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,12 @@
 #ifndef ZABBIX_EXPORT_H
 #define ZABBIX_EXPORT_H
 
-int	zbx_is_export_enabled(void);
+#define ZBX_FLAG_EXPTYPE_EVENTS		1
+#define ZBX_FLAG_EXPTYPE_HISTORY	2
+#define ZBX_FLAG_EXPTYPE_TRENDS		4
+
+int	zbx_validate_export_type(char *export_type, uint32_t *export_mask);
+int	zbx_is_export_enabled(uint32_t flags);
 int	zbx_export_init(char **error);
 
 void	zbx_problems_export_init(const char *process_name, int process_num);
@@ -30,6 +35,8 @@ void	zbx_problems_export_flush(void);
 void	zbx_history_export_init(const char *process_name, int process_num);
 void	zbx_history_export_write(const char *buf, size_t count);
 void	zbx_history_export_flush(void);
+
+void	zbx_trends_export_init(const char *process_name, int process_num);
 void	zbx_trends_export_write(const char *buf, size_t count);
 void	zbx_trends_export_flush(void);
 

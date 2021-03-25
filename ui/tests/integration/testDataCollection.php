@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -165,17 +165,21 @@ class testDataCollection extends CIntegrationTest {
 	 */
 	public function testDataCollection_checkHostAvailability() {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				'temporarily disabling Zabbix agent checks on host "agent": host unavailable'
+			'temporarily disabling Zabbix agent checks on host "agent": interface unavailable'
 		);
 
-		$data = $this->call('host.get', [
-			'hostids'	=> self::$hostids['agent'],
-			'output'	=> ['available']
+		$data = $this->call('hostinterface.get', [
+			'output' => ['available'],
+			'hostids' => self::$hostids['agent'],
+			'filter' => [
+				'type' => 1,
+				'main' => 1
+			]
 		]);
 
 		$this->assertTrue(is_array($data['result']));
 		$this->assertEquals(1, count($data['result']));
-		$this->assertEquals(HOST_AVAILABLE_FALSE, $data['result'][0]['available']);
+		$this->assertEquals(INTERFACE_AVAILABLE_FALSE, $data['result'][0]['available']);
 	}
 
 	/**
@@ -187,8 +191,8 @@ class testDataCollection extends CIntegrationTest {
 	 */
 	public function testDataCollection_checkAgentData() {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-				'enabling Zabbix agent checks on host "agent": host became available',
-				'resuming Zabbix agent checks on host "agent": connection restored'
+			'enabling Zabbix agent checks on host "agent": interface became available',
+			'resuming Zabbix agent checks on host "agent": connection restored'
 		]);
 
 		$passive_data = $this->call('history.get', [
@@ -306,8 +310,8 @@ class testDataCollection extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "proxy"');
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server');
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, [
-				'enabling Zabbix agent checks on host "proxy_agent": host became available',
-				'resuming Zabbix agent checks on host "proxy_agent": connection restored'
+			'enabling Zabbix agent checks on host "proxy_agent": interface became available',
+			'resuming Zabbix agent checks on host "proxy_agent": connection restored'
 		]);
 
 		$passive_data = $this->call('history.get', [

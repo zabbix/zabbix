@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,7 +236,12 @@ class CConfigFile {
 
 			$this->check();
 
-			if (!file_put_contents($this->configFile, $this->getString())) {
+			if (file_put_contents($this->configFile, $this->getString())) {
+				if (!chmod($this->configFile, 0600)) {
+					self::exception(_('Unable to change configuration file permissions to 0600.'));
+				}
+			}
+			else {
 				if (file_exists($this->configFile)) {
 					if (file_get_contents($this->configFile) !== $this->getString()) {
 						self::exception(_('Unable to overwrite the existing configuration file.'));

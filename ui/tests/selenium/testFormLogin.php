@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,9 +120,9 @@ class testFormLogin extends CLegacyWebTest {
 				'Incorrect user name or password or account is temporarily blocked.'
 			);
 			$this->zbxTestTextPresent(['Username', 'Password']);
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'"));
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'"));
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$data['login']."'"));
+			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_failed>0 AND username='".$data['login']."'"));
+			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_clock>0 AND username='".$data['login']."'"));
+			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_ip<>'' AND username='".$data['login']."'"));
 		}
 	}
 
@@ -137,11 +137,11 @@ class testFormLogin extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Username');
 			$this->zbxTestTextPresent('Password');
 
-			$sql = 'SELECT * FROM users WHERE alias=\'user-for-blocking\' AND attempt_failed='.$i.'';
+			$sql = 'SELECT * FROM users WHERE username=\'user-for-blocking\' AND attempt_failed='.$i.'';
 			$this->assertEquals(1, CDBHelper::getCount($sql));
-			$sql = 'SELECT * FROM users WHERE alias=\'user-for-blocking\' AND attempt_clock>0';
+			$sql = 'SELECT * FROM users WHERE username=\'user-for-blocking\' AND attempt_clock>0';
 			$this->assertEquals(1, CDBHelper::getCount($sql));
-			$sql = "SELECT * FROM users WHERE alias='user-for-blocking' AND attempt_ip<>''";
+			$sql = "SELECT * FROM users WHERE username='user-for-blocking' AND attempt_ip<>''";
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 

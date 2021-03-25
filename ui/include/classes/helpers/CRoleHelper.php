@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,6 +76,7 @@ class CRoleHelper {
 	public const ACTIONS_ACKNOWLEDGE_PROBLEMS = 'actions.acknowledge_problems';
 	public const ACTIONS_CLOSE_PROBLEMS = 'actions.close_problems';
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
+	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 	public const DEFAULT_ACCESS_DISABLED = 0;
 	public const DEFAULT_ACCESS_ENABLED = 1;
@@ -321,7 +322,7 @@ class CRoleHelper {
 		$rules = [
 			self::ACTIONS_EDIT_DASHBOARDS, self::ACTIONS_EDIT_MAPS, self::ACTIONS_ACKNOWLEDGE_PROBLEMS,
 			self::ACTIONS_CLOSE_PROBLEMS, self::ACTIONS_CHANGE_SEVERITY, self::ACTIONS_ADD_PROBLEM_COMMENTS,
-			self::ACTIONS_EXECUTE_SCRIPTS
+			self::ACTIONS_EXECUTE_SCRIPTS, self::ACTIONS_MANAGE_API_TOKENS
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
@@ -490,7 +491,8 @@ class CRoleHelper {
 			self::ACTIONS_CHANGE_SEVERITY => ('Change severity'),
 			self::ACTIONS_ACKNOWLEDGE_PROBLEMS => _('Acknowledge problems'),
 			self::ACTIONS_CLOSE_PROBLEMS => _('Close problems'),
-			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts')
+			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts'),
+			self::ACTIONS_MANAGE_API_TOKENS => _('Manage API tokens')
 		];
 
 		return $labels;

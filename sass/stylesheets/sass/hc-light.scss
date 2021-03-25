@@ -61,23 +61,52 @@ $menu-main-submenu-selected-color: #000000;
 $menu-main-submenu-selected-bg-color: #f3f3f3;
 $menu-main-submenu-selected-border-color: #949494;
 
+$menu-main-submenu-next-level-bg: #000000 !default;
+$menu-main-submenu-next-level-shadow: transparent !default;
+
 $menu-main-icons-opacity: 1;
 
 $menu-user-color: #cedae1;
 $menu-user-hover-color: #ffffff;
 $menu-user-disabled-color: #9f9f9f;
 
+$menu-user-submenu-color: #f4f4f4;
+$menu-user-submenu-bg-color: #333333;
+$menu-user-submenu-border-color: #0d0d0d;
+$menu-user-submenu-hover-color: #000000;
+$menu-user-submenu-hover-bg-color: #e6e6e6;
+$menu-user-submenu-hover-border-color: transparent;
+$menu-user-submenu-selected-color: #000000;
+$menu-user-submenu-selected-bg-color: #f3f3f3;
+$menu-user-submenu-selected-border-color: #949494;
+
+$menu-user-submenu-next-level-bg: #000000 !default;
+$menu-user-submenu-next-level-shadow: transparent !default;
+
+$menu-user-arrow-bg-position: -606px -434px;
+$menu-user-arrow-hover-bg-position: -606px -434px;
+$menu-user-selected-arrow-bg-position: -579px -434px;
+
 // Sidebar
 $sidebar-server-name-color: #9f9f9f;
 
 $menu-main-icons: (
-		dashboard: -570px -664px,
-		problems: -570px -688px,
-		monitoring: -570px -712px,
-		inventory: -570px -736px,
-		reports: -570px -760px,
-		configuration: -570px -784px,
-		administration: -570px -808px
+	dashboard: -570px -664px,
+	problems: -570px -688px,
+	monitoring: -570px -712px,
+	inventory: -570px -736px,
+	reports: -570px -760px,
+	configuration: -570px -784px,
+	administration: -570px -808px
+);
+
+$menu-user-expanded-icons: (
+	support: -247px -84px,
+	share: -168px -84px,
+	help: -168px -48px,
+	guest: -247px -192px,
+	profile: -168px -120px,
+	signout: -168px -156px
 );
 
 // UI
@@ -230,8 +259,9 @@ $dashboard-my-bg-color: #555555;
 
 // components/menu-main
 .menu-main {
-	& > li.has-submenu {
+	li.has-submenu {
 		&.is-expanded > a,
+		.is-selected > a,
 		& > a:hover,
 		& > a:focus {
 			&::before {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,8 +110,7 @@ class CControllerHousekeepingEdit extends CController {
 			'compress_older' => $this->getInput('compress_older', CHousekeepingHelper::get(
 				CHousekeepingHelper::COMPRESS_OLDER
 			)),
-			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION),
-			'compression_availability' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_AVAILABILITY)
+			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION)
 		];
 
 		$response = new CControllerResponseData($data);

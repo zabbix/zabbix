@@ -7,7 +7,7 @@ INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, perio
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-24:00');
 
 -- More user scripts
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation) VALUES (4,'Reboot','/sbin/shutdown -r',3,7,4,'This command reboots server.','Do you really want to reboot it?');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, confirmation) VALUES (4, 0,'Reboot','/sbin/shutdown -r',3,7,4,'This command reboots server.','Do you really want to reboot it?');
 
 -- Add proxies
 INSERT INTO hosts (hostid, host, status, description) VALUES (20000, 'Active proxy 1', 5, '');
@@ -175,7 +175,7 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (16, 1
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 16, 1);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 19, 1);
 
-INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (20, 0, NULL, 0, '', 0, '', '', '', '', '/sbin/shutdown -r');
+INSERT INTO opcommand (operationid, scriptid) VALUES (20, 4);
 
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (1, 20, NULL);
 
@@ -208,11 +208,11 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (18, 2
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (19, 28, 7);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (20, 29, 7);
 
-INSERT INTO opcommand (operationid, type, command) VALUES (23, 0, 'echo TEST');
-INSERT INTO opcommand (operationid, type, command) VALUES (30, 0, 'echo TEST');
-
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (2, 23, NULL);
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (3, 30, NULL);
+-- Autoregistration action scripts
+INSERT INTO opcommand (operationid, scriptid) VALUES (23, 4);
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 23, NULL);
+INSERT INTO opcommand (operationid, scriptid) VALUES (30, 4);
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (5, 30, NULL);
 
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 26, 5);
 
@@ -704,6 +704,10 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15000, 15000, 1)
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15002, 15002, 1);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15015, 15015, 1);
 
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5701, 15000, 'Template value mapping');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (57001, 5701, 1, 'yes');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (57002, 5701, 0, 'no');
+
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15001, 'Template inheritance test host', 'Template inheritance test host', 0, '');
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15000, 15001, 1, '127.0.0.1', 1, '10051', 1);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15001, 15001, 1, '127.0.0.2', 1, '10052', 0);
@@ -1060,6 +1064,14 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40000, 40000, 1)
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (40001, 'Simple form test host', 'Simple form test host', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40001, 40001, 4);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (40000, 40001, 40000);
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5601, 40001, 'Reference valuemap');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56001, 5601, 1, 'One');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56002, 5601, 2, 'Two');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56003, 5601, 3, 'Three');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56004, 5601, 4, 'Four');
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5602, 40001, 'Второй валъю мап');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56005, 5602, 1, 'один');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (56006, 5602, 2, 'два');
 
 -- testFormItem interfaces
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '10051');
@@ -1103,27 +1115,27 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (300003, 300003, 99102, 1, 1, 'FF5555', 0, 2, 0);
 
 -- testFormDiscoveryRule.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 33700, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 33701, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 33702, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 33703, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 43700, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 43701, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 43702, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 43703, 1,  50, '', '', 40011, '', '');
 
 -- testFormItemPrototype.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormDiscoveryRule', 'discovery-rule-form', 40001, 4, 33800, 1,  50, '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormDiscoveryRule', 'discovery-rule-form', 40001, 4, 133800, 1,  50, '', '', '', '');
 
 -- testFormItemPrototype.SimpleUpdate
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemPrototype1', 'item-prototype-form1', 40001, 3, 23800, 2, 5, '', '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (501, 23800, 33800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (501, 23800, 133800);
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemPrototype2', 'item-prototype-form2', 40001, 3, 23801, 2, 5, '', '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (502, 23801, 33800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (502, 23801, 133800);
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemPrototype3', 'item-prototype-form3', 40001, 3, 23802, 2, 5, '', '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (503, 23802, 33800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (503, 23802, 133800);
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemPrototype4', 'item-prototype-form4', 40001, 3, 23803, 2, 5, '', '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (504, 23803, 33800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (504, 23803, 133800);
 
 -- testFormTriggerPrototype.SimpleCreate
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemReuse', 'item-prototype-reuse', 40001, 3, 23804, 2, 5, '', '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (505, 23804, 33800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (505, 23804, 133800);
 
 -- testFormTriggerPrototype.SimpleUpdate
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99518,'{99947}=0','testFormTriggerPrototype1','',0,0,0,0,'','',NULL,0,0,2);
@@ -1429,21 +1441,21 @@ INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, de
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15092, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , '30s', '90d',      0,           '', 'The following url should be clickable: https://zabbix.com', 0, '', '');
 
 -- testPageUsers, testFormLogin
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (3, 'test-user', '$2y$10$rHT2NCiJY3ly7ORLdqWbceGrDZ3YsR6gHSb5KAZAtc4QNbs6rFAaC', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (3, 'test-user', '$2y$10$rHT2NCiJY3ly7ORLdqWbceGrDZ3YsR6gHSb5KAZAtc4QNbs6rFAaC', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (5, 8, 3);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-for-blocking', '$2y$10$XuoeDz5QsPSjhZm9Ht.J8ujgX5en.X5QNSzLa3aYn04l9u6bu1p2u', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-for-blocking', '$2y$10$XuoeDz5QsPSjhZm9Ht.J8ujgX5en.X5QNSzLa3aYn04l9u6bu1p2u', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 8, 6);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'disabled-user', '$2y$10$7BRRzklg43VciDKXPsLq7uUqFehlgdTGzr/WfQXDFtACVYWFiRjjO', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'disabled-user', '$2y$10$7BRRzklg43VciDKXPsLq7uUqFehlgdTGzr/WfQXDFtACVYWFiRjjO', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 9, 7);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'no-access-to-the-frontend', '$2y$10$cExfysPEJsHzIoCkoUVH..XM0OSIwIQPE1sob2UgXDcH1Iyw8Wtny', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'no-access-to-the-frontend', '$2y$10$cExfysPEJsHzIoCkoUVH..XM0OSIwIQPE1sob2UgXDcH1Iyw8Wtny', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 12, 8);
 
 -- testFormFilterProblems, testFormFilterHosts
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (92, 'filter-create', '$2y$10$nA7hh4cZ5oHM.GgXPqzZ/e/vaD1LYcOi.3ZfulCjZV/9H4PFtIKnK', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (92, 'filter-create', '$2y$10$nA7hh4cZ5oHM.GgXPqzZ/e/vaD1LYcOi.3ZfulCjZV/9H4PFtIKnK', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (106, 7, 92);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (93, 'filter-delete', '$2y$10$z9toljmutmrQqkrl6BZiGO2kvQNcfN4wY.Pi00CeyhFMwPRIYBt16', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (93, 'filter-delete', '$2y$10$z9toljmutmrQqkrl6BZiGO2kvQNcfN4wY.Pi00CeyhFMwPRIYBt16', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (107, 7, 93);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (94, 'filter-update', '$2y$10$rHPaFkVgIx.ceaZYTlMTiuH9HyCv5M/GXQkrCyQLcK2sdubp303ze', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (94, 'filter-update', '$2y$10$rHPaFkVgIx.ceaZYTlMTiuH9HyCv5M/GXQkrCyQLcK2sdubp303ze', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (108, 7, 94);
 
 INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (24, 93, 'web.monitoring.problem.properties', 1, 0, 0, '{"hostids":["10084"],"filter_name":"delete_problems_1"}', 3);
@@ -1459,14 +1471,14 @@ INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_s
 INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (29, 94, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
 
 -- testTimezone
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'test-timezone', '$2y$10$TUIJdrXgEUaoCmbOdhiLhe8kWc3M.EE.paOv0rC7bgSP2til3643O', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'test-timezone', '$2y$10$TUIJdrXgEUaoCmbOdhiLhe8kWc3M.EE.paOv0rC7bgSP2til3643O', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
 INSERT INTO usrgrp (usrgrpid, name) VALUES (92, 'Test timezone');
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (105, 92, 9);
 
 -- testUrlUserPermissions
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page, url) VALUES (4, 'admin-zabbix', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50, 'toptriggers.php');
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page, url) VALUES (4, 'admin-zabbix', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50, 'toptriggers.php');
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 7, 4);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'user-zabbix', '$2y$10$MZQTU3/7XsECy1DbQqvn/eaoPoMDgMYJ7Ml1wYon1dC0NfwM9E3zu', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'user-zabbix', '$2y$10$MZQTU3/7XsECy1DbQqvn/eaoPoMDgMYJ7Ml1wYon1dC0NfwM9E3zu', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 7, 5);
 
 -- testPageDashboard Favorites
@@ -1478,13 +1490,13 @@ INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUE
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Selenium user group');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'Selenium user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'Selenium user group in configuration');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (5,'Selenium script','test',2,14,NULL,'selenium script description');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (5, 0, 'Selenium script','test',2,14,NULL,'selenium script description', 1);
 UPDATE config SET alert_usrgrpid = 15 WHERE configid = 1;
 
 -- testPageApplication
 INSERT INTO applications (applicationid,hostid,name) VALUES (99000,10084,'Selenium test application');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99000, 10084, 1, 0, 2, 'Selenium item for testPageApplication','item-with-app', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (99000,99000,99000);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (999000,99000,99000);
 
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
@@ -1535,7 +1547,7 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (93,93,'Service'
 -- Tag based permissions
 INSERT INTO usrgrp (usrgrpid, name) VALUES (90, 'Selenium user group for tag permissions AAA');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (91, 'Selenium user group for tag permissions BBB');
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (90, 'Tag-user', '$2y$10$UpgaksQrfBNgJVTZ8Zy53eVE6gaRcGhh1WQZojBAw2GGGh3ZXIoSi', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (90, 'Tag-user', '$2y$10$UpgaksQrfBNgJVTZ8Zy53eVE6gaRcGhh1WQZojBAw2GGGh3ZXIoSi', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (90, 90, 90);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (91, 91, 90);
 -- Tag based permissions: host group, host, item, two triggers
@@ -1799,6 +1811,9 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) va
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99004, 19, 50010, 'Http agent item form', '{$_} {$NONEXISTING}', 'http-item-form', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99005, 19, 50010, 'Http agent item for update', '{$LOCALIP} {$A}', 'http-item-update', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, headers) VALUES (99006, 19, 50010, 'Http agent item for delete', '{$A} and IP number {$LOCALIP}', 'http-item-delete', 30, 50023, '', '', 'zabbix.com', '', '');
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5501, 50010, 'Service state');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (55001, 5501, 0, 'Down');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (55002, 5501, 1, 'Up');
 
 -- testInheritanceApplication
 INSERT INTO applications (applicationid, hostid, name) VALUES (99001, 15000, 'Inheritance application');
@@ -1811,7 +1826,7 @@ INSERT INTO applications (applicationid, hostid, name) VALUES (99005, 15000, 'In
 INSERT INTO applications (applicationid, hostid, name) VALUES (99006, 15001, 'Inheritance application for delete with items');
 INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (902, 99006, 99005);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99085, 15001, 1, 0, 2, 'Item for testInheritanceApplication','item-with-inheritance-app', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99001, 99006, 99085);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999001, 99006, 99085);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99007, 15000, 'Inheritance application for update');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99008, 15001, 'Inheritance application for update');
 INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (903, 99008, 99007);
@@ -2055,13 +2070,13 @@ INSERT INTO applications (applicationid, hostid, name) VALUES (99011, 50011, '2 
 INSERT INTO applications (applicationid, hostid, name) VALUES (99012, 50012, '3 application');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99013, 50013, '4 application');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99086, 50011, 50039, 2, 3, '1_item','trap[1]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99002, 99010, 99086);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999002, 99010, 99086);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99091, 50011, 50039, 2, 3, '2_item','trap[2]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99003, 99011, 99091);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999003, 99011, 99091);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99088, 50012, 50040, 2, 3, '3_item','trap[3]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99004, 99012, 99088);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999004, 99012, 99088);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99089, 50013, 50041, 2, 3, '4_item','trap[4]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99005, 99013, 99089);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999005, 99013, 99089);
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100032, '1_trigger_Not_classified', '{100032}>0', 1, 0, '1533555726', 'Macro should be resolved, host IP should be visible here: {HOST.CONN}', 0, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100033, '1_trigger_Warning', '{100033}>0', 1, 0, '1533555726', 'The following url should be clickable: https://zabbix.com', 2);
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100034, '1_trigger_Average', '{100034}>0', 1, 0, '1533555726', 'https://zabbix.com', 3, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');
@@ -2236,7 +2251,7 @@ INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, desc
 INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status,debug_mode) VALUES (16,'LDAP user group',2,0,0);
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (10,10,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
-INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (91, 'http-auth-admin', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (91, 'http-auth-admin', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (92, 7, 91);
 
 -- testHostAvailabilityWidget
@@ -2253,45 +2268,45 @@ INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek,
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (14,5,14);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (4,5,50016);
 
-INSERT INTO hosts (hostid, host, name, status, available, ipmi_available, snmp_available, jmx_available, description) VALUES (99130, 'Not available host', 'Not available host', 0, 2, 2, 2, 2, 'Not available host for Host availability widget');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99130, 'Not available host', 'Not available host', 0, 'Not available host for Host availability widget');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99050, 99130, 50015);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55040, 99130, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55041, 99130, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55040, 99130, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR Agent');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55041, 99130, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR SNMP');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55041, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55042, 99130, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55043, 99130, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55042, 99130, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR IPMI');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55043, 99130, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR JMX');
 
-INSERT INTO hosts (hostid, host, name, status, available, ipmi_available, snmp_available, jmx_available, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from) VALUES (99131, 'Not available host in maintenance', 'Not available host in maintenance', 0, 2, 2, 2, 2, 'Not available host in maintenance for Host availability widget', 5, 1, 0, 1534971600);
+INSERT INTO hosts (hostid, host, name, status, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from) VALUES (99131, 'Not available host in maintenance', 'Not available host in maintenance', 0, 'Not available host in maintenance for Host availability widget', 5, 1, 0, 1534971600);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99051, 99131, 50016);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55044, 99131, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55045, 99131, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55044, 99131, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55045, 99131, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2);
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55045, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55046, 99131, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55047, 99131, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55046, 99131, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55047, 99131, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2);
 
-INSERT INTO hosts (hostid, host, name, status, available, description) VALUES (99132, 'Unknown host', 'Unknown host', 0, 0,'Unknown host for Host availability widget');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99132, 'Unknown host', 'Unknown host', 0,'Unknown host for Host availability widget');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99052, 99132, 50015);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55048, 99132, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55048, 99132, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1',0);
 
-INSERT INTO hosts (hostid, host, name, status, available, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from) VALUES (99133, 'Unknown host in maintenance', 'Unknown host in maintenance', 0, 0,'Unknown host for Host availability widget in maintenance', 5, 1, 0, 1534971600);
+INSERT INTO hosts (hostid, host, name, status, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from) VALUES (99133, 'Unknown host in maintenance', 'Unknown host in maintenance', 0,'Unknown host for Host availability widget in maintenance', 5, 1, 0, 1534971600);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99053, 99133, 50016);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55049, 99133, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55049, 99133, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1',0);
 
-INSERT INTO hosts (hostid, host, name, status, available, ipmi_available, snmp_available, jmx_available, description) VALUES (99134, 'Available host', 'Available host', 0, 1, 1, 1, 1, 'Available host for Host availability widget');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99134, 'Available host', 'Available host', 0, 'Available host for Host availability widget');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99054, 99134, 50015);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55050, 99134, 1, '127.0.0.1', '', '1', '10050', '1');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55051, 99134, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55050, 99134, 1, '127.0.0.1', '', '1', '10050', '1', 1);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55051, 99134, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 1);
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55051, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55052, 99134, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55053, 99134, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55052, 99134, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 1);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55053, 99134, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 1);
 
-INSERT INTO hosts (hostid, host, name, status, available, ipmi_available, snmp_available, jmx_available, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from) VALUES (99135, 'Available host in maintenance', 'Available host in maintenance', 0, 1, 1, 1, 1, 'Available host in maintenance for Host availability widget', 5, 1, 0, 1534971600);
+INSERT INTO hosts (hostid, host, name, status, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from) VALUES (99135, 'Available host in maintenance', 'Available host in maintenance', 0, 'Available host in maintenance for Host availability widget', 5, 1, 0, 1534971600);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99055, 99135, 50016);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55054, 99135, 1, '127.0.0.1', '', '1', '10050', '1');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55055, 99135, 2, '127.0.0.1', '', '1', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55054, 99135, 1, '127.0.0.1', '', '1', '10050', '1', 1);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55055, 99135, 2, '127.0.0.1', '', '1', '10050', '1', 1);
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55055, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55056, 99135, 3, '127.0.0.1', '', '1', '10050', '1');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55057, 99135, 4, '127.0.0.1', '', '1', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55056, 99135, 3, '127.0.0.1', '', '1', '10050', '1', 1);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55057, 99135, 4, '127.0.0.1', '', '1', '10050', '1', 1);
 
 -- testHostMacros
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (90100, 20006, '{$MACRO1}', '', '');
@@ -2366,9 +2381,9 @@ INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUE
 INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (1009, 8138, 0, 'layout', 1);
 
 -- testFormItemTest
-INSERT INTO hosts (hostid, proxy_hostid, host, name, status, available, description) VALUES (99136, 20000, 'Test item host', 'Test item host', 0, 0,'Test item host for testing items');
+INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99136, 20000, 'Test item host', 'Test item host', 0, 'Test item host for testing items');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (100999, 99136, 4);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55070, 99136, 1, '127.0.0.1', 'Test1', '1', '10050', '1');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55070, 99136, 1, '127.0.0.1', 'Test1', '1', '10050', '1', 0);
 
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55071, 99136, 2, '127.0.0.2', 'Test2', '1', '161', '1');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55071, 2, 1, '{$SNMP_COMMUNITY}');
@@ -2385,7 +2400,7 @@ INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VA
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99142, 0, 99136, 'Master item', '', 'master', 55070, 0, '', '', '');
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99294, 0, 99136, 'Test discovery rule', '', 'test', 55070, 1, '', '', '');
 
-INSERT INTO hosts (hostid, host, name, status, available, description) VALUES (99137, 'Test Item Template', 'Test Item Template', 3, 0,'Template for testing items');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99137, 'Test Item Template', 'Test Item Template', 3,'Template for testing items');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99982, 99137, 4);
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99183, 2, 99137, 'Master item', '', 'master', NULL, 0, '', '', '');
@@ -2626,15 +2641,12 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90270, 1058, 0, 'rows', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90271, 1058, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90272, 1058, 0, 'rf_rate', 30);
--- change show_legend to 0 after ZBX-17813 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90273, 1058, 0, 'show_legend', 0);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90400, 1058, 0, 'show_legend', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90273, 1058, 0, 'show_legend', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (900401, 1058, 7, 'graphid', 0, 600000);
 
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (1059, 130, 'hostavail', 'Test copy Host availability', 13, 6, 5, 4);
--- add following lines after ZBX-17813 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90402, 1059, 0, 'interface_type', 1);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90403, 1059, 0, 'interface_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90402, 1059, 0, 'interface_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90403, 1059, 0, 'interface_type', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904004, 1059, 0, 'interface_type', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904005, 1059, 0, 'layout', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904006, 1059, 0, 'maintenance', 1);
@@ -2698,8 +2710,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904051, 1065, 0, 'show_suppressed', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904052, 1065, 0, 'show_tags', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904053, 1065, 0, 'sort_triggers', 15);
--- change show_timeline to 0 after ZBX-17813 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904054, 1065, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904054, 1065, 0, 'show_timeline', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904055, 1065, 0, 'tag_name_format', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904056, 1065, 0, 'tags.operator.0', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904057, 1065, 0, 'tags.operator.1', 1);
@@ -2721,15 +2732,11 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904071, 1066, 0, 'show_opdata', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904072, 1066, 0, 'show_suppressed', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904073, 1066, 0, 'show_tags', 3);
--- change show_timeline to 0 after ZBX-17813 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904074, 1066, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904074, 1066, 0, 'show_timeline', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904075, 1066, 0, 'sort_triggers', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904076, 1066, 0, 'tag_name_format', 2);
--- change tags.operators to 0 after ZBX-17813 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904077, 1066, 0, 'tags.operator.0', 0);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904078, 1066, 0, 'tags.operator.1', 0);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904079, 1066, 0, 'tags.operator.0', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904080, 1066, 0, 'tags.operator.1', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904077, 1066, 0, 'tags.operator.0', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904078, 1066, 0, 'tags.operator.1', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904081, 1066, 0, 'unacknowledged', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904082, 1066, 1, 'problem', 0, 'test4');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904083, 1066, 1, 'tags.value.0', 0, 3);
@@ -2749,8 +2756,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904096, 1067, 0, 'severities', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904097, 1067, 0, 'severities', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904098, 1067, 0, 'show_opdata', 2);
--- change show_timeline to 0 after ZBX-17813 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904099, 1067, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904099, 1067, 0, 'show_timeline', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905000, 1067, 0, 'show_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905001, 1067, 0, 'tags.operator.0', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905002, 1067, 1, 'problem', 0, 'test problem');
@@ -2778,8 +2784,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905018, 1070, 1, 'url', 0, 'https://www.zabbix.com/integrations');
 
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (1071, 130, 'web', 'Test copy Web monitoring', 7, 21, 3, 3);
--- change maintenance to 0 after ZBX-17813 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905019, 1071, 0, 'maintenance', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905019, 1071, 0, 'maintenance', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905020, 1071, 0, 'rf_rate', 120);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905021, 1071, 2, 'exclude_groupids', 0, 50008);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905022, 1071, 2, 'groupids', 0, 50016);
@@ -2816,9 +2821,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905049, 1073, 0, 'rows', 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905050, 1073, 0, 'dynamic', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905051, 1073, 0, 'rf_rate', 600);
--- change show_legend to 0 after ZBX-17813 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 1073, 0, 'show_legend', 0);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905052, 1073, 0, 'show_legend', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 1073, 0, 'show_legend', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (905053, 1073, 7, 'graphid', 0, 600000);
 
 -- Dashboard for Graph Prototype widget
@@ -2832,16 +2835,18 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) V
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (141, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
 
 -- Overrides for LLD Overrides test
-INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (200, 33800, 'Override for update 1', 1, 1, 0);
-INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (201, 33800, 'Override for update 2', 2, 0, 0);
+INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);
+INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5001, 133800, 'Override for update 2', 2, 0, 0);
 
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (300, 200, 8, '{#MACRO1}', 'test expression_1');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (301, 200, 9, '{#MACRO2}', 'test expression_2');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (300, 5000, 8, '{#MACRO1}', 'test expression_1');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (301, 5000, 9, '{#MACRO2}', 'test expression_2');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (302, 5000, 12, '{#MACRO3}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (303, 5000, 13, '{#MACRO4}', '');
 
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (400, 200, 0, 0, 'test item pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (401, 200, 1, 1, 'test trigger pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (402, 201, 2, 8, 'test graph pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (403, 201, 3, 9, 'test host pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (400, 5000, 0, 0, 'test item pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (401, 5000, 1, 1, 'test trigger pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (402, 5001, 2, 8, 'test graph pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (403, 5001, 3, 9, 'test host pattern');
 
 INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (400, 0);
 INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (402, 0);
@@ -2908,3 +2913,12 @@ INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99451, 90001);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223001, 99451, '', 4, NULL);
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (454, 99451, 'action', 'update');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (455, 99451, 'tag', 'host_prototype');
+
+-- testFormAdministrationScripts
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (200, 5, 'Script for Update', 'test', 2, NULL, NULL, 'update description', 2);
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (100, 200, 'update_name', 'update_value');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (101, 200, 'update_name2', 'update_value2');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (201, 5, 'Script for Clone','test', 2, NULL, NULL, 'clone description', 2);
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (102, 201, 'name1', 'value1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (103, 201, 'name2', 'value2');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (202, 5, 'Script for Delete','test', 2, NULL, NULL, 'delete description', 2);

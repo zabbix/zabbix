@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,8 +142,8 @@ class CApiInputValidator {
 			case API_NUMERIC:
 				return self::validateNumeric($rule, $data, $path, $error);
 
-			case API_SCRIPT_NAME:
-				return self::validateScriptName($rule, $data, $path, $error);
+			case API_SCRIPT_MENU_PATH:
+				return self::validateScriptMenuPath($rule, $data, $path, $error);
 
 			case API_USER_MACRO:
 				return self::validateUserMacro($rule, $data, $path, $error);
@@ -180,6 +180,18 @@ class CApiInputValidator {
 
 			case API_PORT:
 				return self::validatePort($rule, $data, $path, $error);
+
+			case API_TRIGGER_EXPRESSION:
+				return self::validateTriggerExpression($rule, $data, $path, $error);
+
+			case API_EVENT_NAME:
+				return self::validateEventName($rule, $data, $path, $error);
+
+			case API_JSONRPC_PARAMS:
+				return self::validateJsonRpcParams($rule, $data, $path, $error);
+
+			case API_JSONRPC_ID:
+				return self::validateJsonRpcId($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -218,7 +230,7 @@ class CApiInputValidator {
 			case API_HG_NAME:
 			case API_H_NAME:
 			case API_NUMERIC:
-			case API_SCRIPT_NAME:
+			case API_SCRIPT_MENU_PATH:
 			case API_USER_MACRO:
 			case API_LLD_MACRO:
 			case API_RANGE_TIME:
@@ -231,6 +243,10 @@ class CApiInputValidator {
 			case API_IP:
 			case API_DNS:
 			case API_PORT:
+			case API_TRIGGER_EXPRESSION:
+			case API_EVENT_NAME:
+			case API_JSONRPC_PARAMS:
+			case API_JSONRPC_ID:
 				return true;
 
 			case API_OBJECT:
@@ -1336,9 +1352,10 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Global script name validator.
+	 * Global script menu_path validator.
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional)
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -1346,8 +1363,17 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateScriptName($rule, &$data, $path, &$error) {
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+	private static function validateScriptMenuPath($rule, &$data, $path, &$error) {
+		// Having only a root folder is the same as being empty. Temporary modify data to check if it is actually empty.
+		$tmp_data = $data;
+
+		if ($tmp_data === '/') {
+			$tmp_data = '';
+		}
+
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags, $tmp_data, $path, $error) === false) {
 			return false;
 		}
 
@@ -1356,13 +1382,21 @@ class CApiInputValidator {
 			return false;
 		}
 
+		// If empty is allowed there is only root folder, return early.
+		if ($data === '/') {
+			return true;
+		}
+
 		$folders = splitPath($data);
 		$folders = array_map('trim', $folders);
+		$count = count($folders);
 
 		// folder1/{empty}/name or folder1/folder2/{empty}
-		foreach ($folders as $folder) {
-			if ($folder === '') {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('directory or script name cannot be empty'));
+		foreach ($folders as $num => $folder) {
+			// Allow the trailing slash.
+			if ($folder === '' && $num != ($count - 1) && $num != 0) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('directory cannot be empty'));
+
 				return false;
 			}
 		}
@@ -1957,5 +1991,124 @@ class CApiInputValidator {
 		$data = (string) $data;
 
 		return true;
+	}
+
+	/**
+	 * Trigger expression validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO, API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateTriggerExpression($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$expression_data = new CTriggerExpression([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'lowercase_errors' => true
+		]);
+
+		if (!$expression_data->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+			return false;
+		}
+
+		if (!$expression_data->expressions) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('trigger expression must contain at least one host:key reference')
+			);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Event name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateEventName($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$eventname_validator = new CEventNameValidator();
+
+		if (!$eventname_validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $eventname_validator->getError());
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * JSON RPC parameters validator. Parameters MUST contain an array or object value.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateJsonRpcParams($rule, &$data, $path, &$error) {
+		if (is_array($data)) {
+			return true;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or object is expected'));
+
+		return false;
+	}
+
+	/**
+	 * JSON RPC identifier validator. This identifier MUST contain a String, Number, or NULL value.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateJsonRpcId($rule, &$data, $path, &$error) {
+		if (is_string($data) || is_int($data) || is_float($data) || $data === null) {
+			return true;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a string, number or null value is expected'));
+
+		return false;
 	}
 }

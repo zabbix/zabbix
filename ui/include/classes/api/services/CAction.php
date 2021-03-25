@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -306,8 +306,7 @@ class CAction extends CApiService {
 
 			$sqlParts['from']['opcommand'] = 'opcommand oc';
 			$sqlParts['from']['operations_scripts'] = 'operations os';
-			$sqlParts['where'][] = '('.dbConditionInt('oc.scriptid', $options['scriptids']).
-				' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT.')';
+			$sqlParts['where'][] = dbConditionInt('oc.scriptid', $options['scriptids']);
 			$sqlParts['where']['aos'] = 'a.actionid=os.actionid';
 			$sqlParts['where']['ooc'] = 'os.operationid=oc.operationid';
 		}
@@ -450,8 +449,7 @@ class CAction extends CApiService {
 				'SELECT o.actionid,oc.scriptid'.
 				' FROM operations o,opcommand oc'.
 				' WHERE o.operationid=oc.operationid'.
-					' AND '.dbConditionInt('o.actionid', $actionIds).
-					' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+					' AND '.dbConditionInt('o.actionid', $actionIds)
 			);
 			while ($script = DBfetch($dbScripts)) {
 				if (!isset($scripts[$script['scriptid']])) {
@@ -464,6 +462,7 @@ class CAction extends CApiService {
 			$allowedScripts = API::Script()->get([
 				'output' => ['scriptid'],
 				'scriptids' => $scriptIds,
+				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
 				'preservekeys' => true
 			]);
 			foreach ($scriptIds as $scriptId) {
@@ -1365,34 +1364,13 @@ class CAction extends CApiService {
 						$opCommandHstsToInsert = array_merge($opCommandHstsToInsert, $operation['opcommand_hst']);
 					}
 					else {
-						// clear and reset fields to default values on type change
-						if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-							$operation['opcommand']['command'] = '';
+						// Check if "scriptid" needs to be updated in "opcommand" table.
+						if (bccomp($operation['opcommand']['scriptid'], $operationDb['opcommand']['scriptid']) != 0) {
+							$opCommandsToUpdate[] = [
+								'values' => $operation['opcommand'],
+								'where' => ['operationid' => $operation['operationid']]
+							];
 						}
-						else {
-							$operation['opcommand']['scriptid'] = null;
-						}
-						if ($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {
-							$operation['opcommand']['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_AGENT;
-						}
-						if ($operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_SSH
-								&& $operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_TELNET) {
-							$operation['opcommand']['port'] = '';
-							$operation['opcommand']['username'] = '';
-							$operation['opcommand']['password'] = '';
-						}
-						if (!isset($operation['opcommand']['authtype'])) {
-							$operation['opcommand']['authtype'] = ITEM_AUTHTYPE_PASSWORD;
-						}
-						if ($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
-							$operation['opcommand']['publickey'] = '';
-							$operation['opcommand']['privatekey'] = '';
-						}
-
-						$opCommandsToUpdate[] = [
-							'values' => $operation['opcommand'],
-							'where' => ['operationid' => $operation['operationid']]
-						];
 
 						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'groupid');
 						$opCommandGrpsToInsert = array_merge($opCommandGrpsToInsert, $diff['first']);
@@ -1766,122 +1744,24 @@ class CAction extends CApiService {
 					}
 					break;
 				case OPERATION_TYPE_COMMAND:
-					if (!isset($operation['opcommand']['type'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No command type specified for action operation.'));
+					if (!array_key_exists('scriptid', $operation['opcommand'])
+							|| $operation['opcommand']['scriptid'] === null) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('No script specified for action operation command.')
+						);
 					}
 
-					if ((!isset($operation['opcommand']['command'])
-							|| zbx_empty(trim($operation['opcommand']['command'])))
-							&& $operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No command specified for action operation.'));
-					}
+					$scripts = API::Script()->get([
+						'output' => ['scriptid', 'name'],
+						'scriptids' => $operation['opcommand']['scriptid'],
+						'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
+						'preservekeys' => true
+					]);
 
-					switch ($operation['opcommand']['type']) {
-						case ZBX_SCRIPT_TYPE_IPMI:
-							break;
-						case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-							if (!isset($operation['opcommand']['execute_on'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No execution target specified for action operation command "%1$s".',
-										$operation['opcommand']['command']
-									)
-								);
-							}
-							break;
-						case ZBX_SCRIPT_TYPE_SSH:
-							if (!isset($operation['opcommand']['authtype'])
-									|| zbx_empty($operation['opcommand']['authtype'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication type specified for action operation command "%1$s".',
-										$operation['opcommand']['command']
-									)
-								);
-							}
-
-							if (!array_key_exists('username', $operation['opcommand'])
-									|| !is_string($operation['opcommand']['username'])
-									|| $operation['opcommand']['username'] == '') {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication user name specified for action operation command "%1$s".',
-										$operation['opcommand']['command']
-									)
-								);
-							}
-
-							if ($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
-								if (!isset($operation['opcommand']['publickey'])
-										|| zbx_empty($operation['opcommand']['publickey'])) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('No public key file specified for action operation command "%1$s".',
-											$operation['opcommand']['command']
-										)
-									);
-								}
-								if (!isset($operation['opcommand']['privatekey'])
-										|| zbx_empty($operation['opcommand']['privatekey'])) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('No private key file specified for action operation command "%1$s".',
-											$operation['opcommand']['command']
-										)
-									);
-								}
-							}
-							elseif ($operation['opcommand']['authtype'] != ITEM_AUTHTYPE_PASSWORD) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-									$operation['opcommand']['authtype'], 'authtype'
-								));
-							}
-							break;
-						case ZBX_SCRIPT_TYPE_TELNET:
-							if (!array_key_exists('username', $operation['opcommand'])
-									|| !is_string($operation['opcommand']['username'])
-									|| $operation['opcommand']['username'] == '') {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication user name specified for action operation command "%1$s".',
-										$operation['opcommand']['command']
-									)
-								);
-							}
-							break;
-						case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-							if (!isset($operation['opcommand']['scriptid'])
-									|| zbx_empty($operation['opcommand']['scriptid'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_('No script specified for action operation command.')
-								);
-							}
-							$scripts = API::Script()->get([
-								'output' => ['scriptid', 'name'],
-								'scriptids' => $operation['opcommand']['scriptid'],
-								'preservekeys' => true
-							]);
-							if (!isset($scripts[$operation['opcommand']['scriptid']])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _(
-									'Specified script does not exist or you do not have rights on it for action operation command.'
-								));
-							}
-							break;
-						default:
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation command type.'));
-					}
-
-					if (isset($operation['opcommand']['port']) && !zbx_empty($operation['opcommand']['port'])) {
-						if (zbx_ctype_digit($operation['opcommand']['port'])) {
-							if ($operation['opcommand']['port'] > 65535 || $operation['opcommand']['port'] < 1) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
-								);
-							}
-						}
-						else {
-							$user_macro_parser = new CUserMacroParser();
-
-							if ($user_macro_parser->parse($operation['opcommand']['port']) != CParser::PARSE_SUCCESS) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
-								);
-							}
-						}
+					if (!array_key_exists($operation['opcommand']['scriptid'], $scripts)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _(
+							'Specified script does not exist or you do not have rights on it for action operation command.'
+						));
 					}
 
 					$groupids = [];
@@ -1909,20 +1789,11 @@ class CAction extends CApiService {
 					}
 
 					if (!$groupids && !$hostids && $withoutCurrent) {
-						if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('You did not specify targets for action operation global script "%1$s".',
-									$scripts[$operation['opcommand']['scriptid']]['name']
-								)
-							);
-						}
-						else {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('You did not specify targets for action operation command "%1$s".',
-									$operation['opcommand']['command']
-								)
-							);
-						}
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('You did not specify targets for action operation global script "%1$s".',
+								$scripts[$operation['opcommand']['scriptid']]['name']
+							)
+						);
 					}
 
 					$all_hostids = array_merge($all_hostids, $hostids);
@@ -2252,8 +2123,7 @@ class CAction extends CApiService {
 					}
 
 					$db_opcommands = DBselect(
-						'SELECT o.operationid,o.type,o.scriptid,o.execute_on,o.port,o.authtype,o.username,o.password,'.
-							'o.publickey,o.privatekey,o.command'.
+						'SELECT o.operationid,o.scriptid'.
 						' FROM opcommand o'.
 						' WHERE '.dbConditionInt('o.operationid', $opcommand)
 					);
@@ -2479,8 +2349,7 @@ class CAction extends CApiService {
 					}
 
 					$db_opcommands = DBselect(
-						'SELECT o.operationid,o.type,o.scriptid,o.execute_on,o.port,o.authtype,o.username,o.password,'.
-							'o.publickey,o.privatekey,o.command'.
+						'SELECT o.operationid,o.scriptid'.
 						' FROM opcommand o'.
 						' WHERE '.dbConditionInt('o.operationid', $opcommand)
 					);
@@ -2646,8 +2515,7 @@ class CAction extends CApiService {
 				}
 
 				$db_opcommands = DBselect(
-					'SELECT o.operationid,o.type,o.scriptid,o.execute_on,o.port,o.authtype,o.username,o.password,'.
-						'o.publickey,o.privatekey,o.command'.
+					'SELECT o.operationid,o.scriptid'.
 					' FROM opcommand o'.
 					' WHERE '.dbConditionInt('o.operationid', $opcommands)
 				);

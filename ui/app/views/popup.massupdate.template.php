@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
-	->cleanItems()
 	->setId('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.template')
@@ -157,6 +156,13 @@ $tabs->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
 	'macros_checkbox' => [ZBX_ACTION_ADD => 0, ZBX_ACTION_REPLACE => 0, ZBX_ACTION_REMOVE => 0,
 		ZBX_ACTION_REMOVE_ALL => 0
 	]
+]));
+
+// Value mappping.
+$tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
+	'visible' => [],
+	'hostids' => $data['ids'],
+	'context' => 'template'
 ]));
 
 $form->addItem($tabs);

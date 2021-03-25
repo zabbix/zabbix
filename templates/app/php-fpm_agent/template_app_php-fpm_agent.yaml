@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:05Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Applications
@@ -171,7 +171,7 @@ zabbix_export:
             -
               type: REGEX
               parameters:
-                - '{$PHP_FPM.PING.REPLY}$'
+                - '{$PHP_FPM.PING.REPLY}($|\n)'
                 - '1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
@@ -491,6 +491,16 @@ zabbix_export:
           macro: '{$PHP_FPM.STATUS.PAGE}'
           value: status
           description: 'The path of PHP-FPM status page.'
+      valuemaps:
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
       name: 'PHP-FPM: Process'
@@ -538,13 +548,3 @@ zabbix_export:
           item:
             host: 'PHP-FPM by Zabbix agent'
             key: php-fpm.listen_queue_max
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

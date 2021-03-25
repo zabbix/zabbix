@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-11-12T10:52:37Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Modules
@@ -183,7 +183,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
-                  
           triggers:
             -
               expression: '{count(#3,"batterySense","like")}=2'
@@ -322,7 +321,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
-                  
           triggers:
             -
               expression: '{count(#3,"customSettingsEdit","like")}=2'
@@ -1000,6 +998,82 @@ zabbix_export:
           macro: '{$VOLTAGE.MIN.CRIT}'
         -
           macro: '{$VOLTAGE.MIN.WARN}'
+      valuemaps:
+        -
+          name: 'TriStar PWM charge state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: NightCheck
+            -
+              value: '2'
+              newvalue: Disconnect
+            -
+              value: '3'
+              newvalue: Night
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Bulk
+            -
+              value: '6'
+              newvalue: Absorption
+            -
+              value: '7'
+              newvalue: Float
+            -
+              value: '8'
+              newvalue: Equalize
+        -
+          name: 'TriStar PWM control mode'
+          mappings:
+            -
+              value: '0'
+              newvalue: Charge
+            -
+              value: '1'
+              newvalue: LoadControl
+            -
+              value: '2'
+              newvalue: Diversion
+            -
+              value: '3'
+              newvalue: Lighting
+        -
+          name: 'TriStar PWM load state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: LvdWarning
+            -
+              value: '3'
+              newvalue: Lvd
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Disconnect
+            -
+              value: '6'
+              newvalue: LvdWarning1
+            -
+              value: '7'
+              newvalue: OverrideLvd
+            -
+              value: '8'
+              newvalue: Equalize
   graphs:
     -
       name: 'Temperature: Battery/Heatsink'
@@ -1017,79 +1091,3 @@ zabbix_export:
           item:
             host: 'Morningstar TriStar PWM SNMP'
             key: 'temp.heatsink[heatsinkTemperature.0]'
-  value_maps:
-    -
-      name: 'TriStar PWM charge state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Start
-        -
-          value: '1'
-          newvalue: NightCheck
-        -
-          value: '2'
-          newvalue: Disconnect
-        -
-          value: '3'
-          newvalue: Night
-        -
-          value: '4'
-          newvalue: Fault
-        -
-          value: '5'
-          newvalue: Bulk
-        -
-          value: '6'
-          newvalue: Absorption
-        -
-          value: '7'
-          newvalue: Float
-        -
-          value: '8'
-          newvalue: Equalize
-    -
-      name: 'TriStar PWM control mode'
-      mappings:
-        -
-          value: '0'
-          newvalue: Charge
-        -
-          value: '1'
-          newvalue: LoadControl
-        -
-          value: '2'
-          newvalue: Diversion
-        -
-          value: '3'
-          newvalue: Lighting
-    -
-      name: 'TriStar PWM load state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Start
-        -
-          value: '1'
-          newvalue: Normal
-        -
-          value: '2'
-          newvalue: LvdWarning
-        -
-          value: '3'
-          newvalue: Lvd
-        -
-          value: '4'
-          newvalue: Fault
-        -
-          value: '5'
-          newvalue: Disconnect
-        -
-          value: '6'
-          newvalue: LvdWarning1
-        -
-          value: '7'
-          newvalue: OverrideLvd
-        -
-          value: '8'
-          newvalue: Equalize

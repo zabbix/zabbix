@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,6 +195,25 @@ class CTag extends CObject {
 		if ($freeze_on_click) {
 			$this->setAttribute('data-hintbox-static', '1');
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Add a hint box with preloader to the element.
+	 *
+	 * @param array  $data
+	 * @param string $span_class
+	 * @param bool   $freeze_on_click
+	 * @param string $styles
+	 *
+	 * @return $this
+	 */
+	public function setAjaxHint(array $data, string $span_class = '', bool $freeze_on_click = true,
+			string $styles = ''): CTag {
+		$this
+			->setAttribute('data-hintbox-preload', $data)
+			->setHint('', $span_class, $freeze_on_click, $styles);
 
 		return $this;
 	}

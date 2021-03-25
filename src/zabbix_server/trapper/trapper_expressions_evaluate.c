@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,10 @@
 **/
 
 #include "common.h"
-#include "zbxserver.h"
+#include "zbxalgo.h"
+#include "dbcache.h"
+
+#include "trapper_auth.h"
 #include "trapper_expressions_evaluate.h"
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions,
@@ -30,8 +33,7 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 	int			ret = FAIL;
 	struct zbx_json_parse	jp_data, jp_expressions;
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, buffer, sizeof(buffer), NULL) ||
-			SUCCEED != DBget_user_by_active_session(buffer, &user) || USER_TYPE_ZABBIX_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;

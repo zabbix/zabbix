@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,12 +29,6 @@ import (
 func BenchmarkRead2k(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = read2k("/proc/self/stat")
-	}
-}
-
-func BenchmarkReadAll(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = readAll("/proc/self/stat")
 	}
 }
 
