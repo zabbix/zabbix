@@ -328,26 +328,6 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$query_parser = new CQueryParser(['calculated' => true]);
-		$functions = $expression_data->result->getFunctions();
-
-		foreach ($functions as $function) {
-			$params = $function->params_raw['parameters'];
-
-			while ($params[0] instanceof CFunctionParserResult) {
-				$params = $params[0]->params_raw['parameters'];
-			}
-
-			if (is_array($params[0])) {
-				$query = $params[0]['raw'];
-
-				if ($query_parser->parse($query) === CParser::PARSE_FAIL) {
-					$error = _s('Invalid parameter "%1$s": %2$s.', $path, $query_parser->getError());
-					return false;
-				}
-			}
-		}
-
 		return true;
 	}
 

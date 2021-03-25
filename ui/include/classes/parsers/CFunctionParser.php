@@ -208,6 +208,13 @@ class CFunctionParser extends CParser {
 								$p--;
 							}
 							else {
+								$error = $query_parser->getErrorDetails();
+
+								if ($error && $error[1] > $p) {
+									$this->errorPos($error[0], $error[1]);
+									break 3;
+								}
+
 								if ($function_parser->getError() !== '') {
 									[$source, $pos] = $function_parser->getErrorDetails();
 									$this->errorPos($source, $pos);

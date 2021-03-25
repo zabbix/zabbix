@@ -71,6 +71,7 @@ class CQueryParser extends CParser {
 	 * @return int
 	 */
 	public function parse($source, $pos = 0): int {
+		$this->errorClear();
 		$this->result = new CQueryParserResult();
 		$start_pos = $pos;
 
@@ -82,8 +83,11 @@ class CQueryParser extends CParser {
 		$pos++;
 
 		if ($this->host_name_parser->parse($source, $pos) == self::PARSE_FAIL) {
-			[$source, $pos] = $this->host_name_parser->getErrorDetails();
-			$this->errorPos($source, $pos);
+			$error = $this->host_name_parser->getErrorDetails();
+
+			if ($error) {
+				$this->errorPos($error[0], $error[1]);
+			}
 
 			return CParser::PARSE_FAIL;
 		}

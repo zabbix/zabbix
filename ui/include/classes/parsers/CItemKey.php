@@ -152,6 +152,10 @@ class CItemKey extends CParser {
 				$this->parameters[] = $_parameters;
 				$p = $p2;
 			}
+			else {
+				$this->errorPos($data, $p2);
+				return self::PARSE_FAIL;
+			}
 		}
 
 		if ($this->options['with_filter'] && $data[$p] === '?') {
@@ -338,7 +342,7 @@ class CItemKey extends CParser {
 			switch ($source[$pos]) {
 				case '(':
 					if ($state != self::STATE_AFTER_LOGICAL_OPERATOR && $state != self::STATE_AFTER_OPEN_BRACE) {
-						$this->errorPos(substr($source, $pos), 0);
+						$this->errorPos($source, $pos);
 
 						return false;
 					}
@@ -351,7 +355,7 @@ class CItemKey extends CParser {
 
 				case ')':
 					if ($level == 0 || $state != self::STATE_AFTER_CONSTANT) {
-						$this->errorPos(substr($source, $pos), 0);
+						$this->errorPos($source, $pos);
 
 						return false;
 					}
@@ -375,7 +379,7 @@ class CItemKey extends CParser {
 						$attributes[] = $attribute_parser->getMatch();
 					}
 					else {
-						$this->errorPos(substr($source, $pos), 0);
+						$this->errorPos($source, $pos);
 
 						return false;
 					}
@@ -392,13 +396,13 @@ class CItemKey extends CParser {
 		$pos++;
 
 		if (!$attributes) {
-			$this->errorPos(substr($source, $pos), 1);
+			$this->errorPos($source, $pos);
 
 			return false;
 		}
 
 		if ($state != self::STATE_AFTER_CONSTANT && $state != self::STATE_AFTER_CLOSE_BRACE) {
-			$this->errorPos(substr($source, $last_pos), 0);
+			$this->errorPos($source, $last_pos);
 
 			return false;
 		}
