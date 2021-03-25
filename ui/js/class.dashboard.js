@@ -163,8 +163,8 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
-	_isInteracting() {
-		if (this._selected_dashboard_page.isInteracting()) {
+	_isUserInteracting() {
+		if (this._selected_dashboard_page.isUserInteracting()) {
 			return true;
 		}
 
@@ -181,7 +181,7 @@ class CDashboard extends CBaseComponent {
 		return false;
 	}
 
-	_isSlideshowStarted() {
+	_isSlideshowRunning() {
 		return this._slideshow_timeout_id !== null;
 	}
 
@@ -230,7 +230,9 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_switchSlideshow() {
-		if (this._isInteracting()) {
+		this._slideshow_timeout_id = null;
+
+		if (this._isUserInteracting()) {
 			this._slideshow_switch_time = Date.now() + this._slideshow_steady_period;
 			this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(), this._slideshow_steady_period);
 
@@ -240,24 +242,23 @@ class CDashboard extends CBaseComponent {
 		const dashboard_pages = [...this._dashboard_pages.keys()];
 		const dashboard_page_index = dashboard_pages.indexOf(this._selected_dashboard_page);
 
-		this._promiseSelectDashboardPage(
+		this._selectDashboardPage(
 			dashboard_pages[dashboard_page_index < dashboard_pages.length - 1 ? dashboard_page_index + 1 : 0]
 		)
-			.then(() => {
-				let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
 
-				if (timeout_ms == 0) {
-					timeout_ms = this._data.display_period * 1000;
-				}
+		let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
 
-				this._slideshow_switch_time = Math.max(Date.now() + this._slideshow_steady_period,
-					timeout_ms + this._slideshow_switch_time
-				);
+		if (timeout_ms == 0) {
+			timeout_ms = this._data.display_period * 1000;
+		}
 
-				this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(),
-					this._slideshow_switch_time - Date.now()
-				);
-			});
+		this._slideshow_switch_time = Math.max(Date.now() + this._slideshow_steady_period,
+			timeout_ms + this._slideshow_switch_time
+		);
+
+		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(),
+			this._slideshow_switch_time - Date.now()
+		);
 	}
 
 	_keepSteadySlideshow() {
@@ -276,6 +277,35 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
+	_storeSelectedDashboardPage(dashboard_page) {
+		sessionStorage.setItem('dashboard.selected_dashboard_page', JSON.stringify({
+			dashboardid: this._data.dashboardid,
+			dashboard_pageid: dashboard_page.getDashboardPageId(),
+			is_kiosk_mode: this._is_kiosk_mode
+		}));
+	}
+
+	_getRestorableDashboardPage() {
+		let stored_data = sessionStorage.getItem('dashboard.selected_dashboard_page');
+
+		if (stored_data === null) {
+			return null;
+		}
+
+		stored_data = JSON.parse(stored_data);
+
+		if (stored_data.dashboardid !== this._data.dashboardid || stored_data.is_kiosk_mode === this._is_kiosk_mode) {
+			return null;
+		}
+
+		for (const dashboard_page of this._dashboard_pages.keys()) {
+			if (stored_data.dashboard_pageid === dashboard_page.getDashboardPageId()) {
+				return dashboard_page;
+			}
+		}
+		return null;
+	}
+
 	activate() {
 		if (this._dashboard_pages.size == 0) {
 			throw new Error('Cannot activate dashboard without dashboard pages.');
@@ -285,7 +315,13 @@ class CDashboard extends CBaseComponent {
 
 		this._activateEvents();
 
-		this.selectDashboardPage(this._dashboard_pages.keys().next().value);
+		let dashboard_page = this._getRestorableDashboardPage();
+
+		if (dashboard_page === null) {
+			dashboard_page = this._dashboard_pages.keys().next().value;
+		}
+
+		this._selectDashboardPage(dashboard_page);
 
 		this._announceWidgets();
 
@@ -599,7 +635,7 @@ class CDashboard extends CBaseComponent {
 						widgets: []
 					});
 
-					this.selectDashboardPage(dashboard_page);
+					this._selectDashboardPage(dashboard_page);
 				}
 			});
 	}
@@ -908,7 +944,7 @@ class CDashboard extends CBaseComponent {
 			if (this._is_kiosk_mode) {
 				for (const select_dashboard_page of this._dashboard_pages.keys()) {
 					if (select_dashboard_page !== dashboard_page) {
-						this.selectDashboardPage(select_dashboard_page);
+						this._selectDashboardPage(select_dashboard_page);
 						break;
 					}
 				}
@@ -917,7 +953,7 @@ class CDashboard extends CBaseComponent {
 				const tabs = [...this._tabs.getList().children];
 				const tab_index = tabs.indexOf(this._dashboard_pages.get(dashboard_page).tab);
 
-				this.selectDashboardPage(
+				this._selectDashboardPage(
 					this._tabs_dashboard_pages.get(tabs[tab_index > 0 ? tab_index - 1 : tab_index + 1])
 				);
 			}
@@ -976,14 +1012,18 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
-	selectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		if (this._isSlideshowStarted()) {
-			this._keepSteadySlideshow();
+	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
+		if (!this._is_edit_mode) {
+			this._storeSelectedDashboardPage(dashboard_page);
+
+			if (this._isSlideshowRunning()) {
+				this._keepSteadySlideshow();
+			}
 		}
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
-				if (this._isSlideshowStarted()) {
+				if (this._isSlideshowRunning()) {
 					this._startSlideshow();
 				}
 			});
@@ -1323,7 +1363,7 @@ class CDashboard extends CBaseComponent {
 					widgets: widgets
 				});
 
-				this.selectDashboardPage(dashboard_page, {is_async: true});
+				this._selectDashboardPage(dashboard_page, {is_async: true});
 			})
 			.catch((error) => {
 				clearMessages();
@@ -1560,7 +1600,11 @@ class CDashboard extends CBaseComponent {
 						this._keepSteadyHeaderLines();
 					}
 
-					this._keepSteadySlideshow();
+					if (!this._is_edit_mode) {
+						if (this._isSlideshowRunning()) {
+							this._keepSteadySlideshow();
+						}
+					}
 				});
 			},
 
@@ -1568,7 +1612,7 @@ class CDashboard extends CBaseComponent {
 				const dashboard_pages = [...this._dashboard_pages.keys()];
 				const dashboard_page_index = dashboard_pages.indexOf(this._selected_dashboard_page);
 
-				this.selectDashboardPage(
+				this._selectDashboardPage(
 					dashboard_pages[dashboard_page_index > 0 ? dashboard_page_index - 1 : dashboard_pages.length - 1]
 				);
 			},
@@ -1577,7 +1621,7 @@ class CDashboard extends CBaseComponent {
 				const dashboard_pages = [...this._dashboard_pages.keys()];
 				const dashboard_page_index = dashboard_pages.indexOf(this._selected_dashboard_page);
 
-				this.selectDashboardPage(
+				this._selectDashboardPage(
 					dashboard_pages[dashboard_page_index < dashboard_pages.length - 1 ? dashboard_page_index + 1 : 0]
 				);
 			},
@@ -1720,7 +1764,7 @@ class CDashboard extends CBaseComponent {
 					const dashboard_page = this._tabs_dashboard_pages.get(tab);
 
 					if (dashboard_page !== this._selected_dashboard_page) {
-						this.selectDashboardPage(dashboard_page, {is_async: true});
+						this._selectDashboardPage(dashboard_page, {is_async: true});
 					}
 					else if (e.target.classList.contains('btn-dashboard-page-properties')) {
 						jQuery(e.target).menuPopup(this._getDashboardPageActions(dashboard_page), new jQuery.Event(e));
@@ -1736,7 +1780,7 @@ class CDashboard extends CBaseComponent {
 						const dashboard_page = this._tabs_dashboard_pages.get(tab);
 
 						if (dashboard_page !== this._selected_dashboard_page) {
-							this.selectDashboardPage(dashboard_page, {is_async: true});
+							this._selectDashboardPage(dashboard_page, {is_async: true});
 						}
 						else if (e.target.classList.contains('btn-dashboard-page-properties')) {
 							jQuery(e.target).menuPopup(this._getDashboardPageActions(dashboard_page),
@@ -1750,13 +1794,13 @@ class CDashboard extends CBaseComponent {
 			previousPageClick: () => {
 				const tab = this._dashboard_pages.get(this._selected_dashboard_page).tab;
 
-				this.selectDashboardPage(this._tabs_dashboard_pages.get(tab.previousElementSibling), {is_async: true});
+				this._selectDashboardPage(this._tabs_dashboard_pages.get(tab.previousElementSibling), {is_async: true});
 			},
 
 			nextPageClick: () => {
 				const tab = this._dashboard_pages.get(this._selected_dashboard_page).tab;
 
-				this.selectDashboardPage(this._tabs_dashboard_pages.get(tab.nextElementSibling), {is_async: true});
+				this._selectDashboardPage(this._tabs_dashboard_pages.get(tab.nextElementSibling), {is_async: true});
 			}
 		}
 

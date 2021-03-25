@@ -240,6 +240,10 @@ class CDashboardPage extends CBaseComponent {
 		return [...this._widgets.keys()];
 	}
 
+	getDashboardPageId() {
+		return this._data.dashboard_pageid;
+	}
+
 	getName() {
 		return this._data.name;
 	}
@@ -438,9 +442,9 @@ class CDashboardPage extends CBaseComponent {
 		return (pos_1.x == pos_2.x && pos_1.y == pos_2.y && pos_1.width == pos_2.width && pos_1.height == pos_2.height);
 	}
 
-	isInteracting() {
+	isUserInteracting() {
 		for (const widget of this._widgets.keys()) {
-			if (widget.isInteracting()) {
+			if (widget.isUserInteracting()) {
 				return true;
 			}
 		}

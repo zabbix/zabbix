@@ -265,7 +265,7 @@ class CWidget extends CBaseComponent {
 	announceWidgets(widgets) {
 	}
 
-	isInteracting() {
+	isUserInteracting() {
 		return this._target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0;
 	}
 
@@ -612,7 +612,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	_update(do_update_once) {
-		if (this._update_abort_controller !== null || this._is_updating_paused || this.isInteracting()) {
+		if (this._update_abort_controller !== null || this._is_updating_paused || this.isUserInteracting()) {
 			this._startUpdating(1, {do_update_once: do_update_once});
 
 			return;
