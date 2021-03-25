@@ -1619,7 +1619,7 @@ class CDashboard extends CBaseComponent {
 			this._buttons.slideshow.addEventListener('click', this._events.toggleSlideshow);
 		}
 
-		for (const event_name of ['mousemove', 'mousedown' 'keydown', 'wheel']) {
+		for (const event_name of ['mousemove', 'mousedown', 'keydown', 'wheel']) {
 			window.addEventListener(event_name, this._events.interaction);
 		}
 

@@ -49,7 +49,7 @@ jQuery(function($) {
 				}, 2000);
 			};
 
-			for (const event_name of ['mousemove', 'mousedown' 'keydown', 'wheel']) {
+			for (const event_name of ['mousemove', 'mousedown', 'keydown', 'wheel']) {
 				window.addEventListener(event_name, show_header_kioskmode_controls);
 			}
 
