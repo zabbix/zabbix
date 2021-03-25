@@ -1723,7 +1723,7 @@ class CDashboard extends CBaseComponent {
 			});
 		}
 
-		if (this._can_edit_dashboards) {
+		if (this._is_editable) {
 			menu.push({
 				items: [
 					{
