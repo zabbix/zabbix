@@ -3297,10 +3297,10 @@ button {
   background: #69808d url("../img/icon-sprite.svg?20200407") no-repeat -7px -403px; }
 
 .btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-started {
-  background: #69808d url("../img/icon-sprite.svg?20200407") no-repeat -7px -329px; }
+  background: #69808d url("../img/icon-sprite.svg?20200407") no-repeat -432px -582px; }
 
 .btn-dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped {
-  background: #69808d url("../img/icon-sprite.svg?20200407") no-repeat -7px -295px; }
+  background: #69808d url("../img/icon-sprite.svg?20200407") no-repeat -433px -546px; }
 
 .btn-dashboard-kioskmode-previous-page {
   background: #69808d url("../img/icon-sprite.svg?20200407") no-repeat -398px -657px; }
@@ -3563,9 +3563,6 @@ button {
       background-color: #4f4f4f;
       border-bottom: 0; }
 
-.btn-dashboard-conf {
-  background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -619px; }
-
 .header-kioskmode-controls {
   position: fixed;
   top: 5px;
@@ -3581,6 +3578,9 @@ button {
     display: flex; }
     .header-kioskmode-controls ul li {
       margin-right: 10px; }
+
+.btn-dashboard-conf {
+  background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -619px; }
 
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }

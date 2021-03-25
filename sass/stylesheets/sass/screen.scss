@@ -2064,8 +2064,8 @@ $icon-btn: (
 	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
 	action: $btn-bg-color url($sprite-path) no-repeat -7px -367px,
 	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px,
-	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -7px -329px,
-	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -7px -295px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -432px -582px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -433px -546px,
 	dashboard-kioskmode-previous-page: $btn-bg-color url($sprite-path) no-repeat -398px -657px,
 	dashboard-kioskmode-next-page: $btn-bg-color url($sprite-path) no-repeat -396px -624px
 );
@@ -2076,6 +2076,7 @@ $icon-btn: (
 //  .btn-add-fav
 //  .btn-remove-fav
 //  .btn-action
+//  .btn-info
 //  .btn-dashboard-kioskmode-toggle-slideshow
 //  .btn-dashboard-kioskmode-previous-page
 //  .btn-dashboard-kioskmode-next-page
@@ -2454,6 +2455,31 @@ $icon-widget-btn: (
 			color: $font-selected-color;
 			background-color: $ui-bg-selected-color;
 			border-bottom: 0;
+		}
+	}
+}
+
+.header-kioskmode-controls {
+	position: fixed;
+	top: 5px;
+	right: 45px;
+	z-index: 1010;
+	display: flex;
+	transition: opacity 1s ease-out;
+
+	&.hidden {
+		opacity: 0;
+	}
+
+	& > li > ul {
+		margin-right: 10px;
+	}
+
+	ul {
+		display: flex;
+
+		li {
+			margin-right: 10px;
 		}
 	}
 }

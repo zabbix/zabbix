@@ -478,24 +478,28 @@ $form-icon-btn: (
 }
 
 $icon-btn: (
-	conf: $btn-bg-color url($sprite-path) no-repeat -43px -187px,
 	kiosk: $btn-bg-color url($sprite-path) no-repeat -79px -223px,
-	max: $btn-bg-color url($sprite-path) no-repeat -43px -223px,
 	min: $btn-bg-color url($sprite-path) no-repeat -43px -259px,
 	add-fav: $btn-bg-color url($sprite-path) no-repeat -43px -295px,
 	remove-fav: $btn-bg-color url($sprite-path) no-repeat -43px -329px,
 	action: $btn-bg-color url($sprite-path) no-repeat -43px -367px,
-	info: $btn-bg-color url($sprite-path) no-repeat -43px -403px
+	info: $btn-bg-color url($sprite-path) no-repeat -43px -403px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -280px -582px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -281px -546px,
+	dashboard-kioskmode-previous-page: $btn-bg-color url($sprite-path) no-repeat -246px -657px,
+	dashboard-kioskmode-next-page: $btn-bg-color url($sprite-path) no-repeat -244px -624px
 );
 
 // Dynamically generated classes:
 //  .btn-kiosk
-//  .btn-max
 //  .btn-min
 //  .btn-add-fav
 //  .btn-remove-fav
 //  .btn-action
 //  .btn-info
+//  .btn-dashboard-kioskmode-toggle-slideshow
+//  .btn-dashboard-kioskmode-previous-page
+//  .btn-dashboard-kioskmode-next-page
 @each $icon-btn, $bgimage in $icon-btn {
 	.btn-#{$icon-btn} {
 		background: $bgimage;
