@@ -24,11 +24,10 @@ const WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
 const WIDGET_PLACEHOLDER_STATE_KIOSK_MODE = 3;
 const WIDGET_PLACEHOLDER_STATE_READONLY = 4;
 
-const ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-grid-new-widget-placeholder';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-grid-widget-new-box';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX_LABEL = 'dashboard-grid-new-widget-label';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-grid-widget-set-size';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_POSITIONING = 'dashboard-grid-widget-set-position';
+const ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-widget-placeholder';
+const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-widget-placeholder-box';
+const ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL = 'dashboard-widget-placeholder-label';
+const ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-widget-placeholder-resizing';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN = 'hidden';
 
 /**
@@ -54,7 +53,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this._placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_BOX);
 
 		this._placeholder_box_label = document.createElement('div');
-		this._placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_BOX_LABEL);
+		this._placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
 
 		this._placeholder_box_label_wrap = document.createElement('span');
 
@@ -85,9 +84,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this._target.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
 
 		this._target.classList.remove('disabled');
-		this._placeholder_box.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING,
-			ZBX_STYLE_WIDGET_PLACEHOLDER_POSITIONING
-		);
+		this._placeholder_box.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
 		this._placeholder_box_label_wrap.textContent = '';
 
 		switch (state) {
@@ -108,7 +105,6 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 				break;
 
 			case WIDGET_PLACEHOLDER_STATE_POSITIONING:
-				this._placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_POSITIONING);
 				this._placeholder_box_label_wrap.textContent = t('Click and drag to desired size.');
 
 				break;

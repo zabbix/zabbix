@@ -225,7 +225,7 @@
 	z-index: 998; // Below the new widget placeholder.
 }
 
-.dashboard-grid-new-widget-placeholder {
+.dashboard-widget-placeholder {
 	box-sizing: border-box;
 	display: flex;
 	height: 200px;
@@ -236,9 +236,7 @@
 	cursor: pointer;
 	user-select: none;
 
-	.dashboard-grid-widget-new-box,
-	.dashboard-grid-widget-set-position,
-	.dashboard-grid-widget-set-size {
+	.dashboard-widget-placeholder-box {
 		background-color: rgba($ui-bg-color, .7);
 		border: 1px dashed $form-border-color;
 		box-shadow: 2px 2px 6px $action-shadow-color;
@@ -247,12 +245,7 @@
 		overflow: hidden;
 	}
 
-	.dashboard-grid-widget-set-size {
-		background: darken($body-bg-color, 6%);
-		box-shadow: inset 2px 2px 6px $action-shadow-color;
-	}
-
-	.dashboard-grid-new-widget-label {
+	.dashboard-widget-placeholder-label {
 		$icon-height: 28px;
 
 		position: absolute;
@@ -281,13 +274,24 @@
 		}
 	}
 
+	.dashboard-widget-placeholder-resizing {
+		background: darken($body-bg-color, 6%);
+		box-shadow: inset 2px 2px 6px $action-shadow-color;
+
+		.dashboard-widget-placeholder-label {
+			&::before {
+				background: url($sprite-path) no-repeat -345px -888px;
+			}
+		}
+	}
+
 	&.disabled {
 		opacity: 1;
 
-		.dashboard-grid-widget-new-box {
+		.dashboard-widget-placeholder-box {
 			background-color: rgba($ui-bg-color, .7);
 
-			.dashboard-grid-new-widget-label::before {
+			.dashboard-widget-placeholder-label::before {
 				background: url($sprite-path) no-repeat -122px -284px;
 			}
 		}
@@ -295,14 +299,6 @@
 
 	&.hidden {
 		display: none;
-	}
-}
-
-.dashboard-grid-widget-set-size {
-	.dashboard-grid-new-widget-label {
-		&::before {
-			background: url($sprite-path) no-repeat -345px -888px;
-		}
 	}
 }
 
@@ -890,16 +886,6 @@
 
 .new-widget {
 	animation: zoom-in-out .2s linear;
-}
-.dashboard-widget-placeholder {
-	border-color: darken($body-bg-color, 6%) !important;
-	background-color: darken($body-bg-color, 6%) !important;
-}
-
-.dashboard-widget-draggable {
-	border-color: $action-border-color !important;
-	border-bottom-color: darken($action-border-color, 1%) !important;
-	box-shadow: 0 4px 20px 0 $action-shadow-color;
 }
 
 .dashboard-widget {

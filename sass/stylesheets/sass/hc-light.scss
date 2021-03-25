@@ -323,31 +323,28 @@ $dashboard-my-bg-color: #555555;
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
-.dashboard-grid-new-widget-placeholder {
-	.dashboard-grid-widget-new-box,
-	.dashboard-grid-widget-set-position,
-	.dashboard-grid-widget-set-size {
+
+.dashboard-widget-placeholder {
+	.dashboard-widget-placeholder-box {
 		box-shadow: none;
 		border-color: $font-color;
 		background-color: transparent;
 	}
 
-	.dashboard-grid-widget-set-size {
-		border: 2px dashed $font-color;
-		box-shadow: none;
-	}
-
-	.dashboard-grid-new-widget-label {
+	.dashboard-widget-placeholder-label {
 		&::before {
 			background: url($sprite-path) no-repeat -213px -888px;
 		}
 	}
-}
 
-.dashboard-grid-widget-set-size {
-	.dashboard-grid-new-widget-label {
-		&::before {
-			background: url($sprite-path) no-repeat -401px -888px;
+	.dashboard-widget-placeholder-resizing {
+		border: 2px dashed $font-color;
+		box-shadow: none;
+
+		.dashboard-widget-placeholder-label {
+			&::before {
+				background: url($sprite-path) no-repeat -401px -888px;
+			}
 		}
 	}
 }
