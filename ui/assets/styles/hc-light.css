@@ -668,8 +668,6 @@ footer {
   display: none; }
 
 .dashboard-edit {
-  background-color: #ffffff;
-  box-shadow: 0 0 0 4px #ffffff;
   display: inline-block;
   margin-right: 5px;
   position: relative; }
