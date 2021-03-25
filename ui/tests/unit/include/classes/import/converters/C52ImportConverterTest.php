@@ -55,7 +55,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 							'host' => 'Template',
 							'items' => [
 								$calculated + ['params' => '100*last(/'.'/vfs.fs.size[/,free])/last(/'.'/vfs.fs.size[/,total])'],
-								$calculated + ['params' => 'avg(/Zabbix Server/zabbix[wcache,values],600)'],
+								$calculated + ['params' => 'avg(/Zabbix Server/zabbix[wcache,values],600s)'],
 								$calculated + ['params' => 'last(/'.'/net.if.in[eth0,bytes])+last(/'.'/net.if.out[eth0,bytes])'],
 								$calculated + ['params' => '100*last(/'.'/net.if.in[eth0,bytes])/(last(/'.'/net.if.in[eth0,bytes])+last(/'.'/net.if.out[eth0,bytes]))'],
 								$calculated + ['params' => 'last(/'.'/grpsum["video","net.if.out[eth0,bytes]","last"]) / last(/'.'/grpsum["video","nginx_stat.sh[active]","last"])'],

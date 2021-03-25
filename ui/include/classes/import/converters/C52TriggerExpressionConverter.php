@@ -83,8 +83,8 @@ class C52TriggerExpressionConverter extends CConverter {
 	 * @return string
 	 */
 	public function convert($trigger_data) {
-		$this->item = array_key_exists('item', $trigger_data) ? $trigger_data['item'] : null;
-		$this->host = (array_key_exists('host', $trigger_data) && $this->item) ? $trigger_data['host'] : null;
+		$this->item = array_key_exists('item', $trigger_data) ? $trigger_data['item'] : '';
+		$this->host = (array_key_exists('host', $trigger_data) && $this->item) ? $trigger_data['host'] : '';
 
 		$extra_expressions = [];
 
@@ -119,7 +119,7 @@ class C52TriggerExpressionConverter extends CConverter {
 		return array_intersect_key($trigger_data, array_flip(['recovery_expression', 'expression']));
 	}
 
-	private function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr) {
+	protected function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr) {
 		for ($i = count($expression_elements) - 1; $i >= 0; $i--) {
 			$part = $expression_elements[$i];
 
@@ -132,7 +132,7 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 	}
 
-	private function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
+	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
 		$expression_data = new C10TriggerExpression(['allow_func_only' => true]);
 
 		if (($expression_data->parse($expression_element['expression'])) !== false) {
@@ -140,7 +140,7 @@ class C52TriggerExpressionConverter extends CConverter {
 
 			for ($i = count($fn_list) - 1; $i >= 0; $i--) {
 				$fn = $fn_list[$i]['data'];
-				[$new_expression, $_extra_expr] = $this->convertFunction($fn);
+				[$new_expression, $_extra_expr] = $this->convertFunction($fn, $this->host, $this->item);
 
 				$extra_expr[] = $_extra_expr;
 
@@ -159,9 +159,9 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 	}
 
-	private function convertFunction(array $fn): array {
+	protected function convertFunction(array $fn, string $host_name, string $item_key): array {
 		if ($fn['item'] === '' && $fn['host'] === '') {
-			$query = sprintf('/%s/%s', $this->host, $this->item);
+			$query = sprintf('/%s/%s', $host_name, $item_key);
 			$has_hanged_functions = $this->hanged_refs[''];
 		}
 		else {
@@ -394,6 +394,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 */
 	protected function checkHangedFunctionsPerHost(array $tokens): array {
 		$hanged_refs = [];
+
 		foreach ($tokens as $token) {
 			$fn = $token['data'];
 
@@ -416,7 +417,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private function getExpressionParts(int $start, int $end): array {
+	protected function getExpressionParts(int $start, int $end): array {
 		$blank_symbols = [' ', "\r", "\n", "\t"];
 
 		$result = [];

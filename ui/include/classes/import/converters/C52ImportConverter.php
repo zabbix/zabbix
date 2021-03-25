@@ -93,7 +93,7 @@ class C52ImportConverter extends CConverter {
 					}
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item['params'] = $parser->convert($item['params']);
+						$item = $parser->convert($item);
 					}
 				}
 				unset($item);
@@ -133,7 +133,7 @@ class C52ImportConverter extends CConverter {
 					}
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item['params'] = $parser->convert($item['params']);
+						$item = $parser->convert($item);
 					}
 				}
 				unset($item);
