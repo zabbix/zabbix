@@ -72,9 +72,9 @@ class testTimezone extends CWebTest {
 			],
 			[
 				[
-					'user_timezone' => '(UTC-07:00) America/Inuvik',
-					'timezone_db' => 'America/Inuvik',
-					'time_diff' => '-9 hours'
+					'user_timezone' => '(UTC-11:00) Pacific/Niue',
+					'timezone_db' => 'Pacific/Niue',
+					'time_diff' => '-14 hours'
 				]
 			],
 			[
@@ -156,10 +156,10 @@ class testTimezone extends CWebTest {
 						],
 						'Password' => 'test',
 						'Password (once again)' => 'test',
-						'Time zone' => '(UTC-07:00) America/Inuvik'
+						'Time zone' => '(UTC-11:00) Pacific/Niue'
 					],
-					'time_diff' => '-9 hours',
-					'timezone_db' => 'America/Inuvik'
+					'time_diff' => '-14 hours',
+					'timezone_db' => 'Pacific/Niue'
 				]
 			],
 			[

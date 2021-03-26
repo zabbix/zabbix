@@ -54,11 +54,11 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 * If the API call has been unsuccessful - add an error message and return false, instead of an array.
 	 *
 	 * @param string 	$method
-	 * @param mixed 	$params
+	 * @param array 	$params
 	 *
 	 * @return mixed
 	 */
-	protected function callMethod($method, $params) {
+	protected function callMethod($method, array $params) {
 		API::setWrapper();
 		$response = parent::callMethod($method, $params);
 		API::setWrapper($this);
