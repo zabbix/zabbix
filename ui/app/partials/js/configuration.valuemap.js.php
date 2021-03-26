@@ -80,9 +80,13 @@ var AddValueMap = class {
 		link.innerHTML = this.data.name;
 		link.classList.add('wordwrap');
 		link.href = 'javascript:void(0);';
-		link.addEventListener('click',
-			(event) => PopUp('popup.valuemap.edit', Object.assign(this.data, {'edit': 1}), null, event.target)
-		);
+		link.addEventListener('click', (event) => {
+			let valuemap_names = [];
+			let valuemap_table = event.target.closest('table');
+
+			valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => valuemap_names.push(elm.value));
+			PopUp('popup.valuemap.edit', {...this.data, ...{valuemap_names: valuemap_names}, ...{'edit': 1}}, null, event.target)
+		});
 
 		cell.appendChild(this.createHiddenInput('[name]', this.data.name));
 		cell.appendChild(link);
