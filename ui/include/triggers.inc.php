@@ -1875,8 +1875,6 @@ function get_item_function_info($expr) {
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'now' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'percentile' => $rules['numeric'],
-		'str' => $rules['string_as_0or1'],
-		'strlen' => $rules['string_as_uint'],
 		'sum' => $rules['numeric'],
 		'time' => $rules['time'],
 		'timeleft' => $rules['numeric_as_float'],

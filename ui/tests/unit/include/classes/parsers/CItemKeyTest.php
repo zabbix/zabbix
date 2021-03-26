@@ -19,7 +19,9 @@
 **/
 
 
-class CItemKeyTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CItemKeyTest extends TestCase {
 	public static function provider() {
 		return [
 			// valid keys

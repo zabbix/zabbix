@@ -99,11 +99,6 @@ class CFunctionValidator extends CValidator {
 			ITEM_VALUE_TYPE_UINT64 => true
 		];
 
-		$args_ignored = [[
-			'type' => 'str',
-			'mandat' => 0x00
-		]];
-
 		/*
 		 * Types of parameters:
 		 * - query - /host/key reference;
@@ -158,15 +153,15 @@ class CFunctionValidator extends CValidator {
 				'value_types' => $value_types_all
 			],
 			'date' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'dayofmonth' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'dayofweek' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'find' => [
@@ -251,7 +246,7 @@ class CFunctionValidator extends CValidator {
 				'value_types' => $value_types_all
 			],
 			'now' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'percentile' => [
@@ -270,7 +265,7 @@ class CFunctionValidator extends CValidator {
 				'value_types' => $value_types_num
 			],
 			'time' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'timeleft' => [

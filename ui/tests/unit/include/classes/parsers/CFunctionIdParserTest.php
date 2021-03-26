@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,13 +19,15 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class CFunctionIdParserTest extends CParserTest {
 
 	protected function getParser() {
 		return new CFunctionIdParser();
 	}
 
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			['{1}', 0, CParser::PARSE_SUCCESS, '{1}'],
 			['{12345}', 0, CParser::PARSE_SUCCESS, '{12345}'],
