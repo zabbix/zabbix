@@ -325,12 +325,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
-			'str' => [
-				'description' => _('str() - Find string V in last (most recent) value (1 - found, 0 - not found)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
 			'sum' => [
 				'description' => _('sum() - Sum of values of a period T'),
 				'params' => $this->param1SecCount,
