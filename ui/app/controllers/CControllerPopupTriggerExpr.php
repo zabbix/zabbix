@@ -535,7 +535,14 @@ class CControllerPopupTriggerExpr extends CController {
 						$param_type = PARAM_TYPE_TIME;
 					}
 
-					$params = array_column($params, 'match');
+					$params = array_map(function ($param) {
+						return $param->getValue();
+					}, $params);
+
+					if (array_key_exists(0, $params) && ($column_pos = strpos($params[0], ':')) !== false) {
+						$params[] = substr($params[0], $column_pos + 1);
+						$params[0] = substr($params[0], 0, $column_pos);
+					}
 
 					/*
 					 * Try to find an operator, a value and item.
@@ -569,7 +576,7 @@ class CControllerPopupTriggerExpr extends CController {
 								$operator = $operator_token->match;
 								$value = array_key_exists('string', $value_token->data)
 									? $value_token->data['string']
-									: '';
+									: $value_token->match;
 							}
 							else {
 								break;
