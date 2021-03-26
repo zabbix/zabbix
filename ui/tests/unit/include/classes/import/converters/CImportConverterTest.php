@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,7 +19,9 @@
 **/
 
 
-abstract class CImportConverterTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+abstract class CImportConverterTest extends TestCase {
 
 	abstract protected function createConverter();
 	abstract protected function createSource(array $data = []);
