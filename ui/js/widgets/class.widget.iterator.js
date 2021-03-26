@@ -271,7 +271,7 @@ class CWidgetIterator extends CWidget {
 			const widget = this._widgets.has(data.widgetid) ? this._widgets.get(data.widgetid) : this._addWidget(data);
 
 			this._alignToGrid(widget.getView(), index);
-			widget.setPosition(this._grid_pos[index], {is_managed: true});
+			widget.setPos(this._grid_pos[index], {is_managed: true});
 
 			if (widget.getState() !== WIDGET_STATE_ACTIVE) {
 				widget.activate();
@@ -314,10 +314,10 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
-	setPosition(pos, {is_managed = false} = {}) {
+	setPos(pos, {is_managed = false} = {}) {
 		const original_pos = {...this._pos};
 
-		super.setPosition(pos, {is_managed});
+		super.setPos(pos, {is_managed});
 
 		if (this._grid_pos.length > 0
 				&& this._pos.width == original_pos.width && this._pos.height == original_pos.height) {
@@ -355,13 +355,13 @@ class CWidgetIterator extends CWidget {
 		for (let index = 0; index < this._grid_pos.length; index++) {
 			if (index < this._widgets.size) {
 				const widget = widgets[index];
-				const widget_pos = widget.getPosition();
+				const widget_pos = widget.getPos();
 
 				this._alignToGrid(widget.getView(), index);
 
 				if (widget_pos.width != this._grid_pos[index].width
 						|| widget_pos.height != this._grid_pos[index].height) {
-					widget.setPosition(this._grid_pos[index], {is_managed: true});
+					widget.setPos(this._grid_pos[index], {is_managed: true});
 					widget.resize();
 				}
 			}
@@ -535,7 +535,7 @@ class CWidgetIterator extends CWidget {
 					widget.enter();
 
 					if (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
-						this._target.classList.toggle('iterator-double-header', widget.getPosition().y == 0);
+						this._target.classList.toggle('iterator-double-header', widget.getPos().y == 0);
 					}
 				}
 			},

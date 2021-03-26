@@ -149,7 +149,7 @@ class CWidgetGraph extends CWidget {
 	}
 
 	_activateGraph() {
-		const time_period = this.getTimePeriod();
+		const time_period = this._getTimePeriod();
 
 		if (this._graph_url !== null) {
 			const curl = new Curl(this._graph_url, false);

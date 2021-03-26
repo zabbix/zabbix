@@ -17,8 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 const ZBX_WIDGET_VIEW_MODE_NORMAL = 0;
 const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
+
+const WIDGET_STATE_INITIAL = 'initial';
+const WIDGET_STATE_ACTIVE = 'active';
+const WIDGET_STATE_INACTIVE = 'inactive';
+const WIDGET_STATE_DESTROYED = 'destroyed';
 
 const WIDGET_EVENT_EDIT = 'edit';
 const WIDGET_EVENT_ACTIONS = 'actions';
@@ -29,11 +35,6 @@ const WIDGET_EVENT_AFTER_UPDATE = 'after-update';
 const WIDGET_EVENT_COPY = 'copy';
 const WIDGET_EVENT_PASTE = 'paste';
 const WIDGET_EVENT_DELETE = 'delete';
-
-const WIDGET_STATE_INITIAL = 'initial';
-const WIDGET_STATE_ACTIVE = 'active';
-const WIDGET_STATE_INACTIVE = 'inactive';
-const WIDGET_STATE_DESTROYED = 'destroyed';
 
 class CWidget extends CBaseComponent {
 
@@ -119,8 +120,10 @@ class CWidget extends CBaseComponent {
 		this._resizable_handles = [];
 	}
 
-	getCssClass(name) {
-		return this._css_classes[name];
+	// Logical state control methods.
+
+	getState() {
+		return this._state;
 	}
 
 	start() {
@@ -136,7 +139,7 @@ class CWidget extends CBaseComponent {
 		this._makeView();
 
 		if (this._pos !== null) {
-			this.setPosition(this._pos);
+			this.setPos(this._pos);
 		}
 	}
 
@@ -188,6 +191,46 @@ class CWidget extends CBaseComponent {
 	_doDestroy() {
 	}
 
+	// External events management methods.
+
+	isEditMode() {
+		return this._is_edit_mode;
+	}
+
+	setEditMode() {
+		this._is_edit_mode = true;
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._stopUpdating({do_abort: false});
+		}
+
+		this._target.classList.add('ui-draggable', 'ui-resizable');
+	}
+
+	supportsDynamicHosts() {
+		return (this._fields.dynamic == 1);
+	}
+
+	getDynamicHost() {
+		return this._dynamic_hostid;
+	}
+
+	setDynamicHost(dynamic_hostid) {
+		this._dynamic_hostid = dynamic_hostid;
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
+	}
+
+	_getTimePeriod() {
+		return this._time_period;
+	}
+
+	setTimePeriod(time_period) {
+		this._time_period = time_period;
+	}
+
 	isEntered() {
 		return this._target.classList.contains(this._css_classes.focus);
 	}
@@ -216,59 +259,6 @@ class CWidget extends CBaseComponent {
 		return (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) ? 1 : 0;
 	}
 
-	resize() {
-	}
-
-	_setName(name) {
-		this._name = name;
-		this._setHeaderName(this._name !== '' ? this._name : this._defaults.name);
-	}
-
-	_setHeaderName(name) {
-		if (this._state !== WIDGET_STATE_INITIAL) {
-			this._content_header.querySelector('h4').textContent = name;
-		}
-	}
-
-	_setFields(fields) {
-		this._fields = fields;
-	}
-
-	_setConfiguration(configuration) {
-		this._configuration = configuration;
-
-		if (this._state !== WIDGET_STATE_INITIAL) {
-			this._content_body.classList.toggle('no-padding', !this._configuration.padding);
-		}
-	}
-
-	getState() {
-		return this._state;
-	}
-
-	getType() {
-		return this._type;
-	}
-
-	getName() {
-		return this._name;
-	}
-
-	getHeaderName() {
-		return this._name !== '' ? this._name : this._defaults.name;
-	}
-
-	getView() {
-		return this._target;
-	}
-
-	announceWidgets(widgets) {
-	}
-
-	isUserInteracting() {
-		return this._target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0;
-	}
-
 	_isResizing() {
 		return this._target.classList.contains('ui-resizable-resizing');
 	}
@@ -285,21 +275,47 @@ class CWidget extends CBaseComponent {
 		this._target.classList.toggle('ui-draggable-dragging', is_dragging);
 	}
 
-	getResizeHandleSides(resize_handle) {
-		return {
-			top: resize_handle.classList.contains('ui-resizable-nw')
-				|| resize_handle.classList.contains('ui-resizable-n')
-				|| resize_handle.classList.contains('ui-resizable-ne'),
-			right: resize_handle.classList.contains('ui-resizable-ne')
-				|| resize_handle.classList.contains('ui-resizable-e')
-				|| resize_handle.classList.contains('ui-resizable-se'),
-			bottom: resize_handle.classList.contains('ui-resizable-se')
-				|| resize_handle.classList.contains('ui-resizable-s')
-				|| resize_handle.classList.contains('ui-resizable-sw'),
-			left: resize_handle.classList.contains('ui-resizable-sw')
-				|| resize_handle.classList.contains('ui-resizable-w')
-				|| resize_handle.classList.contains('ui-resizable-nw')
-		};
+	isUserInteracting() {
+		return this._target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0;
+	}
+
+	announceWidgets(widgets) {
+	}
+
+	resize() {
+	}
+
+	// Data interface methods.
+
+	getUniqueId() {
+		return this._unique_id;
+	}
+
+	getType() {
+		return this._type;
+	}
+
+	getName() {
+		return this._name;
+	}
+
+	_setName(name) {
+		this._name = name;
+		this._setHeaderName(this._name !== '' ? this._name : this._defaults.name);
+	}
+
+	getHeaderName() {
+		return this._name !== '' ? this._name : this._defaults.name;
+	}
+
+	_setHeaderName(name) {
+		if (this._state !== WIDGET_STATE_INITIAL) {
+			this._content_header.querySelector('h4').textContent = name;
+		}
+	}
+
+	getViewMode() {
+		return this._view_mode;
 	}
 
 	_setViewMode(view_mode) {
@@ -311,101 +327,19 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	getViewMode() {
-		return this._view_mode;
-	}
-
 	getFields() {
 		return this._fields;
 	}
 
-	isEditMode() {
-		return this._is_edit_mode;
+	_setFields(fields) {
+		this._fields = fields;
 	}
 
-	setEditMode() {
-		this._is_edit_mode = true;
+	_setConfiguration(configuration) {
+		this._configuration = configuration;
 
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating({do_abort: false});
-		}
-
-		this._target.classList.add('ui-draggable', 'ui-resizable');
-	}
-
-	_addResizeHandles() {
-		this._resizable_handles = {};
-
-		for (const direction of ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw']) {
-			const resizable_handle = document.createElement('div');
-
-			resizable_handle.classList.add('ui-resizable-handle', `ui-resizable-${direction}`);
-
-			if (['n', 'e', 's', 'w'].includes(direction)) {
-				const ui_resize_dot = document.createElement('div');
-
-				ui_resize_dot.classList.add('ui-resize-dot');
-				resizable_handle.appendChild(ui_resize_dot);
-
-				const ui_resizable_border = document.createElement('div');
-
-				ui_resizable_border.classList.add(`ui-resizable-border-${direction}`);
-				resizable_handle.appendChild(ui_resizable_border);
-			}
-
-			this._target.append(resizable_handle);
-			this._resizable_handles[direction] = resizable_handle;
-		}
-	}
-
-	_removeResizeHandles() {
-		for (const resizable_handle of Object.values(this._resizable_handles)) {
-			resizable_handle.remove();
-		}
-
-		this._resizable_handles = {};
-	}
-
-	getUniqueId() {
-		return this._unique_id;
-	}
-
-	supportsDynamicHosts() {
-		return (this._fields.dynamic == 1);
-	}
-
-	getDynamicHost() {
-		return this._dynamic_hostid;
-	}
-
-	setDynamicHost(dynamic_hostid) {
-		this._dynamic_hostid = dynamic_hostid;
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
-	}
-
-	getTimePeriod() {
-		return this._time_period;
-	}
-
-	setTimePeriod(time_period) {
-		this._time_period = time_period;
-	}
-
-	getPosition() {
-		return this._pos;
-	}
-
-	setPosition(pos, {is_managed = false} = {}) {
-		this._pos = pos;
-
-		if (!is_managed) {
-			this._target.style.left = `${this._cell_width * this._pos.x}%`;
-			this._target.style.top = `${this._cell_height * this._pos.y}px`;
-			this._target.style.width = `${this._cell_width * this._pos.width}%`;
-			this._target.style.height = `${this._cell_height * this._pos.height}px`;
+		if (this._state !== WIDGET_STATE_INITIAL) {
+			this._content_body.classList.toggle('no-padding', !this._configuration.padding);
 		}
 	}
 
@@ -455,17 +389,6 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
-	save() {
-		return {
-			widgetid: this._widgetid ?? undefined,
-			pos: this._pos,
-			type: this._type,
-			name: this._name,
-			view_mode: this._view_mode,
-			fields: Object.keys(this._fields).length > 0 ? JSON.stringify(this._fields) : undefined
-		};
-	}
-
 	getDataCopy({is_single_copy}) {
 		const data = {
 			type: this._type,
@@ -489,6 +412,17 @@ class CWidget extends CBaseComponent {
 		}
 
 		return data;
+	}
+
+	save() {
+		return {
+			widgetid: this._widgetid ?? undefined,
+			pos: this._pos,
+			type: this._type,
+			name: this._name,
+			view_mode: this._view_mode,
+			fields: Object.keys(this._fields).length > 0 ? JSON.stringify(this._fields) : undefined
+		};
 	}
 
 	getActionsMenu({can_paste_widget}) {
@@ -562,6 +496,8 @@ class CWidget extends CBaseComponent {
 
 		return menu;
 	}
+
+	// Content updating methods.
 
 	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
 		if (do_update_once === null) {
@@ -690,6 +626,81 @@ class CWidget extends CBaseComponent {
 			info: response.info,
 			debug: response.debug
 		});
+	}
+
+	// Widget view methods.
+
+	getView() {
+		return this._target;
+	}
+
+	getCssClass(name) {
+		return this._css_classes[name];
+	}
+
+	getPos() {
+		return this._pos;
+	}
+
+	setPos(pos, {is_managed = false} = {}) {
+		this._pos = pos;
+
+		if (!is_managed) {
+			this._target.style.left = `${this._cell_width * this._pos.x}%`;
+			this._target.style.top = `${this._cell_height * this._pos.y}px`;
+			this._target.style.width = `${this._cell_width * this._pos.width}%`;
+			this._target.style.height = `${this._cell_height * this._pos.height}px`;
+		}
+	}
+
+	getResizeHandleSides(resize_handle) {
+		return {
+			top: resize_handle.classList.contains('ui-resizable-nw')
+				|| resize_handle.classList.contains('ui-resizable-n')
+				|| resize_handle.classList.contains('ui-resizable-ne'),
+			right: resize_handle.classList.contains('ui-resizable-ne')
+				|| resize_handle.classList.contains('ui-resizable-e')
+				|| resize_handle.classList.contains('ui-resizable-se'),
+			bottom: resize_handle.classList.contains('ui-resizable-se')
+				|| resize_handle.classList.contains('ui-resizable-s')
+				|| resize_handle.classList.contains('ui-resizable-sw'),
+			left: resize_handle.classList.contains('ui-resizable-sw')
+				|| resize_handle.classList.contains('ui-resizable-w')
+				|| resize_handle.classList.contains('ui-resizable-nw')
+		};
+	}
+
+	_addResizeHandles() {
+		this._resizable_handles = {};
+
+		for (const direction of ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw']) {
+			const resizable_handle = document.createElement('div');
+
+			resizable_handle.classList.add('ui-resizable-handle', `ui-resizable-${direction}`);
+
+			if (['n', 'e', 's', 'w'].includes(direction)) {
+				const ui_resize_dot = document.createElement('div');
+
+				ui_resize_dot.classList.add('ui-resize-dot');
+				resizable_handle.appendChild(ui_resize_dot);
+
+				const ui_resizable_border = document.createElement('div');
+
+				ui_resizable_border.classList.add(`ui-resizable-border-${direction}`);
+				resizable_handle.appendChild(ui_resizable_border);
+			}
+
+			this._target.append(resizable_handle);
+			this._resizable_handles[direction] = resizable_handle;
+		}
+	}
+
+	_removeResizeHandles() {
+		for (const resizable_handle of Object.values(this._resizable_handles)) {
+			resizable_handle.remove();
+		}
+
+		this._resizable_handles = {};
 	}
 
 	_getContentSize() {
@@ -861,6 +872,8 @@ class CWidget extends CBaseComponent {
 		this._target.style.minWidth = `${this._cell_width}%`;
 		this._target.style.minHeight = `${this._cell_height}px`;
 	}
+
+	// Internal events management methods.
 
 	_registerEvents() {
 		this._events = {
