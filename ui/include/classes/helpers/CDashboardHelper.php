@@ -459,21 +459,19 @@ class CDashboardHelper {
 	 * @return array
 	 */
 	public static function prepareForClone(array $dashboards, $templateid): array {
-		// TODO: implement PAGES here.
-
 		foreach ($dashboards as &$dashboard) {
-			// Remove dashboard id.
 			unset($dashboard['dashboardid']);
-			// Replace template id.
+
 			$dashboard['templateid'] = $templateid;
 
-			if ($dashboard['widgets']) {
-				foreach ($dashboard['widgets'] as &$widget) {
+			foreach ($dashboard['pages'] as &$dashboard_page) {
+				unset($dashboard_page['dashboard_pageid']);
+
+				foreach ($dashboard_page['widgets'] as &$widget) {
+					unset($widget['widgetid']);
+
 					$items = [];
 					$graphs = [];
-
-					// Remove widget id from array.
-					unset($widget['widgetid']);
 
 					foreach ($widget['fields'] as $field) {
 						switch ($field['type']) {
@@ -534,6 +532,7 @@ class CDashboardHelper {
 				}
 				unset ($widget);
 			}
+			unset($dashboard_page);
 		}
 		unset($dashboard);
 
