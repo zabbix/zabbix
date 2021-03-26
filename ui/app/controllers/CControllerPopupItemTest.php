@@ -1086,27 +1086,27 @@ abstract class CControllerPopupItemTest extends CController {
 		$pos_left = 0;
 
 		foreach ($result->getTokens() as $token) {
-			switch ($token['type']) {
+			switch ($token->type) {
 				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
 				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
 				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-					if ($pos_left != $token['pos']) {
-						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
+					if ($pos_left != $token->pos) {
+						$expression[] = substr($formula, $pos_left, $token->pos - $pos_left);
 					}
-					$pos_left = $token['pos'] + $token['length'];
+					$pos_left = $token->pos + $token->length;
 					break;
 			}
 
-			switch ($token['type']) {
+			switch ($token->type) {
 				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
 				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-					$expression[] = array_key_exists($token['value'], $macros_posted)
-						? CTriggerExpression::quoteString($macros_posted[$token['value']], false)
-						: $token['value'];
+					$expression[] = array_key_exists($token->match, $macros_posted)
+						? CTriggerExpression::quoteString($macros_posted[$token->match], false)
+						: $token->match;
 					break;
 
 				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-					$string = strtr($token['data']['string'], $macros_posted);
+					$string = strtr($token->data['string'], $macros_posted);
 					$expression[] = CTriggerExpression::quoteString($string, false, true);
 					break;
 			}

@@ -671,6 +671,12 @@ class CTriggerExpression {
 
 		// TODO miks: parser must support functionids as parameters based on value of $this->options['collapsed_expression'].
 		if ($this->function_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
+			$error = $this->function_parser->getErrorDetails();
+
+			if ($error) {
+				$this->pos = $error[1];
+			}
+
 			return false;
 		}
 

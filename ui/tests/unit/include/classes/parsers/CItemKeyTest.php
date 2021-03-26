@@ -19,7 +19,9 @@
 **/
 
 
-class CItemKeyTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CItemKeyTest extends TestCase {
 	public static function provider() {
 		return [
 			// valid keys
@@ -1343,7 +1345,22 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function providerItemKeyFilter() {
+		$with_filter = ['with_filter' => true];
+		$allow_wildcard = ['allow_wildcard' => true];
+
 		return [
+			[
+				'*?[tag="widlcard"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => '*?[tag="widlcard"]',
+					'key' => '*',
+					'parameters' => []
+				],
+				[],
+				$with_filter + $allow_wildcard
+			],
 			[
 				'key?[tag="name"]', 0,
 				[
@@ -1353,7 +1370,20 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
+			],
+			[
+				'key?[group={#LLDMACRO} and tag={$USERMACRO}]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key?[group={#LLDMACRO} and tag={$USERMACRO}]',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[],
+				$with_filter
 			],
 			[
 				'key?[tag="name" and group="name"]', 0,
@@ -1364,7 +1394,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[((tag="name" or group="name") and tag="name")]', 0,
@@ -1375,7 +1406,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key[,b]?[tag="name"]', 0,
@@ -1404,9 +1436,58 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 						]
 					]
 				],
-				['', 'b']
+				['', 'b'],
+				$with_filter
 			],
 
+			[
+				'*?[tag="noattributes"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => _s('incorrect syntax near "%1$s"', '?[tag="noattributes"]'),
+					'match' => '*',
+					'key' => '*',
+					'parameters' => []
+				],
+				[],
+				$allow_wildcard
+			],
+			[
+				'*A?[tag="noattributes"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => _s('incorrect syntax near "%1$s"', 'A?[tag="noattributes"]'),
+					'match' => '*',
+					'key' => '*',
+					'parameters' => []
+				],
+				[],
+				$allow_wildcard
+			],
+			[
+				'A*?[tag="noattributes"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => _s('incorrect syntax near "%1$s"', '*?[tag="noattributes"]'),
+					'match' => 'A',
+					'key' => 'A',
+					'parameters' => []
+				],
+				[],
+				$with_filter
+			],
+			[
+				'**', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => _s('incorrect syntax near "%1$s"', '*'),
+					'match' => '*',
+					'key' => '*',
+					'parameters' => []
+				],
+				[],
+				$allow_wildcard
+			],
 			[
 				'key?[tag="name"] test', 0,
 				[
@@ -1416,19 +1497,33 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 
+			[
+				'*?[tag="noattributes"]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', '*?[tag="noattributes"]'),
+					'match' => '',
+					'key' => '',
+					'parameters' => []
+				],
+				[],
+				$with_filter
+			],
 			[
 				'key?', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'error' => _s('incorrect syntax near "%1$s"', '?'),
+					'error' => _('unexpected end of key'),
 					'match' => '',
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[)*10', 0,
@@ -1439,7 +1534,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[(]', 0,
@@ -1450,7 +1546,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[()]', 0,
@@ -1461,7 +1558,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[ ]', 0,
@@ -1472,7 +1570,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[and group="name"]', 0,
@@ -1483,29 +1582,44 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
-				'key?[tag=onequote"]', 0,
+				'key?[tag="onequote]', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'error' => _s('incorrect syntax near "%1$s"', 'tag=onequote"]'),
+					'error' => _s('incorrect syntax near "%1$s"', 'onequote]'),
 					'match' => '',
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[tag=unquoted]', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'error' => _s('incorrect syntax near "%1$s"', 'tag=unquoted]'),
+					'error' => _s('incorrect syntax near "%1$s"', 'unquoted]'),
 					'match' => '',
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
+			],
+			[
+				'key?[tag={#BROKENLLDMACRO]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', '{#BROKENLLDMACRO]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[],
+				$with_filter
 			],
 			[
 				'key?[unknown="name"]', 0,
@@ -1516,7 +1630,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[(group="Zabbix Servers") and]', 0,
@@ -1527,7 +1642,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[group="name" and]', 0,
@@ -1538,7 +1654,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[group="name" or and]', 0,
@@ -1549,7 +1666,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[group="name" (or group="name")]', 0,
@@ -1560,7 +1678,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 			[
 				'key?[((tag="name" or group="name") tag="name")]', 0,
@@ -1571,7 +1690,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'key' => 'key',
 					'parameters' => []
 				],
-				[]
+				[],
+				$with_filter
 			],
 		];
 	}
@@ -1579,13 +1699,8 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider providerItemKeyFilter
 	 */
-	public function testItemKeyFilter($key, $pos, $expectedResult, $unquoted_params) {
-		static $item_key_parser = null;
-
-		if ($item_key_parser === null) {
-			$item_key_parser = new CItemKey(['with_filter' => true]);
-		}
-
+	public function testItemKeyFilter($key, $pos, $expectedResult, $unquoted_params, $options) {
+		$item_key_parser = new CItemKey($options);
 		$rc = $item_key_parser->parse($key, $pos);
 
 		$result = [

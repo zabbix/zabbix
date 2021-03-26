@@ -1401,27 +1401,27 @@ function expressionLevelDraw(array $next, $level) {
  * Makes tree of expression elements
  *
  * Expression:
- *   "{host1:system.cpu.util[,iowait].last(0)} > 50 and {host2:system.cpu.util[,iowait].last(0)} > 50"
+ *   "last(/host1/system.cpu.util[,iowait], 0) > 50 and last(/host2/system.cpu.util[,iowait], 0) > 50"
  * Result:
- *   array(
- *     [0] => array(
+ *   [
+ *     [0] => [
  *       'id' => '0_94',
  *       'type' => 'operator',
  *       'operator' => 'and',
- *       'elements' => array(
- *         [0] => array(
+ *       'elements' => [
+ *         [0] => [
  *           'id' => '0_44',
  *           'type' => 'expression',
- *           'expression' => '{host1:system.cpu.util[,iowait].last(0)} > 50'
- *         ),
- *         [1] => array(
+ *           'expression' => 'last(/host1/system.cpu.util[,iowait], 0) > 50'
+ *         ],
+ *         [1] => [
  *           'id' => '50_94',
  *           'type' => 'expression',
- *           'expression' => '{host2:system.cpu.util[,iowait].last(0)} > 50'
- *         )
- *       )
- *     )
- *   )
+ *           'expression' => 'last(/host2/system.cpu.util[,iowait], 0) > 50'
+ *         ]
+ *       ]
+ *     ]
+ *   ]
  *
  * @param CTriggerExpression $expressionData
  * @param int $start
@@ -1429,8 +1429,22 @@ function expressionLevelDraw(array $next, $level) {
  *
  * @return array
  */
-function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
+function getExpressionTree(CTriggerExpression $expressionData, int $start, int $end) {
 	$blankSymbols = [' ', "\r", "\n", "\t"];
+
+	$tokens = $expressionData->result->getTokensOfTypes([
+		CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
+		CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
+		CTriggerExprParserResult::TOKEN_TYPE_MACRO,
+		CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO,
+		CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO,
+		CTriggerExprParserResult::TOKEN_TYPE_STRING,
+		CTriggerExprParserResult::TOKEN_TYPE_FUNCTION
+	]);
+	$tokens_by_position = [];
+	foreach ($tokens as $token) {
+		$tokens_by_position[$token->pos] = $token;
+	}
 
 	$expressionTree = [];
 	foreach (['or', 'and'] as $operator) {
@@ -1464,43 +1478,33 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 						$rParentheses = $i;
 					}
 					break;
-				case '{':
-				case '"':
-					// Skip any previously found tokens starting with brace or double quote.
-					foreach ($expressionData->result->getTokens() as $expression_token) {
-						if ($expression_token->pos == $i) {
-							$i += $expression_token->length - 1;
-							break;
-						}
-					}
-					break;
+
 				default:
-					// try to parse an operator
-					if ($operator[$operatorPos] === $expressionData->expression[$i]) {
-						$operatorPos++;
-						$operatorToken .= $expressionData->expression[$i];
+					if (array_key_exists($i, $tokens_by_position)) {
+						$token = $tokens_by_position[$i];
 
-						// operator found
-						if ($operatorToken === $operator) {
-							// we've reached the end of a complete expression, parse the expression on the left side of
-							// the operator
-							if ($level == 0) {
-								// find the last symbol of the expression before the operator
-								$closeSymbolNum = $i - strlen($operator);
+						if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
+								&& $token->match === $operator
+								&& $end > $token->pos
+								&& $level == 0) {
+							$closeSymbolNum = $token->pos;
 
-								// trim blank symbols after the expression
-								while (in_array($expressionData->expression[$closeSymbolNum], $blankSymbols)) {
-									$closeSymbolNum--;
-								}
-
-								$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
-								$openSymbolNum = $i + 1;
-								$operatorFound = true;
+							// Trim blank symbols after the expression.
+							while (in_array($expressionData->expression[$closeSymbolNum - 1], $blankSymbols)) {
+								$closeSymbolNum--;
 							}
-							$operatorPos = 0;
-							$operatorToken = '';
+
+							$expressions[] = getExpressionTree($expressionData, $openSymbolNum, $closeSymbolNum);
+
+							$openSymbolNum = $i + $token->length;
+							$operatorFound = true;
+						}
+						// Jump over the token.
+						else {
+							$i += $token->length - 1;
 						}
 					}
+				break;
 			}
 		}
 
@@ -1853,6 +1857,7 @@ function get_item_function_info($expr) {
 		'abs' => $rules['numeric_as_float'],
 		'avg' => $rules['numeric_as_float'],
 		'band' => $rules['integer'],
+		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'date' => $rules['date'],
 		'dayofmonth' => $rules['day_of_month'],
@@ -1870,8 +1875,6 @@ function get_item_function_info($expr) {
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'now' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'percentile' => $rules['numeric'],
-		'str' => $rules['string_as_0or1'],
-		'strlen' => $rules['string_as_uint'],
 		'sum' => $rules['numeric'],
 		'time' => $rules['time'],
 		'timeleft' => $rules['numeric_as_float'],

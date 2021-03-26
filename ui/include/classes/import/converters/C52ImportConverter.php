@@ -93,7 +93,7 @@ class C52ImportConverter extends CConverter {
 					}
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item['params'] = $parser->convert($item['params']);
+						$item = $parser->convert($item);
 					}
 				}
 				unset($item);
@@ -104,7 +104,7 @@ class C52ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('discovery_rules', $host)) {
-				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
+				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules'], $host);
 			}
 		}
 		unset($host);
@@ -133,14 +133,14 @@ class C52ImportConverter extends CConverter {
 					}
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item['params'] = $parser->convert($item['params']);
+						$item = $parser->convert($item);
 					}
 				}
 				unset($item);
 			}
 
 			if (array_key_exists('discovery_rules', $template)) {
-				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
+				$template['discovery_rules'] = $this->convertDiscoveryRules($template['discovery_rules']);
 			}
 		}
 		unset($template);
@@ -188,13 +188,12 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert discover rules.
 	 *
-	 * @static
-	 *
 	 * @param array $discovery_rules
+	 * @param array $host
 	 *
 	 * @return array
 	 */
-	private static function convertDiscoveryRules(array $discovery_rules): array {
+	private function convertDiscoveryRules(array $discovery_rules, array $host): array {
 		$result = [];
 
 		foreach ($discovery_rules as $discovery_rule) {
@@ -202,7 +201,45 @@ class C52ImportConverter extends CConverter {
 				$discovery_rule['host_prototypes'] = self::convertHostPrototypes($discovery_rule['host_prototypes']);
 			}
 
+			if (array_key_exists('item_prototypes', $discovery_rule)) {
+				$discovery_rule['item_prototypes'] = $this->convertItemPrototypes($discovery_rule['item_prototypes'],
+					$host
+				);
+			}
+			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
+				foreach ($discovery_rule['trigger_prototypes'] as &$trigger_prototype) {
+					$trigger_prototype = $this->convertTrigger($trigger_prototype);
+				}
+				unset($trigger_prototype);
+			}
+
 			$result[] = $discovery_rule;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert item prototypes.
+	 *
+	 * @param array $item_prototypes
+	 * @param array $host
+	 *
+	 * @return array
+	 */
+	private function convertItemPrototypes(array $item_prototypes, array $host): array {
+		$result = [];
+
+		foreach ($item_prototypes as $item_prototype) {
+			if (array_key_exists('trigger_prototypes', $item_prototype)) {
+				foreach ($item_prototype['trigger_prototypes'] as &$trigger_prototype) {
+					$trigger_prototype = $this->convertTrigger($trigger_prototype, $host['host'], $item_prototype['key']
+					);
+				}
+				unset($trigger_prototype);
+			}
+
+			$result[] = $item_prototype;
 		}
 
 		return $result;

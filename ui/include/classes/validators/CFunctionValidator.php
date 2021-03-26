@@ -99,11 +99,6 @@ class CFunctionValidator extends CValidator {
 			ITEM_VALUE_TYPE_UINT64 => true
 		];
 
-		$args_ignored = [[
-			'type' => 'str',
-			'mandat' => 0x00
-		]];
-
 		/*
 		 * Types of parameters:
 		 * - query - /host/key reference;
@@ -146,8 +141,8 @@ class CFunctionValidator extends CValidator {
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
 					['type' => 'scale', 'mandat' => 0x01],
-					['type' => 'str', 'mandat' => 0x00],
-					['type' => 'operation', 'mandat' => 0x00]
+					['type' => 'operation', 'mandat' => 0x00],
+					['type' => 'str', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_all
 			],
@@ -158,15 +153,15 @@ class CFunctionValidator extends CValidator {
 				'value_types' => $value_types_all
 			],
 			'date' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'dayofmonth' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'dayofweek' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'find' => [
@@ -251,7 +246,7 @@ class CFunctionValidator extends CValidator {
 				'value_types' => $value_types_all
 			],
 			'now' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'percentile' => [
@@ -270,7 +265,7 @@ class CFunctionValidator extends CValidator {
 				'value_types' => $value_types_num
 			],
 			'time' => [
-				'args' => $args_ignored,
+				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'timeleft' => [
@@ -361,9 +356,7 @@ class CFunctionValidator extends CValidator {
 				continue;
 			}
 
-			$param = ($fn->params_raw['parameters'][$num] instanceof CParserResult)
-					? $fn->params_raw['parameters'][$num]->match
-					: $fn->params_raw['parameters'][$num]['raw'];
+			$param = $fn->params_raw['parameters'][$num]->getValue();
 
 			if (($arg['mandat'] & 0x02) && strstr($param, ':') === false) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
@@ -371,7 +364,7 @@ class CFunctionValidator extends CValidator {
 				return false;
 			}
 
-			if (!$this->validateParameter($param, $arg)) {
+			if (($arg['mandat'] != 0x00 && $param === '') || !$this->validateParameter($param, $arg)) {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
 				);
@@ -581,7 +574,7 @@ class CFunctionValidator extends CValidator {
 
 		return preg_match('/^#\d+$/', $param)
 			? (substr($param, 1) > 0)
-			: ($this->validateSecValue($param) && $param > 0);
+			: ($this->validateSecValue($param) && $param >= 0);
 	}
 
 	/**
@@ -634,7 +627,6 @@ class CFunctionValidator extends CValidator {
 			return true;
 		}
 		else {
-			$param = (substr($param, 0, 1) === '"' && substr($param, -1) === '"') ? substr($param, 1, -1) : $param;
 			return in_array($param, ['iregexp', 'regexp', 'like']);
 		}
 	}

@@ -20,37 +20,21 @@
 
 
 /**
- * Class to store function parser results.
+ * Class to store unspecified function parameter.
  */
-class CQueryParserResult extends CFunctionParameterResult {
+class CFunctionParameterResult extends CParserResult {
 
 	/**
-	 * Host name
+	 * Parameter type.
 	 *
-	 * @var string
-	 */
-	public $host;
-
-	/**
-	 * Item key
-	 *
-	 * @var string
-	 */
-	public $item;
-
-	/**
-	 * Token type.
-	 *
-	 * @var int
+	 * @var type
 	 */
 	public $type;
 
 	public function __construct(array $data = []) {
-		$data = array_intersect_key($data, array_flip(['host', 'item', 'match', 'pos', 'length']));
+		$data = array_intersect_key($data, array_flip(['type', 'match', 'pos', 'length']));
 		$data += [
-			'type' => CTriggerExprParserResult::TOKEN_TYPE_QUERY,
-			'host' => '',
-			'item' => '',
+			'type' => -1,
 			'match' => '',
 			'pos' => 0,
 			'length' => 0
@@ -59,5 +43,23 @@ class CQueryParserResult extends CFunctionParameterResult {
 		foreach ($data as $property => $value) {
 			$this->$property = $value;
 		}
+	}
+
+	/**
+	 * Get value of parsed parameter.
+	 *
+	 * @return string
+	 */
+	public function getValue(): string {
+		$value = $this->match;
+
+		if ($this instanceof CQueryParserResult) {
+			return $value;
+		}
+		elseif ($this->type == CFunctionParser::PARAM_QUOTED) {
+			$value = (substr($value, 0, 1) === '"' && substr($value, -1) === '"') ? substr($value, 1, -1) : $value;
+		}
+
+		return $value;
 	}
 }

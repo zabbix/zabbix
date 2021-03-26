@@ -50,7 +50,7 @@ class CQueryParser extends CParser {
 	 */
 	public function __construct(array $options = []) {
 		if (array_key_exists('calculated', $options) && $options['calculated']) {
-			$this->item_key_parser = new CItemKey(['with_filter' => true]);
+			$this->item_key_parser = new CItemKey(['with_filter' => true, 'allow_wildcard' => true]);
 			$this->host_name_parser = new CHostNameParser([
 				'allow_host_all' => true,
 				'allow_host_current' => true
@@ -71,6 +71,7 @@ class CQueryParser extends CParser {
 	 * @return int
 	 */
 	public function parse($source, $pos = 0): int {
+		$this->errorClear();
 		$this->result = new CQueryParserResult();
 		$start_pos = $pos;
 
@@ -82,8 +83,11 @@ class CQueryParser extends CParser {
 		$pos++;
 
 		if ($this->host_name_parser->parse($source, $pos) == self::PARSE_FAIL) {
-			[$source, $pos] = $this->host_name_parser->errorPosArray();
-			$this->errorPos($source, $pos);
+			$error = $this->host_name_parser->getErrorDetails();
+
+			if ($error) {
+				$this->errorPos($error[0], $error[1]);
+			}
 
 			return CParser::PARSE_FAIL;
 		}
@@ -97,7 +101,7 @@ class CQueryParser extends CParser {
 		$pos++;
 
 		if ($this->item_key_parser->parse($source, $pos) == self::PARSE_FAIL) {
-			[$source, $pos] = $this->item_key_parser->errorPosArray();
+			[$source, $pos] = $this->item_key_parser->getErrorDetails();
 			$this->errorPos($source, $pos);
 
 			return CParser::PARSE_FAIL;

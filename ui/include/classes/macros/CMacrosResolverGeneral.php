@@ -58,14 +58,14 @@ class CMacrosResolverGeneral {
 
 		if (($result = $expression_data->parse($expression)) !== false) {
 			foreach ($result->getTokens() as $token) {
-				switch ($token['type']) {
+				switch ($token->type) {
 					case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
 					case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-						$values[] = $token['value'];
+						$values[] = $token->match;
 						break;
 
 					case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-						$values[] = $token['data']['string'];
+						$values[] = $token->data['string'];
 						break;
 				}
 			}
@@ -388,13 +388,13 @@ class CMacrosResolverGeneral {
 							$function_parameters = [];
 
 							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-								switch ($param_raw['type']) {
+								switch ($param_raw->type) {
 									case CFunctionParser::PARAM_UNQUOTED:
-										$function_parameters[] = $param_raw['raw'];
+										$function_parameters[] = $param_raw->match;
 										break;
 
 									case CFunctionParser::PARAM_QUOTED:
-										$function_parameters[] = CFunctionParser::unquoteParam($param_raw['raw']);
+										$function_parameters[] = CFunctionParser::unquoteParam($param_raw->match);
 										break;
 								}
 							}
@@ -511,13 +511,13 @@ class CMacrosResolverGeneral {
 		$function_parameters = [];
 		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
 			foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-				switch ($param_raw['type']) {
+				switch ($param_raw->type) {
 					case CFunctionParser::PARAM_UNQUOTED:
-						$function_parameters[] = $param_raw['raw'];
+						$function_parameters[] = $param_raw->match;
 						break;
 
 					case CFunctionParser::PARAM_QUOTED:
-						$function_parameters[] = CFunctionParser::unquoteParam($param_raw['raw']);
+						$function_parameters[] = CFunctionParser::unquoteParam($param_raw->match);
 						break;
 				}
 			}

@@ -19,31 +19,22 @@
 **/
 
 
-class C52CalculatedItemConverter extends CConverter {
+class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 
 	/**
-	 * Array of time functions.
+	 * Item key parser.
 	 *
-	 * @var array
+	 * @var CItemKey
 	 */
-	protected $time_functions = ['date', 'dayofmonth', 'dayofweek', 'time', 'now'];
-
-	/**
-	 * Array of group functions.
-	 *
-	 * @var array
-	 */
-	protected $group_functions = ['grpavg', 'grpmax', 'grpmin', 'grpsum'];
-
-	/**
-	 * @var C10TriggerExpression
-	 */
-	protected $parser;
+	protected $item_key_parser;
 
 	public function __construct() {
 		$this->parser = new C10TriggerExpression([
+			'allow_func_only' => true,
 			'calculated' => true
 		]);
+		$this->item_key_parser = new CItemKey();
+		$this->standalone_functions = getStandaloneFunctions();
 	}
 
 	/**
@@ -52,40 +43,96 @@ class C52CalculatedItemConverter extends CConverter {
 	 * @param string $formula  Calculated item formula to convert.
 	 * @return string
 	 */
-	public function convert($formula) {
-		$result = $this->parser->parse($formula);
-
-		if ($result === false) {
-			return $formula;
+	public function convert($item) {
+		if ($this->parser->parse($item['params']) === false) {
+			return $item;
 		}
 
-		$functions = $result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION);
-		$offset = 0;
+		$extra_expressions = [];
+		$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION);
+		$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
+		$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
+		$this->wrap_subexpressions = ($parts['type'] === 'operator');
+		$this->convertExpressionParts($item['params'], [$parts], $extra_expressions);
+		$extra_expressions = array_filter($extra_expressions);
 
-		foreach ($functions as $function) {
-			$func_name = $function['data']['functionName'];
+		if ($extra_expressions) {
+			$extra_expressions = array_keys(array_flip($extra_expressions));
+			$item['params'] = '('.$item['params'].')';
+			$extra_expressions = array_reverse($extra_expressions);
+			$item['params'] .= ' or '.implode(' or ', $extra_expressions);
+		}
 
-			if (in_array($func_name, $this->time_functions)) {
+		return $item;
+	}
+
+	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
+		if (($this->parser->parse($expression_element['expression'])) === false) {
+			return;
+		}
+
+		$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION);
+
+		for ($i = count($functions) - 1; $i >= 0; $i--) {
+			$fn = $functions[$i]['data'] + ['host' => '', 'item' => ''];
+			$key_param = $fn['functionParams'][0];
+			$host_delimiter_pos = strpos($key_param, ':');
+			$host_name = '';
+
+			if ($host_delimiter_pos !== false && $host_delimiter_pos < strpos($key_param, '[')) {
+				list($host_name, $key_param) = explode(':', $key_param, 2);
+			}
+
+			if ($this->item_key_parser->parse($key_param) === CParser::PARSE_SUCCESS) {
+				array_shift($fn['functionParams']);
+				[$new_expression,] = $this->convertFunction($fn, $host_name, $key_param);
+
+				$expression_element['expression'] = substr_replace($expression_element['expression'], $new_expression,
+					$functions[$i]['pos'], $functions[$i]['length']
+				);
+			}
+		}
+
+		if ($this->wrap_subexpressions && count($functions) > 1) {
+			$expression_element['expression'] = '('.$expression_element['expression'].')';
+		}
+
+		$expression = substr_replace($expression, $expression_element['expression'],
+			$expression_element['pos'], $expression_element['length']
+		);
+	}
+
+	/**
+	 * Check if each particular host reference would be linked through at least one functions according the new trigger
+	 * expression syntax.
+	 *
+	 * @param array $tokens
+	 *
+	 * @return array
+	 */
+	protected function checkHangedFunctionsPerHost(array $tokens): array {
+		$hanged_refs = ['' => false];
+
+		foreach ($tokens as $token) {
+			$host_name = '';
+			$fn = $token['data'];
+			$item_key = $fn['functionParams'][0];
+			$host_delimiter_pos = strpos($item_key, ':');
+
+			if ($host_delimiter_pos === false || $host_delimiter_pos > strpos($item_key, '[')) {
 				continue;
 			}
 
-			$params = $function['data']['functionParams'];
-			$pos = $offset + $function['pos'] + strlen($func_name) + 1;
-			$length = strlen($function['value']) - strlen($func_name) - 2;
-			$host = '';
-			$key = $params[0];
-			$host_delimiter_pos = strpos($key, ':');
+			$host_name = substr($item_key, 0, $host_delimiter_pos);
 
-			if ($host_delimiter_pos !== false && $host_delimiter_pos < strpos($key, '[')) {
-				list($host, $key) = explode(':', $key, 2);
+			if (!array_key_exists($host_name, $hanged_refs)) {
+				$hanged_refs[$host_name] = false;
 			}
-
-			$params[0] = '/'.$host.'/'.$key;
-			$replace = implode(',', $params);
-			$formula = substr_replace($formula, $replace, $pos, $length);
-			$offset += strlen($replace) - $length;
+			if (!in_array($fn['functionName'], $this->standalone_functions)) {
+				$hanged_refs[$host_name] = true;
+			}
 		}
 
-		return $formula;
+		return $hanged_refs;
 	}
 }

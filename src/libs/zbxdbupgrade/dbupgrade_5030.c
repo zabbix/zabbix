@@ -2145,7 +2145,7 @@ static int	dbpatch_is_numeric_count_pattern(const char *op, const char *pattern)
 		return SUCCEED;
 	}
 
-	if (0 == strncmp(op, "band", ZBX_CONST_STRLEN("band")))
+	if (0 == strncmp(op, "bitand", ZBX_CONST_STRLEN("bitand")))
 	{
 		const char	*ptr;
 
@@ -2185,6 +2185,10 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	if (0 == strcmp(function->name, "abschange"))
 	{
 		dbpatch_update_func_abschange(function, replace);
+	}
+	if (0 == strcmp(function->name, "change"))
+	{
+		dbpatch_update_function(function, NULL, "", ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
 	else if (0 == strcmp(function->name, "avg") || 0 == strcmp(function->name, "max") ||
 			0 == strcmp(function->name, "min") || 0 == strcmp(function->name, "sum"))
@@ -2242,7 +2246,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 				ZBX_DBPATCH_ARG_HIST, 0, 2,
 				ZBX_DBPATCH_ARG_NUM, 1,
 				ZBX_DBPATCH_ARG_NONE);
-		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+		dbpatch_update_function(function, "bitand", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
 	}
 	else if (0 == strcmp(function->name, "forecast"))
 	{
@@ -2267,29 +2271,40 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	{
 		int	arg_type = ZBX_DBPATCH_ARG_STR;
 
+		char	*op;
+
 		if (2 <= params.values_num)
 		{
-			const char	*op, *pattern =  function->parameter + params.values[1].l;
+			const char	*pattern = function->parameter + params.values[1].l;
 
 			if (3 > params.values_num || '\0' == *(op = function->parameter + params.values[2].l))
-				op = "eq";
+				op = zbx_strdup(NULL, "eq");
+			else
+				op = zbx_substr_unquote(function->parameter, params.values[2].l, params.values[2].r);
+
+			if (0 == strcmp(op, "band"))
+				op = zbx_strdup(op, "bitand");
 
 			/* set numeric pattern type for numeric items and numeric operators unless */
 			/* band operation pattern contains mask (separated by '/')                 */
 			if ((ITEM_VALUE_TYPE_FLOAT == function->value_type ||
-						ITEM_VALUE_TYPE_UINT64 == function->value_type) &&
+					ITEM_VALUE_TYPE_UINT64 == function->value_type) &&
 					SUCCEED == dbpatch_is_numeric_count_pattern(op, pattern))
 			{
 				arg_type = ZBX_DBPATCH_ARG_NUM;
 			}
 		}
+		else
+			op = zbx_strdup(NULL, "");
 
 		dbpatch_convert_params(&parameter, function->parameter, &params,
 				ZBX_DBPATCH_ARG_HIST, 0, 3,
-				ZBX_DBPATCH_ARG_STR, 2,
+				ZBX_DBPATCH_ARG_CONST_STR, op,
 				arg_type, 1,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+
+		zbx_free(op);
 	}
 	else if (0 == strcmp(function->name, "iregexp") || 0 == strcmp(function->name, "regexp"))
 	{
@@ -2333,6 +2348,10 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 				ZBX_DBPATCH_ARG_STR, 0,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "logseverity"))
+	{
+		dbpatch_update_function(function, NULL, "", ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
 
 	zbx_free(parameter);

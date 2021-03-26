@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-22 11:50+0200\n"
-"PO-Revision-Date: 2021-03-02 02:35+0300\n"
+"PO-Revision-Date: 2021-03-23 11:43+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1614645316.000000\n"
+"X-POOTLE-MTIME: 1616492599.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -349,7 +349,7 @@ msgstr "<メトリクス名>{<ラベル名>=\\\"<ラベル値>\\\", ...} == <値
 
 #: app/views/administration.script.edit.php:110
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<サブメニュー/サブメニュー/...>"
 
 #: include/classes/widgets/CWidgetHelper.php:794
 msgid "ADD OVERRIDE"
@@ -612,7 +612,7 @@ msgstr "アクションログ"
 #: app/views/administration.script.list.php:50
 #: app/views/administration.script.list.php:89
 msgid "Action operation"
-msgstr ""
+msgstr "アクション処理"
 
 #: actionconf.php:169
 msgid "Action updated"
@@ -3096,7 +3096,7 @@ msgstr "スクリプトを更新できません"
 #: include/classes/api/services/CScript.php:628
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
-msgstr ""
+msgstr "スクリプトの範囲を更新できません。\"%1$s\"はアクション\"%2$s\"で使用されています。"
 
 #: services.php:147
 msgid "Cannot update service"
@@ -10509,7 +10509,7 @@ msgstr "JSON文字列で指定してください"
 #: include/classes/core/CJsonRpc.php:146
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "JSON-RPCエラーの生成に失敗しました。\"%1$s\"というようなエラーはありません。"
 
 #: include/items.inc.php:1933
 #: include/views/configuration.host.discovery.edit.php:780
@@ -11292,13 +11292,13 @@ msgstr "マニュアル"
 #: app/views/administration.script.list.php:52
 #: app/views/administration.script.list.php:129
 msgid "Manual event action"
-msgstr ""
+msgstr "手動イベント処理"
 
 #: app/views/administration.script.edit.php:102
 #: app/views/administration.script.list.php:51
 #: app/views/administration.script.list.php:125
 msgid "Manual host action"
-msgstr ""
+msgstr "手動ホスト処理"
 
 #: include/actions.inc.php:1995
 msgid "Manually closed"
@@ -11636,7 +11636,7 @@ msgstr "メニュー項目名"
 
 #: app/views/administration.script.edit.php:107
 msgid "Menu path"
-msgstr ""
+msgstr "メニューパス"
 
 #: app/partials/popup.operations.php:160
 #: app/views/monitoring.widget.actionlog.view.php:37
@@ -13375,7 +13375,7 @@ msgstr "OS情報。文字列値を返す。"
 
 #: app/partials/popup.operations.php:41
 msgid "Operation"
-msgstr ""
+msgstr "処理内容"
 
 #: actionconf.php:278
 #, c-format
@@ -15325,17 +15325,17 @@ msgstr "ルール"
 #: include/actions.inc.php:618 include/actions.inc.php:787
 #, c-format
 msgid "Run script \"%1$s\" on current host"
-msgstr ""
+msgstr "このホスト上でスクリプト\"%1$s\"を実行"
 
 #: include/actions.inc.php:649 include/actions.inc.php:818
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
-msgstr ""
+msgstr "ホストグループ上でスクリプト\"%1$s\"を実行"
 
 #: include/actions.inc.php:631 include/actions.inc.php:800
 #, c-format
 msgid "Run script \"%1$s\" on hosts"
-msgstr ""
+msgstr "ホスト上でスクリプト\"%1$s\"を実行"
 
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:599
@@ -15628,7 +15628,7 @@ msgstr "定期設定"
 #: app/views/administration.script.list.php:47
 #: app/views/administration.script.list.php:74
 msgid "Scope"
-msgstr ""
+msgstr "範囲"
 
 #: app/views/popup.acknowledge.edit.php:53
 msgctxt "selected problems"
@@ -20146,7 +20146,7 @@ msgstr "相対的な時間で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2110
 msgid "a string, number or null value is expected"
-msgstr ""
+msgstr "文字列か数字か空文字列で指定してください"
 
 #: include/classes/validators/CNewValidator.php:273
 msgid "a time is expected"
@@ -20256,7 +20256,7 @@ msgstr "配列か文字列で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2090
 msgid "an array or object is expected"
-msgstr ""
+msgstr "配列かオブジェクトで指定してください"
 
 #: include/classes/import/validators/C10XmlValidator.php:385
 #: include/classes/import/validators/C10XmlValidator.php:407
@@ -20591,7 +20591,7 @@ msgstr "diff() - 最新値と前回値の差の有無 (1 - 有、0 - 無)"
 
 #: include/classes/validators/CApiInputValidator.php:1398
 msgid "directory cannot be empty"
-msgstr ""
+msgstr "ディレクトリを指定してください"
 
 #: include/events.inc.php:60
 msgid "discovered host"

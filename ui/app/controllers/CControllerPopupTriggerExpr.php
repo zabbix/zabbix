@@ -131,13 +131,13 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
-			'v' => [
-				'C' => 'V',
+			'o' => [
+				'C' => 'O',
 				'T' => T_ZBX_STR,
 				'A' => false
 			],
-			'o' => [
-				'C' => 'O',
+			'v' => [
+				'C' => 'V',
 				'T' => T_ZBX_STR,
 				'A' => false
 			],
@@ -267,6 +267,11 @@ class CControllerPopupTriggerExpr extends CController {
 		];
 
 		$this->functions = [
+			'abs' => [
+				'description' => _('abs() - Absolute value'),
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
 			'avg' => [
 				'description' => _('avg() - Average value of a period T'),
 				'params' => $this->param1SecCount,
@@ -284,10 +289,22 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
+			'find' => [
+				'description' => _('find() - Check occurance of pattern V (which fulfill operator O) in period T (1 - match, 0 - no match)'),
+				'params' => $this->param3SecVal,
+				'allowed_types' => $this->allowedTypesStr,
+				'operators' => ['=', '<>']
+			],
 			'last' => [
 				'description' => _('last() - Last (most recent) T value'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'length' => [
+				'description' => _('length() - Length of last (most recent) T value in characters'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'max' => [
@@ -306,18 +323,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('percentile() - Percentile P of a period T'),
 				'params' => $this->param3SecPercent,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'str' => [
-				'description' => _('str() - Find string V in last (most recent) value (1 - found, 0 - not found)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
-			'strlen' => [
-				'description' => _('strlen() - Length of last (most recent) T value in characters'),
-				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'sum' => [
@@ -491,6 +496,8 @@ class CControllerPopupTriggerExpr extends CController {
 		$params = $this->getInput('params', []);
 		$value = $this->getInput('value', 0);
 
+		$item = false;
+
 		// Opening the popup when editing an expression in the trigger constructor.
 		if (($dstfld1 === 'expr_temp' || $dstfld1 === 'recovery_expr_temp') && $expression !== '') {
 			$expression = utf8RawUrlDecode($expression);
@@ -507,28 +514,29 @@ class CControllerPopupTriggerExpr extends CController {
 
 					// Determine param type.
 					$params = $function_token->params_raw['parameters'];
-					if (array_key_exists(0, $params) && !is_array($params[0])
+					if (array_key_exists(0, $params)
 							&& $params[0]->type == CTriggerExprParserResult::TOKEN_TYPE_QUERY) {
 						array_shift($params);
 					}
 
-					$is_num = (array_key_exists(0, $params) && is_array($params[0])
-						&& substr($params[0]['raw'], 0, 1) === '#'
-					);
+					$is_num = (array_key_exists(0, $params) && substr($params[0]->match, 0, 1) === '#');
 
 					if (!in_array($function, ['fuzzytime', 'nodata']) && $is_num) {
 						$param_type = PARAM_TYPE_COUNTS;
-						$params[0]['raw'] = substr($params[0]['raw'], 1);
+						$params[0]->match = substr($params[0]->match, 1);
 					}
 					else {
 						$param_type = PARAM_TYPE_TIME;
 					}
 
 					$params = array_map(function ($param) {
-						return is_array($param)
-							? $param['raw']
-							: $param->match;
+						return $param->getValue();
 					}, $params);
+
+					if (array_key_exists(0, $params) && ($column_pos = strpos($params[0], ':')) !== false) {
+						$params[] = substr($params[0], $column_pos + 1);
+						$params[0] = substr($params[0], 0, $column_pos);
+					}
 
 					/*
 					 * Try to find an operator, a value and item.
@@ -560,7 +568,9 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($fn_name, $this->functions)
 									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
 								$operator = $operator_token->match;
-								$value = $value_token->match;
+								$value = array_key_exists('string', $value_token->data)
+									? $value_token->data['string']
+									: $value_token->match;
 							}
 							else {
 								break;
@@ -600,10 +610,11 @@ class CControllerPopupTriggerExpr extends CController {
 			$item = reset($item);
 		}
 
-		if ($itemid) {
+		if ($item) {
 			$items = CMacrosResolverHelper::resolveItemNames([$item]);
 			$item = $items[0];
 
+			$itemid = $item['itemid'];
 			$item_value_type = $item['value_type'];
 			$item_key = $item['key_'];
 			$item_host_data = reset($item['hosts']);
@@ -635,6 +646,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'params' => $params,
 			'paramtype' => $param_type,
 			'item_description' => $description,
+			'item_required' => !in_array($function, getStandaloneFunctions()),
 			'functions' => $this->functions,
 			'function' => $function,
 			'operator' => $operator,
@@ -675,7 +687,40 @@ class CControllerPopupTriggerExpr extends CController {
 		// Create and validate trigger expression before inserting it into textarea field.
 		if ($this->getInput('add', false)) {
 			try {
-				if ($data['item_description']) {
+				if (in_array($function, getStandaloneFunctions())) {
+					$data['expression'] = sprintf('%s()%s%s',
+						$function,
+						$operator,
+						CTriggerExpression::quoteString($data['value'])
+					);
+
+					// Validate trigger expression.
+					$trigger_expression = new CTriggerExpression();
+
+					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
+						// Validate trigger function.
+						$trigger_function_validator = new CFunctionValidator();
+
+						if (!$trigger_function_validator->validate($result->getTokens()[0])) {
+							error($trigger_function_validator->getError());
+						}
+					}
+					else {
+						error($trigger_expression->error);
+					}
+				}
+				elseif ($data['item_description']) {
+					// Quote function string parameters.
+					foreach ($data['params'] as $param_key => $param) {
+						if (!in_array($param_key, ['v', 'o', 'fit', 'mode', 'pattern'])
+								|| !array_key_exists($param_key, $data['params'])
+								|| $data['params'][$param_key] === '') {
+							continue;
+						}
+
+						$data['params'][$param_key] = quoteFunctionParam($param, true);
+					}
+
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {
@@ -696,21 +741,18 @@ class CControllerPopupTriggerExpr extends CController {
 						unset($data['params']['last'], $data['params']['shift']);
 					}
 
-					// Quote function param.
-					$quoted_params = [];
-					foreach ($data['params'] as $param) {
-						$quoted_params[] = quoteFunctionParam($param);
-					}
+					$fn_params = rtrim(implode(',', $data['params']), ',');
 
-					if (in_array($function, ['date', 'dayofmonth', 'dayofweek', 'now', 'time'])) {
-						$data['expression'] = sprintf('%s()%s%s',
-							$function,
+					if ($function === 'abs') {
+						$data['expression'] = sprintf('abs(last(/%s/%s)%s)%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
 							$operator,
 							CTriggerExpression::quoteString($data['value'])
 						);
 					}
 					else {
-						$fn_params = rtrim(implode(',', $quoted_params), ',');
 						$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
 							$function,
 							$item_host_data['host'],
@@ -726,12 +768,25 @@ class CControllerPopupTriggerExpr extends CController {
 
 					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
 						// Validate trigger function.
+						$math_function_validator = new CMathFunctionValidator();
 						$trigger_function_validator = new CFunctionValidator();
 						$fn = $result->getTokens()[0];
+						$error_msg = '';
 
-						if (!$trigger_function_validator->validate($fn)
-								|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
-							error($trigger_function_validator->getError());
+						if (!$math_function_validator->validate($fn)) {
+							$error_msg = $math_function_validator->getError();
+
+							if (!$trigger_function_validator->validate($fn)
+									|| $trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
+								$error_msg = $trigger_function_validator->getError();
+							}
+							else {
+								$error_msg = '';
+							}
+						}
+
+						if ($error_msg !== '') {
+							error($error_msg);
 						}
 					}
 					else {
