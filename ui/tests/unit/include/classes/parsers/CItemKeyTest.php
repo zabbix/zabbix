@@ -1345,7 +1345,6 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 	public function providerItemKeyFilter() {
 		$with_filter = ['with_filter' => true];
 		$allow_wildcard = ['allow_wildcard' => true];
-		$calculated = $with_filter + $allow_wildcard;
 
 		return [
 			[
@@ -1358,7 +1357,7 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'parameters' => []
 				],
 				[],
-				$calculated
+				$with_filter + $allow_wildcard
 			],
 			[
 				'key?[tag="name"]', 0,
@@ -1366,6 +1365,18 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'match' => 'key?[tag="name"]',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[],
+				$with_filter
+			],
+			[
+				'key?[group={#LLDMACRO} and tag={$USERMACRO}]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'key?[group={#LLDMACRO} and tag={$USERMACRO}]',
 					'key' => 'key',
 					'parameters' => []
 				],
@@ -1440,6 +1451,18 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				$allow_wildcard
 			],
 			[
+				'*A?[tag="noattributes"]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => _s('incorrect syntax near "%1$s"', 'A?[tag="noattributes"]'),
+					'match' => '*',
+					'key' => '*',
+					'parameters' => []
+				],
+				[],
+				$allow_wildcard
+			],
+			[
 				'A*?[tag="noattributes"]', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
@@ -1492,7 +1515,7 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				'key?', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'error' => _s('incorrect syntax near "%1$s"', '?'),
+					'error' => _('unexpected end of key'),
 					'match' => '',
 					'key' => 'key',
 					'parameters' => []
@@ -1561,10 +1584,10 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				$with_filter
 			],
 			[
-				'key?[tag=onequote"]', 0,
+				'key?[tag="onequote]', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'error' => _s('incorrect syntax near "%1$s"', 'tag=onequote"]'),
+					'error' => _s('incorrect syntax near "%1$s"', 'onequote]'),
 					'match' => '',
 					'key' => 'key',
 					'parameters' => []
@@ -1576,7 +1599,19 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				'key?[tag=unquoted]', 0,
 				[
 					'rc' => CParser::PARSE_FAIL,
-					'error' => _s('incorrect syntax near "%1$s"', 'tag=unquoted]'),
+					'error' => _s('incorrect syntax near "%1$s"', 'unquoted]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[],
+				$with_filter
+			],
+			[
+				'key?[tag={#BROKENLLDMACRO]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', '{#BROKENLLDMACRO]'),
 					'match' => '',
 					'key' => 'key',
 					'parameters' => []
