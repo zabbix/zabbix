@@ -67,6 +67,18 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	return r_size;
 }
 
+#if defined(HAVE_LIBCURL)
+static char	*rw_curl_error(CURLcode err)
+{
+	char	*error;
+
+	error = zbx_strdup(NULL,  curl_easy_strerror(err));
+	*error = tolower((unsigned char)*error);
+
+	return error;
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: rw_get_report                                                    *
@@ -100,7 +112,7 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 
 #else
 	struct zbx_json		j;
-	char			*cookie_value, buffer[MAX_ID_LEN + 1];
+	char			*cookie_value, buffer[MAX_ID_LEN + 1], *curl_error = NULL;
 	int			ret = FAIL;
 	long			httpret;
 	zbx_buffer_t		response = {NULL, 0, 0};
@@ -129,7 +141,7 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 
 	if (NULL == (curl = curl_easy_init()))
 	{
-		*error = zbx_strdup(NULL, "cannot initialize cURL library");
+		*error = zbx_strdup(NULL, "Cannot initialize cURL library");
 		goto out;
 	}
 
@@ -145,7 +157,8 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)))
 	{
-		*error = zbx_dsprintf(*error, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
+				(curl_error = rw_curl_error(err)));
 		goto out;
 	}
 
@@ -155,8 +168,8 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, CONFIG_TLS_CERT_FILE)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, CONFIG_TLS_KEY_FILE)))
 		{
-			*error = zbx_dsprintf(*error, "cannot set cURL option %d: %s.", (int)opt,
-					curl_easy_strerror(err));
+			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
+					(curl_error = rw_curl_error(err)));
 			goto out;
 		}
 	}
@@ -164,13 +177,14 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
-		*error = zbx_dsprintf(*error, "could not connect to web service: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot connect to web service: %s", (curl_error = rw_curl_error(err)));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpret)))
 	{
-		*error = zbx_dsprintf(*error, "could not obtain web service response code: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot obtain web service response code: %s",
+				(curl_error = rw_curl_error(err)));
 		goto out;
 	}
 
@@ -204,6 +218,7 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 
 	ret = SUCCEED;
 out:
+	zbx_free(curl_error);
 	zbx_free(response.data);
 
 	curl_slist_free_all(headers);
@@ -402,7 +417,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_REPORTER, SEC_PER_MIN, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to reporting service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to reporting service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -441,7 +456,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read reporter service request");
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot read reporter service request");
 			exit(EXIT_FAILURE);
 		}
 

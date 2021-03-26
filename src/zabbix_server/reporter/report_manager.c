@@ -767,6 +767,12 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, z
 	struct tm		from, to;
 	int			i;
 
+	if ('\0' == *manager->zabbix_url)
+	{
+		*error = zbx_strdup(NULL, "The Frontend URL has not been configured");
+		return NULL;
+	}
+
 	if (SUCCEED != rm_get_report_range(report_time, period, &from, &to))
 	{
 		*error = zbx_strdup(NULL, "invalid report time or period");
@@ -1677,7 +1683,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 	if (0 == dsts.values_num)
 	{
-		*error = zbx_dsprintf(NULL, "no media configured for the report recipients");
+		*error = zbx_dsprintf(NULL, "No media configured for the report recipients");
 		goto out;
 	}
 
@@ -1687,7 +1693,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 	if (SUCCEED != zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_BEGIN_REPORT, data, size))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		*error = zbx_dsprintf(NULL, "cannot send message to report writer");
+		*error = zbx_dsprintf(NULL, "Cannot send message to report writer");
 		goto out;
 	}
 
