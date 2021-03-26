@@ -320,7 +320,7 @@ $dashboard-my-bg-color: #e0e0e0;
 	}
 }
 
-.dashbrd-navigation-tabs {
+.dashboard-navigation-tabs {
 	.csortable-list {
 		& > .csortable-item:focus:not(:active) {
 			& > div {
@@ -346,59 +346,56 @@ $dashboard-my-bg-color: #e0e0e0;
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
-.dashbrd-grid-new-widget-placeholder {
-	.dashbrd-grid-widget-new-box,
-	.dashbrd-grid-widget-set-position,
-	.dashbrd-grid-widget-set-size {
+
+.dashboard-widget-placeholder {
+	.dashboard-widget-placeholder-box {
 		box-shadow: none;
 		border-color: $font-color;
 		background-color: transparent;
 	}
 
-	.dashbrd-grid-widget-set-size {
-		border: 2px dashed $font-color;
-		box-shadow: none;
-		background: darken($body-bg-color, 6%);
-	}
-
-	.dashbrd-grid-new-widget-label {
+	.dashboard-widget-placeholder-label {
 		&::before {
 			background: url($sprite-path) no-repeat -269px -888px;
 		}
 	}
-}
 
-.dashbrd-grid-widget-set-size {
-	.dashbrd-grid-new-widget-label {
-		&::before {
-			background: url($sprite-path) no-repeat -457px -888px;
+	.dashboard-widget-placeholder-resizing {
+		border: 2px dashed $font-color;
+		box-shadow: none;
+		background: darken($body-bg-color, 6%);
+
+		.dashboard-widget-placeholder-label {
+			&::before {
+				background: url($sprite-path) no-repeat -457px -888px;
+			}
 		}
 	}
 }
 
-.dashbrd-grid-widget {
-	&.dashbrd-grid-widget-hidden-header {
-		&.dashbrd-grid-widget-focus {
-			.dashbrd-grid-widget-head {
+.dashboard-grid-widget {
+	&.dashboard-grid-widget-hidden-header {
+		&.dashboard-grid-widget-focus {
+			.dashboard-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}
 	}
 }
 
-.dashbrd-grid-iterator {
-	&.dashbrd-grid-iterator-focus {
-		.dashbrd-grid-iterator-head {
+.dashboard-grid-iterator {
+	&.dashboard-grid-iterator-focus {
+		.dashboard-grid-iterator-head {
 			box-shadow: 0 -6px 8px -2px #000000;
 		}
 	}
 }
 
-.dashbrd.dashbrd-is-edit-mode {
-	.dashbrd-grid-widget {
+.dashboard.dashboard-is-edit-mode {
+	.dashboard-grid-widget {
 		&.ui-draggable-dragging {
-			&.dashbrd-grid-widget-hidden-header {
-				.dashbrd-grid-widget-head {
+			&.dashboard-grid-widget-hidden-header {
+				.dashboard-grid-widget-head {
 					box-shadow: 0 -6px 8px -2px #000000;
 				}
 			}
@@ -412,9 +409,9 @@ $dashboard-my-bg-color: #e0e0e0;
 		}
 	}
 
-	.dashbrd-grid-iterator {
+	.dashboard-grid-iterator {
 		&.ui-draggable-dragging {
-			.dashbrd-grid-iterator-head {
+			.dashboard-grid-iterator-head {
 				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}
@@ -425,13 +422,13 @@ $dashboard-my-bg-color: #e0e0e0;
 				box-shadow: 0 4px 20px 2px #000000;
 			}
 
-			.dashbrd-grid-iterator-mask {
+			.dashboard-grid-iterator-mask {
 				border: 0;
 			}
 		}
 	}
 
-	.dashbrd-grid-widget-placeholder > div {
+	.dashboard-grid-widget-placeholder > div {
 		background-color: lighten($ui-bg-color, 12%) !important;
 	}
 }
@@ -478,24 +475,28 @@ $form-icon-btn: (
 }
 
 $icon-btn: (
-	conf: $btn-bg-color url($sprite-path) no-repeat -43px -187px,
 	kiosk: $btn-bg-color url($sprite-path) no-repeat -79px -223px,
-	max: $btn-bg-color url($sprite-path) no-repeat -43px -223px,
 	min: $btn-bg-color url($sprite-path) no-repeat -43px -259px,
 	add-fav: $btn-bg-color url($sprite-path) no-repeat -43px -295px,
 	remove-fav: $btn-bg-color url($sprite-path) no-repeat -43px -329px,
 	action: $btn-bg-color url($sprite-path) no-repeat -43px -367px,
-	info: $btn-bg-color url($sprite-path) no-repeat -43px -403px
+	info: $btn-bg-color url($sprite-path) no-repeat -43px -403px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -280px -582px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -281px -546px,
+	dashboard-kioskmode-previous-page: $btn-bg-color url($sprite-path) no-repeat -246px -657px,
+	dashboard-kioskmode-next-page: $btn-bg-color url($sprite-path) no-repeat -244px -624px
 );
 
 // Dynamically generated classes:
 //  .btn-kiosk
-//  .btn-max
 //  .btn-min
 //  .btn-add-fav
 //  .btn-remove-fav
 //  .btn-action
 //  .btn-info
+//  .btn-dashboard-kioskmode-toggle-slideshow
+//  .btn-dashboard-kioskmode-previous-page
+//  .btn-dashboard-kioskmode-next-page
 @each $icon-btn, $bgimage in $icon-btn {
 	.btn-#{$icon-btn} {
 		background: $bgimage;
@@ -538,7 +539,7 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashbrd-conf {
+.btn-dashboard-conf {
 	background: url($sprite-path) no-repeat -354px -619px !important;
 }
 
@@ -872,7 +873,7 @@ a.link-action {
 	color: lighten($alt-yellow, 10%);
 }
 
-.dashbrd-widget-graph-link {
+.dashboard-widget-graph-link {
 	&:focus {
 		&::after {
 			background: $blue;

@@ -32,7 +32,7 @@ if ($data['is_resource_available']) {
 
 	$output['body'] = (new CDiv())
 		->addClass('flickerfreescreen')
-		->addItem((new CLink(null, $link_url))->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK))
+		->addItem((new CLink(null, $link_url))->addClass(ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK))
 		->toString();
 
 	$output['async_data'] = $data['widget'];

@@ -1425,7 +1425,6 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 7, 5);
 -- testPageDashboard Favorites
 INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (1,1,'web.favorite.sysmapids',1,'','sysmapid',1);
 INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (2,1,'web.favorite.graphids',519,'','graphid',1);
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (3,1,'web.favorite.screenids',16,'','screenid',1);
 
 -- testFormAdministrationUserGroups
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Selenium user group');
@@ -2579,9 +2578,6 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1056, 130, 'discovery', 'Test copy Discovery status', 9, 4, 4, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90267, 1056, 0, 'rf_rate', 900);
-
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1057, 130, 'favscreens', 'Test copy Favourite screens', 7, 4, 2, 2);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90268, 1057, 0, 'rf_rate', 30);
 
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1058, 130, 'graphprototype', 'Test copy Graph prototype', 0, 6, 13, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90269, 1058, 0, 'columns', 3);

@@ -18,6 +18,7 @@
 **/
 
 
+const WIDGET_NAVTREE_EVENT_MARK = 'mark';
 const WIDGET_NAVTREE_EVENT_SELECT = 'select';
 
 class CWidgetNavTree extends CWidget {
@@ -145,9 +146,8 @@ class CWidgetNavTree extends CWidget {
 				}
 
 				if (this._markTreeItemSelected(this._navtree_item_selected)) {
-					this._openBranch(this._navtree_item_selected);
 					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {
-						sysmapid: jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).data('sysmapid'),
+						sysmapid: this._navtree[this._navtree_item_selected].sysmapid,
 						itemid: this._navtree_item_selected
 					});
 				}
@@ -203,6 +203,7 @@ class CWidgetNavTree extends CWidget {
 					tree_item.classList.add('opened');
 
 					this._setTreeHandlers();
+					this._updateWidgetFields();
 
 					if (typeof old_addPopupValues === 'function') {
 						window.addPopupValues = old_addPopupValues;
@@ -246,13 +247,19 @@ class CWidgetNavTree extends CWidget {
 			select: (e) => {
 				const link = e.target;
 
-				const sysmapid = link.getAttribute('data-sysmapid');
 				const itemid = link.closest('.tree-item').getAttribute('data-id');
 
 				if (this._markTreeItemSelected(itemid)) {
-					updateUserProfile('web.dashbrd.navtree.item.selected', itemid, [this._widgetid]);
+					this._openBranch(this._navtree_item_selected);
 
-					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid});
+					updateUserProfile('web.dashbrd.navtree.item.selected', this._navtree_item_selected,
+						[this._widgetid]
+					);
+
+					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {
+						sysmapid: this._navtree[this._navtree_item_selected].sysmapid,
+						itemid: this._navtree_item_selected
+					});
 				}
 
 				e.preventDefault();
@@ -260,38 +267,21 @@ class CWidgetNavTree extends CWidget {
 
 			selectSubmap: (e) => {
 				if (e.detail.back) {
-					this._markTreeItemSelected(this._navtree[this._navtree_item_selected].parent);
+					if (e.detail.parent_itemid !== null) {
+						this._markTreeItemSelected(e.detail.parent_itemid);
+					}
 				}
 				else {
-					for (const [itemid, item] of Object.entries(this._navtree)) {
-						if (item.sysmapid == e.detail.sysmapid && item.parent == this._navtree_item_selected) {
-							if (this._markTreeItemSelected(itemid)) {
-								this._openBranch(this._navtree_item_selected);
-								break;
-							}
+					for (let [itemid, item] of Object.entries(this._navtree)) {
+						if (item.sysmapid != e.detail.sysmapid || item.parent != e.detail.parent_itemid) {
+							continue;
+						}
+
+						if (this._markTreeItemSelected(itemid)) {
+							this._openBranch(this._navtree_item_selected);
 						}
 					}
 				}
-			}
-		}
-	}
-
-	_activateEvents() {
-		super._activateEvents();
-
-		if (!this._is_edit_mode) {
-			for (const widget of this._maps) {
-				widget.on(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
-			}
-		}
-	}
-
-	_deactivateEvents() {
-		super._deactivateEvents();
-
-		if (!this._is_edit_mode) {
-			for (const widget of this._maps) {
-				widget.off(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
 			}
 		}
 	}
@@ -321,6 +311,12 @@ class CWidgetNavTree extends CWidget {
 				}
 			}
 		}
+
+		if (!this._is_edit_mode) {
+			for (const widget of this._maps) {
+				widget.on(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
+			}
+		}
 	}
 
 	_deactivateContentsEvents() {
@@ -346,6 +342,12 @@ class CWidgetNavTree extends CWidget {
 				for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
 					link.removeEventListener('click', this._events.select);
 				}
+			}
+		}
+
+		if (!this._is_edit_mode) {
+			for (const widget of this._maps) {
+				widget.off(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
 			}
 		}
 	}
@@ -718,7 +720,9 @@ class CWidgetNavTree extends CWidget {
 	_markTreeItemSelected(itemid) {
 		const selected_item = document.getElementById(`${this._unique_id}_tree-item-${itemid}`);
 
-		if (selected_item === null) {
+		const item = this._navtree[itemid];
+
+		if (item === undefined || selected_item === null || item === this._navtree_item_selected) {
 			return false;
 		}
 
@@ -734,6 +738,10 @@ class CWidgetNavTree extends CWidget {
 			step_in_path.classList.add('selected');
 			step_in_path = step_in_path.parentNode.closest('.tree-item');
 		}
+
+		updateUserProfile('web.dashbrd.navtree.item.selected', this._navtree_item_selected, [this._widgetid]);
+
+		this.fire(WIDGET_NAVTREE_EVENT_MARK, {itemid: this._navtree_item_selected});
 
 		return true;
 	};

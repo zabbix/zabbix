@@ -297,7 +297,7 @@ $dashboard-my-bg-color: #555555;
 	}
 }
 
-.dashbrd-navigation-tabs {
+.dashboard-navigation-tabs {
 	.csortable-list {
 		& > .csortable-item:focus:not(:active) {
 			& > div {
@@ -323,40 +323,37 @@ $dashboard-my-bg-color: #555555;
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.
 //   - Do not mix rules for widgets and iterators.
-.dashbrd-grid-new-widget-placeholder {
-	.dashbrd-grid-widget-new-box,
-	.dashbrd-grid-widget-set-position,
-	.dashbrd-grid-widget-set-size {
+
+.dashboard-widget-placeholder {
+	.dashboard-widget-placeholder-box {
 		box-shadow: none;
 		border-color: $font-color;
 		background-color: transparent;
 	}
 
-	.dashbrd-grid-widget-set-size {
-		border: 2px dashed $font-color;
-		box-shadow: none;
-	}
-
-	.dashbrd-grid-new-widget-label {
+	.dashboard-widget-placeholder-label {
 		&::before {
 			background: url($sprite-path) no-repeat -213px -888px;
 		}
 	}
-}
 
-.dashbrd-grid-widget-set-size {
-	.dashbrd-grid-new-widget-label {
-		&::before {
-			background: url($sprite-path) no-repeat -401px -888px;
+	.dashboard-widget-placeholder-resizing {
+		border: 2px dashed $font-color;
+		box-shadow: none;
+
+		.dashboard-widget-placeholder-label {
+			&::before {
+				background: url($sprite-path) no-repeat -401px -888px;
+			}
 		}
 	}
 }
 
-.dashbrd.dashbrd-is-edit-mode {
-	.dashbrd-grid-iterator {
+.dashboard.dashboard-is-edit-mode {
+	.dashboard-grid-iterator {
 		&.ui-resizable-resizing,
 		&.ui-draggable-dragging {
-			.dashbrd-grid-iterator-mask {
+			.dashboard-grid-iterator-mask {
 				border: 0;
 			}
 		}
@@ -439,7 +436,7 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashbrd-conf {
+.btn-dashboard-conf {
 	background: url($sprite-path) no-repeat -201px -619px !important;
 }
 
@@ -753,7 +750,7 @@ a.link-action {
 	color: darken($dark-yellow, 10%);
 }
 
-.dashbrd-widget-graph-link {
+.dashboard-widget-graph-link {
 	&:focus {
 		&::after {
 			background: $blue;

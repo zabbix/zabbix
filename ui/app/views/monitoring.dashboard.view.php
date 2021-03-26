@@ -99,19 +99,19 @@ $widget = (new CWidget())
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
 		(new CList())
-			->setId('dashbrd-control')
+			->setId('dashboard-control')
 			->addItem($main_filter_form)
-			->addItem((new CTag('nav', true, [
+			->addItem((new CTag('nav', true,
 				(new CList())
 					->addItem(
-						(new CButton('dashbrd-edit', _('Edit dashboard')))
+						(new CButton('dashboard-edit', _('Edit dashboard')))
 							->setEnabled($data['dashboard']['can_edit_dashboards'] && $data['dashboard']['editable'])
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
 						(new CButton('', '&nbsp;'))
 							->addClass(ZBX_STYLE_BTN_ACTION)
-							->setId('dashbrd-actions')
+							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
 							->setEnabled($data['dashboard']['can_edit_dashboards'])
 							->setAttribute('aria-haspopup', true)
@@ -120,29 +120,56 @@ $widget = (new CWidget())
 							))
 					)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-			]))->setAttribute('aria-label', _('Content controls')))
-			->addItem((new CListItem([
-				(new CTag('nav', true, [
-					new CList([
-						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
-						(new CList())
-							->addClass(ZBX_STYLE_BTN_SPLIT)
-							->addItem((new CButton('dashbrd-add-widget',
-								[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
-							))->addClass(ZBX_STYLE_BTN_ALT))
-							->addItem(
-								(new CButton('dashbrd-add', '&#8203;'))
-									->addClass(ZBX_STYLE_BTN_ALT)
-									->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
-							),
-						(new CButton('dashbrd-save', _('Save changes'))),
-						(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
-						''
-					])
-				]))
+			))->setAttribute('aria-label', _('Content controls')))
+			->addItem((new CListItem(
+				(new CTag('nav', true, new CList([
+					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
+					(new CList())
+						->addClass(ZBX_STYLE_BTN_SPLIT)
+						->addItem((new CButton('dashboard-add-widget',
+							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
+						))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem(
+							(new CButton('dashboard-add', '&#8203;'))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+						),
+					(new CButton('dashboard-save', _('Save changes'))),
+					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
+					''
+				])))
 					->setAttribute('aria-label', _('Content controls'))
-					->addClass(ZBX_STYLE_DASHBRD_EDIT)
-			]))->addStyle('display: none'))
+					->addClass(ZBX_STYLE_DASHBOARD_EDIT)
+			))->addStyle('display: none'))
+	)
+	->setKioskModeControls(
+		(count($data['dashboard']['pages']) > 1)
+			? (new CList())
+				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
+						->setTitle(_('Previous page'))
+				)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
+						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+							? _s('Stop slideshow')
+							: _s('Start slideshow')
+						)
+						->addClass(
+							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+								? 'slideshow-state-started'
+								: 'slideshow-state-stopped'
+						)
+				)
+				->addItem(
+					(new CSimpleButton(null))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
+						->setTitle(_('Previous page'))
+				)
+			: null
 	)
 	->setNavigation((new CList())->addItem(new CBreadcrumbs([
 		(new CSpan())->addItem(new CLink(_('All dashboards'),
@@ -169,59 +196,64 @@ if ($data['has_time_selector']) {
 	);
 }
 
-$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBRD);
+$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
 
 if (count($data['dashboard']['pages']) > 1) {
-	$dashboard->addClass(ZBX_STYLE_DASHBRD_IS_MULTIPAGE);
+	$dashboard->addClass(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE);
 }
+
 if ($data['dashboard']['dashboardid'] === null) {
-	$dashboard->addClass(ZBX_STYLE_DASHBRD_IS_EDIT_MODE);
+	$dashboard->addClass(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 }
 
 if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 	$dashboard->addItem(
 		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
+			->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION)
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_TABS))
 			->addItem(
 				(new CDiv())
-					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+					->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 					->addItem([
 						(new CSimpleButton())
-							->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+							->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
 							->addClass('btn-iterator-page-previous')
 							->setEnabled(false),
 						(new CSimpleButton())
-							->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+							->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
 							->addClass('btn-iterator-page-next')
 							->setEnabled(false),
-						(new CSimpleButton(
-							($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
-								? _s('Stop slideshow')
-								: _s('Start slideshow')
-						))
+						(new CSimpleButton([
+							(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
+							(new CSpan(_s('Stop slideshow')))->addClass('slideshow-state-started')
+						]))
 							->addClass(ZBX_STYLE_BTN_ALT)
-							->addClass(ZBX_STYLE_DASHBRD_TOGGLE_SLIDESHOW)
+							->addClass(ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW)
+							->addClass(
+								($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
+									? 'slideshow-state-started'
+									: 'slideshow-state-stopped'
+							)
 					])
 			)
 	);
 }
 
-$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID));
+$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
 
 $widget
 	->addItem($dashboard)
 	->show();
 
-(new CScriptTag(
-	'initializeView('.
-		json_encode($data['dashboard']).','.
-		json_encode($data['widget_defaults']).','.
-		json_encode($data['has_time_selector']).','.
-		json_encode($data['time_period']).','.
-		json_encode($data['dynamic']).','.
-		json_encode($web_layout_mode).
-	');'
-))
+(new CScriptTag('
+	initializeView(
+		'.json_encode($data['dashboard']).',
+		'.json_encode($data['widget_defaults']).',
+		'.json_encode($data['has_time_selector']).',
+		'.json_encode($data['time_period']).',
+		'.json_encode($data['dynamic']).',
+		'.json_encode($web_layout_mode).'
+	);
+'))
 	->setOnDocumentReady()
 	->show();

@@ -124,6 +124,7 @@ class CXmlExportWriter extends CExportWriter {
 			'message_templates' => 'message_template',
 			'operations' => 'operation',
 			'overrides' => 'override',
+			'pages' => 'page',
 			'parameters' => 'parameter',
 			'parameters' => 'parameter',
 			'posts' => 'post_field',

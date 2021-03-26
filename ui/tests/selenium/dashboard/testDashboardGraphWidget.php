@@ -22,8 +22,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  *
  * @on-before setDefaultWidgetType
  */
@@ -36,7 +35,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
@@ -166,7 +165,7 @@ class testDashboardGraphWidget extends CWebTest {
 		sleep(2);
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
-				'//button[@class="dialogue-widget-save"]')->one()->waitUntilClickable();
+				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
 
 		if (!is_array($data['error'])) {
 			$data['error'] = [$data['error']];
@@ -2227,7 +2226,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
-		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
 				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 

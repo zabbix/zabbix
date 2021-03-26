@@ -878,7 +878,7 @@ form {
 	vertical-align: top;
 
 	&:last-child {
-		.dashbrd-widget {
+		.dashboard-widget {
 			margin: 0 0 10px;
 		}
 	}
@@ -2063,7 +2063,11 @@ $icon-btn: (
 	add-fav: $btn-bg-color url($sprite-path) no-repeat -7px -295px,
 	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
 	action: $btn-bg-color url($sprite-path) no-repeat -7px -367px,
-	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px
+	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -432px -582px,
+	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -433px -546px,
+	dashboard-kioskmode-previous-page: $btn-bg-color url($sprite-path) no-repeat -398px -657px,
+	dashboard-kioskmode-next-page: $btn-bg-color url($sprite-path) no-repeat -396px -624px
 );
 
 // Dynamically generated classes:
@@ -2073,6 +2077,9 @@ $icon-btn: (
 //  .btn-remove-fav
 //  .btn-action
 //  .btn-info
+//  .btn-dashboard-kioskmode-toggle-slideshow
+//  .btn-dashboard-kioskmode-previous-page
+//  .btn-dashboard-kioskmode-next-page
 @each $icon-btn, $bgimage in $icon-btn {
 	.btn-#{$icon-btn} {
 		background: $bgimage;
@@ -2452,23 +2459,38 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashbrd-conf {
-	background: url($sprite-path) no-repeat -42px -619px;
-	@extend %btn-dashbrd;
-}
-
-.btn-dashbrd-normal {
-	box-shadow: 1px 1px 2px $action-shadow-color;
+.header-kioskmode-controls {
 	position: fixed;
-	right: 45px;
 	top: 5px;
-	opacity: 1;
+	right: 45px;
 	z-index: 1010;
+	display: flex;
 	transition: opacity 1s ease-out;
 
 	&.hidden {
 		opacity: 0;
 	}
+
+	& > li > ul {
+		margin-right: 10px;
+	}
+
+	ul {
+		display: flex;
+
+		li {
+			margin-right: 10px;
+		}
+	}
+}
+
+.btn-dashboard-conf {
+	background: url($sprite-path) no-repeat -42px -619px;
+	@extend %btn-dashboard;
+}
+
+.btn-dashboard-normal {
+	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
 %btn-widget {
@@ -2478,7 +2500,7 @@ $icon-widget-btn: (
 	@extend %btn-widget-defaults;
 }
 
-%btn-dashbrd {
+%btn-dashboard {
 	width: 24px;
 	height: 24px;
 	@extend %btn-widget-defaults;
@@ -2675,17 +2697,13 @@ $form-icon-btn: (
 }
 
 .drag-icon,
-.ui-draggable .dashbrd-widget-head,
-.dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
-.dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
+.ui-draggable .dashboard-widget-head {
 	@extend %cursor-drag;
 }
 
 .ui-draggable {
 	.drag-icon,
-	.dashbrd-widget-head,
-	.dashbrd-grid-widget-head,
-	.dashbrd-grid-iterator-head {
+	.dashboard-widget-head {
 		@extend %cursor-dragging;
 	}
 }
@@ -3141,11 +3159,11 @@ $form-icon-btn: (
 		border: 0;
 
 		th {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 
 		td {
-			@extend %dashbrd-widget-td;
+			@extend %dashboard-widget-td;
 		}
 	}
 
@@ -3164,7 +3182,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.dashbrd-widget-head {
+	.dashboard-widget-head {
 		margin: -10px -10px 6px;
 	}
 
@@ -3539,7 +3557,7 @@ $form-icon-btn: (
 .notif {
 	width: 250px;
 
-	.dashbrd-widget-head {
+	.dashboard-widget-head {
 		margin: -11px 0 7px -9px;
 		padding: 0;
 

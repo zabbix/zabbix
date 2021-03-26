@@ -78,17 +78,23 @@
 		const init = () => {
 			timeControl.refreshPage = false;
 
-			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBRD ?>'), {
+			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
 				containers: {
-					grid: document.querySelector('.<?= ZBX_STYLE_DASHBRD_GRID ?>'),
-					navigation: document.querySelector('.<?= ZBX_STYLE_DASHBRD_NAVIGATION ?>'),
-					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBRD_NAVIGATION_TABS ?>')
+					grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
+					navigation: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION ?>'),
+					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
 				},
-				buttons: {
-					previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBRD_PREVIOUS_PAGE ?>'),
-					next_page: document.querySelector('.<?= ZBX_STYLE_DASHBRD_NEXT_PAGE ?>'),
-					slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBRD_TOGGLE_SLIDESHOW ?>')
-				},
+				buttons: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>
+					? {
+						previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE?>'),
+						next_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE ?>'),
+						slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW ?>')
+					}
+					: {
+						previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE ?>'),
+						next_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NEXT_PAGE ?>'),
+						slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW ?>')
+					},
 				data: {
 					dashboardid: dashboard.dashboardid,
 					name: dashboard.name,
@@ -139,7 +145,7 @@
 				}
 				else {
 					document
-						.getElementById('dashbrd-edit')
+						.getElementById('dashboard-edit')
 						.addEventListener('click', () => {
 							ZABBIX.Dashboard.setEditMode();
 							edit();
@@ -171,29 +177,29 @@
 			clearMessages();
 
 			document
-				.querySelectorAll('#dashbrd-control > li')
+				.querySelectorAll('#dashboard-control > li')
 				.forEach((el) => {
 					el.style.display = (el.nextElementSibling === null) ? '' : 'none';
 				});
 
 			document
-				.getElementById('dashbrd-config')
+				.getElementById('dashboard-config')
 				.addEventListener('click', () => ZABBIX.Dashboard.editProperties());
 
 			document
-				.getElementById('dashbrd-add-widget')
+				.getElementById('dashboard-add-widget')
 				.addEventListener('click', () => ZABBIX.Dashboard.addNewWidget());
 
 			document
-				.getElementById('dashbrd-add')
+				.getElementById('dashboard-add')
 				.addEventListener('click', events.addClick);
 
 			document
-				.getElementById('dashbrd-save')
+				.getElementById('dashboard-save')
 				.addEventListener('click', () => save());
 
 			document
-				.getElementById('dashbrd-cancel')
+				.getElementById('dashboard-cancel')
 				.addEventListener('click', (e) => {
 					cancelEditing();
 					e.preventDefault();
@@ -242,9 +248,6 @@
 
 						location.replace(response.redirect);
 					}
-					else if ('errors' in response) {
-						addMessage(response.errors);
-					}
 				})
 				.catch((error) => {
 					if (typeof error === 'object' && 'html_string' in error) {
@@ -265,7 +268,7 @@
 		};
 
 		const updateBusy = () => {
-			document.getElementById('dashbrd-save').disabled = is_busy || is_busy_saving;
+			document.getElementById('dashboard-save').disabled = is_busy || is_busy_saving;
 		};
 
 		const cancelEditing = () => {

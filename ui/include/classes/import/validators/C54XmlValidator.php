@@ -1698,20 +1698,28 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 					'dashboards' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'dashboard', 'rules' => [
 						'dashboard' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'widgets' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
-								'widget' =>					['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_TYPE],
-									'name' =>					['type' => XML_STRING, 'default' => ''],
-									'x' =>						['type' => XML_STRING, 'default' => '0'],
-									'y' =>						['type' => XML_STRING, 'default' => '0'],
-									'width' =>					['type' => XML_STRING, 'default' => '1'],
-									'height' =>					['type' => XML_STRING, 'default' => '2'],
-									'hide_header' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'fields' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'field', 'rules' => [
-										'field' =>					['type' => XML_ARRAY, 'rules' => [
-											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
-											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateWidgetFieldValue'], 'ex_rules' => [$this, 'getWidgetFieldValueExtendedRules']]
+							'display_period' =>				['type' => XML_STRING, 'default' => '30'],
+							'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
+								'page' =>						['type' => XML_ARRAY, 'rules' => [
+									'name' =>						['type' => XML_STRING, 'default' => ''],
+									'display_period' =>				['type' => XML_STRING, 'default' => '0'],
+									'widgets' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
+										'widget' =>						['type' => XML_ARRAY, 'rules' => [
+											'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_TYPE],
+											'name' =>						['type' => XML_STRING, 'default' => ''],
+											'x' =>							['type' => XML_STRING, 'default' => '0'],
+											'y' =>							['type' => XML_STRING, 'default' => '0'],
+											'width' =>						['type' => XML_STRING, 'default' => '1'],
+											'height' =>						['type' => XML_STRING, 'default' => '2'],
+											'hide_header' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+											'fields' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'field', 'rules' => [
+												'field' =>						['type' => XML_ARRAY, 'rules' => [
+													'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
+													'name' =>						['type' => XML_STRING | XML_REQUIRED],
+													'value' =>						['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateWidgetFieldValue'], 'ex_rules' => [$this, 'getWidgetFieldValueExtendedRules']]
+												]]
+											]]
 										]]
 									]]
 								]]

@@ -33,7 +33,7 @@ class CWidgetElement extends CElement {
 	 * @return integer
 	 */
 	public function getRefreshInterval() {
-		$this->query('xpath://button[@class="btn-widget-action"]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath:.//button[@class="btn-widget-action"]')->waitUntilPresent()->one()->click(true);
 		$selected = $this->query('xpath://ul[@role="menu"]//a[contains(@aria-label, "selected")]')->one();
 		$aria_label = explode(', ', $selected->getAttribute('aria-label'), 3);
 
@@ -46,8 +46,8 @@ class CWidgetElement extends CElement {
 	 * @return string
 	 */
 	public function getHeaderText() {
-		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
-				' contains(@class, "dashbrd-grid-iterator-head")]/h4')->one()->getText();
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
+				' contains(@class, "dashboard-grid-iterator-head")]/h4')->one()->getText();
 	}
 
 	/**
@@ -56,8 +56,8 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content") or'.
-				' contains(@class, "dashbrd-grid-iterator-content")]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-content") or'.
+				' contains(@class, "dashboard-grid-iterator-content")]')->one();
 	}
 
 	/**

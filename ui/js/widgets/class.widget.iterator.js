@@ -25,14 +25,14 @@ class CWidgetIterator extends CWidget {
 
 		this._css_classes = {
 			...this._css_classes,
-			actions: 'dashbrd-grid-iterator-actions',
-			container: 'dashbrd-grid-iterator-container',
-			content: 'dashbrd-grid-iterator-content',
-			focus: 'dashbrd-grid-iterator-focus',
-			head: 'dashbrd-grid-iterator-head',
-			hidden_header: 'dashbrd-grid-iterator-hidden-header',
-			mask: 'dashbrd-grid-iterator-mask',
-			root: 'dashbrd-grid-iterator'
+			actions: 'dashboard-grid-iterator-actions',
+			container: 'dashboard-grid-iterator-container',
+			content: 'dashboard-grid-iterator-content',
+			focus: 'dashboard-grid-iterator-focus',
+			head: 'dashboard-grid-iterator-head',
+			hidden_header: 'dashboard-grid-iterator-hidden-header',
+			mask: 'dashboard-grid-iterator-mask',
+			root: 'dashboard-grid-iterator'
 		};
 
 		this._widgets = new Map();
@@ -271,7 +271,7 @@ class CWidgetIterator extends CWidget {
 			const widget = this._widgets.has(data.widgetid) ? this._widgets.get(data.widgetid) : this._addWidget(data);
 
 			this._alignToGrid(widget.getView(), index);
-			widget.setPosition(this._grid_pos[index], {is_managed: true});
+			widget.setPos(this._grid_pos[index], {is_managed: true});
 
 			if (widget.getState() !== WIDGET_STATE_ACTIVE) {
 				widget.activate();
@@ -314,10 +314,10 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
-	setPosition(pos, {is_managed = false} = {}) {
+	setPos(pos, {is_managed = false} = {}) {
 		const original_pos = {...this._pos};
 
-		super.setPosition(pos, {is_managed});
+		super.setPos(pos, {is_managed});
 
 		if (this._grid_pos.length > 0
 				&& this._pos.width == original_pos.width && this._pos.height == original_pos.height) {
@@ -355,13 +355,13 @@ class CWidgetIterator extends CWidget {
 		for (let index = 0; index < this._grid_pos.length; index++) {
 			if (index < this._widgets.size) {
 				const widget = widgets[index];
-				const widget_pos = widget.getPosition();
+				const widget_pos = widget.getPos();
 
 				this._alignToGrid(widget.getView(), index);
 
 				if (widget_pos.width != this._grid_pos[index].width
 						|| widget_pos.height != this._grid_pos[index].height) {
-					widget.setPosition(this._grid_pos[index], {is_managed: true});
+					widget.setPos(this._grid_pos[index], {is_managed: true});
 					widget.resize();
 				}
 			}
@@ -418,7 +418,7 @@ class CWidgetIterator extends CWidget {
 		const placeholder = document.createElement('div');
 
 		placeholder.appendChild(document.createElement('div'));
-		placeholder.classList.add('dashbrd-grid-iterator-placeholder');
+		placeholder.classList.add('dashboard-grid-iterator-placeholder');
 
 		for (let index = this._widgets.size; index < this._grid_pos.length; index++) {
 			const placeholder_clone = placeholder.cloneNode(true);
@@ -491,7 +491,7 @@ class CWidgetIterator extends CWidget {
 		this._target.style.minHeight = null;
 
 		this._pager = document.createElement('div');
-		this._pager.classList.add('dashbrd-grid-iterator-pager');
+		this._pager.classList.add('dashboard-grid-iterator-pager');
 
 		this._button_previous_page = document.createElement('button');
 		this._button_previous_page.type = 'button';
@@ -500,7 +500,7 @@ class CWidgetIterator extends CWidget {
 		this._pager.appendChild(this._button_previous_page);
 
 		this._pager_stats = document.createElement('span');
-		this._pager_stats.classList.add('dashbrd-grid-iterator-pager-info');
+		this._pager_stats.classList.add('dashboard-grid-iterator-pager-info');
 		this._pager.appendChild(this._pager_stats);
 
 		this._button_next_page = document.createElement('button');
@@ -512,7 +512,7 @@ class CWidgetIterator extends CWidget {
 		this._content_header.insertBefore(this._pager, this._actions);
 
 		this._too_small = document.createElement('div');
-		this._too_small.classList.add('dashbrd-grid-iterator-too-small');
+		this._too_small.classList.add('dashboard-grid-iterator-too-small');
 
 		const too_small_content = document.createElement('div');
 
@@ -535,7 +535,7 @@ class CWidgetIterator extends CWidget {
 					widget.enter();
 
 					if (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
-						this._target.classList.toggle('iterator-double-header', widget.getPosition().y == 0);
+						this._target.classList.toggle('iterator-double-header', widget.getPos().y == 0);
 					}
 				}
 			},
@@ -549,7 +549,7 @@ class CWidgetIterator extends CWidget {
 			},
 
 			iteratorEnter: (e) => {
-				if (e.target.closest('.dashbrd-grid-iterator-placeholder') !== null) {
+				if (e.target.closest('.dashboard-grid-iterator-placeholder') !== null) {
 					this._target.classList.remove('iterator-double-header');
 				}
 			},

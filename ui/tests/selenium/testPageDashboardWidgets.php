@@ -39,7 +39,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Opening edit widget form.
 		$form_system_info = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form_system_info->getField('Type')->getValue());
-		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
+		$form_system_info->submit();
 		// Check that widget type isn't changed in frontend and in DB.
 		$this->checkLastSelectedWidgetType();
 
@@ -53,7 +53,7 @@ class testPageDashboardWidgets extends CWebTest {
 			'Show tags' => 'None'
 		];
 		$form_problems->fill($data);
-		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
+		$form_problems->submit();
 		$this->checkLastSelectedWidgetType();
 
 		// Add widget with current default type "Action log".
@@ -110,7 +110,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Save edit widget form without changing widget type.
 		$sys_info_form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $sys_info_form->getField('Type')->getValue());
-		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
+		$sys_info_form->submit();
 		$this->page->waitUntilReady();
 		// Check that widget type is still remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
@@ -221,7 +221,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$owner->select('test-user');
 		// Change dashboard name.
 		$configuration->getField('Name')->clear()->type('Dashboard create test');
-		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
+		$configuration->submit();
 
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
@@ -241,7 +241,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$overlay->waitUntilReady();
 		// Set name of widget.
 		$form->getField('Name')->type('Clock test');
-		$this->query('xpath://div[@role="dialog"]//button[text()="Add"]')->waitUntilPresent()->one()->click();
+		$form->submit();
 
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
@@ -289,7 +289,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Change show option.
 		$form->getField('Show')->select('Host groups');
 		// Submit the form.
-		$this->query('xpath://div[@role="dialog"]//button[text()="Apply"]')->waitUntilPresent()->one()->click();
+		$form->submit();
 
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();

@@ -1215,7 +1215,30 @@ class CConfigurationExportBuilder {
 		foreach ($dashboards as $dashboard) {
 			$result[] = [
 				'name' => $dashboard['name'],
-				'widgets' => $this->formatWidgets($dashboard['widgets'])
+				'display_period' => $dashboard['display_period'],
+				'auto_start' => $dashboard['auto_start'],
+				'pages' => $this->formatDashboardPages($dashboard['pages'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format dashboard pages.
+	 *
+	 * @param array $dashboard_pages
+	 *
+	 * @return array
+	 */
+	protected function formatDashboardPages(array $dashboard_pages) {
+		$result = [];
+
+		foreach ($dashboard_pages as $dashboard_page) {
+			$result[] = [
+				'name' => $dashboard_page['name'],
+				'display_period' => $dashboard_page['display_period'],
+				'widgets' => $this->formatWidgets($dashboard_page['widgets'])
 			];
 		}
 
