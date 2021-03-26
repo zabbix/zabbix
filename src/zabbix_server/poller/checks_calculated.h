@@ -25,5 +25,6 @@
 #include "sysinfo.h"
 
 int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result);
+int	calc_find_dcitem_by_itemid(const void *d1, const void *d2);
 
 #endif

@@ -156,7 +156,6 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 
 	switch (type)
 	{
-		case ITEM_TYPE_AGGREGATE:
 		case ITEM_TYPE_CALCULATED:
 			ret = SUCCEED;
 			break;
@@ -229,7 +228,6 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 
 			return ZBX_POLLER_TYPE_NORMAL;
 		case ITEM_TYPE_CALCULATED:
-		case ITEM_TYPE_AGGREGATE:
 		case ITEM_TYPE_INTERNAL:
 			if (0 == CONFIG_HISTORYPOLLER_FORKS)
 				break;
@@ -12698,20 +12696,22 @@ void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zb
  * Purpose: gets nested group ids for the specified host groups               *
  *                                                                            *
  * Parameter: groups          - [IN] the parent group names                   *
+ *            groups_num      - [IN] the number of parent groups              *
  *            nested_groupids - [OUT] the nested + parent group ids           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_nested_hostgroupids_by_names(zbx_vector_str_t *groups, zbx_vector_uint64_t *nested_groupids)
+void	zbx_dc_get_nested_hostgroupids_by_names(const char **groups, int groups_num,
+		zbx_vector_uint64_t *nested_groupids)
 {
 	int	i, index;
 
 	WRLOCK_CACHE;
 
-	for (i = 0; i < groups->values_num; i++)
+	for (i = 0; i < groups_num; i++)
 	{
 		zbx_dc_hostgroup_t	group_local, *group;
 
-		group_local.name = groups->values[i];
+		group_local.name = groups[i];
 
 		if (FAIL != (index = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local,
 				dc_compare_hgroups)))
@@ -12725,6 +12725,66 @@ void	zbx_dc_get_nested_hostgroupids_by_names(zbx_vector_str_t *groups, zbx_vecto
 
 	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_hostids_by_group_name                                 *
+ *                                                                            *
+ * Purpose: gets hostids belonging to the group and its nested groups         *
+ *                                                                            *
+ * Parameter: name    - [IN] the group name                                   *
+ *            hostids - [OUT] the hostids                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids)
+{
+	int			i, index;
+	zbx_vector_uint64_t	groupids;
+	zbx_dc_hostgroup_t	group_local, *group;
+
+	zbx_vector_uint64_create(&groupids);
+
+	group_local.name = name;
+
+	WRLOCK_CACHE;
+
+	if (FAIL != (index = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local, dc_compare_hgroups)))
+	{
+		group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
+		dc_get_nested_hostgroupids(group->groupid, &groupids);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < groupids.values_num; i++)
+	{
+		zbx_hashset_iter_t	iter;
+		zbx_uint64_t		*phostid;
+
+		if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups,
+				&groupids.values[i])))
+		{
+			continue;
+		}
+
+		zbx_hashset_iter_reset(&group->hostids, &iter);
+
+		while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+			zbx_vector_uint64_append(hostids, *phostid);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&groupids);
+
+	zbx_vector_uint64_sort(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -13555,6 +13615,15 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 
 		zbx_get_item_tags(dc_function->itemid, item_tags);
 	}
+
+	UNLOCK_CACHE;
+}
+
+void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
+{
+	RDLOCK_CACHE;
+
+	zbx_get_item_tags(itemid, item_tags);
 
 	UNLOCK_CACHE;
 }

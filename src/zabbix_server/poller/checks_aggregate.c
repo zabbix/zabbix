@@ -21,15 +21,44 @@
 #include "log.h"
 #include "valuecache.h"
 #include "dbcache.h"
+#include "checks_calculated.h"
 
 #include "checks_aggregate.h"
 
-#define ZBX_VALUE_FUNC_MIN	0
-#define ZBX_VALUE_FUNC_AVG	1
-#define ZBX_VALUE_FUNC_MAX	2
-#define ZBX_VALUE_FUNC_SUM	3
-#define ZBX_VALUE_FUNC_COUNT	4
-#define ZBX_VALUE_FUNC_LAST	5
+#define ZBX_VALUE_FUNC_UNKNOWN	0
+#define ZBX_VALUE_FUNC_MIN	1
+#define ZBX_VALUE_FUNC_AVG	2
+#define ZBX_VALUE_FUNC_MAX	3
+#define ZBX_VALUE_FUNC_SUM	4
+#define ZBX_VALUE_FUNC_COUNT	5
+#define ZBX_VALUE_FUNC_LAST	6
+
+
+#define MATCH_STRING(x, name, len)	ZBX_CONST_STRLEN(x) == len && 0 == memcmp(name, x, len)
+
+static int	get_function_by_name(const char *name, size_t len)
+{
+
+	if (MATCH_STRING("avg_foreach", name, len))
+		return ZBX_VALUE_FUNC_AVG;
+
+	if (MATCH_STRING("count_foreach", name, len))
+		return ZBX_VALUE_FUNC_COUNT;
+
+	if (MATCH_STRING("last_foreach", name, len))
+		return ZBX_VALUE_FUNC_LAST;
+
+	if (MATCH_STRING("max_foreach", name, len))
+		return ZBX_VALUE_FUNC_MAX;
+
+	if (MATCH_STRING("min_foreach", name, len))
+		return ZBX_VALUE_FUNC_MIN;
+
+	if (MATCH_STRING("sum_foreach", name, len))
+		return ZBX_VALUE_FUNC_SUM;
+
+	return ZBX_VALUE_FUNC_UNKNOWN;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -43,23 +72,25 @@
  *             result      - [OUT] the resulting value                        *
  *                                                                            *
  ******************************************************************************/
-static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int value_type, history_value_t *result)
+static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int value_type, double *result)
 {
 	int	i;
 
-	*result = values->values[0].value;
-
 	if (ITEM_VALUE_TYPE_UINT64 == value_type)
 	{
+		*result = (double)values->values[0].value.ui64;
+
 		for (i = 1; i < values->values_num; i++)
-			if (values->values[i].value.ui64 < result->ui64)
-				result->ui64 = values->values[i].value.ui64;
+			if ((double)values->values[i].value.ui64 < *result)
+				*result = (double)values->values[i].value.ui64;
 	}
 	else
 	{
+		*result = values->values[0].value.dbl;
+
 		for (i = 1; i < values->values_num; i++)
-			if (values->values[i].value.dbl < result->dbl)
-				result->dbl = values->values[i].value.dbl;
+			if (values->values[i].value.dbl < *result)
+				*result = values->values[i].value.dbl;
 	}
 }
 
@@ -75,23 +106,25 @@ static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int v
  *             result      - [OUT] the resulting value                        *
  *                                                                            *
  ******************************************************************************/
-static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int value_type, history_value_t *result)
+static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int value_type, double *result)
 {
 	int	i;
 
-	*result = values->values[0].value;
-
 	if (ITEM_VALUE_TYPE_UINT64 == value_type)
 	{
+		*result = (double)values->values[0].value.ui64;
+
 		for (i = 1; i < values->values_num; i++)
-			if (values->values[i].value.ui64 > result->ui64)
-				result->ui64 = values->values[i].value.ui64;
+			if ((double)values->values[i].value.ui64 > *result)
+				*result = (double)values->values[i].value.ui64;
 	}
 	else
 	{
+		*result = values->values[0].value.dbl;
+
 		for (i = 1; i < values->values_num; i++)
-			if (values->values[i].value.dbl > result->dbl)
-				result->dbl = values->values[i].value.dbl;
+			if (values->values[i].value.dbl > *result)
+				*result = values->values[i].value.dbl;
 	}
 }
 
@@ -107,21 +140,21 @@ static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int v
  *             result      - [OUT] the resulting value                        *
  *                                                                            *
  ******************************************************************************/
-static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int value_type, history_value_t *result)
+static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int value_type, double *result)
 {
 	int	i;
 
+	*result = 0;
+
 	if (ITEM_VALUE_TYPE_UINT64 == value_type)
 	{
-		result->ui64 = 0;
 		for (i = 0; i < values->values_num; i++)
-			result->ui64 += values->values[i].value.ui64;
+			*result += (double)values->values[i].value.ui64;
 	}
 	else
 	{
-		result->dbl = 0;
 		for (i = 0; i < values->values_num; i++)
-			result->dbl += values->values[i].value.dbl;
+			*result += values->values[i].value.dbl;
 	}
 }
 
@@ -137,14 +170,10 @@ static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int v
  *             result      - [OUT] the resulting value                        *
  *                                                                            *
  ******************************************************************************/
-static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int value_type, history_value_t *result)
+static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int value_type, double *result)
 {
 	evaluate_history_func_sum(values, value_type, result);
-
-	if (ITEM_VALUE_TYPE_UINT64 == value_type)
-		result->ui64 /= values->values_num;
-	else
-		result->dbl /= values->values_num;
+	*result /= values->values_num;
 }
 
 /******************************************************************************
@@ -159,13 +188,9 @@ static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int v
  *             result      - [OUT] the resulting value                        *
  *                                                                            *
  ******************************************************************************/
-static void	evaluate_history_func_count(zbx_vector_history_record_t *values, int value_type,
-		history_value_t *result)
+static void	evaluate_history_func_count(zbx_vector_history_record_t *values, double *result)
 {
-	if (ITEM_VALUE_TYPE_UINT64 == value_type)
-		result->ui64 = values->values_num;
-	else
-		result->dbl = values->values_num;
+	*result = (double)values->values_num;
 }
 
 /******************************************************************************
@@ -178,9 +203,12 @@ static void	evaluate_history_func_count(zbx_vector_history_record_t *values, int
  *             result      - [OUT] the resulting value                        *
  *                                                                            *
  ******************************************************************************/
-static void	evaluate_history_func_last(zbx_vector_history_record_t *values, history_value_t *result)
+static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int value_type, double *result)
 {
-	*result = values->values[0].value;
+	if (ITEM_VALUE_TYPE_UINT64 == value_type)
+		*result = (double)values->values[0].value.ui64;
+	else
+		*result = values->values[0].value.dbl;
 }
 
 /******************************************************************************
@@ -201,7 +229,7 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, hist
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func(zbx_vector_history_record_t *values, int value_type, int func,
-		history_value_t *result)
+		double *result)
 {
 	switch (func)
 	{
@@ -218,162 +246,34 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
 			evaluate_history_func_sum(values, value_type, result);
 			break;
 		case ZBX_VALUE_FUNC_COUNT:
-			evaluate_history_func_count(values, value_type, result);
+			evaluate_history_func_count(values, result);
 			break;
 		case ZBX_VALUE_FUNC_LAST:
-			evaluate_history_func_last(values, result);
+			evaluate_history_func_last(values, value_type, result);
 			break;
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: quote_string                                                     *
+ * Function: calc_get_item                                                    *
  *                                                                            *
- * Purpose: quotes string by enclosing it in double quotes and escaping       *
- *          double quotes inside string with '\'.                             *
+ * Purpose: get item from cache by itemid                                     *
  *                                                                            *
- * Parameters: str    - [IN/OUT] the string to quote                          *
- *             sz_str - [IN] the string length                                *
+ * Parameters: eval    - [IN] the evaluation data                             *
+ *             itemid  - [IN] the item identifier                             *
  *                                                                            *
- * Comments: The '\' character itself is not quoted. As the result if string  *
- *           ends with '\' it can be quoted (for example for error messages), *
- *           but it's impossible to unquote it.                               *
+ * Return value: The cached item.                                             *
  *                                                                            *
  ******************************************************************************/
-static void	quote_string(char **str, size_t sz_src)
+DC_ITEM	*get_dcitem(zbx_vector_ptr_t *dcitem_refs, zbx_uint64_t itemid)
 {
-	size_t	sz_dst;
+	int	index;
 
-	sz_dst = zbx_get_escape_string_len(*str, "\"") + 3;
+	if (FAIL == (index = zbx_vector_ptr_bsearch(dcitem_refs, &itemid, calc_find_dcitem_by_itemid)))
+		return NULL;
 
-	*str = (char *)zbx_realloc(*str, sz_dst);
-
-	(*str)[--sz_dst] = '\0';
-	(*str)[--sz_dst] = '"';
-
-	while (0 < sz_src)
-	{
-		(*str)[--sz_dst] = (*str)[--sz_src];
-
-		if ('"' == (*str)[sz_src])
-			(*str)[--sz_dst] = '\\';
-	}
-	(*str)[--sz_dst] = '"';
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: aggregate_quote_groups                                           *
- *                                                                            *
- * Purpose: quotes the individual groups in the list if necessary             *
- *                                                                            *
- ******************************************************************************/
-static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_offset, zbx_vector_str_t *groups)
-{
-	int	i;
-	char	*group, *separator = "";
-
-	for (i = 1; i <= groups->values_num; i++)
-	{
-		group = zbx_strdup(NULL, groups->values[i - 1]);
-		zbx_strcpy_alloc(str, str_alloc, str_offset, separator);
-		separator = (char *)", ";
-
-		quote_string(&group, strlen(group));
-		zbx_strcpy_alloc(str, str_alloc, str_offset, group);
-		zbx_free(group);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: aggregate_get_items                                              *
- *                                                                            *
- * Purpose: get array of items specified by key for selected groups           *
- *          (including nested groups)                                         *
- *                                                                            *
- * Parameters: itemids - [OUT] list of item ids                               *
- *             groups  - [IN] list of host groups                             *
- *             itemkey - [IN] item key to aggregate                           *
- *             error   - [OUT] the error message                              *
- *                                                                            *
- * Return value: SUCCEED - item identifier(s) were retrieved successfully     *
- *               FAIL    - no items matching the specified groups or keys     *
- *                                                                            *
- ******************************************************************************/
-static int	aggregate_get_items(zbx_vector_uint64_t *itemids, zbx_vector_str_t *groups, const char *itemkey,
-		char **error)
-{
-	char			*esc;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		itemid;
-	char			*sql = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0, error_alloc = 0, error_offset = 0;
-	int			ret = FAIL;
-	zbx_vector_uint64_t	groupids;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemkey:'%s'", __func__, itemkey);
-
-	zbx_vector_uint64_create(&groupids);
-	zbx_dc_get_nested_hostgroupids_by_names(groups, &groupids);
-
-	if (0 == groupids.values_num)
-	{
-		zbx_strcpy_alloc(error, &error_alloc, &error_offset, "None of the groups in list ");
-		aggregate_quote_groups(error, &error_alloc, &error_offset, groups);
-		zbx_strcpy_alloc(error, &error_alloc, &error_offset, " is correct.");
-		goto out;
-	}
-
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-	esc = DBdyn_escape_string(itemkey);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct i.itemid"
-			" from items i,hosts h,hosts_groups hg,item_rtdata ir"
-			" where i.hostid=h.hostid"
-				" and h.hostid=hg.hostid"
-				" and i.key_='%s'"
-				" and i.status=%d"
-				" and ir.itemid=i.itemid"
-				" and ir.state=%d"
-				" and h.status=%d"
-				" and",
-			esc, ITEM_STATUS_ACTIVE, ITEM_STATE_NORMAL, HOST_STATUS_MONITORED);
-
-	zbx_free(esc);
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values, groupids.values_num);
-	result = DBselect("%s", sql);
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		zbx_vector_uint64_append(itemids, itemid);
-	}
-	DBfree_result(result);
-
-	if (0 == itemids->values_num)
-	{
-		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "No items for key \"%s\" in group(s) ", itemkey);
-		aggregate_quote_groups(error, &error_alloc, &error_offset, groups);
-		zbx_chrcpy_alloc(error, &error_alloc, &error_offset, '.');
-		goto out;
-	}
-
-	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	ret = SUCCEED;
-
-out:
-	zbx_vector_uint64_destroy(&groupids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
+	return dcitem_refs->values[index];
 }
 
 /******************************************************************************
@@ -391,262 +291,109 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_aggregate(const DC_ITEM *item, AGENT_RESULT *res, int grp_func, zbx_vector_str_t *groups,
-		const char *itemkey, int item_func, const char *param)
+int	evaluate_aggregate(zbx_vector_uint64_t *itemids, zbx_vector_ptr_t *dcitem_refs, const zbx_timespec_t *ts,
+		const char *func_name, size_t len, int args_num, const zbx_variant_t *args, zbx_variant_t *value,
+		char **error)
 {
-	zbx_vector_uint64_t		itemids;
-	history_value_t			value, item_result;
-	zbx_history_record_t		group_value;
-	int				ret = FAIL, *errcodes = NULL, i, count, seconds;
-	DC_ITEM				*items = NULL;
-	zbx_vector_history_record_t	values, group_values;
-	char				*error = NULL;
-	zbx_timespec_t			ts;
+	int				ret = FAIL, i, count, seconds, item_func;
+	zbx_vector_history_record_t	values;
+	zbx_vector_dbl_t		*results;
+	double				result;
+	zbx_variant_t			arg;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d itemkey:'%s' item_func:%d param:'%s'",
-			__func__, grp_func, itemkey, item_func, ZBX_NULL2STR(param));
-
-	zbx_timespec(&ts);
-	zbx_vector_uint64_create(&itemids);
-
-	if (FAIL == aggregate_get_items(&itemids, groups, itemkey, &error))
+	if (ZBX_VALUE_FUNC_UNKNOWN == (item_func = get_function_by_name(func_name, len)))
 	{
-		SET_MSG_RESULT(res, error);
-		goto clean1;
+		*error = zbx_strdup(NULL, "unsupported function");
+		return FAIL;
 	}
-
-	memset(&value, 0, sizeof(value));
-	zbx_history_record_vector_create(&group_values);
-
-	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
-	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * itemids.values_num);
-
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
 	if (ZBX_VALUE_FUNC_LAST == item_func)
 	{
+		if (0 != args_num)
+		{
+			*error = zbx_strdup(NULL, "invalid number of function parameters");
+			return FAIL;
+		}
+
 		count = 1;
 		seconds = 0;
 	}
 	else
 	{
-		if (FAIL == is_time_suffix(param, &seconds, ZBX_LENGTH_UNLIMITED))
+		if (1 != args_num)
 		{
-			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter."));
-			goto clean2;
+			*error = zbx_strdup(NULL, "invalid number of function parameters");
+			return FAIL;
 		}
-		count = 0;
+
+		if (ZBX_VARIANT_STR == args[0].type)
+		{
+			if (FAIL == is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+			{
+				*error = zbx_strdup(NULL, "invalid second parameter");
+				goto out;
+			}
+		}
+		else
+		{
+			zbx_variant_copy(&arg, &args[0]);
+
+			if (SUCCEED != zbx_variant_convert(&arg, ZBX_VARIANT_DBL))
+			{
+				zbx_variant_clear(&arg);
+				*error = zbx_strdup(NULL, "invalid second parameter");
+				return FAIL;
+			}
+
+			seconds = arg.data.dbl;
+			zbx_variant_clear(&arg);
+		}
 	}
 
-	for (i = 0; i < itemids.values_num; i++)
+	results = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
+	zbx_vector_dbl_create(results);
+
+	for (i = 0; i < itemids->values_num; i++)
 	{
-		if (SUCCEED != errcodes[i])
+		DC_ITEM	*dcitem;
+
+		if (NULL == (dcitem = get_dcitem(dcitem_refs, itemids->values[i])))
 			continue;
 
-		if (ITEM_STATUS_ACTIVE != items[i].status)
+		if (ITEM_STATUS_ACTIVE != dcitem->status)
 			continue;
 
-		if (HOST_STATUS_MONITORED != items[i].host.status)
+		if (HOST_STATUS_MONITORED != dcitem->host.status)
 			continue;
 
-		if (ITEM_VALUE_TYPE_FLOAT != items[i].value_type && ITEM_VALUE_TYPE_UINT64 != items[i].value_type)
+		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
 			continue;
 
 		zbx_history_record_vector_create(&values);
 
-		if (SUCCEED == zbx_vc_get_values(items[i].itemid, items[i].value_type, &values, seconds, count, &ts) &&
+		if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts) &&
 				0 < values.values_num)
 		{
-			evaluate_history_func(&values, items[i].value_type, item_func, &item_result);
-
-			if (item->value_type == items[i].value_type)
-				group_value.value = item_result;
-			else
-			{
-				if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-					group_value.value.ui64 = (zbx_uint64_t)item_result.dbl;
-				else
-					group_value.value.dbl = (double)item_result.ui64;
-			}
-
-			zbx_vector_history_record_append_ptr(&group_values, &group_value);
+			evaluate_history_func(&values, dcitem->value_type, item_func, &result);
+			zbx_vector_dbl_append(results, result);
 		}
 
-		zbx_history_record_vector_destroy(&values, items[i].value_type);
+		zbx_history_record_vector_destroy(&values, dcitem->value_type);
 	}
 
-	if (0 == group_values.values_num)
+	if (0 == results->values_num)
 	{
-		char	*tmp = NULL;
-		size_t	tmp_alloc = 0, tmp_offset = 0;
+		zbx_vector_dbl_destroy(results);
+		zbx_free(results);
 
-		aggregate_quote_groups(&tmp, &tmp_alloc, &tmp_offset, groups);
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key \"%s\" in group(s) %s.", itemkey, tmp));
-		zbx_free(tmp);
-
-		goto clean2;
-	}
-
-	evaluate_history_func(&group_values, item->value_type, grp_func, &value);
-
-	if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-		SET_DBL_RESULT(res, value.dbl);
-	else
-		SET_UI64_RESULT(res, value.ui64);
-
-	ret = SUCCEED;
-clean2:
-	DCconfig_clean_items(items, errcodes, itemids.values_num);
-
-	zbx_free(errcodes);
-	zbx_free(items);
-	zbx_history_record_vector_destroy(&group_values, item->value_type);
-clean1:
-	zbx_vector_uint64_destroy(&itemids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_value_aggregate                                              *
- *                                                                            *
- * Purpose: retrieve data from Zabbix server (aggregate items)                *
- *                                                                            *
- * Parameters: item - item we are interested in                               *
- *                                                                            *
- * Return value: SUCCEED - data successfully retrieved and stored in result   *
- *                         and result_str (as string)                         *
- *               NOTSUPPORTED - requested item is not supported               *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-int	get_value_aggregate(const DC_ITEM *item, AGENT_RESULT *result)
-{
-	AGENT_REQUEST		request;
-	int			ret = NOTSUPPORTED;
-	const char		*tmp, *groups, *itemkey, *funcp = NULL;
-	int			grp_func, item_func, params_num;
-	zbx_vector_str_t	group_names;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key_orig);
-
-	init_request(&request);
-	zbx_vector_str_create(&group_names);
-
-	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Value type must be Numeric for aggregate items"));
+		*error = zbx_strdup(NULL, "no data for query");
 		goto out;
 	}
 
-	if (SUCCEED != parse_item_key(item->key, &request))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
-		goto out;
-	}
-
-	if (0 == strcmp(get_rkey(&request), "grpmin"))
-	{
-		grp_func = ZBX_VALUE_FUNC_MIN;
-	}
-	else if (0 == strcmp(get_rkey(&request), "grpavg"))
-	{
-		grp_func = ZBX_VALUE_FUNC_AVG;
-	}
-	else if (0 == strcmp(get_rkey(&request), "grpmax"))
-	{
-		grp_func = ZBX_VALUE_FUNC_MAX;
-	}
-	else if (0 == strcmp(get_rkey(&request), "grpsum"))
-	{
-		grp_func = ZBX_VALUE_FUNC_SUM;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key."));
-		goto out;
-	}
-
-	params_num = get_rparams_num(&request);
-
-	if (3 > params_num || params_num > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	groups = get_rparam(&request, 0);
-	itemkey = get_rparam(&request, 1);
-	tmp = get_rparam(&request, 2);
-
-	if (REQUEST_PARAMETER_TYPE_ARRAY == get_rparam_type(&request, 0))
-	{
-		int				i, groups_num;
-		char				*group;
-		zbx_request_parameter_type_t	type;
-
-		groups_num = num_param(groups);
-
-		for (i = 1; i <= groups_num; i++)
-		{
-			if (NULL == (group = get_param_dyn(groups, i, &type)))
-				continue;
-
-			zbx_vector_str_append(&group_names, group);
-
-			if (REQUEST_PARAMETER_TYPE_STRING != type)
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid host group list: %s", groups));
-				goto out;
-			}
-		}
-	}
-	else
-		zbx_vector_str_append(&group_names, zbx_strdup(NULL, groups));
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Host groups: '%s', Item key: '%s', Item function: '%s'", groups, itemkey, tmp);
-
-	if (0 == strcmp(tmp, "min"))
-		item_func = ZBX_VALUE_FUNC_MIN;
-	else if (0 == strcmp(tmp, "avg"))
-		item_func = ZBX_VALUE_FUNC_AVG;
-	else if (0 == strcmp(tmp, "max"))
-		item_func = ZBX_VALUE_FUNC_MAX;
-	else if (0 == strcmp(tmp, "sum"))
-		item_func = ZBX_VALUE_FUNC_SUM;
-	else if (0 == strcmp(tmp, "count"))
-		item_func = ZBX_VALUE_FUNC_COUNT;
-	else if (0 == strcmp(tmp, "last"))
-		item_func = ZBX_VALUE_FUNC_LAST;
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	if (4 == params_num)
-	{
-		funcp = get_rparam(&request, 3);
-	}
-	else if (3 == params_num && ZBX_VALUE_FUNC_LAST != item_func)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	if (SUCCEED != evaluate_aggregate(item, result, grp_func, &group_names, itemkey, item_func, funcp))
-		goto out;
+	zbx_variant_set_dbl_vector(value, results);
 
 	ret = SUCCEED;
 out:
-	zbx_vector_str_clear_ext(&group_names, zbx_str_free);
-	zbx_vector_str_destroy(&group_names);
-	free_request(&request);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

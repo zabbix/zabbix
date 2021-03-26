@@ -20,9 +20,10 @@
 #ifndef ZABBIX_CHECKS_AGGREGATE_H
 #define ZABBIX_CHECKS_AGGREGATE_H
 
-#include "dbcache.h"
-#include "sysinfo.h"
+#include "common.h"
 
-extern	int	get_value_aggregate(const DC_ITEM *item, AGENT_RESULT *result);
+int	evaluate_aggregate(zbx_vector_uint64_t *itemids, zbx_vector_ptr_t *dcitem_refs, const zbx_timespec_t *ts,
+		const char *func_name, size_t len, int args_num, const zbx_variant_t *args, zbx_variant_t *value,
+		char **error);
 
 #endif

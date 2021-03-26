@@ -163,9 +163,6 @@ int	zbx_mock_str_to_item_type(const char *str)
 	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX_ACTIVE"))
 		return ITEM_TYPE_ZABBIX_ACTIVE;
 
-	if (0 == strcmp(str, "ITEM_TYPE_AGGREGATE"))
-		return ITEM_TYPE_AGGREGATE;
-
 	if (0 == strcmp(str, "ITEM_TYPE_HTTPTEST"))
 		return ITEM_TYPE_HTTPTEST;
 
