@@ -274,6 +274,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		$dialogue = $dashboard->edit()->addWidget();
 		$form = $dialogue->asForm();
 		$form->fill($data['fields']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$form->submit();
 		$this->page->waitUntilReady();
 
