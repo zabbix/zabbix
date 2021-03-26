@@ -22,7 +22,6 @@ const ZBX_STYLE_DASHBOARD_IS_MULTIPAGE = 'dashboard-is-multipage';
 const ZBX_STYLE_DASHBOARD_IS_EDIT_MODE = 'dashboard-is-edit-mode';
 const ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE = 'is-scrollable';
 const ZBX_STYLE_DASHBOARD_SELECTED_TAB = 'selected-tab';
-const ZBX_STYLE_DASHBOARD_POSITIONING = 'dashboard-positioning';
 
 const DASHBOARD_STATE_INITIAL = 'initial';
 const DASHBOARD_STATE_ACTIVE = 'active';
