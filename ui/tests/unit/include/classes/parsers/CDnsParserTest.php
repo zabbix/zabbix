@@ -19,12 +19,14 @@
 **/
 
 
-class CDnsParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CDnsParserTest extends TestCase {
 
 	/**
 	 * An array of trigger functions and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			[
 				'dns.name', 0, [],
@@ -289,7 +291,7 @@ class CDnsParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

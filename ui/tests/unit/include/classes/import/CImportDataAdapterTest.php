@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,7 +19,9 @@
 **/
 
 
-class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CImportDataAdapterTest extends TestCase {
 
 	/**
 	 * Cached XMl sources
@@ -2470,7 +2472,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				<date>2014-11-14T09:41:02Z</date>
 			</zabbix_export>';
 
-		//$this->setExpectedException('Exception', 'Invalid tag "/zabbix_export/version": unsupported version number.');
+		//$this->expectException('Exception', 'Invalid tag "/zabbix_export/version": unsupported version number.');
 		$this->expectException(Exception::class);
 		$this->expectExceptionMessage('Invalid tag "/zabbix_export/version": unsupported version number.');
 		$this->getAdapter($xml);
