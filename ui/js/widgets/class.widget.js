@@ -53,6 +53,7 @@ class CWidget extends CBaseComponent {
 		dashboard_page,
 		cell_width,
 		cell_height,
+		min_rows,
 		is_editable,
 		is_edit_mode,
 		can_edit_dashboards,
@@ -81,6 +82,7 @@ class CWidget extends CBaseComponent {
 		};
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
+		this._min_rows = min_rows;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;

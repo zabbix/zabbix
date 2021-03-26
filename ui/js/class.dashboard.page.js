@@ -426,6 +426,7 @@ class CDashboardPage extends CBaseComponent {
 			},
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
+			min_rows: this._widget_min_rows,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
 			can_edit_dashboards: this._can_edit_dashboards,

@@ -36,7 +36,6 @@ class CWidgetIterator extends CWidget {
 		};
 
 		this._widgets = new Map();
-
 		this._placeholders = [];
 
 		this._grid_pos = [];
@@ -45,8 +44,6 @@ class CWidgetIterator extends CWidget {
 
 		this._page = 1;
 		this._page_count = 1;
-
-		this._widget_min_rows = 2;
 	}
 
 	_getUpdateRequestData() {
@@ -219,7 +216,7 @@ class CWidgetIterator extends CWidget {
 
 	_updateTooSmallState() {
 		const is_too_small = this._pos.width < this._getColumnsField()
-			|| this._pos.height < this._getRowsField() * this._widget_min_rows;
+			|| this._pos.height < this._getRowsField() * this._min_rows;
 
 		this._target.classList.toggle('iterator-too-small', is_too_small);
 	}
