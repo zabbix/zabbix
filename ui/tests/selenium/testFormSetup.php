@@ -110,7 +110,8 @@ class testFormSetup extends CWebTest {
 		$this->checkButtons();
 
 		global $DB;
-		$this->assertScreenshot($this->query('xpath://form')->one(), 'Prerequisites_'.$DB['TYPE']);
+		$php_version = $this->query('xpath://td[text()="PHP version"]/following-sibling::td')->one();
+		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $php_version, 'Prerequisites_'.$DB['TYPE']);
 	}
 
 	public function testFormSetup_dbConnectionSectionLayout() {
@@ -265,7 +266,7 @@ class testFormSetup extends CWebTest {
 		// Check timezone field.
 		$timezones_field = $form->getField('Default time zone');
 		$timezones = $timezones_field->getOptions()->asText();
-		$this->assertEquals(427, count($timezones));
+		$this->assertEquals(426, count($timezones));
 		foreach (['System: (UTC+02:00) Europe/Riga', '(UTC+02:00) Europe/Riga'] as $timezone_value){
 			$this->assertContains($timezone_value, $timezones);
 		}
