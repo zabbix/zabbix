@@ -22,8 +22,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  *
  * @on-before setDefaultWidgetType
  */
@@ -166,7 +165,7 @@ class testDashboardGraphWidget extends CWebTest {
 		sleep(2);
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
-				'//button[@class="dialogue-widget-save"]')->one()->waitUntilClickable();
+				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
 
 		if (!is_array($data['error'])) {
 			$data['error'] = [$data['error']];
