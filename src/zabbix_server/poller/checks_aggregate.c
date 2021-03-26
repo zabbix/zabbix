@@ -348,6 +348,7 @@ int	evaluate_aggregate(zbx_vector_uint64_t *itemids, zbx_vector_ptr_t *dcitem_re
 			seconds = arg.data.dbl;
 			zbx_variant_clear(&arg);
 		}
+		count = 0;
 	}
 
 	results = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
