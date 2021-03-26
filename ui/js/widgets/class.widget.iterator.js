@@ -41,97 +41,14 @@ class CWidgetIterator extends CWidget {
 		this._grid_pos = [];
 
 		this._has_contents = false;
+		this._has_alt_content = false;
 
 		this._page = 1;
 		this._page_count = 1;
 	}
 
-	_getUpdateRequestData() {
-		const request_data = super._getUpdateRequestData();
-
-		request_data.page = this._page;
-
-		return request_data;
-	}
-
-	_updateGridPositions() {
-		this._grid_pos = [];
-
-		const num_columns = this._getColumnsField();
-		const num_rows = this._getRowsField();
-
-		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
-			const cell_column = index % num_columns;
-			const cell_row = Math.floor(index / num_columns);
-			const cell_width_min = Math.floor(this._pos.width / num_columns);
-			const cell_height_min = Math.floor(this._pos.height / num_rows);
-
-			const num_enlarged_columns = this._pos.width - cell_width_min * num_columns;
-			const num_enlarged_rows = this._pos.height - cell_height_min * num_rows;
-
-			this._grid_pos.push({
-				x: cell_column * cell_width_min + Math.min(cell_column, num_enlarged_columns),
-				y: cell_row * cell_height_min + Math.min(cell_row, num_enlarged_rows),
-				width: cell_width_min + (cell_column < num_enlarged_columns ? 1 : 0),
-				height: cell_height_min + (cell_row < num_enlarged_rows ? 1 : 0)
-			});
-		}
-	}
-
-	_createUniqueId() {
-		let unique_ids = [];
-
-		for (const widget of this._widgets.values()) {
-			unique_ids.push(widget.getUniqueId());
-		}
-
-		let index = 0;
-
-		while (unique_ids.includes(`${this._unique_id}-${index}`)) {
-			index++;
-		}
-
-		return `${this._unique_id}-${index}`;
-	}
-
-	_setViewMode(view_mode) {
-		super._setViewMode(view_mode);
-
-		for (const widget of this._widgets.values()) {
-			widget._setViewMode(view_mode);
-		}
-	}
-
-	_createWidget(data) {
-		return new (eval(data.defaults.js_class))({
-			type: data.type,
-			name: data.name,
-			view_mode: this._view_mode,
-			fields: data.fields,
-			configuration: data.configuration,
-			defaults: data.defaults,
-			widgetid: data.widgetid,
-			is_new: false,
-			rf_rate: 0,
-			dashboard: this._dashboard,
-			dashboard_page: this._dashboard_page,
-			cell_width: this._cell_width,
-			cell_height: this._cell_height,
-			is_editable: false,
-			is_edit_mode: false,
-			can_edit_dashboards: this._can_edit_dashboards,
-			time_period: this._time_period,
-			dynamic_hostid: this._dynamic_hostid,
-			unique_id: this._createUniqueId()
-		});
-	}
-
-	_truncateWidget(widget) {
-		widget._actions.style.display = 'none';
-	}
-
 	_doDeactivate() {
-		if (this._hasContents()) {
+		if (this._has_contents) {
 			for (const widget of this._widgets.values()) {
 				if (widget._state === WIDGET_STATE_ACTIVE) {
 					widget.deactivate();
@@ -143,86 +60,59 @@ class CWidgetIterator extends CWidget {
 		super._doDeactivate();
 	}
 
-	_addWidgetEventListeners(widget) {
-		widget
-			.on(WIDGET_EVENT_ENTER, this._events.widgetEnter)
-			.on(WIDGET_EVENT_LEAVE, this._events.widgetLeave);
+	getNumHeaderLines() {
+		if (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+				&& this._target.classList.contains('iterator-double-header')) {
+			return 2;
+		}
+
+		return 1;
 	}
 
-	_removeWidgetEventListeners(widget) {
-		widget
-			.off(WIDGET_EVENT_ENTER, this._events.widgetEnter)
-			.off(WIDGET_EVENT_LEAVE, this._events.widgetLeave);
-	}
+	resize() {
+		super.resize();
 
-	_addWidget(data) {
-		const widget = this._createWidget(data);
+		if (this._has_contents && !this._isTooSmall()) {
+			this._updatePager();
+		}
 
-		widget.start();
+		if (this._has_alt_content || this._isTooSmall() || this._isResizing()) {
+			return;
+		}
 
-		this._content_body.append(widget.getView());
-
-		this._truncateWidget(widget);
-
-		this._widgets.set(data.widgetid, widget);
-
-		return widget;
-	}
-
-	_deleteWidget(widgetid) {
-		const widget = this._widgets.get(widgetid);
-
-		this._content_body.removeChild(widget.getView());
-
-		this._removeWidgetEventListeners(widget);
-		widget.destroy();
-
-		this._widgets.delete(widgetid);
-	}
-
-	_deleteWidgets() {
-		for (const widgetid of this._widgets.keys()) {
-			this._deleteWidget(widgetid);
+		for (const widget of this._widgets.values()) {
+			widget.resize();
 		}
 	}
 
-	_hasAltContent() {
-		return this._target.classList.contains('iterator-alt-content');
-	}
+	_setViewMode(view_mode) {
+		super._setViewMode(view_mode);
 
-	_clearAltContent() {
-		if (this._hasAltContent()) {
-			this._target.classList.remove('iterator-alt-content');
-			this._content_body.innerHTML = '';
+		for (const widget of this._widgets.values()) {
+			widget._setViewMode(view_mode);
 		}
 	}
 
-	_setAltContent({body = null, messages = null} = {}) {
-		this._clearAltContent();
+	_setFields(fields) {
+		const num_columns = this._getColumnsField();
+		const num_rows = this._getRowsField();
 
-		const alt_content = document.createElement('div');
+		super._setFields(fields);
 
-		if (messages !== null) {
-			alt_content.insertAdjacentHTML('afterbegin', messages);
+		if (num_columns != this._getColumnsField() || num_rows != this._getRowsField()) {
+			this._clearContents();
+			this._clearAltContent();
+
+			this._updateTooSmallState();
+
+			if (this._isTooSmall()) {
+				if (this._state === WIDGET_STATE_ACTIVE) {
+					this._stopUpdating();
+				}
+			}
+
+			this._updateGridPositions();
 		}
-
-		if (body !== null) {
-			alt_content.insertAdjacentHTML('afterbegin', body);
-		}
-
-		this._content_body.appendChild(alt_content);
-		this._target.classList.add('iterator-alt-content');
-	}
-
-	_updateTooSmallState() {
-		const is_too_small = this._pos.width < this._getColumnsField()
-			|| this._pos.height < this._getRowsField() * this._min_rows;
-
-		this._target.classList.toggle('iterator-too-small', is_too_small);
-	}
-
-	_isTooSmall() {
-		return this._target.classList.contains('iterator-too-small');
 	}
 
 	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
@@ -231,7 +121,7 @@ class CWidgetIterator extends CWidget {
 		}
 
 		if (this._isResizing()) {
-			if (this._hasContents() || this._hasAltContent()) {
+			if (this._has_contents || this._has_alt_content) {
 				return;
 			}
 		}
@@ -239,13 +129,65 @@ class CWidgetIterator extends CWidget {
 		super._startUpdating(delay_sec, {do_update_once});
 	}
 
-	getNumHeaderLines() {
-		if (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
-				&& this._target.classList.contains('iterator-double-header')) {
-			return 2;
+	setPos(pos, {is_managed = false} = {}) {
+		const original_pos = {...this._pos};
+
+		super.setPos(pos, {is_managed});
+
+		if (this._grid_pos.length > 0
+				&& this._pos.width == original_pos.width && this._pos.height == original_pos.height) {
+			return;
 		}
 
-		return 1;
+		const was_too_small = this._isTooSmall();
+
+		this._updateTooSmallState();
+
+		if (this._isTooSmall()) {
+			if (this._state === WIDGET_STATE_ACTIVE && !was_too_small) {
+				this._stopUpdating();
+			}
+
+			return;
+		}
+
+		if (this._has_alt_content) {
+			return;
+		}
+
+		this._updateGridPositions();
+
+		if (!this._has_contents) {
+			if (this._state === WIDGET_STATE_ACTIVE && was_too_small) {
+				this._startUpdating();
+			}
+
+			return;
+		}
+
+		const widgets = [...this._widgets.values()];
+
+		for (let index = 0; index < this._grid_pos.length; index++) {
+			if (index < this._widgets.size) {
+				const widget = widgets[index];
+				const widget_pos = widget.getPos();
+
+				this._alignToGrid(widget.getView(), index);
+
+				if (widget_pos.width != this._grid_pos[index].width
+						|| widget_pos.height != this._grid_pos[index].height) {
+					widget.setPos(this._grid_pos[index], {is_managed: true});
+					widget.resize();
+				}
+			}
+			else {
+				this._alignToGrid(this._placeholders[index - this._widgets.size], index);
+			}
+		}
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
 	}
 
 	_setContents(response) {
@@ -292,8 +234,40 @@ class CWidgetIterator extends CWidget {
 		this._has_contents = false;
 	}
 
-	_hasContents() {
-		return this._has_contents;
+	_setAltContent({body = null, messages = null} = {}) {
+		this._clearAltContent();
+
+		const alt_content = document.createElement('div');
+
+		if (messages !== null) {
+			alt_content.insertAdjacentHTML('afterbegin', messages);
+		}
+
+		if (body !== null) {
+			alt_content.insertAdjacentHTML('afterbegin', body);
+		}
+
+		this._content_body.appendChild(alt_content);
+		this._target.classList.add('iterator-alt-content');
+
+		this._has_alt_content = true;
+	}
+
+	_clearAltContent() {
+		if (this._has_alt_content) {
+			this._has_alt_content = false;
+
+			this._target.classList.remove('iterator-alt-content');
+			this._content_body.innerHTML = '';
+		}
+	}
+
+	_getUpdateRequestData() {
+		const request_data = super._getUpdateRequestData();
+
+		request_data.page = this._page;
+
+		return request_data;
 	}
 
 	_processUpdateResponse(response) {
@@ -311,94 +285,79 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
-	setPos(pos, {is_managed = false} = {}) {
-		const original_pos = {...this._pos};
+	_addWidget(data) {
+		const widget = this._createWidget(data);
 
-		super.setPos(pos, {is_managed});
+		widget.start();
 
-		if (this._grid_pos.length > 0
-				&& this._pos.width == original_pos.width && this._pos.height == original_pos.height) {
-			return;
-		}
+		this._content_body.append(widget.getView());
 
-		const was_too_small = this._isTooSmall();
+		this._truncateWidget(widget);
 
-		this._updateTooSmallState();
+		this._widgets.set(data.widgetid, widget);
 
-		if (this._isTooSmall()) {
-			if (this._state === WIDGET_STATE_ACTIVE && !was_too_small) {
-				this._stopUpdating();
-			}
-
-			return;
-		}
-
-		if (this._hasAltContent()) {
-			return;
-		}
-
-		this._updateGridPositions();
-
-		if (!this._hasContents()) {
-			if (this._state === WIDGET_STATE_ACTIVE && was_too_small) {
-				this._startUpdating();
-			}
-
-			return;
-		}
-
-		const widgets = [...this._widgets.values()];
-
-		for (let index = 0; index < this._grid_pos.length; index++) {
-			if (index < this._widgets.size) {
-				const widget = widgets[index];
-				const widget_pos = widget.getPos();
-
-				this._alignToGrid(widget.getView(), index);
-
-				if (widget_pos.width != this._grid_pos[index].width
-						|| widget_pos.height != this._grid_pos[index].height) {
-					widget.setPos(this._grid_pos[index], {is_managed: true});
-					widget.resize();
-				}
-			}
-			else {
-				this._alignToGrid(this._placeholders[index - this._widgets.size], index);
-			}
-		}
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
+		return widget;
 	}
 
-	resize() {
-		super.resize();
+	_createWidget(data) {
+		return new (eval(data.defaults.js_class))({
+			type: data.type,
+			name: data.name,
+			view_mode: this._view_mode,
+			fields: data.fields,
+			configuration: data.configuration,
+			defaults: data.defaults,
+			widgetid: data.widgetid,
+			is_new: false,
+			rf_rate: 0,
+			dashboard: this._dashboard,
+			dashboard_page: this._dashboard_page,
+			cell_width: this._cell_width,
+			cell_height: this._cell_height,
+			is_editable: false,
+			is_edit_mode: false,
+			can_edit_dashboards: this._can_edit_dashboards,
+			time_period: this._time_period,
+			dynamic_hostid: this._dynamic_hostid,
+			unique_id: this._createUniqueId()
+		});
+	}
 
-		if (this._hasContents() && !this._isTooSmall()) {
-			this._updatePager();
-		}
+	_truncateWidget(widget) {
+		widget._actions.style.display = 'none';
+	}
 
-		if (this._hasAltContent() || this._isTooSmall() || this._isResizing()) {
-			return;
-		}
+	_deleteWidget(widgetid) {
+		const widget = this._widgets.get(widgetid);
 
-		for (const widget of this._widgets.values()) {
-			widget.resize();
-		}
+		this._content_body.removeChild(widget.getView());
+
+		this._removeWidgetEventListeners(widget);
+		widget.destroy();
+
+		this._widgets.delete(widgetid);
 	}
 
 	_updateWidget(widget) {
 		widget._startUpdating();
 	}
 
-	_alignToGrid(element, grid_index) {
-		const pos = this._grid_pos[grid_index];
+	_deleteWidgets() {
+		for (const widgetid of this._widgets.keys()) {
+			this._deleteWidget(widgetid);
+		}
+	}
 
-		element.style.left = `${pos.x / this._pos.width * 100}%`;
-		element.style.top = `${pos.y * this._cell_height}px`;
-		element.style.width = `${pos.width / this._pos.width * 100}%`;
-		element.style.height =`${pos.height * this._cell_height}px`;
+	_addWidgetEventListeners(widget) {
+		widget
+			.on(WIDGET_EVENT_ENTER, this._events.widgetEnter)
+			.on(WIDGET_EVENT_LEAVE, this._events.widgetLeave);
+	}
+
+	_removeWidgetEventListeners(widget) {
+		widget
+			.off(WIDGET_EVENT_ENTER, this._events.widgetEnter)
+			.off(WIDGET_EVENT_LEAVE, this._events.widgetLeave);
 	}
 
 	_deletePlaceholders() {
@@ -427,34 +386,48 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
-	_getColumnsField() {
-		return this._fields.columns !== undefined ? this._fields.columns : 2;
+	_isTooSmall() {
+		return this._target.classList.contains('iterator-too-small');
 	}
 
-	_getRowsField() {
-		return this._fields.rows !== undefined ? this._fields.rows : 1;
+	_updateTooSmallState() {
+		const is_too_small = this._pos.width < this._getColumnsField()
+			|| this._pos.height < this._getRowsField() * this._min_rows;
+
+		this._target.classList.toggle('iterator-too-small', is_too_small);
 	}
 
-	_setFields(fields) {
+	_updateGridPositions() {
+		this._grid_pos = [];
+
 		const num_columns = this._getColumnsField();
 		const num_rows = this._getRowsField();
 
-		super._setFields(fields);
+		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
+			const cell_column = index % num_columns;
+			const cell_row = Math.floor(index / num_columns);
+			const cell_width_min = Math.floor(this._pos.width / num_columns);
+			const cell_height_min = Math.floor(this._pos.height / num_rows);
 
-		if (num_columns != this._getColumnsField() || num_rows != this._getRowsField()) {
-			this._clearContents();
-			this._clearAltContent();
+			const num_enlarged_columns = this._pos.width - cell_width_min * num_columns;
+			const num_enlarged_rows = this._pos.height - cell_height_min * num_rows;
 
-			this._updateTooSmallState();
-
-			if (this._isTooSmall()) {
-				if (this._state === WIDGET_STATE_ACTIVE) {
-					this._stopUpdating();
-				}
-			}
-
-			this._updateGridPositions();
+			this._grid_pos.push({
+				x: cell_column * cell_width_min + Math.min(cell_column, num_enlarged_columns),
+				y: cell_row * cell_height_min + Math.min(cell_row, num_enlarged_rows),
+				width: cell_width_min + (cell_column < num_enlarged_columns ? 1 : 0),
+				height: cell_height_min + (cell_row < num_enlarged_rows ? 1 : 0)
+			});
 		}
+	}
+
+	_alignToGrid(element, grid_index) {
+		const pos = this._grid_pos[grid_index];
+
+		element.style.left = `${pos.x / this._pos.width * 100}%`;
+		element.style.top = `${pos.y * this._cell_height}px`;
+		element.style.width = `${pos.width / this._pos.width * 100}%`;
+		element.style.height =`${pos.height * this._cell_height}px`;
 	}
 
 	_updatePager(page = this._page, page_count = this._page_count) {
@@ -479,6 +452,30 @@ class CWidgetIterator extends CWidget {
 			- parseFloat(getComputedStyle(this._pager).marginRight);
 
 		this._content_header.classList.toggle('pager-visible', width_available >= 0);
+	}
+
+	_getColumnsField() {
+		return this._fields.columns !== undefined ? this._fields.columns : 2;
+	}
+
+	_getRowsField() {
+		return this._fields.rows !== undefined ? this._fields.rows : 1;
+	}
+
+	_createUniqueId() {
+		let unique_ids = [];
+
+		for (const widget of this._widgets.values()) {
+			unique_ids.push(widget.getUniqueId());
+		}
+
+		let index = 0;
+
+		while (unique_ids.includes(`${this._unique_id}-${index}`)) {
+			index++;
+		}
+
+		return `${this._unique_id}-${index}`;
 	}
 
 	_makeView() {
