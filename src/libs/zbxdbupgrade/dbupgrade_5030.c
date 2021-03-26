@@ -961,56 +961,56 @@ static int	DBpatch_5030056(void)
 
 #define ZBX_FIELD_UUID			{"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0}
 
-static int	DBpatch_5030057(void)
+static int	DBpatch_5030081(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_5030058(void)
+static int	DBpatch_5030082(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_5030059(void)
+static int	DBpatch_5030083(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("triggers", &field);
 }
 
-static int	DBpatch_5030060(void)
+static int	DBpatch_5030084(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("dashboard", &field);
 }
 
-static int	DBpatch_5030061(void)
+static int	DBpatch_5030085(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("graphs", &field);
 }
 
-static int	DBpatch_5030062(void)
+static int	DBpatch_5030086(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("hstgrp", &field);
 }
 
-static int	DBpatch_5030063(void)
+static int	DBpatch_5030087(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("httptest", &field);
 }
 
-static int	DBpatch_5030064(void)
+static int	DBpatch_5030088(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
@@ -1035,7 +1035,7 @@ static char	*update_template_name(char *old)
 	return ptr;
 }
 
-static int	DBpatch_5030065(void)
+static int	DBpatch_5030089(void)
 {
 	int		ret = SUCCEED;
 	char		*name, *uuid, *sql = NULL;
@@ -1076,7 +1076,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030066(void)
+static int	DBpatch_5030090(void)
 {
 	int		ret = SUCCEED;
 	char		*name, *uuid, *sql = NULL, *seed = NULL;
@@ -1120,7 +1120,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030067(void)
+static int	DBpatch_5030091(void)
 {
 	int		ret = SUCCEED;
 	char		*name, *uuid, *sql = NULL, *seed = NULL;
@@ -1210,7 +1210,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030068(void)
+static int	DBpatch_5030092(void)
 {
 	int		ret = SUCCEED;
 	char		*name, *host_name, *uuid, *sql = NULL, *seed = NULL;
@@ -1282,7 +1282,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030069(void)
+static int	DBpatch_5030093(void)
 {
 	int		ret = SUCCEED;
 	char		*dashboard_name, *dashboard, *uuid, *sql = NULL, *seed = NULL;
@@ -1328,7 +1328,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030070(void)
+static int	DBpatch_5030094(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *httptest, *uuid, *sql = NULL, *seed = NULL;
@@ -1374,7 +1374,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030071(void)
+static int	DBpatch_5030095(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *valuemap, *uuid, *sql = NULL, *seed = NULL;
@@ -1420,7 +1420,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030072(void)
+static int	DBpatch_5030096(void)
 {
 	int		ret = SUCCEED;
 	char		*group_name, *uuid, *sql = NULL;
@@ -1456,7 +1456,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030073(void)
+static int	DBpatch_5030097(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *key, *key_discovery, *uuid, *sql = NULL, *seed = NULL;
@@ -1506,7 +1506,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030074(void)
+static int	DBpatch_5030098(void)
 {
 	int		ret = SUCCEED;
 	char		*trigger_name, *uuid, *sql = NULL, *seed = NULL;
@@ -1614,7 +1614,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030075(void)
+static int	DBpatch_5030099(void)
 {
 	int		ret = SUCCEED;
 	char		*graph_name, *templ_name, *key, *uuid, *sql = NULL, *seed = NULL;
@@ -1666,7 +1666,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030076(void)
+static int	DBpatch_5030100(void)
 {
 	int		ret = SUCCEED;
 	char		*host_name, *name_tmpl, *key, *uuid, *seed = NULL, *sql = NULL;
@@ -1783,25 +1783,25 @@ DBPATCH_ADD(5030053, 0, 1)
 DBPATCH_ADD(5030054, 0, 1)
 DBPATCH_ADD(5030055, 0, 1)
 DBPATCH_ADD(5030056, 0, 1)
-DBPATCH_ADD(5030057, 0, 1)
-DBPATCH_ADD(5030058, 0, 1)
-DBPATCH_ADD(5030059, 0, 1)
-DBPATCH_ADD(5030060, 0, 1)
-DBPATCH_ADD(5030061, 0, 1)
-DBPATCH_ADD(5030062, 0, 1)
-DBPATCH_ADD(5030063, 0, 1)
-DBPATCH_ADD(5030064, 0, 1)
-DBPATCH_ADD(5030065, 0, 1)
-DBPATCH_ADD(5030066, 0, 1)
-DBPATCH_ADD(5030067, 0, 1)
-DBPATCH_ADD(5030068, 0, 1)
-DBPATCH_ADD(5030069, 0, 1)
-DBPATCH_ADD(5030070, 0, 1)
-DBPATCH_ADD(5030071, 0, 1)
-DBPATCH_ADD(5030072, 0, 1)
-DBPATCH_ADD(5030073, 0, 1)
-DBPATCH_ADD(5030074, 0, 1)
-DBPATCH_ADD(5030075, 0, 1)
-DBPATCH_ADD(5030076, 0, 1)
+DBPATCH_ADD(5030081, 0, 1)
+DBPATCH_ADD(5030082, 0, 1)
+DBPATCH_ADD(5030083, 0, 1)
+DBPATCH_ADD(5030084, 0, 1)
+DBPATCH_ADD(5030085, 0, 1)
+DBPATCH_ADD(5030086, 0, 1)
+DBPATCH_ADD(5030087, 0, 1)
+DBPATCH_ADD(5030088, 0, 1)
+DBPATCH_ADD(5030089, 0, 1)
+DBPATCH_ADD(5030090, 0, 1)
+DBPATCH_ADD(5030091, 0, 1)
+DBPATCH_ADD(5030092, 0, 1)
+DBPATCH_ADD(5030093, 0, 1)
+DBPATCH_ADD(5030094, 0, 1)
+DBPATCH_ADD(5030095, 0, 1)
+DBPATCH_ADD(5030096, 0, 1)
+DBPATCH_ADD(5030097, 0, 1)
+DBPATCH_ADD(5030098, 0, 1)
+DBPATCH_ADD(5030099, 0, 1)
+DBPATCH_ADD(5030100, 0, 1)
 
 DBPATCH_END()
