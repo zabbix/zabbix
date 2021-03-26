@@ -2902,7 +2902,7 @@ static int	DBpatch_5030083(void)
 static int	dbpatch_aggregate2formula(const AGENT_REQUEST *request, char **str, size_t *str_alloc,
 		size_t *str_offset, char **error)
 {
-	char	*ptr, *esc;
+	char	*esc;
 
 	if (3 > request->nparam)
 	{
@@ -2935,15 +2935,31 @@ static int	dbpatch_aggregate2formula(const AGENT_REQUEST *request, char **str, s
 	zbx_snprintf_alloc(str, str_alloc, str_offset, "(%s_foreach(/*/%s?[", request->params[2],
 			request->params[1]);
 
-	for (ptr = strtok(request->params[0], ","); NULL != ptr; ptr = strtok(NULL, ","))
+	if (REQUEST_PARAMETER_TYPE_ARRAY == get_rparam_type(request, 0))
 	{
-		if ('[' != (*str)[*str_offset - 1])
-			zbx_strcpy_alloc(str, str_alloc, str_offset, " or ");
+		int				i, groups_num;
+		char				*group;
+		zbx_request_parameter_type_t	type;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "ptr:%s", ptr);
-		esc = zbx_dyn_escape_string(ptr, "\\\"");
-		zabbix_log(LOG_LEVEL_DEBUG, "esc:%s", esc);
+		groups_num = num_param(request->params[0]);
 
+		for (i = 1; i <= groups_num; i++)
+		{
+			if (NULL == (group = get_param_dyn(request->params[0], i, &type)))
+				continue;
+
+			if ('[' != (*str)[*str_offset - 1])
+				zbx_strcpy_alloc(str, str_alloc, str_offset, " or ");
+
+			esc = zbx_dyn_escape_string(group, "\\\"");
+			zbx_snprintf_alloc(str, str_alloc, str_offset, "group=\"%s\"", esc);
+			zbx_free(esc);
+			zbx_free(group);
+		}
+	}
+	else
+	{
+		esc = zbx_dyn_escape_string(request->params[0], "\\\"");
 		zbx_snprintf_alloc(str, str_alloc, str_offset, "group=\"%s\"", esc);
 		zbx_free(esc);
 	}
