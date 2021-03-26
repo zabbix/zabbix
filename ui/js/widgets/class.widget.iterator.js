@@ -191,7 +191,6 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_setContents(response) {
-		this._setHeaderName(response.name);
 		this._updatePager(response.page, response.page_count);
 
 		let response_widgetids = [];
@@ -271,6 +270,8 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_processUpdateResponse(response) {
+		this._setHeaderName(response.name);
+
 		if (response.body !== undefined || response.messages !== undefined) {
 			this._clearContents();
 
