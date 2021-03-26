@@ -220,7 +220,10 @@ class CControllerMenuPopup extends CController {
 					}
 
 					foreach ($db_trigger['functions'] as $function) {
-						$parameters = array_map('trim', explode(',', $function['parameter']));
+						$parameters = array_map(function ($param) {
+							return trim($param, ' "');
+						}, explode(',', $function['parameter']));
+
 						if ($function['function'] !== 'find' || !array_key_exists(2, $parameters)
 								|| !in_array($parameters[2], ['regexp', 'iregexp'])) {
 							continue 2;

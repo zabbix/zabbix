@@ -604,11 +604,19 @@ function triggerExpressionReplaceHost(string $expression, string $src_host, stri
 	return $expression;
 }
 
-function check_right_on_trigger_by_expression($permission, $expression) {
+/**
+ * Check permissions for all hosts used in expression and returns unique /host/key references of expression.
+ *
+ * @param int    $permission
+ * @param string $expression
+ *
+ * @return array
+ */
+function check_right_on_trigger_by_expression(int $permission, string $expression): array {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
 		error($expressionData->error);
-		return false;
+		return [false, []];
 	}
 	$expression_hosts = $expressionData->result->getHosts();
 
@@ -624,11 +632,14 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 	foreach ($expression_hosts as $host) {
 		if (!isset($hosts[$host])) {
 			error(_s('Incorrect trigger expression. Host "%1$s" does not exist or you have no access to this host.', $host));
-			return false;
+			return [false, []];
 		}
 	}
 
-	return true;
+	$queries = $expressionData->result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_QUERY]);
+	$queries = array_keys(array_flip(array_column($queries, 'match')));
+
+	return [true, $queries];
 }
 
 function replace_template_dependencies($deps, $hostid) {
