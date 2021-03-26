@@ -22,7 +22,7 @@
 /**
  * Class to store function parser results.
  */
-class CQueryParserResult extends CParserResult {
+class CQueryParserResult extends CFunctionParameterResult {
 
 	/**
 	 * Host name

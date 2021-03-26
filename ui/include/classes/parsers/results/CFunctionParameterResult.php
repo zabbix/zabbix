@@ -44,4 +44,22 @@ class CFunctionParameterResult extends CParserResult {
 			$this->$property = $value;
 		}
 	}
+
+	/**
+	 * Get value of parsed parameter.
+	 *
+	 * @return string
+	 */
+	public function getValue(): string {
+		$value = $this->match;
+
+		if ($this instanceof CQueryParserResult) {
+			return $value;
+		}
+		elseif ($this->type == CFunctionParser::PARAM_QUOTED) {
+			$value = (substr($value, 0, 1) === '"' && substr($value, -1) === '"') ? substr($value, 1, -1) : $value;
+		}
+
+		return $value;
+	}
 }

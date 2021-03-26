@@ -163,18 +163,19 @@ class CFunctionParser extends CParser {
 							break;
 
 						case ',':
-							if (array_key_exists($num, $_parameters)) {
-								// Not overwrite previous empty parameter.
-								$num++;
-							}
-							$_parameters[$num] = new CFunctionParameterResult([
+							$_parameters[$num++] = new CFunctionParameterResult([
 								'type' => self::PARAM_UNQUOTED,
 								'match' => '',
-								'pos' => $p
+								'pos' => $p - $pos
 							]);
 							break;
 
 						case ')':
+							$_parameters[$num] = new CFunctionParameterResult([
+								'type' => self::PARAM_UNQUOTED,
+								'match' => '',
+								'pos' => $p - $pos
+							]);
 							$state = self::STATE_END_OF_PARAMS;
 							break;
 
@@ -182,30 +183,27 @@ class CFunctionParser extends CParser {
 							$_parameters[$num] = new CFunctionParameterResult([
 								'type' => self::PARAM_QUOTED,
 								'match' => $source[$p],
-								'pos' => $p
+								'pos' => $p - $pos
 							]);
 							$state = self::STATE_QUOTED;
 							break;
 
 						default:
 							if ($query_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $query_parser->getLength();
-								$_parameters[$num++] = $query_parser->result;
-								$state = self::STATE_NEW;
-								$p--;
+								$p += $query_parser->getLength() - 1;
+								$_parameters[$num] = $query_parser->result;
+								$state = self::STATE_END;
 							}
 							elseif ($function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $function_parser->getLength();
-								$_parameters[$num++] = $function_parser->result;
-								$state = self::STATE_NEW;
-								$p--;
+								$p += $function_parser->getLength() - 1;
+								$_parameters[$num] = $function_parser->result;
+								$state = self::STATE_END;
 							}
 							elseif ($this->options['collapsed_expression']
 									&& $functionid_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $functionid_parser->getLength();
-								$_parameters[$num++] = $functionid_parser->result;
-								$state = self::STATE_NEW;
-								$p--;
+								$p += $functionid_parser->getLength() - 1;
+								$_parameters[$num] = $functionid_parser->result;
+								$state = self::STATE_END;
 							}
 							else {
 								$error = $query_parser->getErrorDetails();
@@ -225,7 +223,7 @@ class CFunctionParser extends CParser {
 									$_parameters[$num] = new CFunctionParameterResult([
 										'type' => self::PARAM_UNQUOTED,
 										'match' => $source[$p],
-										'pos' => $p
+										'pos' => $p - $pos
 									]);
 								}
 								else {
