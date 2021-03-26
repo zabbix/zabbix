@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,9 +21,11 @@
 
 require_once __DIR__.'/../../../include/js.inc.php';
 
-class CzbxjsvalueTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	public static function testProvider() {
+class zbxjsvalueTest extends TestCase {
+
+	public static function dataProvider() {
 		$return_as_object = true;
 
 		return [
@@ -123,7 +125,7 @@ class CzbxjsvalueTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param bool                  $as_object
 	 * @param array|string|int|bool $source

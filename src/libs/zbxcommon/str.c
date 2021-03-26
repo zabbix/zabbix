@@ -5971,7 +5971,7 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strloc_unquote                                               *
+ * Function: zbx_substr_unquote                                               *
  *                                                                            *
  * Purpose: unquotes valid substring at the specified location                *
  *                                                                            *
@@ -5981,7 +5981,7 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_substr(const char *src, size_t left, size_t right)
+char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 {
 	char	*str, *ptr;
 

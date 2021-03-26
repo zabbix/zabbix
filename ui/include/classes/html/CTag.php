@@ -200,6 +200,25 @@ class CTag extends CObject {
 	}
 
 	/**
+	 * Add a hint box with preloader to the element.
+	 *
+	 * @param array  $data
+	 * @param string $span_class
+	 * @param bool   $freeze_on_click
+	 * @param string $styles
+	 *
+	 * @return $this
+	 */
+	public function setAjaxHint(array $data, string $span_class = '', bool $freeze_on_click = true,
+			string $styles = ''): CTag {
+		$this
+			->setAttribute('data-hintbox-preload', $data)
+			->setHint('', $span_class, $freeze_on_click, $styles);
+
+		return $this;
+	}
+
+	/**
 	 * Set data for menu popup.
 	 *
 	 * @param array $data

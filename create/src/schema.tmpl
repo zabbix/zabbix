@@ -441,6 +441,14 @@ FIELD		|confirmation	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|type		|t_integer	|'5'	|NOT NULL	|0
 FIELD		|execute_on	|t_integer	|'2'	|NOT NULL	|0
 FIELD		|timeout	|t_varchar(32)	|'30s'	|NOT NULL	|ZBX_NODATA
+FIELD		|scope		|t_integer	|'1'	|NOT NULL	|0
+FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|menu_path	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|usrgrpid
 INDEX		|2		|groupid
 UNIQUE		|3		|name
@@ -499,16 +507,7 @@ INDEX		|2		|userid
 
 TABLE|opcommand|operationid|ZBX_DATA
 FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|scriptid	|t_id		|	|NULL		|0			|2|scripts	|		|RESTRICT
-FIELD		|execute_on	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|command	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|scriptid	|t_id		|	|NOT NULL	|0			|2|scripts	|		|RESTRICT
 INDEX		|1		|scriptid
 
 TABLE|opcommand_hst|opcommand_hstid|ZBX_DATA
@@ -1599,7 +1598,7 @@ FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|command	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|command	|t_text		|''	|NOT NULL	|0
 FIELD		|alertid	|t_id		|	|NULL		|0			|-|alerts
 FIELD		|parent_taskid	|t_id		|	|NOT NULL	|0			|-|task		|taskid
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|-|hosts
@@ -1896,4 +1895,4 @@ INDEX	|4		|creator_userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030058	|5030058
+ROW		|5030082	|5030082
