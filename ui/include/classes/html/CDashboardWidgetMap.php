@@ -163,7 +163,7 @@ class CDashboardWidgetMap extends CDiv {
 									->addItem(_s('Go back to %1$s', $this->previous_map['name']))
 								),
 								'#'
-						))->setAttribute('data-previous-map', $this->previous_map['sysmapid'])
+						))->addClass('js-previous-map')
 					);
 
 				$this->addItem($go_back_div);
