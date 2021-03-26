@@ -1066,6 +1066,12 @@ footer {
       .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .msg-bad {
         margin: 0 10px; }
 
+.dashboard-grid-widget.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-head,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-head,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-head,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-head {
+  cursor: auto; }
+
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-actions {
   opacity: 1; }
 .dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
@@ -5024,17 +5030,19 @@ span.is-loading {
 .overflow-table::-webkit-scrollbar {
   height: 9px; }
 
-.drag-icon,
-.ui-draggable .dashboard-widget-head,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-head {
+.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-head,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-head,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-head, .drag-icon,
+.ui-draggable .dashboard-widget-head {
   cursor: move;
   cursor: grab; }
 
-.ui-draggable .drag-icon,
-.ui-draggable .dashboard-widget-head,
-.ui-draggable .dashboard-grid-widget-head,
-.ui-draggable .dashboard-grid-iterator-head, .cursor-dragging {
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head,
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head, .ui-draggable .drag-icon,
+.ui-draggable .dashboard-widget-head, .cursor-dragging {
   cursor: move;
   cursor: grabbing; }
 

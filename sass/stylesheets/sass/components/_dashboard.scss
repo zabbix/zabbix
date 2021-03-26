@@ -1,3 +1,8 @@
+// Dashboard, widgets and iterators.
+// To maintain code clarity:
+//   - Do not mix rules for dashboard view mode and dashboard edit mode.
+//   - Do not mix rules for widgets and iterators.
+
 .header-kioskmode-controls {
 	.dashboard-kioskmode-controls {
 		li {
@@ -177,10 +182,6 @@
 	}
 }
 
-// Dashboard, widgets and iterators.
-// To maintain code clarity:
-//   - Do not mix rules for dashboard view mode and dashboard edit mode.
-//   - Do not mix rules for widgets and iterators.
 .dashboard-grid-container {
 	position: relative;
 	margin: 0 -4px -4px -4px;
@@ -676,6 +677,26 @@
 				}
 			}
 		}
+	}
+}
+
+.dashboard-grid-widget.ui-draggable,
+.dashboard-grid-iterator.ui-draggable {
+	.dashboard-grid-widget-head,
+	.dashboard-grid-iterator-head {
+		@extend %cursor-drag;
+	}
+
+	&.ui-draggable-dragging {
+		.dashboard-grid-widget-head,
+		.dashboard-grid-iterator-head {
+			@extend %cursor-dragging;
+		}
+	}
+
+	.dashboard-grid-widget .dashboard-grid-widget-head,
+	.dashboard-grid-iterator .dashboard-grid-iterator-head {
+		cursor: auto;
 	}
 }
 

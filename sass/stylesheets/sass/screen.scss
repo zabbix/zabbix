@@ -2697,17 +2697,13 @@ $form-icon-btn: (
 }
 
 .drag-icon,
-.ui-draggable .dashboard-widget-head,
-.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-head {
+.ui-draggable .dashboard-widget-head {
 	@extend %cursor-drag;
 }
 
 .ui-draggable {
 	.drag-icon,
-	.dashboard-widget-head,
-	.dashboard-grid-widget-head,
-	.dashboard-grid-iterator-head {
+	.dashboard-widget-head {
 		@extend %cursor-dragging;
 	}
 }
