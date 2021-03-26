@@ -131,13 +131,13 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
-			'v' => [
-				'C' => 'V',
+			'o' => [
+				'C' => 'O',
 				'T' => T_ZBX_STR,
 				'A' => false
 			],
-			'o' => [
-				'C' => 'O',
+			'v' => [
+				'C' => 'V',
 				'T' => T_ZBX_STR,
 				'A' => false
 			],
@@ -267,6 +267,11 @@ class CControllerPopupTriggerExpr extends CController {
 		];
 
 		$this->functions = [
+			'abs' => [
+				'description' => _('abs() - Absolute value'),
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
 			'avg' => [
 				'description' => _('avg() - Average value of a period T'),
 				'params' => $this->param1SecCount,
@@ -284,10 +289,22 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
+			'find' => [
+				'description' => _('find() - Check occurance of pattern V (which fulfill operator O) in period T (1 - match, 0 - no match)'),
+				'params' => $this->param3SecVal,
+				'allowed_types' => $this->allowedTypesStr,
+				'operators' => ['=', '<>']
+			],
 			'last' => [
 				'description' => _('last() - Last (most recent) T value'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'length' => [
+				'description' => _('length() - Length of last (most recent) T value in characters'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'max' => [
@@ -313,12 +330,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'params' => $this->param2SecCount,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']
-			],
-			'strlen' => [
-				'description' => _('strlen() - Length of last (most recent) T value in characters'),
-				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'sum' => [
 				'description' => _('sum() - Sum of values of a period T'),
@@ -698,6 +709,17 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 				}
 				elseif ($data['item_description']) {
+					// Quote function string parameters.
+					foreach ($data['params'] as $param_key => $param) {
+						if (!in_array($param_key, ['v', 'o', 'fit', 'mode', 'pattern'])
+								|| !array_key_exists($param_key, $data['params'])
+								|| $data['params'][$param_key] === '') {
+							continue;
+						}
+
+						$data['params'][$param_key] = quoteFunctionParam($param, true);
+					}
+
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {
@@ -718,33 +740,52 @@ class CControllerPopupTriggerExpr extends CController {
 						unset($data['params']['last'], $data['params']['shift']);
 					}
 
-					// Quote function param.
-					$quoted_params = [];
-					foreach ($data['params'] as $param) {
-						$quoted_params[] = quoteFunctionParam($param);
-					}
+					$fn_params = rtrim(implode(',', $data['params']), ',');
 
-					$fn_params = rtrim(implode(',', $quoted_params), ',');
-					$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
-						$function,
-						$item_host_data['host'],
-						$data['item_key'],
-						($fn_params === '') ? '' : ','.$fn_params,
-						$operator,
-						CTriggerExpression::quoteString($data['value'])
-					);
+					if ($function === 'abs') {
+						$data['expression'] = sprintf('abs(last(/%s/%s)%s)%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
+							$operator,
+							CTriggerExpression::quoteString($data['value'])
+						);
+					}
+					else {
+						$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
+							$function,
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
+							$operator,
+							CTriggerExpression::quoteString($data['value'])
+						);
+					}
 
 					// Validate trigger expression.
 					$trigger_expression = new CTriggerExpression();
 
 					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
 						// Validate trigger function.
+						$math_function_validator = new CMathFunctionValidator();
 						$trigger_function_validator = new CFunctionValidator();
 						$fn = $result->getTokens()[0];
+						$error_msg = '';
 
-						if (!$trigger_function_validator->validate($fn)
-								|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
-							error($trigger_function_validator->getError());
+						if (!$math_function_validator->validate($fn)) {
+							$error_msg = $math_function_validator->getError();
+
+							if (!$trigger_function_validator->validate($fn)
+									|| $trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
+								$error_msg = $trigger_function_validator->getError();
+							}
+							else {
+								$error_msg = '';
+							}
+						}
+
+						if ($error_msg !== '') {
+							error($error_msg);
 						}
 					}
 					else {

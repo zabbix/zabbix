@@ -155,6 +155,9 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 			if ($param_name === 'period_shift') {
 				$param_field->setAttribute('placeholder', 'now/h');
 			}
+			elseif ($param_name === 'shift') {
+				$param_field->setAttribute('placeholder', 'now-h');
+			}
 
 			$expression_form_list->addRow($label, [
 				$param_field,
