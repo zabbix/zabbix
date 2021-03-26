@@ -21,10 +21,6 @@
 
 class CControllerPopupScheduledReportTest extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'name' =>			'required|db report.name|not_empty',
