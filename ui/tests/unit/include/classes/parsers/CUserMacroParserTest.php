@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,12 +19,14 @@
 **/
 
 
-class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CUserMacroParserTest extends TestCase {
 
 	/**
 	 * An array of user macros and parsed results.
 	 */
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			// Normal macros without context.
 			['{$MACRO}', 0, [
@@ -913,7 +915,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

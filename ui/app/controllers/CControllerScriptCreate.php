@@ -23,16 +23,25 @@ class CControllerScriptCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>					'db scripts.name',
-			'type' =>					'db scripts.type|in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI.','.ZBX_SCRIPT_TYPE_WEBHOOK,
-			'execute_on' =>				'db scripts.execute_on|in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER.','.ZBX_SCRIPT_EXECUTE_ON_PROXY,
+			'name' =>					'required|db scripts.name|not_empty',
+			'scope' =>					'db scripts.scope| in '.implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
+			'type' =>					'required|db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK]),
+			'execute_on' =>				'db scripts.execute_on|in '.implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]),
+			'menu_path' =>				'db scripts.menu_path',
+			'authtype' =>				'db scripts.authtype|in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'username' =>				'db scripts.username',
+			'password' =>				'db scripts.password',
+			'publickey' =>				'db scripts.publickey',
+			'privatekey' =>				'db scripts.privatekey',
+			'passphrase' =>				'db scripts.password',
+			'port' =>					'db scripts.port',
 			'command' =>				'db scripts.command|flags '.P_CRLF,
 			'commandipmi' =>			'db scripts.command|flags '.P_CRLF,
 			'parameters' =>				'array',
 			'script' => 				'db scripts.command|flags '.P_CRLF,
-			'timeout' => 				'db scripts.timeout|time_unit '.implode(':', [1, 60]),
+			'timeout' => 				'db scripts.timeout|time_unit '.implode(':', [1, SEC_PER_MIN]),
 			'description' =>			'db scripts.description',
-			'host_access' =>			'db scripts.host_access|in '.PERM_READ.','.PERM_READ_WRITE,
+			'host_access' =>			'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
 			'groupid' =>				'db scripts.groupid',
 			'usrgrpid' =>				'db scripts.usrgrpid',
 			'hgstype' =>				'in 0,1',
@@ -51,6 +60,7 @@ class CControllerScriptCreate extends CController {
 					CMessageHelper::setErrorTitle(_('Cannot add script'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
@@ -67,29 +77,62 @@ class CControllerScriptCreate extends CController {
 	protected function doAction() {
 		$script = [];
 
-		$this->getInputs($script, ['command', 'description', 'usrgrpid', 'groupid', 'host_access', 'confirmation']);
-		$script['name'] = trimPath($this->getInput('name', ''));
+		$this->getInputs($script, ['name', 'description', 'groupid']);
+		$script['scope'] = $this->getInput('scope', ZBX_SCRIPT_SCOPE_ACTION);
 		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_WEBHOOK);
-		$script['execute_on'] = $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_PROXY);
 
-		if ($script['type'] != ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {
-			$script['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_PROXY;
+		if ($script['scope'] != ZBX_SCRIPT_SCOPE_ACTION) {
+			$script['menu_path'] = trimPath($this->getInput('menu_path', ''));
+			$script['host_access'] = $this->getInput('host_access', PERM_READ);
+			$script['confirmation'] = $this->getInput('confirmation', '');
+			$script['usrgrpid'] = $this->getInput('usrgrpid', 0);
 		}
 
-		if ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) {
-			$script['command'] = $this->getInput('commandipmi', '');
-		}
-		elseif ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
-			$script['command'] = $this->getInput('script', '');
-			$script['timeout'] = $this->getInput('timeout', DB::getDefault('scripts', 'timeout'));
-			$parameters = $this->getInput('parameters', []);
+		switch ($script['type']) {
+			case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+				$script['command'] = $this->getInput('command', '');
+				$script['execute_on'] = $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_PROXY);
+				break;
 
-			if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
-				$script['parameters'] = array_map(function ($name, $value) {
-						return compact('name', 'value');
-					}, $parameters['name'], $parameters['value']
-				);
-			}
+			case ZBX_SCRIPT_TYPE_IPMI:
+				$script['command'] = $this->getInput('commandipmi', '');
+				break;
+
+			case ZBX_SCRIPT_TYPE_SSH:
+				$script['command'] = $this->getInput('command', '');
+				$script['username'] = $this->getInput('username', '');
+				$script['port'] = $this->getInput('port', '');
+				$script['authtype'] = $this->getInput('authtype', ITEM_AUTHTYPE_PASSWORD);
+
+				if ($script['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
+					$script['password'] = $this->getInput('password', '');
+				}
+				else {
+					$script['publickey'] = $this->getInput('publickey', '');
+					$script['privatekey'] = $this->getInput('privatekey', '');
+					$script['password'] = $this->getInput('passphrase', '');
+				}
+				break;
+
+			case ZBX_SCRIPT_TYPE_TELNET:
+				$script['command'] = $this->getInput('command', '');
+				$script['username'] = $this->getInput('username', '');
+				$script['password'] = $this->getInput('password', '');
+				$script['port'] = $this->getInput('port', '');
+				break;
+
+			case ZBX_SCRIPT_TYPE_WEBHOOK:
+				$script['command'] = $this->getInput('script', '');
+				$script['timeout'] = $this->getInput('timeout', DB::getDefault('scripts', 'timeout'));
+				$parameters = $this->getInput('parameters', []);
+
+				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
+					$script['parameters'] = array_map(function ($name, $value) {
+							return compact('name', 'value');
+						}, $parameters['name'], $parameters['value']
+					);
+				}
+				break;
 		}
 
 		if ($this->getInput('hgstype', 1) == 0) {
@@ -111,6 +154,7 @@ class CControllerScriptCreate extends CController {
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot add script'));
 		}
+
 		$this->setResponse($response);
 	}
 }

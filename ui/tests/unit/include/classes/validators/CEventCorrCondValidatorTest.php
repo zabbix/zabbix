@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,15 +19,15 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class CEventCorrCondValidatorTest extends CValidatorTest {
 
-	public function validParamProvider() {
-		return [
-			[[]]
-		];
+	public function dataProviderValidParam() {
+		return [];
 	}
 
-	public function validValuesProvider() {
+	public function dataProviderValidValues() {
 		return [
 			[[], [
 				'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
@@ -130,7 +130,7 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function invalidValuesProvider() {
+	public function dataProviderInvalidValues() {
 		return [
 			[[],
 				[
@@ -260,7 +260,7 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 	/**
 	 * Test that a correct error message is generated when setting an object name.
 	 *
-	 * @dataProvider invalidValuesWithObjectsProvider()
+	 * @dataProvider dataProviderInvalidValuesWithObjects()
 	 *
 	 * @param array 	$params
 	 * @param mixed 	$value
@@ -271,7 +271,7 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 		$this->markTestIncomplete();
 	}
 
-	public function invalidValuesWithObjectsProvider() {
+	public function dataProviderInvalidValuesWithObjects() {
 		return [
 			[
 				[],
