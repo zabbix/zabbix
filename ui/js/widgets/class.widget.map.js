@@ -44,7 +44,7 @@ class CWidgetMap extends CWidget {
 	_doActivate() {
 		super._doActivate();
 
-		if (this._has_contents && this._state === WIDGET_STATE_ACTIVE) {
+		if (this._has_contents) {
 			this._activateContentsEvents();
 		}
 	}

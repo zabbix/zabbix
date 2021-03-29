@@ -43,7 +43,14 @@ class CWidgetNavTree extends CWidget {
 	_doActivate() {
 		super._doActivate();
 
-		this._activateContentsEvents();
+		if (this._has_contents) {
+			if (this._target.querySelector('.root') === null) {
+				this._makeTree();
+				this._activateTree();
+			}
+
+			this._activateContentsEvents();
+		}
 	}
 
 	_doDeactivate() {
@@ -96,14 +103,18 @@ class CWidgetNavTree extends CWidget {
 
 
 	setEditMode() {
-		this._deactivateContentsEvents();
-		this._removeTree();
+		if (this._has_contents) {
+			this._deactivateContentsEvents();
+			this._removeTree();
+		}
 
 		super.setEditMode();
 
-		this._makeTree();
-		this._makeSortable();
-		this._activateContentsEvents();
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._makeTree();
+			this._activateTree();
+			this._activateContentsEvents();
+		}
 	}
 
 	_processUpdateResponse(response) {
@@ -130,30 +141,7 @@ class CWidgetNavTree extends CWidget {
 
 			this._makeTree();
 
-			if (this._is_edit_mode) {
-				this._makeSortable();
-			}
-			else {
-				this._parseProblems();
-
-				if (this._navtree_item_selected === null
-						|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')
-				) {
-					this._navtree_item_selected = jQuery('.tree-item:visible', jQuery(this._target))
-						.not('[data-sysmapid="0"]')
-						.first()
-						.data('id');
-				}
-
-				let sysmapid = 0;
-
-				if (this._markTreeItemSelected(this._navtree_item_selected)) {
-					sysmapid = this._navtree[this._navtree_item_selected].sysmapid;
-				}
-
-				this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
-			}
-
+			this._activateTree();
 			this._activateContentsEvents();
 		}
 	}
@@ -284,6 +272,32 @@ class CWidgetNavTree extends CWidget {
 					}
 				}
 			}
+		}
+	}
+
+	_activateTree() {
+		if (this._is_edit_mode) {
+			this._makeSortable();
+		}
+		else {
+			this._parseProblems();
+
+			if (this._navtree_item_selected === null
+				|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')
+			) {
+				this._navtree_item_selected = jQuery('.tree-item:visible', jQuery(this._target))
+					.not('[data-sysmapid="0"]')
+					.first()
+					.data('id');
+			}
+
+			let sysmapid = 0;
+
+			if (this._markTreeItemSelected(this._navtree_item_selected)) {
+				sysmapid = this._navtree[this._navtree_item_selected].sysmapid;
+			}
+
+			this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
 		}
 	}
 
@@ -418,7 +432,7 @@ class CWidgetNavTree extends CWidget {
 		}
 
 		this._setTreeHandlers();
-	};
+	}
 
 	_makeTreeBranch(parent_id = null) {
 		const ul = document.createElement('ul');
