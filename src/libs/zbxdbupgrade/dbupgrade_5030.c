@@ -2183,7 +2183,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	{
 		dbpatch_update_func_abschange(function, replace);
 	}
-	if (0 == strcmp(function->name, "change"))
+	else if (0 == strcmp(function->name, "change"))
 	{
 		dbpatch_update_function(function, NULL, "", ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
