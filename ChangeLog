@@ -19,6 +19,8 @@ A.F.I..PS. [ZBXNEXT-6368] moved action operation scripts to global scripts, adde
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
@@ -159,6 +161,11 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 --------------------------------------------------------------------------------
+Changes for 5.2.6
+
+5.2.6rc1 was released as 5.2.6 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.2.6rc1
 
 New features:
@@ -177,6 +184,8 @@ A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and t
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
@@ -628,6 +637,11 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.10
+
+5.0.10rc1 was released as 5.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.10rc1
 
 New features:
@@ -644,6 +658,8 @@ A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and t
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
@@ -2636,12 +2652,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.30
+
+4.0.30rc1 was released as 4.0.30 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.30rc1
 
 New features:
 A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
