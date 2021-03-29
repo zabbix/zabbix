@@ -88,6 +88,7 @@ $form_grid
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('maxlength', DB::getFieldLength('report', 'name'))
+				->setAttribute('autofocus', 'autofocus')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	])
 	->addItem([
