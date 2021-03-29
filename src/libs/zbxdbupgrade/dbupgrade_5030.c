@@ -2982,14 +2982,11 @@ static int	dbpatch_aggregate2formula(const AGENT_REQUEST *request, char **str, s
 
 static int	DBpatch_5030084(void)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
-	zbx_vector_ptr_t	functions;
-	int			ret = SUCCEED;
-	char			*sql = NULL, *params = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset;
-
-	zbx_vector_ptr_create(&functions);
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL, *params = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
