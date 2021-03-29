@@ -77,9 +77,10 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 			$fn = $functions[$i]['data'] + ['host' => '', 'item' => ''];
 			$key_param = $fn['functionParams'][0];
 			$host_delimiter_pos = strpos($key_param, ':');
+			$key_param_pos = strpos($key_param, '[');
 			$host_name = '';
 
-			if ($host_delimiter_pos !== false && $host_delimiter_pos < strpos($key_param, '[')) {
+			if ($host_delimiter_pos !== false && ($key_param_pos === false || $host_delimiter_pos < $key_param_pos)) {
 				list($host_name, $key_param) = explode(':', $key_param, 2);
 			}
 
