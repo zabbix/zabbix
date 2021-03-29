@@ -154,6 +154,8 @@ class CDashboard extends CBaseComponent {
 
 		this._activateEvents();
 
+		this._announceWidgets();
+
 		let dashboard_page = this._getRestorableDashboardPage();
 
 		if (dashboard_page === null) {
@@ -161,8 +163,6 @@ class CDashboard extends CBaseComponent {
 		}
 
 		this._selectDashboardPage(dashboard_page);
-
-		this._announceWidgets();
 
 		if (this._is_edit_mode) {
 			this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
