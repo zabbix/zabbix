@@ -488,11 +488,6 @@ function addToOverlaysStack(id, element, type, xhr) {
 // Keydown handler. Closes last opened overlay UI element.
 function closeDialogHandler(event) {
 	if (event.which == 27) { // ESC
-		// Do not catch multiselect events.
-		if (jQuery(event.target).closest('.multiselect').data('multiSelect') !== undefined) {
-			return;
-		}
-
 		var dialog = overlays_stack.end();
 		if (typeof dialog !== 'undefined') {
 			switch (dialog.type) {
