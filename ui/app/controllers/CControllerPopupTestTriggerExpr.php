@@ -63,6 +63,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 
 			foreach ($result->getTokensOfTypes(array_keys($this->supported_token_types)) as $token) {
 				if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION
+						&& !in_array($token->function, getStandaloneFunctions())
 						&& $token->getFunctionTriggerQuery() === null) {
 					continue;
 				}
