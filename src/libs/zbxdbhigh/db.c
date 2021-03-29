@@ -873,16 +873,16 @@ unsigned long	DBextract_DBversion(struct zbx_json *json)
  *                                                                            *
  * Purpose: writes a json entry in DB with the result for the front-end       *
  *                                                                            *
- * Parameters: json - [IN] json entry                                         *
+ * Parameters: version - [IN] entry of DB versions                            *
  *                                                                            *
  ******************************************************************************/
-void	DBflush_version_requirements(struct zbx_json *json)
+void	DBflush_version_requirements(const char *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", json->buffer))
+	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", version))
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
 
 	DBclose();

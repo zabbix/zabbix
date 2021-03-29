@@ -1030,19 +1030,19 @@ static void	zbx_main_sigusr_handler(int flags)
 
 static void	zbx_check_db(void)
 {
-	struct zbx_json	versions_json;
+	struct zbx_json	db_ver;
 
-	zbx_json_init(&versions_json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_init(&db_ver, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != DBcheck_capabilities(DBextract_DBversion(&versions_json)) || SUCCEED != DBcheck_version())
+	if (SUCCEED != DBcheck_capabilities(DBextract_DBversion(&db_ver)) || SUCCEED != DBcheck_version())
 	{
-		zbx_json_free(&versions_json);
+		zbx_json_free(&db_ver);
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_history_check_version(&versions_json);
-	DBflush_version_requirements(&versions_json);
-	zbx_json_free(&versions_json);
+	zbx_history_check_version(&db_ver);
+	DBflush_version_requirements(db_ver.buffer);
+	zbx_json_free(&db_ver);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
