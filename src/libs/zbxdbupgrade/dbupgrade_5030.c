@@ -2991,9 +2991,7 @@ static int	DBpatch_5030084(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* ITEM_TYPE_AGGREGATE = 8 */
-	result = DBselect("select i.itemid,key_"
-			" from items i"
-			" where i.type=8");
+	result = DBselect("select itemid,key_ from items where type=8");
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
