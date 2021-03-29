@@ -386,20 +386,24 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
 
-				if (action === 'popup.scriptexec' || action === 'popup.scheduledreport.test') {
-					buttons.push({
-						'title': t('Ok'),
-						'cancel': true,
-						'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
-					});
-				}
-				else {
-					buttons.push({
-						'title': t('Cancel'),
-						'class': 'btn-alt',
-						'cancel': true,
-						'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
-					});
+				switch (action) {
+					case 'popup.scheduledreport.list':
+					case 'popup.scheduledreport.test':
+					case 'popup.scriptexec':
+						buttons.push({
+							'title': t('Ok'),
+							'cancel': true,
+							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+						});
+						break;
+
+					default:
+						buttons.push({
+							'title': t('Cancel'),
+							'class': 'btn-alt',
+							'cancel': true,
+							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+						});
 				}
 
 				overlay.setProperties({
