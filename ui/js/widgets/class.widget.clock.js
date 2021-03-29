@@ -53,11 +53,11 @@ class CWidgetClock extends CWidget {
 			const now = new Date();
 
 			if (response.clock_data.time !== null) {
-				this._time_offset = now.getTime() - parseInt(response.clock_data.time) * 1000;
+				this._time_offset = now.getTime() - response.clock_data.time * 1000;
 			}
 
 			if (response.clock_data.time_zone_offset !== null) {
-				this._time_offset -= (now.getTimezoneOffset() * 60 + parseInt(response.clock_data.time_zone_offset)) * 1000;
+				this._time_offset -= (now.getTimezoneOffset() * 60 + response.clock_data.time_zone_offset) * 1000;
 			}
 
 			this._startClock();

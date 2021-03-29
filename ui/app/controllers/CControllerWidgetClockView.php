@@ -93,7 +93,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 							try {
 								$now = new DateTime($last_value['value']);
 
-								$time_zone_offset = $now->format('Z');
+								$time_zone_offset = (int) $now->format('Z');
 
 								$time = time() - ($last_value['clock'] - $now->getTimestamp());
 							}
@@ -116,7 +116,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 
 				$now = new DateTime();
 				$time = $now->getTimestamp();
-				$time_zone_offset = $now->format('Z');
+				$time_zone_offset = (int) $now->format('Z');
 				break;
 
 			default:
