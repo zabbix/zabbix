@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-02-16T06:28:24Z'
+  date: '2021-03-29T14:20:18Z'
   groups:
     -
       name: Templates/Databases
@@ -485,7 +485,7 @@ zabbix_export:
           key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
           history: 7d
           value_type: FLOAT
-          units: ms
+          units: s
           applications:
             -
               name: PostgreSQL
@@ -495,6 +495,10 @@ zabbix_export:
               parameters:
                 - 'Time:\s(\d+\.\d+)\sms'
                 - \1
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
           triggers:
             -
               expression: '{min(5m)} > {$PG.PING_TIME.MAX.WARN}'
