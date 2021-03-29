@@ -132,7 +132,7 @@ class CWidgetMap extends CWidget {
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					if (response.mapid > 0) {
+					if (response.mapid > 0 && this._map_svg) {
 						this._map_svg.update(response);
 					}
 					else {
