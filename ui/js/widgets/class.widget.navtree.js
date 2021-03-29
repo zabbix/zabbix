@@ -69,7 +69,7 @@ class CWidgetNavTree extends CWidget {
 			}
 		}
 
-		if (this._widgetid === null) {
+		if (this._fields.reference.length == 0) {
 			let reference;
 
 			do {
@@ -145,12 +145,13 @@ class CWidgetNavTree extends CWidget {
 						.data('id');
 				}
 
+				let sysmapid = 0;
+
 				if (this._markTreeItemSelected(this._navtree_item_selected)) {
-					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {
-						sysmapid: this._navtree[this._navtree_item_selected].sysmapid,
-						itemid: this._navtree_item_selected
-					});
+					sysmapid = this._navtree[this._navtree_item_selected].sysmapid;
 				}
+
+				this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
 			}
 
 			this._activateContentsEvents();
