@@ -1440,9 +1440,8 @@ class CDashboardPage extends CBaseComponent {
 
 					return true;
 				}
-				else {
-					return false;
-				}
+
+				return false;
 			}
 
 			const original_positions = new Map();
