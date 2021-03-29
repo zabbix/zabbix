@@ -303,7 +303,6 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'length' => [
 				'description' => _('length() - Length of last (most recent) T value in characters'),
-				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
@@ -530,7 +529,9 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					$params = array_map(function ($param) {
-						return $param->getValue();
+						return ($param instanceof CFunctionParserResult)
+							? $param->getFunctionTriggerQuery()->getValue()
+							: $param->getValue();
 					}, $params);
 
 					if (array_key_exists(0, $params) && ($column_pos = strpos($params[0], ':')) !== false) {
@@ -748,6 +749,14 @@ class CControllerPopupTriggerExpr extends CController {
 							$item_host_data['host'],
 							$data['item_key'],
 							($fn_params === '') ? '' : ','.$fn_params,
+							$operator,
+							CTriggerExpression::quoteString($data['value'])
+						);
+					}
+					elseif ($function === 'length') {
+						$data['expression'] = sprintf('length(last(/%s/%s))%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
 							$operator,
 							CTriggerExpression::quoteString($data['value'])
 						);
