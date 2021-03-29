@@ -642,30 +642,32 @@ jQuery(function ($) {
 		},
 		activate: function () {
 			const widget = $(this).data('widget');
+			const graph = jQuery(widget._svg);
 
-			jQuery(widget._svg)
-				.on('mousemove', {graph: jQuery(widget._svg)}, showHintbox)
+			graph
+				.on('mousemove', {graph}, showHintbox)
 				.on('mouseleave', function() {
-					destroyHintbox(jQuery(widget._svg));
-					hideHelper(jQuery(widget._svg));
+					destroyHintbox(graph);
+					hideHelper(graph);
 				})
 				.on('selectstart', false);
 
 			if (widget._svg_options.sbox) {
-				jQuery(widget._svg)
+				graph
 					.on('dblclick', function() {
-						hintBox.hideHint(jQuery(widget._svg), true);
+						hintBox.hideHint(graph, true);
 						$.publish('timeselector.zoomout');
 						return false;
 					})
-					.on('mousedown', {graph: jQuery(widget._svg)}, startSBoxDrag);
+					.on('mousedown', {graph}, startSBoxDrag);
 			}
 		},
 		deactivate: function (e) {
 			const widget = $(this).data('widget');
+			const graph = jQuery(widget._svg);
 
-			destroySBox(e, jQuery(widget._svg));
-			jQuery(widget._svg).off('mousemove mouseleave dblclick mousedown selectstart');
+			destroySBox(e, graph);
+			graph.off('mousemove mouseleave dblclick mousedown selectstart');
 		}
 	};
 
