@@ -569,7 +569,8 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($fn_name, $this->functions)
 									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
 								$operator = $operator_token->match;
-								$value = array_key_exists('string', $value_token->data)
+								$value = (($value_token instanceof CTriggerExprParserResult)
+										&& array_key_exists('string', $value_token->data))
 									? $value_token->data['string']
 									: $value_token->match;
 							}
