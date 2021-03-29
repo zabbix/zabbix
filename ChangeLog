@@ -2022,6 +2022,8 @@ New features:
 A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
