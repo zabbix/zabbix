@@ -214,11 +214,11 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' and {Trapper:trap[1].count(1m, 32/8, band)} > 0'.
 				' and {Trapper:trap[1].count(1m)} > 0',
 
-				'count(/Trapper/trap[3],#1,"eq","0") > 0'.
+				'count(/Trapper/trap[3],#1,"eq",0) > 0'.
 				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'.
-				' and count(/Trapper/trap[2],5m:now-1h,"iregexp","10") > 0'.
-				' and count(/Trapper/trap[1],5m:now-2d,"gt","100") > 0'.
-				' and count(/Trapper/trap[1],1m,"band","32") > 0'.
+				' and count(/Trapper/trap[2],5m:now-1h,"iregexp",10) > 0'.
+				' and count(/Trapper/trap[1],5m:now-2d,"gt",100) > 0'.
+				' and count(/Trapper/trap[1],1m,"band",32) > 0'.
 				' and count(/Trapper/trap[1],1m,"band","32/8") > 0'.
 				' and count(/Trapper/trap[1],1m) > 0'
 			],
@@ -259,7 +259,7 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				'{Trapper:trap[3].count(#1,0,eq)} > 0'.
 				' and {Trapper:trap[3].count(5m,"xyz",regexp,2h)} > 0',
 
-				'count(/Trapper/trap[3],#1,"eq","0") > 0'.
+				'count(/Trapper/trap[3],#1,"eq",0) > 0'.
 				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'
 			],
 			[

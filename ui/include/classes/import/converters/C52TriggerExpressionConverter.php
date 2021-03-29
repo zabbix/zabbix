@@ -226,6 +226,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				}
 				break;
 
+			case 'logseverity':
+				$new_expression = sprintf('logseverity(%1$s)', $query);
+				break;
+
 			default:
 				$new_expression = sprintf('%s(%s%s)', $fn['functionName'], $query,
 					self::paramsToString(self::convertParameters($fn['functionParams'], $fn['functionName']))
