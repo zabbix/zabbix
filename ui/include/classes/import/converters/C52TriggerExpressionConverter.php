@@ -335,19 +335,23 @@ class C52TriggerExpressionConverter extends CConverter {
 				break;
 		}
 
+		$parameters = array_values($parameters);
+
 		if (in_array($fn_name, ['percentile', 'band', 'timeleft', 'forecast'])) {
-			$keys_strip = [0, 1];
+			$keys_skip = [0, 1];
 		}
 		elseif ($fn_name === 'logeventid' || $fn_name === 'logsource') {
-			$keys_strip = [];
+			$keys_skip = [];
+		}
+		elseif ($fn_name === 'count') {
+			$keys_skip = [0, ctype_digit((string) $parameters[2]) ? 2 : null];
 		}
 		else {
-			$keys_strip = [0];
+			$keys_skip = [0];
 		}
 
-		$parameters = array_values($parameters);
-		array_walk($parameters, function (&$param, $i) use ($keys_strip) {
-			if (in_array($i, $keys_strip)) {
+		array_walk($parameters, function (&$param, $i) use ($keys_skip) {
+			if (in_array($i, $keys_skip)) {
 				return;
 			}
 
