@@ -2932,8 +2932,7 @@ static int	dbpatch_aggregate2formula(const AGENT_REQUEST *request, char **str, s
 		return FAIL;
 	}
 
-	zbx_snprintf_alloc(str, str_alloc, str_offset, "(%s_foreach(/*/%s?[", request->params[2],
-			request->params[1]);
+	zbx_snprintf_alloc(str, str_alloc, str_offset, "(%s_foreach(/*/%s?[", request->params[2], request->params[1]);
 
 	if (REQUEST_PARAMETER_TYPE_ARRAY == get_rparam_type(request, 0))
 	{
