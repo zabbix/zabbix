@@ -12739,7 +12739,7 @@ void	zbx_dc_get_nested_hostgroupids_by_names(const char **groups, int groups_num
  ******************************************************************************/
 void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids)
 {
-	int			i, index;
+	int			i;
 	zbx_vector_uint64_t	groupids;
 	zbx_dc_hostgroup_t	group_local, *group;
 
@@ -12749,9 +12749,9 @@ void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hos
 
 	WRLOCK_CACHE;
 
-	if (FAIL != (index = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local, dc_compare_hgroups)))
+	if (FAIL != (i = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local, dc_compare_hgroups)))
 	{
-		group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
+		group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[i];
 		dc_get_nested_hostgroupids(group->groupid, &groupids);
 	}
 
