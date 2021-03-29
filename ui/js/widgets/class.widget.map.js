@@ -151,6 +151,14 @@ class CWidgetMap extends CWidget {
 		};
 	}
 
+	getDataCopy({is_single_copy}) {
+		const data = super.getDataCopy({is_single_copy});
+
+		data.fields = {...data.fields, filter_widget_reference: null};
+
+		return data;
+	}
+
 	_processUpdateResponse(response) {
 		if (this._has_contents) {
 			this._deactivateContentsEvents();
