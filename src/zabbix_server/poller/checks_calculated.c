@@ -167,7 +167,7 @@ static void	calc_eval_clear(zbx_calc_eval_t *eval)
 static int	calcitem_eval_single(zbx_calc_eval_t *eval, zbx_item_query_t *query, const char *name, size_t len,
 		int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
-	char		func_name[MAX_STRING_LEN], *params = NULL;
+	char		func_name[MAX_STRING_LEN], *params = NULL, *errmsg = NULL;
 	size_t		params_alloc = 0, params_offset = 0;
 	DC_ITEM		*item;
 	int		i, ret = FAIL;
@@ -216,7 +216,9 @@ static int	calcitem_eval_single(zbx_calc_eval_t *eval, zbx_item_query_t *query, 
 
 	if (0 == args_num)
 	{
-		ret = evaluate_function2(value, item, func_name, "", ts, error);
+		ret = evaluate_function2(value, item, func_name, "", ts, &errmsg);
+		*error = zbx_dsprintf(NULL,"Cannot evaluate calculated item formula: %s", errmsg);
+		zbx_free(errmsg);
 		goto out;
 	}
 
