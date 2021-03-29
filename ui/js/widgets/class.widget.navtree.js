@@ -65,6 +65,8 @@ class CWidgetNavTree extends CWidget {
 
 		const used_references = [];
 
+		this._maps = [];
+
 		for (const widget of widgets) {
 			if (widget instanceof CWidgetMap
 					&& this._fields.reference === widget._fields.filter_widget_reference) {
@@ -74,6 +76,10 @@ class CWidgetNavTree extends CWidget {
 					used_references.push(widget._fields.reference);
 				}
 			}
+		}
+
+		if (this._has_contents) {
+			this._activateContentsEvents();
 		}
 
 		if (this._fields.reference.length == 0) {
