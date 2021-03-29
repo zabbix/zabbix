@@ -420,10 +420,10 @@ class CWidgetNavTree extends CWidget {
 	};
 
 	_makeTreeBranch(parent_id = null) {
-		const ul = document.createElement('UL');
+		const ul = document.createElement('ul');
 
 		if (parent_id !== null) {
-			ul.setAttribute('id', `${this._unique_id}_children-of-${parent_id}`);
+			ul.id = `${this._unique_id}_children-of-${parent_id}`;
 		}
 
 		ul.classList.add('tree-list');
@@ -432,7 +432,7 @@ class CWidgetNavTree extends CWidget {
 	};
 
 	_makeTreeItem(item, depth = 1, editable = true) {
-		const li_item = document.createElement('LI');
+		const li_item = document.createElement('li');
 
 		li_item.classList.add('tree-item');
 
@@ -456,16 +456,18 @@ class CWidgetNavTree extends CWidget {
 			let child_items_visible = 0;
 
 			for (const child of item.children) {
-				if (typeof child === 'object') {
-					ul.appendChild(this._makeTreeItem(child, depth + 1));
+				if (typeof child !== 'object') {
+					continue;
+				}
 
-					if (child.id > this._last_id) {
-						this._last_id = child.id;
-					}
+				ul.appendChild(this._makeTreeItem(child, depth + 1));
 
-					if (child.item_visible === true) {
-						child_items_visible++;
-					}
+				if (child.id > this._last_id) {
+					this._last_id = child.id;
+				}
+
+				if (child.item_visible === true) {
+					child_items_visible++;
 				}
 			}
 
@@ -481,21 +483,21 @@ class CWidgetNavTree extends CWidget {
 		let link;
 
 		if (!this._is_edit_mode && item.sysmapid != 0 && item.item_active) {
-			link = document.createElement('A');
+			link = document.createElement('a');
 
+			link.href = '#';
 			link.setAttribute('data-sysmapid', item.sysmapid);
-			link.setAttribute('href', '#');
 		}
 		else {
-			link = document.createElement('SPAN');
+			link = document.createElement('span');
 		}
 
-		link.classList.add('item-name');
-		link.setAttribute('title', item.name);
+		link.title = item.name;
 		link.innerText = item.name;
+		link.classList.add('item-name');
 
+		li_item.id = `${this._unique_id}_tree-item-${item.id}`;
 		li_item.setAttribute('data-id', item.id);
-		li_item.setAttribute('id', `${this._unique_id}_tree-item-${item.id}`);
 
 		if (item.sysmapid != 0) {
 			li_item.setAttribute('data-sysmapid', item.sysmapid);
@@ -505,7 +507,7 @@ class CWidgetNavTree extends CWidget {
 			li_item.style.display = 'none';
 		}
 
-		const tree_row = document.createElement('DIV');
+		const tree_row = document.createElement('div');
 
 		tree_row.classList.add('tree-row');
 		li_item.appendChild(tree_row);
@@ -514,79 +516,79 @@ class CWidgetNavTree extends CWidget {
 		let problems;
 
 		if (this._is_edit_mode) {
-			tools = document.createElement('DIV');
+			tools = document.createElement('div');
 			tools.classList.add('tools');
 			tree_row.appendChild(tools);
 		}
 		else {
-			problems = document.createElement('DIV');
+			problems = document.createElement('div');
 			problems.classList.add('problem-icon-list');
 			tree_row.appendChild(problems);
 		}
 
-		const content = document.createElement('DIV');
+		const content = document.createElement('div');
 
 		content.classList.add('content');
 		tree_row.appendChild(content);
 
-		const margin_lvl = document.createElement('DIV');
+		const margin_lvl = document.createElement('div');
 
 		margin_lvl.classList.add('margin-lvl');
 		content.appendChild(margin_lvl);
 
 		if (this._is_edit_mode) {
-			const button_add_child = document.createElement('INPUT');
+			const button_add_child = document.createElement('input');
 
+			button_add_child.type = 'button';
+			button_add_child.title = t('Add child element');
 			button_add_child.classList.add('add-child-btn', 'js-button-add-child');
-			button_add_child.setAttribute('type', 'button');
 			button_add_child.setAttribute('data-id', item.id);
-			button_add_child.setAttribute('title', t('Add child element'));
 			tools.appendChild(button_add_child);
 
-			const button_add_maps = document.createElement('INPUT');
+			const button_add_maps = document.createElement('input');
 
+			button_add_maps.type = 'button';
+			button_add_maps.title = t('Add multiple maps');
 			button_add_maps.classList.add('import-items-btn', 'js-button-add-maps');
-			button_add_maps.setAttribute('type', 'button');
 			button_add_maps.setAttribute('data-id', item.id);
-			button_add_maps.setAttribute('title', t('Add multiple maps'));
 			tools.appendChild(button_add_maps);
 
 			if (editable) {
-				const button_edit = document.createElement('INPUT');
+				const button_edit = document.createElement('input');
 
+				button_edit.type = 'button';
+				button_edit.title = t('Edit');
 				button_edit.classList.add('edit-item-btn', 'js-button-edit');
-				button_edit.setAttribute('type', 'button');
 				button_edit.setAttribute('data-id', item.id);
-				button_edit.setAttribute('title', t('Edit'));
 				tools.appendChild(button_edit);
 
-				const button_remove = document.createElement('BUTTON');
+				const button_remove = document.createElement('button');
 
+				button_remove.type = 'button';
+				button_remove.title = t('Remove');
 				button_remove.classList.add('remove-btn', 'js-button-remove');
-				button_remove.setAttribute('type', 'button');
 				button_remove.setAttribute('data-id', item.id);
-				button_remove.setAttribute('title', t('Remove'));
 				tools.appendChild(button_remove);
 			}
 		}
 
 		if (this._is_edit_mode && editable) {
-			const drag = document.createElement('DIV');
+			const drag = document.createElement('div');
 
 			drag.classList.add('drag-icon');
 			content.appendChild(drag);
 		}
 
-		const arrow = document.createElement('DIV');
+		const arrow = document.createElement('div');
 
 		arrow.classList.add('arrow');
 		content.appendChild(arrow);
 
 		if (editable) {
-			const arrow_btn = document.createElement('BUTTON');
-			const arrow_span = document.createElement('SPAN');
+			const arrow_btn = document.createElement('button');
+			const arrow_span = document.createElement('span');
 
-			arrow_btn.setAttribute('type', 'button');
+			arrow_btn.type = 'button';
 			arrow_btn.classList.add('treeview');
 			arrow_span.classList.add(li_item.classList.contains('opened') ? 'arrow-down' : 'arrow-right');
 			arrow_btn.appendChild(arrow_span);
@@ -639,24 +641,24 @@ class CWidgetNavTree extends CWidget {
 		li_item.appendChild(ul);
 
 		if (this._is_edit_mode && editable) {
-			const name_fld = document.createElement('INPUT');
-			name_fld.setAttribute('type', 'hidden');
-			name_fld.setAttribute('name', 'navtree.name.' + item.id);
-			name_fld.setAttribute('id', `${this._unique_id}_navtree.name.${item.id}`);
+			const name_fld = document.createElement('input');
+			name_fld.id = `${this._unique_id}_navtree.name.${item.id}`;
+			name_fld.type = 'hidden';
+			name_fld.name = `navtree.name.${item.id}`;
 			name_fld.value = item.name;
 			li_item.appendChild(name_fld);
 
-			const parent_fld = document.createElement('INPUT');
-			parent_fld.setAttribute('type', 'hidden');
-			parent_fld.setAttribute('name', 'navtree.parent.' + item.id);
-			parent_fld.setAttribute('id', `${this._unique_id}_navtree.parent.${item.id}`);
-			parent_fld.value = +item.parent || 0;
+			const parent_fld = document.createElement('input');
+			parent_fld.id = `${this._unique_id}_navtree.parent.${item.id}`;
+			parent_fld.type = 'hidden';
+			parent_fld.name = `navtree.parent.${item.id}`;
+			parent_fld.value = item.parent || 0;
 			li_item.appendChild(parent_fld);
 
-			const mapid_fld = document.createElement('INPUT');
-			mapid_fld.setAttribute('type', 'hidden');
-			mapid_fld.setAttribute('name', 'navtree.sysmapid.' + item.id);
-			mapid_fld.setAttribute('id', `${this._unique_id}_navtree.sysmapid.${item.id}`);
+			const mapid_fld = document.createElement('input');
+			mapid_fld.id = `${this._unique_id}_navtree.sysmapid.${item.id}`;
+			mapid_fld.type = 'hidden';
+			mapid_fld.name = `navtree.sysmapid.${item.id}`;
 			mapid_fld.value = item.sysmapid;
 			li_item.appendChild(mapid_fld);
 		}
@@ -812,10 +814,10 @@ class CWidgetNavTree extends CWidget {
 
 		for (const [severity, value] of Object.entries(this._severity_levels)) {
 			for (const problem of this._target.querySelectorAll(`[data-problems${severity}]`)) {
-				const indicator = document.createElement('SPAN');
+				const indicator = document.createElement('span');
 
+				indicator.title = value.name;
 				indicator.classList.add('problem-icon-list-item', value.style_class);
-				indicator.setAttribute('title', value.name);
 				indicator.innerText = problem.getAttribute(`data-problems${severity}`);
 
 				problem.querySelector('.tree-row > .problem-icon-list')

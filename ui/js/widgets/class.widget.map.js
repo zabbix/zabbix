@@ -113,6 +113,9 @@ class CWidgetMap extends CWidget {
 			if (this._sysmapid !== null || this._source_type == WIDGET_SYSMAP_SOURCETYPE_MAP) {
 				return super._promiseUpdate();
 			}
+			else {
+				return Promise.resolve();
+			}
 		}
 		else {
 			const curl = new Curl(this._map_svg.options.refresh);
