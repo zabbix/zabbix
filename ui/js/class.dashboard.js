@@ -1280,7 +1280,7 @@ class CDashboard extends CBaseComponent {
 
 		if (this._can_edit_dashboards) {
 			menu_actions.push({
-				label: t('S_COPY'),
+				label: t('Copy'),
 				clickCallback: () => this._storeDashboardPageDataCopy(dashboard_page.getDataCopy())
 			});
 		}

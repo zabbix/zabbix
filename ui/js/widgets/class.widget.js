@@ -433,14 +433,14 @@ class CWidget extends CBaseComponent {
 
 		if (this._can_edit_dashboards && (this._dashboard.templateid === null || this._dynamic_hostid === null)) {
 			menu_actions.push({
-				label: t('S_COPY'),
+				label: t('Copy'),
 				clickCallback: () => this.fire(WIDGET_EVENT_COPY)
 			});
 		}
 
 		if (this._is_edit_mode) {
 			menu_actions.push({
-				label: t('S_PASTE'),
+				label: t('Paste'),
 				disabled: (can_paste_widget === false),
 				clickCallback: () => this.fire(WIDGET_EVENT_PASTE)
 			});
