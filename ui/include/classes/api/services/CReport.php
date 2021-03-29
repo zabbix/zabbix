@@ -449,9 +449,9 @@ class CReport extends CApiService {
 
 		$db_report_params = ($method === 'update')
 			? DB::select('report_param', [
-					'output' => ['reportparamid', 'reportid', 'name', 'value'],
-					'filter' => ['reportid' => array_keys($report_params)]
-				])
+				'output' => ['reportparamid', 'reportid', 'name', 'value'],
+				'filter' => ['reportid' => array_keys($report_params)]
+			])
 			: [];
 
 		$ins_report_params = [];
@@ -527,9 +527,9 @@ class CReport extends CApiService {
 
 		$db_report_users = ($method === 'update')
 			? DB::select('report_user', [
-					'output' => ['reportuserid', 'reportid', 'userid', 'access_userid', 'exclude'],
-					'filter' => ['reportid' => array_keys($report_users)]
-				])
+				'output' => ['reportuserid', 'reportid', 'userid', 'access_userid', 'exclude'],
+				'filter' => ['reportid' => array_keys($report_users)]
+			])
 			: [];
 
 		$ins_report_users = [];
@@ -601,9 +601,9 @@ class CReport extends CApiService {
 
 		$db_report_usrgrps = ($method === 'update')
 			? DB::select('report_usrgrp', [
-					'output' => ['reportusrgrpid', 'reportid', 'usrgrpid', 'access_userid'],
-					'filter' => ['reportid' => array_keys($report_usrgrps)]
-				])
+				'output' => ['reportusrgrpid', 'reportid', 'usrgrpid', 'access_userid'],
+				'filter' => ['reportid' => array_keys($report_usrgrps)]
+			])
 			: [];
 
 		$ins_report_usrgrps = [];
@@ -742,9 +742,11 @@ class CReport extends CApiService {
 					' FROM report_user ru'.
 					' WHERE '.dbConditionInt('reportid', $reportids)
 				);
+
 				while ($user = DBfetch($users)) {
 					$reportid = $user['reportid'];
 					unset($user['reportid']);
+
 					$result[$reportid]['users'][] = $user;
 				}
 			}
@@ -774,9 +776,11 @@ class CReport extends CApiService {
 					' FROM report_usrgrp rug'.
 					' WHERE '.dbConditionInt('reportid', $reportids)
 				);
+
 				while ($user_group = DBfetch($user_groups)) {
 					$reportid = $user_group['reportid'];
 					unset($user_group['reportid']);
+
 					$result[$reportid]['user_groups'][] = $user_group;
 				}
 			}

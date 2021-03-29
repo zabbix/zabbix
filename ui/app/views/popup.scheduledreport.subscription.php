@@ -58,37 +58,37 @@ $form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
 $recipient_multiselect = (new CMultiSelect(
 	($data['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER)
 		? [
-				'name' => 'recipientid',
-				'object_name' => 'users',
-				'multiple' => false,
-				'data' => $data['recipient_ms'],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'users',
-						'srcfld1' => 'userid',
-						'srcfld2' => 'fullname',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'recipientid'
-					]
-				],
-				'add_post_js' => false
-			]
+			'name' => 'recipientid',
+			'object_name' => 'users',
+			'multiple' => false,
+			'data' => $data['recipient_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'users',
+					'srcfld1' => 'userid',
+					'srcfld2' => 'fullname',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'recipientid'
+				]
+			],
+			'add_post_js' => false
+		]
 		: [
-				'name' => 'recipientid',
-				'object_name' => 'usersGroups',
-				'multiple' => false,
-				'data' => $data['recipient_ms'],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'usrgrp',
-						'srcfld1' => 'usrgrpid',
-						'srcfld2' => 'name',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'recipientid'
-					]
-				],
-				'add_post_js' => false
-			]
+			'name' => 'recipientid',
+			'object_name' => 'usersGroups',
+			'multiple' => false,
+			'data' => $data['recipient_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'usrgrp',
+					'srcfld1' => 'usrgrpid',
+					'srcfld2' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'recipientid'
+				]
+			],
+			'add_post_js' => false
+		]
 ))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 $form_grid
