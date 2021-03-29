@@ -531,7 +531,7 @@ static void	calc_get_item_candidates(zbx_calc_eval_t *eval, const zbx_calc_query
 						group->hostids.values_num);
 			}
 			else
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "1");
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " 0");
 
 			last_pos = token.loc.r + 1;
 			pos = token.loc.r;
