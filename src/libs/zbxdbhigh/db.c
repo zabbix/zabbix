@@ -881,12 +881,10 @@ void	DBflush_version_requirements(struct zbx_json *json)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	DBbegin();
 
 	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", json->buffer))
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
 
-	DBcommit();
 	DBclose();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
