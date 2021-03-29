@@ -234,6 +234,9 @@ class CReport extends CApiService {
 		}
 
 		$this->checkDuplicates(array_column($reports, 'name'));
+		$this->checkDashboards(array_unique(array_column($reports, 'dashboardid')));
+		$this->checkUsers($reports);
+		$this->checkUserGroups($reports);
 	}
 
 	/**
@@ -252,6 +255,163 @@ class CReport extends CApiService {
 
 		if ($db_reports) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Report "%1$s" already exists.', $db_reports[0]['name']));
+		}
+	}
+
+	/**
+	 * Check for valid dashboards.
+	 *
+	 * @param array $dashboardids
+	 *
+	 * @throws APIException if dashboard is not valid.
+	 */
+	protected function checkDashboards(array $dashboardids): void {
+		$db_dashboards = API::Dashboard()->get([
+			'output' => [],
+			'dashboardids' => $dashboardids,
+			'preservekeys' => true
+		]);
+
+		foreach ($dashboardids as $dashboardid) {
+			if (!array_key_exists($dashboardid, $db_dashboards)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Dashboard with ID "%1$s" is not available.', $dashboardid)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Check for valid users.
+	 *
+	 * @param array  $reports
+	 * @param string $reports[]['userid']                          (optional)
+	 * @param array  $reports[]['users']                           (optional)
+	 * @param string $reports[]['users'][]['userid']
+	 * @param string $reports[]['users'][]['access_userid']        (optional)
+	 * @param array  $reports[]['user_groups']                     (optional)
+	 * @param string $reports[]['user_groups'][]['access_userid']  (optional)
+	 * @param array  $db_reports                                   (optional)
+	 * @param string $db_reports[]['userid']
+	 *
+	 * @throws APIException if user is not valid.
+	 */
+	protected function checkUsers(array $reports, array $db_reports = []): void {
+		$userids = [];
+
+		foreach ($reports as $report) {
+			$db_report = $db_reports ? $db_reports[$report['reportid']] : [];
+
+			if (array_key_exists('userid', $report) && (!$db_report || $report['userid'] != $db_report['userid'])) {
+				if ($report['userid'] != self::$userData['userid']
+						&& self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only super admins can set report owner.'));
+				}
+
+				$userids[$report['userid']] = true;
+			}
+
+			if (array_key_exists('users', $report) && $report['users']) {
+				$db_userids = [];
+				$db_access_userids = [];
+				if ($db_report) {
+					$db_userids = array_flip(array_column($db_report['users'], 'userid'));
+					$db_access_userids = array_flip(array_column($db_report['users'], 'access_userid'));
+				}
+
+				foreach ($report['users'] as $user) {
+					if (!array_key_exists($user['userid'], $db_userids)) {
+						$userids[$user['userid']] = true;
+					}
+
+					if (array_key_exists('access_userid', $user) && $user['access_userid'] != 0
+							&& !array_key_exists($user['access_userid'], $db_access_userids)) {
+						$userids[$user['access_userid']] = true;
+					}
+				}
+			}
+
+			if (array_key_exists('user_groups', $report) && $report['user_groups']) {
+				$db_access_userids = $db_report
+					? array_flip(array_column($db_report['user_groups'], 'access_userid'))
+					: [];
+
+				foreach ($report['user_groups'] as $usrgrp) {
+					if (array_key_exists('access_userid', $usrgrp) && $usrgrp['access_userid'] != 0
+							&& !array_key_exists($usrgrp['access_userid'], $db_access_userids)) {
+						$userids[$usrgrp['access_userid']] = true;
+					}
+				}
+			}
+		}
+
+		unset($userids[self::$userData['userid']]);
+
+		if (!$userids) {
+			return;
+		}
+
+		$userids = array_keys($userids);
+
+		$db_users = API::User()->get([
+			'output' => [],
+			'userids' => $userids,
+			'preservekeys' => true
+		]);
+
+		foreach ($userids as $userid) {
+			if (!array_key_exists($userid, $db_users)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with ID "%1$s" is not available.', $userid));
+			}
+		}
+	}
+
+	/**
+	 * Check for valid user groups.
+	 *
+	 * @param array  $reports
+	 * @param string $reports[]['reportid']
+	 * @param array  $reports[]['user_groups']                   (optional)
+	 * @param string $reports[]['user_groups'][]['usrgrpid']
+	 * @param array  $db_reports                                 (optional)
+	 * @param array  $db_reports[]['user_groups']
+	 * @param string $db_reports[]['user_groups'][]['usrgrpid']
+	 *
+	 * @throws APIException if user group is not valid.
+	 */
+	protected function checkUserGroups(array $reports, array $db_reports = []): void {
+		$usrgrpids = [];
+
+		foreach ($reports as $report) {
+			if (array_key_exists('user_groups', $report) && $report['user_groups']) {
+				$db_usrgrpids = $db_reports
+					? array_flip(array_column($db_reports[$report['reportid']]['user_groups'], 'usrgrpid'))
+					: [];
+
+				foreach ($report['user_groups'] as $usrgrp) {
+					if (!array_key_exists($usrgrp['usrgrpid'], $db_usrgrpids)) {
+						$usrgrpids[$usrgrp['usrgrpid']] = true;
+					}
+				}
+			}
+		}
+
+		if (!$usrgrpids) {
+			return;
+		}
+
+		$usrgrpids = array_keys($usrgrpids);
+
+		$db_usrgrps = API::UserGroup()->get([
+			'output' => [],
+			'usrgrpids' => $usrgrpids,
+			'preservekeys' => true
+		]);
+
+		foreach ($usrgrpids as $usrgrpid) {
+			if (!array_key_exists($usrgrpid, $db_usrgrps)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with ID "%1$s" is not available.', $usrgrpid));
+			}
 		}
 	}
 
@@ -352,17 +512,24 @@ class CReport extends CApiService {
 			'preservekeys' => true
 		]);
 
-		if (count($reports) != count($db_reports)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		$names = [];
+		$dashboardids = [];
 
 		foreach ($reports as $report) {
+			if (!array_key_exists($report['reportid'], $db_reports)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Report with ID "%1$s" is not available.', $report['reportid'])
+				);
+			}
+
 			$db_report = $db_reports[$report['reportid']];
 
 			if (array_key_exists('name', $report) && $report['name'] !== $db_report['name']) {
 				$names[] = $report['name'];
+			}
+
+			if (array_key_exists('dashboardid', $report) && $report['dashboardid'] != $db_report['dashboardid']) {
+				$dashboardids[$report['dashboardid']] = true;
 			}
 
 			$active_since = $db_report['active_since'];
@@ -415,6 +582,11 @@ class CReport extends CApiService {
 		if ($names) {
 			$this->checkDuplicates($names);
 		}
+		if ($dashboardids) {
+			$this->checkDashboards(array_keys($dashboardids));
+		}
+		$this->checkUsers($reports, $db_reports);
+		$this->checkUserGroups($reports, $db_reports);
 	}
 
 	/**
