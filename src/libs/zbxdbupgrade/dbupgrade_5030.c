@@ -2965,10 +2965,10 @@ static int	dbpatch_aggregate2formula(const AGENT_REQUEST *request, char **str, s
 	}
 
 	zbx_chrcpy_alloc(str, str_alloc, str_offset, ']');
+
 	if (4 == request->nparam)
-	{
 		zbx_snprintf_alloc(str, str_alloc, str_offset, ",%s", request->params[3]);
-	}
+
 	zbx_strcpy_alloc(str, str_alloc, str_offset, "))");
 
 	if (ITEM_PARAM_LEN < zbx_strlen_utf8(*str))
