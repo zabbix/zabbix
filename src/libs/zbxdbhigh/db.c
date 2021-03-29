@@ -898,19 +898,19 @@ void	DBflush_version_requirements(struct zbx_json *json)
  *                                                                            *
  * Purpose: checks DBMS for optional features and exit if is not suitable     *
  *                                                                            *
+ * Parameters: db_version - [IN] version of DB                                *
+ *                                                                            *
  * Return value: SUCCEED - if optional features were checked successfully     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBcheck_capabilities(unsigned long db_version)
+int	DBcheck_capabilities(zbx_uint32_t db_version)
 {
-	int	ret = SUCCEED;
-
 #ifdef HAVE_POSTGRESQL
 
 #define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
 #define MIN_TIMESCALEDB_VERSION			10500
-	int		timescaledb_version;
+	int		timescaledb_version, ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -933,17 +933,13 @@ int	DBcheck_capabilities(unsigned long db_version)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum is %d",
 				db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
-		DBfree_result(result);
-		ret = FAIL;
-		goto out;
+		goto clean;
 	}
 
 	if (0 == (timescaledb_version = zbx_tsdb_get_version()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot determine TimescaleDB version");
-		DBfree_result(result);
-		ret = FAIL;
-		goto out;
+		goto clean;
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
@@ -952,18 +948,19 @@ int	DBcheck_capabilities(unsigned long db_version)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
 				timescaledb_version, MIN_TIMESCALEDB_VERSION);
-		DBfree_result(result);
-		ret = FAIL;
-		goto out;
+		goto clean;
 	}
+
+	ret = SUCCEED;
 clean:
 	DBfree_result(result);
 out:
 	DBclose();
 #else
+	int	ret = SUCCEED;
+
 	ZBX_UNUSED(db_version);
 #endif
-
 	return ret;
 }
 
