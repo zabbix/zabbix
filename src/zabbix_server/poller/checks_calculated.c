@@ -1073,7 +1073,7 @@ static void	calc_eval_clear(zbx_calc_eval_t *eval)
 static int	calcitem_eval_one(zbx_calc_eval_t *eval, zbx_calc_query_t *query, const char *name, size_t len, int args_num,
 		const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
-	char			func_name[MAX_STRING_LEN], *params = NULL, *errmsg = NULL;
+	char			func_name[MAX_STRING_LEN], *params = NULL;
 	size_t			params_alloc = 0, params_offset = 0;
 	DC_ITEM			*item;
 	int			i, ret = FAIL;
@@ -1139,25 +1139,27 @@ static int	calcitem_eval_one(zbx_calc_eval_t *eval, zbx_calc_query_t *query, con
 
 		switch (args[i].type)
 		{
-		case ZBX_VARIANT_DBL:
-			zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_DBL64, args[i].data.dbl);
-			break;
-		case ZBX_VARIANT_STR:
-			zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
-			break;
-		case ZBX_VARIANT_UI64:
-			zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64, args[i].data.ui64);
-			break;
-		case ZBX_VARIANT_NONE:
-			break;
-		default:
-			*error = zbx_dsprintf(NULL, " unsupported argument #%d type \"%s\"", i + 1,
-					zbx_variant_type_desc(&args[i]));
-			goto out;
+			case ZBX_VARIANT_DBL:
+				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_DBL64,
+						args[i].data.dbl);
+				break;
+			case ZBX_VARIANT_STR:
+				zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
+				break;
+			case ZBX_VARIANT_UI64:
+				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64,
+						args[i].data.ui64);
+				break;
+			case ZBX_VARIANT_NONE:
+				break;
+			default:
+				*error = zbx_dsprintf(NULL, " unsupported argument #%d type \"%s\"", i + 1,
+						zbx_variant_type_desc(&args[i]));
+				goto out;
 		}
 	}
 
-	ret = evaluate_function2(value, item, func_name, params, ts, &errmsg);
+	ret = evaluate_function2(value, item, func_name, params, ts, error);
 out:
 	zbx_free(params);
 
