@@ -78,7 +78,7 @@ foreach (DASHBOARD_DISPLAY_PERIODS as $period) {
 
 $form_list->addRow(new CLabel(_('Default page display period'), 'display_period'), $display_period_select);
 
-$form_list->addRow(new CLabel(_('Auto start slideshow'), 'auto_start'),
+$form_list->addRow(new CLabel(_('Start slideshow automatically'), 'auto_start'),
 	(new CCheckBox('auto_start'))->setChecked($data['dashboard']['auto_start'] == 1)
 );
 

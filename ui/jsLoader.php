@@ -142,41 +142,67 @@ $tranStrings = [
 		'Operation details' => _('Operation details')
 	],
 	'class.dashboard.js' => [
-		'Page %1$d' => _('Page %1$d')
-	],
-	'class.dashboard.page.js' => [
-		'Edit widget' => _('Edit widget'),
-		'Add widget' => _('Add widget'),
-		'Paste widget' => _('Paste widget'),
-		'S_COPY' => _('Copy'),
-		'S_PASTE' => _('Paste'),
-		'Apply' => _('Apply'),
-		'Add' => _('Add'),
-		'Edit' => _('Edit'),
-		'Cancel' => _('Cancel'),
+		'Actions' => _('Actions'),
+		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' => _('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
+		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.'),
+		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
-		'Previous page' => _('Previous page'),
-		'Next page' => _('Next page'),
-		'Widget is too small for the specified number of columns and rows.' =>
-			_('Widget is too small for the specified number of columns and rows.'),
-		'Cannot add widget: not enough free space on the dashboard.' =>
-			_('Cannot add widget: not enough free space on the dashboard.')
+		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
+		'Failed to paste widget.' => _('Failed to paste widget.'),
+		'Failed to update dashboard page properties.' => _('Failed to update dashboard page properties.'),
+		'Failed to update dashboard properties.' => _('Failed to update dashboard properties.'),
+		'Failed to update widget properties.' => _('Failed to update widget properties.'),
+		'Page %1$d' => _('Page %1$d'),
+		'Paste widget' => _('Paste widget'),
+		'Properties' => _('Properties'),
+		'Start slideshow' => _('Start slideshow'),
+		'Stop slideshow' => _('Stop slideshow')
 	],
 	'class.dashboard.widget.placeholder.js' => [
-		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
-		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
 		'Add a new widget' => _('Add a new widget'),
+		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
+		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Release to create a widget.' => _('Release to create a widget.'),
-		'Click and drag to desired size.' => _('Click and drag to desired size.')
+		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard')
 	],
 	'class.widget.js' => [
-		'No refresh' => _('No refresh'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
 		'1 minute' => _n('%1$s minute', '%1$s minutes', 1),
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
-		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15)
+		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
+		'Actions' => _s('Actions'),
+		'Copy' => _s('Copy'),
+		'Delete' => _s('Delete'),
+		'Edit' => _s('Edit'),
+		'No refresh' => _('No refresh'),
+		'Paste' => _s('Paste'),
+		'Refresh interval' => _s('Refresh interval')
+	],
+	'class.widget.iterator.js' => [
+		'Next page' => _s('Next page'),
+		'Previous page' => _s('Previous page'),
+		'Widget is too small for the specified number of columns and rows.' =>
+			_s('Widget is too small for the specified number of columns and rows.')
+	],
+	'class.widget.graph.js' => [
+		'Actions' => _s('Actions'),
+		'Download image' => _s('Download image')
+	],
+	'class.widget.navtree.js' => [
+		'Add' => _s('Add'),
+		'Add child element' => _s('Add child element'),
+		'Add multiple maps' => _s('Add multiple maps'),
+		'Apply' => _s('Apply'),
+		'Cancel' => _s('Cancel'),
+		'Edit' => _s('Edit'),
+		'Edit tree element' => _s('Edit tree element'),
+		'Remove' => _s('Remove')
+	],
+	'class.widget.svggraph.js' => [
+		'Actions' => _s('Actions'),
+		'Download image' => _s('Download image')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -328,15 +354,13 @@ $tranStrings = [
 		'Last month graph' => _('Last month graph'),
 		'Last week graph' => _('Last week graph'),
 		'Problems' => _('Problems'),
-		'Refresh interval' => _('Refresh interval'),
 		'Scripts' => _('Scripts'),
 		'Submap' => _('Submap'),
 		'S_TRIGGER' => _('Trigger'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
 		'Web' => _('Web'),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
-		'Download image' => _('Download image')
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
@@ -346,17 +370,6 @@ $tranStrings = [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
-	],
-	'class.cnavtree.js' => [
-		'Edit' => _('Edit'),
-		'Remove' => _('Remove'),
-		'root' => _('root'),
-		'Edit tree element' => _('Edit tree element'),
-		'Apply' => _('Apply'),
-		'Add' => _('Add'),
-		'Cancel' => _('Cancel'),
-		'Add child element' => _('Add child element'),
-		'Add multiple maps' => _('Add multiple maps')
 	],
 	'colorpicker.js' => [
 		'S_CLOSE' => _('Close')
