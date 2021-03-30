@@ -48,7 +48,7 @@ class CControllerPopupScheduledReportTest extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
 	}
 
 	protected function doAction() {
