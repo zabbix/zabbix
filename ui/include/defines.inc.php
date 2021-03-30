@@ -1668,7 +1668,7 @@ define('ZBX_STYLE_DASHBOARD', 'dashboard');
 define('ZBX_STYLE_DASHBOARD_IS_MULTIPAGE', 'dashboard-is-multipage');
 define('ZBX_STYLE_DASHBOARD_IS_EDIT_MODE', 'dashboard-is-edit-mode');
 define('ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS', 'dashboard-kioskmode-controls');
-define('ZBX_STYLE_DASHBOARD_GRID', 'dashboard-grid-container');
+define('ZBX_STYLE_DASHBOARD_GRID', 'dashboard-grid');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION', 'dashboard-navigation');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS', 'dashboard-navigation-controls');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION_TABS', 'dashboard-navigation-tabs');

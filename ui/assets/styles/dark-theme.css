@@ -772,14 +772,14 @@ footer {
   .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.dashboard-previous-page, .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.dashboard-next-page {
     display: inline-block; }
 
-.dashboard-grid-container {
+.dashboard-grid {
   position: relative;
   margin: 0 -4px -4px -4px;
   z-index: 3;
   transition: margin-top .3s; }
-  .dashboard-grid-container.reserve-header-lines-1 {
+  .dashboard-grid.reserve-header-lines-1 {
     margin-top: 2rem; }
-  .dashboard-grid-container.reserve-header-lines-2 {
+  .dashboard-grid.reserve-header-lines-2 {
     margin-top: calc(4rem + 8px); }
 
 .dashboard:not(.dashboard-is-multipage):not(.dashboard-is-edit-mode) .dashboard-navigation {

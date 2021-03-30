@@ -31,7 +31,7 @@ class CDashboardElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('class:dashboard-grid-container'))->asDashboard();
+		return (new CElementQuery('class:dashboard-grid'))->asDashboard();
 	}
 
 	/**
