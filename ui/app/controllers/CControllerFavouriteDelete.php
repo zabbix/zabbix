@@ -65,9 +65,10 @@ class CControllerFavouriteDelete extends CController {
 		if ($result) {
 			$data['main_block'] = '
 				var addrm_fav = document.getElementById("addrm_fav");
+
 				if (addrm_fav !== null) {
 					addrm_fav.title = "'._('Add to favourites').'";
-					addrm_fav.onclick = () => {add2favorites("'.$object.'", "'.$objectid.'");};
+					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'");
 					addrm_fav.classList.add("btn-add-fav");
 					addrm_fav.classList.remove("btn-remove-fav");
 				}
@@ -78,7 +79,7 @@ class CControllerFavouriteDelete extends CController {
 						}
 					});
 				}
-				';
+			';
 		}
 		else {
 			$data['main_block'] = '';
