@@ -1681,7 +1681,7 @@ class CDashboard extends CBaseComponent {
 			tabsClick: (e) => {
 				const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
 
-				if (tab !== null) {
+				if (tab !== null && tab.parentNode.classList.contains(ZBX_STYLE_SORTABLE_LIST)) {
 					const dashboard_page = this._tabs_dashboard_pages.get(tab);
 
 					if (dashboard_page !== this._selected_dashboard_page) {
