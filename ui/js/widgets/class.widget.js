@@ -73,13 +73,16 @@ class CWidget extends CBaseComponent {
 		this._pos = pos;
 		this._is_new = is_new;
 		this._rf_rate = rf_rate;
+
 		this._dashboard = {
 			templateid: dashboard.templateid,
 			dashboardid: dashboard.dashboardid
 		};
+
 		this._dashboard_page = {
 			unique_id: dashboard_page.unique_id
 		};
+
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
 		this._min_rows = min_rows;
@@ -132,6 +135,7 @@ class CWidget extends CBaseComponent {
 		if (this._state !== WIDGET_STATE_INITIAL) {
 			throw new Error('Unsupported state change.');
 		}
+
 		this._state = WIDGET_STATE_INACTIVE;
 
 		this._doStart();
@@ -149,6 +153,7 @@ class CWidget extends CBaseComponent {
 		if (this._state !== WIDGET_STATE_INACTIVE) {
 			throw new Error('Unsupported state change.');
 		}
+
 		this._state = WIDGET_STATE_ACTIVE;
 
 		this._doActivate();
@@ -163,6 +168,7 @@ class CWidget extends CBaseComponent {
 		if (this._state !== WIDGET_STATE_ACTIVE) {
 			throw new Error('Unsupported state change.');
 		}
+
 		this._state = WIDGET_STATE_INACTIVE;
 
 		this._doDeactivate();
@@ -182,9 +188,11 @@ class CWidget extends CBaseComponent {
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this.deactivate();
 		}
+
 		if (this._state !== WIDGET_STATE_INACTIVE) {
 			throw new Error('Unsupported state change.');
 		}
+
 		this._state = WIDGET_STATE_DESTROYED;
 
 		this._doDestroy();

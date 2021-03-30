@@ -62,11 +62,13 @@ class CDashboard extends CBaseComponent {
 			navigation: containers.navigation,
 			navigation_tabs: containers.navigation_tabs
 		}
+
 		this._buttons = {
 			previous_page: buttons.previous_page,
 			next_page: buttons.next_page,
 			slideshow: buttons.slideshow
 		};
+
 		this._data = {
 			dashboardid: data.dashboardid,
 			name: data.name,
@@ -75,6 +77,7 @@ class CDashboard extends CBaseComponent {
 			display_period: data.display_period,
 			auto_start: data.auto_start
 		};
+
 		this._max_dashboard_pages = max_dashboard_pages;
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
@@ -86,7 +89,7 @@ class CDashboard extends CBaseComponent {
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
-		this._is_kiosk_mode = is_kiosk_mode,
+		this._is_kiosk_mode = is_kiosk_mode;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
 

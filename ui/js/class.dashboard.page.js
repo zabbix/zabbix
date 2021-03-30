@@ -62,10 +62,12 @@ class CDashboardPage extends CBaseComponent {
 			name: data.name,
 			display_period: data.display_period
 		};
+
 		this._dashboard = {
 			templateid: dashboard.templateid,
 			dashboardid: dashboard.dashboardid
 		};
+
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
 		this._max_columns = max_columns;
@@ -189,9 +191,11 @@ class CDashboardPage extends CBaseComponent {
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
 			this.deactivate();
 		}
+
 		if (this._state !== DASHBOARD_PAGE_STATE_INACTIVE) {
 			throw new Error('Unsupported state change.');
 		}
+
 		this._state = DASHBOARD_PAGE_STATE_DESTROYED;
 
 		for (const widget of this._widgets.keys()) {
