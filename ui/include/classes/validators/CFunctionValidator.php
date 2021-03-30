@@ -229,7 +229,7 @@ class CFunctionValidator extends CValidator {
 			'nodata'=> [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
-					['type' => 'sec_min30', 'mandat' => 0x01],
+					['type' => 'sec_neg', 'mandat' => 0x01],
 					['type' => 'nodata_mode', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_all
@@ -406,9 +406,6 @@ class CFunctionValidator extends CValidator {
 			case 'sec_neg':
 				return $this->validateSecNeg($param);
 
-			case 'sec_min30':
-				return $this->validateSecMin30($param);
-
 			case 'num_suffix':
 				return $this->validateNumSuffix($param);
 
@@ -537,23 +534,6 @@ class CFunctionValidator extends CValidator {
 	 */
 	private function validateSecZero(string $param): bool {
 		return ($this->isMacro($param) || $this->validateSecValue($param));
-	}
-
-	/**
-	 * Validate trigger function parameter which cannot be less then 30 seconds.
-	 * Examples: 30s, 1m, 5w
-	 *
-	 * @param string $param
-	 *
-	 * @return bool
-	 */
-	private function validateSecMin30(string $param): bool {
-		if ($this->isMacro($param)) {
-			return true;
-		}
-
-		$sec = timeUnitToSeconds($param, false);
-		return ($sec && $sec >= 30);
 	}
 
 	/**
