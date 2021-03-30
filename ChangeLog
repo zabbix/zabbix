@@ -161,6 +161,13 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 --------------------------------------------------------------------------------
+Changes for 5.2.7rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.2.6
 
 5.2.6rc1 was released as 5.2.6 without any changes
@@ -635,6 +642,13 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.11rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.10
@@ -2650,6 +2664,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.31rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.30
