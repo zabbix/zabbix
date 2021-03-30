@@ -48,15 +48,17 @@ class CFunctionParameterResult extends CParserResult {
 	/**
 	 * Get value of parsed parameter.
 	 *
+	 * @param bool $keep_unquoted  Keep parameters of type CFunctionParser::PARAM_QUOTED unqioted.
+	 *
 	 * @return string
 	 */
-	public function getValue(): string {
+	public function getValue(bool $keep_unquoted = false): string {
 		$value = $this->match;
 
 		if ($this instanceof CQueryParserResult) {
 			return $value;
 		}
-		elseif ($this->type == CFunctionParser::PARAM_QUOTED) {
+		elseif (!$keep_unquoted && $this->type == CFunctionParser::PARAM_QUOTED) {
 			$value = (substr($value, 0, 1) === '"' && substr($value, -1) === '"') ? substr($value, 1, -1) : $value;
 		}
 
