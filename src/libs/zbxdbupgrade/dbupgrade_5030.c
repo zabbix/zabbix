@@ -1731,7 +1731,7 @@ static char	*update_template_name(char *old)
 	ptr = old;
 
 	if (NULL != zbx_regexp_match(old, "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) ", NULL) &&
-			1 == sscanf(old, "Template %*[^ ] %" ZBX_STR(MAX_STRING_LEN) "s", new) &&
+			1 == sscanf(old, "Template %*[^ ] %" ZBX_STR(MAX_STRING_LEN) "[^\n]s", new) &&
 			MIN_TEMPLATE_NAME_LEN <= strlen(new))
 	{
 		ptr = zbx_strdup(ptr, new);
@@ -1896,8 +1896,8 @@ static int	DBpatch_5030091(void)
 			zbx_free(trigger_expr);
 		}
 
-		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset,"%s", row[1]);
-		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset,"%s", expression);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", expression);
 
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set uuid='%s'"
@@ -1947,14 +1947,15 @@ static int	DBpatch_5030092(void)
 		DB_ROW		row2;
 		DB_RESULT	result2;
 
-		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset,"%s", row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
 
 		result2 = DBselect(
 				"select h.host"
 				" from graphs_items gi"
 				" join items i on i.itemid=gi.itemid"
 				" join hosts h on h.hostid=i.hostid"
-				" where gi.graphid=%s",
+				" where gi.graphid=%s"
+				" order by h.host",
 				row[0]);
 
 		while (NULL != (row2 = DBfetch(result2)))
@@ -2352,7 +2353,7 @@ static int	DBpatch_5030099(void)
 	{
 		templ_name = zbx_strdup(NULL, row[2]);
 		templ_name = update_template_name(templ_name);
-		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset,"%s%s%s", templ_name, row[3], row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s%s%s", templ_name, row[3], row[1]);
 
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set uuid='%s'"
@@ -2390,7 +2391,7 @@ static int	DBpatch_5030100(void)
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select h.hostid,h.host,h2.name,i.key_"
+			"select h.hostid,h.host,h2.host,i.key_"
 			" from hosts h"
 			" join host_discovery hd on hd.hostid=h.hostid"
 			" join items i on i.itemid=hd.parent_itemid"
