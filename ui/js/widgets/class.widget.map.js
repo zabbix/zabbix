@@ -21,7 +21,7 @@
 const WIDGET_SYSMAP_SOURCETYPE_MAP = 1;
 const WIDGET_SYSMAP_SOURCETYPE_FILTER = 2;
 
-const WIDGET_SYSMAP_EVENT_SUBMAP_SELECT = 'submap-select';
+const WIDGET_SYSMAP_EVENT_SUBMAP_SELECT = 'widget-sysmap-submap-select';
 
 class CWidgetMap extends CWidget {
 

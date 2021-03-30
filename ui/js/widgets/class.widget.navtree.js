@@ -18,8 +18,8 @@
 **/
 
 
-const WIDGET_NAVTREE_EVENT_MARK = 'mark';
-const WIDGET_NAVTREE_EVENT_SELECT = 'select';
+const WIDGET_NAVTREE_EVENT_MARK = 'widget-navtree-mark';
+const WIDGET_NAVTREE_EVENT_SELECT = 'widget-navtree-select';
 
 class CWidgetNavTree extends CWidget {
 
