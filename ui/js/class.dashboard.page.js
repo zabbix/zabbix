@@ -23,16 +23,16 @@ const DASHBOARD_PAGE_STATE_ACTIVE = 'active';
 const DASHBOARD_PAGE_STATE_INACTIVE = 'inactive';
 const DASHBOARD_PAGE_STATE_DESTROYED = 'destroyed';
 
-const DASHBOARD_PAGE_EVENT_EDIT = 'edit';
-const DASHBOARD_PAGE_EVENT_WIDGET_ADD = 'widget-add';
-const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'widget-delete';
-const DASHBOARD_PAGE_EVENT_WIDGET_POSITION = 'widget-position';
-const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'widget-edit';
-const DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS = 'widget-actions';
-const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'widget-copy';
-const DASHBOARD_PAGE_EVENT_WIDGET_PASTE = 'widget-paste';
-const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'announce-widgets';
-const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'reserve-header-lines';
+const DASHBOARD_PAGE_EVENT_EDIT = 'dashboard-page-edit';
+const DASHBOARD_PAGE_EVENT_WIDGET_ADD = 'dashboard-page-widget-add';
+const DASHBOARD_PAGE_EVENT_WIDGET_DELETE = 'dashboard-page-widget-delete';
+const DASHBOARD_PAGE_EVENT_WIDGET_POSITION = 'dashboard-page-widget-position';
+const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'dashboard-page-widget-edit';
+const DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS = 'dashboard-page-widget-actions';
+const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'dashboard-page-widget-copy';
+const DASHBOARD_PAGE_EVENT_WIDGET_PASTE = 'dashboard-page-widget-paste';
+const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'dashboard-page-announce-widgets';
+const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'dashboard-page-reserve-header-lines';
 
 class CDashboardPage extends CBaseComponent {
 

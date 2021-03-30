@@ -29,10 +29,10 @@ const DASHBOARD_STATE_ACTIVE = 'active';
 const DASHBOARD_CLIPBOARD_TYPE_WIDGET = 'widget';
 const DASHBOARD_CLIPBOARD_TYPE_DASHBOARD_PAGE = 'dashboard-page';
 
-const DASHBOARD_EVENT_BUSY = 'busy';
-const DASHBOARD_EVENT_IDLE = 'idle';
-const DASHBOARD_EVENT_EDIT = 'edit';
-const DASHBOARD_EVENT_APPLY_PROPERTIES = 'apply-properties';
+const DASHBOARD_EVENT_BUSY = 'dashboard-busy';
+const DASHBOARD_EVENT_IDLE = 'dashboard-idle';
+const DASHBOARD_EVENT_EDIT = 'dashboard-edit';
+const DASHBOARD_EVENT_APPLY_PROPERTIES = 'dashboard-apply-properties';
 
 class CDashboard extends CBaseComponent {
 

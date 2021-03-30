@@ -26,15 +26,15 @@ const WIDGET_STATE_ACTIVE = 'active';
 const WIDGET_STATE_INACTIVE = 'inactive';
 const WIDGET_STATE_DESTROYED = 'destroyed';
 
-const WIDGET_EVENT_EDIT = 'edit';
-const WIDGET_EVENT_ACTIONS = 'actions';
-const WIDGET_EVENT_ENTER = 'enter';
-const WIDGET_EVENT_LEAVE = 'leave';
-const WIDGET_EVENT_BEFORE_UPDATE = 'before-update';
-const WIDGET_EVENT_AFTER_UPDATE = 'after-update';
-const WIDGET_EVENT_COPY = 'copy';
-const WIDGET_EVENT_PASTE = 'paste';
-const WIDGET_EVENT_DELETE = 'delete';
+const WIDGET_EVENT_EDIT = 'widget-edit';
+const WIDGET_EVENT_ACTIONS = 'widget-actions';
+const WIDGET_EVENT_ENTER = 'widget-enter';
+const WIDGET_EVENT_LEAVE = 'widget-leave';
+const WIDGET_EVENT_BEFORE_UPDATE = 'widget-before-update';
+const WIDGET_EVENT_AFTER_UPDATE = 'widget-after-update';
+const WIDGET_EVENT_COPY = 'widget-copy';
+const WIDGET_EVENT_PASTE = 'widget-paste';
+const WIDGET_EVENT_DELETE = 'widget-delete';
 
 class CWidget extends CBaseComponent {
 
