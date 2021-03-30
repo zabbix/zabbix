@@ -987,8 +987,6 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_promiseApplyDashboardPageProperties(properties, data) {
-		const overlay = overlays_stack.getById('dashboard_page_properties');
-
 		properties.name = properties.name.trim();
 
 		const curl = new Curl('zabbix.php', false);
