@@ -2130,7 +2130,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
  ******************************************************************************/
 static int	dbpatch_is_numeric_count_pattern(const char *op, const char *pattern)
 {
-	if (0 == strncmp(op, "eq", ZBX_CONST_STRLEN("eq")) ||
+	if (NULL == op || '\0' == *op || 0 == strncmp(op, "eq", ZBX_CONST_STRLEN("eq")) ||
 			0 == strncmp(op, "ne", ZBX_CONST_STRLEN("ne")) ||
 			0 == strncmp(op, "gt", ZBX_CONST_STRLEN("gt")) ||
 			0 == strncmp(op, "ge", ZBX_CONST_STRLEN("ge")) ||
@@ -2267,19 +2267,19 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	else if (0 == strcmp(function->name, "count"))
 	{
 		int	arg_type = ZBX_DBPATCH_ARG_STR;
-		char	*op;
+		char	*op = NULL;
 
 		if (2 <= params.values_num)
 		{
 			const char	*pattern = function->parameter + params.values[1].l;
 
-			if (3 > params.values_num || '\0' == *(op = function->parameter + params.values[2].l))
-				op = zbx_strdup(NULL, "eq");
-			else
+			if (3 <= params.values_num && '\0' != *(op = function->parameter + params.values[2].l))
+			{
 				op = zbx_substr_unquote(function->parameter, params.values[2].l, params.values[2].r);
 
-			if (0 == strcmp(op, "band"))
-				op = zbx_strdup(op, "bitand");
+				if (0 == strcmp(op, "band"))
+					op = zbx_strdup(op, "bitand");
+			}
 
 			/* set numeric pattern type for numeric items and numeric operators unless */
 			/* band operation pattern contains mask (separated by '/')                 */
@@ -2289,8 +2289,6 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 				arg_type = ZBX_DBPATCH_ARG_NUM;
 			}
 		}
-		else
-			op = zbx_strdup(NULL, "");
 
 		dbpatch_convert_params(&parameter, function->parameter, &params,
 				ZBX_DBPATCH_ARG_HIST, 0, 3,
