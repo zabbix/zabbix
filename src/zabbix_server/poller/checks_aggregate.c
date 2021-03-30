@@ -309,12 +309,6 @@ int	evaluate_aggregate(zbx_vector_uint64_t *itemids, zbx_vector_ptr_t *dcitem_re
 
 	if (ZBX_VALUE_FUNC_LAST == item_func)
 	{
-		if (0 != args_num)
-		{
-			*error = zbx_strdup(NULL, "invalid number of function parameters");
-			return FAIL;
-		}
-
 		count = 1;
 		seconds = 0;
 	}
