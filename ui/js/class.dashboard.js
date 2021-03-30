@@ -173,7 +173,7 @@ class CDashboard extends CBaseComponent {
 			this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 		}
 
-		if (!this._is_edit_mode && this._data.auto_start == 1) {
+		if (!this._is_edit_mode && this._data.auto_start == 1 && this._dashboard_pages.size > 1) {
 			this._startSlideshow();
 		}
 	}
