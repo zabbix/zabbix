@@ -36,7 +36,7 @@
 				update_btn.setAttribute('value', 'scheduledreport.create');
 				update_btn.innerHTML = <?= json_encode(_('Add')) ?>;
 
-				document.querySelectorAll('#reportid, #clone, #test, #delete').forEach((elem) => { elem.remove(); });
+				document.querySelectorAll('#reportid, #clone, #delete').forEach((elem) => { elem.remove(); });
 			});
 		}
 

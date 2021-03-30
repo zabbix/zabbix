@@ -212,22 +212,24 @@ $form_grid
 	]);
 
 if ($data['source'] === 'reports') {
+	$test_button = (new CSimpleButton(_('Test')))
+		->setId('test')
+		->setEnabled($data['allowed_edit']);
+
 	$cancel_button = (new CRedirectButton(_('Cancel'),
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'scheduledreport.list')
 			->setArgument('page', CPagerHelper::loadPage('scheduledreport.list', null))
 	))->setId('cancel');
 
-	$buttons = [$cancel_button];
+	$buttons = [$test_button, $cancel_button];
 
 	if ($data['reportid'] != 0) {
 		$buttons = [
 			(new CSimpleButton(_('Clone')))
 				->setId('clone')
 				->setEnabled($data['allowed_edit']),
-			(new CSimpleButton(_('Test')))
-				->setId('test')
-				->setEnabled($data['allowed_edit']),
+			$test_button,
 			(new CRedirectButton(_('Delete'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'scheduledreport.delete')
