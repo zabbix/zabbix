@@ -95,6 +95,8 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_init() {
+		this._state = DASHBOARD_STATE_INITIAL;
+
 		this._dashboard_pages = new Map();
 		this._selected_dashboard_page = null;
 
