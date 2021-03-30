@@ -216,7 +216,7 @@ class CTextTriggerConstructor {
 			$expr = preg_replace('/^\((.*)\)$/u', '$1', $expr);
 
 			// trim parentheses around item function macros
-			$value = preg_replace('/\((.*)\)(=|<>)[01]/U', '$1', $expr);
+			$value = preg_replace('/\((.*)\)(=|<>)0/U', '$1', $expr);
 
 			// trim surrounding parentheses
 			$value = preg_replace('/^\((.*)\)$/u', '$1', $value);
