@@ -164,7 +164,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |ClickHouse: There are queries running more than {$CLICKHOUSE.QUERY_TIME.MAX.WARN} seconds |<p>-</p> |`{TEMPLATE_NAME:clickhouse.process.elapsed.last()}>{$CLICKHOUSE.QUERY_TIME.MAX.WARN}` |AVERAGE |<p>Manual close: YES</p> |
-|ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
+|ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |ClickHouse: Service is down |<p>-</p> |`{TEMPLATE_NAME:clickhouse.ping.last()}=0 or {ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</p> |
 |ClickHouse: Version has changed (new version: {ITEM.VALUE}) |<p>ClickHouse version has changed. Ack to close.</p> |`{TEMPLATE_NAME:clickhouse.version.diff()}=1 and {TEMPLATE_NAME:clickhouse.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |ClickHouse: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:clickhouse.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
