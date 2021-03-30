@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,21 +19,23 @@
 **/
 
 
-class CEventNameValidatorTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CEventNameValidatorTest extends TestCase {
 
 	/**
 	 * @var CEventNameValidator $validator
 	 */
 	protected $validator;
 
-	public function setUp() {
+	protected function setUp(): void {
 		$this->validator = new CEventNameValidator();
 	}
 
 	/**
 	 * An array of e-mails, results and error messages.
 	 */
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			['', true, null],
 			['Macro except expression macro are ignored {ANY_MACRO_HERE}', true, null],
@@ -50,7 +52,7 @@ class CEventNameValidatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 */
 	public function testValidateEmail($event_name, $expected, $error) {
 		$this->assertSame($this->validator->validate($event_name), $expected);
