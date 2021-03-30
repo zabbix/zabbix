@@ -31,6 +31,7 @@
 #include "zbxreport.h"
 #include "../../libs/zbxcrypto/aes.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
+#include "zbxalert.h"
 
 #include "report_manager.h"
 #include "report_protocol.h"
@@ -42,6 +43,10 @@
 #define ZBX_REPORT_UPDATE_STATE		0x0002
 #define ZBX_REPORT_UPDATE_ERROR		0x0004
 #define ZBX_REPORT_UPDATE		(ZBX_REPORT_UPDATE_LASTSENT | ZBX_REPORT_UPDATE_STATE | ZBX_REPORT_UPDATE_ERROR)
+
+#define ZBX_REPORT_STATE_SUCCESS	1
+#define ZBX_REPORT_STATE_ERROR		2
+#define ZBX_REPORT_STATE_SUCCESS_INFO	3
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num, CONFIG_REPORTWRITER_FORKS;
@@ -136,6 +141,8 @@ typedef struct
 	zbx_uint64_t		batchid;
 	zbx_uint64_t		reportid;
 	int			error_num;
+	int			sent_num;
+	int			total_num;
 	char			*info;
 	size_t			info_alloc;
 	size_t			info_offset;
@@ -628,7 +635,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 			else
 				esc = empty;
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cerror='%s'", delim, esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cinfo='%s'", delim, esc);
 
 			if (esc != empty)
 				zbx_free(esc);
@@ -1071,7 +1078,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 	zbx_vector_uint64_create(&reportids);
 
 	result = DBselect("select r.reportid,r.userid,r.name,r.dashboardid,r.period,r.cycle,r.weekdays,r.start_time,"
-				"r.active_since,r.active_till,u.timezone,r.state,r.error,r.lastsent,r.status"
+				"r.active_since,r.active_till,u.timezone,r.state,r.info,r.lastsent,r.status"
 			" from report r,users u"
 			" where r.userid=u.userid");
 
@@ -1977,6 +1984,8 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 	batch = (zbx_rm_batch_t *)zbx_hashset_insert(&manager->batches, &batch_local, sizeof(batch_local));
 	batch->reportid = report->reportid;
 	batch->error_num = 0;
+	batch->sent_num = 0;
+	batch->total_num = 0;
 	batch->info = NULL;
 	batch->info_alloc = 0;
 	batch->info_offset = 0;
@@ -2097,7 +2106,8 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
  *             info    - [IN] additional information (errors)                 *
  *                                                                            *
  ******************************************************************************/
-static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, const char *info)
+static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, const char *error, int sent_num,
+		int total_num)
 {
 	zbx_rm_batch_t	*batch;
 	int		i;
@@ -2115,9 +2125,14 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
 		size_t	offset = batch->info_offset;
 
 		batch->error_num++;
-		zbx_strcpy_alloc(&batch->info, &batch->info_alloc, &batch->info_offset, info);
+		zbx_strcpy_alloc(&batch->info, &batch->info_alloc, &batch->info_offset, error);
 		batch->info[offset] = toupper(batch->info[offset]);
 		zbx_strcpy_alloc(&batch->info, &batch->info_alloc, &batch->info_offset, ".\n");
+	}
+	else
+	{
+		batch->sent_num += sent_num;
+		batch->total_num += total_num;
 	}
 
 	for (i = 0; i < batch->jobs.values_num; i++)
@@ -2138,11 +2153,30 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
 
 		if (NULL != (report = (zbx_rm_report_t *)zbx_hashset_search(&manager->reports, &batch->reportid)))
 		{
-			char	str[MAX_STRING_LEN];
+			char	*info = NULL;
+			size_t	info_alloc = 0, info_offset = 0;
 
-			zbx_snprintf(str, sizeof(str), "Failed to send %d reports:\n%s", batch->error_num,
-					batch->info);
-			rm_update_report(manager, report, (0 == batch->error_num ? SUCCEED : FAIL), info);
+			status = ZBX_REPORT_STATE_SUCCESS;
+
+			if (batch->sent_num != batch->total_num)
+			{
+				zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
+						"Failed to sent %d report(s) from %d.\n",
+						batch->total_num - batch->sent_num, batch->total_num);
+				status = ZBX_REPORT_STATE_SUCCESS_INFO;
+			}
+
+			if (0 != batch->error_num)
+			{
+				zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
+						"Failed to create %d report(s):\n%s",
+						batch->error_num, batch->info);
+				status = ZBX_REPORT_STATE_ERROR;
+			}
+
+			rm_update_report(manager, report, status, info);
+
+			zbx_free(info);
 		}
 
 		rm_batch_clean(batch);
@@ -2208,7 +2242,7 @@ static int	rm_process_jobs(zbx_rm_t *manager)
 				rm_job_free(job);
 			}
 			else
-				rm_finish_job(manager, job, FAIL, error);
+				rm_finish_job(manager, job, FAIL, error, 0, 0);
 
 			zbx_queue_ptr_push(&manager->free_writers, writer);
 			zbx_free(error);
@@ -2285,8 +2319,6 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
  ******************************************************************************/
 static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 {
-	int		status;
-	char		*error;
 	zbx_rm_writer_t	*writer;
 
 	if (NULL == (writer = rm_get_writer(manager, client)))
@@ -2307,9 +2339,30 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 	}
 	else
 	{
-		report_deserialize_response(message->data, &status, &error, NULL);
-		rm_finish_job(manager, writer->job, status, error);
+		zbx_vector_ptr_t		results;
+		int				status, i, total_num = 0, sent_num = 0;
+		zbx_alerter_dispatch_result_t	*result;
+		char				*error;
+
+		zbx_vector_ptr_create(&results);
+
+		report_deserialize_response(message->data, &status, &error, &results);
+
+		for (i = 0; i < results.values_num; i++)
+		{
+			result = (zbx_alerter_dispatch_result_t *)results.values[i];
+
+			if (SUCCEED == result->status)
+				sent_num++;
+
+			total_num++;
+		}
+
+		rm_finish_job(manager, writer->job, status, error, sent_num, total_num);
 		zbx_free(error);
+
+		zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
+		zbx_vector_ptr_destroy(&results);
 	}
 
 	writer->job = NULL;

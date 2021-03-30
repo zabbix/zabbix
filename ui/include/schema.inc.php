@@ -8740,7 +8740,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'error' => [
+			'info' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
