@@ -634,7 +634,7 @@ return JSON.stringify(data)
                            <expression>{min(5m)}&gt;0</expression>
                            <name>Data region {#JMXNAME}: Pages replace rate more than 0</name>
                            <priority>WARNING</priority>
-                           <description>There is more data than DataRegionMaxSize. Сluster started to replace pages in memory. Page replacement can slow down operations.</description>
+                           <description>There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
