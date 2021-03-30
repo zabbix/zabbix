@@ -670,7 +670,8 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
  * @param {bool}   options['editable']
  * @param {bool}   options['has_related_reports']
  * @param {bool}   options['allowed_edit']
- * @param {bool}   options['allowed_manage_reports']
+ * @param {bool}   options['allowed_view_reports']
+ * @param {bool}   options['allowed_create_reports']
  * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
@@ -733,29 +734,34 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 	}
 
 	// Report actions.
-	if (options.allowed_manage_reports) {
-		sections.push({
-			label: options.allowed_edit ? null: t('Actions'),
-			items: [
-				{
-					label: t('Create new report'),
-					clickCallback: function () {
-						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+	if (options.allowed_view_reports) {
+		const report_actions = [
+			{
+				label: t('View related reports'),
+				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-						PopUp('popup.scheduledreport.edit', popup_options, null, trigger_elmnt);
-					}
+					PopUp('popup.scheduledreport.list', popup_options, null, trigger_elmnt);
 				},
-				{
-					label: t('View related reports'),
-					clickCallback: function () {
-						jQuery(this).closest('.menu-popup').menuPopup('close', null);
+				disabled: !options.has_related_reports
+			}
+		];
 
-						PopUp('popup.scheduledreport.list', popup_options, null, trigger_elmnt);
-					},
-					disabled: !options.has_related_reports
+		if (options.allowed_create_reports) {
+			report_actions.unshift({
+				label: t('Create new report'),
+				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					PopUp('popup.scheduledreport.edit', popup_options, null, trigger_elmnt);
 				}
-			]
-		});
+			});
+		}
+
+		sections.push({
+			label: options.allowed_edit ? null : t('Actions'),
+			items: report_actions
+		})
 	}
 
 	return sections;
