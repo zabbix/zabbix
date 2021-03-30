@@ -4006,8 +4006,8 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
-			margin: 0 -10px 10px;
-			padding: 0 10px;
+			margin: 0 -10px 8px;
+			padding: 2px 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
 
@@ -4142,7 +4142,7 @@ $form-icon-btn: (
 	}
 
 	.dashbrd-widget-head {
-		margin: -10px -10px 6px;
+		margin: -10px -10px 4px;
 	}
 
 	.maps-container {

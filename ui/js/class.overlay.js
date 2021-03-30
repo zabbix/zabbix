@@ -87,7 +87,7 @@ function Overlay(type, dialogueid) {
  */
 Overlay.prototype.centerDialog = function() {
 	var body_scroll_height = this.$dialogue.$body[0].scrollHeight,
-		body_height = this.$dialogue.$body.height();
+		body_height = this.$dialogue.$body.innerHeight();
 
 	if (body_height != Math.floor(body_height)) {
 		// The body height is often about a half pixel less than the height.
