@@ -132,7 +132,7 @@ There are no template links in this template.
 |PostgreSQL |Application {#APPLICATION}: Replication replay lag | |DEPENDENT |pgsql.replication.process.replay_lag["{#APPLICATION}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#APPLICATION}'].replay_lag`</p> |
 |PostgreSQL |Application {#APPLICATION}: Replication write lag | |DEPENDENT |pgsql.replication.process.write_lag["{#APPLICATION}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#APPLICATION}'].write_lag`</p> |
 |PostgreSQL |DB {#DBNAME}: Database age |<p>Database age</p> |ZABBIX_PASSIVE |pgsql.db.age["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
-|PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number оf bloating tables</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
+|PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number of bloating tables</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Database size |<p>Database size</p> |ZABBIX_PASSIVE |pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Blocks hit per second |<p>Total number of times disk blocks were found already in the buffer cache, so that a read was not necessary</p> |DEPENDENT |pgsql.dbstat.blks_hit.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blks_hit`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Total number of disk blocks read in this database</p> |DEPENDENT |pgsql.dbstat.blks_read.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blks_read`</p><p>- CHANGE_PER_SECOND |
