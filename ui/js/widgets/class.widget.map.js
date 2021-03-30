@@ -109,8 +109,10 @@ class CWidgetMap extends CWidget {
 	}
 
 	_promiseUpdate() {
-		if (!this._has_content || this._map_svg === null) {
-			if (this._sysmapid !== null || this._source_type == WIDGET_SYSMAP_SOURCETYPE_MAP) {
+		if (!this._has_contents || this._map_svg === null) {
+			if (this._sysmapid !== null
+					|| this._source_type == WIDGET_SYSMAP_SOURCETYPE_MAP
+					|| this._filter_widget === null) {
 				return super._promiseUpdate();
 			}
 
