@@ -25,6 +25,7 @@
 #include "zbxvariant.h"
 #include "zbxserialize.h"
 #include "zbxserver.h"
+#include "eval.h"
 
 ZBX_VECTOR_IMPL(eval_token, zbx_eval_token_t)
 

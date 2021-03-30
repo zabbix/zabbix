@@ -266,7 +266,7 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
  * Return value: The cached item.                                             *
  *                                                                            *
  ******************************************************************************/
-DC_ITEM	*get_dcitem(zbx_vector_ptr_t *dcitem_refs, zbx_uint64_t itemid)
+static DC_ITEM	*get_dcitem(zbx_vector_ptr_t *dcitem_refs, zbx_uint64_t itemid)
 {
 	int	index;
 
