@@ -135,11 +135,11 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' and {Trapper:trap[1].percentile(60,3600,80)} > 4'.
 				' and {Trapper:trap[1].percentile(1m,1h,90)} > 5',
 
-				'percentile(/Trapper/trap[1],30m,50) > 0'.
-				' and percentile(/Trapper/trap[1],60s,60) > 1'.
-				' and percentile(/Trapper/trap[1],#10,70) > 3'.
-				' and percentile(/Trapper/trap[1],60s:now-3600s,80) > 4'.
-				' and percentile(/Trapper/trap[1],1m:now-1h,90) > 5'
+				'percentile(/Trapper/trap[1],30m,"50") > 0'.
+				' and percentile(/Trapper/trap[1],60s,"60") > 1'.
+				' and percentile(/Trapper/trap[1],#10,"70") > 3'.
+				' and percentile(/Trapper/trap[1],60s:now-3600s,"80") > 4'.
+				' and percentile(/Trapper/trap[1],1m:now-1h,"90") > 5'
 			],
 			[
 				'{Trapper:trap[1].sum(30m)} > 0'.
@@ -184,16 +184,16 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{Trapper:trap[2].band(#1, 32)} > 0 and {Trapper:trap[2].band(#2, 64, 1h)} > 0',
-				'band(/Trapper/trap[2],#1,32) > 0 and band(/Trapper/trap[2],#2:now-1h,64) > 0'
+				'band(/Trapper/trap[2],#1,"32") > 0 and band(/Trapper/trap[2],#2:now-1h,"64") > 0'
 			],
 			[
 				'{Trapper:trap[2].forecast(#10,,100)} > 0'.
 				' and {Trapper:trap[2].forecast(3600,7200,600,linear,avg)} > 0'.
 				' and {Trapper:trap[2].forecast(30m,1d,600,,avg)} > 0',
 
-				'forecast(/Trapper/trap[2],#10,100s) > 0'.
-				' and forecast(/Trapper/trap[2],3600s:now-7200s,600s,"linear","avg") > 0'.
-				' and forecast(/Trapper/trap[2],30m:now-1d,600s,,"avg") > 0'
+				'forecast(/Trapper/trap[2],#10,"100s") > 0'.
+				' and forecast(/Trapper/trap[2],3600s:now-7200s,"600s","linear","avg") > 0'.
+				' and forecast(/Trapper/trap[2],30m:now-1d,"600s",,"avg") > 0'
 			],
 
 			[
@@ -201,9 +201,9 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' and {Trapper:trap[2].timeleft(3600,7200,600,linear)} > 0'.
 				' and {Trapper:trap[2].timeleft(30m,1d,600)} > 0',
 
-				'timeleft(/Trapper/trap[2],#10,100) > 0'.
-				' and timeleft(/Trapper/trap[2],3600s:now-7200s,600,"linear") > 0'.
-				' and timeleft(/Trapper/trap[2],30m:now-1d,600) > 0'
+				'timeleft(/Trapper/trap[2],#10,"100") > 0'.
+				' and timeleft(/Trapper/trap[2],3600s:now-7200s,"600","linear") > 0'.
+				' and timeleft(/Trapper/trap[2],30m:now-1d,"600") > 0'
 			],
 			[
 				'{Trapper:trap[3].count(#1, 0, eq)} > 0'.
@@ -214,11 +214,11 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				' and {Trapper:trap[1].count(1m, 32/8, band)} > 0'.
 				' and {Trapper:trap[1].count(1m)} > 0',
 
-				'count(/Trapper/trap[3],#1,"eq",0) > 0'.
+				'count(/Trapper/trap[3],#1,"eq","0") > 0'.
 				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'.
-				' and count(/Trapper/trap[2],5m:now-1h,"iregexp",10) > 0'.
-				' and count(/Trapper/trap[1],5m:now-2d,"gt",100) > 0'.
-				' and count(/Trapper/trap[1],1m,"band",32) > 0'.
+				' and count(/Trapper/trap[2],5m:now-1h,"iregexp","10") > 0'.
+				' and count(/Trapper/trap[1],5m:now-2d,"gt","100") > 0'.
+				' and count(/Trapper/trap[1],1m,"band","32") > 0'.
 				' and count(/Trapper/trap[1],1m,"band","32/8") > 0'.
 				' and count(/Trapper/trap[1],1m) > 0'
 			],
@@ -259,7 +259,7 @@ class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
 				'{Trapper:trap[3].count(#1,0,eq)} > 0'.
 				' and {Trapper:trap[3].count(5m,"xyz",regexp,2h)} > 0',
 
-				'count(/Trapper/trap[3],#1,"eq",0) > 0'.
+				'count(/Trapper/trap[3],#1,"eq","0") > 0'.
 				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'
 			],
 			[

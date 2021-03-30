@@ -339,23 +339,15 @@ class C52TriggerExpressionConverter extends CConverter {
 				break;
 		}
 
-		$parameters = array_values($parameters);
+		// Keys in $parameters array to skip from quoting.
+		$functions_with_period_parameter = ['delta', 'avg', 'max', 'min', 'sum', 'last', 'strlen', 'percentile',
+			'timeleft', 'forecast', 'band', 'count', 'fuzzytime', 'nodata', 'iregexp', 'regexp', 'str', 'trendavg',
+			'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum'
+		];
+		$unquotable_parameters = in_array($fn_name, $functions_with_period_parameter) ? [0] : [];
 
-		if (in_array($fn_name, ['percentile', 'band', 'timeleft', 'forecast'])) {
-			$keys_skip = [0, 1];
-		}
-		elseif ($fn_name === 'logeventid' || $fn_name === 'logsource') {
-			$keys_skip = [];
-		}
-		elseif ($fn_name === 'count') {
-			$keys_skip = [0, ctype_digit((string) $parameters[2]) ? 2 : null];
-		}
-		else {
-			$keys_skip = [0];
-		}
-
-		array_walk($parameters, function (&$param, $i) use ($keys_skip) {
-			if (in_array($i, $keys_skip)) {
+		array_walk($parameters, function (&$param, $i) use ($unquotable_parameters) {
+			if (in_array($i, $unquotable_parameters)) {
 				return;
 			}
 
