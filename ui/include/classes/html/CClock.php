@@ -23,16 +23,12 @@ class CClock extends CDiv {
 
 	private $width;
 	private $height;
-	private $error;
+	private $is_enabled = true;
 
 	public function __construct() {
 		parent::__construct();
 
 		$this->addClass(ZBX_STYLE_CLOCK);
-
-		$this->width = null;
-		$this->height = null;
-		$this->error = null;
 	}
 
 	public function setWidth($value) {
@@ -47,8 +43,8 @@ class CClock extends CDiv {
 		return $this;
 	}
 
-	public function setError($value) {
-		$this->error = $value;
+	public function setEnabled($is_enabled) {
+		$this->is_enabled = $is_enabled;
 
 		return $this;
 	}
@@ -132,7 +128,7 @@ class CClock extends CDiv {
 			$clock->setAttribute('style', 'width: '.$this->width.'px; height:'.$this->height.'px;');
 		}
 
-		if ($this->error !== null) {
+		if (!$this->is_enabled) {
 			$clock->addClass(ZBX_STYLE_DISABLED);
 		}
 

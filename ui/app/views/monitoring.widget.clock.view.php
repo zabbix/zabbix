@@ -32,15 +32,12 @@ if ($data['clock']['critical_error'] !== null) {
 	];
 }
 else {
-	$item = new CClock();
-
-	if ($data['clock']['error'] !== null) {
-		$item->setError($data['clock']['error']);
-	}
-
 	$output = [
 		'name' => $data['name'],
-		'body' => $item->toString(),
+		'body' =>
+			(new CClock())
+				->setEnabled($data['clock']['is_enabled'])
+				->toString(),
 		'clock_data' => [
 			'time' => $data['clock']['time'],
 			'time_zone_offset' => $data['clock']['time_zone_offset']

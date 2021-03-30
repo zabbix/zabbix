@@ -38,7 +38,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 		$time = null;
 		$name = $this->getDefaultName();
 		$time_zone_offset = null;
-		$error = null;
+		$is_enabled = true;
 		$critical_error = null;
 
 		switch ($fields['time_type']) {
@@ -68,7 +68,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 					}
 					// Editing template dashboard?
 					else {
-						$error = _('No data.');
+						$is_enabled = false;
 					}
 				}
 				else {
@@ -80,7 +80,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 					]);
 				}
 
-				if ($error === null) {
+				if ($is_enabled) {
 					if ($items) {
 						$item = $items[0];
 						$name = $item['hosts'][0]['name'];
@@ -98,11 +98,11 @@ class CControllerWidgetClockView extends CControllerWidget {
 								$time = time() - ($last_value['clock'] - $now->getTimestamp());
 							}
 							catch (Exception $e) {
-								$error = _('Incorrect data.');
+								$is_enabled = false;
 							}
 						}
 						else {
-							$error = _('No data.');
+							$is_enabled = false;
 						}
 					}
 					else {
@@ -129,7 +129,7 @@ class CControllerWidgetClockView extends CControllerWidget {
 			'clock' => [
 				'time' => $time,
 				'time_zone_offset' => $time_zone_offset,
-				'error' => $error,
+				'is_enabled' => $is_enabled,
 				'critical_error' => $critical_error
 			],
 			'user' => [
