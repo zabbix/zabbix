@@ -198,7 +198,7 @@ class CDashboard extends CBaseComponent {
 		}
 
 		this._stopSlideshow();
-		this._resetHeaderLines();
+
 		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 
 		if (is_internal_call) {
@@ -770,7 +770,9 @@ class CDashboard extends CBaseComponent {
 
 		this._activatePage(this._selected_dashboard_page);
 
-		this._resetHeaderLines();
+		if (this._is_kiosk_mode) {
+			this._resetHeaderLines();
+		}
 	}
 
 	_activatePage(dashboard_page) {
@@ -1168,8 +1170,6 @@ class CDashboard extends CBaseComponent {
 			.then(() => this._promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}))
 			.then((configuration) => {
 				overlayDialogueDestroy(overlay.dialogueid);
-
-				this._resetHeaderLines();
 
 				if (widget !== null && widget.getType() === type) {
 					widget.updateProperties({name, view_mode, fields, configuration});
