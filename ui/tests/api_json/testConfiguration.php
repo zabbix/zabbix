@@ -807,25 +807,16 @@ class testConfiguration extends CAPITest {
 			],
 			[
 				'format' => 'xml',
-				'parameter' => 'valueMaps',
-				'source' => '<?xml version="1.0" encoding="UTF-8"?>
-								<zabbix_export>
-								<version>3.2</version>
-								<date>2016-12-12T07:18:00Z</date>
-								<value_maps>
-									<value_map>
-										<name>API valueMap xml import</name>
-										<mappings>
-											<mapping>
-												<value>1</value>
-												<newvalue>Up</newvalue>
-											</mapping>
-										</mappings>
-									</value_map>
-								</value_maps>
-								</zabbix_export>',
-				'sql' => 'select * from valuemaps where name=\'API valueMap xml import\''
-			],
+				'rules' => [
+					'valueMaps' => [
+						'createMissing' => true
+					],
+					'hosts' => [
+						'createMissing' => true
+					]
+				],
+				'source' => '<?xml version="1.0" encoding="UTF-8"?> <zabbix_export> <version>5.4</version> <date>2016-12-12T07:18:00Z</date> <hosts> <host> <host>API xml import host</host> <name>API xml import host</name> <groups> <group> <name>Linux servers</name> </group> </groups> <valuemaps> <valuemap> <name>API valueMap xml import</name> <mappings> <mapping> <value>1</value> <newvalue>Up</newvalue> </mapping> </mappings> </valuemap> </valuemaps> </host> </hosts> </zabbix_export>',
+				'sql' => 'select * from valuemap where name=\'API valueMap xml import\''			],
 			[
 				'format' => 'json',
 				'rules' => [
