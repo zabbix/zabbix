@@ -367,7 +367,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 					'item' => 'trap'
 				],
 				[
-					'expression' => '(dayofweek()=0) or (last(/Zabbix server/trap)<>last(/Zabbix server/trap))',
+					'expression' => '(dayofweek()=0) or (last(/Zabbix server/trap)<>last(/Zabbix server/trap))'
 				]
 			],
 			'two short expressions' => [
