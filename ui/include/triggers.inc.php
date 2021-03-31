@@ -1861,6 +1861,9 @@ function get_item_function_info($expr) {
 		],
 		'day_of_week' => [
 			'any' => ['value_type' => '1-7', 'values' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7]]
+		],
+		'now' => [
+			'any' => ['value_type' => 'Numeric (integer)', 'values' => null]
 		]
 	];
 
@@ -1884,7 +1887,7 @@ function get_item_function_info($expr) {
 		'max' => $rules['numeric'],
 		'min' => $rules['numeric'],
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
-		'now' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
+		'now' => $rules['now'],
 		'percentile' => $rules['numeric'],
 		'sum' => $rules['numeric'],
 		'time' => $rules['time'],
