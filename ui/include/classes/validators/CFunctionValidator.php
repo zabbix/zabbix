@@ -511,12 +511,10 @@ class CFunctionValidator extends CValidator {
 			return true;
 		}
 
-		$param = explode(':', $param) + ['', ''];
-		$sec_num = $param[0];
-		$time_shift = $param[1];
+		[$period, $time_shift] = explode(':', $param) + ['', null];
 
-		$is_sec_num_valid = ((!($mandat & 0x01) && $sec_num === '') || $this->validateSecNum($sec_num));
-		$is_time_shift_valid = ((!($mandat & 0x02) && $time_shift === '') || $this->validatePeriodShift($time_shift));
+		$is_sec_num_valid = ((!($mandat & 0x01) && $period === '') || $this->validateSecNum($period));
+		$is_time_shift_valid = ((!($mandat & 0x02) && $time_shift === null) || $this->validatePeriodShift($time_shift));
 
 		return ($is_sec_num_valid && $is_time_shift_valid);
 	}
@@ -536,25 +534,24 @@ class CFunctionValidator extends CValidator {
 			return true;
 		}
 
-		$param = explode(':', $param) + ['', ''];
-		$period = $param[0];
-		$period_shift = $param[1];
+		[$period, $period_shift] = explode(':', $param) + ['', null];
 
-		$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
-		if ($mandat & 0x01) {
-			if (!$this->isMacro($period)) {
-				if ($simple_interval_parser->parse($period) != CParser::PARSE_SUCCESS) {
-					return false;
-				}
+		if (($mandat & 0x01) && !$this->isMacro($period)) {
+			$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
+			if ($simple_interval_parser->parse($period) != CParser::PARSE_SUCCESS) {
+				return false;
+			}
 
-				$value = timeUnitToSeconds($period, true);
-				if ($value < SEC_PER_HOUR || $value % SEC_PER_HOUR != 0) {
-					return false;
-				}
+			$value = timeUnitToSeconds($period, true);
+			if ($value < SEC_PER_HOUR || $value % SEC_PER_HOUR != 0) {
+				return false;
 			}
 		}
 
-		if (($mandat & 0x02) && !$this->validateTrendPeriods($period, $period_shift)) {
+		if (!($mandat & 0x02) && $period_shift === null) {
+			return true;
+		}
+		elseif (($mandat & 0x02) && !$this->validateTrendPeriods($period, $period_shift)) {
 			return $this->isMacro($period_shift);
 		}
 
@@ -702,27 +699,14 @@ class CFunctionValidator extends CValidator {
 	private function validatePeriodShift(string $param): bool {
 		$relative_time_parser = new CRelativeTimeParser();
 
-		if ($relative_time_parser->parse($param) == CParser::PARSE_SUCCESS) {
-			$tokens = $relative_time_parser->getTokens();
-
-			$offset_tokens = array_filter($tokens, function ($token) {
-				return ($token['type'] ==  CRelativeTimeParser::ZBX_TOKEN_OFFSET);
-			});
-
-			if (($offset_token = reset($offset_tokens)) !== false
-					&& $offset_token['sign'] === '-' && (int) $offset_token['value'] > 0) {
-				return true;
-			}
-		}
-
-		return false;
+		return ($relative_time_parser->parse($param) == CParser::PARSE_SUCCESS);
 	}
 
 	/**
 	 * Validate trend* function used period and period_shift arguments.
 	 *
-	 * @param string $period_value        Value of period, first argument for trend* function.
-	 * @param string $period_shift_value  Value of period shift, second argument for trend* function.
+	 * @param string $period_value        Value of period.
+	 * @param string $period_shift_value  Value of period shift.
 	 *
 	 * @return bool
 	 */
@@ -731,8 +715,15 @@ class CFunctionValidator extends CValidator {
 		$period = strpos($precisions, substr($period_value, -1));
 
 		if ($period !== false) {
+			if (substr($period_shift_value, 0, 4) !== 'now/') {
+				return false;
+			}
+			$period_shift_value = substr($period_shift_value, 4);
+
 			$relative_time_parser = new CRelativeTimeParser();
-			$relative_time_parser->parse($period_shift_value);
+			if ($relative_time_parser->parse($period_shift_value) !== CParser::PARSE_SUCCESS) {
+				return false;
+			}
 
 			foreach ($relative_time_parser->getTokens() as $token) {
 				if ($token['type'] !== CRelativeTimeParser::ZBX_TOKEN_PRECISION) {
