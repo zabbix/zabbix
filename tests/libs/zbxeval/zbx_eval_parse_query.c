@@ -40,7 +40,7 @@ void	zbx_mock_test_entry(void **state)
 
 	key = zbx_mock_get_parameter_string("out.key");
 
-	if (NULL == query.key)
+	if (0 == len)
 	{
 		if ('\0' != *key)
 			fail_msg("failed to parse query");
