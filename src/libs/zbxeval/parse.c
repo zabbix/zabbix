@@ -1041,6 +1041,8 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 
 		if (0 != (ctx->stack.values[ctx->stack.values_num - 1].type & ZBX_EVAL_CLASS_PROPERTY))
 		{
+			prop = &ctx->stack.values[ctx->stack.values_num - 1];
+
 			if (2 > ctx->stack.values_num)
 			{
 				*error = zbx_dsprintf(*error, "missing comparison string for property at \"%s\"",
@@ -1056,7 +1058,6 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 				return FAIL;
 			}
 
-			prop = &ctx->stack.values[ctx->stack.values_num - 1];
 		}
 
 		if (0 != (ctx->stack.values[ctx->stack.values_num - 1].type & ZBX_EVAL_CLASS_OPERAND) &&
