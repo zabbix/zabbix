@@ -47,5 +47,13 @@
 							.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_weekdays)
 					);
 			});
+
+		document
+			.querySelector('#scheduledreport-form')
+			.addEventListener('submit', () => {
+				document.querySelectorAll('#name, #subject, #message, #description').forEach((elem) => {
+					elem.value = elem.value.trim();
+				});
+			});
 	})();
 </script>
