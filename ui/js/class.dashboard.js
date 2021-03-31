@@ -1470,10 +1470,10 @@ class CDashboard extends CBaseComponent {
 
 		data.tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 		this._tabs.scrollItemIntoView(data.tab);
-		this._updateNavigationButtons({dashboard_page});
+		this._updateNavigationButtons(dashboard_page);
 	}
 
-	_updateNavigationButtons({dashboard_page = null} = {}) {
+	_updateNavigationButtons(dashboard_page = null) {
 		this._containers.navigation.classList.toggle(ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE,
 			this._tabs.isScrollable()
 		);
