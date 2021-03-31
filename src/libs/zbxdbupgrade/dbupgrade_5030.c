@@ -3613,6 +3613,8 @@ static int	DBpatch_5030108(void)
 			"web.dashbrd.list_was_opened", "web.dashboard.list_was_opened",
 			"web.dashbrd.filter", "web.dashboard.filter",
 			"web.dashbrd.filter.active", "web.dashboard.filter.active",
+			"web.dashbrd.filter.from", "web.dashboard.filter.from",
+			"web.dashbrd.filter.to", "web.dashboard.filter.to",
 			"web.dashbrd.filter_name", "web.dashboard.filter_name",
 			"web.dashbrd.filter_show", "web.dashboard.filter_show",
 			"web.dashbrd.last_widget_type", "web.dashboard.last_widget_type",
