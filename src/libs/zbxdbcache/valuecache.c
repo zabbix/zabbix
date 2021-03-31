@@ -2762,7 +2762,7 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 	if (ZBX_VC_DISABLED == vc_state)
 		return FAIL;
 
-	WRLOCK_CACHE;
+	RDLOCK_CACHE;
 
 	stats->hits = vc_cache->hits;
 	stats->misses = vc_cache->misses;
