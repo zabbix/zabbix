@@ -395,6 +395,10 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function checkQuotes(string $type, int $value_type, CParserResult $parameter): bool {
+		if ($parameter->getValue() === '') {
+			return true;
+		}
+
 		switch ($type) {
 			// Mandatory unquoted.
 			case 'query':
