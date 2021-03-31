@@ -1224,6 +1224,25 @@ static void	vc_remove_item(zbx_vc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vc_remove_item_by_id                                             *
+ *                                                                            *
+ * Purpose: removes item from cache and frees resources allocated for it      *
+ *                                                                            *
+ * Parameters: itemid - [IN] the item identifier                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_remove_item_by_id(zbx_uint64_t itemid)
+{
+	zbx_vc_item_t	*item;
+
+	if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &itemid)))
+		return;
+
+	vch_item_free_cache(item);
+	zbx_hashset_remove_direct(&vc_cache->items, item);
+}
+/******************************************************************************
+ *                                                                            *
  * Function: vc_item_update_db_cached_from                                    *
  *                                                                            *
  * Purpose: updates the timestamp from which the item is being cached         *
@@ -2632,7 +2651,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
 		int count, const zbx_timespec_t *ts)
 {
-	zbx_vc_item_t	*item;
+	zbx_vc_item_t	*item, new_item;
 	int 		ret = FAIL, cache_used = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d seconds:%d count:%d sec:%d ns:%d",
@@ -2648,21 +2667,18 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_re
 
 	if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
-		zbx_vc_item_t	new_item;
-
 		if (ZBX_VC_MODE_NORMAL != vc_cache->mode)
 			goto out;
 
 		memset(&new_item, 0, sizeof(new_item));
 		new_item.itemid = itemid;
 		new_item.value_type = value_type;
-
-		ret = vch_item_get_values(&new_item, values, seconds, count, ts);
+		item = &new_item;
 	}
 	else if (item->value_type != value_type)
 		goto out;
-	else
-		ret = vch_item_get_values(item, values, seconds, count, ts);
+
+	ret = vch_item_get_values(item, values, seconds, count, ts);
 out:
 	if (FAIL == ret)
 	{
@@ -2672,8 +2688,7 @@ out:
 		ret = vc_db_get_values(itemid, value_type, values, seconds, count, ts);
 		WRLOCK_CACHE;
 
-		if (NULL != item)
-			vc_remove_item(item);
+		vc_remove_item_by_id(itemid);
 
 		if (SUCCEED == ret)
 			vc_update_statistics(NULL, 0, values->values_num);
