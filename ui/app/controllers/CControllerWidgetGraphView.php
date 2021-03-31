@@ -45,7 +45,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 		$resourceid = null;
-		$profileIdx = 'web.dashbrd.filter';
+		$profileIdx = 'web.dashboard.filter';
 		$profileIdx2 = $this->getInput('dashboardid', 0);
 		$is_resource_available = true;
 		$header_name = $this->getDefaultName();

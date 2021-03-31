@@ -102,7 +102,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		// Use dashboard time from user profile.
 		if ($graph_data['dashboard_time'] && !$preview) {
 			$timeline = getTimeSelectorPeriod([
-				'profileIdx' => 'web.dashbrd.filter',
+				'profileIdx' => 'web.dashboard.filter',
 				'profileIdx2' => $this->getInput('dashboardid', 0)
 			]);
 

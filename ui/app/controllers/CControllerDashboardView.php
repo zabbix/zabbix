@@ -89,7 +89,7 @@ class CControllerDashboardView extends CController {
 		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 
 		$time_selector_options = [
-			'profileIdx' => 'web.dashbrd.filter',
+			'profileIdx' => 'web.dashboard.filter',
 			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
@@ -102,11 +102,11 @@ class CControllerDashboardView extends CController {
 			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
-			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
+			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 		];
 
 		if (self::hasDynamicWidgets($dashboard['pages'])) {
-			$hostid = $this->getInput('hostid', CProfile::get('web.dashbrd.hostid', 0));
+			$hostid = $this->getInput('hostid', CProfile::get('web.dashboard.hostid', 0));
 
 			$hosts = ($hostid != 0)
 				? CArrayHelper::renameObjectsKeys(API::Host()->get([
@@ -201,9 +201,9 @@ class CControllerDashboardView extends CController {
 			// Getting existing dashboard.
 			$dashboardid = $this->hasInput('dashboardid')
 				? $this->getInput('dashboardid')
-				: CProfile::get('web.dashbrd.dashboardid');
+				: CProfile::get('web.dashboard.dashboardid');
 
-			if ($dashboardid === null && CProfile::get('web.dashbrd.list_was_opened') != 1) {
+			if ($dashboardid === null && CProfile::get('web.dashboard.list_was_opened') != 1) {
 				// Get first available dashboard that user has read permissions.
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid'],
@@ -234,7 +234,7 @@ class CControllerDashboardView extends CController {
 						'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
 					];
 
-					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
+					CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
 				elseif ($this->hasInput('dashboardid')) {
 					$error = _('No permissions to referred object or it does not exist!');

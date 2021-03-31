@@ -2076,7 +2076,7 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4)
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (100, 'Dashboard for Problem hosts widget', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (100, 100);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1000, 100, 'problemhosts', '', 0, 0, 8, 8);
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashbrd.dashboardid', 1,'','', 1);
+INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashboard.dashboardid', 1,'','', 1);
 
 -- testPageAvailabilityReport SLA reports
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '');

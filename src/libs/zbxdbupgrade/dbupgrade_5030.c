@@ -3601,6 +3601,48 @@ static int	DBpatch_5030107(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_5030108(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.dashbrd.dashboardid", "web.dashboard.dashboardid",
+			"web.dashbrd.hostid", "web.dashboard.hostid",
+			"web.dashbrd.list.sort", "web.dashboard.list.sort",
+			"web.dashbrd.list.sortorder", "web.dashboard.list.sortorder",
+			"web.dashbrd.list_was_opened", "web.dashboard.list_was_opened",
+			"web.dashbrd.filter", "web.dashboard.filter",
+			"web.dashbrd.filter.active", "web.dashboard.filter.active",
+			"web.dashbrd.filter_name", "web.dashboard.filter_name",
+			"web.dashbrd.filter_show", "web.dashboard.filter_show",
+			"web.dashbrd.last_widget_type", "web.dashboard.last_widget_type",
+			"web.dashbrd.navtree.item.selected", "web.dashboard.widget.navtree.item.selected",
+			"web.dashbrd.widget.rf_rate", "web.dashboard.widget.rf_rate"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030109(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx=CONCAT('web.dashboard.widget.navtree.item-', SUBSTR(idx, 21))"
+			" where idx like 'web.dashbrd.navtree-%.toggle'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5030)
@@ -3715,5 +3757,7 @@ DBPATCH_ADD(5030104, 0, 1)
 DBPATCH_ADD(5030105, 0, 1)
 DBPATCH_ADD(5030106, 0, 1)
 DBPATCH_ADD(5030107, 0, 1)
+DBPATCH_ADD(5030108, 0, 1)
+DBPATCH_ADD(5030109, 0, 1)
 
 DBPATCH_END()

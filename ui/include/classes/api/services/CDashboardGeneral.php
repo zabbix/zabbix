@@ -811,7 +811,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 */
 	protected static function deleteWidgets(array $widgetids): void {
 		DB::delete('profiles', [
-			'idx' => 'web.dashbrd.widget.rf_rate',
+			'idx' => 'web.dashboard.widget.rf_rate',
 			'idx2' => $widgetids
 		]);
 

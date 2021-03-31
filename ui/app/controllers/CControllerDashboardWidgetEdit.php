@@ -71,11 +71,11 @@ class CControllerDashboardWidgetEdit extends CController {
 			$type = $this->getInput('type');
 
 			if (!array_key_exists($type, $known_widget_types) || $this->getInput('prev_type', $type) !== $type) {
-				CProfile::update('web.dashbrd.last_widget_type', $type, PROFILE_TYPE_STR);
+				CProfile::update('web.dashboard.last_widget_type', $type, PROFILE_TYPE_STR);
 			}
 		}
 		else {
-			$type = CProfile::get('web.dashbrd.last_widget_type');
+			$type = CProfile::get('web.dashboard.last_widget_type');
 			if (!array_key_exists($type, $known_widget_types)) {
 				$type = array_keys($known_widget_types)[0];
 			}
