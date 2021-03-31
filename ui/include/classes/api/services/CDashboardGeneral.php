@@ -805,15 +805,21 @@ abstract class CDashboardGeneral extends CApiService {
 	/**
 	 * Delete widgets.
 	 *
+	 * This will also delete profile keys related to the specified widgets, including the standard ones:
+	 *   - web.dashboard.widget.rf_rate
+	 *   - web.dashboard.widget.navtree.item.selected
+	 *   - web.dashboard.widget.navtree.item-*.toggle
+	 *
 	 * @static
 	 *
 	 * @param array $widgetids
 	 */
 	protected static function deleteWidgets(array $widgetids): void {
-		DB::delete('profiles', [
-			'idx' => 'web.dashboard.widget.rf_rate',
-			'idx2' => $widgetids
-		]);
+		DBexecute(
+			'DELETE FROM profiles'.
+				' WHERE idx LIKE '.zbx_dbstr('web.dashboard.widget.%').
+					' AND '.dbConditionId('idx2', $widgetids)
+		);
 
 		DB::delete('widget', ['widgetid' => $widgetids]);
 	}
