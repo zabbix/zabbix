@@ -1973,14 +1973,14 @@ static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_
  *                         description)                                       *
  *                                                                            *
  ******************************************************************************/
-static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector_loc_t *params, ...)
+static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_loc_t *params, ...)
 {
-	size_t		out_alloc = 0, out_offset = 0;
-	va_list 	args;
-	int		index, type, param_num = 0;
-	zbx_strloc_t	*loc;
-	const char	*ptr;
-	char		*arg;
+	size_t			out_alloc = 0, out_offset = 0;
+	va_list 		args;
+	int			index, type, param_num = 0;
+	const zbx_strloc_t	*loc;
+	const char		*ptr;
+	char			*arg;
 
 	va_start(args, params);
 
@@ -2116,6 +2116,29 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 		*out = zbx_strdup(NULL, "");
 }
 
+static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, zbx_vector_loc_t *params,
+		char **replace)
+{
+	char	*parameter = NULL, *mask = NULL;
+
+	if (2 <= params->values_num && '\0' != function->parameter[params->values[1].l])
+	{
+		mask = zbx_substr_unquote(function->parameter, params->values[1].l, params->values[1].r);
+		*replace = zbx_dsprintf(NULL, "bitand({" ZBX_FS_UI64 "},%s)", function->functionid, mask);
+		zbx_free(mask);
+	}
+	else
+		*replace = zbx_dsprintf(NULL, "bitand({" ZBX_FS_UI64 "})", function->functionid);
+
+	dbpatch_convert_params(&parameter, function->parameter, params,
+			ZBX_DBPATCH_ARG_HIST, 0, 2,
+			ZBX_DBPATCH_ARG_NONE);
+
+	dbpatch_update_function(function, "last", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+
+	zbx_free(parameter);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: dbpatch_is_numeric_count_pattern                                 *
@@ -2241,11 +2264,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	}
 	else if (0 == strcmp(function->name, "band"))
 	{
-		dbpatch_convert_params(&parameter, function->parameter, &params,
-				ZBX_DBPATCH_ARG_HIST, 0, 2,
-				ZBX_DBPATCH_ARG_NUM, 1,
-				ZBX_DBPATCH_ARG_NONE);
-		dbpatch_update_function(function, "bitand", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+		dbpatch_update_func_bitand(function, &params, replace);
 	}
 	else if (0 == strcmp(function->name, "forecast"))
 	{
