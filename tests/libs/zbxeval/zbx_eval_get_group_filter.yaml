@@ -82,4 +82,11 @@ in:
 out:
   groups: ['x', 'y']
   filter: '({0}={1})'
+---
+test case: Expression 'group<>"abc" and group<>"xyz"'
+in:
+  expression: 'group<>"abc" and group<>"xyz"'
+out:
+  groups: [abc,xyz]
+  filter: '(not {0} and not {1})'
 ...

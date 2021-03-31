@@ -500,14 +500,14 @@ static void	calc_get_item_candidates(zbx_calc_eval_t *eval, const zbx_calc_query
 		clause = "and";
 	}
 
-	if (0 != (query->flags & ZBX_CALC_QUERY_FILTER) && '\0' != *filter_template)
+	if (0 != (query->flags & ZBX_CALC_QUERY_FILTER) && NULL != filter_template && '\0' != *filter_template)
 	{
 		zbx_uint64_t		index;
 		int			pos = 0, last_pos = 0;
 		zbx_token_t		token;
 		zbx_calc_group_t	*group;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " %s", clause);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " %s ", clause);
 
 		for (; SUCCEED == zbx_token_find(filter_template, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
 		{
@@ -524,6 +524,9 @@ static void	calc_get_item_candidates(zbx_calc_eval_t *eval, const zbx_calc_query
 
 			zbx_strncpy_alloc(&sql, &sql_alloc, &sql_offset, filter_template + last_pos,
 					token.loc.l - last_pos);
+
+			if (' ' == sql[sql_offset - 1])
+				sql_offset--;
 
 			if (0 < group->hostids.values_num)
 			{
