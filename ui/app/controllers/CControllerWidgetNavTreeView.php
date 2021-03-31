@@ -458,14 +458,16 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		$widgetid = $this->getInput('widgetid', 0);
 		$navtree_item_selected = 0;
 		$navtree_items_opened = [];
-		if ($widgetid) {
-			$navtree_items_opened = CProfile::findByIdxPattern('web.dashboard.widget.navtree.item-%.toggle', $widgetid);
 
-			// Keep only numerical value from idx key name.
-			foreach ($navtree_items_opened as &$item_opened) {
-				$item_opened = substr($item_opened, 20, -7);
+		if ($widgetid) {
+			$pattern = 'web.dashboard.widget.navtree.item-%.toggle';
+			$discard_from_start = strpos($pattern, '%');
+			$discard_from_end = strlen($pattern) - $discard_from_start - 1;
+
+			foreach (CProfile::findByIdxPattern($pattern, $widgetid) as $item_opened) {
+				$navtree_items_opened[] = substr($item_opened, $discard_from_start, -$discard_from_end);
 			}
-			unset($item_opened);
+
 			$navtree_item_selected = CProfile::get('web.dashboard.widget.navtree.item.selected', 0, $widgetid);
 		}
 
