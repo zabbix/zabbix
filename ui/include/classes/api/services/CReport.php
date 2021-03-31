@@ -47,7 +47,7 @@ class CReport extends CApiService {
 	protected $sortColumns = ['reportid', 'name', 'status'];
 
 	protected $output_fields = ['reportid', 'userid', 'name', 'description', 'status', 'dashboardid', 'period', 'cycle',
-		'weekdays', 'start_time', 'active_since', 'active_till', 'state', 'lastsent', 'error', 'subject', 'message'
+		'weekdays', 'start_time', 'active_since', 'active_till', 'state', 'lastsent', 'info', 'subject', 'message'
 	];
 	protected $user_output_fields = ['userid', 'access_userid', 'exclude'];
 	protected $usrgrp_output_fields = ['usrgrpid', 'access_userid'];
@@ -70,7 +70,7 @@ class CReport extends CApiService {
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'dashboardid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED],
-				'state' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_REPORT_STATE_UNKNOWN, ZBX_REPORT_STATE_SENT, ZBX_REPORT_STATE_ERROR])]
+				'state' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_REPORT_STATE_UNKNOWN, ZBX_REPORT_STATE_SENT, ZBX_REPORT_STATE_ERROR, ZBX_REPORT_STATE_SUCCESS_INFO])]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]

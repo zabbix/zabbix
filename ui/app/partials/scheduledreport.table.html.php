@@ -69,8 +69,11 @@ foreach ($data['reports'] as $report) {
 
 	$info_icons = [];
 
-	if ($report['state'] == ZBX_REPORT_STATE_ERROR && $report['error'] !== '') {
-		$info_icons[] = makeErrorIcon($report['error']);
+	if (($report['state'] == ZBX_REPORT_STATE_ERROR || $report['state'] == ZBX_REPORT_STATE_SUCCESS_INFO)
+			&& $report['info'] !== '') {
+		$info_icons[] = ($report['state'] == ZBX_REPORT_STATE_ERROR)
+			? makeErrorIcon($report['info'])
+			: makeWarningIcon($report['info']);
 	}
 
 	if ($report['status'] == ZBX_REPORT_STATUS_DISABLED) {

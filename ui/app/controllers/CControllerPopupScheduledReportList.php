@@ -56,7 +56,7 @@ class CControllerPopupScheduledReportList extends CController {
 			],
 			'reports' => API::Report()->get([
 				'output' => ['reportid', 'userid', 'name', 'status', 'period', 'cycle', 'active_till', 'state',
-					'lastsent', 'error'
+					'lastsent', 'info'
 				],
 				'filter' => ['dashboardid' => $this->getInput('dashboardid')]
 			])

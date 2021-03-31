@@ -101,7 +101,7 @@ class CControllerScheduledReportList extends CController {
 
 		$data['reports'] = API::Report()->get([
 			'output' => ['reportid', 'userid', 'name', 'status', 'period', 'cycle', 'active_till', 'state', 'lastsent',
-				'error'
+				'info'
 			],
 			'expired' => $expired,
 			'search' => [
