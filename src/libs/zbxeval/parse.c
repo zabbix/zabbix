@@ -1041,30 +1041,37 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 
 		if (0 != (ctx->stack.values[ctx->stack.values_num - 1].type & ZBX_EVAL_CLASS_PROPERTY))
 		{
-			prop = &ctx->stack.values[ctx->stack.values_num - 1];
-
 			if (2 > ctx->stack.values_num)
 			{
 				*error = zbx_dsprintf(*error, "missing comparison string for property at \"%s\"",
 						ctx->expression + prop->loc.l);
 				return FAIL;
 			}
-		}
-		else
-			value = &ctx->stack.values[ctx->stack.values_num - 1];
 
-		if (2 <= ctx->stack.values_num)
+			value = &ctx->stack.values[ctx->stack.values_num - 2];
+			if (0 == (value->type & ZBX_EVAL_CLASS_OPERAND))
+			{
+				*error = zbx_dsprintf(*error, "property must be compared with a constant value at"
+						" \"%s\"", ctx->expression + prop->loc.l);
+				return FAIL;
+			}
+
+			prop = &ctx->stack.values[ctx->stack.values_num - 1];
+		}
+
+		if (0 != (ctx->stack.values[ctx->stack.values_num - 1].type & ZBX_EVAL_CLASS_OPERAND) &&
+				0 != (token->type & ZBX_EVAL_CLASS_OPERATOR2))
 		{
 			if (0 != (ctx->stack.values[ctx->stack.values_num - 2].type & ZBX_EVAL_CLASS_PROPERTY))
+			{
 				prop = &ctx->stack.values[ctx->stack.values_num - 2];
-			else
-				value = &ctx->stack.values[ctx->stack.values_num - 2];
+				value = &ctx->stack.values[ctx->stack.values_num - 1];
+			}
 		}
 
 		if (NULL != prop)
 		{
-			if (NULL == value || (ZBX_EVAL_TOKEN_VAR_STR != value->type &&
-					ZBX_EVAL_TOKEN_VAR_USERMACRO != value->type &&
+			if ((ZBX_EVAL_TOKEN_VAR_STR != value->type && ZBX_EVAL_TOKEN_VAR_USERMACRO != value->type &&
 					ZBX_EVAL_TOKEN_VAR_LLDMACRO != value->type))
 			{
 				*error = zbx_dsprintf(*error, "invalid value type compared with property at \"%s\"",

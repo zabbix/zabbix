@@ -17,9 +17,8 @@ test case: Expression 'group="x" or "y"=group'
 in:
   expression: 'group="x" or "y"=group'
 out:
-  groups: ['x']
-  groups: ['y']
-  filter: '{0} or {1}'
+  groups: ['x','y']
+  filter: '({0} or {1})'
 ---
 test case: Expression 'tag="a"'
 in:
