@@ -89,4 +89,11 @@ in:
 out:
   groups: [abc,xyz]
   filter: '(not {0} and not {1})'
+---
+test case: Expression '(group="Zabbix servers") or ("Zabbix servers"=group)'
+in:
+  expression: '(group="Zabbix servers") or ("Zabbix servers"=group)'
+out:
+  groups: [Zabbix servers,Zabbix servers]
+  filter: '({0} or {1})'
 ...

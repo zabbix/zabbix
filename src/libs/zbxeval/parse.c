@@ -1247,8 +1247,8 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 		else if (ZBX_EVAL_TOKEN_GROUP_CLOSE == token.type)
 		{
 			/* right parenthesis must follow and operand, right parenthesis or function */
-			if (0 == (ctx->last_token_type & ZBX_EVAL_CLASS_OPERAND) &&
-					0 == (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR) &&
+			if (0 == (ctx->last_token_type & (ZBX_EVAL_CLASS_OPERAND | ZBX_EVAL_CLASS_PROPERTY |
+					ZBX_EVAL_CLASS_SEPARATOR)) &&
 					(ctx->ops.values_num < 2 ||
 					ZBX_EVAL_TOKEN_FUNCTION != ctx->ops.values[ctx->ops.values_num - 2].type))
 			{
