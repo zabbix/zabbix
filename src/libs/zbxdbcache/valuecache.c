@@ -663,14 +663,14 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
  *           added to both - item and cache statistics.                       *
  *                                                                            *
  ******************************************************************************/
-static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
+static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses, int now)
 {
 	if (NULL != item)
 	{
 		int	hour;
 
 		item->hits += hits;
-		item->last_accessed = time(NULL);
+		item->last_accessed = now;
 
 		hour = item->last_accessed / SEC_PER_HOUR;
 		if (hour != item->hour)
@@ -2691,7 +2691,7 @@ out:
 		vc_remove_item_by_id(itemid);
 
 		if (SUCCEED == ret)
-			vc_update_statistics(NULL, 0, values->values_num);
+			vc_update_statistics(NULL, 0, values->values_num, time(NULL));
 	}
 
 	UNLOCK_CACHE;
@@ -2896,7 +2896,7 @@ void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
  ******************************************************************************/
 void	zbx_vc_flush_stats()
 {
-	int		i;
+	int		i, now;
 	zbx_vc_item_t	*item = NULL;
 	zbx_uint64_t	itemid = 0;
 
@@ -2904,6 +2904,8 @@ void	zbx_vc_flush_stats()
 		return;
 
 	zbx_vector_vc_itemupdate_sort(&vc_itemupdates, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	now = time(NULL);
 
 	WRLOCK_CACHE;
 
@@ -2928,7 +2930,7 @@ void	zbx_vc_flush_stats()
 				break;
 			case ZBX_VC_UPDATE_STATS:
 				vc_update_statistics(item, update->data[ZBX_VC_UPDATE_STATS_HITS],
-						update->data[ZBX_VC_UPDATE_STATS_MISSES]);
+						update->data[ZBX_VC_UPDATE_STATS_MISSES], now);
 				break;
 		}
 	}
