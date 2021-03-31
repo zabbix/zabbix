@@ -172,7 +172,7 @@ class testFormAdministrationGeneral extends CWebTest {
 			$data['fields']['Login attempts'] = '3';
 		}
 		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
-		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD && CTestArrayHelper::get($values, 'Default time zone')) {
 			$values['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($values['Default time zone']);
 		}
 		$form->checkValue($values);

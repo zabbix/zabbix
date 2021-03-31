@@ -272,7 +272,7 @@ class testFormSetup extends CWebTest {
 			$this->assertContains($timezone, $timezones);
 		}
 		// Select a certain timezone.
-		$form->getField('Default time zone')->select($timezone);
+		$form->getField('Default time zone')->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
 
 		// Check Default theme field.
 		$themes = $form->getField('Default theme');
