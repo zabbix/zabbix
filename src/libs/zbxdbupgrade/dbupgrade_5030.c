@@ -1980,6 +1980,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 	int		index, type, param_num = 0;
 	zbx_strloc_t	*loc;
 	const char	*ptr;
+	char		*arg;
 
 	va_start(args, params);
 
@@ -1995,17 +1996,15 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 				{
 					loc = &params->values[index];
 
-					if ('#' == parameter[loc->l])
+					if ('\0' != parameter[loc->l])
 					{
-						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-								loc->r - loc->l + 1);
-					}
-					else
-					{
-						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-								loc->r - loc->l + 1);
-						if (0 != isdigit(parameter[loc->r]))
+						arg = zbx_substr_unquote(parameter, loc->l, loc->r);
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, arg);
+
+						if ('#' != *arg && 0 != isdigit(arg[strlen(arg) - 1]))
 							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
+
+						zbx_free(arg);
 					}
 				}
 
@@ -2015,14 +2014,17 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 
 					if ('\0' != parameter[loc->l])
 					{
+						arg = zbx_substr_unquote(parameter, loc->l, loc->r);
+
 						if (0 == out_offset)
 							zbx_strcpy_alloc(out, &out_alloc, &out_offset, "#1");
 
 						zbx_strcpy_alloc(out, &out_alloc, &out_offset, ":now-");
-						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-								loc->r - loc->l + 1);
-						if (0 != isdigit(parameter[loc->r]))
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, arg);
+						if (0 != isdigit(arg[strlen(arg) - 1]))
 							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
+
+						zbx_free(arg);
 					}
 				}
 

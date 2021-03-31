@@ -19,7 +19,9 @@
 **/
 
 
-class C10FunctionParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class C10FunctionParserTest extends TestCase {
 
 	/**
 	 * An array of trigger functions and parsed results.
