@@ -3619,7 +3619,9 @@ static int	DBpatch_5030108(void)
 			"web.dashbrd.filter_show", "web.dashboard.filter_show",
 			"web.dashbrd.last_widget_type", "web.dashboard.last_widget_type",
 			"web.dashbrd.navtree.item.selected", "web.dashboard.widget.navtree.item.selected",
-			"web.dashbrd.widget.rf_rate", "web.dashboard.widget.rf_rate"
+			"web.dashbrd.widget.rf_rate", "web.dashboard.widget.rf_rate",
+			"web.templates.dashbrd.list.sort", "web.templates.dashboard.list.sort",
+			"web.templates.dashbrd.list.sortorder", "web.templates.dashboard.list.sortorder"
 		};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
