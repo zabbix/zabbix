@@ -578,14 +578,15 @@ class CControllerPopupTriggerExpr extends CController {
 								break;
 							}
 
-							if (!in_array($fn_name, getStandaloneFunctions())) {
+							if (!in_array($fn_name, getStandaloneFunctions())
+									&& ($query = $function_token->getFunctionTriggerQuery()) !== null) {
 								$items = API::Item()->get([
 									'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 									'selectHosts' => ['name'],
 									'webitems' => true,
 									'filter' => [
-										'host' => $function_token->getHosts()[0],
-										'key_' => $function_token->getItems()[0],
+										'host' => $query->host,
+										'key_' => $query->item,
 										'flags' => null
 									]
 								]);
