@@ -3638,7 +3638,7 @@ static int	DBpatch_5030109(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set idx=CONCAT('web.dashboard.widget.navtree.item-', SUBSTR(idx, 21))"
-			" where idx like 'web.dashbrd.navtree-%.toggle'"))
+			" where idx like 'web.dashbrd.navtree-%%.toggle'"))
 		return FAIL;
 
 	return SUCCEED;
