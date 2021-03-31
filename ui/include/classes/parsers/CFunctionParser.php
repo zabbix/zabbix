@@ -89,11 +89,6 @@ class CFunctionParser extends CParser {
 	public function parse($source, $pos = 0): int {
 		$this->errorClear();
 
-		if ($this->depth > TRIGGER_MAX_FUNCTION_DEPTH) {
-			$this->errorPos($source, $pos);
-			return self::PARSE_FAIL;
-		}
-
 		$this->result = new CFunctionParserResult();
 		$this->length = 0;
 
@@ -113,6 +108,11 @@ class CFunctionParser extends CParser {
 			'parameters' => []
 		];
 		if (!$this->parseFunctionParameters($source, $p, $params_raw['parameters'])) {
+			return self::PARSE_FAIL;
+		}
+
+		if ($this->depth > TRIGGER_MAX_FUNCTION_DEPTH) {
+			$this->errorPos($source, $pos);
 			return self::PARSE_FAIL;
 		}
 
