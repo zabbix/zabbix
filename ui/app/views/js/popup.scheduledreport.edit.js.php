@@ -28,6 +28,8 @@ function submitScheduledReport(overlay) {
 	const $form = overlay.$dialogue.find('form');
 	const url = new Curl($form.attr('action'));
 
+	$form.trimValues(['#name', '#subject', '#message', '#description']);
+
 	fetch(url.getUrl(), {
 		method: 'POST',
 		body: new URLSearchParams(new FormData($form.get(0)))
