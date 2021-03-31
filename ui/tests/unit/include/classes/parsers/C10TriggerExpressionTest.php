@@ -19,7 +19,9 @@
 **/
 
 
-class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class C10TriggerExpressionTest extends TestCase {
 
 	public static function provider() {
 		return [

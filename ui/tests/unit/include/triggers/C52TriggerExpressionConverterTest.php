@@ -19,18 +19,20 @@
 **/
 
 
-class C52TriggerExpressionConverterTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class C52TriggerExpressionConverterTest extends TestCase {
 
 	/**
 	 * @var C52TriggerExpressionConverter
 	 */
 	private $converter;
 
-	protected function setUp() {
+	protected function setUp(): void {
 		$this->converter = new C52TriggerExpressionConverter();
 	}
 
-	protected function tearDown() {
+	protected function tearDown(): void {
 		$this->converter = null;
 	}
 

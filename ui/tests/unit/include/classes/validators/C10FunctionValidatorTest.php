@@ -19,7 +19,9 @@
 **/
 
 
-class C10FunctionValidatorTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class C10FunctionValidatorTest extends TestCase {
 
 	private static function parameterSecNum_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
 		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
