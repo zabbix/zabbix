@@ -37,7 +37,7 @@ class CFunctionValidator extends CValidator {
 	 *   ]
 	 * ]
 	 *
-	 * <parameter_type> can be 'query', 'fit', 'mode', 'num_suffix', 'num_unsigned', 'operation', 'percent', 'sec_neg',
+	 * <parameter_type> can be 'query', 'fit', 'mode', 'num_suffix', 'operation', 'percent', 'sec_neg',
 	 *                         'sec_num', 'sec_num_zero', 'sec_zero', 'pattern'
 	 * <value_type> can be one of ITEM_VALUE_TYPE_*
 	 *
@@ -92,7 +92,6 @@ class CFunctionValidator extends CValidator {
 		 * Types of parameters:
 		 * - query - /host/key reference;
 		 * - scale - sec|#num:time_shift;
-		 * - num_unsigned
 		 * - sec_neg
 		 * - fit   - can be either empty or one of valid parameters;
 		 * - mode  - can be either empty or one of valid parameters;
@@ -116,14 +115,6 @@ class CFunctionValidator extends CValidator {
 					['type' => 'scale', 'mandat' => 0x01]
 				],
 				'value_types' => $value_types_num
-			],
-			'band' => [
-				'args' => [
-					['type' => 'query', 'mandat' => 0x01],
-					['type' => 'scale', 'mandat' => 0x00],
-					['type' => 'num_unsigned', 'mandat' => 0x01]
-				],
-				'value_types' => $value_types_int
 			],
 			'count' => [
 				'args' => [
@@ -423,7 +414,6 @@ class CFunctionValidator extends CValidator {
 				break;
 
 			// Optionally quoted.
-			case 'num_unsigned':
 			case 'percent':
 			case 'num_suffix':
 				return true;
@@ -695,7 +685,7 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateOperation(string $param): bool {
-		return ($this->isMacro($param) || preg_match('/^(eq|ne|gt|ge|lt|le|like|band|regexp|iregexp|)$/', $param));
+		return ($this->isMacro($param) || preg_match('/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp|)$/', $param));
 	}
 
 	/**

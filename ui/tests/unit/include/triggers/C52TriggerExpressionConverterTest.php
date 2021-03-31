@@ -186,7 +186,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[2].band(#1, 32)} > 0 and {Trapper:trap[2].band(#2, 64, 1h)} > 0',
-				'band(/Trapper/trap[2],#1,"32") > 0 and band(/Trapper/trap[2],#2:now-1h,"64") > 0'
+				'bitand(last(/Trapper/trap[2],#1),"32") > 0 and bitand(last(/Trapper/trap[2],#2:now-1h),"64") > 0'
 			],
 			[
 				'{Trapper:trap[2].forecast(#10,,100)} > 0'.
@@ -220,8 +220,8 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and count(/Trapper/trap[3],5m:now-2h,"regexp","xyz") > 0'.
 				' and count(/Trapper/trap[2],5m:now-1h,"iregexp","10") > 0'.
 				' and count(/Trapper/trap[1],5m:now-2d,"gt","100") > 0'.
-				' and count(/Trapper/trap[1],1m,"band","32") > 0'.
-				' and count(/Trapper/trap[1],1m,"band","32/8") > 0'.
+				' and count(/Trapper/trap[1],1m,"bitand","32") > 0'.
+				' and count(/Trapper/trap[1],1m,"bitand","32/8") > 0'.
 				' and count(/Trapper/trap[1],1m) > 0'
 			],
 			[

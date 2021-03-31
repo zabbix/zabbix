@@ -32,6 +32,7 @@ class CMathFunctionValidator extends CValidator {
 	private $allowed = [
 		'abs',
 		'avg',
+		'bitand',
 		'max',
 		'min',
 		'length',
@@ -39,13 +40,14 @@ class CMathFunctionValidator extends CValidator {
 	];
 
 	/**
-	 * The array containing functions with supported exactly one parameter.
+	 * The array containing functions with supported exact number of parameters.
 	 *
 	 * @var array
 	 */
-	private $single_parameter_functions = [
-		'abs',
-		'length'
+	private $number_of_parameters = [
+		'abs' => 1,
+		'bitand' => 2,
+		'length' => 1
 	];
 
 	/**
@@ -118,8 +120,9 @@ class CMathFunctionValidator extends CValidator {
 			return false;
 		}
 
-		if ((in_array($fn->function, $this->single_parameter_functions) && count($fn->params_raw['parameters']) != 1)
-				|| count($fn->params_raw['parameters']) == 0) {
+		if (count($fn->params_raw['parameters']) == 0
+				|| (in_array($fn->function, $this->number_of_parameters)
+						&& count($fn->params_raw['parameters']) != $this->number_of_parameters[$fn->function])) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid number of parameters.'));
 			return false;

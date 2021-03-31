@@ -176,6 +176,13 @@ class C52TriggerExpressionConverter extends CConverter {
 				$new_expression = sprintf('abs(change(%1$s))', $query);
 				break;
 
+			case 'band':
+				$params = self::convertParameters($fn['functionParams'], $fn['functionName']);
+				$timeshift = self::paramsToString([$params[0]]);
+				$mask = self::paramsToString([$params[1]]);
+				$new_expression = sprintf('bitand(last(%1$s%2$s)%3$s)', $query, $timeshift, $mask);
+				break;
+
 			case 'delta':
 				$params = self::convertParameters($fn['functionParams'], $fn['functionName']);
 				$params = self::paramsToString($params);
@@ -298,6 +305,9 @@ class C52TriggerExpressionConverter extends CConverter {
 				if ($parameters[3] !== '') {
 					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[3];
+				}
+				if ($parameters[2] === 'band') {
+					$parameters[2] = 'bitand';
 				}
 				unset($parameters[3]);
 				array_push($parameters, $parameters[1]);

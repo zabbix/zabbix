@@ -1870,7 +1870,7 @@ function get_item_function_info($expr) {
 	$functions = [
 		'abs' => $rules['numeric_as_float'],
 		'avg' => $rules['numeric_as_float'],
-		'band' => $rules['integer'],
+		'bitand' => $rules['integer'],
 		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'date' => $rules['date'],

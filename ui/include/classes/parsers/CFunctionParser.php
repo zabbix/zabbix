@@ -222,11 +222,13 @@ class CFunctionParser extends CParser {
 									$_parameters[$num] = new CFunctionParameterResult([
 										'type' => self::PARAM_UNQUOTED,
 										'match' => $source[$p],
-										'pos' => $p - $pos
+										'pos' => $p - $pos,
+										'length' => 1
 									]);
 								}
 								else {
 									$_parameters[$num]->match .= $source[$p];
+									$_parameters[$num]->length++;
 								}
 
 								$state = self::STATE_UNQUOTED;
@@ -268,12 +270,14 @@ class CFunctionParser extends CParser {
 
 						default:
 							$_parameters[$num]->match .= $source[$p];
+							$_parameters[$num]->length++;
 					}
 					break;
 
 				// a quoted parameter
 				case self::STATE_QUOTED:
 					$_parameters[$num]->match .= $source[$p];
+					$_parameters[$num]->length++;
 
 					if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
 						$state = self::STATE_END;

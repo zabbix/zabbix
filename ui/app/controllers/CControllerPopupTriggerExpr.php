@@ -384,8 +384,8 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
-			'band' => [
-				'description' => _('band() - Bitwise AND of last (most recent) T value and mask'),
+			'bitand' => [
+				'description' => _('bitand() - Bitwise AND of last (most recent) T value and mask'),
 				'params' => $this->paramSecIntCount,
 				'allowed_types' => $this->allowedTypesInt,
 				'operators' => ['=', '<>']
@@ -734,7 +734,8 @@ class CControllerPopupTriggerExpr extends CController {
 							? '#'.$data['params']['last']
 							: $data['params']['last'];
 					}
-					elseif ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, ['last', 'band', 'strlen'])) {
+					elseif ($data['paramtype'] == PARAM_TYPE_TIME
+							&& in_array($function, ['last', 'bitand', 'strlen'])) {
 						$data['params']['last'] = '';
 					}
 
@@ -747,6 +748,12 @@ class CControllerPopupTriggerExpr extends CController {
 						unset($data['params']['last'], $data['params']['shift']);
 					}
 
+					$mask = '';
+					if ($function === 'bitand' && array_key_exists('mask', $data['params'])) {
+						$mask = $data['params']['mask'];
+						unset($data['params']['mask']);
+					}
+
 					$fn_params = rtrim(implode(',', $data['params']), ',');
 
 					if ($function === 'abs') {
@@ -754,6 +761,16 @@ class CControllerPopupTriggerExpr extends CController {
 							$item_host_data['host'],
 							$data['item_key'],
 							($fn_params === '') ? '' : ','.$fn_params,
+							$operator,
+							CTriggerExpression::quoteString($data['value'])
+						);
+					}
+					elseif ($function === 'bitand') {
+						$data['expression'] = sprintf('bitand(last(/%s/%s%s)%s)%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
+							($mask === '') ? '' : ','.$mask,
 							$operator,
 							CTriggerExpression::quoteString($data['value'])
 						);
