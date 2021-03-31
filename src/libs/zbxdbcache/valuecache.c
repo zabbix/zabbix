@@ -2581,10 +2581,10 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 
 			/* If the new value type does not match the item's type in cache remove it, */
 			/* so it's cached with the correct type from correct tables when accessed   */
-			/* next time.
-			/* Also remove item if the value adding failed. In this case we            */
-			/* won't have the latest data in cache - so the requests must go directly  */
-			/* to the database.                                                        */
+			/* next time.                                                               */
+			/* Also remove item if the value adding failed. In this case we             */
+			/* won't have the latest data in cache - so the requests must go directly   */
+			/* to the database.                                                         */
 			if (item->value_type != h->value_type || item->last_accessed < expire_timestamp ||
 					FAIL == vch_item_add_value_at_head(item, &record))
 			{
@@ -2632,7 +2632,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
 		int count, const zbx_timespec_t *ts)
 {
-	zbx_vc_item_t	*item = NULL, new_item;
+	zbx_vc_item_t	*item;
 	int 		ret = FAIL, cache_used = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d seconds:%d count:%d sec:%d ns:%d",
@@ -2648,18 +2648,21 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_re
 
 	if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
+		zbx_vc_item_t	new_item;
+
 		if (ZBX_VC_MODE_NORMAL != vc_cache->mode)
 			goto out;
 
 		memset(&new_item, 0, sizeof(new_item));
 		new_item.itemid = itemid;
 		new_item.value_type = value_type;
-		item = &new_item;
+
+		ret = vch_item_get_values(&new_item, values, seconds, count, ts);
 	}
 	else if (item->value_type != value_type)
 		goto out;
-
-	ret = vch_item_get_values(item, values, seconds, count, ts);
+	else
+		ret = vch_item_get_values(item, values, seconds, count, ts);
 out:
 	if (FAIL == ret)
 	{
