@@ -28,7 +28,7 @@ out:
 ---
 test case: Replace '{$U} -> xyz'
 in:
-  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'strlen({$U})'
   replace: 
   - {token: '{$U}', value: 'xyz'}
@@ -37,7 +37,7 @@ out:
 ---
 test case: Replace '"{$U}" -> 123'
 in:
-  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'strlen("{$U}")'
   replace: 
   - {token: '"{$U}"', value: '123'}
@@ -55,7 +55,7 @@ out:
 ---
 test case: Replace '"{#U}" -> 123'
 in:
-  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_COMPOSE_LLD]
+  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_COMPOSE_LLD]
   expression: 'strlen({#U})'
   replace: 
   - {token: '{#U}', value: 'xyz'}
@@ -73,7 +73,7 @@ out:
 ---
 test case: Replace '"{#U}" -> 1m'
 in:
-  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_COMPOSE_LLD,ZBX_EVAL_PARSE_COMPARE,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_COMPOSE_LLD,ZBX_EVAL_PARSE_COMPARE,ZBX_EVAL_PARSE_VAR]
   expression: '{#U} = 60'
   replace: 
   - {token: '{#U}', value: '1m'}

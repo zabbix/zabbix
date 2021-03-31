@@ -351,10 +351,13 @@ static void	eval_parse_character_token(size_t pos, zbx_token_type_t type, zbx_ev
  *             pos   - [IN] the starting position                             *
  *             token - [OUT] the parsed token                                 *
  *                                                                            *
+ * Return value: SUCCEED - the token was parsed successfully                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  * Comments: Tokens starting with '<' are '<', '<=' and '<>'.                 *
  *                                                                            *
  ******************************************************************************/
-static void	eval_parse_less_character_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token)
+static int	eval_parse_less_character_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token)
 {
 	if (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPARE_EQ) && '>' == ctx->expression[pos + 1])
 	{
@@ -362,10 +365,13 @@ static void	eval_parse_less_character_token(zbx_eval_context_t *ctx, size_t pos,
 	}
 	else
 	{
+		if (0 == (ctx->rules & ZBX_EVAL_PARSE_COMPARE_SORT))
+			return FAIL;
+
 		if ('=' != ctx->expression[pos + 1])
 		{
 			eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_LT, token);
-			return;
+			return SUCCEED;
 		}
 
 		token->type = ZBX_EVAL_TOKEN_OP_LE;
@@ -373,6 +379,8 @@ static void	eval_parse_less_character_token(zbx_eval_context_t *ctx, size_t pos,
 
 	token->loc.l = pos;
 	token->loc.r = pos + 1;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -895,12 +903,12 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 		case '<':
 			if (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPARE))
 			{
-				eval_parse_less_character_token(ctx, pos, token);
-				return SUCCEED;
+				if (SUCCEED == eval_parse_less_character_token(ctx, pos, token))
+					return SUCCEED;
 			}
 			break;
 		case '>':
-			if (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPARE))
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_COMPARE_SORT))
 			{
 				eval_parse_greater_character_token(ctx, pos, token);
 				return SUCCEED;
@@ -914,14 +922,14 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			}
 			break;
 		case '(':
-			if (0 != (ctx->rules & (ZBX_EVAL_PARSE_FUNCTION | ZBX_EVAL_PARSE_GROUP)))
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_GROUP))
 			{
 				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_GROUP_OPEN, token);
 				return SUCCEED;
 			}
 			break;
 		case ')':
-			if (0 != (ctx->rules & (ZBX_EVAL_PARSE_FUNCTION | ZBX_EVAL_PARSE_GROUP)))
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_GROUP))
 			{
 				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_GROUP_CLOSE, token);
 				return SUCCEED;
@@ -960,7 +968,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			}
 			break;
 		case ',':
-			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION))
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION_ARGS))
 			{
 				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_COMMA, token);
 				return SUCCEED;
@@ -979,7 +987,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 						return SUCCEED;
 				}
 
-				if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION) &&
+				if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION_NAME) &&
 						SUCCEED == eval_parse_function_token(ctx, pos, token))
 				{
 					return SUCCEED;

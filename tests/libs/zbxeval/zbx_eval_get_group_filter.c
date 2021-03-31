@@ -52,6 +52,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_eval_get_group_filter(&ctx, &groups, &filter, &error))
 		fail_msg("failed to get group filter: %s", error);
 
+
 	filter_exp = zbx_mock_get_parameter_string("out.filter");
 
 	if (NULL == filter)

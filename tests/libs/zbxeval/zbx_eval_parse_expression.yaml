@@ -1079,7 +1079,6 @@ in:
   rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
   expression: '1 +not 2'
 out:
-out:
   stack:
   result: FAIL
 --- # constant variable index
@@ -1213,7 +1212,7 @@ out:
 --- # built-in functions
 test case: Succeed 'min()'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'min()'
 out:
   stack:
@@ -1222,14 +1221,14 @@ out:
 ---
 test case: Fail 'min('
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'min('
 out:
   result: FAIL
 ---
 test case: Succeed 'min(1)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'min(1)'
 out:
   stack:
@@ -1239,7 +1238,7 @@ out:
 ---
 test case: Succeed 'min(1,2)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'min(1,2)'
 out:
   stack:
@@ -1250,7 +1249,7 @@ out:
 ---
 test case: Succeed 'min(1,)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'min(1,)'
 out:
   stack:
@@ -1261,7 +1260,7 @@ out:
 ---
 test case: Succeed 'min(,)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'min(,)'
 out:
   stack:
@@ -1272,7 +1271,7 @@ out:
 ---
 test case: Succeed 'min(1,"xyz")'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'min(1,"xyz")'
 out:
   stack:
@@ -1283,7 +1282,7 @@ out:
 ---
 test case: Succeed 'min(1,{$MACRO:context,})'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_USERMACRO]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_USERMACRO]
   expression: 'min(1,{$MACRO:context,})'
 out:
   stack:
@@ -1294,7 +1293,7 @@ out:
 ---
 test case: Succeed '1 + min(2, 3) - 4'
 in:
-  rules: [ZBX_EVAL_PARSE_CONST_INDEX,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_CONST_INDEX,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: '1 + min(2, 3) - 4'
 out:
   stack:
@@ -1309,7 +1308,7 @@ out:
 ---
 test case: Succeed 'avg(min(1, 2), 3, max(4, 5, 6))'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'avg(min(1, 2), 3, max(4, 5, 6))'
 out:
   stack:
@@ -1326,7 +1325,7 @@ out:
 ---
 test case: Succeed 'min(1, , 2)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(1, , 2)'
 out:
   stack:
@@ -1338,7 +1337,7 @@ out:
 ---
 test case: Succeed 'min(/host/key,1)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/host/key,1)'
 out:
   stack:
@@ -1349,21 +1348,21 @@ out:
 ---
 test case: Fail 'min(/host/key,1)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/host/key,1)'
 out:
   result: FAIL
 ---
 test case: Fail 'min(,1m:now-1d)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(,1m:now-1d)'
 out:
   result: FAIL
 ---
 test case: Succeed 'min(/host/key,5m)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/host/key,5m)'
 out:
   stack:
@@ -1374,7 +1373,7 @@ out:
 ---
 test case: Succeed 'min(/host/key,5m:now-1h)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/host/key,5m:now-1h)'
 out:
   stack:
@@ -1385,7 +1384,7 @@ out:
 ---
 test case: Succeed 'min(/host/key,#10)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'min(/host/key,#10)'
 out:
   stack:
@@ -1396,7 +1395,7 @@ out:
 ---
 test case: Succeed 'min(/host/key,{$MACRO})'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'min(/host/key,{$MACRO})'
 out:
   stack:
@@ -1407,7 +1406,7 @@ out:
 ---
 test case: Succeed 'min(/host/key,#{$MACRO})'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPOUND_CONST]
   expression: 'min(/host/key,#{$MACRO})'
 out:
   stack:
@@ -1418,7 +1417,7 @@ out:
 ---
 test case: Succeed 'min(/host/key,#{{#LLD}.func})'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPOUND_CONST]
   expression: 'min(/host/key,#{{#LLD}.func})'
 out:
   stack:
@@ -1446,7 +1445,7 @@ out:
 ---
 test case: Succeed 'min(1w, 2d, 3h, 4m, 5s)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'min(1w, 2d, 3h, 4m, 5s)'
 out:
   stack:
@@ -1510,21 +1509,21 @@ out:
 ---
 test case: Fail 'min(2s, 1m),'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'min(2s, 1m),'
 out:
   result: FAIL
 ---
 test case: Fail '1 + ((/host/key))'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: '1 + ((/host/key,1d))'
 out:
   result: FAIL
 ---
 test case: Succeed 'last(/host/key)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'last(/host/key)'
 out:
   stack:
@@ -1534,7 +1533,7 @@ out:
 ---
 test case: Succeed 'last(/host/key,#1)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'last(/host/key,#1)'
 out:
   stack:
@@ -1545,7 +1544,7 @@ out:
 ---
 test case: Succeed 'count(//trap[1],#5,,0)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'count(//trap[1],#5,,0)'
 out:
   stack:
@@ -1558,7 +1557,7 @@ out:
 ---
 test case: Succeed 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h ","1 ")'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
   expression: 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h","1")'
 out:
   stack:
@@ -1577,7 +1576,7 @@ out:
 ---
 test case: Succeed 'min(1 + 2, 0.5 + 1.5)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR_NUM]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR_NUM]
   expression: 'min(1 + 2, 0.5 + 1.5)'
 out:
   stack:
@@ -1599,7 +1598,7 @@ out:
 ---
 test case: Succeed 'min(3 * (1 + 2), 0.5 + 1.5)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR_NUM]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR_NUM]
   expression: 'min(3 * (1 + 2), 0.5 + 1.5)'
 out:
   stack:
@@ -1627,7 +1626,7 @@ out:
 ---
 test case: Succeed 'last(/host/key,#1:now-1h)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'last(/host/key,#1:now-1h)'
 out:
   stack:
@@ -1718,7 +1717,7 @@ out:
 --- # query filters
 test case: Succeed 'min(/*/key?[group="a"],1)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/*/key?[group="a"],1)'
 out:
   stack:
@@ -1729,7 +1728,7 @@ out:
 ---
 test case: Succeed 'min(/*/key?[group="a:\"1\""],1)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/*/key?[group="a:\"1\""],1)'
 out:
   stack:
@@ -1740,7 +1739,7 @@ out:
 ---
 test case: Succeed 'min(/*/key?[group="[]"],1)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/*/key?[group="[]"],1)'
 out:
   stack:
@@ -1751,15 +1750,22 @@ out:
 ---
 test case: Fail 'min(/*/key?[group="a",1)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/*/key?[group="a",1)'
 out:
   result: FAIL
 ---
 test case: Fail 'min(/*/key?[group="a],1)'
 in:
-  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_MATH]
   expression: 'min(/*/key?[group="a],1)'
+out:
+  result: FAIL
+---
+test case: Fail '1 < 2'
+in:
+  rules: [ZBX_EVAL_PARSE_VAR]
+  expression: '1 < 2'
 out:
   result: FAIL
 ...

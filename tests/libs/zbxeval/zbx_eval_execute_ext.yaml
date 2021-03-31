@@ -1,7 +1,7 @@
 ---
 test case: Expression 'forty_two()'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'forty_two()'
   callbacks:
   - name: forty_two
@@ -12,7 +12,7 @@ out:
 ---
 test case: Expression 'forty_two()'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
   expression: 'forty_two()'
   callbacks:
   - name: forty_two
@@ -24,7 +24,7 @@ out:
 ---
 test case: Expression 'sum(hist(/host/key,1h))'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_ITEM_QUERY]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY]
   expression: 'sum(hist(/host/key,1h))'
   callbacks:
   - name: hist
@@ -36,7 +36,7 @@ out:
 ---
 test case: Expression 'sum(hist(/host/key,1h),0)'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_VAR]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_VAR]
   expression: 'sum(hist(/host/key,1h),0)'
   callbacks:
   - name: hist
@@ -47,7 +47,7 @@ out:
 ---
 test case: Expression 'min(err(), 1) or 1'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PROCESS_ERROR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PROCESS_ERROR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
   expression: 'min(err(), 1) or 1'
   callbacks:
   - name: err
@@ -59,7 +59,7 @@ out:
 ---
 test case: Expression 'min(err(), 1) or 1'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
   expression: 'min(err(), 1) or 1'
   callbacks:
   - name: err
@@ -70,7 +70,7 @@ out:
 ---
 test case: Expression 'min(1, 2, err()) and 0'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PROCESS_ERROR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PROCESS_ERROR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
   expression: 'min(1, 2, err()) and 0'
   callbacks:
   - name: err
@@ -82,7 +82,7 @@ out:
 ---
 test case: Expression 'min(1, 2, err()) and 0'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_LOGIC]
   expression: 'min(1, 2, err()) and 0'
   callbacks:
   - name: err
@@ -93,7 +93,7 @@ out:
 ---
 test case: Expression 'sum(hist(/host/key,1h))'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_ITEM_QUERY]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY]
   expression: 'sum(hist(/host/key,1h))'
   callbacks:
   - name: hist
@@ -104,7 +104,7 @@ out:
 ---
 test case: Expression 'sum(hist(/host/key,))'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_ITEM_QUERY]
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY]
   expression: 'sum(hist(/host/key,))'
   callbacks:
   - name: hist
