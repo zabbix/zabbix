@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:00Z'
+  date: '2021-03-24T06:29:31Z'
   groups:
     -
       name: Templates/Applications
@@ -676,7 +676,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              params: 'last(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.flush.total[{#ES.NODE}]) + (last(es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
+              params: 'change(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.flush.total[{#ES.NODE}]) + (change(es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
               description: 'The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.'
               application_prototypes:
                 -
@@ -760,7 +760,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              params: 'last(es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.indexing.index_total[{#ES.NODE}]) + (last(es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
+              params: 'change(es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
               description: 'The average indexing latency calculated from the available index_total and index_time_in_millis metrics.'
               application_prototypes:
                 -
@@ -994,7 +994,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              params: 'last(es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.search.fetch_total[{#ES.NODE}]) + (last(es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
+              params: 'change(es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
               description: 'The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.'
               application_prototypes:
                 -
@@ -1126,8 +1126,8 @@ zabbix_export:
               value_type: FLOAT
               units: ms
               params: |
-                last(es.node.indices.search.query_time_in_millis[{#ES.NODE}]) / 
-                ( last(es.node.indices.search.query_total[{#ES.NODE}]) + (last(es.node.indices.search.query_total[{#ES.NODE}]) = 0) )
+                change(es.node.indices.search.query_time_in_millis[{#ES.NODE}]) / 
+                ( change(es.node.indices.search.query_total[{#ES.NODE}]) + (change(es.node.indices.search.query_total[{#ES.NODE}]) = 0) )
               description: 'The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.'
               application_prototypes:
                 -
