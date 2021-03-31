@@ -1,0 +1,1 @@
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
