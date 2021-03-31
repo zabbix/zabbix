@@ -813,7 +813,7 @@ static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
 
 	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (item->last_accessed < timestamp && source_item != item)
+		if (0 != item->last_accessed && item->last_accessed < timestamp && source_item != item)
 		{
 			freed += vch_item_free_cache(item) + sizeof(zbx_vc_item_t);
 			zbx_hashset_iter_remove(&iter);
