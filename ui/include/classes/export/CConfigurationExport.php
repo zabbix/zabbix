@@ -48,7 +48,7 @@ class CConfigurationExport {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $options ids of elements that should be exported.
+	 * @param array $options IDs of elements that should be exported.
 	 */
 	public function __construct(array $options) {
 		$this->options = [
@@ -122,7 +122,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Export elements whose ids were passed to constructor.
+	 * Export elements whose IDs were passed to constructor.
 	 * The resulting export format depends on the export writer that was set,
 	 * the export structure depends on the builder that was set.
 	 *
@@ -344,8 +344,8 @@ class CConfigurationExport {
 	 */
 	protected function gatherTemplateDashboards(array $templates) {
 		$dashboards = API::TemplateDashboard()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'selectPages' => API_OUTPUT_EXTEND,
+			'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
+			'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 			'templateids' => array_keys($templates),
 			'preservekeys' => true
 		]);
@@ -371,7 +371,7 @@ class CConfigurationExport {
 		$itemids = [];
 		$graphids = [];
 
-		// Collect ids.
+		// Collect IDs.
 		foreach ($dashboard_pages as $dashboard_page) {
 			foreach ($dashboard_page['widgets'] as $widget) {
 				foreach ($widget['fields'] as $field) {
@@ -379,10 +379,12 @@ class CConfigurationExport {
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
 							$hostids[$field['value']] = true;
 							break;
+
 						case ZBX_WIDGET_FIELD_TYPE_ITEM:
 						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
 							$itemids[$field['value']] = true;
 							break;
+
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
 							$graphids[$field['value']] = true;
@@ -396,7 +398,7 @@ class CConfigurationExport {
 		$items = $this->getItemsReferences(array_keys($itemids));
 		$graphs = $this->getGraphsReferences(array_keys($graphids));
 
-		// Replace ids.
+		// Replace IDs.
 		foreach ($dashboard_pages as &$dashboard_page) {
 			foreach ($dashboard_page['widgets'] as &$widget) {
 				foreach ($widget['fields'] as &$field) {
@@ -404,10 +406,12 @@ class CConfigurationExport {
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
 							$field['value'] = $hosts[$field['value']];
 							break;
+
 						case ZBX_WIDGET_FIELD_TYPE_ITEM:
 						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
 							$field['value'] = $items[$field['value']];
 							break;
+
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
 							$field['value'] = $graphs[$field['value']];
@@ -1258,7 +1262,7 @@ class CConfigurationExport {
 	protected function prepareMapExport(array &$exportMaps) {
 		$sysmapIds = $groupIds = $hostIds = $triggerIds = $imageIds = [];
 
-		// gather element ids that must be substituted
+		// gather element IDs that must be substituted
 		foreach ($exportMaps as $sysmap) {
 			foreach ($sysmap['selements'] as $selement) {
 				switch ($selement['elementtype']) {
@@ -1328,12 +1332,15 @@ class CConfigurationExport {
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$selement['elements'] = [$sysmaps[$selement['elements'][0]['sysmapid']]];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$selement['elements'] = [$groups[$selement['elements'][0]['groupid']]];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_HOST:
 						$selement['elements'] = [$hosts[$selement['elements'][0]['hostid']]];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						foreach ($selement['elements'] as &$element) {
 							$element = $triggers[$element['triggerid']];
@@ -1365,7 +1372,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get groups references by group ids.
+	 * Get groups references by group IDs.
 	 *
 	 * @param array $groupIds
 	 *
@@ -1392,7 +1399,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get hosts references by host ids.
+	 * Get hosts references by host IDs.
 	 *
 	 * @param array $hostIds
 	 *
@@ -1448,7 +1455,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get graphs references by graph ids.
+	 * Get graphs references by graph IDs.
 	 *
 	 * @param array $graphIds
 	 *
@@ -1483,7 +1490,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get items references by item ids.
+	 * Get items references by item IDs.
 	 *
 	 * @param array $itemIds
 	 *
@@ -1519,7 +1526,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get triggers references by trigger ids.
+	 * Get triggers references by trigger IDs.
 	 *
 	 * @param array $triggerIds
 	 *
@@ -1555,7 +1562,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get images references by image ids.
+	 * Get images references by image IDs.
 	 *
 	 * @param array $imageIds
 	 *
