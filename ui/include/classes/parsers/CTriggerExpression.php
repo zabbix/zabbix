@@ -34,7 +34,7 @@ class CTriggerExpression {
 	public const ERROR_LEVEL = 1;
 	public const ERROR_UNEXPECTED_ENDING = 2;
 	public const ERROR_UNPARSED_CONTENT = 3;
-	public const ERROR_MAX_DEPTH_EXCEEDED = 4;
+	public const ERROR_FUNCTION_PARSER = 4;
 
 	/**
 	 * Shows a validity of trigger expression
@@ -560,7 +560,7 @@ class CTriggerExpression {
 		}
 
 		$errors = array_filter([
-			$this->function_parser->getErrorDetails() ? self::ERROR_MAX_DEPTH_EXCEEDED : 0,
+			$this->function_parser->getErrorDetails() ? self::ERROR_FUNCTION_PARSER : 0,
 			($level != 0) ? self::ERROR_LEVEL : 0,
 			($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)
 				? self::ERROR_UNEXPECTED_ENDING : 0,
@@ -569,7 +569,7 @@ class CTriggerExpression {
 		$error = reset($errors);
 
 		if ($error) {
-			if ($error == self::ERROR_MAX_DEPTH_EXCEEDED) {
+			if ($error == self::ERROR_FUNCTION_PARSER) {
 				['1' => $this->pos] = $this->function_parser->getErrorDetails();
 			}
 
