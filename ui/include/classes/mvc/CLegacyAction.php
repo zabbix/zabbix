@@ -66,8 +66,7 @@ class CLegacyAction extends CAction {
 			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart4.php', 'chart5.php', 'chart6.php', 'chart7.php',
 				'history.php', 'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php',
 				'imgstore.php', 'jsrpc.php', 'map.php', 'overview.php', 'toptriggers.php', 'tr_events.php',
-				'screenconf.php', 'screenedit.php', 'screens.php', 'slideconf.php', 'slides.php', 'srv_status.php',
-				'sysmap.php', 'sysmaps.php', 'report2.php'
+				'srv_status.php', 'sysmap.php', 'sysmaps.php', 'report2.php'
 			];
 		}
 
@@ -90,18 +89,11 @@ class CLegacyAction extends CAction {
 		$rule_actions = [];
 
 		if (in_array($user_type, [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])) {
-			if ($action === 'screenconf.php' || $action === 'screenedit.php') {
-				return getRequest('templateid', false)
-					? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-					: $this->checkAccess(CRoleHelper::UI_MONITORING_SCREENS);
-			}
-
 			$rule_actions = [
 				CRoleHelper::UI_MONITORING_PROBLEMS => ['tr_events.php'],
-				CRoleHelper::UI_MONITORING_HOSTS => ['host_screen.php', 'httpdetails.php'],
+				CRoleHelper::UI_MONITORING_HOSTS => ['httpdetails.php'],
 				CRoleHelper::UI_MONITORING_OVERVIEW => ['overview.php'],
 				CRoleHelper::UI_MONITORING_LATEST_DATA => ['history.php'],
-				CRoleHelper::UI_MONITORING_SCREENS => ['screens.php', 'slideconf.php', 'slides.php'],
 				CRoleHelper::UI_MONITORING_MAPS => ['image.php', 'map.php', 'sysmap.php', 'sysmaps.php'],
 				CRoleHelper::UI_MONITORING_SERVICES => ['chart5.php', 'srv_status.php'],
 				CRoleHelper::UI_INVENTORY_OVERVIEW => ['hostinventoriesoverview.php'],

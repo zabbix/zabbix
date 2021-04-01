@@ -2073,65 +2073,6 @@ class C10ImportConverterTest extends CImportConverterTest {
 
 	}
 
-	public function testConvertScreens() {
-		$this->assertConvert(
-			$this->createExpectedResult([]),
-			$this->createSource()
-		);
-		$this->assertConvert(
-			$this->createExpectedResult(['screens' => '']),
-			$this->createSource(['screens' => ''])
-		);
-
-		$source = $this->createSource([
-			'screens' => [
-				[],
-				[
-					'screenitems' => ''
-				],
-				[
-					'screenitems' => [
-						// resource is exported as "0" if it's not used
-						[
-							'resourceid' => '0'
-						],
-						[
-							'resourceid' => [
-								'key_' => 'itemkey'
-							]
-						]
-					]
-				]
-			]
-		]);
-
-		$expectedResult = $this->createExpectedResult([
-			'screens' => [
-				[],
-				[
-					'screen_items' => ''
-				],
-				[
-					'screen_items' => [
-						[
-							'resource' => '0',
-							'sort_triggers' => ''
-						],
-						[
-							'resource' => [
-								'key' => 'itemkey'
-							],
-							'sort_triggers' => ''
-						]
-					]
-				]
-			]
-		]);
-
-		$this->assertConvert($expectedResult, $source);
-
-	}
-
 	protected function createSource(array $data = []) {
 		return [
 			'zabbix_export' => array_merge([
