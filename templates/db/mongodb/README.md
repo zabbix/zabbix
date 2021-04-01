@@ -23,7 +23,7 @@ This template was tested on:
 2. Set the {$MONGODB.CONNSTRING} such as <protocol(host:port)> or named session.
 3. Set the user name and password in host macros ({$MONGODB.USER}, {$MONGODB.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.
 
-Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
+**Note**, depending on the number of DBs and collections discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
 
 Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]"`
 
@@ -57,8 +57,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Database discovery |<p>Collect database metrics.</p> |ZABBIX_PASSIVE |mongodb.db.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]<p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$MONGODB.LLD.FILTER.DB.MATCHES}`</p><p>- B: {#DBNAME} NOT_MATCHES_REGEX `{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}`</p> |
-|Collection discovery |<p>Collect collections metrics.</p> |ZABBIX_PASSIVE |mongodb.collections.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]<p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$MONGODB.LLD.FILTER.DB.MATCHES}`</p><p>- B: {#DBNAME} NOT_MATCHES_REGEX `{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}`</p><p>- C: {#COLLECTION} MATCHES_REGEX `{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}`</p><p>- D: {#COLLECTION} NOT_MATCHES_REGEX `{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}`</p> |
+|Database discovery |<p>Collect database metrics.</p><p>Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.</p> |ZABBIX_PASSIVE |mongodb.db.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]<p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$MONGODB.LLD.FILTER.DB.MATCHES}`</p><p>- B: {#DBNAME} NOT_MATCHES_REGEX `{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}`</p> |
+|Collection discovery |<p>Collect collections metrics.</p><p>Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.</p> |ZABBIX_PASSIVE |mongodb.collections.discovery["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]<p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$MONGODB.LLD.FILTER.DB.MATCHES}`</p><p>- B: {#DBNAME} NOT_MATCHES_REGEX `{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}`</p><p>- C: {#COLLECTION} MATCHES_REGEX `{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}`</p><p>- D: {#COLLECTION} NOT_MATCHES_REGEX `{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}`</p> |
 |Replication discovery |<p>Collect metrics by Zabbix agent if it exists</p> |DEPENDENT |mongodb.rs.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |WiredTiger metrics |<p>Collect metrics of WiredTiger Storage Engine if it exists</p> |DEPENDENT |mongodb.wired_tiger.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(JSON.parse(value).wiredTiger   ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 
