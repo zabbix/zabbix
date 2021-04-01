@@ -3412,7 +3412,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 			if (ZBX_VALUEMAP_STATUS_RANGE != valuemap->status)
 				continue;
 
-			if (1 == sscanf(valuemap->value, "<%s", threshold_max))
+			if (1 == sscanf(valuemap->value, "<%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "s", threshold_max))
 			{
 				zbx_lrtrim(threshold_max, " ");
 				if (ZBX_INFINITY != (max = evaluate_string_to_double(threshold_max)) &&
@@ -3421,7 +3421,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 					goto map_value;
 				}
 			}
-			else if (1 == sscanf(valuemap->value, ">%s", threshold_min))
+			else if (1 == sscanf(valuemap->value, ">%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "s", threshold_min))
 			{
 				zbx_lrtrim(threshold_min, " ");
 				if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
@@ -3430,7 +3430,8 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 					goto map_value;
 				}
 			}
-			else if (2 == sscanf(valuemap->value, "%[^:]:%s", threshold_min, threshold_max))
+			else if (2 == sscanf(valuemap->value, "%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "[^:]:%"
+					ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "s", threshold_min, threshold_max))
 			{
 				zbx_lrtrim(threshold_max, " ");
 				zbx_lrtrim(threshold_min, " ");
