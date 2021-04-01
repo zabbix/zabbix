@@ -96,7 +96,6 @@ class CFunctionParser extends CParser {
 		}
 
 		if ($p == $pos) {
-			$this->errorPos($source, ++$pos);
 			return self::PARSE_FAIL;
 		}
 
