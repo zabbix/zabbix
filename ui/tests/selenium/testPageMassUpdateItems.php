@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * Test the mass update of items.
@@ -113,7 +114,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'hostid' => self::HOSTID,
 				'name' => '4_SNMP_trap',
 				'key_' => 'snmptrap[regexp]',
-				'type' => 17 ,
+				'type' => 17,
 				'value_type' => 1,
 				'interfaceid'=> '40012',
 				'delay' => '4m'
@@ -131,7 +132,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'hostid' => self::HOSTID,
 				'name' => '6_Aggregate',
 				'key_' => 'grpmin["host group","key",avg,min]',
-				'type' => 8 ,
+				'type' => 8,
 				'value_type' => 3,
 				'interfaceid'=> '40012',
 				'delay' => '30s'
@@ -149,12 +150,54 @@ class testPageMassUpdateItems extends CWebTest{
 			[
 				'hostid' => self::HOSTID,
 				'name' => '8_IPMI',
-				'key_' => 'gipmi2',
-				'type' => 12 ,
+				'key_' => 'ipmi2',
+				'type' => 12,
 				'value_type' => 3,
 				'interfaceid'=> '40013',
 				'delay' => '11s',
 				'ipmi_sensor' => 'temp'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '9_SNMP_Agent',
+				'key_' => 'snmp1',
+				'type' => 20,
+				'value_type' => 4,
+				'interfaceid'=> '40012',
+				'delay' => '9m',
+				'snmp_oid' => '.1.3.6.1.2.1.1.1.0'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '10_SNMP_Agent',
+				'key_' => 'snmp2',
+				'type' => 20,
+				'value_type' => 4,
+				'interfaceid'=> '40012',
+				'delay' => '101s',
+				'snmp_oid' => '.1.3.8.1.2.1.1.1.0'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '11_SSH_Agent',
+				'key_' => 'ssh.run[]',
+				'type' => 13,
+				'value_type' => 1,
+				'interfaceid'=> '40011',
+				'delay' => '22s',
+				'username' => 'username1',
+				'params' => 'executed script 1'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '12_SSH_Agent',
+				'key_' => 'ssh.run[description]',
+				'type' => 13,
+				'value_type' => 1,
+				'interfaceid'=> '40011',
+				'delay' => '55s',
+				'username' => 'username2',
+				'params' => 'executed script 2'
 			]
 		]);
 	}
@@ -171,22 +214,22 @@ class testPageMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent (active)'],
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
 						'Units'=> ['id' => 'units', 'value' => '$'],
-						'Update interval' => [
-							'Delay' => '99s',
-							'Custom intervals' => [
-								[
-									'action' => USER_ACTION_UPDATE,
-									'index' => 0,
-									'type' => 'Flexible',
-									'delay' => '60s',
-									'period' => '2-5,3:00-17:00'
-								],
-								[
-									'type' => 'Scheduling',
-									'delay' => 'wd3-4h1-15'
-								]
-							]
-						],
+//						'Update interval' => [
+//							'Delay' => '99s',
+//							'Custom intervals' => [
+//								[
+//									'action' => USER_ACTION_UPDATE,
+//									'index' => 0,
+//									'type' => 'Flexible',
+//									'delay' => '60s',
+//									'period' => '2-5,3:00-17:00'
+//								],
+//								[
+//									'type' => 'Scheduling',
+//									'delay' => 'wd3-4h1-15'
+//								]
+//							]
+//						],
 						'History storage period' => [
 							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
 							'input' => ['id' => 'history', 'value' => '400d']
@@ -229,22 +272,22 @@ class testPageMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix internal'],
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Text'],
-						'Update interval' => [
-							'Delay' => '90s',
-							'Custom intervals' => [
-								[
-									'action' => USER_ACTION_UPDATE,
-									'index' => 0,
-									'type' => 'Scheduling',
-									'delay' => 'wd3-4h1-15'
-								],
-								[
-									'type' => 'Flexible',
-									'delay' => '99s',
-									'period' => '1-2,7:00-8:00'
-								]
-							]
-						],
+//						'Update interval' => [
+//							'Delay' => '90s',
+//							'Custom intervals' => [
+//								[
+//									'action' => USER_ACTION_UPDATE,
+//									'index' => 0,
+//									'type' => 'Scheduling',
+//									'delay' => 'wd3-4h1-15'
+//								],
+//								[
+//									'type' => 'Flexible',
+//									'delay' => '99s',
+//									'period' => '1-2,7:00-8:00'
+//								]
+//							]
+//						],
 //						'Applications' => [
 //							'action' => 'Replace',
 //							'applications' => ['1', '2']
@@ -317,7 +360,34 @@ class testPageMassUpdateItems extends CWebTest{
 								'name' => 'header name 2',
 								'value' => 'header value 2'
 							]
-						]
+						],
+						'Enable trapping' => ['id' => 'allow_traps', 'value' => true]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'JMX agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.4 : 10054'],
+						'JMX endpoint'=> ['id' => 'jmx_endpoint', 'value' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi']
+						// Validate endpoint
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051']
 					]
 				]
 			],
@@ -343,8 +413,8 @@ class testPageMassUpdateItems extends CWebTest{
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP trap'], // Validate key
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Character'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.2 : 10052'], // Add interface to host
+						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 10055'],
 						'History storage period' => [
 							'radio' => ['id' => 'history_mode', 'value' => 'Do not keep history']
 						],
@@ -360,7 +430,49 @@ class testPageMassUpdateItems extends CWebTest{
 //						'expected_applications' => []
 					]
 				]
-			]
+			],
+			[
+				[
+					'names'=> [
+						'9_SNMP_Agent',
+						'10_SNMP_Agent'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
+						'Type of information'=> ['id' => 'value_type', 'value' => 'Character'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 1055']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'11_SSH_Agent',
+						'12_SSH_Agent'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
+						'Authentication method' => ['id' => 'authtype', 'value' => 'Public key'],
+						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
+						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'11_SSH_Agent',
+						'12_SSH_Agent'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
+						'Authentication method' => ['id' => 'authtype', 'value' => 'Password'],
+						'User name' => ['id' => 'username', 'value' => 'New_user_name'],
+						'Password' => ['id' => 'password', 'value' => 'New_password'],
+
+					]
+				]
+			],
 		];
 	}
 
@@ -393,6 +505,7 @@ class testPageMassUpdateItems extends CWebTest{
 				case 'Type of information':
 				case 'Status':
 				case 'Show value':
+				case 'Authentication method':
 					$form->query('id', $value['id'])->asZDropdown()->one()->select($value['value']);
 					break;
 
@@ -400,13 +513,18 @@ class testPageMassUpdateItems extends CWebTest{
 				case 'Description':
 				case 'User name':
 				case 'Password':
-				case 'User name':
-				case 'Password':
 				case 'Log time format':
 				case 'Allowed hosts':
 				case 'Request body' :
 				case 'URL':
+				case 'JMX endpoint':
+				case 'Public key file':
+				case 'Private key file':
 					$form->query('id', $value['id'])->one()->fill($value['value']);
+					break;
+
+				case 'Enable trapping':
+					$form->query('id', $value['id'])->one()->asCheckbox()->set($value['value']);
 					break;
 
 				case 'Request body type':
@@ -440,21 +558,6 @@ class testPageMassUpdateItems extends CWebTest{
 				case 'Headers':
 					$form->query('xpath:.//div[@id="headers_pairs"]/table')->asMultifieldTable()->one()->fill($value);
 					break;
-
-				case 'Security name':
-				case 'Security level':
-				case 'Authentication protocol':
-				case 'Authentication passphrase':
-				case 'Privacy protocol':
-				case 'Privacy passphrase':
-				case 'Type of information':
-
-				case 'SNMP community':
-				case 'JMX endpoint':
-
-				case 'Authentication method':
-				case 'Public key file':
-				case 'Private key file':
 			}
 		}
 		$form->submit();
@@ -477,7 +580,26 @@ class testPageMassUpdateItems extends CWebTest{
 					case 'Allowed hosts':
 					case 'Request body':
 					case 'URL':
+					case 'JMX endpoint':
+					case 'Authentication method':
+					case 'Public key file':
+					case 'Private key file':
+					case 'Request body type':
+					case 'User name':
+					case 'Password':
+					case 'Log time format':
+					case 'Enable trapping':
 						$this->assertEquals($value['value'], $form->getField($field)->getValue());
+						break;
+
+					case 'History storage period':
+					case 'Trend storage period':
+						$this->assertEquals($value['radio']['value'], $form->query('id', $value['radio']['id'])
+								->one()->asSegmentedRadio()->getValue());
+						if(array_key_exists('input', $value)){
+							$this->assertEquals($value['input']['value'], $form->query('id', $value['input']['id'])
+									->one()->getValue());
+						}
 						break;
 
 					case 'Status':
@@ -508,6 +630,11 @@ class testPageMassUpdateItems extends CWebTest{
 
 						$this->assertEquals($value, $form->query('xpath:.//div[@id="headers_pairs"]/table')
 								->asMultifieldTable()->one()->getValue());
+						break;
+
+					case 'Applications':
+
+						break;
 				}
 			}
 
