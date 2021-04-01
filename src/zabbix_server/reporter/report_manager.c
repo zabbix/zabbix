@@ -839,7 +839,7 @@ static void	rm_update_report(zbx_rm_t *manager, zbx_rm_report_t *report, int sta
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() reportid:" ZBX_FS_UI64 ", state:%d info:%s", __func__,
 			report->reportid, state, ZBX_NULL2EMPTY_STR(info));
 
-	if (SUCCEED == state)
+	if (ZBX_REPORT_STATE_SUCCESS == state)
 		flags |= ZBX_REPORT_UPDATE_LASTSENT;
 
 	if (report->state != state)
@@ -2156,8 +2156,8 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
 			char	*info = NULL;
 			size_t	info_alloc = 0, info_offset = 0;
 
-			status = ZBX_REPORT_STATE_SUCCESS;
 
+			status = ZBX_REPORT_STATE_SUCCESS;
 			if (batch->sent_num != batch->total_num)
 			{
 				zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
