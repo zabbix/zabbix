@@ -321,6 +321,9 @@ static zbx_shared_str_t	shared_str_new(const char *src)
 	size_t	len;
 	char	*ptr;
 
+	if (NULL == src)
+		return NULL;
+
 	len = strlen(src);
 	ptr = zbx_malloc(NULL, len + sizeof(zbx_uint32_t) + 1);
 	*((zbx_uint32_t *)ptr) = 0;
@@ -824,8 +827,7 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	alert->sendto = db_alert->sendto;
 	alert->subject = db_alert->subject;
 
-	alert->message = shared_str_new(db_alert->message);
-	shared_str_addref(alert->message);
+	alert->message = shared_str_addref(shared_str_new(db_alert->message));
 	zbx_free(db_alert->message);
 
 	alert->params = db_alert->params;
