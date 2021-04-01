@@ -1973,14 +1973,14 @@ static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_loc_
  *                         description)                                       *
  *                                                                            *
  ******************************************************************************/
-static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector_loc_t *params, ...)
+static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_loc_t *params, ...)
 {
-	size_t		out_alloc = 0, out_offset = 0;
-	va_list 	args;
-	int		index, type, param_num = 0;
-	zbx_strloc_t	*loc;
-	const char	*ptr;
-	char		*arg;
+	size_t			out_alloc = 0, out_offset = 0;
+	va_list 		args;
+	int			index, type, param_num = 0;
+	const zbx_strloc_t	*loc;
+	const char		*ptr;
+	char			*arg;
 
 	va_start(args, params);
 
@@ -1995,27 +1995,26 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 				if (params->values_num > (index = va_arg(args, int)))
 				{
 					loc = &params->values[index];
+					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
 
-					if ('\0' != parameter[loc->l])
+					if ('\0' != *arg)
 					{
-						arg = zbx_substr_unquote(parameter, loc->l, loc->r);
 						zbx_strcpy_alloc(out, &out_alloc, &out_offset, arg);
 
 						if ('#' != *arg && 0 != isdigit(arg[strlen(arg) - 1]))
 							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
-
-						zbx_free(arg);
 					}
+
+					zbx_free(arg);
 				}
 
 				if (-1 != (index = va_arg(args, int)) && index < params->values_num)
 				{
 					loc = &params->values[index];
+					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
 
-					if ('\0' != parameter[loc->l])
+					if ('\0' != *arg)
 					{
-						arg = zbx_substr_unquote(parameter, loc->l, loc->r);
-
 						if (0 == out_offset)
 							zbx_strcpy_alloc(out, &out_alloc, &out_offset, "#1");
 
@@ -2023,28 +2022,34 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 						zbx_strcpy_alloc(out, &out_alloc, &out_offset, arg);
 						if (0 != isdigit(arg[strlen(arg) - 1]))
 							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
-
-						zbx_free(arg);
 					}
+
+					zbx_free(arg);
 				}
 
 				break;
 			case ZBX_DBPATCH_ARG_TIME:
 				if (params->values_num > (index = va_arg(args, int)))
 				{
+					char	*str;
+
 					loc = &params->values[index];
-					zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-							loc->r - loc->l + 1);
-					if (0 != isdigit(parameter[loc->r]))
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+					if (0 != isdigit(parameter[strlen(str) - 1]))
 						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
+					zbx_free(str);
 				}
 				break;
 			case ZBX_DBPATCH_ARG_NUM:
 				if (params->values_num > (index = va_arg(args, int)))
 				{
+					char	*str;
+
 					loc = &params->values[index];
-					zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
-							loc->r - loc->l + 1);
+					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+					zbx_free(str);
 				}
 				break;
 			case ZBX_DBPATCH_ARG_STR:
@@ -2114,6 +2119,29 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 	}
 	else
 		*out = zbx_strdup(NULL, "");
+}
+
+static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, zbx_vector_loc_t *params,
+		char **replace)
+{
+	char	*parameter = NULL, *mask = NULL;
+
+	if (2 <= params->values_num && '\0' != function->parameter[params->values[1].l])
+	{
+		mask = zbx_substr_unquote(function->parameter, params->values[1].l, params->values[1].r);
+		*replace = zbx_dsprintf(NULL, "bitand({" ZBX_FS_UI64 "},%s)", function->functionid, mask);
+		zbx_free(mask);
+	}
+	else
+		*replace = zbx_dsprintf(NULL, "bitand({" ZBX_FS_UI64 "})", function->functionid);
+
+	dbpatch_convert_params(&parameter, function->parameter, params,
+			ZBX_DBPATCH_ARG_HIST, 0, 2,
+			ZBX_DBPATCH_ARG_NONE);
+
+	dbpatch_update_function(function, "last", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+
+	zbx_free(parameter);
 }
 
 /******************************************************************************
@@ -2208,10 +2236,18 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	{
 		dbpatch_update_func_diff(function, replace, functions);
 	}
-	else if (0 == strcmp(function->name, "fuzzytime") || 0 == strcmp(function->name, "nodata"))
+	else if (0 == strcmp(function->name, "fuzzytime"))
 	{
 		dbpatch_convert_params(&parameter, function->parameter, &params,
 				ZBX_DBPATCH_ARG_TIME, 0,
+				ZBX_DBPATCH_ARG_NONE);
+		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
+	}
+	else if (0 == strcmp(function->name, "nodata"))
+	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_TIME, 0,
+				ZBX_DBPATCH_ARG_STR, 1,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
@@ -2241,11 +2277,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	}
 	else if (0 == strcmp(function->name, "band"))
 	{
-		dbpatch_convert_params(&parameter, function->parameter, &params,
-				ZBX_DBPATCH_ARG_HIST, 0, 2,
-				ZBX_DBPATCH_ARG_NUM, 1,
-				ZBX_DBPATCH_ARG_NONE);
-		dbpatch_update_function(function, "bitand", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
+		dbpatch_update_func_bitand(function, &params, replace);
 	}
 	else if (0 == strcmp(function->name, "forecast"))
 	{

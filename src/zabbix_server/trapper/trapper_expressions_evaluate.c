@@ -109,9 +109,8 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	for (i = 0; i < expressions.values_num; i++)
 	{
-		double			expr_result;
-		zbx_vector_ptr_t	unknown_msgs;
-		char			*errmsg = NULL;
+		double	expr_result;
+		char	*errmsg = NULL;
 
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, ZBX_PROTO_TAG_EXPRESSION, expressions.values[i], ZBX_JSON_TYPE_STRING);
