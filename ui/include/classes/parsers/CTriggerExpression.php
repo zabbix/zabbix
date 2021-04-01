@@ -34,6 +34,7 @@ class CTriggerExpression {
 	public const ERROR_LEVEL = 1;
 	public const ERROR_UNEXPECTED_ENDING = 2;
 	public const ERROR_UNPARSED_CONTENT = 3;
+	public const ERROR_MAX_DEPTH_EXCEEDED = 4;
 
 	/**
 	 * Shows a validity of trigger expression
@@ -559,6 +560,7 @@ class CTriggerExpression {
 		}
 
 		$errors = array_filter([
+			$this->function_parser->getErrorDetails() ? self::ERROR_MAX_DEPTH_EXCEEDED : 0,
 			($level != 0) ? self::ERROR_LEVEL : 0,
 			($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)
 				? self::ERROR_UNEXPECTED_ENDING : 0,
@@ -567,6 +569,10 @@ class CTriggerExpression {
 		$error = reset($errors);
 
 		if ($error) {
+			if ($error == self::ERROR_MAX_DEPTH_EXCEEDED) {
+				['1' => $this->pos] = $this->function_parser->getErrorDetails();
+			}
+
 			$exp_part = substr($this->expression, ($this->pos == 0) ? 0 : $this->pos - 1);
 			if ($this->options['calculated']) {
 				$this->error = _s('incorrect calculated item formula starting from "%1$s"', $exp_part);
@@ -670,7 +676,6 @@ class CTriggerExpression {
 
 		// TODO miks: parser must support functionids as parameters based on value of $this->options['collapsed_expression'].
 		if ($this->function_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
-			$this->error = $this->function_parser->getError();
 			return false;
 		}
 

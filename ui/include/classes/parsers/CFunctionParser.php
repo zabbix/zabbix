@@ -112,7 +112,7 @@ class CFunctionParser extends CParser {
 		}
 
 		if ($this->depth > TRIGGER_MAX_FUNCTION_DEPTH) {
-			$this->errorPos($source, $pos);
+			$this->errorPos($source, ++$pos);
 			return self::PARSE_FAIL;
 		}
 
