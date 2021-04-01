@@ -28,6 +28,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $param2SecCount = [];
 	private $param2SecMode = [];
 	private $param3SecVal = [];
+	private $param_find = [];
 	private $param3SecPercent = [];
 	private $paramSecIntCount = [];
 	private $paramForecast = [];
@@ -130,6 +131,30 @@ class CControllerPopupTriggerExpr extends CController {
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
 				'A' => true
+			],
+			'o' => [
+				'C' => 'O',
+				'T' => T_ZBX_STR,
+				'A' => false
+			],
+			'v' => [
+				'C' => 'V',
+				'T' => T_ZBX_STR,
+				'A' => false
+			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			]
+		];
+
+		$this->param_find = [
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'M' => $this->metrics,
+				'A' => false
 			],
 			'o' => [
 				'C' => 'O',
@@ -291,7 +316,7 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'find' => [
 				'description' => _('find() - Check occurance of pattern V (which fulfill operator O) in period T (1 - match, 0 - no match)'),
-				'params' => $this->param3SecVal,
+				'params' => $this->param_find,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']
 			],
