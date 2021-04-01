@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-16T09:40:17Z</date>
+   <date>2021-04-01T09:52:19Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1246,7 +1246,8 @@ Secondary nodes send getMore operations as part of the replication process.</des
                      </condition>
                   </conditions>
                </filter>
-               <description>Collect collections metrics.</description>
+               <description>Collect collections metrics.&#13;
+Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>MongoDB {#DBNAME}.{#COLLECTION}: Objects, avg size</name>
@@ -2167,7 +2168,8 @@ Secondary nodes send getMore operations as part of the replication process.</des
                      </condition>
                   </conditions>
                </filter>
-               <description>Collect database metrics.</description>
+               <description>Collect database metrics.&#13;
+Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>MongoDB {#DBNAME}: Collections</name>
@@ -3118,6 +3120,28 @@ return JSON.stringify(status.set
                            <status>ENABLED</status>
                            <discover>DISCOVER</discover>
                         </operation>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>Replication lag</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Arbiter metrics</name>
+                     <step>2</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#NODE_STATE}</macro>
+                              <value>7</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
                         <operation>
                            <operationobject>ITEM_PROTOTYPE</operationobject>
                            <operator>LIKE</operator>
