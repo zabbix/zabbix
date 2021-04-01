@@ -228,15 +228,37 @@ class CReport extends CApiService {
 				}
 			}
 
-			if (!$report['users'] && !$report['user_groups']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one user or user group must be specified.'));
-			}
+			$this->checkHasRecipients($report['users'], $report['user_groups']);
 		}
 
 		$this->checkDuplicates(array_column($reports, 'name'));
 		$this->checkDashboards(array_unique(array_column($reports, 'dashboardid')));
 		$this->checkUsers($reports);
 		$this->checkUserGroups($reports);
+	}
+
+	/**
+	 * Check if there is at least one recipient or recipient group.
+	 *
+	 * @param array $users
+	 * @param array $usrgrps
+	 *
+	 * @throws APIException if there are no recipients to send the report to.
+	 */
+	protected function checkHasRecipients(array $users, array $usrgrps): void {
+		if ($usrgrps) {
+			return;
+		}
+
+		if (!$users) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one user or user group must be specified.'));
+		}
+
+		if (!array_key_exists(ZBX_REPORT_EXCLUDE_USER_FALSE, array_column($users, 'exclude', 'exclude'))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_('If no user groups are specified, at least one user must be included in the mailing list.')
+			);
+		}
 	}
 
 	/**
@@ -569,13 +591,10 @@ class CReport extends CApiService {
 				);
 			}
 
-			$report_users = array_key_exists('users', $report) ? $report['users'] : $db_report['users'];
-			$report_user_groups = array_key_exists('user_groups', $report)
-				? $report['user_groups']
-				: $db_report['user_groups'];
-
-			if (!$report_users && !$report_user_groups) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one user or user group must be specified.'));
+			if (array_key_exists('users', $report) || array_key_exists('user_groups', $report)) {
+				$this->checkHasRecipients(array_key_exists('users', $report) ? $report['users'] : $db_report['users'],
+					array_key_exists('user_groups', $report) ? $report['user_groups'] : $db_report['user_groups']
+				);
 			}
 		}
 
