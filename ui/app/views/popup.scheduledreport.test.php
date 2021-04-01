@@ -25,7 +25,7 @@
 
 $form = (new CForm())->addItem($data['messages']);
 
-if ($data['recipients']) {
+if (array_key_exists('recipients', $data)) {
 	$emails_sent = [];
 	$emails_not_sent = [];
 
