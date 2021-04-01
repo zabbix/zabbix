@@ -839,7 +839,7 @@ static void	rm_update_report(zbx_rm_t *manager, zbx_rm_report_t *report, int sta
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() reportid:" ZBX_FS_UI64 ", state:%d info:%s", __func__,
 			report->reportid, state, ZBX_NULL2EMPTY_STR(info));
 
-	if (ZBX_REPORT_STATE_SUCCESS == state)
+	if (ZBX_REPORT_STATE_ERROR != state)
 		flags |= ZBX_REPORT_UPDATE_LASTSENT;
 
 	if (report->state != state)
