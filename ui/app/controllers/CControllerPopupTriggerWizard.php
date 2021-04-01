@@ -136,13 +136,12 @@ class CControllerPopupTriggerWizard extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
 				$trigger_valid = false;
 			}
-
-			if (!$item) {
+			elseif (!$item) {
 				error('No permissions to referred object or it does not exist!');
 				$trigger_valid = false;
 			}
-
-			if ($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
+			elseif ($exprs
+					&& ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
 				[$editable, $queries] = check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression);
 
 				// Check of no other /host/key references.
