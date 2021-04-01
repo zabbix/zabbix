@@ -737,7 +737,7 @@ static char	*rm_get_report_name(const char *name, int report_time)
 	if (NULL == (tm = localtime(&rtime)))
 		name_full = zbx_dsprintf(NULL, "%s.pdf", name_esc);
 	else
-		name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1970,
+		name_full = zbx_dsprintf(NULL, "%s_%04d-%02d-%02d_%02d-%02d.pdf", name_esc, tm->tm_year + 1900,
 				tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
 
 	zbx_free(name_esc);
