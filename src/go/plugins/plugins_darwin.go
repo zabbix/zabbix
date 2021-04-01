@@ -24,6 +24,7 @@ import (
 	_ "zabbix.com/plugins/docker"
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/memcached"
+	_ "zabbix.com/plugins/mongodb"
 	_ "zabbix.com/plugins/mysql"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/oracle"

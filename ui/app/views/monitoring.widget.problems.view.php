@@ -184,12 +184,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$problem_link = [
 		(new CLinkAction($problem['name']))
-			->setHint(
-				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-					'triggerid' => $trigger['triggerid']], $eventid, $show_timeline, $data['fields']['show_tags'],
-					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority']
-				)
-			)
+			->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $eventid, $show_timeline,
+				$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
+				$data['fields']['tag_priority']
+			))
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], getSeverityName($problem['severity'], $data['config'])
 			))
