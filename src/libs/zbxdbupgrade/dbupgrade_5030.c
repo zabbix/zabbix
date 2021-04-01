@@ -1995,27 +1995,26 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 				if (params->values_num > (index = va_arg(args, int)))
 				{
 					loc = &params->values[index];
+					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
 
-					if ('\0' != parameter[loc->l])
+					if ('\0' != *arg)
 					{
-						arg = zbx_substr_unquote(parameter, loc->l, loc->r);
 						zbx_strcpy_alloc(out, &out_alloc, &out_offset, arg);
 
 						if ('#' != *arg && 0 != isdigit(arg[strlen(arg) - 1]))
 							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
-
-						zbx_free(arg);
 					}
+
+					zbx_free(arg);
 				}
 
 				if (-1 != (index = va_arg(args, int)) && index < params->values_num)
 				{
 					loc = &params->values[index];
+					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
 
-					if ('\0' != parameter[loc->l])
+					if ('\0' != *arg)
 					{
-						arg = zbx_substr_unquote(parameter, loc->l, loc->r);
-
 						if (0 == out_offset)
 							zbx_strcpy_alloc(out, &out_alloc, &out_offset, "#1");
 
@@ -2023,9 +2022,9 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 						zbx_strcpy_alloc(out, &out_alloc, &out_offset, arg);
 						if (0 != isdigit(arg[strlen(arg) - 1]))
 							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
-
-						zbx_free(arg);
 					}
+
+					zbx_free(arg);
 				}
 
 				break;
