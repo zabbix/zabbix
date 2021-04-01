@@ -85,8 +85,8 @@ class CControllerPopupScheduledReportTest extends CController {
 		if ($result) {
 			$msg_title = null;
 
-			if (is_array($result) && array_key_exists('results', $result)) {
-				$data['results'] = $result['results'];
+			if (is_array($result) && array_key_exists('recipients', $result)) {
+				$data['recipients'] = $result['recipients'];
 			}
 
 			info(_('Report generating test successful.'));

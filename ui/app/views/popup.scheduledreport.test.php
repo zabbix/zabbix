@@ -25,16 +25,16 @@
 
 $form = (new CForm())->addItem($data['messages']);
 
-if ($data['results']) {
+if ($data['recipients']) {
 	$emails_sent = [];
 	$emails_not_sent = [];
 
-	foreach ($data['results'] as $result) {
-		if ($result['status'] == 0) {
-			$emails_sent[] = $result['recipient'];
+	foreach ($data['recipients'] as $recipient) {
+		if ($recipient['status'] == 0) {
+			$emails_sent[] = $recipient['recipient'];
 		}
 		else {
-			$emails_not_sent[] = $result['recipient'];
+			$emails_not_sent[] = $recipient['recipient'];
 		}
 	}
 
