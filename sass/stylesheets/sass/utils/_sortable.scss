@@ -1,8 +1,8 @@
-.csortable {
+.sortable {
 	position: relative;
 	overflow: hidden;
 
-	.csortable-list {
+	.sortable-list {
 		position: relative;
 		top: 0;
 		left: 0;
@@ -10,17 +10,17 @@
 		@if $ui-transitions {
 			transition: left .2s, top .2s;
 
-			.csortable-item {
+			.sortable-item {
 				transition: left .2s, top .2s;
 			}
 		}
 	}
 
-	&.csortable-dragging {
-		.csortable-item {
+	&.sortable-dragging {
+		.sortable-item {
 			position: absolute;
 
-			&.csortable-dragging {
+			&.sortable-dragging {
 				display: none;
 			}
 		}

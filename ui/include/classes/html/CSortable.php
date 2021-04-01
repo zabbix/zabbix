@@ -28,35 +28,35 @@ class CSortable extends CTag {
 	 *
 	 * @var string
 	 */
-	public const ZBX_STYLE_SORTABLE = 'csortable';
+	public const ZBX_STYLE_SORTABLE = 'sortable';
 
 	/**
 	 * List class of a CSortable.
 	 *
 	 * @var string
 	 */
-	public const ZBX_STYLE_SORTABLE_LIST = 'csortable-list';
+	public const ZBX_STYLE_SORTABLE_LIST = 'sortable-list';
 
 	/**
 	 * List item class of a CSortable.
 	 *
 	 * @var string
 	 */
-	public const ZBX_STYLE_SORTABLE_ITEM = 'csortable-item';
+	public const ZBX_STYLE_SORTABLE_ITEM = 'sortable-item';
 
 	/**
 	 * Drag action triggering class for item child elements. If not specified, the whole item will work as drag handle.
 	 *
 	 * @var string
 	 */
-	public const ZBX_STYLE_SORTABLE_DRAG_HANDLE = 'csortable-drag-handle';
+	public const ZBX_STYLE_SORTABLE_DRAG_HANDLE = 'sortable-drag-handle';
 
 	/**
 	 * Class applied to the CSortable container and the target list item while dragging.
 	 *
 	 * @var string
 	 */
-	public const ZBX_STYLE_SORTABLE_DRAGGING = 'csortable-dragging';
+	public const ZBX_STYLE_SORTABLE_DRAGGING = 'sortable-dragging';
 
 	/**
 	 * List of items.

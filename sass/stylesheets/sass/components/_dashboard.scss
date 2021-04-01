@@ -56,20 +56,20 @@
 	margin: -2px 10px -2px 0;
 	overflow: hidden;
 
-	.csortable {
+	.sortable {
 		// Accommodate 2px shadow of focused tabs.
 		padding: 2px 0;
 		// Hide the invisible tab paddings.
 		margin: 0 -1.5px;
 	}
 
-	.csortable-list {
+	.sortable-list {
 		display: flex;
 		padding: 0;
 		margin: 0;
 		align-items: center;
 
-		& > .csortable-item:focus:not(:active) {
+		& > .sortable-item:focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
 			padding: 0 3.5px 0 3.5px;
 
@@ -81,7 +81,7 @@
 		}
 	}
 
-	.csortable-item {
+	.sortable-item {
 		// This container should not be visually styled at this level.
 		box-sizing: border-box;
 		display: block;
@@ -132,14 +132,14 @@
 		}
 	}
 
-	& .csortable > .csortable-item > div,
-	& .csortable-list > .csortable-item > div:hover {
+	& .sortable > .sortable-item > div,
+	& .sortable-list > .sortable-item > div:hover {
 		background: $action-hover-color;
 		border: 1px solid darken($action-hover-color, 20%);
 	}
 
-	& .csortable > .csortable-item > div.selected-tab,
-	& .csortable-list > .csortable-item > div.selected-tab {
+	& .sortable > .sortable-item > div.selected-tab,
+	& .sortable-list > .sortable-item > div.selected-tab {
 		background-color: $ui-bg-selected-color;
 		border: 1px solid transparent;
 

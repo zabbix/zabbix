@@ -19,6 +19,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "utils/indicator";
 @import "utils/resizable";
 @import "utils/scrollable";
+@import "utils/sortable";
 
 @import "layout/grid";
 @import "layout/header";
@@ -26,7 +27,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/sidebar";
 @import "layout/form-grid";
 
-@import "components/csortable";
 @import "components/dashboard";
 @import "components/form-search";
 @import "components/menu-main";

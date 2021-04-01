@@ -18,11 +18,11 @@
 **/
 
 
-const ZBX_STYLE_SORTABLE = 'csortable';
-const ZBX_STYLE_SORTABLE_LIST = 'csortable-list';
-const ZBX_STYLE_SORTABLE_ITEM = 'csortable-item';
-const ZBX_STYLE_SORTABLE_DRAG_HANDLE = 'csortable-drag-handle';
-const ZBX_STYLE_SORTABLE_DRAGGING = 'csortable-dragging';
+const ZBX_STYLE_SORTABLE = 'sortable';
+const ZBX_STYLE_SORTABLE_LIST = 'sortable-list';
+const ZBX_STYLE_SORTABLE_ITEM = 'sortable-item';
+const ZBX_STYLE_SORTABLE_DRAG_HANDLE = 'sortable-drag-handle';
+const ZBX_STYLE_SORTABLE_DRAGGING = 'sortable-dragging';
 
 const SORTABLE_EVENT_DRAG_START = 'drag_start';
 const SORTABLE_EVENT_DRAG_END = 'drag_end';
