@@ -2082,7 +2082,7 @@ out:
 static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int range_start, int count,
 		const zbx_timespec_t *ts)
 {
-	int				ret = SUCCEED, cached_records = 0, range_end;
+	int				ret = SUCCEED, cached_records = 0, range_end, records_offset;
 	zbx_vector_history_record_t	records;
 	zbx_uint64_t			itemid;
 	unsigned char			value_type;
@@ -2131,6 +2131,8 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int ran
 		range_end = ts->sec;
 	}
 
+	records_offset = records.values_num;
+
 	if (SUCCEED == ret && SUCCEED == (ret = vc_db_read_values_by_time_and_count(itemid, value_type, &records,
 			range_start, count - cached_records, range_end, ts)))
 	{
@@ -2158,6 +2160,14 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int ran
 		goto out;
 
 	ret = records.values_num;
+
+	if (0 == range_start && count - cached_records > records.values_num - records_offset)
+	{
+		(*item)->active_range = 0;
+		(*item)->daily_range = 0;
+		(*item)->status = ZBX_ITEM_STATUS_CACHED_ALL;
+	}
+
 	if ((count <= records.values_num || 0 == range_start) && 0 != records.values_num)
 	{
 		vc_item_update_db_cached_from(*item,
@@ -2286,13 +2296,8 @@ out:
 	if (count > values->values_num)
 	{
 		if (0 == seconds)
-		{
-			/* not enough data in db to fulfill a count based request request */
-			item->active_range = 0;
-			item->daily_range = 0;
-			item->status = ZBX_ITEM_STATUS_CACHED_ALL;
 			return;
-		}
+
 		/* not enough data in the requested period, set the range equal to the period plus */
 		/* one second to include nanosecond shifts                                         */
 		range_timestamp = ts->sec - seconds;
@@ -2688,7 +2693,8 @@ out:
 		ret = vc_db_get_values(itemid, value_type, values, seconds, count, ts);
 		WRLOCK_CACHE;
 
-		vc_remove_item_by_id(itemid);
+		if (ZBX_VC_DISABLED != vc_state)
+			vc_remove_item_by_id(itemid);
 
 		if (SUCCEED == ret)
 			vc_update_statistics(NULL, 0, values->values_num, time(NULL));
