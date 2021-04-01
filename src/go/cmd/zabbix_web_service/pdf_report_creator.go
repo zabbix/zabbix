@@ -122,8 +122,8 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 	if err = chromedp.Run(ctx, chromedp.Tasks{
 		network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
-		navigateAndWaitFor(u.String(), "networkIdle"),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
+		navigateAndWaitFor(u.String(), "networkIdle"),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
 			defer cancel()
