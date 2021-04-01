@@ -35,7 +35,7 @@ class CControllerPopupScheduledReportTest extends CController {
 
 		if (!$ret) {
 			$output = [];
-			if (($messages = getMessages()) !== null) {
+			if (($messages = getMessages(false, null, false)) !== null) {
 				$output['errors'] = $messages->toString();
 			}
 
