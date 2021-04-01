@@ -36,7 +36,7 @@ Template tooling version used: 0.38</description>
          </applications>
          <items>
             <item>
-               <name>MongoDB cluster: Configserver heartbear</name>
+               <name>MongoDB cluster: Configserver heartbeat</name>
                <type>DEPENDENT</type>
                <key>mongodb.config_server_heartbeat</key>
                <delay>0</delay>
