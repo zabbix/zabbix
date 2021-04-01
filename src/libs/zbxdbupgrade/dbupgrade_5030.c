@@ -1652,6 +1652,13 @@ static int	DBpatch_5030080(void)
 	return DBmodify_field_type("task_remote_command", &field, &old_field);
 }
 /*  end of ZBXNEXT-6368 patches */
+
+static int	DBpatch_5030081(void)
+{
+	const ZBX_FIELD	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("valuemap_mapping", &field);
+}
 #endif
 
 DBPATCH_START(5030)
@@ -1739,5 +1746,6 @@ DBPATCH_ADD(5030077, 0, 1)
 DBPATCH_ADD(5030078, 0, 1)
 DBPATCH_ADD(5030079, 0, 1)
 DBPATCH_ADD(5030080, 0, 1)
+DBPATCH_ADD(5030081, 0, 1)
 
 DBPATCH_END()

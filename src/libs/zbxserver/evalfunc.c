@@ -43,15 +43,20 @@ zbx_value_type_t;
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
+#define ZBX_VALUEMAP_STATUS_MATCH	0
+#define ZBX_VALUEMAP_STATUS_REGEXP	1
+#define ZBX_VALUEMAP_STATUS_RANGE	2
+
 typedef struct
 {
 	char	value[ZBX_VALUEMAP_STRING_LEN];
 	char	newvalue[ZBX_VALUEMAP_STRING_LEN];
+	int	status;
 }
 zbx_valuemaps_t;
 
-ZBX_PTR_VECTOR_DECL(valuemaps_ptr, zbx_valuemaps_t *);
-ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *);
+ZBX_PTR_VECTOR_DECL(valuemaps_ptr, zbx_valuemaps_t *)
+ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *)
 
 static const char	*zbx_type_string(zbx_value_type_t type)
 {
@@ -3317,12 +3322,11 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 {
 	char				*value_tmp;
 	int				i, ret = FAIL;
-	double				input_value, min, max;
+	double				input_value;
 	DB_RESULT			result;
 	DB_ROW				row;
-	zbx_valuemaps_t			*valuemap = NULL;
+	zbx_valuemaps_t			*valuemap;
 	zbx_vector_valuemaps_ptr_t	valuemaps;
-	zbx_vector_ptr_t		regexps;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __func__, value, valuemapid);
 
@@ -3332,7 +3336,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	zbx_vector_valuemaps_ptr_create(&valuemaps);
 
 	result = DBselect(
-			"select value,newvalue"
+			"select value,newvalue,status"
 			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64,
 			valuemapid);
@@ -3347,45 +3351,53 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 		valuemap = (zbx_valuemaps_t *)zbx_malloc(NULL, sizeof(zbx_valuemaps_t));
 		zbx_strlcpy_utf8(valuemap->value, row[0], ZBX_VALUEMAP_STRING_LEN);
 		zbx_strlcpy_utf8(valuemap->newvalue, row[1], ZBX_VALUEMAP_STRING_LEN);
+		valuemap->status = atoi(row[2]);
 		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
-		valuemap = NULL;
 	}
 
 	DBfree_result(result);
-
-	zbx_vector_valuemaps_ptr_sort(&valuemaps, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-	if (FAIL != (i = zbx_vector_valuemaps_ptr_search(&valuemaps, (zbx_valuemaps_t *)value,
-			ZBX_DEFAULT_STR_COMPARE_FUNC)))
-	{
-		goto map_value;
-	}
 
 	for (i = 0; i < valuemaps.values_num; i++)
 	{
 		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
 
+		if (ZBX_VALUEMAP_STATUS_MATCH == valuemap->status && 0 == strcmp(valuemap->value, value))
+			goto map_value;
+	}
+
+	for (i = 0; i < valuemaps.values_num; i++)
+	{
+		char			*pattern;
+		int			match;
+		zbx_vector_ptr_t	regexps;
+
+		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+
+		if (ZBX_VALUEMAP_STATUS_REGEXP != valuemap->status)
+			continue;
+
+		zbx_vector_ptr_create(&regexps);
+
+		pattern = valuemap->value;
+
 		if ('@' == *valuemap->value)
 		{
-			char	*pattern;
-			int	result;
-
-			zbx_vector_ptr_create(&regexps);
-
 			DCget_expressions_by_name(&regexps, valuemap->value + 1);
 
-			pattern = valuemap->value;
 			if (0 == regexps.values_num)
-				pattern++;
-
-			result =  regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
-
-			zbx_regexp_clean_expressions(&regexps);
-			zbx_vector_ptr_destroy(&regexps);
-
-			if (ZBX_REGEXP_MATCH == result)
-				goto map_value;
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "global regular expression \"%s\" does not exist",
+						valuemap->value + 1);
+			}
 		}
+		match =  regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
+
+		zbx_regexp_clean_expressions(&regexps);
+		zbx_vector_ptr_destroy(&regexps);
+
+		if (ZBX_REGEXP_MATCH == match)
+			goto map_value;
+
 	}
 
 	if (ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
@@ -3396,6 +3408,9 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 			double	min, max;
 
 			valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+
+			if (ZBX_VALUEMAP_STATUS_RANGE != valuemap->status)
+				continue;
 
 			if (1 == sscanf(valuemap->value, "<%s", threshold_max))
 			{
@@ -3430,10 +3445,12 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 		}
 	}
 
-	if (FAIL != (i = zbx_vector_valuemaps_ptr_search(&valuemaps, (zbx_valuemaps_t *)"*",
-			ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	for (i = 0; i < valuemaps.values_num; i++)
 	{
-		goto map_value;
+		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+
+		if (ZBX_VALUEMAP_STATUS_RANGE == valuemap->status && 0 == strcmp(valuemap->value, "*"))
+			goto map_value;
 	}
 
 map_value:
