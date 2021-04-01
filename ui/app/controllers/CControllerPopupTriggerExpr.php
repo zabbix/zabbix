@@ -764,13 +764,23 @@ class CControllerPopupTriggerExpr extends CController {
 						$data['params']['last'] = '';
 					}
 
-					// Combince sec|#num and <time_shift> parameters into one.
+					// Combince sec|#num and <time_shift|period_shift> parameters into one.
 					if (array_key_exists('last', $data['params'])) {
+						if (array_key_exists('shift', $data['params'])) {
+							$shift = $data['params']['shift'];
+						}
+						elseif (array_key_exists('period_shift', $data['params'])) {
+							$shift = $data['params']['period_shift'];
+						}
+						else {
+							$shift = null;
+						}
+
 						array_unshift($data['params'], implode(':', array_filter([
 							$data['params']['last'],
-							array_key_exists('shift', $data['params']) ? $data['params']['shift'] : null
+							$shift
 						])));
-						unset($data['params']['last'], $data['params']['shift']);
+						unset($data['params']['last'], $data['params']['shift'], $data['params']['period_shift']);
 					}
 
 					$mask = '';
