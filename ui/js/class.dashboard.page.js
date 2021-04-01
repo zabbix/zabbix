@@ -436,6 +436,7 @@ class CDashboardPage extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
+			scope_id: this._unique_id,
 			unique_id
 		});
 	}

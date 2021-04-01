@@ -771,7 +771,7 @@ class CSortable extends CBaseComponent {
 					return;
 				}
 
-				const reference_item = (e.key === 'ArrowLeft')
+				const reference_item = e.key === 'ArrowLeft'
 					? e.target.previousElementSibling
 					: (e.target.nextElementSibling ? e.target.nextElementSibling.nextElementSibling : null);
 
@@ -781,6 +781,8 @@ class CSortable extends CBaseComponent {
 				}
 
 				this.insertItemBefore(e.target, reference_item);
+
+				e.preventDefault();
 
 				// Re-focus the moved item.
 				e.target.focus();

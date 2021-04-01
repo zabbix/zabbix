@@ -132,19 +132,27 @@
 		}
 	}
 
-	& .sortable > .sortable-item > div,
-	& .sortable-list > .sortable-item > div:hover {
+	.sortable > .sortable-item > div,
+	.sortable-list > .sortable-item > div:hover {
 		background: $action-hover-color;
 		border: 1px solid darken($action-hover-color, 20%);
 	}
 
-	& .sortable > .sortable-item > div.selected-tab,
-	& .sortable-list > .sortable-item > div.selected-tab {
+	.sortable > .sortable-item > div.selected-tab,
+	.sortable-list > .sortable-item > div.selected-tab {
 		background-color: $ui-bg-selected-color;
 		border: 1px solid transparent;
 
 		span {
 			color: $font-selected-color;
+		}
+	}
+
+	.sortable-dragging {
+		.sortable-item {
+			& > div {
+				@extend %cursor-dragging;
+			}
 		}
 	}
 }

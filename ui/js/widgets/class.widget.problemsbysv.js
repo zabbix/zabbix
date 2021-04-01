@@ -26,7 +26,17 @@ class CWidgetProblemsBySv extends CWidget {
 		this._events = {
 			...this._events,
 
-			acknowledgeCreated: (e, response, overlay) => {
+			acknowledgeCreated: (e, response) => {
+				for (let i = overlays_stack.length - 1; i >= 0; i--) {
+					const overlay = overlays_stack.getById(overlays_stack.stack[i]);
+
+					if (overlay.type === 'hintbox') {
+						if (this._content_body.contains(overlay.element)) {
+							hintBox.deleteHint(overlay.element);
+						}
+					}
+				}
+
 				clearMessages();
 
 				addMessage(makeMessageBox('good', [], response.message, true, false));

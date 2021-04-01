@@ -195,8 +195,8 @@ class CWidgetGraph extends CWidget {
 		};
 	}
 
-	getActionsMenu({can_paste_widget}) {
-		const menu = super.getActionsMenu({can_paste_widget});
+	getActionsContextMenu({can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_paste_widget});
 
 		if (this._is_edit_mode) {
 			return menu;

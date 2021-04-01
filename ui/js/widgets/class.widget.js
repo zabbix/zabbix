@@ -59,6 +59,7 @@ class CWidget extends CBaseComponent {
 		can_edit_dashboards,
 		time_period,
 		dynamic_hostid,
+		scope_id,
 		unique_id
 	}) {
 		super(document.createElement('div'));
@@ -91,6 +92,7 @@ class CWidget extends CBaseComponent {
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
+		this._scope_id = scope_id;
 		this._unique_id = unique_id;
 
 		this._init();
@@ -121,7 +123,6 @@ class CWidget extends CBaseComponent {
 		this._preloader_timeout = null;
 		this._preloader_timeout_sec = 10;
 		this._show_preloader_asap = true;
-
 		this._resizable_handles = [];
 	}
 
@@ -218,7 +219,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	supportsDynamicHosts() {
-		return (this._fields.dynamic == 1);
+		return this._fields.dynamic == 1;
 	}
 
 	getDynamicHost() {
@@ -266,7 +267,7 @@ class CWidget extends CBaseComponent {
 	}
 
 	getNumHeaderLines() {
-		return (this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) ? 1 : 0;
+		return this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 1 : 0;
 	}
 
 	_isResizing() {
@@ -435,7 +436,7 @@ class CWidget extends CBaseComponent {
 		};
 	}
 
-	getActionsMenu({can_paste_widget}) {
+	getActionsContextMenu({can_paste_widget}) {
 		let menu = [];
 		let menu_actions = [];
 
@@ -449,7 +450,7 @@ class CWidget extends CBaseComponent {
 		if (this._is_edit_mode) {
 			menu_actions.push({
 				label: t('Paste'),
-				disabled: (can_paste_widget === false),
+				disabled: can_paste_widget === false,
 				clickCallback: () => this.fire(WIDGET_EVENT_PASTE)
 			});
 

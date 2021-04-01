@@ -747,13 +747,16 @@ footer {
         margin: 0 -9px 0 4px; }
       .dashboard-navigation-tabs .sortable-item > div:not(.selected-tab) button {
         display: none; }
-  .dashboard-navigation-tabs .sortable > .sortable-item > div, .dashboard-navigation-tabs .sortable-list > .sortable-item > div:hover {
+  .dashboard-navigation-tabs .sortable > .sortable-item > div,
+  .dashboard-navigation-tabs .sortable-list > .sortable-item > div:hover {
     background: #454545;
     border: 1px solid #121212; }
-  .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab, .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab {
+  .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab,
+  .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab {
     background-color: #4f4f4f;
     border: 1px solid transparent; }
-    .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span, .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
+    .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span,
+    .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
       color: #f2f2f2; }
 
 .dashboard-navigation-controls {
@@ -5093,7 +5096,7 @@ span.is-loading {
   cursor: move;
   cursor: grab; }
 
-.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
+.dashboard-navigation-tabs .sortable-dragging .sortable-item > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
 .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head, .ui-draggable .drag-icon,
