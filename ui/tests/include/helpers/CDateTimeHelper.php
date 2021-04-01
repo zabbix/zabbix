@@ -37,13 +37,13 @@ class CDateTimeHelper {
 	}
 
 	/**
-	 * Get the UTC time for a specific time zone.
+	 * Get the UTC offset for a specific time zone.
 	 *
 	 * @param string $timezone		time-zone name
 	 *
 	 * @return string
 	 */
-	public static function getUTCTime($timezone) {
+	public static function getUTCOffset($timezone) {
 		$offset = (strtotime('today 12:00 am UTC') - strtotime('today 12:00 am '.$timezone));
 		$sign = $offset >= 0 ? '+' : '-';
 		$offset = abs($offset);
@@ -60,22 +60,20 @@ class CDateTimeHelper {
 	 */
 	public static function getTimeZoneFormat($label) {
 		$timezone = ($label === 'System' || $label === 'System default') ? 'Europe/Riga' : $label;
-		$utc = CDateTimeHelper::getUTCTime($timezone);
+		$utc = CDateTimeHelper::getUTCOffset($timezone);
 
-		if ($label === 'System' || $label === 'System default') {
-			return $label.': ('.$utc.') '.$timezone;
-		}
-		else {
-			return '('.$utc.') '.$timezone;
-		}
+		return (($label === 'System' || $label === 'System default') ? $label .': ': '').'('.$utc.') '.$timezone;
 	}
 
 	/**
-	 * Days count for the case when current or past year is leap year.
+	 * The days are counted from specific date and time period.
+	 *
+	 * @param string $date		timestamp
+	 * @param string $period	time period
 	 *
 	 * @return int
 	 */
-	public static function countDays() {
-		return (new DateTime())->diff((new DateTime())->sub(new DateInterval('P1Y')))->days;
+	public static function countDays($date = 'now', $period = 'P1Y') {
+		return (new DateTime($date))->diff((new DateTime($date))->sub(new DateInterval($period)))->days;
 	}
 }
