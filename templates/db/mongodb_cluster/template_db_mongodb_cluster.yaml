@@ -29,7 +29,7 @@ zabbix_export:
           name: 'Zabbix raw items'
       items:
         -
-          name: 'MongoDB cluster: Configserver heartbear'
+          name: 'MongoDB cluster: Configserver heartbeat'
           type: DEPENDENT
           key: mongodb.config_server_heartbeat
           delay: '0'
