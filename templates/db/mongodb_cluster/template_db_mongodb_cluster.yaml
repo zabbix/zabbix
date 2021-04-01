@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-16T09:51:01Z'
+  date: '2021-04-01T10:00:17Z'
   groups:
     -
       name: Templates/Databases
@@ -29,9 +29,9 @@ zabbix_export:
           name: 'Zabbix raw items'
       items:
         -
-          name: 'MongoDB cluster: Configserver heartbear'
+          name: 'MongoDB cluster: Configserver heartbeat'
           type: DEPENDENT
-          key: mongodb.config_server_heartbit
+          key: mongodb.config_server_heartbeat
           delay: '0'
           history: 7d
           units: s
@@ -783,7 +783,9 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Collect collections metrics.'
+          description: |
+            Collect collections metrics.
+            Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
           item_prototypes:
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, avg size'
@@ -968,7 +970,9 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Collect database metrics.'
+          description: |
+            Collect database metrics.
+            Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.
           item_prototypes:
             -
               name: 'MongoDB {#DBNAME}: Size, data'

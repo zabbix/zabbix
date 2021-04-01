@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-16T09:50:57Z'
+  date: '2021-04-01T10:00:13Z'
   groups:
     -
       name: Templates/Databases
@@ -972,7 +972,9 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Collect collections metrics.'
+          description: |
+            Collect collections metrics.
+            Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
           item_prototypes:
             -
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, avg size'
@@ -1679,7 +1681,9 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Collect database metrics.'
+          description: |
+            Collect database metrics.
+            Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.
           item_prototypes:
             -
               name: 'MongoDB {#DBNAME}: Collections'
@@ -2412,6 +2416,22 @@ zabbix_export:
                   value: 'Number of unhealthy replicas'
                   status: ENABLED
                   discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Replication lag'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'Arbiter metrics'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#NODE_STATE}'
+                    value: '7'
+                    formulaid: A
+              operations:
                 -
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
