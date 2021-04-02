@@ -1,8 +1,16 @@
 Changes for 5.4.0rc1
 
 New features:
+A.F.....S. [ZBXNEXT-6288,ZBXNEXT-6289] removed screens and slideshows (akozlovs, talbergs)
+A.F.....S. [ZBXNEXT-6309] added support for multi-page dashboards (arimdjonoks, ashubin, averza)
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.0beta2
