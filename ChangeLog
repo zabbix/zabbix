@@ -484,8 +484,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.11rc1
 
 New features:
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.10
