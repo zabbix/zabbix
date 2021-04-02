@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 /**
  * Test the mass update of items.
  *
- * @backup items
+ * @backup items, interface
  */
 class testPageMassUpdateItems extends CWebTest{
 
@@ -198,6 +198,32 @@ class testPageMassUpdateItems extends CWebTest{
 				'delay' => '55s',
 				'username' => 'username2',
 				'params' => 'executed script 2'
+			]
+		]);
+	}
+
+	/**
+	 * Add interface to host.
+	 */
+	public function prepareInterfaceData() {
+		CDataHelper::call('hostinterface.create', [
+			[
+				'hostid' => self::HOSTID,
+				'dns' => '',
+				'ip' => '127.0.5.5',
+				'main' => 0,
+				'port' => '10055',
+				'type'=> 2,
+				'useip' => 1,
+				'details' => [
+						'version' => 3,
+						'bulk' => 1,
+						'securityname' => 'zabbix',
+						'securitylevel' => 0,
+						'authprotocol' => 0,
+						'privprotocol' => 0,
+						'contextname' => 'zabbix'
+				]
 			]
 		]);
 	}
@@ -440,7 +466,7 @@ class testPageMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Character'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 1055']
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 10055']
 					]
 				]
 			],
@@ -477,7 +503,7 @@ class testPageMassUpdateItems extends CWebTest{
 	}
 
 	/**
-	 * @on-before-once prepareItemData
+	 * @on-before-once prepareItemData, prepareInterfaceData
 	 *
 	 * @dataProvider getItemChangeData
 	 */
@@ -643,9 +669,10 @@ class testPageMassUpdateItems extends CWebTest{
 		}
 	}
 
-
+/*
 	public function testPageMassUpdateItems_ChangePreprocessing($data) {
 
 	}
+ */
 }
 

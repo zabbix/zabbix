@@ -1067,8 +1067,6 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES 
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (40012, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40013, 40001, 1, 3, 1, '127.0.5.3', '10053');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '10054');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40015, 40001, 1, 2, 1, '127.0.5.5', '10055');
-INSERT INTO interface_snmp (interfaceid, version, bulk, securityname, contextname) values (40015, 3, 1, 'zabbix', 'zabbix');
 
 -- testFormItem.LayoutCheck testFormItem.SimpleUpdate
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99098, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011, '', 1, '', '');
