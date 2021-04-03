@@ -68,7 +68,7 @@ class CControllerDashboardPagePropertiesEdit extends CController {
 				'display_period' => (int) $this->getInput('display_period',
 					DB::getDefault('dashboard_page', 'display_period')
 				),
-				'unique_id' => $this->hasInput('unique_id') ? $this->getInput('unique_id') : null,
+				'unique_id' => $this->hasInput('unique_id') ? $this->getInput('unique_id') : null
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

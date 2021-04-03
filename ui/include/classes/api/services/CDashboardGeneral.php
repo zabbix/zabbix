@@ -36,7 +36,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 	protected const WIDGET_FIELD_TYPE_COLUMNS = [
 		ZBX_WIDGET_FIELD_TYPE_INT32 => 'value_int',
-		ZBX_WIDGET_FIELD_TYPE_STR => 'value_str',
+		ZBX_WIDGET_FIELD_TYPE_STR => 'value_str'
 	] + self::WIDGET_FIELD_TYPE_COLUMNS_FK;
 
 	protected $tableName = 'dashboard';

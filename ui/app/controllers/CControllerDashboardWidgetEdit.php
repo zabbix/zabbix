@@ -106,7 +106,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				? $this->getInput('dashboard_page_unique_id')
 				: null,
 			'known_widget_types' => $known_widget_types,
-			'captions' => $this->getCaptions($form),
+			'captions' => $this->getCaptions($form)
 		]));
 	}
 
