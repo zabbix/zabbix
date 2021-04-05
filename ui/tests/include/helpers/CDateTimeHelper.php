@@ -24,11 +24,13 @@
 class CDateTimeHelper {
 
 	/**
-	 * Check if daylight saving time is now.
+	 * Check if time zone observe the daylight saving time.
+	 *
+	 * @param string $timezone		time-zone name
 	 *
 	 * @return boolean
 	 */
-	public static function isDaylightSavingTime() {
+	public static function isDaylightSavingTime($timezone) {
 		$zone = new DateTimeZone($timezone);
 		$time = time();
 		$transition = $zone->getTransitions($time, $time);
