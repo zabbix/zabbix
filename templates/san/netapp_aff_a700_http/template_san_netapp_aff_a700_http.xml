@@ -198,7 +198,7 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <units>!iops</units>
-               <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+               <description>The number of I/O operations observed at the storage object. Performance metric for write I/O operations.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -306,7 +306,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>!iops</units>
-               <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+               <description>The number of I/O operations observed at the storage object. Performance metric for write I/O operations.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -402,7 +402,7 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <units>!mcs</units>
-               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Peformance metric for write I/O operations.</description>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for write I/O operations.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -479,7 +479,7 @@ Template tooling version used: 0.38</description>
                <params>(last(netapp.cluster.statistics.latency_raw.write) - prev(netapp.cluster.statistics.latency_raw.write)) /
 ( last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) +
 (last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) = 0) ) * 0.001</params>
-               <description>The average latency per I/O operation in milliseconds observed at the storage object. Peformance metric for write I/O operations.</description>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -578,7 +578,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
-               <description>Throughput bytes observed at the storage object. Peformance metric for write I/O operations.</description>
+               <description>Throughput bytes observed at the storage object. Performance metric for write I/O operations.</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -760,7 +760,7 @@ return JSON.stringify(result);
                <url>{$URL}/api/cluster/nodes?fields=*</url>
             </item>
             <item>
-               <name>Get ehternet ports</name>
+               <name>Get ethernet ports</name>
                <type>HTTP_AGENT</type>
                <key>netapp.ports.eth.get</key>
                <history>0</history>
@@ -1928,7 +1928,7 @@ return JSON.stringify(result);
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!iops</units>
-                     <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <description>The number of I/O operations observed at the storage object. Performance metric for write I/O operations.</description>
                      <applications>
                         <application>
                            <name>Zabbix raw items</name>
@@ -2036,7 +2036,7 @@ return JSON.stringify(result);
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>!iops</units>
-                     <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <description>The number of I/O operations observed at the storage object. Performance metric for write I/O operations.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Volume "{#VOLUMENAME}"</name>
@@ -2132,7 +2132,7 @@ return JSON.stringify(result);
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!mcs</units>
-                     <description>The raw latency in microseconds observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <description>The raw latency in microseconds observed at the storage object. Performance metric for write I/O operations.</description>
                      <applications>
                         <application>
                            <name>Zabbix raw items</name>
@@ -2308,7 +2308,7 @@ return JSON.stringify(result);
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>Bps</units>
-                     <description>Throughput bytes observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <description>Throughput bytes observed at the storage object. Performance metric for write I/O operations.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Volume "{#VOLUMENAME}"</name>

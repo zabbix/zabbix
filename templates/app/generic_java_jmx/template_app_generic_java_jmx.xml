@@ -1102,7 +1102,7 @@
             <macro>
                <macro>{$JMX.MP.USAGE.MAX}</macro>
                <value>85</value>
-               <description>A threshold in percent for memory pools utilization trigger. Use a context to change the treshold for a specific pool.</description>
+               <description>A threshold in percent for memory pools utilization trigger. Use a context to change the threshold for a specific pool.</description>
             </macro>
             <macro>
                <macro>{$JMX.MP.USAGE.TIME}</macro>
