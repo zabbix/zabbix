@@ -425,7 +425,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: |
-            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for backround merges, mutations and fetches).
+            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background merges, mutations and fetches).
              Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa. This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."
           applications:
             -
@@ -438,7 +438,7 @@ zabbix_export:
           master_item:
             key: clickhouse.system.metrics
         -
-          name: 'ClickHouse: Memory used for backround moves'
+          name: 'ClickHouse: Memory used for background moves'
           type: DEPENDENT
           key: clickhouse.memory.tracking.background.moves
           delay: '0'
@@ -446,7 +446,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: |
-            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for backround moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.
+            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.
              This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."
           applications:
             -
@@ -1101,7 +1101,7 @@ zabbix_export:
           master_item:
             key: clickhouse.system.metrics
         -
-          name: 'ClickHouse: ZooKeeper exeptions per second'
+          name: 'ClickHouse: ZooKeeper exceptions per second'
           type: DEPENDENT
           key: clickhouse.zookeper.exeptions.rate
           delay: '0'
@@ -1125,7 +1125,7 @@ zabbix_export:
           master_item:
             key: clickhouse.system.events
         -
-          name: 'ClickHouse: ZooKeeper hardware exeptions per second'
+          name: 'ClickHouse: ZooKeeper hardware exceptions per second'
           type: DEPENDENT
           key: clickhouse.zookeper.hw_exeptions.rate
           delay: '0'
@@ -1191,7 +1191,7 @@ zabbix_export:
                 "Number of sessions (connections) to ZooKeeper. 
                 Should be no more than one, because using more than one connection to ZooKeeper may lead to bugs due to lack of linearizability (stale reads) that ZooKeeper consistency model allows."
         -
-          name: 'ClickHouse: ZooKeeper user exeptions per second'
+          name: 'ClickHouse: ZooKeeper user exceptions per second'
           type: DEPENDENT
           key: clickhouse.zookeper.user_exeptions.rate
           delay: '0'
@@ -1278,7 +1278,7 @@ zabbix_export:
           triggers:
             -
               expression: '{last()}=0'
-              name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable'
+              name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable'
               priority: AVERAGE
               manual_close: 'YES'
       discovery_rules:
@@ -1846,7 +1846,7 @@ zabbix_export:
       manual_close: 'YES'
       dependencies:
         -
-          name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable'
+          name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable'
           expression: '{ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0'
   graphs:
     -
@@ -2059,7 +2059,7 @@ zabbix_export:
             host: 'ClickHouse by HTTP'
             key: clickhouse.uptime
     -
-      name: 'ClickHouse: Zookeeper exeptions rate'
+      name: 'ClickHouse: Zookeeper exceptions rate'
       graph_items:
         -
           color: 1A7C11

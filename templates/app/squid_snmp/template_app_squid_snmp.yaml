@@ -881,7 +881,7 @@ zabbix_export:
         -
           macro: '{$SQUID.FILE.DESC.WARN.MIN}'
           value: '100'
-          description: 'The threshold for minimum number of avaliable file descriptors'
+          description: 'The threshold for minimum number of available file descriptors'
         -
           macro: '{$SQUID.HTTP.PORT}'
           value: '3128'
@@ -889,7 +889,7 @@ zabbix_export:
         -
           macro: '{$SQUID.PAGE.FAULT.WARN}'
           value: '90'
-          description: 'The threshold for sys page faults rate in percent of recieved HTTP requests'
+          description: 'The threshold for sys page faults rate in percent of received HTTP requests'
         -
           macro: '{$SQUID.SNMP.COMMUNITY}'
           value: public
@@ -901,7 +901,7 @@ zabbix_export:
   triggers:
     -
       expression: '{Squid SNMP:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}'
-      name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests)'
+      name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
       priority: WARNING
     -
       expression: '{Squid SNMP:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapHighWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100'
