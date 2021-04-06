@@ -411,7 +411,7 @@ class CConfiguration extends CApiService {
 		$export = $this->intersectKeys($export, $uuid_structure);
 		$import = $this->intersectKeys($import, $uuid_structure);
 
-		$return = $this->compareByStructure($uuid_structure, $export, $import);
+		$return = $this->compareByStructure($uuid_structure, $export, $import, $params['rules']);
 
 		return $return;
 	}
@@ -444,10 +444,11 @@ class CConfiguration extends CApiService {
 	 * @param array $structure
 	 * @param array $before
 	 * @param array $after
+	 * @param array $options
 	 *
 	 * @return array
 	 */
-	protected function compareByStructure(array $structure, array $before, array $after): array {
+	protected function compareByStructure(array $structure, array $before, array $after, array $options): array {
 		$result = [];
 
 		foreach ($structure as $key => $sub_structure) {
@@ -464,24 +465,26 @@ class CConfiguration extends CApiService {
 
 			if (array_key_exists('added', $diff)) {
 				foreach ($diff['added'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, [], $entity);
+					$entity = $this->compareByStructure($sub_structure, [], $entity, $options);
 				}
 				unset($entity);
 			}
 
 			if (array_key_exists('removed', $diff)) {
 				foreach ($diff['removed'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, $entity, []);
+					$entity = $this->compareByStructure($sub_structure, $entity, [], $options);
 				}
 				unset($entity);
 			}
 
 			if ($sub_structure && array_key_exists('updated', $diff)) {
 				foreach ($diff['updated'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, $entity['before'], $entity['after']);
+					$entity = $this->compareByStructure($sub_structure, $entity['before'], $entity['after'], $options);
 				}
 				unset($entity);
 			}
+
+			$diff = $this->applyOptions($options, $key, $diff);
 
 			unset($before[$key], $after[$key]);
 
@@ -557,5 +560,208 @@ class CConfiguration extends CApiService {
 		}
 
 		return $diff;
+	}
+
+	/**
+	 * Compare two entities and separate all their keys into added/removed/updated.
+	 *
+	 * @param array $options     import options
+	 * @param array $entity_key  key of entity being processed
+	 * @param array $diff        diff for this entity
+	 *
+	 * @return array
+	 */
+	protected function applyOptions(array $options, string $entity_key, array $diff): array {
+		$option_key_map = [
+			'groups' => 'groups',
+			'templates' => 'templates',
+			'items' => 'items',
+			'triggers' => 'triggers',
+			'discovery_rules' => 'discoveryRules',
+			'item_prototypes' => 'discoveryRules',
+			'trigger_prototypes' => 'discoveryRules',
+			'graph_prototypes' => 'discoveryRules',
+			'host_prototypes' => 'discoveryRules',
+			'dashboards' => 'templateDashboards',
+			'httptests' => 'httptests',
+			'valuemaps' => 'valueMaps',
+			'triggers' => 'triggers',
+			'graphs' => 'graphs'
+		];
+
+		// TODO VM: simple triggers should be moved to general triggers.
+
+		$entity_options = $options[$option_key_map[$entity_key]];
+		$stored_changes = [];
+
+		if ($entity_key === 'templates' && array_key_exists('updated', $diff)) {
+			for ($key = 0; $key< count($diff['updated']); $key++) {
+				$entity = $diff['updated'][$key];
+				$has_before_templates = array_key_exists('templates', $entity['before']);
+				$has_after_templates = array_key_exists('templates', $entity['after']);
+
+				if (!$has_before_templates && !$has_after_templates) {
+					continue;
+				}
+				elseif ($has_before_templates && !$has_after_templates) {
+					$entity['after']['templates'] = [];
+
+					// Make sure, precessed entry is last in both arrays. Otherwise it will break the comparison.
+					$before_templates = $entity['before']['templates'];
+					unset($entity['before']['templates']);
+					$entity['before']['templates'] = $before_templates;
+				}
+				elseif ($has_after_templates && !$has_before_templates) {
+					$entity['before']['templates'] = [];
+				}
+
+				if ($entity['before']['templates'] === $entity['after']['templates']) {
+					continue;
+				}
+
+				if (!$options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
+					$entity['after']['templates'] = $entity['before']['templates'];
+				}
+				elseif ($options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
+					$entity['after']['templates'] = $this->afterForInnerCreateMissing($entity['before']['templates'],
+							$entity['after']['templates']);
+				}
+				elseif ($options['templateLinkage']['deleteMissing'] && !$options['templateLinkage']['createMissing']) {
+					$entity['after']['templates'] = $this->afterForInnerDeleteMissing($entity['before']['templates'],
+							$entity['after']['templates']);
+				}
+
+				if ($entity['before'] === $entity['after'] && count($entity) === 2) {
+					unset($diff['updated'][$key]);
+				}
+				else {
+					$stored_changes[$key]['templates'] = $entity['after']['templates'];
+				}
+			}
+			unset($entity);
+
+			if (!$diff['updated']) {
+				unset($diff['updated']);
+			}
+		}
+
+		if (!array_key_exists('createMissing', $entity_options) || !$entity_options['createMissing']) {
+			unset($diff['added']);
+		}
+
+		if (!array_key_exists('deleteMissing', $entity_options) || !$entity_options['deleteMissing']) {
+			unset($diff['removed']);
+		}
+
+		if ((!array_key_exists('updateExisting', $entity_options) || !$entity_options['updateExisting'])
+				&& array_key_exists('updated', $diff)) {
+			$new_updated = [];
+
+			foreach ($diff['updated'] as $key => $entity) {
+				$has_inner_entities = array_flip(array_keys($entity));
+				unset($has_inner_entities['before'], $has_inner_entities['after']);
+				$has_inner_entities = count($has_inner_entities) > 0;
+
+				if ($has_inner_entities || array_key_exists($key, $stored_changes)) {
+					$entity['after'] = $entity['before'];
+					$new_updated[] = $entity;
+				}
+			}
+
+			if ($new_updated) {
+				$diff['updated'] = $new_updated;
+			}
+			else {
+				unset($diff['updated']);
+			}
+		}
+
+		if ($stored_changes) {
+			foreach ($stored_changes as $key => $stored_entry) {
+				$entry = $diff['updated'][$key]['after'];
+
+				foreach ($stored_entry as $entry_key => $entry_after_value) {
+					if ($entry_after_value !== []) {
+						$entry[$entry_key] = $entry_after_value;
+					}
+				}
+
+				$diff['updated'][$key]['after'] = $entry;
+			}
+		}
+
+		if (array_key_exists('updated', $diff)) {
+			// Reset keys.
+			$diff['updated'] = array_values($diff['updated']);
+
+			// TODO VM: (?) it may be a good idea to keep original order of keys, but it will increase complexity.
+			// Make sure, key order is same in 'before' and 'after' arrays.
+			foreach ($diff['updated'] as &$entity) {
+				$order = array_flip(array_keys($entity['before']));
+				$order = $this->intersectKeys($order, array_keys($entity['after']));
+				$entity['after'] = array_merge($order, $entity['after']);
+			}
+			unset($entity);
+		}
+
+		return $diff;
+	}
+
+	/**
+	 * Create "after" that contains all entries from "before" and "after" combined.
+	 *
+	 * @param type $before
+	 * @param type $after
+	 *
+	 * @return type
+	 */
+	protected function afterForInnerCreateMissing($before, $after) {
+		$missing = [];
+
+		foreach ($after as $after_entity) {
+			$found = false;
+
+			foreach ($before as $before_entity) {
+				if ($before_entity === $after_entity) {
+					$found = true;
+					break;
+				}
+			}
+
+			if (!$found) {
+				$missing[] = $after_entity;
+			}
+		}
+
+		return array_merge($before, $missing);
+	}
+
+	/**
+	 * Create "after" that contains only entries from "after" that were also present in "before".
+	 *
+	 * @param type $before
+	 * @param type $after
+	 *
+	 * @return type
+	 */
+	protected function afterForInnerDeleteMissing($before, $after) {
+		$new_after = [];
+
+		foreach ($after as $after_entity) {
+			$found = false;
+
+			foreach ($before as $before_entity) {
+				if ($before_entity === $after_entity) {
+					$found = true;
+					break;
+				}
+			}
+
+			if ($found) {
+				$new_after[] = $after_entity;
+			}
+		}
+
+		return $new_after;
 	}
 }
