@@ -1741,16 +1741,4 @@ int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
 
-#define DBVERSION_UNDEFINED				0
-#define VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY	""
-typedef enum
-{
-	DB_VERSION_SUPPORTED,
-	DB_VERSION_LOWER_THAN_MINIMUM,
-	DB_VERSION_HIGHER_THAN_MAXIMUM,
-	DB_VERSION_FAILED_TO_RETRIEVE
-} db_version_status_flags_shared_with_FRONTEND;
-
-int	zbx_check_DBversion(char *database, unsigned long current_version, unsigned long min_version,
-		unsigned long max_version);
 #endif

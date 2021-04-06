@@ -1032,9 +1032,9 @@ static void	zbx_check_db(void)
 {
 	struct zbx_json	db_ver;
 
-	zbx_json_init(&db_ver, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&db_ver, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != DBcheck_capabilities(DBextract_DBversion(&db_ver)) || SUCCEED != DBcheck_version())
+	if (SUCCEED != DBcheck_capabilities(DBextract_version(&db_ver)) || SUCCEED != DBcheck_version())
 	{
 		zbx_json_free(&db_ver);
 		exit(EXIT_FAILURE);

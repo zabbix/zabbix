@@ -38,7 +38,7 @@ const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
 
-static unsigned long	ZBX_ELASTIC_SVERSION = DBVERSION_UNDEFINED;
+static unsigned long	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
 typedef struct
 {
@@ -1015,161 +1015,112 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	return SUCCEED;
 }
 
-typedef struct
-{
-	char	*ptr;
-	size_t	len;
-}
-single_curl_response_string;
-
-static void	single_curl_response_init_string(single_curl_response_string *s)
-{
-	s->len = 0;
-	s->ptr = malloc(s->len + 1);
-
-	if (NULL == s->ptr)
-	{
-		zbx_error("malloc() failed");
-		exit(EXIT_FAILURE);
-	}
-
-	s->ptr[0] = '\0';
-}
-
-static size_t	single_curl_response_write_func(void *ptr, size_t size, size_t nmemb, single_curl_response_string *s)
-{
-	size_t	new_len = s->len + size * nmemb;
-
-	s->ptr = realloc(s->ptr, new_len + 1);
-
-	if (s->ptr == NULL)
-	{
-		zbx_error("realloc() failed");
-		exit(EXIT_FAILURE);
-	}
-
-	memcpy(s->ptr + s->len, ptr, size * nmemb);
-	s->ptr[new_len] = '\0';
-	s->len = new_len;
-
-	return size * nmemb;
-}
-
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_check_version                                                  *
+ * Function: zbx_elastic_version_extract                                            *
  *                                                                                  *
  * Purpose: queries elastic search version and extracts the numeric version from    *
  *          the response string                                                     *
  *                                                                                  *
  ************************************************************************************/
-void	zbx_elastic_check_version(struct zbx_json *json)
+void	zbx_elastic_version_extract(struct zbx_json *json)
 {
-#define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER_E		3
-	char		version_unparsed[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE];
-	int		flag, major_version_num, minor_version_num, increment_version_num, overall_status = SUCCEED;
-	unsigned long	elasticDB_version;
-
-	single_curl_response_string	s;
+#define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)(x/100))*100))
+	zbx_httppage_t			page;
 	struct zbx_json_parse		jp, jp_values, jp_sub;
 	struct curl_slist		*curl_headers;
 	CURLcode			err;
 	CURLoption			opt;
 	CURL				*handle;
+	size_t				version_len;
+	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE];
+	int				flag, major_num, minor_num, increment_num, ret = FAIL;
+	zbx_uint32_t			version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	single_curl_response_init_string(&s);
-
 	if (0 != curl_global_init(CURL_GLOBAL_ALL))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL library");
-		overall_status = FAIL;
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize cURL library");
 		goto out;
 	}
 
 	if (NULL == (handle = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL session");
-		overall_status = FAIL;
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize cURL session");
 		goto out;
 	}
 
 	curl_headers = curl_slist_append(NULL, "Content-Type: application/json");
 
 	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_URL, CONFIG_HISTORY_STORAGE_URL)) ||
-			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEFUNCTION,
-			single_curl_response_write_func)) ||
-			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEDATA, &s)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEDATA, &page)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_FAILONERROR, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_ERRORBUFFER, errbuf)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
-		overall_status = FAIL;
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
+	memset(&page, 0, sizeof(zbx_httppage_t));
 	*errbuf = '\0';
 
 	if (CURLE_OK != (err = curl_easy_perform(handle)))
 	{
 		elastic_log_error(handle, err, errbuf);
-		overall_status = FAIL;
 		goto clean;
 
 	}
 
-	if (SUCCEED != zbx_json_open(s.ptr, &jp) ||
+	if (SUCCEED != zbx_json_open(page.data, &jp) ||
 		SUCCEED != zbx_json_brackets_open(jp.start, &jp_values) ||
 		SUCCEED != zbx_json_brackets_by_name(&jp_values, "version", &jp_sub) ||
-		SUCCEED != zbx_json_value_by_name(&jp_sub, "number", version_unparsed, sizeof(version_unparsed), NULL))
+		SUCCEED != zbx_json_value_by_name_dyn(&jp_sub, "number", &version_friendly, &version_len, NULL))
 	{
-		overall_status = FAIL;
 		goto clean;
 	}
+
+	ret = SUCCEED;
 clean:
-	curl_easy_cleanup(handle);
 	curl_slist_free_all(curl_headers);
+	curl_easy_cleanup(handle);
 out:
-	if (FAIL == overall_status)
+	if (FAIL == ret)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to extract ElasticDB version");
-		elasticDB_version = DBVERSION_UNDEFINED;
+		version = ZBX_DBVERSION_UNDEFINED;
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version retrieved unparsed: %s", version_unparsed);
+		zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version retrieved unparsed: %s", version_friendly);
 
-		if (3 != sscanf(version_unparsed, "%d.%d.%d", &major_version_num, &minor_version_num,
-				&increment_version_num) || major_version_num >= 100 || major_version_num <= 0 ||
-				minor_version_num >= 100 || minor_version_num < 0 || increment_version_num >= 100 ||
-				increment_version_num < 0)
+		if (3 != sscanf(version_friendly, "%d.%d.%d", &major_num, &minor_num, &increment_num) ||
+				major_num >= 100 || major_num <= 0 || minor_num >= 100 || minor_num < 0 ||
+				increment_num >= 100 || increment_num < 0)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Failed to detect ElasticDB version from the "
-					"following query result: %s", version_unparsed);
-			elasticDB_version = DBVERSION_UNDEFINED;
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to detect ElasticDB version from the "
+					"following query result: %s", version_friendly);
+			version = ZBX_DBVERSION_UNDEFINED;
 		}
 		else
 		{
-			elasticDB_version = major_version_num * 10000 + minor_version_num * 100 +
-					increment_version_num;
+			version = major_num * 10000 + minor_num * 100 + increment_num;
 		}
 	}
 
-#define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION 70000
-#define SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION_FRIENDLY "7.x"
-	flag = zbx_check_DBversion("ElasticDB", elasticDB_version, SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION,
-			DBVERSION_UNDEFINED);
-	zbx_json_create_entry_for_DBversion(json, "ElasticDB", version_unparsed,
-			SUPPORTED_ELASTIC_SEARCH_MINIMUM_MAJOR_VERSION_FRIENDLY,
-			VERSION_REQUIREMENT_NOT_DEFINED_FRIENDLY, flag);
-	zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version result: %lu", elasticDB_version);
-	ZBX_ELASTIC_SVERSION = elasticDB_version;
-	zbx_free(s.ptr);
+	flag = zbx_db_version_check("ElasticDB", version, ZBX_ELASTIC_MIN_VERSION, ZBX_DBVERSION_UNDEFINED);
+	zbx_db_version_json_create(json, "ElasticDB", version_friendly, ZBX_ELASTIC_MIN_VERSION_FRIENDLY, "", flag);
+	ZBX_ELASTIC_SVERSION = version;
+	zbx_free(version_friendly);
+	zbx_free(page.data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s version:%lu", __func__, zbx_result_string(ret),
+			(unsigned long)version);
 }
 
-unsigned long	zbx_elastic_get_version(void)
+unsigned long	zbx_elastic_version_get(void)
 {
 	return ZBX_ELASTIC_SVERSION;
 }
@@ -1184,13 +1135,13 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	return FAIL;
 }
 
-void	zbx_elastic_check_version(struct zbx_json *json)
+void	zbx_elastic_version_extract(struct zbx_json *json)
 {
 	ZBX_UNUSED(json);
 }
 
-unsigned long	zbx_elastic_get_version(void)
+unsigned long	zbx_elastic_version_get(void)
 {
-	return DBVERSION_UNDEFINED;
+	return ZBX_DBVERSION_UNDEFINED;
 }
 #endif

@@ -437,5 +437,5 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
 void	zbx_history_check_version(struct zbx_json *json)
 {
 	if (NULL != CONFIG_HISTORY_STORAGE_URL)
-		zbx_elastic_check_version(json);
+		zbx_elastic_version_extract(json);
 }

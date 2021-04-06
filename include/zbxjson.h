@@ -297,7 +297,4 @@ void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath);
 int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath);
 int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char **output);
 
-void	zbx_json_create_entry_for_DBversion(struct zbx_json *json, char *database, char *friendly_current_version,
-		char *friendly_min_version, char *friendly_max_version, int flag);
-
 #endif /* ZABBIX_ZJSON_H */

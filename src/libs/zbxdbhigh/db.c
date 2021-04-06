@@ -851,17 +851,17 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBextract_DBversion                                              *
+ * Function: DBextract_version                                                *
  *                                                                            *
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-unsigned long	DBextract_DBversion(struct zbx_json *json)
+zbx_uint32_t	DBextract_version(struct zbx_json *json)
 {
-	unsigned long ret;
+	zbx_uint32_t	ret;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	ret = zbx_dbms_extract_version(json);
+	ret = zbx_dbms_version_extract(json);
 	DBclose();
 
 	return ret;
@@ -930,7 +930,7 @@ int	DBcheck_capabilities(zbx_uint32_t db_version)
 	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > db_version)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %lu is not supported with TimescaleDB, minimum is %d",
-				db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
+				(unsigned long)db_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
 		goto clean;
 	}
 

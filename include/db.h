@@ -502,7 +502,7 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-unsigned long	DBextract_DBversion(struct zbx_json *json);
+zbx_uint32_t	DBextract_version(struct zbx_json *json);
 void		DBflush_version_requirements(const char *version);
 int		DBcheck_capabilities(zbx_uint32_t db_version);
 
@@ -876,4 +876,5 @@ void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_oper
 
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
 		zbx_vector_ptr_t *ops);
+
 #endif
