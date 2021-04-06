@@ -110,18 +110,18 @@ class testSID extends CWebTest {
 			// Regular expressions update.
 			[
 				[
-					'link' => 'sid=4edd8ac639666666&form_refresh=1&name=1_regexp_1_1&expressions%5B0%5D%5Bexpression_type'.
-							'%5D=0&expressions%5B0%5D%5Bexpression%5D=first+test+string&expressions%5B0%5D%5Bexp_delimiter%5D=%2C'.
-							'&expressions%5B0%5D%5Bcase_sensitive%5D=1&expressions%5B0%5D%5Bexpressionid%5D=20'.
-							'&test_string=first+test+string&update=Update'
+					'link' => 'zabbix.php?action=regex.update&regexid=20&sid=4edd8ac639666666&form_refresh=1&name='.
+							'1_regexp_1_1&expressions%5B0%5D%5Bexpression_type%5D=0&expressions%5B0%5D%5Bexpression%5D='.
+							'first+test+string&expressions%5B0%5D%5Bexp_delimiter%5D=%2C&expressions%5B0%5D%5B'.
+							'case_sensitive%5D=1&expressions%5B0%5D%5Bexpressionid%5D=20&test_string=first+test+string&update=Update'
 				]
 			],
 			[
 				[
-					'link' => 'form_refresh=1&name=1_regexp_1_1&expressions%5B0%5D%5Bexpression_type%5D=0&'.
-							'expressions%5B0%5D%5Bexpression%5D=first+test+string&expressions%5B0%5D%5Bexp_delimiter%5D=%2C'.
-							'&expressions%5B0%5D%5Bcase_sensitive%5D=1&expressions%5B0%5D%5Bexpressionid%5D=20'.
-							'&test_string=first+test+string&update=Update'
+					'link' => 'zabbix.php?action=regex.update&regexid=20&form_refresh=1&name=1_regexp_1_1&expressions'.
+							'%5B0%5D%5Bexpression_type%5D=0&expressions%5B0%5D%5Bexpression%5D=first+test+string&'.
+							'expressions%5B0%5D%5Bexp_delimiter%5D=%2C&expressions%5B0%5D%5Bcase_sensitive%5D='.
+							'1&expressions%5B0%5D%5Bexpressionid%5D=20&test_string=first+test+string&update=Update'
 				]
 			],
 			// Timeselector update.
@@ -149,13 +149,13 @@ class testSID extends CWebTest {
 			// Value mapping update.
 			[
 				[
-					'link' => 'form_refresh=1&valuemapid=161&name=new_name&mappings%5B0%5D%5Bvalue%5D=test&'.
-							'mappings%5B0%5D%5Bnewvalue%5D=test&update=Update'
+					'link' => 'zabbix.php?action=valuemap.update&form_refresh=1&valuemapid=161&name=new_name&mappings'.
+							'%5B0%5D%5Bvalue%5D=test&mappings%5B0%5D%5Bnewvalue%5D=test&update=Update'
 				]
 			],
 			[
 				[
-					'link' => 'sid=91d59c2ab1111111&form_refresh=1&valuemapid=161&name=new_name&'.
+					'link' => 'zabbix.php?action=valuemap.update&sid=91d59c2ab1111111&form_refresh=1&valuemapid=161&name=new_name&'.
 							'mappings%5B0%5D%5Bvalue%5D=test&mappings%5B0%5D%5Bnewvalue%5D=test&update=Update'
 				]
 			]
@@ -168,7 +168,7 @@ class testSID extends CWebTest {
 	public function testSID_Links($data) {
 		$this->page->login()->open($data['link']);
 		$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
-		$this->query('button:Go to dashboard')->one()->click();
+		$this->query('button:Go to dashboard')->one()->waitUntilClickable()->click();
 		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentUrl());
 	}
 }
