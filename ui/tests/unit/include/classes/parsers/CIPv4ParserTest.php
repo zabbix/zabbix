@@ -19,12 +19,14 @@
 **/
 
 
-class CIPv4ParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CIPv4ParserTest extends TestCase {
 
 	/**
 	 * An array of trigger functions and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			[
 				'192.168.3.4', 0, [
@@ -84,7 +86,7 @@ class CIPv4ParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

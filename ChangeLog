@@ -1,11 +1,52 @@
+Changes for 5.0.11rc1
+
+New features:
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
+
+Bug fixes:
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.10
+
+5.0.10rc1 was released as 5.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.10rc1
 
 New features:
+.......PS. [ZBXNEXT-6503] added protection of Zabbix Server from overloading by proxy data (dgoloscapov, wiper)
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
+.........T [ZBXNEXT-5869] added templates "MongoDB node by Zabbix Agent 2" and "MongoDB cluster by Zabbix Agent 2" (ychukina)
+.........T [ZBXNEXT-6507] added Template Power APC UPS by SNMP (mchudinov)
+...G...... [ZBXNEXT-6408] added mongoDB plugin (vadimipatov)
+.........T [ZBXNEXT-6462] added Cisco Catalyst 3750 templates (afayantsev)
+.........T [ZBXNEXT-6450] added template NetApp AFF A700 by HTTP (mchudinov)
+.........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 .........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
 .........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
+...G...... [ZBX-19103] fixed device sorting in Zabbix agent 2 smartctl plugin (esneiders)
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
+.........T [ZBX-18918] updated deprecated items in "RabbitMQ" template (abakaldin)
+.........T [ZBX-18634] changed macro names according to the Guidelines, fixed context macros in Temperature Discovery triggers, added preprocessing into Fan Discovery and Temperature Discovery (mchudinov)
+.........T [ZBX-18620] added {#REPLICA_NAME} macro in items of Non-local database discovery (mchudinov)
+...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
+.........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 .........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 ...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
@@ -1986,11 +2027,34 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.30rc1
+Changes for 4.0.31rc1
 
 New features:
 
 Bug fixes:
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.30
+
+4.0.30rc1 was released as 4.0.30 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.30rc1
+
+New features:
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
+
+Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
 .....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
 
 --------------------------------------------------------------------------------
@@ -5069,6 +5133,11 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.32
+
+3.0.32rc1 was released as 3.0.32 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.32rc1

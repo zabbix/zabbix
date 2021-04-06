@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,7 +19,9 @@
 **/
 
 
-class C10ItemKeyConverterTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class C10ItemKeyConverterTest extends TestCase {
 
 	public function dataProvider() {
 		$keys = ['tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh'];

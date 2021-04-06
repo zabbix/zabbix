@@ -19,12 +19,14 @@
 **/
 
 
-class CTriggerExpressionReplaceHostTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class triggerExpressionReplaceHostTest extends TestCase {
 
 	/**
 	 * An array of trigger functions and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			[
 				'{host:item.func()}',
@@ -65,7 +67,7 @@ class CTriggerExpressionReplaceHostTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param string  $expected

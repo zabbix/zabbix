@@ -1459,7 +1459,7 @@ UPDATE config SET alert_usrgrpid = 15 WHERE configid = 1;
 -- testPageApplication
 INSERT INTO applications (applicationid,hostid,name) VALUES (99000,10084,'Selenium test application');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99000, 10084, 1, 0, 2, 'Selenium item for testPageApplication','item-with-app', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (99000,99000,99000);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (199000,99000,99000);
 
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
@@ -1786,7 +1786,7 @@ INSERT INTO applications (applicationid, hostid, name) VALUES (99005, 15000, 'In
 INSERT INTO applications (applicationid, hostid, name) VALUES (99006, 15001, 'Inheritance application for delete with items');
 INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (902, 99006, 99005);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99085, 15001, 1, 0, 2, 'Item for testInheritanceApplication','item-with-inheritance-app', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99001, 99006, 99085);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (199001, 99006, 99085);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99007, 15000, 'Inheritance application for update');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99008, 15001, 'Inheritance application for update');
 INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (903, 99008, 99007);
@@ -2030,13 +2030,13 @@ INSERT INTO applications (applicationid, hostid, name) VALUES (99011, 50011, '2 
 INSERT INTO applications (applicationid, hostid, name) VALUES (99012, 50012, '3 application');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99013, 50013, '4 application');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99086, 50011, 50039, 2, 3, '1_item','trap[1]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99002, 99010, 99086);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (199002, 99010, 99086);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99091, 50011, 50039, 2, 3, '2_item','trap[2]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99003, 99011, 99091);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (199003, 99011, 99091);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99088, 50012, 50040, 2, 3, '3_item','trap[3]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99004, 99012, 99088);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (199004, 99012, 99088);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99089, 50013, 50041, 2, 3, '4_item','trap[4]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99005, 99013, 99089);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (199005, 99013, 99089);
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100032, '1_trigger_Not_classified', '{100032}>0', 1, 0, '1533555726', 'Macro should be resolved, host IP should be visible here: {HOST.CONN}', 0, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100033, '1_trigger_Warning', '{100033}>0', 1, 0, '1533555726', 'The following url should be clickable: https://zabbix.com', 2);
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100034, '1_trigger_Average', '{100034}>0', 1, 0, '1533555726', 'https://zabbix.com', 3, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');

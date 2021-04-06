@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,13 +19,15 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class CReferenceParserTest extends CParserTest {
 
 	protected function getParser() {
 		return new CReferenceParser();
 	}
 
-	public function testProvider() {
+	public function dataProvider() {
 		return [
 			['$1', 0, CParser::PARSE_SUCCESS, '$1'],
 			['$2', 0, CParser::PARSE_SUCCESS, '$2'],

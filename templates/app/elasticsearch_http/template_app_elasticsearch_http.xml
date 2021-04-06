@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-04-21T07:09:29Z</date>
+   <date>2021-03-23T10:28:36Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -21,7 +21,7 @@ If you use an atypical location ES API, don't forget to change the macros {$ELAS
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -828,7 +828,7 @@ This is the actual amount of free disk space the Elasticsearch node can utilize.
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ms</units>
-                     <params>last(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.flush.total[{#ES.NODE}]) + (last(es.node.indices.flush.total[{#ES.NODE}]) = 0) )</params>
+                     <params>change(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.flush.total[{#ES.NODE}]) + (change(es.node.indices.flush.total[{#ES.NODE}]) = 0) )</params>
                      <description>The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -931,7 +931,7 @@ and eventually prevent you from being able to add new information to your index.
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ms</units>
-                     <params>last(es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.indexing.index_total[{#ES.NODE}]) + (last(es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )</params>
+                     <params>change(es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )</params>
                      <description>The average indexing latency calculated from the available index_total and index_time_in_millis metrics.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1186,7 +1186,7 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ms</units>
-                     <params>last(es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.search.fetch_total[{#ES.NODE}]) + (last(es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )</params>
+                     <params>change(es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( change(es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )</params>
                      <description>The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1346,8 +1346,8 @@ or requesting too many results.</description>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ms</units>
-                     <params>last(es.node.indices.search.query_time_in_millis[{#ES.NODE}]) / 
-( last(es.node.indices.search.query_total[{#ES.NODE}]) + (last(es.node.indices.search.query_total[{#ES.NODE}]) = 0) )</params>
+                     <params>change(es.node.indices.search.query_time_in_millis[{#ES.NODE}]) / 
+( change(es.node.indices.search.query_total[{#ES.NODE}]) + (change(es.node.indices.search.query_total[{#ES.NODE}]) = 0) )</params>
                      <description>The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1971,6 +1971,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ES {#ES.NODE}: Latency</name>
