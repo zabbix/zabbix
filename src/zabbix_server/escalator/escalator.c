@@ -508,7 +508,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 				ZBX_DBROW2UINT64(mediatypeid, row[0]);
 			}
 
-			if (atoi(row[1]) != 1)
+			if (1 != atoi(row[1]))
 			{
 				add_user_msg(userid, mediatypeid, user_msg, row[2], row[3], actionid, event, r_event,
 						ack, macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
