@@ -2036,7 +2036,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 					loc = &params->values[index];
 					str = zbx_substr_unquote(parameter, loc->l, loc->r);
 					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
-					if (0 != isdigit(parameter[strlen(str) - 1]))
+					if (0 != isdigit(str[strlen(str) - 1]))
 						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
 					zbx_free(str);
 				}
