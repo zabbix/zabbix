@@ -38,7 +38,7 @@ const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
 
-static unsigned long	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
+static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
 typedef struct
 {
@@ -1120,7 +1120,7 @@ out:
 			(unsigned long)version);
 }
 
-unsigned long	zbx_elastic_version_get(void)
+zbx_uint32_t	zbx_elastic_version_get(void)
 {
 	return ZBX_ELASTIC_SVERSION;
 }
@@ -1140,7 +1140,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json)
 	ZBX_UNUSED(json);
 }
 
-unsigned long	zbx_elastic_version_get(void)
+zbx_uint32_t	zbx_elastic_version_get(void)
 {
 	return ZBX_DBVERSION_UNDEFINED;
 }

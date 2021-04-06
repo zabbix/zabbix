@@ -3901,3 +3901,4 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
 
 	return SUCCEED;
 }
+
