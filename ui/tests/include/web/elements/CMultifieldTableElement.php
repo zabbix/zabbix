@@ -444,7 +444,7 @@ class CMultifieldTableElement extends CTableElement {
 			$data = [$data];
 		}
 
-		if ($this->mapping === null) {
+		if ($this->mapping === null && count($data) >= 1) {
 			$this->mapping = $this->detectFieldMapping();
 		}
 

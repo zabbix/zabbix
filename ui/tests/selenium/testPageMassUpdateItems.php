@@ -240,22 +240,22 @@ class testPageMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent (active)'],
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
 						'Units'=> ['id' => 'units', 'value' => '$'],
-//						'Update interval' => [
-//							'Delay' => '99s',
-//							'Custom intervals' => [
-//								[
-//									'action' => USER_ACTION_UPDATE,
-//									'index' => 0,
-//									'type' => 'Flexible',
-//									'delay' => '60s',
-//									'period' => '2-5,3:00-17:00'
-//								],
-//								[
-//									'type' => 'Scheduling',
-//									'delay' => 'wd3-4h1-15'
-//								]
-//							]
-//						],
+						'Update interval' => [
+							'Delay' => '99s',
+							'Custom intervals' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'type' => 'Flexible',
+									'delay' => '60s',
+									'period' => '2-5,3:00-17:00'
+								],
+								[
+									'type' => 'Scheduling',
+									'delay' => 'wd3-4h1-15'
+								]
+							]
+						],
 						'History storage period' => [
 							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
 							'input' => ['id' => 'history', 'value' => '400d']
@@ -298,22 +298,22 @@ class testPageMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix internal'],
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Text'],
-//						'Update interval' => [
-//							'Delay' => '90s',
-//							'Custom intervals' => [
-//								[
-//									'action' => USER_ACTION_UPDATE,
-//									'index' => 0,
-//									'type' => 'Scheduling',
-//									'delay' => 'wd3-4h1-15'
-//								],
-//								[
-//									'type' => 'Flexible',
-//									'delay' => '99s',
-//									'period' => '1-2,7:00-8:00'
-//								]
-//							]
-//						],
+						'Update interval' => [
+							'Delay' => '90s',
+							'Custom intervals' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'type' => 'Scheduling',
+									'delay' => 'wd3-4h1-15'
+								],
+								[
+									'type' => 'Flexible',
+									'delay' => '99s',
+									'period' => '1-2,7:00-8:00'
+								]
+							]
+						],
 //						'Applications' => [
 //							'action' => 'Replace',
 //							'applications' => ['1', '2']
@@ -332,8 +332,49 @@ class testPageMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (unsigned)'],
 						'Show value' => ['id' => 'valuemapid', 'value' => 'Alarm state'],
-						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => '127.0.0.1'],  // Validation - "zabbix host"
+						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => '127.0.0.1']
 					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
+						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => '{HOST.HOST}']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
+						'Allowed hosts' => [
+							'id' => 'trapper_hosts',
+							'value' => '192.168.1.0/24, 192.168.3.1-255, 192.168.1-10.1-255, ::1,2001:db8::/32, zabbix.domain'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
+						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => 'Zabbix server']
+					],
+					'error' => 'Incorrect value for field "trapper_hosts": invalid address range "Zabbix server".'
 				]
 			],
 			[
@@ -588,84 +629,90 @@ class testPageMassUpdateItems extends CWebTest{
 		}
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Items updated');
 
-		// Check changed fields in saved item form.
-		foreach ($data['names'] as $name) {
-			$table->query('link', $name)->one()->waitUntilClickable()->click();
-			$form->invalidate();
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Cannot update items', $data['error']);
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'Items updated');
 
-			foreach ($data['change'] as $field => $value) {
-				switch ($field) {
-					case 'Type':
-					case 'Host interface':
-					case 'Type of information':
-					case 'Show value':
-					case 'Units':
-					case 'Description':
-					case 'Allowed hosts':
-					case 'Request body':
-					case 'URL':
-					case 'JMX endpoint':
-					case 'Authentication method':
-					case 'Public key file':
-					case 'Private key file':
-					case 'Request body type':
-					case 'User name':
-					case 'Password':
-					case 'Log time format':
-					case 'Enable trapping':
-						$this->assertEquals($value['value'], $form->getField($field)->getValue());
-						break;
+			// Check changed fields in saved item form.
+			foreach ($data['names'] as $name) {
+				$table->query('link', $name)->one()->waitUntilClickable()->click();
+				$form->invalidate();
 
-					case 'History storage period':
-					case 'Trend storage period':
-						$this->assertEquals($value['radio']['value'], $form->query('id', $value['radio']['id'])
-								->one()->asSegmentedRadio()->getValue());
-						if(array_key_exists('input', $value)){
-							$this->assertEquals($value['input']['value'], $form->query('id', $value['input']['id'])
-									->one()->getValue());
-						}
-						break;
+				foreach ($data['change'] as $field => $value) {
+					switch ($field) {
+						case 'Type':
+						case 'Host interface':
+						case 'Type of information':
+						case 'Show value':
+						case 'Units':
+						case 'Description':
+						case 'Allowed hosts':
+						case 'Request body':
+						case 'URL':
+						case 'JMX endpoint':
+						case 'Authentication method':
+						case 'Public key file':
+						case 'Private key file':
+						case 'Request body type':
+						case 'User name':
+						case 'Password':
+						case 'Log time format':
+						case 'Enable trapping':
+							$this->assertEquals($value['value'], $form->getField($field)->getValue());
+							break;
 
-					case 'Status':
-						$status = ($value['value'] === 'Enabled') ? true : false;
-						$this->assertEquals($status, $form->getField('Enabled')->getValue());
-						break;
-
-					case 'Update interval':
-						$this->assertEquals($value['Delay'], $form->getField($field)->getValue());
-						if(array_key_exists('Custom intervals', $value)){
-							// Remove action and index fields.
-							foreach ($value['Custom intervals'] as &$interval) {
-								unset($interval['action'], $interval['index']);
+						case 'History storage period':
+						case 'Trend storage period':
+							$this->assertEquals($value['radio']['value'], $form->query('id', $value['radio']['id'])
+									->one()->asSegmentedRadio()->getValue());
+							if(array_key_exists('input', $value)){
+								$this->assertEquals($value['input']['value'], $form->query('id', $value['input']['id'])
+										->one()->getValue());
 							}
-							unset($interval);
+							break;
 
-							$this->assertEquals($value['Custom intervals'], $form->query('id:delayFlexTable')
-									->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()->getValue());
-						}
-						break;
+						case 'Status':
+							$status = ($value['value'] === 'Enabled') ? true : false;
+							$this->assertEquals($status, $form->getField('Enabled')->getValue());
+							break;
 
-					case 'Headers':
-						// Remove action and index fields.
-						foreach ($value as &$header) {
-							unset($header['action'], $header['index']);
-						}
-						unset($header);
+						case 'Update interval':
+							$this->assertEquals($value['Delay'], $form->getField($field)->getValue());
+							if(array_key_exists('Custom intervals', $value)){
+								// Remove action and index fields.
+								foreach ($value['Custom intervals'] as &$interval) {
+									unset($interval['action'], $interval['index']);
+								}
+								unset($interval);
 
-						$this->assertEquals($value, $form->query('xpath:.//div[@id="headers_pairs"]/table')
-								->asMultifieldTable()->one()->getValue());
-						break;
+								$this->assertEquals($value['Custom intervals'], $form->query('id:delayFlexTable')
+										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()->getValue());
+							}
+							break;
 
-					case 'Applications':
+						case 'Headers':
+							// Remove action and index fields.
+							foreach ($value as &$header) {
+								unset($header['action'], $header['index']);
+							}
+							unset($header);
 
-						break;
+							$this->assertEquals($value, $form->query('xpath:.//div[@id="headers_pairs"]/table')
+									->asMultifieldTable()->one()->getValue());
+							break;
+
+						case 'Applications':
+
+							break;
+					}
 				}
-			}
 
-			$form->query('button:Cancel')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
+				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$this->page->waitUntilReady();
+			}
 		}
 	}
 
