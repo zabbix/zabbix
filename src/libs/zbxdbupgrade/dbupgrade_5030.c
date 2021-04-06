@@ -2651,8 +2651,7 @@ static int	DBpatch_5030082(void)
 	return SUCCEED;
 }
 
-static char	*dbpatch_formula_to_expression(const char *calchost, zbx_uint64_t itemid, const char *formula,
-		zbx_vector_ptr_t *functions)
+static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *formula, zbx_vector_ptr_t *functions)
 {
 	zbx_dbpatch_function_t	*func;
 	const char		*ptr;
@@ -2731,7 +2730,7 @@ static int	DBpatch_5030083(void)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select i.itemid,i.params,h.host"
+	result = DBselect("select i.itemid,i.params"
 			" from items i,hosts h"
 			" where i.type=15"
 				" and h.hostid=i.hostid"
@@ -2746,7 +2745,7 @@ static int	DBpatch_5030083(void)
 		size_t		out_alloc = 0, out_offset = 0;
 
 		ZBX_STR2UINT64(itemid, row[0]);
-		if (NULL == (expression = dbpatch_formula_to_expression(row[2], itemid, row[1], &functions)))
+		if (NULL == (expression = dbpatch_formula_to_expression(itemid, row[1], &functions)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\"formula",
 					itemid);
