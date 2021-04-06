@@ -198,12 +198,16 @@ class CView {
 	}
 
 	/**
-	 * Get current layout mode if layout modes were enabled for this view, or ZBX_LAYOUT_NORMAL otherwise.
+	 * Get current layout mode.
 	 *
-	 * @return int  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
+	 * @return int
 	 */
 	public function getLayoutMode() {
-		return $this->layout_modes_enabled ? CViewHelper::loadLayoutMode() : ZBX_LAYOUT_NORMAL;
+		if ($this->layout_modes_enabled) {
+			return (getRequest('service') === '1') ? ZBX_LAYOUT_SERVICE : CViewHelper::loadLayoutMode();
+		}
+
+		return ZBX_LAYOUT_NORMAL;
 	}
 
 	/**

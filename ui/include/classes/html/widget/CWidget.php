@@ -116,7 +116,7 @@ class CWidget {
 					->setAttribute('aria-label', _('Content controls'))
 			);
 		}
-		elseif ($this->title !== null || $this->controls !== null) {
+		elseif ($this->web_layout_mode == ZBX_LAYOUT_NORMAL && ($this->title !== null || $this->controls !== null)) {
 			$items[] = $this->createTopHeader();
 		}
 

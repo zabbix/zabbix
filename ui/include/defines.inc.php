@@ -1434,8 +1434,9 @@ define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secre
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Layout
-define('ZBX_LAYOUT_NORMAL',     0);
-define('ZBX_LAYOUT_KIOSKMODE',  1);
+define('ZBX_LAYOUT_NORMAL',		0);
+define('ZBX_LAYOUT_KIOSKMODE',	1);
+define('ZBX_LAYOUT_SERVICE',	2);
 define('ZBX_LAYOUT_MODE', 'layout-mode');
 
 // Sidebar

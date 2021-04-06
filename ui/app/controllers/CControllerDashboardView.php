@@ -33,7 +33,8 @@ class CControllerDashboardView extends CController {
 			'new' => 'in 1',
 			'cancel' => 'in 1',
 			'from' => 'range_time',
-			'to' => 'range_time'
+			'to' => 'range_time',
+			'service' => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -86,19 +87,21 @@ class CControllerDashboardView extends CController {
 			return;
 		}
 
-		$time_selector_options = [
-			'profileIdx' => 'web.dashbrd.filter',
-			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
-			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-			'to' => $this->hasInput('to') ? $this->getInput('to') : null
-		];
+		if (!$this->hasInput('service')) {
+			$time_selector_options = [
+				'profileIdx' => 'web.dashbrd.filter',
+				'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
+				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+				'to' => $this->hasInput('to') ? $this->getInput('to') : null
+			];
 
-		updateTimeSelectorPeriod($time_selector_options);
+			updateTimeSelectorPeriod($time_selector_options);
+		}
 
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
-			'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
+			'time_selector' => (!$this->hasInput('service') && CDashboardHelper::hasTimeSelector($dashboard['widgets']))
 				? getTimeSelectorPeriod($time_selector_options)
 				: null,
 			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
@@ -232,7 +235,9 @@ class CControllerDashboardView extends CController {
 						'limit' => 1
 					]);
 
-					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
+					if (!$this->hasInput('service')) {
+						CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
+					}
 				}
 				elseif ($this->hasInput('dashboardid')) {
 					$error = _('No permissions to referred object or it does not exist!');

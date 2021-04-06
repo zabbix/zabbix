@@ -805,7 +805,7 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, z
 	zbx_vector_uint64_append_array(&job->userids, userids, userids_num);
 
 	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset,
-			"%s/zabbix.php?action=dashboard.view&kiosk=1&dashboardid=" ZBX_FS_UI64,
+			"%s/zabbix.php?action=dashboard.view&service=1&dashboardid=" ZBX_FS_UI64,
 			manager->zabbix_url, dashboardid);
 	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&from=%s", rm_time_to_urlfield(&from));
 	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&to=%s", rm_time_to_urlfield(&to));

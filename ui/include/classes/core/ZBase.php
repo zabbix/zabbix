@@ -652,9 +652,13 @@ class ZBase {
 	}
 
 	/**
-	 * Set layout to kiosk mode if URL contains 'kiosk' arguments.
+	 * Set layout mode using URL parameters.
 	 */
 	private function setLayoutModeByUrl() {
+		if (getRequest('service') === '1') {
+			return;
+		}
+
 		if (hasRequest('kiosk')) {
 			CViewHelper::saveLayoutMode(getRequest('kiosk') === '1' ? ZBX_LAYOUT_KIOSKMODE : ZBX_LAYOUT_NORMAL);
 
