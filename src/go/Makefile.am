@@ -54,6 +54,8 @@ clean:
 install-zabbix.com/cmd/zabbix_agent2:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
 		go install -ldflags="${AGENT_GOLDFLAGS}" ${TARGETS}
+	test -f "$(DESTDIR)@AGENT2_CONFIG_FILE@" || cp "conf/zabbix_agent2.conf" "$(DESTDIR)@AGENT2_CONFIG_FILE@"
+	test -d "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_DIR@" || mkdir -p "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_DIR@"; cp -r "conf/zabbix_agent2.d/plugins.d/" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_DIR@"
 
 install-zabbix.com/cmd/zabbix_web_service:
 	GOBIN=${GOBIN} go install -ldflags="${WEBSERVICE_GOLDFLAGS}" zabbix.com/cmd/zabbix_web_service
