@@ -349,12 +349,6 @@ class CFunctionValidator extends CValidator {
 
 			$parameter_value = $fn->params_raw['parameters'][$num]->getValue();
 
-			if (($arg['mandat'] & 0x02) && strstr($parameter_value, ':') === false) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-					_('Mandatory parameter is missing.'));
-				return false;
-			}
-
 			if ($arg['mandat'] != 0x00 && !$this->validateParameter($fn->params_raw['parameters'][$num], $arg)) {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
@@ -535,12 +529,12 @@ class CFunctionValidator extends CValidator {
 	 * Valid period can contain time unit not less than 1 hour and multiple of an hour.
 	 * Valid period shift can contain time range value with precision and multiple of an hour.
 	 *
-	 * @param string $param
+	 * @param mixed $param
 	 *
 	 * @return bool
 	 */
-	private function validatePeriod(string $param, int $mandat): bool {
-		if ($this->isMacro($param)) {
+	private function validatePeriod($param, int $mandat): bool {
+		if ($this->isMacro($param->getValue())) {
 			return true;
 		}
 
