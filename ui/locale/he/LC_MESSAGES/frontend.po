@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-02 19:55+0300\n"
-"PO-Revision-Date: 2021-03-08 17:12+0300\n"
+"PO-Revision-Date: 2021-04-05 09:41+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1615216368.000000\n"
+"X-POOTLE-MTIME: 1617608468.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -150,8 +150,8 @@ msgstr[1] "%1$s מארחים במצב תחזוקה"
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "שעה"
+msgstr[1] "%1$s שעות"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:134
 #: app/controllers/CControllerWidgetPlainTextView.php:135
@@ -627,7 +627,7 @@ msgstr "רישום משימות"
 #: app/views/administration.script.list.php:50
 #: app/views/administration.script.list.php:89
 msgid "Action operation"
-msgstr ""
+msgstr "פעולת משימה"
 
 #: actionconf.php:169
 msgid "Action updated"
@@ -4738,7 +4738,7 @@ msgstr "בררת מחדל"
 #: app/views/dashboard.page.properties.edit.php:48
 #, c-format
 msgid "Default (%1$s)"
-msgstr ""
+msgstr "בררת מחדל (%1$s)"
 
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
@@ -13042,7 +13042,7 @@ msgstr "פרטים על מערכת ההפעלה. מחזירה מחרוזת"
 
 #: app/partials/popup.operations.php:41
 msgid "Operation"
-msgstr ""
+msgstr "פעילות"
 
 #: actionconf.php:278
 #, c-format
@@ -13496,7 +13496,7 @@ msgstr "ה־PSK קצר מדי. הכמות המזערית ביותר היא %1$s 
 #: jsLoader.php:155
 #, c-format
 msgid "Page %1$d"
-msgstr ""
+msgstr "עמוד %1$d"
 
 #: app/views/dashboard.page.properties.edit.php:55
 msgid "Page display period"
@@ -15246,7 +15246,7 @@ msgstr "תזמון"
 #: app/views/administration.script.list.php:47
 #: app/views/administration.script.list.php:74
 msgid "Scope"
-msgstr ""
+msgstr "היקף"
 
 #: app/views/popup.acknowledge.edit.php:53
 msgctxt "selected problems"
@@ -16139,11 +16139,11 @@ msgstr "התחלה בעוד"
 #: app/views/monitoring.host.dashboard.view.php:100
 #: app/views/monitoring.host.dashboard.view.php:164 jsLoader.php:158
 msgid "Start slideshow"
-msgstr ""
+msgstr "להתחיל מצגת"
 
 #: app/views/dashboard.properties.edit.php:81
 msgid "Start slideshow automatically"
-msgstr ""
+msgstr "להתחיל מצגת אוטומטית"
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -16304,7 +16304,7 @@ msgstr "להפסיק עיבוד"
 #: app/views/monitoring.host.dashboard.view.php:99
 #: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:159
 msgid "Stop slideshow"
-msgstr ""
+msgstr "לעצור מצגת"
 
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:295

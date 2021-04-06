@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-02 19:55+0300\n"
-"PO-Revision-Date: 2021-03-23 11:43+0300\n"
+"PO-Revision-Date: 2021-04-03 14:29+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1616492599.000000\n"
+"X-POOTLE-MTIME: 1617452992.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -145,7 +145,7 @@ msgstr[0] "%1$s ホストがメンテナンス中"
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
+msgstr[0] "%1$s時間"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:134
 #: app/controllers/CControllerWidgetPlainTextView.php:135
@@ -1785,7 +1785,7 @@ msgstr "相関関係を追加できません"
 #: jsLoader.php:146
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "ダッシュボードページが追加できません： 最大数%1$dのダッシュボードページが追加されています。"
 
 #: include/classes/api/services/CTrigger.php:965
 #: include/classes/api/services/CTriggerPrototype.php:787
@@ -4072,7 +4072,7 @@ msgstr "アクションの作成"
 
 #: include/classes/helpers/CRoleHelper.php:479
 msgid "Create and edit dashboards"
-msgstr ""
+msgstr "ダッシュボードの作成と変更"
 
 #: include/classes/helpers/CRoleHelper.php:484
 msgid "Create and edit maintenance"
@@ -4435,7 +4435,7 @@ msgstr[0] "ダッシュボードを削除しました"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
-msgstr ""
+msgstr "ダッシュボードページのプロパティ"
 
 #: app/views/dashboard.properties.edit.php:88
 msgid "Dashboard properties"
@@ -4661,7 +4661,7 @@ msgstr "標準"
 #: app/views/dashboard.page.properties.edit.php:48
 #, c-format
 msgid "Default (%1$s)"
-msgstr ""
+msgstr "デフォルト (%1$s)"
 
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
@@ -4706,7 +4706,7 @@ msgstr "デフォルトのアクション実行ステップの間隔"
 
 #: app/views/dashboard.properties.edit.php:79
 msgid "Default page display period"
-msgstr ""
+msgstr "デフォルトのページ表示間隔"
 
 #: app/views/administration.gui.edit.php:83
 #: include/classes/setup/CSetupWizard.php:475
@@ -6498,11 +6498,11 @@ msgstr "URLを解析できませんでした。"
 
 #: jsLoader.php:150
 msgid "Failed to paste dashboard page."
-msgstr ""
+msgstr "ダッシュボードページの貼り付けに失敗しました。"
 
 #: jsLoader.php:151
 msgid "Failed to paste widget."
-msgstr ""
+msgstr "ウィジェットの貼り付けに失敗しました。"
 
 #: app/controllers/CControllerDashboardUpdate.php:137
 #: app/controllers/CControllerTemplateDashboardUpdate.php:131
@@ -6511,11 +6511,11 @@ msgstr "ダッシュボードの更新に失敗しました"
 
 #: jsLoader.php:152
 msgid "Failed to update dashboard page properties."
-msgstr ""
+msgstr "ダッシュボードページのプロパティの変更に失敗しました。"
 
 #: jsLoader.php:153
 msgid "Failed to update dashboard properties."
-msgstr ""
+msgstr "ダッシュボードのプロパティの変更に失敗しました。"
 
 #: include/classes/api/services/CTemplate.php:595
 msgid "Failed to update template."
@@ -6523,7 +6523,7 @@ msgstr "テンプレートの更新の失敗。"
 
 #: jsLoader.php:154
 msgid "Failed to update widget properties."
-msgstr ""
+msgstr "ウィジェットのプロパティの変更に失敗しました。"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -13123,7 +13123,7 @@ msgstr "出力"
 #: include/classes/api/services/CDashboardGeneral.php:276
 #, c-format
 msgid "Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%1$s\"のページ#%2$d上の X:%3$d, Y:%4$d にあるウィジェットと重複しています。"
 
 #: include/views/configuration.item.edit.php:749
 #: include/views/configuration.item.edit.php:785
@@ -13389,11 +13389,11 @@ msgstr "PSKが短すぎます。最低%1$s桁の16進数で設定してくださ
 #: jsLoader.php:155
 #, c-format
 msgid "Page %1$d"
-msgstr ""
+msgstr "ページ %1$d"
 
 #: app/views/dashboard.page.properties.edit.php:55
 msgid "Page display period"
-msgstr ""
+msgstr "ページ表示間隔"
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -16029,11 +16029,11 @@ msgstr "開始時刻"
 #: app/views/monitoring.host.dashboard.view.php:100
 #: app/views/monitoring.host.dashboard.view.php:164 jsLoader.php:158
 msgid "Start slideshow"
-msgstr ""
+msgstr "スライドショーの開始"
 
 #: app/views/dashboard.properties.edit.php:81
 msgid "Start slideshow automatically"
-msgstr ""
+msgstr "スライドショーの自動開始"
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -16194,7 +16194,7 @@ msgstr "処理の停止"
 #: app/views/monitoring.host.dashboard.view.php:99
 #: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:159
 msgid "Stop slideshow"
-msgstr ""
+msgstr "スライドショーの停止"
 
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:295
@@ -18869,7 +18869,7 @@ msgstr "有効な時間帯"
 #: include/classes/api/services/CDashboardGeneral.php:289
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
-msgstr ""
+msgstr "ダッシュボード\"%1$s\"のページ#%2$d上の X:%3$d, Y:%4$d のウィジェットは範囲外です。"
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
