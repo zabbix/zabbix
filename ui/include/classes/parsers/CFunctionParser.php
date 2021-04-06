@@ -201,11 +201,6 @@ class CFunctionParser extends CParser {
 								$_parameters[$num] = $query_parser->result;
 								$state = self::STATE_END;
 							}
-							elseif ($period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
-								$p += $period_parser->getLength() - 1;
-								$_parameters[$num] = $period_parser->result;
-								$state = self::STATE_END;
-							}
 							elseif ($function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $function_parser->getLength() - 1;
 								$_parameters[$num] = $function_parser->result;
@@ -215,6 +210,11 @@ class CFunctionParser extends CParser {
 									&& $functionid_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $functionid_parser->getLength() - 1;
 								$_parameters[$num] = $functionid_parser->result;
+								$state = self::STATE_END;
+							}
+							elseif ($period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$p += $period_parser->getLength() - 1;
+								$_parameters[$num] = $period_parser->result;
 								$state = self::STATE_END;
 							}
 							else {
