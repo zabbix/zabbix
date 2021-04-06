@@ -136,14 +136,24 @@ class CControllerPopupTriggerWizard extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
 				$trigger_valid = false;
 			}
-
-			if (!$item) {
+			elseif (!$item) {
 				error('No permissions to referred object or it does not exist!');
 				$trigger_valid = false;
 			}
+			elseif ($exprs
+					&& ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
+				[$editable, $queries] = check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression);
 
-			if ($exprs && ($expression = $constructor->getExpressionFromParts($host['host'], $item['key_'], $exprs))) {
-				if (check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) {
+				// Check of no other /host/key references.
+				if (count($queries) != 1 || $queries[0] !== '/'.$host['host'].'/'.$item['key_']) {
+					$update = array_key_exists('triggerid', $page_options);
+					$trigger_valid = false;
+
+					// This cannot be achieved normally using UI so no need to explain in details.
+					error($update ? _('Cannot update trigger') : _('Cannot add trigger'));
+				}
+
+				if ($trigger_valid && $editable) {
 					if (array_key_exists('triggerid', $page_options)) {
 						$triggerid = $page_options['triggerid'];
 						$description = $page_options['description'];

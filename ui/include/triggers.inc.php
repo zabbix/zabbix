@@ -604,11 +604,19 @@ function triggerExpressionReplaceHost(string $expression, string $src_host, stri
 	return $expression;
 }
 
-function check_right_on_trigger_by_expression($permission, $expression) {
+/**
+ * Check permissions for all hosts used in expression and returns unique /host/key references of expression.
+ *
+ * @param int    $permission
+ * @param string $expression
+ *
+ * @return array
+ */
+function check_right_on_trigger_by_expression(int $permission, string $expression): array {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
 		error($expressionData->error);
-		return false;
+		return [false, []];
 	}
 	$expression_hosts = $expressionData->result->getHosts();
 
@@ -624,11 +632,14 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 	foreach ($expression_hosts as $host) {
 		if (!isset($hosts[$host])) {
 			error(_s('Incorrect trigger expression. Host "%1$s" does not exist or you have no access to this host.', $host));
-			return false;
+			return [false, []];
 		}
 	}
 
-	return true;
+	$queries = $expressionData->result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_QUERY]);
+	$queries = array_keys(array_flip(array_column($queries, 'match')));
+
+	return [true, $queries];
 }
 
 function replace_template_dependencies($deps, $hostid) {
@@ -1850,13 +1861,16 @@ function get_item_function_info($expr) {
 		],
 		'day_of_week' => [
 			'any' => ['value_type' => '1-7', 'values' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7]]
+		],
+		'now' => [
+			'any' => ['value_type' => 'Numeric (integer)', 'values' => null]
 		]
 	];
 
 	$functions = [
 		'abs' => $rules['numeric_as_float'],
 		'avg' => $rules['numeric_as_float'],
-		'band' => $rules['integer'],
+		'bitand' => $rules['integer'],
 		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'date' => $rules['date'],
@@ -1873,7 +1887,7 @@ function get_item_function_info($expr) {
 		'max' => $rules['numeric'],
 		'min' => $rules['numeric'],
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
-		'now' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
+		'now' => $rules['now'],
 		'percentile' => $rules['numeric'],
 		'sum' => $rules['numeric'],
 		'time' => $rules['time'],

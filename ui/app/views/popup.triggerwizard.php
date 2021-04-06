@@ -52,7 +52,8 @@ foreach ($data['expressions'] as $expr) {
 	$expressions[] = [
 		'expression' => $expr['value'],
 		'type_label' => $expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH ? _('Include') : _('Exclude'),
-		'type' => $expr['type']
+		'type' => $expr['type'],
+		'details' => $expr['details']
 	];
 }
 

@@ -37,8 +37,8 @@ class CFunctionValidator extends CValidator {
 	 *   ]
 	 * ]
 	 *
-	 * <parameter_type> can be 'query', 'fit', 'mode', 'num_suffix', 'num_unsigned', 'operation', 'percent', 'sec_neg',
-	 *                         'sec_num', 'sec_num_zero', 'sec_zero'
+	 * <parameter_type> can be 'query', 'fit', 'mode', 'num_suffix', 'operation', 'percent', 'sec_neg',
+	 *                         'sec_num', 'sec_num_zero', 'sec_zero', 'pattern'
 	 * <value_type> can be one of ITEM_VALUE_TYPE_*
 	 *
 	 * @var array
@@ -103,9 +103,7 @@ class CFunctionValidator extends CValidator {
 		 * Types of parameters:
 		 * - query - /host/key reference;
 		 * - scale - sec|#num:time_shift;
-		 * - num_unsigned
 		 * - sec_neg
-		 * - str
 		 * - fit   - can be either empty or one of valid parameters;
 		 * - mode  - can be either empty or one of valid parameters;
 		 * - nodata_mode
@@ -129,20 +127,12 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $value_types_num
 			],
-			'band' => [
-				'args' => [
-					['type' => 'query', 'mandat' => 0x01],
-					['type' => 'scale', 'mandat' => 0x00],
-					['type' => 'num_unsigned', 'mandat' => 0x01]
-				],
-				'value_types' => $value_types_int
-			],
 			'count' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
 					['type' => 'scale', 'mandat' => 0x01],
 					['type' => 'operation', 'mandat' => 0x00],
-					['type' => 'str', 'mandat' => 0x00]
+					['type' => 'pattern', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_all
 			],
@@ -206,7 +196,7 @@ class CFunctionValidator extends CValidator {
 			'logeventid' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
-					['type' => 'str', 'mandat' => 0x00]
+					['type' => 'pattern', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_log
 			],
@@ -219,7 +209,7 @@ class CFunctionValidator extends CValidator {
 			'logsource' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
-					['type' => 'str', 'mandat' => 0x00]
+					['type' => 'pattern', 'mandat' => 0x00]
 				],
 				'value_types' => $value_types_log
 			],
@@ -237,7 +227,7 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $value_types_num
 			],
-			'nodata'=> [
+			'nodata' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
 					['type' => 'sec_neg', 'mandat' => 0x01],
@@ -318,12 +308,17 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate trigger function like last(0), time(), etc.
 	 *
-	 * @param CFunctionParserResult  $fn
+	 * @param array                  $value
+	 * @param CFunctionParserResult  $value['fn']
+	 * @param int                    $value['value_type']  Used only to enable some parameters unquoted.
 	 *
 	 * @return bool
 	 */
-	public function validate($fn) {
+	public function validate($value) {
 		$this->setError('');
+
+		$value_type = array_key_exists('value_type', $value) ? $value['value_type'] : ITEM_VALUE_TYPE_STR;
+		$fn = $value['fn'];
 
 		if (!array_key_exists($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
@@ -356,15 +351,16 @@ class CFunctionValidator extends CValidator {
 				continue;
 			}
 
-			$param = $fn->params_raw['parameters'][$num]->getValue();
-
-			if (($arg['mandat'] & 0x02) && strstr($param, ':') === false) {
+			if (!$this->checkQuotes($arg['type'], $value_type, $fn->params_raw['parameters'][$num])) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-					_('Mandatory parameter is missing.'));
+					$param_labels[$num]
+				);
 				return false;
 			}
 
-			if (($arg['mandat'] != 0x00 && $param === '') || !$this->validateParameter($param, $arg)) {
+			$parameter_value = $fn->params_raw['parameters'][$num]->getValue();
+
+			if ($arg['mandat'] != 0x00 && !$this->validateParameter($fn->params_raw['parameters'][$num], $arg)) {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
 				);
@@ -378,16 +374,62 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate value type.
 	 *
-	 * @param int                   $value_type
-	 * @param CFunctionParserResult $fn
+	 * @param array                 $value
+	 * @param CFunctionParserResult $value['fn']
+	 * @param int                   $value['value_type']  To check if function support particular type of values.
 	 *
 	 * @return bool
 	 */
-	public function validateValueType(int $value_type, CFunctionParserResult $fn): bool {
-		if (!array_key_exists($value_type, $this->allowed[$fn->function]['value_types'])) {
+	public function validateValueType(array $value): bool {
+		if (!array_key_exists($value['value_type'], $this->allowed[$value['fn']->function]['value_types'])) {
 			$this->setError(_s('Incorrect item value type "%1$s" provided for trigger function "%2$s".',
-				itemValueTypeString($value_type), $fn->match));
+				itemValueTypeString($value['value_type']), $value['fn']->match));
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if parameter is properly quoted.
+	 *
+	 * @param string         $type
+	 * @param int            $value_type
+	 * @param CParserResult  $param
+	 *
+	 * @return bool
+	 */
+	private function checkQuotes(string $type, int $value_type, CParserResult $parameter): bool {
+		if ($parameter->getValue() === '') {
+			return true;
+		}
+
+		switch ($type) {
+			// Mandatory unquoted.
+			case 'query':
+			case 'scale':
+			case 'period':
+			case 'sec_neg':
+			case 'sec_zero':
+				return !self::isQuoted($parameter->getValue(true));
+
+			// Mandatory quoted based on value type.
+			case 'pattern':
+				$support_unquoted = (ctype_digit((string) $parameter->getValue())
+						&& in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]));
+				if (!$support_unquoted && !self::isQuoted($parameter->getValue(true))) {
+					return false;
+				}
+				break;
+
+			// Optionally quoted.
+			case 'percent':
+			case 'num_suffix':
+				return true;
+
+			// Mandatory quoted.
+			default:
+				return self::isQuoted($parameter->getValue(true));
 		}
 
 		return true;
@@ -396,47 +438,47 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate trigger function parameter.
 	 *
-	 * @param string $param
+	 * @param mixed  $param
 	 * @param array  $arg
 	 * @param string $arg['type']
 	 * @param string $arg['mandat']
 	 *
 	 * @return bool
 	 */
-	private function validateParameter(string $param, array $arg): bool {
+	private function validateParameter($param, array $arg): bool {
 		switch ($arg['type']) {
 			case 'query':
-				return $this->validateQuery($param);
+				return $this->validateQuery($param->getValue());
 
 			case 'scale':
 				return $this->validateScale($param, $arg['mandat']);
 
 			case 'sec_zero':
-				return $this->validateSecZero($param);
+				return $this->validateSecZero($param->getValue());
 
 			case 'sec_neg':
-				return $this->validateSecNeg($param);
+				return $this->validateSecNeg($param->getValue());
 
 			case 'num_suffix':
-				return $this->validateNumSuffix($param);
+				return $this->validateNumSuffix($param->getValue());
 
 			case 'nodata_mode':
-				return ($param === 'strict' || $param === '');
+				return ($param->getValue() === 'strict' || $param->getValue() === '');
 
 			case 'fit':
-				return ($param === '' || $this->validateFit($param));
+				return ($param->getValue() === '' || $this->validateFit($param->getValue()));
 
 			case 'function':
-				return $this->validateStringFunction($param);
+				return $this->validateStringFunction($param->getValue());
 
 			case 'mode':
-				return ($param === '' || $this->validateMode($param));
+				return ($param->getValue() === '' || $this->validateMode($param->getValue()));
 
 			case 'percent':
-				return $this->validatePercent($param);
+				return $this->validatePercent($param->getValue());
 
 			case 'operation':
-				return $this->validateOperation($param);
+				return $this->validateOperation($param->getValue());
 
 			case 'period':
 				return $this->validatePeriod($param, $arg['mandat']);
@@ -465,21 +507,29 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate joint "sec|#num:time_shift" syntax.
 	 *
-	 * @param string $param
+	 * @param mixed $param
 	 *
 	 * @return bool
 	 */
-	private function validateScale(string $param, int $mandat): bool {
-		if ($this->isMacro($param)) {
+	private function validateScale($param, int $mandat): bool {
+		if ($this->isMacro($param->getValue())) {
 			return true;
 		}
 
-		$param = explode(':', $param) + ['', ''];
-		$sec_num = $param[0];
-		$time_shift = $param[1];
+		if (!($param instanceof CPeriodParserResult)) {
+			return false;
+		}
+		else {
+			$period = $param->sec_num;
+			$time_shift = $param->time_shift;
+		}
 
-		$is_sec_num_valid = ((!($mandat & 0x01) && $sec_num === '') || $this->validateSecNum($sec_num));
-		$is_time_shift_valid = ((!($mandat & 0x02) && $time_shift === '') || $this->validatePeriodShift($time_shift));
+		$is_sec_num_valid = ((!($mandat & 0x01) && $period === '')
+				|| $param->sec_num_contains_macros
+				|| $this->validateSecNum($period));
+		$is_time_shift_valid = ((!($mandat & 0x02) && ($time_shift === '' || $time_shift === null))
+				|| $param->time_shift_contains_macros
+				|| (!($mandat & 0x02) && $time_shift !== null && $this->validatePeriodShift($time_shift)));
 
 		return ($is_sec_num_valid && $is_time_shift_valid);
 	}
@@ -490,34 +540,39 @@ class CFunctionValidator extends CValidator {
 	 * Valid period can contain time unit not less than 1 hour and multiple of an hour.
 	 * Valid period shift can contain time range value with precision and multiple of an hour.
 	 *
-	 * @param string $param
+	 * @param mixed $param
 	 *
 	 * @return bool
 	 */
-	private function validatePeriod(string $param, int $mandat): bool {
-		if ($this->isMacro($param)) {
+	private function validatePeriod($param, int $mandat): bool {
+		if ($this->isMacro($param->getValue())) {
 			return true;
 		}
 
-		$param = explode(':', $param) + ['', ''];
-		$period = $param[0];
-		$period_shift = $param[1];
+		if (!($param instanceof CPeriodParserResult)) {
+			return false;
+		}
+		else {
+			$period = $param->sec_num;
+			$period_shift = $param->time_shift;
+		}
 
-		$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
-		if ($mandat & 0x01) {
-			if (!$this->isMacro($period)) {
-				if ($simple_interval_parser->parse($period) != CParser::PARSE_SUCCESS) {
-					return false;
-				}
+		if (($mandat & 0x01) && !$param->sec_num_contains_macros) {
+			$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
+			if ($simple_interval_parser->parse($period) != CParser::PARSE_SUCCESS) {
+				return false;
+			}
 
-				$value = timeUnitToSeconds($period, true);
-				if ($value < SEC_PER_HOUR || $value % SEC_PER_HOUR != 0) {
-					return false;
-				}
+			$value = timeUnitToSeconds($period, true);
+			if ($value < SEC_PER_HOUR || $value % SEC_PER_HOUR != 0) {
+				return false;
 			}
 		}
 
-		if (($mandat & 0x02) && !$this->validateTrendPeriods($period, $period_shift)) {
+		if (!($mandat & 0x02) && $period_shift === null) {
+			return true;
+		}
+		elseif (($mandat & 0x02) && !$this->validateTrendPeriods($period, $period_shift)) {
 			return $this->isMacro($period_shift);
 		}
 
@@ -652,7 +707,7 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateOperation(string $param): bool {
-		return ($this->isMacro($param) || preg_match('/^(eq|ne|gt|ge|lt|le|like|band|regexp|iregexp|)$/', $param));
+		return ($this->isMacro($param) || preg_match('/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp|)$/', $param));
 	}
 
 	/**
@@ -665,27 +720,14 @@ class CFunctionValidator extends CValidator {
 	private function validatePeriodShift(string $param): bool {
 		$relative_time_parser = new CRelativeTimeParser();
 
-		if ($relative_time_parser->parse($param) == CParser::PARSE_SUCCESS) {
-			$tokens = $relative_time_parser->getTokens();
-
-			$offset_tokens = array_filter($tokens, function ($token) {
-				return ($token['type'] ==  CRelativeTimeParser::ZBX_TOKEN_OFFSET);
-			});
-
-			if (($offset_token = reset($offset_tokens)) !== false
-					&& $offset_token['sign'] === '-' && (int) $offset_token['value'] > 0) {
-				return true;
-			}
-		}
-
-		return false;
+		return ($relative_time_parser->parse($param) == CParser::PARSE_SUCCESS);
 	}
 
 	/**
 	 * Validate trend* function used period and period_shift arguments.
 	 *
-	 * @param string $period_value        Value of period, first argument for trend* function.
-	 * @param string $period_shift_value  Value of period shift, second argument for trend* function.
+	 * @param string $period_value        Value of period.
+	 * @param string $period_shift_value  Value of period shift.
 	 *
 	 * @return bool
 	 */
@@ -694,8 +736,15 @@ class CFunctionValidator extends CValidator {
 		$period = strpos($precisions, substr($period_value, -1));
 
 		if ($period !== false) {
+			if (substr($period_shift_value, 0, 4) !== 'now/') {
+				return false;
+			}
+			$period_shift_value = substr($period_shift_value, 4);
+
 			$relative_time_parser = new CRelativeTimeParser();
-			$relative_time_parser->parse($period_shift_value);
+			if ($relative_time_parser->parse($period_shift_value) !== CParser::PARSE_SUCCESS) {
+				return false;
+			}
 
 			foreach ($relative_time_parser->getTokens() as $token) {
 				if ($token['type'] !== CRelativeTimeParser::ZBX_TOKEN_PRECISION) {
@@ -732,5 +781,16 @@ class CFunctionValidator extends CValidator {
 		);
 
 		return ($user_macro_parser->parse($param) == CParser::PARSE_SUCCESS || $is_valid_lld_macro);
+	}
+
+	/**
+	 * Check if given value is properly quoted.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function isQuoted(string $param): bool {
+		return (substr($param, 0, 1) === '"' && substr($param, -1) === '"' && substr($param, -2) !== '\"');
 	}
 }
