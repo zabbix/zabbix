@@ -347,15 +347,15 @@ class CFunctionValidator extends CValidator {
 				return false;
 			}
 
-			$param = $fn->params_raw['parameters'][$num]->getValue();
+			$parameter_value = $fn->params_raw['parameters'][$num]->getValue();
 
-			if (($arg['mandat'] & 0x02) && strstr($param, ':') === false) {
+			if (($arg['mandat'] & 0x02) && strstr($parameter_value, ':') === false) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					_('Mandatory parameter is missing.'));
 				return false;
 			}
 
-			if (($arg['mandat'] != 0x00 && $param === '') || !$this->validateParameter($param, $arg)) {
+			if ($arg['mandat'] != 0x00 && !$this->validateParameter($fn->params_raw['parameters'][$num], $arg)) {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
 				);
@@ -433,47 +433,47 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate trigger function parameter.
 	 *
-	 * @param string $param
+	 * @param mixed  $param
 	 * @param array  $arg
 	 * @param string $arg['type']
 	 * @param string $arg['mandat']
 	 *
 	 * @return bool
 	 */
-	private function validateParameter(string $param, array $arg): bool {
+	private function validateParameter($param, array $arg): bool {
 		switch ($arg['type']) {
 			case 'query':
-				return $this->validateQuery($param);
+				return $this->validateQuery($param->getValue());
 
 			case 'scale':
 				return $this->validateScale($param, $arg['mandat']);
 
 			case 'sec_zero':
-				return $this->validateSecZero($param);
+				return $this->validateSecZero($param->getValue());
 
 			case 'sec_neg':
-				return $this->validateSecNeg($param);
+				return $this->validateSecNeg($param->getValue());
 
 			case 'num_suffix':
-				return $this->validateNumSuffix($param);
+				return $this->validateNumSuffix($param->getValue());
 
 			case 'nodata_mode':
-				return ($param === 'strict' || $param === '');
+				return ($param->getValue() === 'strict' || $param->getValue() === '');
 
 			case 'fit':
-				return ($param === '' || $this->validateFit($param));
+				return ($param->getValue() === '' || $this->validateFit($param->getValue()));
 
 			case 'function':
-				return $this->validateStringFunction($param);
+				return $this->validateStringFunction($param->getValue());
 
 			case 'mode':
-				return ($param === '' || $this->validateMode($param));
+				return ($param->getValue() === '' || $this->validateMode($param->getValue()));
 
 			case 'percent':
-				return $this->validatePercent($param);
+				return $this->validatePercent($param->getValue());
 
 			case 'operation':
-				return $this->validateOperation($param);
+				return $this->validateOperation($param->getValue());
 
 			case 'period':
 				return $this->validatePeriod($param, $arg['mandat']);
@@ -502,19 +502,29 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate joint "sec|#num:time_shift" syntax.
 	 *
-	 * @param string $param
+	 * @param mixed $param
 	 *
 	 * @return bool
 	 */
-	private function validateScale(string $param, int $mandat): bool {
-		if ($this->isMacro($param)) {
+	private function validateScale($param, int $mandat): bool {
+		if ($this->isMacro($param->getValue())) {
 			return true;
 		}
 
-		[$period, $time_shift] = explode(':', $param) + ['', null];
+		if (!($param instanceof CPeriodParserResult)) {
+			return false;
+		}
+		else {
+			$period = $param->sec_num;
+			$time_shift = $param->time_shift;
+		}
 
-		$is_sec_num_valid = ((!($mandat & 0x01) && $period === '') || $this->validateSecNum($period));
-		$is_time_shift_valid = ((!($mandat & 0x02) && $time_shift === null) || $this->validatePeriodShift($time_shift));
+		$is_sec_num_valid = ((!($mandat & 0x01) && $period === '')
+				|| $param->sec_num_contains_macros
+				|| $this->validateSecNum($period));
+		$is_time_shift_valid = ((!($mandat & 0x02) && $time_shift === '')
+				|| $param->time_shift_contains_macros
+				|| $this->validatePeriodShift($time_shift));
 
 		return ($is_sec_num_valid && $is_time_shift_valid);
 	}
@@ -534,9 +544,15 @@ class CFunctionValidator extends CValidator {
 			return true;
 		}
 
-		[$period, $period_shift] = explode(':', $param) + ['', null];
+		if (!($param instanceof CPeriodParserResult)) {
+			return false;
+		}
+		else {
+			$period = $param->sec_num;
+			$period_shift = $param->time_shift;
+		}
 
-		if (($mandat & 0x01) && !$this->isMacro($period)) {
+		if (($mandat & 0x01) && !$param->sec_num_contains_macros) {
 			$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
 			if ($simple_interval_parser->parse($period) != CParser::PARSE_SUCCESS) {
 				return false;

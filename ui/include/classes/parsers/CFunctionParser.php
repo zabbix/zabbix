@@ -154,6 +154,7 @@ class CFunctionParser extends CParser {
 		$num = 0;
 
 		$query_parser = new CQueryParser();
+		$period_parser = new CPeriodParser();
 		$function_parser = new self($this->options, $this->depth + 1);
 
 		if ($this->options['collapsed_expression']) {
@@ -198,6 +199,11 @@ class CFunctionParser extends CParser {
 							if ($query_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $query_parser->getLength() - 1;
 								$_parameters[$num] = $query_parser->result;
+								$state = self::STATE_END;
+							}
+							elseif ($period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$p += $period_parser->getLength() - 1;
+								$_parameters[$num] = $period_parser->result;
 								$state = self::STATE_END;
 							}
 							elseif ($function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
