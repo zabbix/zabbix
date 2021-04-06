@@ -11,7 +11,6 @@ This template was tested on:
 - MySQL, version 5.7, 8.0
 - Percona, version 8.0
 - MariaDB, version 10.4
-- Zabbix, version 5.0
 
 ## Setup
 
@@ -62,7 +61,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Databases discovery |<p>Scanning databases in DBMS.</p> |ZABBIX_PASSIVE |mysql.db.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- A: {#DATABASE} NOT_MATCHES_REGEX `information_schema`</p> |
+|Database discovery |<p>Scanning databases in DBMS.</p> |ZABBIX_PASSIVE |mysql.db.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- A: {#DATABASE} NOT_MATCHES_REGEX `information_schema`</p> |
 |Replication discovery |<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p> |ZABBIX_PASSIVE |mysql.replication.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |MariaDB discovery |<p>Additional metrics if MariaDB is used.</p> |DEPENDENT |mysql.extra_metric.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.search('MariaDB')>-1 ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
@@ -140,7 +139,7 @@ There are no template links in this template.
 |MySQL: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:mysql.uptime.nodata(30m)}=1` |INFO |<p>**Depends on**:</p><p>- MySQL: Service is down</p> |
 |MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m) |<p>The number of failed attempts to connect to the MySQL server is more than {$MYSQL.ABORTED_CONN.MAX.WARN} in the last 5 minutes.</p> |`{TEMPLATE_NAME:mysql.aborted_connects.rate.min(5m)}>{$MYSQL.ABORTED_CONN.MAX.WARN}` |AVERAGE |<p>**Depends on**:</p><p>- MySQL: Refused connections (max_connections limit reached)</p> |
 |MySQL: Refused connections (max_connections limit reached) |<p>Number of refused connections due to the max_connections limit being reached.</p> |`{TEMPLATE_NAME:mysql.connection_errors_max_connections.rate.last()}>0` |AVERAGE | |
-|MySQL: Buffer pool utilization is too low (less {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m) |<p>The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</p> |`{TEMPLATE_NAME:mysql.buffer_pool_utilization.max(5m)}<{$MYSQL.BUFF_UTIL.MIN.WARN}` |WARNING | |
+|MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m) |<p>The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</p> |`{TEMPLATE_NAME:mysql.buffer_pool_utilization.max(5m)}<{$MYSQL.BUFF_UTIL.MIN.WARN}` |WARNING | |
 |MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m) |<p>Possibly the application using the database is in need of query optimization.</p> |`{TEMPLATE_NAME:mysql.created_tmp_files.rate.min(5m)}>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}` |WARNING | |
 |MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m) |<p>Possibly the application using the database is in need of query optimization.</p> |`{TEMPLATE_NAME:mysql.created_tmp_disk_tables.rate.min(5m)}>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}` |WARNING | |
 |MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m) |<p>Possibly the application using the database is in need of query optimization.</p> |`{TEMPLATE_NAME:mysql.created_tmp_tables.rate.min(5m)}>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}` |WARNING | |
