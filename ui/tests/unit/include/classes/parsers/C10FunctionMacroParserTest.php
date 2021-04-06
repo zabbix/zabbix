@@ -21,7 +21,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class CFunctionMacroParserTest extends CParserTest {
+class C10FunctionMacroParserTest extends CParserTest {
 
 	protected function getParser() {
 		return new C10FunctionMacroParser();

@@ -35,6 +35,7 @@ class CTriggerExprParserResult extends CParserResult {
 	const TOKEN_TYPE_FUNCTIONID_MACRO = 9;
 	const TOKEN_TYPE_FUNCTION = 10;
 	const TOKEN_TYPE_QUERY = 11;
+	const TOKEN_TYPE_PERIOD = 12;
 
 	/**
 	 * Array of tokens.

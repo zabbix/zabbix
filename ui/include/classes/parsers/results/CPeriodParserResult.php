@@ -20,21 +20,56 @@
 
 
 /**
- * Class to store unspecified function parameter.
+ * Class to store function period parser results.
  */
-class CFunctionParameterResult extends CParserResult {
+class CPeriodParserResult extends CFunctionParameterResult {
 
 	/**
-	 * Parameter type.
+	 * <sec|#num> parameter
 	 *
-	 * @var type
+	 * @var string
+	 */
+	public $sec_num;
+
+	/**
+	 * <time_shift> parameter
+	 *
+	 * @var string
+	 */
+	public $time_shift;
+
+	/**
+	 * Indicates if time_shift contains macros.
+	 *
+	 * @var bool
+	 */
+	public $sec_num_contains_macros = false;
+
+	/**
+	 * Indicates if time_shift_contains_macros contains macros.
+	 *
+	 * @var bool
+	 */
+	public $time_shift_contains_macros = false;
+
+	/**
+	 * Token type.
+	 *
+	 * @var int
 	 */
 	public $type;
 
 	public function __construct(array $data = []) {
-		$data = array_intersect_key($data, array_flip(['type', 'match', 'pos', 'length']));
+		$data = array_intersect_key($data, array_flip(['sec_num', 'time_shift', 'sec_num_contains_macros',
+			'time_shift_contains_macros', 'match', 'pos', 'length'
+		]));
+
 		$data += [
-			'type' => -1,
+			'type' => CTriggerExprParserResult::TOKEN_TYPE_PERIOD,
+			'sec_num' => '',
+			'time_shift' => '',
+			'sec_num_contains_macros' => '',
+			'time_shift_contains_macros' => '',
 			'match' => '',
 			'pos' => 0,
 			'length' => 0
@@ -43,25 +78,5 @@ class CFunctionParameterResult extends CParserResult {
 		foreach ($data as $property => $value) {
 			$this->$property = $value;
 		}
-	}
-
-	/**
-	 * Get value of parsed parameter.
-	 *
-	 * @param bool $keep_unquoted  Keep parameters of type CFunctionParser::PARAM_QUOTED unqioted.
-	 *
-	 * @return string
-	 */
-	public function getValue(bool $keep_unquoted = false): string {
-		$value = $this->match;
-
-		if ($this instanceof CQueryParserResult) {
-			return $value;
-		}
-		elseif (!$keep_unquoted && $this->type == CFunctionParser::PARAM_QUOTED) {
-			$value = (substr($value, 0, 1) === '"' && substr($value, -1) === '"') ? substr($value, 1, -1) : $value;
-		}
-
-		return $value;
 	}
 }

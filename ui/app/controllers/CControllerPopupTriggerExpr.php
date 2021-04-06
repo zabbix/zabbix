@@ -28,6 +28,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $param2SecCount = [];
 	private $param2SecMode = [];
 	private $param3SecVal = [];
+	private $param_find = [];
 	private $param3SecPercent = [];
 	private $paramSecIntCount = [];
 	private $paramForecast = [];
@@ -130,6 +131,30 @@ class CControllerPopupTriggerExpr extends CController {
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
 				'A' => true
+			],
+			'o' => [
+				'C' => 'O',
+				'T' => T_ZBX_STR,
+				'A' => false
+			],
+			'v' => [
+				'C' => 'V',
+				'T' => T_ZBX_STR,
+				'A' => false
+			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			]
+		];
+
+		$this->param_find = [
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'M' => $this->metrics,
+				'A' => false
 			],
 			'o' => [
 				'C' => 'O',
@@ -291,7 +316,7 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'find' => [
 				'description' => _('find() - Check occurance of pattern V (which fulfill operator O) in period T (1 - match, 0 - no match)'),
-				'params' => $this->param3SecVal,
+				'params' => $this->param_find,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']
 			],
@@ -303,7 +328,6 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'length' => [
 				'description' => _('length() - Length of last (most recent) T value in characters'),
-				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
@@ -385,8 +409,8 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
-			'band' => [
-				'description' => _('band() - Bitwise AND of last (most recent) T value and mask'),
+			'bitand' => [
+				'description' => _('bitand() - Bitwise AND of last (most recent) T value and mask'),
 				'params' => $this->paramSecIntCount,
 				'allowed_types' => $this->allowedTypesInt,
 				'operators' => ['=', '<>']
@@ -520,23 +544,24 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					$is_num = (array_key_exists(0, $params) && substr($params[0]->match, 0, 1) === '#');
+					$param_type = (!in_array($function, ['fuzzytime', 'nodata']) && $is_num)
+						? PARAM_TYPE_COUNTS
+						: PARAM_TYPE_TIME;
 
-					if (!in_array($function, ['fuzzytime', 'nodata']) && $is_num) {
-						$param_type = PARAM_TYPE_COUNTS;
-						$params[0]->match = substr($params[0]->match, 1);
+					$param_values = [];
+					foreach ($params as $i => $param) {
+						if ($param instanceof CFunctionParserResult) {
+							$param_values[] = $param->getFunctionTriggerQuery()->getValue();
+						}
+						elseif ($i == 0 && ($param instanceof CPeriodParserResult)) {
+							$param_values[] = $is_num ? substr($param->sec_num, 1) : $param->sec_num;
+							$param_values[] = $param->time_shift;
+						}
+						else {
+							$param_values[] = $param->getValue();
+						}
 					}
-					else {
-						$param_type = PARAM_TYPE_TIME;
-					}
-
-					$params = array_map(function ($param) {
-						return $param->getValue();
-					}, $params);
-
-					if (array_key_exists(0, $params) && ($column_pos = strpos($params[0], ':')) !== false) {
-						$params[] = substr($params[0], $column_pos + 1);
-						$params[0] = substr($params[0], 0, $column_pos);
-					}
+					$params = $param_values;
 
 					/*
 					 * Try to find an operator, a value and item.
@@ -568,7 +593,8 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($fn_name, $this->functions)
 									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
 								$operator = $operator_token->match;
-								$value = array_key_exists('string', $value_token->data)
+								$value = (($value_token instanceof CTriggerExprParserResult)
+										&& array_key_exists('string', $value_token->data))
 									? $value_token->data['string']
 									: $value_token->match;
 							}
@@ -576,14 +602,15 @@ class CControllerPopupTriggerExpr extends CController {
 								break;
 							}
 
-							if (!in_array($fn_name, getStandaloneFunctions())) {
+							if (!in_array($fn_name, getStandaloneFunctions())
+									&& ($query = $function_token->getFunctionTriggerQuery()) !== null) {
 								$items = API::Item()->get([
 									'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 									'selectHosts' => ['name'],
 									'webitems' => true,
 									'filter' => [
-										'host' => $function_token->getHosts()[0],
-										'key_' => $function_token->getItems()[0],
+										'host' => $query->host,
+										'key_' => $query->item,
 										'flags' => null
 									]
 								]);
@@ -701,7 +728,10 @@ class CControllerPopupTriggerExpr extends CController {
 						// Validate trigger function.
 						$trigger_function_validator = new CFunctionValidator();
 
-						if (!$trigger_function_validator->validate($result->getTokens()[0])) {
+						$fn_data = [
+							'fn' => $result->getTokens()[0]
+						];
+						if (!$trigger_function_validator->validate($fn_data)) {
 							error($trigger_function_validator->getError());
 						}
 					}
@@ -728,17 +758,34 @@ class CControllerPopupTriggerExpr extends CController {
 							? '#'.$data['params']['last']
 							: $data['params']['last'];
 					}
-					elseif ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, ['last', 'band', 'strlen'])) {
+					elseif ($data['paramtype'] == PARAM_TYPE_TIME
+							&& in_array($function, ['last', 'bitand', 'strlen'])) {
 						$data['params']['last'] = '';
 					}
 
-					// Combince sec|#num and <time_shift> parameters into one.
+					// Combince sec|#num and <time_shift|period_shift> parameters into one.
 					if (array_key_exists('last', $data['params'])) {
+						if (array_key_exists('shift', $data['params'])) {
+							$shift = $data['params']['shift'];
+						}
+						elseif (array_key_exists('period_shift', $data['params'])) {
+							$shift = $data['params']['period_shift'];
+						}
+						else {
+							$shift = null;
+						}
+
 						array_unshift($data['params'], implode(':', array_filter([
 							$data['params']['last'],
-							array_key_exists('shift', $data['params']) ? $data['params']['shift'] : null
+							$shift
 						])));
-						unset($data['params']['last'], $data['params']['shift']);
+						unset($data['params']['last'], $data['params']['shift'], $data['params']['period_shift']);
+					}
+
+					$mask = '';
+					if ($function === 'bitand' && array_key_exists('mask', $data['params'])) {
+						$mask = $data['params']['mask'];
+						unset($data['params']['mask']);
 					}
 
 					$fn_params = rtrim(implode(',', $data['params']), ',');
@@ -748,6 +795,24 @@ class CControllerPopupTriggerExpr extends CController {
 							$item_host_data['host'],
 							$data['item_key'],
 							($fn_params === '') ? '' : ','.$fn_params,
+							$operator,
+							CTriggerExpression::quoteString($data['value'])
+						);
+					}
+					elseif ($function === 'bitand') {
+						$data['expression'] = sprintf('bitand(last(/%s/%s%s)%s)%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
+							($fn_params === '') ? '' : ','.$fn_params,
+							($mask === '') ? '' : ','.$mask,
+							$operator,
+							CTriggerExpression::quoteString($data['value'])
+						);
+					}
+					elseif ($function === 'length') {
+						$data['expression'] = sprintf('length(last(/%s/%s))%s%s',
+							$item_host_data['host'],
+							$data['item_key'],
 							$operator,
 							CTriggerExpression::quoteString($data['value'])
 						);
@@ -770,14 +835,17 @@ class CControllerPopupTriggerExpr extends CController {
 						// Validate trigger function.
 						$math_function_validator = new CMathFunctionValidator();
 						$trigger_function_validator = new CFunctionValidator();
-						$fn = $result->getTokens()[0];
+						$fn_data = [
+							'fn' => $result->getTokens()[0],
+							'value_type' => $data['itemValueType']
+						];
 						$error_msg = '';
 
-						if (!$math_function_validator->validate($fn)) {
+						if (!$math_function_validator->validate($fn_data)) {
 							$error_msg = $math_function_validator->getError();
 
-							if (!$trigger_function_validator->validate($fn)
-									|| $trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
+							if (!$trigger_function_validator->validate($fn_data)
+									|| !$trigger_function_validator->validateValueType($fn_data)) {
 								$error_msg = $trigger_function_validator->getError();
 							}
 							else {

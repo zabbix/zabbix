@@ -1143,7 +1143,7 @@ class CControllerPopupGeneric extends CController {
 			case 'item_prototypes':
 				$options += [
 					'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
-					'selectHosts' => ['name'],
+					'selectHosts' => ['name', 'host'],
 					'templated' => $this->hasInput('templated_hosts') ? true : null
 				];
 
