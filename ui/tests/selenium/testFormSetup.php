@@ -267,11 +267,12 @@ class testFormSetup extends CWebTest {
 		$timezones_field = $form->getField('Default time zone');
 		$timezones = $timezones_field->getOptions()->asText();
 		$this->assertEquals(426, count($timezones));
-		foreach (['System: (UTC+02:00) Europe/Riga', '(UTC+02:00) Europe/Riga'] as $timezone_value){
-			$this->assertContains($timezone_value, $timezones);
+		foreach (['System', 'Europe/Riga'] as $timezone_value) {
+			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
+			$this->assertContains($timezone, $timezones);
 		}
 		// Select a certain timezone.
-		$form->getField('Default time zone')->select('(UTC+02:00) Europe/Riga');
+		$form->getField('Default time zone')->select(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'));
 
 		// Check Default theme field.
 		$themes = $form->getField('Default theme');
