@@ -544,25 +544,24 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					$is_num = (array_key_exists(0, $params) && substr($params[0]->match, 0, 1) === '#');
+					$param_type = (!in_array($function, ['fuzzytime', 'nodata']) && $is_num)
+						? PARAM_TYPE_COUNTS
+						: PARAM_TYPE_TIME;
 
-					if (!in_array($function, ['fuzzytime', 'nodata']) && $is_num) {
-						$param_type = PARAM_TYPE_COUNTS;
-						$params[0]->match = substr($params[0]->match, 1);
+					$param_values = [];
+					foreach ($params as $i => $param) {
+						if ($param instanceof CFunctionParserResult) {
+							$param_values[] = $param->getFunctionTriggerQuery()->getValue();
+						}
+						elseif ($i == 0 && ($param instanceof CPeriodParserResult)) {
+							$param_values[] = $is_num ? substr($param->sec_num, 1) : $param->sec_num;
+							$param_values[] = $param->time_shift;
+						}
+						else {
+							$param_values[] = $param->getValue();
+						}
 					}
-					else {
-						$param_type = PARAM_TYPE_TIME;
-					}
-
-					$params = array_map(function ($param) {
-						return ($param instanceof CFunctionParserResult)
-							? $param->getFunctionTriggerQuery()->getValue()
-							: $param->getValue();
-					}, $params);
-
-					if (array_key_exists(0, $params) && ($column_pos = strpos($params[0], ':')) !== false) {
-						$params[] = substr($params[0], $column_pos + 1);
-						$params[0] = substr($params[0], 0, $column_pos);
-					}
+					$params = $param_values;
 
 					/*
 					 * Try to find an operator, a value and item.
