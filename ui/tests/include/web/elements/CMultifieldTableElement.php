@@ -450,7 +450,7 @@ class CMultifieldTableElement extends CTableElement {
 			$data = [$data];
 		}
 
-		// TODO: comment
+		// If the first row  already presents in multifield table no need to press Add.
 		$rows = $this->getRows()->count();
 		if (count($data) >= 1 && CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
 			if ($this->mapping === null) {
