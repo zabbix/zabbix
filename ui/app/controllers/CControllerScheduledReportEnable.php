@@ -36,7 +36,8 @@ class CControllerScheduledReportEnable extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS)) {
+		if (!$this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
+				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS)) {
 			return false;
 		}
 

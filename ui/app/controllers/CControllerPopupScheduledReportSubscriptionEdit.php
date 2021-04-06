@@ -92,7 +92,8 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
+			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
 	}
 
 	protected function doAction() {
