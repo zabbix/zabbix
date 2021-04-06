@@ -99,13 +99,10 @@
 			pattern = '';
 
 		for (var x in items) {
-			query = items[x].name;
+			query = items[x].query;
 			break;
 		}
-		if (query !== '') {
-			query = '/' + query.replace(': ', '/');
-		}
-		else {
+		if (query === '') {
 			return false;
 		}
 
@@ -178,13 +175,12 @@
 	$('#itemid').on('change', function(ev, ms) {
 		var query = '';
 		for (var x in ms.values.selected) {
-			query = ms.values.selected[x].name;
+			query = ms.values.selected[x].query;
 			break;
 		}
 
 		if (query !== '') {
 			$add_button.prop('disabled', false);
-			query = '/' + query.replace(': ', '/');
 		}
 		else {
 			$add_button.prop('disabled', true);
