@@ -356,6 +356,11 @@ class C52TriggerExpressionConverter extends CConverter {
 		];
 		$unquotable_parameters = in_array($fn_name, $functions_with_period_parameter) ? [0] : [];
 
+		// Time parameter don't need to be quoted for forecast() function.
+		if ($fn_name === 'forecast') {
+			$unquotable_parameters[] = 2;
+		}
+
 		array_walk($parameters, function (&$param, $i) use ($unquotable_parameters) {
 			if (in_array($i, $unquotable_parameters)) {
 				return;

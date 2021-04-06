@@ -522,9 +522,9 @@ class CFunctionValidator extends CValidator {
 		$is_sec_num_valid = ((!($mandat & 0x01) && $period === '')
 				|| $param->sec_num_contains_macros
 				|| $this->validateSecNum($period));
-		$is_time_shift_valid = ((!($mandat & 0x02) && $time_shift === '')
+		$is_time_shift_valid = ((!($mandat & 0x02) && ($time_shift === '' || $time_shift === null))
 				|| $param->time_shift_contains_macros
-				|| $this->validatePeriodShift($time_shift));
+				|| (!($mandat & 0x02) && $time_shift !== null && $this->validatePeriodShift($time_shift)));
 
 		return ($is_sec_num_valid && $is_time_shift_valid);
 	}
