@@ -28,6 +28,7 @@
 	var row_num = 0;
 	var userids = new Set();
 	var usrgrpids = new Set();
+	var allowed_edit = <?= json_encode($data['allowed_edit']) ?>;
 
 	var ReportSubscription = class {
 
@@ -70,7 +71,7 @@
 		createRecipientCell() {
 			const cell = document.createElement('td');
 			const icon = document.createElement('span');
-			const link = document.createElement('a');
+			let recipient;
 
 			if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
 				icon.classList.add('<?= ZBX_STYLE_ICON_USER ?>');
@@ -83,26 +84,33 @@
 				usrgrpids.add(this.data.recipientid);
 			}
 
-			link.innerHTML = this.data.recipient_name;
-			link.href = 'javascript:void(0);';
-			link.setAttribute('title', this.data.recipient_name);
-			link.addEventListener('click', (event) => {
-				const popup_options = Object.assign(this.data, {
-					edit: 1,
-					old_recipientid: this.data.recipientid,
-					userids: Array.from(userids),
-					usrgrpids: Array.from(usrgrpids)
+			if (allowed_edit) {
+				recipient = document.createElement('a');
+				recipient.href = 'javascript:void(0);';
+				recipient.addEventListener('click', (event) => {
+					const popup_options = Object.assign(this.data, {
+						edit: 1,
+						old_recipientid: this.data.recipientid,
+						userids: Array.from(userids),
+						usrgrpids: Array.from(usrgrpids)
+					});
+
+					if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
+						popup_options.exclude = recipient.parentNode.parentNode.querySelector('[name*=exclude]').value;
+					}
+
+					PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
 				});
+			}
+			else {
+				recipient = document.createElement('span');
+			}
 
-				if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
-					popup_options.exclude = link.parentNode.parentNode.querySelector('[name*=exclude]').value;
-				}
-
-				PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
-			});
+			recipient.innerHTML = this.data.recipient_name;
+			recipient.setAttribute('title', this.data.recipient_name);
 
 			cell.appendChild(icon);
-			cell.appendChild(link);
+			cell.appendChild(recipient);
 			cell.appendChild(this.createHiddenInput('[recipientid]', this.data.recipientid));
 			cell.appendChild(this.createHiddenInput('[recipient_type]', this.data.recipient_type));
 			cell.appendChild(this.createHiddenInput('[recipient_name]', this.data.recipient_name));
@@ -138,36 +146,41 @@
 				return cell;
 			}
 
-			const link = document.createElement('a');
+			let status;
 
-			link.href = 'javascript:void(0);';
-			link.classList.add('<?= ZBX_STYLE_LINK_ACTION ?>');
+			if (allowed_edit) {
+				status = document.createElement('a');
+				status.href = 'javascript:void(0);';
+				status.classList.add('<?= ZBX_STYLE_LINK_ACTION ?>');
+				status.addEventListener('click', (event) => {
+					const input = status.parentNode.querySelector('[name*=exclude]');
 
-			if (this.data.exclude == <?= ZBX_REPORT_EXCLUDE_USER_FALSE ?>) {
-				link.innerHTML = <?= json_encode(_('Include')) ?>;
-				link.classList.add('<?= ZBX_STYLE_GREEN ?>');
+					if (input.value == <?= ZBX_REPORT_EXCLUDE_USER_TRUE ?>) {
+						status.innerHTML = <?= json_encode(_('Include')) ?>;
+						status.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
+						input.value = <?= ZBX_REPORT_EXCLUDE_USER_FALSE ?>
+					}
+					else {
+						status.innerHTML = <?= json_encode(_('Exclude')) ?>;
+						status.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
+						input.value = <?= ZBX_REPORT_EXCLUDE_USER_TRUE ?>
+					}
+				});
 			}
 			else {
-				link.innerHTML = <?= json_encode(_('Exclude')) ?>;
-				link.classList.add('<?= ZBX_STYLE_RED ?>');
+				status = document.createElement('span');
 			}
 
-			link.addEventListener('click', (event) => {
-				const input = link.parentNode.querySelector('[name*=exclude]');
+			if (this.data.exclude == <?= ZBX_REPORT_EXCLUDE_USER_FALSE ?>) {
+				status.innerHTML = <?= json_encode(_('Include')) ?>;
+				status.classList.add('<?= ZBX_STYLE_GREEN ?>');
+			}
+			else {
+				status.innerHTML = <?= json_encode(_('Exclude')) ?>;
+				status.classList.add('<?= ZBX_STYLE_RED ?>');
+			}
 
-				if (input.value == <?= ZBX_REPORT_EXCLUDE_USER_TRUE ?>) {
-					link.innerHTML = <?= json_encode(_('Include')) ?>;
-					link.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
-					input.value = <?= ZBX_REPORT_EXCLUDE_USER_FALSE ?>
-				}
-				else {
-					link.innerHTML = <?= json_encode(_('Exclude')) ?>;
-					link.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
-					input.value = <?= ZBX_REPORT_EXCLUDE_USER_TRUE ?>
-				}
-			});
-
-			cell.appendChild(link);
+			cell.appendChild(status);
 			cell.appendChild(this.createHiddenInput('[exclude]', this.data.exclude));
 
 			return cell;
@@ -180,16 +193,22 @@
 			btn.type = 'button';
 			btn.classList.add('<?= ZBX_STYLE_BTN_LINK ?>');
 			btn.innerHTML = <?= json_encode(_('Remove')) ?>;
-			btn.addEventListener('click', () => {
-				if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
-					userids.delete(this.data.recipientid);
-				}
-				else {
-					usrgrpids.delete(this.data.recipientid);
-				}
 
-				this.row.remove();
-			});
+			if (allowed_edit) {
+				btn.addEventListener('click', () => {
+					if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
+						userids.delete(this.data.recipientid);
+					}
+					else {
+						usrgrpids.delete(this.data.recipientid);
+					}
+
+					this.row.remove();
+				});
+			}
+			else {
+				btn.setAttribute('disabled', 'disabled');
+			}
 
 			cell.appendChild(btn);
 
@@ -245,6 +264,8 @@
 
 	subscriptions.forEach((subscription) => new ReportSubscription(subscription));
 
-	ReportSubscription.initializeNewUserPopup();
-	ReportSubscription.initializeNewUserGroupPopup();
+	if (allowed_edit) {
+		ReportSubscription.initializeNewUserPopup();
+		ReportSubscription.initializeNewUserGroupPopup();
+	}
 </script>

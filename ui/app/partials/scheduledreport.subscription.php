@@ -59,5 +59,6 @@ $table = (new CTable())
 	->show();
 
 $this->includeJsFile('scheduledreport.subscription.js.php', [
+	'allowed_edit' => $data['allowed_edit'],
 	'subscriptions' => $data['subscriptions']
 ]);
