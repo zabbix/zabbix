@@ -1194,7 +1194,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 			char	info[MAX_STRING_LEN];
 
 			zbx_snprintf(info, sizeof(info), "Cannot calculate report start time: %s", zbx_strerror(errno));
-			rm_update_report(manager, report, FAIL, info);
+			rm_update_report(manager, report, ZBX_REPORT_STATE_ERROR, info);
 
 			if (0 != report->nextcheck)
 				zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
@@ -2081,7 +2081,7 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 		if (FAIL == ret)
 		{
 			report->nextcheck = 0;
-			rm_update_report(manager, report, FAIL, error);
+			rm_update_report(manager, report, ZBX_REPORT_STATE_ERROR, error);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process report: %s", error);
 			zbx_free(error);
@@ -2308,9 +2308,9 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_test_report                                                   *
+ * Function: rm_process_result                                                *
  *                                                                            *
- * Purpose: test report                                                       *
+ * Purpose: process report result message                                     *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
  *             client  - [IN] the connected writer                            *
