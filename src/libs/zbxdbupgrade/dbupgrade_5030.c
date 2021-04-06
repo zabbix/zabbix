@@ -2307,12 +2307,14 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 		{
 			const char	*pattern = function->parameter + params.values[1].l;
 
-			if (3 <= params.values_num && '\0' != *(op = function->parameter + params.values[2].l))
+			if (3 <= params.values_num && '\0' != function->parameter[params.values[2].l])
 			{
 				op = zbx_substr_unquote(function->parameter, params.values[2].l, params.values[2].r);
 
 				if (0 == strcmp(op, "band"))
 					op = zbx_strdup(op, "bitand");
+				else if ('\0' == *op)
+					zbx_free(op);
 			}
 
 			/* set numeric pattern type for numeric items and numeric operators unless */
