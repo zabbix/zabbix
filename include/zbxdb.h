@@ -178,7 +178,7 @@ typedef enum
 	DB_VERSION_LOWER_THAN_MINIMUM,
 	DB_VERSION_HIGHER_THAN_MAXIMUM,
 	DB_VERSION_FAILED_TO_RETRIEVE
-} db_version_status_t;
+} zbx_db_version_status_t;
 
 zbx_uint32_t	zbx_dbms_version_get(void);
 zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json);
