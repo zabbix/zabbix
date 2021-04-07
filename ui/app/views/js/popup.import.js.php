@@ -54,10 +54,7 @@ function confirmSubmit(overlay) {
 }
 
 function submitPopup(overlay) {
-	const form = document.querySelector('#import-form');
-	const source = form.querySelector('#rules_preset').value;
-
-	if (source === "template") {
+	if (document.getElementById('rules_preset').value === "template") {
 		return openImportComparePopup(overlay);
 	}
 	else {
@@ -66,35 +63,29 @@ function submitPopup(overlay) {
 }
 
 function submitImportPopup(overlay) {
-	const form = document.querySelector('#import-form');
-	const file = form.querySelector('#import_file');
-	const formData = new FormData();
-
 	// Remove error message.
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-	// Append import file.
-	formData.append('import_file', file.files.length ? file.files[0] : '');
+	const form = document.getElementById('import-form');
+	const file = form.getElementById('import_file');
 
-	// Append all checkboxes to form.
-	[...form.querySelectorAll('input[type=checkbox]:checked, input[type=hidden]')].map(
-		(elem) => formData.append(elem.name, elem.value)
-	);
-
-	url = new Curl('zabbix.php', false),
+	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import');
 	url.setArgument('output', 'ajax');
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		body: formData
+		body: {
+			...new FormData(form),
+			import_file: file.files.length ? file.files[0] : ''
+		}
 	})
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
+			file.value = '';
 			overlay.unsetLoading();
 			$(response.errors).insertBefore(form);
-			form.querySelector('#import_file').value = '';
 		}
 		else {
 			postMessageOk(response['title']);
@@ -108,35 +99,29 @@ function submitImportPopup(overlay) {
 }
 
 function openImportComparePopup(overlay) {
-	const form = document.querySelector('#import-form');
-	const file = form.querySelector('#import_file');
-	const formData = new FormData();
-
 	// Remove error message.
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-	// Append import file.
-	formData.append('import_file', file.files.length ? file.files[0] : '');
-	formData.append('parent_overlayid', overlay.dialogueid);
+	const form = document.getElementById('import-form');
+	const file = form.getElementById('import_file');
 
-	// Append all checkboxes to form.
-	[...form.querySelectorAll('input[type=checkbox]:checked, input[type=hidden]')].map(
-		(elem) => formData.append(elem.name, elem.value)
-	);
-
-	url = new Curl('zabbix.php', false),
+	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import.compare');
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		body: formData
+		body: {
+			...new FormData(form),
+			import_file: file.files.length ? file.files[0] : '',
+			parent_overlayid: overlay.dialogueid
+		}
 	})
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
+			file.value = '';
 			overlay.unsetLoading();
 			$(response.errors).insertBefore(form);
-			form.querySelector('#import_file').value = '';
 		}
 		else {
 			overlayDialogue({
