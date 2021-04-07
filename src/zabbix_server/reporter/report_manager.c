@@ -1037,7 +1037,7 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
  *             now    - [IN] the current  time                                *
  *                                                                            *
  * Return value: SUCCEED - the report is active                               *
- *               FAIL    - otherwise                                         *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	rm_is_report_active(const zbx_rm_report_t *report, int now)
@@ -1049,6 +1049,44 @@ static int	rm_is_report_active(const zbx_rm_report_t *report, int now)
 		return FAIL;
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_dequeue_report                                                *
+ *                                                                            *
+ * Purpose: remove report from queue if it was queued                         *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *             report  - [IN] the report                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_dequeue_report(zbx_rm_t *manager, zbx_rm_report_t *report)
+{
+	if (0 != report->nextcheck)
+	{
+		zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
+		report->nextcheck = 0;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rm_dequeue_report                                                *
+ *                                                                            *
+ * Purpose: remove report from queue if it was queued                         *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *             report  - [IN] the report                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_dequeue_report(zbx_rm_t *manager, zbx_rm_report_t *report)
+{
+	if (0 != report->nextcheck)
+	{
+		zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
+		report->nextcheck = 0;
+	}
 }
 
 /******************************************************************************
@@ -1154,11 +1192,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 
 		if (ZBX_REPORT_STATUS_DISABLED == report->status)
 		{
-			if (0 != report->nextcheck)
-			{
-				zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
-				report->nextcheck = 0;
-			}
+			rm_dequeue_report(manager, report);
 			continue;
 		}
 
@@ -1182,11 +1216,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 						zbx_binary_heap_insert(&manager->report_queue, &elem);
 				}
 				else
-				{
-					if (0 != report->nextcheck)
-						zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
-					report->nextcheck = 0;
-				}
+					rm_dequeue_report(manager, report);
 			}
 		}
 		else
@@ -1195,9 +1225,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 
 			zbx_snprintf(info, sizeof(info), "Cannot calculate report start time: %s", zbx_strerror(errno));
 			rm_update_report(manager, report, ZBX_REPORT_STATE_ERROR, info);
-
-			if (0 != report->nextcheck)
-				zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
+			rm_dequeue_report(manager, report);
 		}
 	}
 	DBfree_result(result);
@@ -2053,6 +2081,7 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 			break;
 
 		zbx_binary_heap_remove_min(&manager->report_queue);
+		report->nextcheck = 0;
 
 		if (SUCCEED == (ret = rm_report_create_jobs(manager, report, now, &error)))
 		{
@@ -2067,8 +2096,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 					jobs_num++;
 				}
-				else
-					report->nextcheck = 0;
 			}
 			else
 			{
@@ -2080,7 +2107,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 		if (FAIL == ret)
 		{
-			report->nextcheck = 0;
 			rm_update_report(manager, report, ZBX_REPORT_STATE_ERROR, error);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process report: %s", error);
