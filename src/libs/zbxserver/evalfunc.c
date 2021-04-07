@@ -424,7 +424,7 @@ out:
 #define OP_LIKE		6
 #define OP_REGEXP	7
 #define OP_IREGEXP	8
-#define OP_BAND		9
+#define OP_BITAND		9
 #define OP_MAX		10
 
 static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t pattern, zbx_uint64_t mask)
@@ -455,7 +455,7 @@ static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t 
 			if (value <= pattern)
 				(*count)++;
 			break;
-		case OP_BAND:
+		case OP_BITAND:
 			if ((value & mask) == pattern)
 				(*count)++;
 	}
@@ -627,7 +627,7 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 	else if (0 == strcmp(arg3, "iregexp"))
 		op = OP_IREGEXP;
 	else if (0 == strcmp(arg3, "band"))
-		op = OP_BAND;
+		op = OP_BITAND;
 
 	if (OP_UNKNOWN == op)
 	{
@@ -652,14 +652,14 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 			goto out;
 		}
 
-		if (OP_BAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		if (OP_BITAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
 			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting float values",
 					arg3);
 			goto out;
 		}
 
-		if (OP_BAND == op && NULL != (arg2_2 = strchr(arg2, '/')))
+		if (OP_BITAND == op && NULL != (arg2_2 = strchr(arg2, '/')))
 		{
 			*arg2_2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
 			arg2_2++;	/* start of the 2nd part of the 2nd parameter (mask) */
@@ -669,7 +669,7 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 		{
 			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			{
-				if (OP_BAND != op)
+				if (OP_BITAND != op)
 				{
 					if (SUCCEED != str2uint64(arg2, ZBX_UNIT_SYMBOLS, &arg2_ui64))
 					{
@@ -834,7 +834,7 @@ out:
 #undef OP_LIKE
 #undef OP_REGEXP
 #undef OP_IREGEXP
-#undef OP_BAND
+#undef OP_BITAND
 #undef OP_MAX
 
 /******************************************************************************
