@@ -1039,7 +1039,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	page.data = NULL;
+	memset(&page, 0, sizeof(zbx_httppage_t));
 
 	if (0 != curl_global_init(CURL_GLOBAL_ALL))
 	{
@@ -1066,7 +1066,6 @@ void	zbx_elastic_version_extract(struct zbx_json *json)
 		goto clean;
 	}
 
-	memset(&page, 0, sizeof(zbx_httppage_t));
 	*errbuf = '\0';
 
 	if (CURLE_OK != (err = curl_easy_perform(handle)))
