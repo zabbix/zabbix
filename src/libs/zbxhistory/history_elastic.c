@@ -1032,7 +1032,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json)
 	CURLcode			err;
 	CURLoption			opt;
 	CURL				*handle;
-	size_t				version_len;
+	size_t				version_len = 0;
 	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE];
 	int				flag, major_num, minor_num, increment_num, ret = FAIL;
 	zbx_uint32_t			version;
