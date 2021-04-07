@@ -904,11 +904,12 @@ void	DBflush_version_requirements(const char *version)
  ******************************************************************************/
 int	DBcheck_capabilities(zbx_uint32_t db_version)
 {
+	int	ret = SUCCEED;
 #ifdef HAVE_POSTGRESQL
 
 #define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
 #define MIN_TIMESCALEDB_VERSION			10500
-	int		timescaledb_version, ret = FAIL;
+	int		timescaledb_version;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -925,6 +926,8 @@ int	DBcheck_capabilities(zbx_uint32_t db_version)
 
 	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 		goto clean;
+
+	ret = FAIL;	/* In case of major upgrade, db_extension may be missing */
 
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
 	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > db_version)
@@ -955,8 +958,6 @@ clean:
 out:
 	DBclose();
 #else
-	int	ret = SUCCEED;
-
 	ZBX_UNUSED(db_version);
 #endif
 	return ret;
