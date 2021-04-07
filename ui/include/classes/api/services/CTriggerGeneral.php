@@ -1729,12 +1729,12 @@ abstract class CTriggerGeneral extends CApiService {
 
 			foreach ($expression_fields as $expr_field) {
 				if (array_key_exists($expr_field, $triggers_function_occurances[$tnum])) {
+					// Sort trigger function occurrences in reverse order by position.
 					usort($triggers_function_occurances[$tnum][$expr_field], function ($a, $b) {
-						return $a['pos'] <=> $b['pos'];
+						return $b['pos'] <=> $a['pos'];
 					});
 
-					for ($i = count($triggers_function_occurances[$tnum][$expr_field])-1; $i>=0; $i--) {
-						$occurance = $triggers_function_occurances[$tnum][$expr_field][$i];
+					foreach ($triggers_function_occurances[$tnum][$expr_field] as $occurance) {
 						$trigger[$expr_field] = substr_replace($trigger[$expr_field],
 							'{'.$triggers_functions[$tnum][$occurance['match']]['functionid'].'}', $occurance['pos'],
 							$occurance['length']
