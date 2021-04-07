@@ -37,16 +37,6 @@ INSTALL_TARGETS += install-zabbix.com/cmd/zabbix_web_service
 dist_sysconf_DATA += conf/zabbix_web_service.conf
 endif
 
-PLUGIN_CFG_POSTGRES = postgres.conf
-PLUGIN_CFG_ORACLE = oracle.conf
-PLUGIN_CFG_CEPH = ceph.conf
-PLUGIN_CFG_MYSQL = mysql.conf
-PLUGIN_CFG_MEMCACHED = memcached.conf
-PLUGIN_CFG_MONGODB = mongodb.conf
-PLUGIN_CFG_REDIS = redis.conf
-PLUGIN_CFG_SMART = smart.conf
-PLUGIN_CFG_DOCKER = docker.conf
-
 all: build
 
 zabbix.com/cmd/zabbix_agent2:
@@ -66,15 +56,20 @@ install-zabbix.com/cmd/zabbix_agent2:
 		go install -ldflags="${AGENT_GOLDFLAGS}" ${TARGETS}
 	$(MKDIR_P) "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@"
 	test -f "$(DESTDIR)@AGENT2_CONFIG_FILE@" || cp "conf/zabbix_agent2.conf" "$(DESTDIR)@AGENT2_CONFIG_FILE@"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_POSTGRES)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_POSTGRES)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_POSTGRES)"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_ORACLE)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_ORACLE)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_ORACLE)"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_CEPH)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_CEPH)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_CEPH)"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_MYSQL)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_MYSQL)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_MYSQL)"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_MEMCACHED)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_MEMCACHED)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_MEMCACHED)"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_MONGODB)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_MONGODB)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_MONGODB)"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_REDIS)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_REDIS)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_REDIS)"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_SMART)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_SMART)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_SMART)"
-	test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_DOCKER)" || cp "conf/zabbix_agent2.d/plugins.d/$(PLUGIN_CFG_DOCKER)" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$(PLUGIN_CFG_DOCKER)"
+	for cfg in \
+		postgres.conf \
+		oracle.conf \
+		ceph.conf \
+		mysql.conf \
+		memcached.conf \
+		mongodb.conf \
+		redis.conf \
+		smart.conf \
+		docker.conf; \
+	do \
+		test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$$cfg" || \
+		cp "conf/zabbix_agent2.d/plugins.d/$$cfg" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$$cfg"; \
+	done
 
 install-zabbix.com/cmd/zabbix_web_service:
 	GOBIN=${GOBIN} go install -ldflags="${WEBSERVICE_GOLDFLAGS}" zabbix.com/cmd/zabbix_web_service
