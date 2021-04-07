@@ -62,42 +62,6 @@ function submitPopup(overlay) {
 	}
 }
 
-function submitImportPopup(overlay) {
-	// Remove error message.
-	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
-	const form = document.getElementById('import-form');
-	const file_input = document.getElementById('import_file');
-	const form_data = new FormData(form);
-
-	form_data.append('import_file', file_input.files.length ? file_input.files[0] : '');
-
-	const url = new Curl('zabbix.php', false);
-	url.setArgument('action', 'popup.import');
-	url.setArgument('output', 'ajax');
-
-	fetch(url.getUrl(), {
-		method: 'post',
-		body: form_data
-	})
-	.then((response) => response.json())
-	.then((response) => {
-		if ('errors' in response) {
-			file_input.value = '';
-			overlay.unsetLoading();
-			$(response.errors).insertBefore(form);
-		}
-		else {
-			postMessageOk(response['title']);
-			if ('messages' in response) {
-				postMessageDetails('success', response.messages);
-			}
-			overlayDialogueDestroy(overlay.dialogueid);
-			location.href = location.href;
-		}
-	});
-}
-
 function openImportComparePopup(overlay) {
 	// Remove error message.
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
@@ -134,6 +98,42 @@ function openImportComparePopup(overlay) {
 			}, overlay.$btn_submit);
 
 			overlay.unsetLoading();
+		}
+	});
+}
+
+function submitImportPopup(overlay) {
+	// Remove error message.
+	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
+	const form = document.getElementById('import-form');
+	const file_input = document.getElementById('import_file');
+	const form_data = new FormData(form);
+
+	form_data.append('import_file', file_input.files.length ? file_input.files[0] : '');
+
+	const url = new Curl('zabbix.php', false);
+	url.setArgument('action', 'popup.import');
+	url.setArgument('output', 'ajax');
+
+	fetch(url.getUrl(), {
+		method: 'post',
+		body: form_data
+	})
+	.then((response) => response.json())
+	.then((response) => {
+		if ('errors' in response) {
+			file_input.value = '';
+			overlay.unsetLoading();
+			$(response.errors).insertBefore(form);
+		}
+		else {
+			postMessageOk(response['title']);
+			if ('messages' in response) {
+				postMessageDetails('success', response.messages);
+			}
+			overlayDialogueDestroy(overlay.dialogueid);
+			location.href = location.href;
 		}
 	});
 }
