@@ -291,7 +291,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ssl_cert_file' => getRequest('ssl_cert_file'),
 			'ssl_key_file' => getRequest('ssl_key_file'),
 			'ssl_key_password' => getRequest('ssl_key_password'),
-			'headers' => []
+			'headers' => [],
+			'tags' => $tags
 		];
 
 		foreach (getRequest('pairs', []) as $pair) {
@@ -316,8 +317,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$dbHttpTest = API::HttpTest()->get([
 				'httptestids' => $_REQUEST['httptestid'],
 				'output' => API_OUTPUT_EXTEND,
-				'selectSteps' => API_OUTPUT_EXTEND,
-				'selectTags' => ['tag', 'value']
+				'selectSteps' => API_OUTPUT_EXTEND
 			]);
 			$dbHttpTest = reset($dbHttpTest);
 			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
@@ -376,12 +376,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$httpTest['httptestid'] = $httpTestId = $_REQUEST['httptestid'];
 
-			CArrayHelper::sort($dbHttpTest['tags'], ['tag', 'value']);
-			CArrayHelper::sort($tags, ['tag', 'value']);
-			if (array_values($dbHttpTest['tags']) !== array_values($tags)) {
-				$httpTest['tags'] = $tags;
-			}
-
 			$result = API::HttpTest()->update($httpTest);
 			if (!$result) {
 
@@ -396,8 +390,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($step['httptestid'], $step['httpstepid']);
 			}
 			unset($step);
-
-			$httpTest['tags'] = $tags;
 
 			$result = API::HttpTest()->create($httpTest);
 			if (!$result) {

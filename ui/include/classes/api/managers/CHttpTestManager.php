@@ -1223,43 +1223,42 @@ class CHttpTestManager {
 	protected static function updateItemsTags(array $tags, array $stepitemids): void {
 		// Select tags from database.
 		$db_tags_raw = DB::select('item_tag', [
-			'output' => ['itemtagid', 'tag', 'value'],
+			'output' => ['itemtagid', 'tag', 'value', 'itemid'],
 			'filter' => ['itemid' => $stepitemids]
 		]);
 		$db_tags = [];
 		foreach ($db_tags_raw as $tag) {
-			$key = json_encode([$tag['tag'], $tag['value']]);
-			if (!array_key_exists($key, $db_tags)) {
-				$db_tags[$key] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value'],
-					'itemtagids' => []
-				];
-			}
-			$db_tags[$key]['itemtagids'][] = $tag['itemtagid'];
+			$db_tags[$tag['itemid']][$tag['tag']][$tag['value']] = $tag['itemtagid'];
 		}
 
-		// Find which tags must be added/deleted.
-		foreach ($db_tags as $del_tag_key => $tag_delete) {
-			foreach ($tags as $new_tag_key => $tag_add) {
-				if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
-					unset($db_tags[$del_tag_key], $tags[$new_tag_key]);
-					continue 2;
+		// Make array with new tags.
+		$item_tags_add = array_fill_keys($stepitemids, $tags);
+
+		// Unset tags which don't need to add/delete.
+		foreach ($db_tags as $stepitemid => $item_tags_del) {
+			foreach ($item_tags_add[$stepitemid] as $new_tag_key => $tag_add) {
+				if (array_key_exists($tag_add['tag'], $item_tags_del)
+						&& array_key_exists($tag_add['value'], $item_tags_del[$tag_add['tag']])) {
+					unset($item_tags_add[$stepitemid][$new_tag_key], $db_tags[$stepitemid][$tag_add['tag']]);
 				}
 			}
 		}
 
+		// Delete tags.
 		$del_tagids = [];
 		foreach ($db_tags as $db_tag) {
-			$del_tagids = array_merge($del_tagids, $db_tag['itemtagids']);
+			foreach ($db_tag as $db_tagids) {
+				$del_tagids = array_merge($del_tagids, array_values($db_tagids));
+			}
 		}
 		if ($del_tagids) {
 			DB::delete('item_tag', ['itemtagid' => $del_tagids]);
 		}
 
+		// Add new tags.
 		$new_tags = [];
-		foreach ($tags as $tag) {
-			foreach ($stepitemids as $stepitemid) {
+		foreach ($item_tags_add as $stepitemid => $tags) {
+			foreach ($tags as $tag) {
 				$tag['itemid'] = $stepitemid;
 				$new_tags[] = $tag;
 			}
