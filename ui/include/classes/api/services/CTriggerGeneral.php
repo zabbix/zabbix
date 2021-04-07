@@ -155,10 +155,8 @@ abstract class CTriggerGeneral extends CApiService {
 				foreach ($hosts_by_tpl_hostid[$tpl_hostid] as $host) {
 					// Replace template name in /host/key reference to target host name.
 					$new_trigger['expression'] = $tpl_trigger['expression'];
-					$queries = $expression_data->result->getTokensOfTypes([
-						CTriggerExprParserResult::TOKEN_TYPE_QUERY
-					]);
-					for ($i = count($queries)-1; $i >= 0; $i--) {
+					$queries = $expression_data->result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_QUERY]);
+					for ($i = count($queries) - 1; $i >= 0; $i--) {
 						$new_trigger['expression'] = substr_replace($new_trigger['expression'],
 							'/'.$host['host'].'/'.$queries[$i]->item, $queries[$i]->pos, $queries[$i]->length
 						);
@@ -166,14 +164,12 @@ abstract class CTriggerGeneral extends CApiService {
 
 					if ($tpl_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 						$new_trigger['recovery_expression'] = $tpl_trigger['recovery_expression'];
-
 						$queries = $recovery_expression_data->result->getTokensOfTypes([
 							CTriggerExprParserResult::TOKEN_TYPE_QUERY
 						]);
-						for ($i = count($queries)-1; $i >= 0; $i--) {
-							$new_trigger['recovery_expression'] = substr_replace(
-								$new_trigger['recovery_expression'], '/'.$host['host'].'/'.$queries[$i]->item,
-								$queries[$i]->pos, $queries[$i]->length
+						for ($i = count($queries) - 1; $i >= 0; $i--) {
+							$new_trigger['recovery_expression'] = substr_replace($new_trigger['recovery_expression'],
+								'/'.$host['host'].'/'.$queries[$i]->item, $queries[$i]->pos, $queries[$i]->length
 							);
 						}
 					}
@@ -427,10 +423,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 					// Replace template name in /host/key reference to target host name.
 					$expression = $tpl_trigger['expression'];
-					$queries = $expression_data->result->getTokensOfTypes([
-						CTriggerExprParserResult::TOKEN_TYPE_QUERY
-					]);
-					for ($i = count($queries)-1; $i >= 0; $i--) {
+					$queries = $expression_data->result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_QUERY]);
+					for ($i = count($queries) - 1; $i >= 0; $i--) {
 						$expression = substr_replace($expression, '/'.$chd_trigger['host'].'/'.$queries[$i]->item,
 							$queries[$i]->pos, $queries[$i]->length
 						);
@@ -445,7 +439,7 @@ abstract class CTriggerGeneral extends CApiService {
 						$queries = $recovery_expression_data->result->getTokensOfTypes([
 							CTriggerExprParserResult::TOKEN_TYPE_QUERY
 						]);
-						for ($i = count($queries)-1; $i >= 0; $i--) {
+						for ($i = count($queries) - 1; $i >= 0; $i--) {
 							$recovery_expression = substr_replace($recovery_expression,
 								'/'.$chd_trigger['host'].'/'.$queries[$i]->item, $queries[$i]->pos, $queries[$i]->length
 							);
@@ -1406,14 +1400,13 @@ abstract class CTriggerGeneral extends CApiService {
 		foreach ($triggers as $tnum => $trigger) {
 			$expressions_changed = ($db_triggers === null
 				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
-					|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']));
+				|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']));
 
 			if (!$expressions_changed) {
 				continue;
 			}
 
 			$expressionData->parse($trigger['expression']);
-
 			foreach ($expressionData->result->getItemsGroupedByHosts() as $key => $host) {
 				if (array_key_exists($key, $hosts_keys)) {
 					$hosts_keys[$key]['keys'] += $host['keys'];
@@ -1425,7 +1418,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$expressionData->parse($trigger['recovery_expression']);
-
 				foreach ($expressionData->result->getItemsGroupedByHosts() as $key => $host) {
 					if (array_key_exists($key, $hosts_keys)) {
 						$hosts_keys[$key]['keys'] += $host['keys'];
@@ -1531,7 +1523,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$moved_triggers = [];
 		}
 
-		$triggers_function_occurances = [];
+		$triggers_function_occurrences = [];
 		foreach ($triggers as $tnum => &$trigger) {
 			$expressions_changed = ($db_triggers === null
 				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
@@ -1542,7 +1534,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$triggers_functions[$tnum] = [];
-			$triggers_function_occurances[$tnum] = [];
+			$triggers_function_occurrences[$tnum] = [];
 			if ($class === 'CTriggerPrototype') {
 				$lld_ruleids = [];
 			}
@@ -1566,6 +1558,7 @@ abstract class CTriggerGeneral extends CApiService {
 				// Validate functions of trigger expression. Colect trigger functions in $triggers_functions.
 				foreach ($expressionData->result->getFunctions() as $fn) {
 					$query = $fn->getFunctionTriggerQuery();
+
 					$fn_data = [
 						'fn' => $fn,
 						'value_type' => ($query !== null)
@@ -1620,7 +1613,7 @@ abstract class CTriggerGeneral extends CApiService {
 							];
 						}
 
-						$triggers_function_occurances[$tnum][$expr_field][] = [
+						$triggers_function_occurrences[$tnum][$expr_field][] = [
 							'match' => $fn->match,
 							'length' => $fn->length,
 							'pos' => $fn->pos
@@ -1706,7 +1699,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->validateMovedTriggers($moved_triggers);
 		}
 
-		$functions_num = array_sum(array_map(function ($funcs) {return count($funcs);}, $triggers_functions));
+		$functions_num = array_sum(array_map(function ($funcs) { return count($funcs); }, $triggers_functions));
 		$functionid = DB::reserveIds('functions', $functions_num);
 
 		$max_length = [
@@ -1716,9 +1709,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 		// Replace func(/host/item) macros with {<functionid>}.
 		foreach ($triggers as $tnum => &$trigger) {
-			$expressions_changed = $db_triggers === null
+			$expressions_changed = ($db_triggers === null
 				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
-				|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']);
+				|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']));
 
 			if (!$expressions_changed) {
 				continue;
@@ -1735,16 +1728,16 @@ abstract class CTriggerGeneral extends CApiService {
 				: ['expression'];
 
 			foreach ($expression_fields as $expr_field) {
-				if (array_key_exists($expr_field, $triggers_function_occurances[$tnum])) {
-					usort($triggers_function_occurances[$tnum][$expr_field], function ($a, $b) {
-						return $a['pos'] <=> $b['pos'];
+				if (array_key_exists($expr_field, $triggers_function_occurrences[$tnum])) {
+					// Sort trigger function occurrences in reverse order by position.
+					usort($triggers_function_occurrences[$tnum][$expr_field], function ($a, $b) {
+						return $b['pos'] <=> $a['pos'];
 					});
 
-					for ($i = count($triggers_function_occurances[$tnum][$expr_field])-1; $i>=0; $i--) {
-						$occurance = $triggers_function_occurances[$tnum][$expr_field][$i];
+					foreach ($triggers_function_occurrences[$tnum][$expr_field] as $occurrence) {
 						$trigger[$expr_field] = substr_replace($trigger[$expr_field],
-							'{'.$triggers_functions[$tnum][$occurance['match']]['functionid'].'}', $occurance['pos'],
-							$occurance['length']
+							'{'.$triggers_functions[$tnum][$occurrence['match']]['functionid'].'}', $occurrence['pos'],
+							$occurrence['length']
 						);
 					}
 				}

@@ -530,6 +530,7 @@ class CFunctionValidator extends CValidator {
 	 * Valid period shift can contain time range value with precision and multiple of an hour.
 	 *
 	 * @param mixed $param
+	 * @param int   $mandat
 	 *
 	 * @return bool
 	 */
@@ -546,7 +547,7 @@ class CFunctionValidator extends CValidator {
 			$period_shift = $param->time_shift;
 		}
 
-		if (($mandat & 0x01) && !$param->sec_num_contains_macros) {
+		if ((($mandat & 0x01) || $mandat !== '') && !$param->sec_num_contains_macros) {
 			$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
 			if ($simple_interval_parser->parse($period) != CParser::PARSE_SUCCESS) {
 				return false;
@@ -558,11 +559,11 @@ class CFunctionValidator extends CValidator {
 			}
 		}
 
-		if (!($mandat & 0x02) && $period_shift === null) {
+		if ((!($mandat & 0x02) && $period_shift === null) || $param->time_shift_contains_macros) {
 			return true;
 		}
-		elseif (($mandat & 0x02) && !$this->validateTrendPeriods($period, $period_shift)) {
-			return $this->isMacro($period_shift);
+		elseif (!$this->validateTrendPeriods($period, $period_shift)) {
+			return false;
 		}
 
 		return true;

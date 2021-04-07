@@ -2146,51 +2146,11 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Function: dbpatch_is_numeric_count_pattern                                 *
- *                                                                            *
- * Purpose: check if the pattern can be a numeric value for the specified     *
- *          operation                                                         *
- *                                                                            *
- * Parameters: op      - [IN] the operation                                   *
- *             pattern - [IN] the pattern                                     *
- *                                                                            *
- * Comments: The op and pattern parameters are pointers to trigger expression *
- *           substrings.                                                      *
- *                                                                            *
- ******************************************************************************/
-static int	dbpatch_is_numeric_count_pattern(const char *op, const char *pattern)
-{
-	if (NULL == op || '\0' == *op || 0 == strncmp(op, "eq", ZBX_CONST_STRLEN("eq")) ||
-			0 == strncmp(op, "ne", ZBX_CONST_STRLEN("ne")) ||
-			0 == strncmp(op, "gt", ZBX_CONST_STRLEN("gt")) ||
-			0 == strncmp(op, "ge", ZBX_CONST_STRLEN("ge")) ||
-			0 == strncmp(op, "lt", ZBX_CONST_STRLEN("lt")) ||
-			0 == strncmp(op, "le", ZBX_CONST_STRLEN("le")))
-	{
-		return SUCCEED;
-	}
-
-	if (0 == strncmp(op, "bitand", ZBX_CONST_STRLEN("bitand")))
-	{
-		const char	*ptr;
-
-		/* op was the next parameter after pattern in the count function - */
-		/* if the '/' is located beyond op, it's outside pattern           */
-		if (NULL == (ptr = strchr(pattern, '/')) || ptr >= op)
-			return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dbpatch_convert_function                                         *
  *                                                                            *
  * Purpose: convert function to new parameter syntax/order                    *
  *                                                                            *
  * Parameters: function   - [IN/OUT] the function to convert                  *
- *             value_type - [IN] the function item value type                 *
  *             replace    - [OUT] the replacement for {functionid} in the     *
  *                          expression                                        *
  *             functions  - [IN/OUT] the functions                            *
@@ -2199,8 +2159,7 @@ static int	dbpatch_is_numeric_count_pattern(const char *op, const char *pattern)
  *           added.                                                           *
  *                                                                            *
  ******************************************************************************/
-static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned char value_type,
-		char **replace, zbx_vector_ptr_t *functions)
+static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, zbx_vector_ptr_t *functions)
 {
 	zbx_vector_loc_t	params;
 	char			*parameter = NULL;
@@ -2300,13 +2259,10 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 	}
 	else if (0 == strcmp(function->name, "count"))
 	{
-		int	arg_type = ZBX_DBPATCH_ARG_STR;
 		char	*op = NULL;
 
 		if (2 <= params.values_num)
 		{
-			const char	*pattern = function->parameter + params.values[1].l;
-
 			if (3 <= params.values_num && '\0' != function->parameter[params.values[2].l])
 			{
 				op = zbx_substr_unquote(function->parameter, params.values[2].l, params.values[2].r);
@@ -2316,20 +2272,12 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, unsigned 
 				else if ('\0' == *op)
 					zbx_free(op);
 			}
-
-			/* set numeric pattern type for numeric items and numeric operators unless */
-			/* band operation pattern contains mask (separated by '/')                 */
-			if ((ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type) &&
-					SUCCEED == dbpatch_is_numeric_count_pattern(op, pattern))
-			{
-				arg_type = ZBX_DBPATCH_ARG_NUM;
-			}
 		}
 
 		dbpatch_convert_params(&parameter, function->parameter, &params,
 				ZBX_DBPATCH_ARG_HIST, 0, 3,
 				ZBX_DBPATCH_ARG_CONST_STR, op,
-				arg_type, 1,
+				ZBX_DBPATCH_ARG_STR, 1,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 
@@ -2415,7 +2363,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	zbx_vector_ptr_create(&trigger_functions);
 	zbx_vector_uint64_create(&hostids);
 
-	result = DBselect("select f.functionid,f.itemid,f.name,f.parameter,i.value_type,h.hostid"
+	result = DBselect("select f.functionid,f.itemid,f.name,f.parameter,h.hostid"
 			" from functions f"
 			" join items i"
 				" on f.itemid=i.itemid"
@@ -2427,13 +2375,11 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char		*replace = NULL;
-		unsigned char	value_type;
+		char	*replace = NULL;
 
 		ZBX_STR2UINT64(functionid, row[0]);
 		ZBX_STR2UINT64(itemid, row[1]);
-		ZBX_STR2UINT64(hostid, row[5]);
-		ZBX_STR2UCHAR(value_type, row[4]);
+		ZBX_STR2UINT64(hostid, row[4]);
 
 		if (0 == strcmp(row[2], "date") || 0 == strcmp(row[2], "dayofmonth") ||
 				0 == strcmp(row[2], "dayofweek") || 0 == strcmp(row[2], "now") ||
@@ -2455,7 +2401,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 		func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
 		zbx_vector_ptr_append(functions, func);
-		dbpatch_convert_function(func, value_type, &replace, functions);
+		dbpatch_convert_function(func, &replace, functions);
 
 		if (NULL != replace)
 		{
