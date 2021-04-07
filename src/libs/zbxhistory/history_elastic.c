@@ -1039,6 +1039,8 @@ void	zbx_elastic_version_extract(struct zbx_json *json)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	page.data = NULL;
+
 	if (0 != curl_global_init(CURL_GLOBAL_ALL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize cURL library");
