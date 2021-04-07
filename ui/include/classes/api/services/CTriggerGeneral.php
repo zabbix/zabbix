@@ -1523,7 +1523,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$moved_triggers = [];
 		}
 
-		$triggers_function_occurances = [];
+		$triggers_function_occurrences = [];
 		foreach ($triggers as $tnum => &$trigger) {
 			$expressions_changed = ($db_triggers === null
 				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
@@ -1534,7 +1534,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$triggers_functions[$tnum] = [];
-			$triggers_function_occurances[$tnum] = [];
+			$triggers_function_occurrences[$tnum] = [];
 			if ($class === 'CTriggerPrototype') {
 				$lld_ruleids = [];
 			}
@@ -1613,7 +1613,7 @@ abstract class CTriggerGeneral extends CApiService {
 							];
 						}
 
-						$triggers_function_occurances[$tnum][$expr_field][] = [
+						$triggers_function_occurrences[$tnum][$expr_field][] = [
 							'match' => $fn->match,
 							'length' => $fn->length,
 							'pos' => $fn->pos
@@ -1728,16 +1728,16 @@ abstract class CTriggerGeneral extends CApiService {
 				: ['expression'];
 
 			foreach ($expression_fields as $expr_field) {
-				if (array_key_exists($expr_field, $triggers_function_occurances[$tnum])) {
+				if (array_key_exists($expr_field, $triggers_function_occurrences[$tnum])) {
 					// Sort trigger function occurrences in reverse order by position.
-					usort($triggers_function_occurances[$tnum][$expr_field], function ($a, $b) {
+					usort($triggers_function_occurrences[$tnum][$expr_field], function ($a, $b) {
 						return $b['pos'] <=> $a['pos'];
 					});
 
-					foreach ($triggers_function_occurances[$tnum][$expr_field] as $occurance) {
+					foreach ($triggers_function_occurrences[$tnum][$expr_field] as $occurrence) {
 						$trigger[$expr_field] = substr_replace($trigger[$expr_field],
-							'{'.$triggers_functions[$tnum][$occurance['match']]['functionid'].'}', $occurance['pos'],
-							$occurance['length']
+							'{'.$triggers_functions[$tnum][$occurrence['match']]['functionid'].'}', $occurrence['pos'],
+							$occurrence['length']
 						);
 					}
 				}
