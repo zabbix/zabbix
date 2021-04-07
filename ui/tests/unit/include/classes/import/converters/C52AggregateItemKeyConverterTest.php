@@ -23,6 +23,12 @@ use PHPUnit\Framework\TestCase;
 
 class C52AggregateItemKeyConverterTest extends TestCase {
 
+	protected $converter;
+
+	public function setup() {
+		$this->converter = new C52AggregateItemKeyConverter();
+	}
+
 	public function dataProvider(): array {
 		return [
 			[
@@ -84,8 +90,6 @@ class C52AggregateItemKeyConverterTest extends TestCase {
 	 * @param $expected
 	 */
 	public function testConvert($key, $expected) {
-		$converter = new C52AggregateItemKeyConverter();
-
-		$this->assertEquals($expected, $converter->convert($key));
+		$this->assertEquals($expected, $this->converter->convert($key));
 	}
 }
