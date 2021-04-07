@@ -28,21 +28,20 @@ $page['type'] = PAGE_TYPE_JSON;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$severity_min = getRequest('severity_min');
-if (!zbx_ctype_digit($severity_min)) {
-	$severity_min = null;
-}
-$map_data = CMapHelper::get(getRequest('sysmapid'), ['severity_min' => $severity_min]);
+$options = [];
 
-if (hasRequest('uniqueid')) {
-	// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
-	foreach ($map_data['elements'] as &$element) {
-		$actions = json_decode($element['actions'], true);
-		$actions['data']['widget_uniqueid'] = getRequest('uniqueid');
-		$element['actions'] = json_encode($actions);
+if (hasRequest('severity_min')) {
+	$severity_min = getRequest('severity_min');
+	if (zbx_ctype_digit($severity_min)) {
+		$options['severity_min'] = $severity_min;
 	}
-	unset($element);
 }
+
+if (hasRequest('unique_id')) {
+	$options['unique_id'] = getRequest('unique_id');
+}
+
+$map_data = CMapHelper::get(getRequest('sysmapid'), $options);
 
 // No need to get all data.
 $options = [

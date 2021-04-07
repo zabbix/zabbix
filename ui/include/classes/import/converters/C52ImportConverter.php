@@ -96,7 +96,41 @@ class C52ImportConverter extends CConverter {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
 			}
 
+			if (array_key_exists('dashboards', $template)) {
+				$template['dashboards'] = self::convertTemplateDashboards($template['dashboards']);
+			}
+
 			$result[] = $template;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert template dashboards.
+	 *
+	 * @static
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	private static function convertTemplateDashboards(array $dashboards): array {
+		$result = [];
+
+		foreach ($dashboards as $dashboard) {
+			$dashboard_page = [];
+
+			if (array_key_exists('widgets', $dashboard)) {
+				$dashboard_page['widgets'] = $dashboard['widgets'];
+			}
+
+			$dashboard = [
+				'name' => $dashboard['name'],
+				'pages' => [$dashboard_page]
+			];
+
+			$result[] = $dashboard;
 		}
 
 		return $result;

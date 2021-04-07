@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	const HOST_ID = 40001;
-	const UPDATED_ID = 33800;
+	const UPDATED_ID = 133800;
 
 	public static $created_id;
 	public static $old_hash;

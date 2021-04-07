@@ -38,10 +38,6 @@ $scripts = [];
 $field = $fields[CWidgetFieldReference::FIELD_NAME];
 $form->addVar($field->getName(), $field->getValue());
 
-if ($field->getValue() === '') {
-	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
-}
-
 // Source.
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['source_type']),

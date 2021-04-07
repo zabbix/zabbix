@@ -111,38 +111,15 @@ class CMenuPopupHelper {
 			]
 		];
 
+		if (array_key_exists('unique_id', $selement)) {
+			$data['data']['unique_id'] = $selement['unique_id'];
+		}
+
 		if ($severity_min != TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 			$data['data']['severity_min'] = $severity_min;
 		}
 		if ($hostid != 0) {
 			$data['data']['hostid'] = $hostid;
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Prepare data for refresh time menu popup.
-	 *
-	 * @param string $widgetName
-	 * @param string $currentRate
-	 * @param bool   $multiplier   Multiplier or time mode.
-	 * @param array  $params       (optional) URL parameters.
-	 *
-	 * @return array
-	 */
-	public static function getRefresh($widgetName, $currentRate, $multiplier = false, array $params = []) {
-		$data = [
-			'type' => 'refresh',
-			'data' => [
-				'widgetName' => $widgetName,
-				'currentRate' => $currentRate,
-				'multiplier' => $multiplier ? '1' : '0'
-			]
-		];
-
-		if ($params) {
-			$data['data']['params'] = $params;
 		}
 
 		return $data;

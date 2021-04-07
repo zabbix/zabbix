@@ -39,8 +39,8 @@ class CControllerProfileUpdate extends CController {
 				case 'web.avail_report.filter.active':
 				case 'web.charts.filter.active':
 				case 'web.correlation.filter.active':
-				case 'web.dashbrd.filter.active':
-				case 'web.dashbrd.hostid':
+				case 'web.dashboard.filter.active':
+				case 'web.dashboard.hostid':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
 				case 'web.groups.filter.active':
@@ -64,15 +64,11 @@ class CControllerProfileUpdate extends CController {
 				case 'web.problem.filter.active':
 				case 'web.proxies.filter.active':
 				case 'web.scheduledreport.filter.active':
-				case 'web.screenconf.filter.active':
-				case 'web.screens.filter.active':
 				case 'web.scripts.filter.active':
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
 				case 'web.sidebar.mode':
-				case 'web.slideconf.filter.active':
-				case 'web.slides.filter.active':
 				case 'web.sysmapconf.filter.active':
 				case 'web.templates.filter.active':
 				case 'web.templates.graphs.filter.active':
@@ -91,8 +87,8 @@ class CControllerProfileUpdate extends CController {
 					$ret = true;
 					break;
 
-				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
-				case 'web.dashbrd.navtree.item.selected':
+				case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
+				case 'web.dashboard.widget.navtree.item.selected':
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
 					$ret = $this->hasInput('idx2');
@@ -122,7 +118,7 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			case 'web.latest.toggle':
 			case 'web.latest.toggle_other':
-			case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
+			case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));
 				}
@@ -133,7 +129,7 @@ class CControllerProfileUpdate extends CController {
 				}
 				break;
 
-			case 'web.dashbrd.navtree.item.selected':
+			case 'web.dashboard.widget.navtree.item.selected':
 				foreach ($this->getInput('idx2') as $idx2) {
 					CProfile::update($idx, $value_int, PROFILE_TYPE_INT, $idx2);
 				}

@@ -1698,20 +1698,28 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 					'dashboards' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'dashboard', 'rules' => [
 						'dashboard' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'widgets' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
-								'widget' =>					['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_TYPE],
-									'name' =>					['type' => XML_STRING, 'default' => ''],
-									'x' =>						['type' => XML_STRING, 'default' => '0'],
-									'y' =>						['type' => XML_STRING, 'default' => '0'],
-									'width' =>					['type' => XML_STRING, 'default' => '1'],
-									'height' =>					['type' => XML_STRING, 'default' => '2'],
-									'hide_header' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'fields' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'field', 'rules' => [
-										'field' =>					['type' => XML_ARRAY, 'rules' => [
-											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
-											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateWidgetFieldValue'], 'ex_rules' => [$this, 'getWidgetFieldValueExtendedRules']]
+							'display_period' =>				['type' => XML_STRING, 'default' => '30'],
+							'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
+								'page' =>						['type' => XML_ARRAY, 'rules' => [
+									'name' =>						['type' => XML_STRING, 'default' => ''],
+									'display_period' =>				['type' => XML_STRING, 'default' => '0'],
+									'widgets' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
+										'widget' =>						['type' => XML_ARRAY, 'rules' => [
+											'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_TYPE],
+											'name' =>						['type' => XML_STRING, 'default' => ''],
+											'x' =>							['type' => XML_STRING, 'default' => '0'],
+											'y' =>							['type' => XML_STRING, 'default' => '0'],
+											'width' =>						['type' => XML_STRING, 'default' => '1'],
+											'height' =>						['type' => XML_STRING, 'default' => '2'],
+											'hide_header' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+											'fields' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'field', 'rules' => [
+												'field' =>						['type' => XML_ARRAY, 'rules' => [
+													'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
+													'name' =>						['type' => XML_STRING | XML_REQUIRED],
+													'value' =>						['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateWidgetFieldValue'], 'ex_rules' => [$this, 'getWidgetFieldValueExtendedRules']]
+												]]
+											]]
 										]]
 									]]
 								]]
@@ -1795,36 +1803,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 								'host' =>					['type' => XML_STRING | XML_REQUIRED],
 								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]]
-						]]
-					]]
-				]]
-			]],
-			'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
-				'screen' =>					['type' => XML_ARRAY, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'hsize' =>					['type' => XML_STRING | XML_REQUIRED],
-					'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
-					'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
-						'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
-							// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_validate' method.
-							'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-							// The tag 'style' should be validated before the 'resource' because it is used in 'ex_validate' method.
-							'style' =>					['type' => XML_STRING | XML_REQUIRED],
-							'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
-							'width' =>					['type' => XML_STRING | XML_REQUIRED],
-							'height' =>					['type' => XML_STRING | XML_REQUIRED],
-							'x' =>						['type' => XML_STRING | XML_REQUIRED],
-							'y' =>						['type' => XML_STRING | XML_REQUIRED],
-							'colspan' =>				['type' => XML_STRING | XML_REQUIRED],
-							'rowspan' =>				['type' => XML_STRING | XML_REQUIRED],
-							'elements' =>				['type' => XML_STRING | XML_REQUIRED],
-							'valign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'halign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
-							'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
-							'url' =>					['type' => XML_STRING | XML_REQUIRED],
-							'application' =>			['type' => XML_STRING | XML_REQUIRED],
-							'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]]
 				]]
@@ -2097,73 +2075,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		}
 
 		return CXmlConstantValue::ORIGINAL_ERROR;
-	}
-
-	/**
-	 * Validate "screen_item/resource" tag.
-	 *
-	 * @param array|string $data         Import data.
-	 * @param array        $parent_data  Data's parent array.
-	 * @param string       $path         XML path.
-	 *
-	 * @throws Exception if the map element is invalid.
-	 *
-	 * @return array|string
-	 */
-	public function validateScreenItemResource($data, array $parent_data = null, $path) {
-		if (zbx_is_int($parent_data['resourcetype'])) {
-			switch ($parent_data['resourcetype']) {
-				case SCREEN_RESOURCE_GRAPH:
-				case SCREEN_RESOURCE_LLD_GRAPH:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>			['type' => XML_STRING | XML_REQUIRED],
-						'host' =>			['type' => XML_STRING | XML_REQUIRED]
-					]];
-					break;
-
-				case SCREEN_RESOURCE_CLOCK:
-					if ($parent_data['style'] != TIME_TYPE_HOST) {
-						return $data;
-					}
-					// break; is not missing here
-
-				case SCREEN_RESOURCE_SIMPLE_GRAPH:
-				case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-				case SCREEN_RESOURCE_PLAIN_TEXT:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'key' =>			['type' => XML_STRING | XML_REQUIRED],
-						'host' =>			['type' => XML_STRING | XML_REQUIRED]
-					]];
-					break;
-
-				case SCREEN_RESOURCE_MAP:
-				case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-				case SCREEN_RESOURCE_DATA_OVERVIEW:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>			['type' => XML_STRING | XML_REQUIRED]
-					]];
-					break;
-
-				case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>			['type' => XML_STRING]
-					]];
-					break;
-
-				case SCREEN_RESOURCE_HOST_TRIGGERS:
-					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'host' =>			['type' => XML_STRING]
-					]];
-					break;
-
-				default:
-					return $data;
-			}
-
-			$data = $this->doValidate($rules, $data, $path);
-		}
-
-		return $data;
 	}
 
 	/**

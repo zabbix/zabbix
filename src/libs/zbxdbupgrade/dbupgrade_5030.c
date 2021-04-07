@@ -21,6 +21,8 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "zbxalgo.h"
+#include "../zbxalgo/vectorimpl.h"
 
 /*
  * 5.4 development database patches
@@ -948,7 +950,2707 @@ static int	DBpatch_5030056(void)
 	return SUCCEED;
 }
 
+/* Patches and helper functions for ZBXNEXT-6368 */
+
+static int	is_valid_opcommand_type(const char *type_str, const char *scriptid)
+{
+#define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4	/* not used after upgrade */
+	unsigned int	type;
+
+	if (SUCCEED != is_uint31(type_str, &type))
+		return FAIL;
+
+	switch (type)
+	{
+		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+		case ZBX_SCRIPT_TYPE_IPMI:
+		case ZBX_SCRIPT_TYPE_SSH:
+		case ZBX_SCRIPT_TYPE_TELNET:
+			if (SUCCEED == DBis_null(scriptid))
+				return SUCCEED;
+			else
+				return FAIL;
+		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
+			if (FAIL == DBis_null(scriptid))
+				return SUCCEED;
+			else
+				return FAIL;
+		default:
+			return FAIL;
+	}
+#undef ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+}
+
+static int	validate_types_in_opcommand(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	if (NULL == (result = DBselect("select operationid,type,scriptid from opcommand")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'opcommand'", __func__);
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (SUCCEED != is_valid_opcommand_type(row[1], row[2]))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "%s(): invalid record in table \"opcommand\": operationid: %s"
+					" type: %s scriptid: %s", __func__, row[0], row[1],
+					(SUCCEED == DBis_null(row[2])) ? "value is NULL" : row[2]);
+			ret = FAIL;
+			break;
+		}
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 static int	DBpatch_5030057(void)
+{
+	return validate_types_in_opcommand();
+}
+
+static int	DBpatch_5030058(void)
+{
+	const ZBX_FIELD	field = {"scope", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030059(void)
+{
+	const ZBX_FIELD	field = {"port", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030060(void)
+{
+	const ZBX_FIELD	field = {"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030061(void)
+{
+	const ZBX_FIELD	field = {"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030062(void)
+{
+	const ZBX_FIELD	field = {"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030063(void)
+{
+	const ZBX_FIELD	field = {"publickey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030064(void)
+{
+	const ZBX_FIELD	field = {"privatekey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030065(void)
+{
+	const ZBX_FIELD	field = {"menu_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5030066 (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: set value for 'scripts' table column 'scope' for existing global  *
+ *          scripts                                                           *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ * Comments: 'scope' is set only for scripts which are NOT used in any action *
+ *           operation. Otherwise the 'scope' default value is used, no need  *
+ *           to modify it.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5030066(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update scripts set scope=%d"
+			" where scriptid not in ("
+			"select distinct scriptid"
+			" from opcommand"
+			" where scriptid is not null)", ZBX_SCRIPT_SCOPE_HOST))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static char	*zbx_rename_host_macros(const char *command)
+{
+	char	*p1, *p2, *p3, *p4, *p5, *p6, *p7;
+
+	p1 = string_replace(command, "{HOST.CONN}", "{HOST.TARGET.CONN}");
+	p2 = string_replace(p1, "{HOST.DNS}", "{HOST.TARGET.DNS}");
+	p3 = string_replace(p2, "{HOST.HOST}", "{HOST.TARGET.HOST}");
+	p4 = string_replace(p3, "{HOST.IP}", "{HOST.TARGET.IP}");
+	p5 = string_replace(p4, "{HOST.NAME}", "{HOST.TARGET.NAME}");
+	p6 = string_replace(p5, "{HOSTNAME}", "{HOST.TARGET.NAME}");
+	p7 = string_replace(p6, "{IPADDRESS}", "{HOST.TARGET.IP}");
+
+	zbx_free(p1);
+	zbx_free(p2);
+	zbx_free(p3);
+	zbx_free(p4);
+	zbx_free(p5);
+	zbx_free(p6);
+
+	return p7;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5030067 (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: rename some {HOST.*} macros to {HOST.TARGET.*} in existing global *
+ *          scripts which are used in actions                                 *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5030067(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	if (NULL == (result = DBselect("select scriptid,command"
+			" from scripts"
+			" where scriptid in (select distinct scriptid from opcommand where scriptid is not null)")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'scripts'", __func__);
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char	*command, *command_esc;
+		int	rc;
+
+		command_esc = DBdyn_escape_field("scripts", "command", (command = zbx_rename_host_macros(row[1])));
+
+		zbx_free(command);
+
+		rc = DBexecute("update scripts set command='%s' where scriptid=%s", command_esc, row[0]);
+
+		zbx_free(command_esc);
+
+		if (ZBX_DB_OK > rc)
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_split_name  (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: helper function to split script name into menu_path and name      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                name - [IN] old name                                        *
+ *           menu_path - [OUT] menu path part, must be deallocated by caller  *
+ *   name_without_path - [OUT] name, DO NOT deallocate in caller              *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_split_name(const char *name, char **menu_path, const char **name_without_path)
+{
+	char	*p;
+
+	if (NULL == (p = strrchr(name, '/')))
+		return;
+
+	/* do not split if '/' is found at the beginning or at the end */
+	if (name == p || '\0' == *(p + 1))
+		return;
+
+	*menu_path = zbx_strdup(*menu_path, name);
+
+	p = *menu_path + (p - name);
+	*p = '\0';
+	*name_without_path = p + 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_make_script_name_unique  (part of ZBXNEXT-6368)              *
+ *                                                                            *
+ * Purpose: helper function to assist in making unique script names           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *            name - [IN] proposed name, to be tried first                    *
+ *          suffix - [IN/OUT] numeric suffix to start from                    *
+ *     unique_name - [OUT] unique name, must be deallocated by caller         *
+ *                                                                            *
+ * Return value: SUCCEED - unique name found, FAIL - DB error                 *
+ *                                                                            *
+ * Comments: pass initial suffix=0 to get "script ABC", "script ABC 2",       *
+ *           "script ABC 3", ... .                                            *
+ *           Pass initial suffix=1 to get "script ABC 1", "script ABC 2",     *
+ *           "script ABC 3", ... .                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_make_script_name_unique(const char *name, int *suffix, char **unique_name)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql, *try_name = NULL, *try_name_esc = NULL;
+
+	while (1)
+	{
+		if (0 == *suffix)
+		{
+			try_name = zbx_strdup(NULL, name);
+			(*suffix)++;
+		}
+		else
+			try_name = zbx_dsprintf(try_name, "%s %d", name, *suffix);
+
+		(*suffix)++;
+
+		try_name_esc = DBdyn_escape_string(try_name);
+
+		sql = zbx_dsprintf(NULL, "select scriptid from scripts where name='%s'", try_name_esc);
+
+		zbx_free(try_name_esc);
+
+		if (NULL == (result = DBselectN(sql, 1)))
+		{
+			zbx_free(try_name);
+			zbx_free(sql);
+			zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'scripts'", __func__);
+			return FAIL;
+		}
+
+		zbx_free(sql);
+
+		if (NULL == (row = DBfetch(result)))
+		{
+			*unique_name = try_name;
+			DBfree_result(result);
+			return SUCCEED;
+		}
+
+		DBfree_result(result);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5030068 (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: split script name between 'menu_path' and 'name' columns for      *
+ *          existing global scripts                                           *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5030068(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	if (NULL == (result = DBselect("select scriptid,name"
+			" from scripts")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'scripts'", __func__);
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		const char	*scriptid = row[0];
+		const char	*name = row[1];
+		const char	*name_without_path;
+		char		*menu_path = NULL, *menu_path_esc = NULL;
+		char		*name_without_path_unique = NULL, *name_esc = NULL;
+		int		rc, suffix = 0;
+
+		zbx_split_name(name, &menu_path, &name_without_path);
+
+		if (NULL == menu_path)
+			continue;
+
+		if (SUCCEED != zbx_make_script_name_unique(name_without_path, &suffix, &name_without_path_unique))
+		{
+			zbx_free(menu_path);
+			ret = FAIL;
+			break;
+		}
+
+		menu_path_esc = DBdyn_escape_string(menu_path);
+		name_esc = DBdyn_escape_string(name_without_path_unique);
+
+		rc = DBexecute("update scripts set menu_path='%s',name='%s' where scriptid=%s",
+				menu_path_esc, name_esc, scriptid);
+
+		zbx_free(name_esc);
+		zbx_free(menu_path_esc);
+		zbx_free(name_without_path_unique);
+		zbx_free(menu_path);
+
+		if (ZBX_DB_OK > rc)
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+typedef struct
+{
+	char	*command;
+	char	*username;
+	char	*password;
+	char	*publickey;
+	char	*privatekey;
+	char	*type;
+	char	*execute_on;
+	char	*port;
+	char	*authtype;
+}
+zbx_opcommand_parts_t;
+
+typedef struct
+{
+	size_t		size;
+	char		*record;
+	zbx_uint64_t	scriptid;
+}
+zbx_opcommand_rec_t;
+
+ZBX_VECTOR_DECL(opcommands, zbx_opcommand_rec_t)
+ZBX_VECTOR_IMPL(opcommands, zbx_opcommand_rec_t)
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_pack_record (part of ZBXNEXT-6368)                           *
+ *                                                                            *
+ * Purpose: helper function, packs parts of remote command into one memory    *
+ *          chunk for efficient storing and comparing                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *           parts - [IN] structure with all remote command components        *
+ *   packed_record - [OUT] memory chunk with packed data. Must be deallocated *
+ *                   by caller.                                               *
+ *                                                                            *
+ * Return value: size of memory chunk with the packed remote command          *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	zbx_pack_record(const zbx_opcommand_parts_t *parts, char **packed_record)
+{
+	size_t	size;
+	char	*p, *p_end;
+
+	size = strlen(parts->command) + strlen(parts->username) + strlen(parts->password) + strlen(parts->publickey) +
+			strlen(parts->privatekey) + strlen(parts->type) + strlen(parts->execute_on) +
+			strlen(parts->port) + strlen(parts->authtype) + 9; /* 9 terminating '\0' bytes for 9 parts */
+
+	*packed_record = (char *)zbx_malloc(*packed_record, size);
+	p = *packed_record;
+	p_end = *packed_record + size;
+
+	p += zbx_strlcpy(p, parts->command, size) + 1;
+	p += zbx_strlcpy(p, parts->username, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->password, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->publickey, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->privatekey, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->type, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->execute_on, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->port, (size_t)(p_end - p)) + 1;
+	p += zbx_strlcpy(p, parts->authtype, (size_t)(p_end - p)) + 1;
+
+	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_duplicate (part of ZBXNEXT-6368)                       *
+ *                                                                            *
+ * Purpose: checking if this remote command is a new one or a duplicate one   *
+ *          and storing the assigned new global script id                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      opcommands - [IN] vector used for checking duplicates                 *
+ *           parts - [IN] structure with all remote command components        *
+ *           index - [OUT] index of vector element used to store information  *
+ *                   about the remote command (either a new one or            *
+ *                   an existing one)                                         *
+ *                                                                            *
+ * Return value: IS_NEW for new elements, IS_DUPLICATE for elements already   *
+ *               seen                                                         *
+ *                                                                            *
+ ******************************************************************************/
+#define IS_NEW		0
+#define IS_DUPLICATE	1
+
+static int	zbx_check_duplicate(zbx_vector_opcommands_t *opcommands,
+		const zbx_opcommand_parts_t *parts, int *index)
+{
+	char			*packed_record = NULL;
+	size_t			size;
+	zbx_opcommand_rec_t	elem;
+	int			i;
+
+	size = zbx_pack_record(parts, &packed_record);
+
+	for (i = 0; i < opcommands->values_num; i++)
+	{
+		if (size == opcommands->values[i].size &&
+				0 == memcmp(opcommands->values[i].record, packed_record, size))
+		{
+			zbx_free(packed_record);
+			*index = i;
+			return IS_DUPLICATE;
+		}
+	}
+
+	elem.size = size;
+	elem.record = packed_record;
+	elem.scriptid = 0;
+	zbx_vector_opcommands_append(opcommands, elem);
+	*index = opcommands->values_num - 1;
+
+	return IS_NEW;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5030069   (part of ZBXNEXT-6368)                         *
+ *                                                                            *
+ * Purpose: migrate remote commands from table 'opcommand' to table 'scripts' *
+ *          and convert them into global scripts                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5030069(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = SUCCEED, i, suffix = 1;
+	zbx_vector_opcommands_t	opcommands;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	zbx_vector_opcommands_create(&opcommands);
+
+	if (NULL == (result = DBselect("select command,username,password,publickey,privatekey,type,execute_on,port,"
+			"authtype,operationid"
+			" from opcommand"
+			" where scriptid is null"
+			" order by command,username,password,publickey,privatekey,type,execute_on,port,authtype")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'opcommand'", __func__);
+		zbx_vector_opcommands_destroy(&opcommands);
+
+		return FAIL;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char			*operationid;
+		int			index;
+		zbx_opcommand_parts_t	parts;
+
+		parts.command = row[0];
+		parts.username = row[1];
+		parts.password = row[2];
+		parts.publickey = row[3];
+		parts.privatekey = row[4];
+		parts.type = row[5];
+		parts.execute_on = row[6];
+		parts.port = row[7];
+		parts.authtype = row[8];
+		operationid = row[9];
+
+		if (IS_NEW == zbx_check_duplicate(&opcommands, &parts, &index))
+		{
+			char		*script_name = NULL, *script_name_esc;
+			char		*command_esc, *port_esc, *username_esc;
+			char		*password_esc, *publickey_esc, *privatekey_esc;
+			zbx_uint64_t	scriptid, type, execute_on, authtype, operationid_num;
+			int		rc;
+
+			if (SUCCEED != zbx_make_script_name_unique("Script", &suffix, &script_name))
+			{
+				ret = FAIL;
+				break;
+			}
+
+			scriptid = DBget_maxid("scripts");
+
+			ZBX_DBROW2UINT64(type, parts.type);
+			ZBX_DBROW2UINT64(execute_on, parts.execute_on);
+			ZBX_DBROW2UINT64(authtype, parts.authtype);
+			ZBX_DBROW2UINT64(operationid_num, operationid);
+
+			script_name_esc = DBdyn_escape_string(script_name);
+			command_esc = DBdyn_escape_string(parts.command);
+			port_esc = DBdyn_escape_string(parts.port);
+			username_esc = DBdyn_escape_string(parts.username);
+			password_esc = DBdyn_escape_string(parts.password);
+			publickey_esc = DBdyn_escape_string(parts.publickey);
+			privatekey_esc = DBdyn_escape_string(parts.privatekey);
+
+			zbx_free(script_name);
+
+			rc = DBexecute("insert into scripts (scriptid,name,command,description,type,execute_on,scope,"
+					"port,authtype,username,password,publickey,privatekey) values ("
+					ZBX_FS_UI64 ",'%s','%s',''," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',"
+					ZBX_FS_UI64 ",'%s','%s','%s','%s')",
+					scriptid, script_name_esc, command_esc, type, execute_on,
+					ZBX_SCRIPT_SCOPE_ACTION, port_esc, authtype,
+					username_esc, password_esc, publickey_esc, privatekey_esc);
+
+			zbx_free(privatekey_esc);
+			zbx_free(publickey_esc);
+			zbx_free(password_esc);
+			zbx_free(username_esc);
+			zbx_free(port_esc);
+			zbx_free(command_esc);
+			zbx_free(script_name_esc);
+
+			if (ZBX_DB_OK > rc || ZBX_DB_OK > DBexecute("update opcommand set scriptid=" ZBX_FS_UI64
+						" where operationid=" ZBX_FS_UI64, scriptid, operationid_num))
+			{
+				ret = FAIL;
+				break;
+			}
+
+			opcommands.values[index].scriptid = scriptid;
+		}
+		else	/* IS_DUPLICATE */
+		{
+			zbx_uint64_t	scriptid;
+
+			/* link to a previously migrated script */
+			scriptid = opcommands.values[index].scriptid;
+
+			if (ZBX_DB_OK > DBexecute("update opcommand set scriptid=" ZBX_FS_UI64
+					" where operationid=%s", scriptid, operationid))
+			{
+				ret = FAIL;
+				break;
+			}
+		}
+	}
+
+	DBfree_result(result);
+
+	for (i = 0; i < opcommands.values_num; i++)
+		zbx_free(opcommands.values[i].record);
+
+	zbx_vector_opcommands_destroy(&opcommands);
+
+	return ret;
+}
+#undef IS_NEW
+#undef IS_DUPLICATE
+
+static int	DBpatch_5030070(void)
+{
+	const ZBX_FIELD field = {"scriptid", NULL, "scripts","scriptid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("opcommand", &field);
+}
+
+static int	DBpatch_5030071(void)
+{
+	return DBdrop_field("opcommand", "execute_on");
+}
+
+static int	DBpatch_5030072(void)
+{
+	return DBdrop_field("opcommand", "port");
+}
+
+static int	DBpatch_5030073(void)
+{
+	return DBdrop_field("opcommand", "authtype");
+}
+
+static int	DBpatch_5030074(void)
+{
+	return DBdrop_field("opcommand", "username");
+}
+
+static int	DBpatch_5030075(void)
+{
+	return DBdrop_field("opcommand", "password");
+}
+
+static int	DBpatch_5030076(void)
+{
+	return DBdrop_field("opcommand", "publickey");
+}
+
+static int	DBpatch_5030077(void)
+{
+	return DBdrop_field("opcommand", "privatekey");
+}
+
+static int	DBpatch_5030078(void)
+{
+	return DBdrop_field("opcommand", "command");
+}
+
+static int	DBpatch_5030079(void)
+{
+	return DBdrop_field("opcommand", "type");
+}
+
+static int	DBpatch_5030080(void)
+{
+	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_remote_command", &field, &old_field);
+}
+/*  end of ZBXNEXT-6368 patches */
+
+static int	DBpatch_5030081(void)
+{
+	const ZBX_FIELD	field = {"display_period", "30", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dashboard", &field);
+}
+
+static int	DBpatch_5030082(void)
+{
+	const ZBX_FIELD	field = {"auto_start", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dashboard", &field);
+}
+
+static int	DBpatch_5030083(void)
+{
+	const ZBX_TABLE	table =
+			{"dashboard_page", "dashboard_pageid", 0,
+				{
+					{"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"display_period", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030084(void)
+{
+	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dashboard_page", 1, &field);
+}
+
+static int	DBpatch_5030085(void)
+{
+	return DBcreate_index("dashboard_page", "dashboard_page_1", "dashboardid", 0);
+}
+
+static int	DBpatch_5030086(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"insert into dashboard_page (dashboard_pageid,dashboardid)"
+			" select dashboardid,dashboardid from dashboard"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030087(void)
+{
+	const ZBX_FIELD	field = {"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	if (SUCCEED != DBadd_field("widget", &field))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030088(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update widget set dashboard_pageid=dashboardid"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030089(void)
+{
+	const ZBX_FIELD	field = {"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("widget", &field);
+}
+
+static int	DBpatch_5030090(void)
+{
+	return DBdrop_foreign_key("widget", 1);
+}
+
+static int	DBpatch_5030091(void)
+{
+	return DBdrop_field("widget", "dashboardid");
+}
+
+static int	DBpatch_5030092(void)
+{
+	return DBcreate_index("widget", "widget_1", "dashboard_pageid", 0);
+}
+
+static int	DBpatch_5030093(void)
+{
+	const ZBX_FIELD field = {"dashboard_pageid", NULL, "dashboard_page", "dashboard_pageid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget", 1, &field);
+}
+
+typedef struct
+{
+	uint64_t	screenitemid;
+	uint64_t	screenid;
+	int		resourcetype;
+	uint64_t	resourceid;
+	int		width;
+	int		height;
+	int		x;
+	int		y;
+	int		colspan;
+	int		rowspan;
+	int		elements;
+	int		style;
+	char		*url;
+	int		sort_triggers;
+	char		*application;
+	int		dynamic;
+}
+zbx_db_screen_item_t;
+
+typedef struct
+{
+	uint64_t	widget_fieldid;
+	int		type;
+	char		*name;
+	int		value_int;
+	char		*value_str;
+	uint64_t	value_itemid;
+	uint64_t	value_graphid;
+	uint64_t	value_groupid;
+	uint64_t	value_hostid;
+	uint64_t	value_sysmapid;
+}
+zbx_db_widget_field_t;
+
+typedef struct
+{
+	int	position;
+	int	span;
+	int	size;
+}
+zbx_screen_item_dim_t;
+
+typedef struct
+{
+	uint64_t	dashboardid;
+	char		*name;
+	uint64_t	userid;
+	int		private;
+	int		display_period;
+}
+zbx_db_dashboard_t;
+
+typedef struct
+{
+	uint64_t	dashboard_pageid;
+	uint64_t	dashboardid;
+	char		*name;
+}
+zbx_db_dashboard_page_t;
+
+typedef struct
+{
+	uint64_t	widgetid;
+	uint64_t	dashboardid;
+	char		*type;
+	char		*name;
+	int		x;
+	int		y;
+	int		width;
+	int		height;
+	int		view_mode;
+}
+zbx_db_widget_t;
+
+#define DASHBOARD_MAX_COLS			(24)
+#define DASHBOARD_MAX_ROWS			(64)
+#define DASHBOARD_WIDGET_MIN_ROWS		(2)
+#define DASHBOARD_WIDGET_MAX_ROWS		(32)
+#define SCREEN_MAX_ROWS				(100)
+#define SCREEN_MAX_COLS				(100)
+
+#undef SCREEN_RESOURCE_CLOCK
+#define SCREEN_RESOURCE_CLOCK			(7)
+#undef SCREEN_RESOURCE_GRAPH
+#define SCREEN_RESOURCE_GRAPH			(0)
+#undef SCREEN_RESOURCE_SIMPLE_GRAPH
+#define SCREEN_RESOURCE_SIMPLE_GRAPH		(1)
+#undef SCREEN_RESOURCE_LLD_GRAPH
+#define SCREEN_RESOURCE_LLD_GRAPH		(20)
+#undef SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+#define SCREEN_RESOURCE_LLD_SIMPLE_GRAPH	(19)
+#undef SCREEN_RESOURCE_PLAIN_TEXT
+#define SCREEN_RESOURCE_PLAIN_TEXT		(3)
+#undef SCREEN_RESOURCE_URL
+#define SCREEN_RESOURCE_URL			(11)
+
+#undef SCREEN_RESOURCE_MAP
+#define SCREEN_RESOURCE_MAP			(2)
+#undef SCREEN_RESOURCE_HOST_INFO
+#define SCREEN_RESOURCE_HOST_INFO		(4)
+#undef SCREEN_RESOURCE_TRIGGER_INFO
+#define SCREEN_RESOURCE_TRIGGER_INFO		(5)
+#undef SCREEN_RESOURCE_SERVER_INFO
+#define SCREEN_RESOURCE_SERVER_INFO		(6)
+#undef SCREEN_RESOURCE_TRIGGER_OVERVIEW
+#define SCREEN_RESOURCE_TRIGGER_OVERVIEW	(9)
+#undef SCREEN_RESOURCE_DATA_OVERVIEW
+#define SCREEN_RESOURCE_DATA_OVERVIEW		(10)
+#undef SCREEN_RESOURCE_ACTIONS
+#define SCREEN_RESOURCE_ACTIONS			(12)
+#undef SCREEN_RESOURCE_EVENTS
+#define SCREEN_RESOURCE_EVENTS			(13)
+#undef SCREEN_RESOURCE_HOSTGROUP_TRIGGERS
+#define SCREEN_RESOURCE_HOSTGROUP_TRIGGERS	(14)
+#undef SCREEN_RESOURCE_SYSTEM_STATUS
+#define SCREEN_RESOURCE_SYSTEM_STATUS		(15)
+#undef SCREEN_RESOURCE_HOST_TRIGGERS
+#define SCREEN_RESOURCE_HOST_TRIGGERS		(16)
+
+#define ZBX_WIDGET_FIELD_TYPE_INT32		(0)
+#define ZBX_WIDGET_FIELD_TYPE_STR		(1)
+#define ZBX_WIDGET_FIELD_TYPE_GROUP		(2)
+#define ZBX_WIDGET_FIELD_TYPE_HOST		(3)
+#define ZBX_WIDGET_FIELD_TYPE_ITEM		(4)
+#define ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE	(5)
+#define ZBX_WIDGET_FIELD_TYPE_GRAPH		(6)
+#define ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE	(7)
+#define ZBX_WIDGET_FIELD_TYPE_MAP		(8)
+
+/* #define ZBX_WIDGET_FIELD_RESOURCE_GRAPH				(0) */
+/* #define ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH			(1) */
+/* #define ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE		(2) */
+/* #define ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE	(3) */
+
+#define ZBX_WIDGET_TYPE_CLOCK			("clock")
+#define ZBX_WIDGET_TYPE_GRAPH_CLASSIC		("graph")
+#define ZBX_WIDGET_TYPE_GRAPH_PROTOTYPE		("graphprototype")
+#define ZBX_WIDGET_TYPE_PLAIN_TEXT		("plaintext")
+#define ZBX_WIDGET_TYPE_URL			("url")
+#define ZBX_WIDGET_TYPE_ACTIONS			("actionlog")
+#define ZBX_WIDGET_TYPE_DATA_OVERVIEW		("dataover")
+#define ZBX_WIDGET_TYPE_PROBLEMS		("problems")
+#define ZBX_WIDGET_TYPE_HOST_INFO		("hostavail")
+#define ZBX_WIDGET_TYPE_MAP			("map")
+#define ZBX_WIDGET_TYPE_SYSTEM_STATUS		("problemsbysv")
+#define ZBX_WIDGET_TYPE_SERVER_INFO		("systeminfo")
+#define ZBX_WIDGET_TYPE_TRIGGER_OVERVIEW	("trigover")
+
+#define POS_EMPTY	(127)
+#define POS_TAKEN	(1)
+
+ZBX_VECTOR_DECL(scitem_dim2, zbx_screen_item_dim_t)
+ZBX_VECTOR_IMPL(scitem_dim2, zbx_screen_item_dim_t)
+ZBX_VECTOR_DECL(char2, char)
+ZBX_VECTOR_IMPL(char2, char)
+
+#define SKIP_EMPTY(vector,index)	if (POS_EMPTY == vector->values[index]) continue
+
+#define COLLISIONS_MAX_NUMBER	(100)
+#define REFERENCE_MAX_LEN	(5)
+#define DASHBOARD_NAME_LEN	(255)
+
+static int DBpatch_dashboard_name(char *name, char **new_name)
+{
+	int		affix = 0, ret = FAIL, trim;
+	char		*affix_string = NULL;
+	DB_RESULT	result = NULL;
+	DB_ROW		row;
+
+	*new_name = zbx_strdup(*new_name, name);
+
+	do
+	{
+		DBfree_result(result);
+
+		result = DBselect("select count(*)"
+				" from dashboard"
+				" where name='%s' and templateid is null",
+				*new_name);
+
+		if (NULL == result || NULL == (row = DBfetch(result)))
+		{
+			zbx_free(*new_name);
+			break;
+		}
+
+		if (0 == strcmp("0", row[0]))
+		{
+			ret = SUCCEED;
+			break;
+		}
+
+		affix_string = zbx_dsprintf(affix_string, " (%d)", affix + 1);
+		trim = (int)strlen(name) + (int)strlen(affix_string) - DASHBOARD_NAME_LEN;
+		if (0 < trim )
+			name[(int)strlen(name) - trim] = '\0';
+
+		*new_name = zbx_dsprintf(*new_name, "%s%s", name, affix_string);
+	} while (COLLISIONS_MAX_NUMBER > affix++);
+
+	DBfree_result(result);
+	zbx_free(affix_string);
+
+	return ret;
+}
+
+static int DBpatch_reference_name(char **ref_name)
+{
+	int		i = 0, j, ret = FAIL;
+	char		name[REFERENCE_MAX_LEN + 1];
+	const char	*pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	DB_RESULT	result = NULL;
+	DB_ROW		row;
+
+	name[REFERENCE_MAX_LEN] = '\0';
+
+	do
+	{
+		for (j = 0; j < REFERENCE_MAX_LEN; j++)
+			name[j] = pattern[rand() % (int)strlen(pattern)];
+
+		DBfree_result(result);
+
+		result = DBselect("select count(*)"
+			" from widget_field"
+			" where value_str='%s' and name='reference'",
+			name);
+
+		if (NULL == result || NULL == (row = DBfetch(result)))
+			break;
+
+		if (0 == strcmp("0", row[0]))
+		{
+			ret = SUCCEED;
+			*ref_name = zbx_strdup(NULL, name);
+			break;
+		}
+
+	} while (COLLISIONS_MAX_NUMBER > i++);
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_init_dashboard(zbx_db_dashboard_t *dashboard, char *name, uint64_t userid,
+		int private)
+{
+	int	ret = SUCCEED;
+
+	memset((void *)dashboard, 0, sizeof(zbx_db_dashboard_t));
+
+	dashboard->userid = userid;
+	dashboard->private = private;
+	dashboard->display_period = 30;
+	ret = DBpatch_dashboard_name(name, &dashboard->name);
+
+	return ret;
+}
+
+static void	DBpatch_widget_field_free(zbx_db_widget_field_t *field)
+{
+	zbx_free(field->name);
+	zbx_free(field->value_str);
+	zbx_free(field);
+}
+
+static void	DBpatch_screen_item_free(zbx_db_screen_item_t *si)
+{
+	zbx_free(si->url);
+	zbx_free(si->application);
+	zbx_free(si);
+}
+
+static size_t	DBpatch_array_max_used_index(char *array, size_t arr_size)
+{
+	size_t	i, m = 0;
+
+	for (i = 0; i < arr_size; i++)
+	{
+		if (0 != array[i])
+			m = i;
+	}
+
+	return m;
+}
+
+static void DBpatch_normalize_screen_items_pos(zbx_vector_ptr_t *scr_items)
+{
+	char	used_x[SCREEN_MAX_COLS], used_y[SCREEN_MAX_ROWS];
+	char	keep_x[SCREEN_MAX_COLS], keep_y[SCREEN_MAX_ROWS];
+	int	i, n, x;
+
+	memset((void *)used_x, 0, sizeof(used_x));
+	memset((void *)used_y, 0, sizeof(used_y));
+	memset((void *)keep_x, 0, sizeof(keep_x));
+	memset((void *)keep_y, 0, sizeof(keep_y));
+
+	for (i = 0; i < scr_items->values_num; i++)
+	{
+		zbx_db_screen_item_t	*c = (zbx_db_screen_item_t *)scr_items->values[i];
+
+		for (n = c->x; n < c->x + c->colspan && n < SCREEN_MAX_COLS; n++)
+			used_x[n] = 1;
+		for (n = c->y; n < c->y + c->rowspan && n < SCREEN_MAX_ROWS; n++)
+			used_y[n] = 1;
+
+		keep_x[c->x] = 1;
+		if (c->x + c->colspan < SCREEN_MAX_COLS)
+			keep_x[c->x + c->colspan] = 1;
+		keep_y[c->y] = 1;
+		if (c->y + c->rowspan < SCREEN_MAX_ROWS)
+			keep_y[c->y + c->rowspan] = 1;
+	}
+
+#define COMPRESS_SCREEN_ITEMS(axis, span, a_size)							\
+													\
+do {													\
+	for (x = (int)DBpatch_array_max_used_index(keep_ ## axis, a_size); x >= 0; x--)			\
+	{												\
+		if (0 != keep_ ## axis[x] && 0 != used_ ## axis[x])					\
+			continue;									\
+													\
+		for (i = 0; i < scr_items->values_num; i++)						\
+		{											\
+			zbx_db_screen_item_t	*c = (zbx_db_screen_item_t *)scr_items->values[i];	\
+													\
+			if (x < c->axis)								\
+				c->axis--;								\
+													\
+			if (x > c->axis && x < c->axis + c->span)					\
+				c->span--;								\
+		}											\
+	}												\
+} while (0)
+
+	COMPRESS_SCREEN_ITEMS(x, colspan, SCREEN_MAX_COLS);
+	COMPRESS_SCREEN_ITEMS(y, rowspan, SCREEN_MAX_ROWS);
+
+#undef COMPRESS_SCREEN_ITEMS
+}
+
+static void	DBpatch_get_preferred_widget_size(zbx_db_screen_item_t *item, int *w, int *h)
+{
+	*w = item->width;
+	*h = item->height;
+
+	if (SCREEN_RESOURCE_LLD_GRAPH == item->resourcetype || SCREEN_RESOURCE_LLD_SIMPLE_GRAPH == item->resourcetype ||
+			SCREEN_RESOURCE_GRAPH == item->resourcetype ||
+			SCREEN_RESOURCE_SIMPLE_GRAPH == item->resourcetype)
+	{
+		*h += 215;	/* SCREEN_LEGEND_HEIGHT */
+	}
+
+	if (SCREEN_RESOURCE_PLAIN_TEXT == item->resourcetype || SCREEN_RESOURCE_HOST_INFO == item->resourcetype ||
+			SCREEN_RESOURCE_TRIGGER_INFO == item->resourcetype ||
+			SCREEN_RESOURCE_SERVER_INFO == item->resourcetype ||
+			SCREEN_RESOURCE_ACTIONS == item->resourcetype ||
+			SCREEN_RESOURCE_EVENTS == item->resourcetype ||
+			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS == item->resourcetype ||
+			SCREEN_RESOURCE_SYSTEM_STATUS == item->resourcetype ||
+			SCREEN_RESOURCE_HOST_TRIGGERS== item->resourcetype)
+	{
+		*h = 2 + 2 * MIN(25, item->elements) / 5;
+	}
+	else
+		*h = (int)round((double)*h / 70);				/* WIDGET_ROW_HEIGHT */
+
+	*w = (int)round((double)*w / 1920 * DASHBOARD_MAX_COLS);	/* DISPLAY_WIDTH */
+
+	*w = MIN(DASHBOARD_MAX_COLS, MAX(1, *w));
+	*h = MIN(DASHBOARD_WIDGET_MAX_ROWS, MAX(DASHBOARD_WIDGET_MIN_ROWS, *h));
+}
+
+static void	DBpatch_get_min_widget_size(zbx_db_screen_item_t *item, int *w, int *h)
+{
+	switch (item->resourcetype)
+	{
+		case SCREEN_RESOURCE_CLOCK:
+			*w = 1; *h = 2;
+			break;
+		case SCREEN_RESOURCE_GRAPH:
+		case SCREEN_RESOURCE_SIMPLE_GRAPH:
+		case SCREEN_RESOURCE_LLD_GRAPH:
+		case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+		case SCREEN_RESOURCE_MAP:
+			*w = 4; *h = 4;
+			break;
+		case SCREEN_RESOURCE_PLAIN_TEXT:
+		case SCREEN_RESOURCE_URL:
+		case SCREEN_RESOURCE_TRIGGER_INFO:
+		case SCREEN_RESOURCE_ACTIONS:
+		case SCREEN_RESOURCE_EVENTS:
+		case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+		case SCREEN_RESOURCE_HOST_TRIGGERS:
+			*w = 4; *h = 2;
+			break;
+		case SCREEN_RESOURCE_HOST_INFO:
+			*w = 4; *h = 3;
+			break;
+		case SCREEN_RESOURCE_SERVER_INFO:
+		case SCREEN_RESOURCE_SYSTEM_STATUS:
+			*w = 4; *h = 4;
+			break;
+		case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
+			*w = 4; *h = 7;
+			break;
+		case SCREEN_RESOURCE_DATA_OVERVIEW:
+			*w = 4; *h = 5;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "%s: unknown resource type %d", __func__, item->resourcetype);
+	}
+}
+
+static char	*lw_array_to_str(zbx_vector_char2_t *v)
+{
+	static char	str[MAX_STRING_LEN];
+	char		*ptr;
+	int		i, max = MAX_STRING_LEN, len;
+
+	ptr = str;
+	len = (int)zbx_snprintf(ptr, (size_t)max, "[ ");
+	ptr += len;
+	max -= len;
+
+	for (i = 0; 0 < max && i < v->values_num; i++)
+	{
+		if (POS_EMPTY != v->values[i])
+		{
+			len = (int)zbx_snprintf(ptr, (size_t)max, "%d:%d ", i, (int)v->values[i]);
+			ptr += len;
+			max -= len;
+		}
+	}
+
+	if (max > 1)
+		strcat(ptr, "]");
+
+	return str;
+}
+
+static void	lw_array_debug(char *pfx, zbx_vector_char2_t *v)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "%s: %s", pfx, lw_array_to_str(v));
+}
+
+static void	int_array_debug(char *pfx, int *a, int alen, int emptyval)
+{
+	static char	str[MAX_STRING_LEN];
+	char		*ptr;
+	int		i, max = MAX_STRING_LEN, len;
+
+	ptr = str;
+	len = (int)zbx_snprintf(ptr, (size_t)max, "[ ");
+	ptr += len;
+	max -= len;
+
+	for (i = 0; 0 < max && i < alen; i++)
+	{
+		if (emptyval != a[i])
+		{
+			len = (int)zbx_snprintf(ptr, (size_t)max, "%d:%d ", i, a[i]);
+			ptr += len;
+			max -= len;
+		}
+	}
+
+	if (max > 1)
+		strcat(ptr, "]");
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s: %s", pfx, str);
+}
+
+static zbx_vector_char2_t	*lw_array_create(void)
+{
+	zbx_vector_char2_t	*v;
+	static char		fill[SCREEN_MAX_ROWS];
+
+	if (0 == fill[0])
+		memset(fill, POS_EMPTY, SCREEN_MAX_ROWS);
+
+	v = (zbx_vector_char2_t *)malloc(sizeof(zbx_vector_char2_t));
+
+	zbx_vector_char2_create(v);
+	zbx_vector_char2_append_array(v, fill, SCREEN_MAX_ROWS);
+
+	return v;
+}
+
+static void	lw_array_free(zbx_vector_char2_t *v)
+{
+	if (NULL != v)
+	{
+		zbx_vector_char2_destroy(v);
+		zbx_free(v);
+	}
+}
+
+static zbx_vector_char2_t	*lw_array_create_fill(int start, size_t num)
+{
+	size_t			i;
+	zbx_vector_char2_t	*v;
+
+	v = lw_array_create();
+
+	for (i = (size_t)start; i < (size_t)start + num && i < (size_t)v->values_num; i++)
+		v->values[i] = POS_TAKEN;
+
+	return v;
+}
+
+static zbx_vector_char2_t	*lw_array_diff(zbx_vector_char2_t *a, zbx_vector_char2_t *b)
+{
+	int			i;
+	zbx_vector_char2_t	*v;
+
+	v = lw_array_create();
+
+	for (i = 0; i < a->values_num; i++)
+	{
+		SKIP_EMPTY(a, i);
+		if (POS_EMPTY == b->values[i])
+			v->values[i] = a->values[i];
+	}
+
+	return v;
+}
+
+static zbx_vector_char2_t	*lw_array_intersect(zbx_vector_char2_t *a, zbx_vector_char2_t *b)
+{
+	int			i;
+	zbx_vector_char2_t	*v;
+
+	v = lw_array_create();
+
+	for (i = 0; i < a->values_num; i++)
+	{
+		SKIP_EMPTY(a, i);
+		if (POS_EMPTY != b->values[i])
+			v->values[i] = a->values[i];
+	}
+
+	return v;
+}
+
+static int	lw_array_count(zbx_vector_char2_t *v)
+{
+	int	i, c = 0;
+
+	for (i = 0; i < v->values_num; i++)
+	{
+		if (POS_EMPTY != v->values[i])
+			c++;
+	}
+
+	return c;
+}
+
+static int	lw_array_sum(zbx_vector_char2_t *v)
+{
+	int	i, c = 0;
+
+	for (i = 0; i < v->values_num; i++)
+	{
+		if (POS_EMPTY != v->values[i])
+			c += v->values[i];
+	}
+
+	return c;
+}
+
+typedef struct
+{
+	int			index;	/* index for zbx_vector_scitem_dim2_t */
+	zbx_vector_char2_t	*r_block;
+}
+sciitem_block_t;
+
+static zbx_vector_char2_t	*sort_dimensions;
+
+static int	DBpatch_block_compare_func(const void *d1, const void *d2)
+{
+	const sciitem_block_t	*i1 = *(const sciitem_block_t **)d1;
+	const sciitem_block_t	*i2 = *(const sciitem_block_t **)d2;
+	zbx_vector_char2_t	*diff1, *diff2;
+	int			unsized_a, unsized_b;
+
+	diff1 = lw_array_diff(i1->r_block, sort_dimensions);
+	diff2 = lw_array_diff(i2->r_block, sort_dimensions);
+
+	unsized_a = lw_array_count(diff1);
+	unsized_b = lw_array_count(diff2);
+
+	lw_array_free(diff1);
+	lw_array_free(diff2);
+
+	ZBX_RETURN_IF_NOT_EQUAL(unsized_a, unsized_b);
+
+	return 0;
+}
+
+static zbx_vector_char2_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim2_t *scitems)
+{
+	int			i;
+	zbx_vector_ptr_t	blocks;
+	sciitem_block_t		*block;
+	zbx_vector_char2_t	*dimensions;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&blocks);
+	dimensions = lw_array_create();
+
+	for (i = 0; i < scitems->values_num; i++)
+	{
+		block = (sciitem_block_t *)malloc(sizeof(sciitem_block_t));
+		block->r_block = lw_array_create_fill(scitems->values[i].position, (size_t)scitems->values[i].span);
+		block->index = i;
+		zbx_vector_ptr_append(&blocks, (void *)block);
+	}
+
+	sort_dimensions = dimensions;
+
+	while (0 < blocks.values_num)
+	{
+		zbx_vector_char2_t	*block_dimensions, *block_unsized, *r_block;
+		int			block_dimensions_sum, block_unsized_count, size_overflow, n;
+
+		zbx_vector_ptr_sort(&blocks, DBpatch_block_compare_func);
+		block = blocks.values[0];
+		r_block = block->r_block;
+
+		block_dimensions = lw_array_intersect(dimensions, r_block);
+		block_dimensions_sum = lw_array_sum(block_dimensions);
+		lw_array_free(block_dimensions);
+
+		block_unsized = lw_array_diff(r_block, dimensions);
+		block_unsized_count = lw_array_count(block_unsized);
+		size_overflow = scitems->values[block->index].size - block_dimensions_sum;
+
+		if (0 < block_unsized_count)
+		{
+			for (n = 0; n < block_unsized->values_num; n++)
+			{
+				SKIP_EMPTY(block_unsized, n);
+				dimensions->values[n] = (char)MAX(1, size_overflow / block_unsized_count);
+				size_overflow -= dimensions->values[n];
+				block_unsized_count--;
+			}
+		}
+		else if (0 < size_overflow)
+		{
+			for (n = 0; n < r_block->values_num; n++)
+			{
+				double	factor;
+				int	new_dimension;
+
+				SKIP_EMPTY(r_block, n);
+				factor = (double)(size_overflow + block_dimensions_sum) / block_dimensions_sum;
+				new_dimension = (int)round(factor * dimensions->values[n]);
+				block_dimensions_sum -= dimensions->values[n];
+				size_overflow -= new_dimension - dimensions->values[n];
+				dimensions->values[n] = (char)new_dimension;
+			}
+		}
+
+		lw_array_free(block->r_block);
+		zbx_free(block);
+		lw_array_free(block_unsized);
+		zbx_vector_ptr_remove(&blocks, 0);
+	}
+
+	zbx_vector_ptr_destroy(&blocks);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): dim:%s", __func__, lw_array_to_str(dimensions));
+
+	return dimensions;
+}
+
+/* modifies widget units in first argument */
+static void	DBpatch_adjust_axis_dimensions(zbx_vector_char2_t *d, zbx_vector_char2_t *d_min, int target)
+{
+	int	dimensions_sum, i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s(): d:%s", __func__, lw_array_to_str(d));
+	zabbix_log(LOG_LEVEL_TRACE, "  d_min:%s", lw_array_to_str(d_min));
+
+	dimensions_sum = lw_array_sum(d);
+
+	while (dimensions_sum != target)
+	{
+		int	potential_index = -1;
+		double	potential_value;
+
+		for (i = 0; i < d->values_num; i++)
+		{
+			double	value;
+
+			SKIP_EMPTY(d, i);
+			value = (double)d->values[i] / d_min->values[i];
+
+			if (0 > potential_index ||
+					(dimensions_sum > target && value > potential_value) ||
+					(dimensions_sum < target && value < potential_value))
+			{
+				potential_index = i;
+				potential_value = value;
+			}
+		}
+
+		if (0 <= potential_index)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "dim_sum:%d pot_idx/val:%d/%.2lf", dimensions_sum,
+					potential_index, potential_value);
+		}
+
+		if (dimensions_sum > target && d->values[potential_index] == d_min->values[potential_index])
+			break;
+
+		if (dimensions_sum > target)
+		{
+			d->values[potential_index]--;
+			dimensions_sum--;
+		}
+		else
+		{
+			d->values[potential_index]++;
+			dimensions_sum++;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): d:%s", __func__, lw_array_to_str(d));
+}
+
+static void	DBpatch_get_dashboard_dimensions(zbx_vector_ptr_t *scr_items, zbx_vector_char2_t **x,
+		zbx_vector_char2_t **y)
+{
+	zbx_vector_char2_t		*dim_x_pref, *dim_x_min;
+	zbx_vector_char2_t		*dim_y_pref, *dim_y_min;
+	zbx_vector_scitem_dim2_t	items_x_pref, items_y_pref;
+	zbx_vector_scitem_dim2_t	items_x_min, items_y_min;
+	int				i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_vector_scitem_dim2_create(&items_x_pref);
+	zbx_vector_scitem_dim2_create(&items_y_pref);
+	zbx_vector_scitem_dim2_create(&items_x_min);
+	zbx_vector_scitem_dim2_create(&items_y_min);
+
+	for (i = 0; i < scr_items->values_num; i++)
+	{
+		int			pref_size_w, pref_size_h;
+		int			min_size_w, min_size_h;
+		zbx_screen_item_dim_t	item;
+		zbx_db_screen_item_t	*si;
+
+		si = scr_items->values[i];
+		DBpatch_get_preferred_widget_size(si, &pref_size_w, &pref_size_h);
+		DBpatch_get_min_widget_size(si, &min_size_w, &min_size_h);
+
+		item.position = si->x;
+		item.span = si->colspan;
+		item.size = MAX(pref_size_w, min_size_w);
+		zbx_vector_scitem_dim2_append(&items_x_pref, item);
+
+		item.position = si->y;
+		item.span = si->rowspan;
+		item.size = MAX(pref_size_h, min_size_h);
+		zbx_vector_scitem_dim2_append(&items_y_pref, item);
+
+		item.position = si->x;
+		item.span = si->colspan;
+		item.size = min_size_w;
+		zbx_vector_scitem_dim2_append(&items_x_min, item);
+
+		item.position = si->y;
+		item.span = si->rowspan;
+		item.size = min_size_h;
+		zbx_vector_scitem_dim2_append(&items_y_min, item);
+	}
+
+	dim_x_pref = DBpatch_get_axis_dimensions(&items_x_pref);
+	dim_x_min = DBpatch_get_axis_dimensions(&items_x_min);
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s: dim_x_pref:%s", __func__, lw_array_to_str(dim_x_pref));
+	zabbix_log(LOG_LEVEL_TRACE, "  dim_x_min:%s", lw_array_to_str(dim_x_min));
+
+	DBpatch_adjust_axis_dimensions(dim_x_pref, dim_x_min, DASHBOARD_MAX_COLS);
+
+	dim_y_pref = DBpatch_get_axis_dimensions(&items_y_pref);
+	dim_y_min = DBpatch_get_axis_dimensions(&items_y_min);
+
+	if (DASHBOARD_MAX_ROWS < lw_array_sum(dim_y_pref))
+		DBpatch_adjust_axis_dimensions(dim_y_pref, dim_y_min, DASHBOARD_MAX_ROWS);
+
+	lw_array_free(dim_x_min);
+	lw_array_free(dim_y_min);
+	zbx_vector_scitem_dim2_destroy(&items_x_pref);
+	zbx_vector_scitem_dim2_destroy(&items_y_pref);
+	zbx_vector_scitem_dim2_destroy(&items_x_min);
+	zbx_vector_scitem_dim2_destroy(&items_y_min);
+
+	*x = dim_x_pref;
+	*y = dim_y_pref;
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): x:%s y:%s", __func__, lw_array_to_str(*x), lw_array_to_str(*y));
+}
+
+static zbx_db_widget_field_t	*DBpatch_make_widget_field(int type, char *name, void *value)
+{
+	zbx_db_widget_field_t	*wf;
+
+	wf = (zbx_db_widget_field_t *)zbx_calloc(NULL, 1, sizeof(zbx_db_widget_field_t));
+	wf->name = zbx_strdup(NULL, name);
+	wf->type = type;
+
+	switch (type)
+	{
+		case ZBX_WIDGET_FIELD_TYPE_INT32:
+			wf->value_int = *((int *)value);
+			break;
+		case ZBX_WIDGET_FIELD_TYPE_STR:
+			wf->value_str = zbx_strdup(NULL, (char *)value);
+			break;
+		case ZBX_WIDGET_FIELD_TYPE_GROUP:
+			wf->value_groupid = *((uint64_t *)value);
+			break;
+		case ZBX_WIDGET_FIELD_TYPE_HOST:
+			wf->value_hostid = *((uint64_t *)value);
+			break;
+		case ZBX_WIDGET_FIELD_TYPE_ITEM:
+		case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+			wf->value_itemid = *((uint64_t *)value);
+			break;
+		case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+		case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+			wf->value_graphid = *((uint64_t *)value);
+			break;
+		case ZBX_WIDGET_FIELD_TYPE_MAP:
+			wf->value_sysmapid = *((uint64_t *)value);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "%s: unknown field type: %d", __func__, type);
+	}
+
+	if (NULL == wf->value_str)
+		wf->value_str = zbx_strdup(NULL, "");
+
+	return wf;
+}
+
+static void DBpatch_widget_from_screen_item(zbx_db_screen_item_t *si, zbx_db_widget_t *w, zbx_vector_ptr_t *fields)
+{
+	int			tmp;
+	char			*reference = NULL;
+	zbx_db_widget_field_t	*f;
+
+	w->name = zbx_strdup(NULL, "");
+	w->view_mode = 0;	/* ZBX_WIDGET_VIEW_MODE_NORMAL */
+
+#define ADD_FIELD(a, b, c)				\
+							\
+do {							\
+	f = DBpatch_make_widget_field(a, b, c);		\
+	zbx_vector_ptr_append(fields, (void *)f);	\
+} while (0)
+
+	switch (si->resourcetype)
+	{
+		case SCREEN_RESOURCE_CLOCK:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_CLOCK);
+
+			/* here are below in this switch we add only those fields that are not */
+			/* considered default by frontend API */
+
+			if (0 != si->style)	/* style 0 is default, don't add */
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "time_type", (void *)&si->style);
+			if (2 == si->style)	/* TIME_TYPE_HOST */
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_ITEM, "itemid", (void *)&si->resourceid);
+			break;
+		case SCREEN_RESOURCE_GRAPH:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_GRAPH_CLASSIC);
+			/* source_type = ZBX_WIDGET_FIELD_RESOURCE_GRAPH (0); don't add because it's default */
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_GRAPH, "graphid", (void *)&si->resourceid);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
+			break;
+		case SCREEN_RESOURCE_SIMPLE_GRAPH:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_GRAPH_CLASSIC);
+			tmp = 1;	/* source_type = ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH */
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "source_type", (void *)&tmp);
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_ITEM, "itemid", (void *)&si->resourceid);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
+			break;
+		case SCREEN_RESOURCE_LLD_GRAPH:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_GRAPH_PROTOTYPE);
+			/* source_type = ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE (2); don't add because it's default */
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE, "graphid", (void *)&si->resourceid);
+			/* add field "columns" because the default value is 2 */
+			tmp = 1;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "columns", (void *)&tmp);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
+			/* don't add field "rows" because 1 is default */
+			break;
+		case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_GRAPH_PROTOTYPE);
+			tmp = 3;	/* source_type = ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE */
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "source_type", (void *)&tmp);
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, "itemid", (void *)&si->resourceid);
+			tmp = 1;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "columns", (void *)&tmp);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
+			/* don't add field "rows" because 1 is default */
+			break;
+		case SCREEN_RESOURCE_PLAIN_TEXT:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_PLAIN_TEXT);
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_ITEM, "itemids", (void *)&si->resourceid);
+			if (0 != si->style)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_as_html", (void *)&si->style);
+			if (25 != si->elements)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_lines", (void *)&si->elements);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
+			break;
+		case SCREEN_RESOURCE_URL:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_URL);
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_STR, "url", (void *)si->url);
+			tmp = 1;
+			if (1 == si->dynamic)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "dynamic", (void *)&tmp);
+			break;
+		case SCREEN_RESOURCE_ACTIONS:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_ACTIONS);
+			if (4 != si->sort_triggers)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "sort_triggers", (void *)&si->sort_triggers);
+			if (25 != si->elements)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_lines", (void *)&si->elements);
+			break;
+		case SCREEN_RESOURCE_DATA_OVERVIEW:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_DATA_OVERVIEW);
+			tmp = 1;
+			if (1 == si->style)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "style", (void *)&tmp);
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_GROUP, "groupids", (void *)&si->resourceid);
+			if ('\0' != *si->application)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_STR, "application", (void *)si->application);
+			break;
+		case SCREEN_RESOURCE_EVENTS:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_PROBLEMS);
+			if (25 != si->elements)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_lines", (void *)&si->elements);
+			tmp = 2;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show", (void *)&tmp);
+			break;
+		case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_PROBLEMS);
+			if (0 != si->sort_triggers)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "sort_triggers", (void *)&si->sort_triggers);
+			if (25 != si->elements)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_lines", (void *)&si->elements);
+			if (0 != si->resourceid)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_GROUP, "groupids", (void *)&si->resourceid);
+			tmp = 3;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show", (void *)&tmp);
+			tmp = 0;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_timeline", (void *)&tmp);
+			break;
+		case SCREEN_RESOURCE_HOST_INFO:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_HOST_INFO);
+			tmp = 1;
+			if (1 == si->style)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "layout", (void *)&tmp);
+			if (0 != si->resourceid)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_GROUP, "groupids", (void *)&si->resourceid);
+			break;
+		case SCREEN_RESOURCE_HOST_TRIGGERS:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_PROBLEMS);
+			if (0 != si->sort_triggers)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "sort_triggers", (void *)&si->sort_triggers);
+			if (25 != si->elements)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_lines", (void *)&si->elements);
+			if (0 != si->resourceid)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_HOST, "hostids", (void *)&si->resourceid);
+			tmp = 3;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show", (void *)&tmp);
+			tmp = 0;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_timeline", (void *)&tmp);
+			break;
+		case SCREEN_RESOURCE_MAP:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_MAP);
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_MAP, "sysmapid", (void *)&si->resourceid);
+			if (SUCCEED == DBpatch_reference_name(&reference))
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_STR, "reference", (void *)reference);
+			zbx_free(reference);
+			break;
+		case SCREEN_RESOURCE_SYSTEM_STATUS:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_SYSTEM_STATUS);
+			break;
+		case SCREEN_RESOURCE_SERVER_INFO:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_SERVER_INFO);
+			break;
+		case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_TRIGGER_OVERVIEW);
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_GROUP, "groupids", (void *)&si->resourceid);
+			if ('\0' != *si->application)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_STR, "application", (void *)si->application);
+			tmp = 1;
+			if (1 == si->style)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "style", (void *)&tmp);
+			tmp = 2;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show", (void *)&tmp);
+			break;
+		case SCREEN_RESOURCE_TRIGGER_INFO:
+			w->type = zbx_strdup(NULL, ZBX_WIDGET_TYPE_SYSTEM_STATUS);
+			if (0 != si->resourceid)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_GROUP, "groupids", (void *)&si->resourceid);
+			tmp = 1;
+			if (1 == si->style)
+				ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "layout", (void *)&tmp);
+			tmp = 1;
+			ADD_FIELD(ZBX_WIDGET_FIELD_TYPE_INT32, "show_type", (void *)&tmp);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "%s: unknown screen resource type: %d", __func__,
+					si->resourcetype);
+	}
+#undef ADD_FIELD
+}
+
+static char	*DBpatch_resourcetype_str(int rtype)
+{
+	switch (rtype)
+	{
+		case SCREEN_RESOURCE_CLOCK:
+			return "clock";
+		case SCREEN_RESOURCE_GRAPH:
+			return "graph";
+		case SCREEN_RESOURCE_SIMPLE_GRAPH:
+			return "simplegraph";
+		case SCREEN_RESOURCE_LLD_GRAPH:
+			return "lldgraph";
+		case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
+			return "lldsimplegraph";
+		case SCREEN_RESOURCE_PLAIN_TEXT:
+			return "plaintext";
+		case SCREEN_RESOURCE_URL:
+			return "url";
+		/* additional types */
+		case SCREEN_RESOURCE_MAP:
+			return "map";
+		case SCREEN_RESOURCE_HOST_INFO:
+			return "host info";
+		case SCREEN_RESOURCE_TRIGGER_INFO:
+			return "trigger info";
+		case SCREEN_RESOURCE_SERVER_INFO:
+			return "server info";
+		case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
+			return "trigger overview";
+		case SCREEN_RESOURCE_DATA_OVERVIEW:
+			return "data overview";
+		case SCREEN_RESOURCE_ACTIONS:
+			return "action";
+		case SCREEN_RESOURCE_EVENTS:
+			return "events";
+		case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+			return "hostgroup triggers";
+		case SCREEN_RESOURCE_SYSTEM_STATUS:
+			return "system status";
+		case SCREEN_RESOURCE_HOST_TRIGGERS:
+			return "host triggers";
+	}
+
+	return "*unknown*";
+}
+
+static void	DBpatch_trace_screen_item(zbx_db_screen_item_t *item)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "    screenitemid:" ZBX_FS_UI64 " screenid:" ZBX_FS_UI64,
+			item->screenitemid, item->screenid);
+	zabbix_log(LOG_LEVEL_TRACE, "        resourcetype: %s resourceid:" ZBX_FS_UI64,
+			DBpatch_resourcetype_str(item->resourcetype), item->resourceid);
+	zabbix_log(LOG_LEVEL_TRACE, "        w/h: %dx%d (x,y): (%d,%d) (c,rspan): (%d,%d)",
+			item->width, item->height, item->x, item->y, item->colspan, item->rowspan);
+}
+
+static void	DBpatch_trace_widget(zbx_db_widget_t *w)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "    widgetid:" ZBX_FS_UI64 " dbid:" ZBX_FS_UI64 " type:%s",
+			w->widgetid, w->dashboardid, w->type);
+	zabbix_log(LOG_LEVEL_TRACE, "    widget type: %s w/h: %dx%d (x,y): (%d,%d)",
+			w->type, w->width, w->height, w->x, w->y);
+}
+
+/* adds new dashboard to the DB, sets new dashboardid in the struct */
+static int 	DBpatch_add_dashboard(zbx_db_dashboard_t *dashboard)
+{
+	char	*name_esc;
+	int	res;
+
+	dashboard->dashboardid = DBget_maxid("dashboard");
+	name_esc = DBdyn_escape_string(dashboard->name);
+
+	zabbix_log(LOG_LEVEL_TRACE, "adding dashboard id:" ZBX_FS_UI64, dashboard->dashboardid);
+
+	res = DBexecute("insert into dashboard (dashboardid,name,userid,private,display_period) values "
+			"("ZBX_FS_UI64 ",'%s',"ZBX_FS_UI64 ",%d,%d)",
+			dashboard->dashboardid, name_esc, dashboard->userid, dashboard->private,
+			dashboard->display_period);
+
+	zbx_free(name_esc);
+
+	return ZBX_DB_OK > res ? FAIL : SUCCEED;
+}
+
+/* adds new dashboard page to the DB, sets new dashboard_pageid in the struct */
+static int 	DBpatch_add_dashboard_page(zbx_db_dashboard_page_t *dashboard_page, uint64_t dashboardid, char *name,
+		int display_period, int sortorder)
+{
+	int	res;
+
+	dashboard_page->dashboard_pageid = DBget_maxid("dashboard_page");
+	dashboard_page->dashboardid = dashboardid;
+
+	zabbix_log(LOG_LEVEL_TRACE, "adding dashboard_page id:" ZBX_FS_UI64, dashboard_page->dashboard_pageid);
+
+	res = DBexecute("insert into dashboard_page (dashboard_pageid,dashboardid,name,display_period,sortorder)"
+			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ",'%s',%d,%d)",
+			dashboard_page->dashboard_pageid, dashboardid, name, display_period, sortorder);
+
+	return ZBX_DB_OK > res ? FAIL : SUCCEED;
+}
+
+/* adds new widget and widget fields to the DB */
+static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx_vector_ptr_t *fields)
+{
+	uint64_t	new_fieldid;
+	int		i, ret = SUCCEED;
+	char		*name_esc;
+
+	widget->widgetid = DBget_maxid("widget");
+	widget->dashboardid = dashboardid;
+	name_esc = DBdyn_escape_string(widget->name);
+
+	zabbix_log(LOG_LEVEL_TRACE, "adding widget id: " ZBX_FS_UI64 ", type: %s", widget->widgetid, widget->type);
+
+
+	if (ZBX_DB_OK > DBexecute("insert into widget (widgetid,dashboard_pageid,type,name,x,y,width,height,view_mode) "
+			"values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,%d,%d,%d,%d)",
+			widget->widgetid, widget->dashboardid, widget->type, name_esc,
+			widget->x, widget->y, widget->width, widget->height, widget->view_mode))
+	{
+		ret = FAIL;
+	}
+
+	zbx_free(name_esc);
+
+	if (SUCCEED == ret && 0 < fields->values_num)
+		new_fieldid = DBget_maxid_num("widget_field", fields->values_num);
+
+	for (i = 0; SUCCEED == ret && i < fields->values_num; i++)
+	{
+		char			s1[ZBX_MAX_UINT64_LEN + 1], s2[ZBX_MAX_UINT64_LEN + 1],
+					s3[ZBX_MAX_UINT64_LEN + 1], s4[ZBX_MAX_UINT64_LEN + 1],
+					s5[ZBX_MAX_UINT64_LEN + 1], *url_esc;
+		zbx_db_widget_field_t	*f;
+
+		f = (zbx_db_widget_field_t *)fields->values[i];
+		url_esc = DBdyn_escape_string(f->value_str);
+
+		if (0 != f->value_itemid)
+			zbx_snprintf(s1, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_itemid);
+		else
+			zbx_snprintf(s1, ZBX_MAX_UINT64_LEN + 1, "null");
+
+		if (0 != f->value_graphid)
+			zbx_snprintf(s2, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_graphid);
+		else
+			zbx_snprintf(s2, ZBX_MAX_UINT64_LEN + 1, "null");
+
+		if (0 != f->value_groupid)
+			zbx_snprintf(s3, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_groupid);
+		else
+			zbx_snprintf(s3, ZBX_MAX_UINT64_LEN + 1, "null");
+
+		if (0 != f->value_hostid)
+			zbx_snprintf(s4, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_hostid);
+		else
+			zbx_snprintf(s4, ZBX_MAX_UINT64_LEN + 1, "null");
+
+		if (0 != f->value_sysmapid)
+			zbx_snprintf(s5, ZBX_MAX_UINT64_LEN + 1, ZBX_FS_UI64, f->value_sysmapid);
+		else
+			zbx_snprintf(s5, ZBX_MAX_UINT64_LEN + 1, "null");
+
+		if (ZBX_DB_OK > DBexecute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
+				"value_str,value_itemid,value_graphid,value_groupid,value_hostid,value_sysmapid)"
+				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,'%s',%s,%s,%s,%s,%s)",
+				new_fieldid++, widget->widgetid, f->type, f->name, f->value_int, url_esc,
+				s1, s2, s3, s4, s5))
+		{
+			ret = FAIL;
+		}
+
+		zbx_free(url_esc);
+	}
+
+	return ret;
+}
+
+static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screenid)
+{
+	int		ret = SUCCEED, permission;
+	uint64_t	userid, usrgrpid, dashboard_userid, dashboard_usrgrpid;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	dashboard_userid = DBget_maxid("dashboard_user");
+
+	result = DBselect("select userid, permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(userid, row[0]);
+		permission = atoi(row[1]);
+
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
+			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
+			dashboard_userid++, dashboardid, userid, permission))
+		{
+			ret = FAIL;
+			goto out;
+		}
+	}
+
+	DBfree_result(result);
+
+	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
+
+	result = DBselect("select usrgrpid,permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(usrgrpid, row[0]);
+		permission = atoi(row[1]);
+
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
+			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		{
+			ret = FAIL;
+			goto out;
+		}
+	}
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slideshowid)
+{
+	int		ret = SUCCEED, permission;
+	uint64_t	userid, usrgrpid, dashboard_userid, dashboard_usrgrpid;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	dashboard_userid = DBget_maxid("dashboard_user");
+
+	result = DBselect("select userid,permission from slideshow_user where slideshowid=" ZBX_FS_UI64, slideshowid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(userid, row[0]);
+		permission = atoi(row[1]);
+
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
+			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
+			dashboard_userid++, dashboardid, userid, permission))
+		{
+			ret = FAIL;
+			goto out;
+		}
+	}
+
+	DBfree_result(result);
+
+	dashboard_usrgrpid = DBget_maxid("dashboard_usrgrp");
+
+	result = DBselect("select usrgrpid,permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
+			slideshowid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(usrgrpid, row[0]);
+		permission = atoi(row[1]);
+
+		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
+			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ","ZBX_FS_UI64 ", %d)",
+			dashboard_usrgrpid++, dashboardid, usrgrpid, permission))
+		{
+			ret = FAIL;
+			goto out;
+		}
+	}
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+
+static int	DBpatch_delete_screen(uint64_t screenid)
+{
+	if (ZBX_DB_OK > DBexecute("delete from screens_items where screenid=" ZBX_FS_UI64, screenid))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("delete from screens where screenid=" ZBX_FS_UI64, screenid))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+#define OFFSET_ARRAY_SIZE	(SCREEN_MAX_ROWS + 1)
+
+static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
+{
+	DB_ROW			row;
+	int			i, ret = SUCCEED;
+	zbx_db_screen_item_t	*scr_item;
+	zbx_vector_ptr_t	screen_items;
+	zbx_vector_char2_t	*dim_x, *dim_y;
+	int			offsets_x[OFFSET_ARRAY_SIZE], offsets_y[OFFSET_ARRAY_SIZE];
+
+	zbx_vector_ptr_create(&screen_items);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		scr_item = (zbx_db_screen_item_t*)zbx_calloc(NULL, 1, sizeof(zbx_db_screen_item_t));
+
+		ZBX_DBROW2UINT64(scr_item->screenitemid, row[0]);
+		ZBX_DBROW2UINT64(scr_item->screenid, row[1]);
+		scr_item->resourcetype = atoi(row[2]);
+		ZBX_DBROW2UINT64(scr_item->resourceid, row[3]);
+		scr_item->width = atoi(row[4]);
+		scr_item->height = atoi(row[5]);
+		scr_item->x = atoi(row[6]);
+		scr_item->y = atoi(row[7]);
+		scr_item->colspan = atoi(row[8]);
+		scr_item->rowspan = atoi(row[9]);
+		scr_item->elements = atoi(row[10]);
+		scr_item->style = atoi(row[11]);
+		scr_item->url = zbx_strdup(NULL, row[12]);
+		scr_item->sort_triggers = atoi(row[13]);
+		scr_item->application = zbx_strdup(NULL, row[14]);
+		scr_item->dynamic = atoi(row[15]);
+
+		DBpatch_trace_screen_item(scr_item);
+
+		zbx_vector_ptr_append(&screen_items, (void *)scr_item);
+	}
+
+	if (screen_items.values_num > 0)
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "total %d screen items", screen_items.values_num);
+
+		DBpatch_normalize_screen_items_pos(&screen_items);
+		DBpatch_get_dashboard_dimensions(&screen_items, &dim_x, &dim_y);
+
+		lw_array_debug("dim_x", dim_x);
+		lw_array_debug("dim_y", dim_y);
+
+		offsets_x[0] = 0;
+		offsets_y[0] = 0;
+		for (i = 1; i < OFFSET_ARRAY_SIZE; i++)
+		{
+			offsets_x[i] = -1;
+			offsets_y[i] = -1;
+		}
+
+		for (i = 0; i < dim_x->values_num; i++)
+		{
+			if (POS_EMPTY != dim_x->values[i])
+				offsets_x[i + 1] = i == 0 ? dim_x->values[i] : offsets_x[i] + dim_x->values[i];
+			if (POS_EMPTY != dim_y->values[i])
+				offsets_y[i + 1] = i == 0 ? dim_y->values[i] : offsets_y[i] + dim_y->values[i];
+		}
+
+		int_array_debug("offsets_x", offsets_x, OFFSET_ARRAY_SIZE, -1);
+		int_array_debug("offsets_y", offsets_y, OFFSET_ARRAY_SIZE, -1);
+	}
+
+
+	for (i = 0; SUCCEED == ret && i < screen_items.values_num; i++)
+	{
+		int			offset_idx_x, offset_idx_y;
+		zbx_db_widget_t		w;
+		zbx_vector_ptr_t	widget_fields;
+		zbx_db_screen_item_t	*si;
+
+		si = screen_items.values[i];
+
+		offset_idx_x = si->x + si->colspan;
+		if (offset_idx_x > OFFSET_ARRAY_SIZE - 1)
+		{
+			offset_idx_x = OFFSET_ARRAY_SIZE - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "config error, x screen size overflow for item " ZBX_FS_UI64,
+					si->screenitemid);
+		}
+
+		offset_idx_y = si->y + si->rowspan;
+		if (offset_idx_y > OFFSET_ARRAY_SIZE - 1)
+		{
+			offset_idx_y = OFFSET_ARRAY_SIZE - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "config error, y screen size overflow for item " ZBX_FS_UI64,
+					si->screenitemid);
+		}
+
+		memset((void *)&w, 0, sizeof(zbx_db_widget_t));
+		w.x = offsets_x[si->x];
+		w.y = offsets_y[si->y];
+		w.width = offsets_x[offset_idx_x] - offsets_x[si->x];
+		w.height = offsets_y[offset_idx_y] - offsets_y[si->y];
+
+		/* skip screen items not fitting on the dashboard */
+		if (w.x + w.width > DASHBOARD_MAX_COLS || w.y + w.height > DASHBOARD_MAX_ROWS)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "skipping screenitemid " ZBX_FS_UI64
+					" (too wide, tall or offscreen)", si->screenitemid);
+			continue;
+		}
+
+		zbx_vector_ptr_create(&widget_fields);
+
+		DBpatch_widget_from_screen_item(si, &w, &widget_fields);
+
+		ret = DBpatch_add_widget(id, &w, &widget_fields);
+
+		DBpatch_trace_widget(&w);
+
+		zbx_vector_ptr_clear_ext(&widget_fields, (zbx_clean_func_t)DBpatch_widget_field_free);
+		zbx_vector_ptr_destroy(&widget_fields);
+		zbx_free(w.name);
+		zbx_free(w.type);
+	}
+
+	if (screen_items.values_num > 0)
+	{
+		lw_array_free(dim_x);
+		lw_array_free(dim_y);
+	}
+
+	zbx_vector_ptr_clear_ext(&screen_items, (zbx_clean_func_t)DBpatch_screen_item_free);
+	zbx_vector_ptr_destroy(&screen_items);
+
+	return ret;
+}
+
+static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t userid, int private)
+{
+	DB_RESULT		result;
+	int			ret;
+	zbx_db_dashboard_t	dashboard;
+	zbx_db_dashboard_page_t	dashboard_page;
+
+	result = DBselect(
+			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
+			",elements,style,url,sort_triggers,application,dynamic from screens_items"
+			" where screenid=" ZBX_FS_UI64, screenid);
+
+	if (NULL == result)
+		return FAIL;
+
+	if (SUCCEED != DBpatch_init_dashboard(&dashboard, name, userid, private))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen '%s'due to name collision.", name);
+		ret = FAIL;
+		goto out;
+	}
+
+	ret = DBpatch_add_dashboard(&dashboard);
+
+	if (SUCCEED == ret)
+		ret = DBpatch_add_dashboard_page(&dashboard_page, dashboard.dashboardid, "", 0, 0);
+
+	if (SUCCEED == ret)
+		ret = DBpatch_convert_screen_items(result, dashboard_page.dashboard_pageid);
+
+	if (SUCCEED == ret)
+		ret = DBpatch_set_permissions_screen(dashboard.dashboardid, screenid);
+
+	zbx_free(dashboard.name);
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_delay_routine(const char *screen_delay, int *dashboard_delay)
+{
+	int	delays[] = {10, 30, 60, 120, 600, 1800, 3600};
+	int	i, imax, tmp;
+
+	if (FAIL == is_time_suffix(screen_delay, &tmp, ZBX_LENGTH_UNLIMITED))
+		return FAIL;
+
+	imax = (int)ARRSIZE(delays);
+
+	if (0 >= tmp)
+	{
+		tmp = 0;
+	}
+	else if (tmp <= delays[0])
+	{
+		tmp = delays[0];
+	}
+	else if (tmp >= delays[imax - 1])
+	{
+		tmp = delays[imax - 1];
+	}
+	else
+	{
+		for (i = 0; i < imax - 1; i++)
+		{
+			if (tmp >= delays[i] && tmp <= delays[i + 1])
+				tmp = ((tmp - delays[i]) >= (delays[i + 1] - tmp)) ? delays[i + 1] : delays[i];
+		}
+	}
+
+	*dashboard_delay = tmp;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay, uint64_t userid, int private)
+{
+	int			ret;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_db_dashboard_t	dashboard;
+	DB_RESULT		result;
+	DB_ROW			row;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select slideid,screenid,step,delay"
+			" from slides"
+			" where slideshowid=" ZBX_FS_UI64
+			" order by step asc", slideshowid);
+
+	result = DBselectN(sql, 50);
+	zbx_free(sql);
+
+	if (NULL == result)
+		return FAIL;
+
+	if (SUCCEED != DBpatch_init_dashboard(&dashboard, name, userid, private))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen '%s'due to name collision.", name);
+		ret = FAIL;
+		goto exit;
+	}
+
+	dashboard.display_period = delay;
+
+	if (SUCCEED != (ret = DBpatch_add_dashboard(&dashboard)))
+		goto out;
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		int			step, page_delay;
+		zbx_db_dashboard_page_t	dashboard_page;
+		DB_RESULT		result2, result3;
+		DB_ROW			row2;
+		uint64_t 		screenid;
+
+		step = atoi(row[2]);
+		page_delay = atoi(row[3]);
+		ZBX_DBROW2UINT64(screenid, row[1]);
+
+		result2 = DBselect("select name from screens where screenid=" ZBX_FS_UI64, screenid);
+
+		if (NULL == result2 || NULL == (row2 = DBfetch(result2)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen " ZBX_FS_UI64, screenid);
+			DBfree_result(result2);
+			continue;
+		}
+
+		if (SUCCEED != (ret = DBpatch_add_dashboard_page(&dashboard_page, dashboard.dashboardid,
+				row2[0], page_delay, step)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen " ZBX_FS_UI64, screenid);
+			DBfree_result(result2);
+			continue;
+		}
+
+		result3 = DBselect(
+			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
+			",elements,style,url,sort_triggers,application,dynamic from screens_items"
+			" where screenid=" ZBX_FS_UI64, screenid);
+
+		if (NULL != result3)
+			DBpatch_convert_screen_items(result3, dashboard_page.dashboard_pageid);
+
+		DBfree_result(result2);
+		DBfree_result(result3);
+	}
+
+out:
+	ret = DBpatch_set_permissions_slideshow(dashboard.dashboardid, slideshowid);
+
+	zbx_free(dashboard.name);
+exit:
+	DBfree_result(result);
+
+	return ret;
+}
+
+#undef OFFSET_ARRAY_SIZE
+
+static int	DBpatch_5030094(void)
+{
+	int		ret = SUCCEED;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	result = DBselect("select slideshowid,name,delay,userid,private from slideshows");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		uint64_t	slideshowid, userid;
+		int		private, delay;
+
+		ZBX_DBROW2UINT64(slideshowid, row[0]);
+		ZBX_DBROW2UINT64(userid, row[3]);
+		private = atoi(row[4]);
+
+		if (FAIL == (ret = DBpatch_delay_routine(row[2], &delay)))
+			break;
+
+		ret = DBpatch_convert_slideshow(slideshowid, row[1], delay, userid, private);
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030095(void)
+{
+	int		ret = SUCCEED;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	result = DBselect("select screenid,name,userid,private from screens");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		uint64_t	screenid, userid;
+		int		private;
+
+		ZBX_DBROW2UINT64(screenid, row[0]);
+		ZBX_DBROW2UINT64(userid, row[2]);
+		private = atoi(row[3]);
+
+		if (SUCCEED == (ret = DBpatch_convert_screen(screenid, row[1], userid, private)))
+			ret = DBpatch_delete_screen(screenid);
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+#undef DASHBOARD_MAX_COLS
+#undef DASHBOARD_MAX_ROWS
+#undef DASHBOARD_WIDGET_MIN_ROWS
+#undef DASHBOARD_WIDGET_MAX_ROWS
+
+#undef SCREEN_MAX_ROWS
+#undef SCREEN_MAX_COLS
+#undef SCREEN_RESOURCE_CLOCK
+#undef SCREEN_RESOURCE_GRAPH
+#undef SCREEN_RESOURCE_SIMPLE_GRAPH
+#undef SCREEN_RESOURCE_LLD_GRAPH
+#undef SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+#undef SCREEN_RESOURCE_PLAIN_TEXT
+#undef SCREEN_RESOURCE_URL
+
+#undef SCREEN_RESOURCE_MAP
+#undef SCREEN_RESOURCE_HOST_INFO
+#undef SCREEN_RESOURCE_TRIGGER_INFO
+#undef SCREEN_RESOURCE_SERVER_INFO
+#undef SCREEN_RESOURCE_TRIGGER_OVERVIEW
+#undef SCREEN_RESOURCE_DATA_OVERVIEW
+#undef SCREEN_RESOURCE_ACTIONS
+#undef SCREEN_RESOURCE_EVENTS
+#undef SCREEN_RESOURCE_HOSTGROUP_TRIGGERS
+#undef SCREEN_RESOURCE_SYSTEM_STATUS
+#undef SCREEN_RESOURCE_HOST_TRIGGERS
+
+#undef ZBX_WIDGET_FIELD_TYPE_INT32
+#undef ZBX_WIDGET_FIELD_TYPE_STR
+#undef ZBX_WIDGET_FIELD_TYPE_ITEM
+#undef ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE
+#undef ZBX_WIDGET_FIELD_TYPE_GRAPH
+#undef ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
+
+/* #undef ZBX_WIDGET_FIELD_RESOURCE_GRAPH */
+/* #undef ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH */
+/* #undef ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE */
+/* #undef ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE */
+
+#undef ZBX_WIDGET_TYPE_CLOCK
+#undef ZBX_WIDGET_TYPE_GRAPH_CLASSIC
+#undef ZBX_WIDGET_TYPE_GRAPH_PROTOTYPE
+#undef ZBX_WIDGET_TYPE_PLAIN_TEXT
+#undef ZBX_WIDGET_TYPE_URL
+#undef POS_EMPTY
+#undef POS_TAKEN
+#undef SKIP_EMPTY
+
+static int	DBpatch_5030096(void)
+{
+	return DBdrop_table("slides");
+}
+
+static int	DBpatch_5030097(void)
+{
+	return DBdrop_table("slideshow_user");
+}
+
+static int	DBpatch_5030098(void)
+{
+	return DBdrop_table("slideshow_usrgrp");
+}
+
+static int	DBpatch_5030099(void)
+{
+	return DBdrop_table("slideshows");
+
+}
+
+static int	DBpatch_5030100(void)
+{
+	return DBdrop_table("screen_usrgrp");
+}
+
+static int	DBpatch_5030101(void)
+{
+	return DBdrop_table("screens_items");
+}
+
+static int	DBpatch_5030102(void)
+{
+	return DBdrop_table("screen_user");
+}
+
+static int	DBpatch_5030103(void)
+{
+	return DBdrop_table("screens");
+}
+
+static int	DBpatch_5030104(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from widget where type='favscreens'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030105(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+			"'web.favorite.screenids', "
+			"'web.screenconf.filter.active', "
+			"'web.screenconf.filter_name', "
+			"'web.screenconf.php.sort', "
+			"'web.screenconf.php.sortorder', "
+			"'web.screens.elementid', "
+			"'web.screens.filter.active', "
+			"'web.screens.filter.from', "
+			"'web.screens.filter.to', "
+			"'web.screens.hostid', "
+			"'web.screens.tr_groupid', "
+			"'web.screens.tr_hostid', "
+			"'web.slideconf.filter.active', "
+			"'web.slideconf.filter_name', "
+			"'web.slideconf.php.sort', "
+			"'web.slideconf.php.sortorder', "
+			"'web.slides.elementid', "
+			"'web.slides.filter.active', "
+			"'web.slides.filter.from', "
+			"'web.slides.filter.to', "
+			"'web.slides.hostid', "
+			"'web.slides.rf_rate.hat_slides', "
+			"'web.favorite.screenids')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030106(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from role_rule"
+			" where name like 'api.method.%%'"
+			" and (value_str like 'screen.%%' or value_str like 'screenitem.%%')"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030107(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from role_rule where name='ui.monitoring.screens'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030108(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.dashbrd.dashboardid", "web.dashboard.dashboardid",
+			"web.dashbrd.hostid", "web.dashboard.hostid",
+			"web.dashbrd.list.sort", "web.dashboard.list.sort",
+			"web.dashbrd.list.sortorder", "web.dashboard.list.sortorder",
+			"web.dashbrd.list_was_opened", "web.dashboard.list_was_opened",
+			"web.dashbrd.filter", "web.dashboard.filter",
+			"web.dashbrd.filter.active", "web.dashboard.filter.active",
+			"web.dashbrd.filter.from", "web.dashboard.filter.from",
+			"web.dashbrd.filter.to", "web.dashboard.filter.to",
+			"web.dashbrd.filter_name", "web.dashboard.filter_name",
+			"web.dashbrd.filter_show", "web.dashboard.filter_show",
+			"web.dashbrd.last_widget_type", "web.dashboard.last_widget_type",
+			"web.dashbrd.navtree.item.selected", "web.dashboard.widget.navtree.item.selected",
+			"web.dashbrd.widget.rf_rate", "web.dashboard.widget.rf_rate",
+			"web.templates.dashbrd.list.sort", "web.templates.dashboard.list.sort",
+			"web.templates.dashbrd.list.sortorder", "web.templates.dashboard.list.sortorder"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030109(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx=CONCAT('web.dashboard.widget.navtree.item-', SUBSTR(idx, 21))"
+			" where idx like 'web.dashbrd.navtree-%%.toggle'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030110(void)
 {
 	const ZBX_TABLE	table =
 			{"report", "reportid", 0,
@@ -976,26 +3678,26 @@ static int	DBpatch_5030057(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030058(void)
+static int	DBpatch_5030111(void)
 {
 	return DBcreate_index("report", "report_1", "name", 1);
 }
 
-static int	DBpatch_5030059(void)
+static int	DBpatch_5030112(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report", 1, &field);
 }
 
-static int	DBpatch_5030060(void)
+static int	DBpatch_5030113(void)
 {
 	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report", 2, &field);
 }
 
-static int	DBpatch_5030061(void)
+static int	DBpatch_5030114(void)
 {
 	const ZBX_TABLE	table =
 			{"report_param", "reportparamid", 0,
@@ -1012,19 +3714,19 @@ static int	DBpatch_5030061(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030062(void)
+static int	DBpatch_5030115(void)
 {
 	return DBcreate_index("report_param", "report_param_1", "reportid", 0);
 }
 
-static int	DBpatch_5030063(void)
+static int	DBpatch_5030116(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_param", 1, &field);
 }
 
-static int	DBpatch_5030064(void)
+static int	DBpatch_5030117(void)
 {
 	const ZBX_TABLE	table =
 			{"report_user", "reportuserid", 0,
@@ -1042,33 +3744,33 @@ static int	DBpatch_5030064(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030065(void)
+static int	DBpatch_5030118(void)
 {
 	return DBcreate_index("report_user", "report_user_1", "reportid", 0);
 }
 
-static int	DBpatch_5030066(void)
+static int	DBpatch_5030119(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_user", 1, &field);
 }
 
-static int	DBpatch_5030067(void)
+static int	DBpatch_5030120(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_user", 2, &field);
 }
 
-static int	DBpatch_5030068(void)
+static int	DBpatch_5030121(void)
 {
 	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("report_user", 3, &field);
 }
 
-static int	DBpatch_5030069(void)
+static int	DBpatch_5030122(void)
 {
 	const ZBX_TABLE	table =
 			{"report_usrgrp", "reportusrgrpid", 0,
@@ -1085,39 +3787,38 @@ static int	DBpatch_5030069(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030070(void)
+static int	DBpatch_5030123(void)
 {
 	return DBcreate_index("report_usrgrp", "report_usrgrp_1", "reportid", 0);
 }
 
-static int	DBpatch_5030071(void)
+static int	DBpatch_5030124(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 1, &field);
 }
 
-static int	DBpatch_5030072(void)
+static int	DBpatch_5030125(void)
 {
 	const ZBX_FIELD field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 2, &field);
 }
 
-static int	DBpatch_5030073(void)
+static int	DBpatch_5030126(void)
 {
 	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("report_usrgrp", 3, &field);
 }
 
-static int	DBpatch_5030074(void)
+static int	DBpatch_5030127(void)
 {
 	const ZBX_FIELD	field = {"url", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
-
 #endif
 
 DBPATCH_START(5030)
@@ -1199,5 +3900,58 @@ DBPATCH_ADD(5030071, 0, 1)
 DBPATCH_ADD(5030072, 0, 1)
 DBPATCH_ADD(5030073, 0, 1)
 DBPATCH_ADD(5030074, 0, 1)
+DBPATCH_ADD(5030075, 0, 1)
+DBPATCH_ADD(5030076, 0, 1)
+DBPATCH_ADD(5030077, 0, 1)
+DBPATCH_ADD(5030078, 0, 1)
+DBPATCH_ADD(5030079, 0, 1)
+DBPATCH_ADD(5030080, 0, 1)
+DBPATCH_ADD(5030081, 0, 1)
+DBPATCH_ADD(5030082, 0, 1)
+DBPATCH_ADD(5030083, 0, 1)
+DBPATCH_ADD(5030084, 0, 1)
+DBPATCH_ADD(5030085, 0, 1)
+DBPATCH_ADD(5030086, 0, 1)
+DBPATCH_ADD(5030087, 0, 1)
+DBPATCH_ADD(5030088, 0, 1)
+DBPATCH_ADD(5030089, 0, 1)
+DBPATCH_ADD(5030090, 0, 1)
+DBPATCH_ADD(5030091, 0, 1)
+DBPATCH_ADD(5030092, 0, 1)
+DBPATCH_ADD(5030093, 0, 1)
+DBPATCH_ADD(5030094, 0, 1)
+DBPATCH_ADD(5030095, 0, 1)
+DBPATCH_ADD(5030096, 0, 1)
+DBPATCH_ADD(5030097, 0, 1)
+DBPATCH_ADD(5030098, 0, 1)
+DBPATCH_ADD(5030099, 0, 1)
+DBPATCH_ADD(5030100, 0, 1)
+DBPATCH_ADD(5030101, 0, 1)
+DBPATCH_ADD(5030102, 0, 1)
+DBPATCH_ADD(5030103, 0, 1)
+DBPATCH_ADD(5030104, 0, 1)
+DBPATCH_ADD(5030105, 0, 1)
+DBPATCH_ADD(5030106, 0, 1)
+DBPATCH_ADD(5030107, 0, 1)
+DBPATCH_ADD(5030108, 0, 1)
+DBPATCH_ADD(5030109, 0, 1)
+DBPATCH_ADD(5030110, 0, 1)
+DBPATCH_ADD(5030111, 0, 1)
+DBPATCH_ADD(5030112, 0, 1)
+DBPATCH_ADD(5030113, 0, 1)
+DBPATCH_ADD(5030114, 0, 1)
+DBPATCH_ADD(5030115, 0, 1)
+DBPATCH_ADD(5030116, 0, 1)
+DBPATCH_ADD(5030117, 0, 1)
+DBPATCH_ADD(5030118, 0, 1)
+DBPATCH_ADD(5030119, 0, 1)
+DBPATCH_ADD(5030120, 0, 1)
+DBPATCH_ADD(5030121, 0, 1)
+DBPATCH_ADD(5030122, 0, 1)
+DBPATCH_ADD(5030123, 0, 1)
+DBPATCH_ADD(5030124, 0, 1)
+DBPATCH_ADD(5030125, 0, 1)
+DBPATCH_ADD(5030126, 0, 1)
+DBPATCH_ADD(5030127, 0, 1)
 
 DBPATCH_END()

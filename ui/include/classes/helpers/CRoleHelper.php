@@ -29,7 +29,6 @@ class CRoleHelper {
 	public const UI_MONITORING_HOSTS = 'ui.monitoring.hosts';
 	public const UI_MONITORING_OVERVIEW = 'ui.monitoring.overview';
 	public const UI_MONITORING_LATEST_DATA = 'ui.monitoring.latest_data';
-	public const UI_MONITORING_SCREENS = 'ui.monitoring.screens';
 	public const UI_MONITORING_MAPS = 'ui.monitoring.maps';
 	public const UI_MONITORING_DISCOVERY = 'ui.monitoring.discovery';
 	public const UI_MONITORING_SERVICES = 'ui.monitoring.services';
@@ -285,9 +284,9 @@ class CRoleHelper {
 	public static function getAllUiElements(int $user_type): array {
 		$rules = [
 			self::UI_MONITORING_DASHBOARD, self::UI_MONITORING_PROBLEMS, self::UI_MONITORING_HOSTS,
-			self::UI_MONITORING_OVERVIEW, self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_SCREENS,
-			self::UI_MONITORING_MAPS, self::UI_MONITORING_SERVICES, self::UI_INVENTORY_OVERVIEW,
-			self::UI_INVENTORY_HOSTS, self::UI_REPORTS_AVAILABILITY_REPORT, self::UI_REPORTS_TOP_TRIGGERS
+			self::UI_MONITORING_OVERVIEW, self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_MAPS,
+			self::UI_MONITORING_SERVICES, self::UI_INVENTORY_OVERVIEW, self::UI_INVENTORY_HOSTS,
+			self::UI_REPORTS_AVAILABILITY_REPORT, self::UI_REPORTS_TOP_TRIGGERS
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
@@ -382,7 +381,6 @@ class CRoleHelper {
 					self::UI_MONITORING_HOSTS => _('Hosts'),
 					self::UI_MONITORING_OVERVIEW => _('Overview'),
 					self::UI_MONITORING_LATEST_DATA => _('Latest data'),
-					self::UI_MONITORING_SCREENS => _('Screens'),
 					self::UI_MONITORING_MAPS => _('Maps')
 				];
 
@@ -485,7 +483,7 @@ class CRoleHelper {
 	 */
 	public static function getActionsLabels(int $user_type): array {
 		$labels = [
-			self::ACTIONS_EDIT_DASHBOARDS => _('Create and edit dashboards and screens'),
+			self::ACTIONS_EDIT_DASHBOARDS => _('Create and edit dashboards'),
 			self::ACTIONS_EDIT_MAPS => _('Create and edit maps')
 		];
 
