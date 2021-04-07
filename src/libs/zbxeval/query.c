@@ -327,8 +327,8 @@ static char	*eval_unquote_str(char *str)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_generate_filter(zbx_eval_context_t *ctx, zbx_vector_eval_token_t *stack, zbx_vector_str_t *groups,
-		char **filter, char **error)
+static int	eval_generate_filter(const zbx_eval_context_t *ctx, const zbx_vector_eval_token_t *stack,
+		zbx_vector_str_t *groups, char **filter, char **error)
 {
 	zbx_vector_str_t	out;
 	int			i, ret = FAIL;
