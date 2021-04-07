@@ -1067,12 +1067,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								}
 
 								$value = [bold($function['function'].'(')];
-								if ($function['parameter'] === TRIGGER_QUERY_PLACEHOLDER) {
+								if (($pos = strpos($function['parameter'], TRIGGER_QUERY_PLACEHOLDER)) !== false) {
+									if ($pos != 0) {
+										$value[] = substr($function['parameter'], 0, $pos);
+									}
 									$value[] = $link;
-								}
-								elseif (substr($function['parameter'], 0, 1) === TRIGGER_QUERY_PLACEHOLDER) {
-									$value[] = $link;
-									$value[] = substr($function['parameter'], 1);
+									if (strlen($function['parameter']) > $pos + 1) {
+										$value[] = substr($function['parameter'], $pos + 1);
+									}
 								}
 								else {
 									$value[] = $function['parameter'];
