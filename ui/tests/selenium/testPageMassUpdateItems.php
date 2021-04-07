@@ -31,6 +31,9 @@ class testPageMassUpdateItems extends CWebTest{
 
 	const HOSTID = 40001;	// Simple form test host.
 	const HOST_NAME = 'Simple form test host';
+	const AGENT_INTERFACE_ID = 40011;
+	const SNMP2_INTERFACE_ID = 40012;
+	const IPMI_INTERFACE_ID = 40013;
 
 	const INTERVAL_MAPPING = [
 		'Type' => [
@@ -53,7 +56,6 @@ class testPageMassUpdateItems extends CWebTest{
 		]
 	];
 
-
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -74,8 +76,9 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => '1agent',
 				'type' => 0,
 				'value_type' => 0,
-				'interfaceid'=> '40011',
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '1m',
+				'applications' => [5000, 5001],
 				'preprocessing' => [
 					[
 						'type' => '5',
@@ -91,8 +94,9 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => '2agent',
 				'type' => 0,
 				'value_type' => 1,
-				'interfaceid'=> '40011',
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
+				'applications' => [5000, 5001],
 				'preprocessing' => [
 					[
 						'type' => '1',
@@ -108,8 +112,9 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'snmptrap.fallback',
 				'type' => 17,
 				'value_type' => 0,
-				'interfaceid'=> '40012',
-				'delay' => '3m'
+				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'delay' => '3m',
+				'applications' => [5002, 5003]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -117,8 +122,9 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'snmptrap[regexp]',
 				'type' => 17,
 				'value_type' => 1,
-				'interfaceid'=> '40012',
-				'delay' => '4m'
+				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'delay' => '4m',
+				'applications' => [5002, 5003]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -126,8 +132,9 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'grpavg["host group","key",avg,last]',
 				'type' => 8,
 				'value_type' => 0,
-				'interfaceid'=> '40012',
-				'delay' => '9m'
+				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'delay' => '9m',
+				'applications' => [5004, 5005]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -135,8 +142,9 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'grpmin["host group","key",avg,min]',
 				'type' => 8,
 				'value_type' => 3,
-				'interfaceid'=> '40012',
-				'delay' => '30s'
+				'interfaceid'=> self::SNMP2_INTERFACE_ID,
+				'delay' => '30s',
+				'applications' => [5004, 5005]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -144,9 +152,10 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'ipmi1',
 				'type' => 12,
 				'value_type' => 0,
-				'interfaceid'=> '40013',
+				'interfaceid'=> self::IPMI_INTERFACE_ID,
 				'delay' => '10m',
-				'ipmi_sensor' => 'temp'
+				'ipmi_sensor' => 'temp',
+				'applications' => [5002, 5003]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -154,9 +163,10 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'ipmi2',
 				'type' => 12,
 				'value_type' => 3,
-				'interfaceid'=> '40013',
+				'interfaceid'=> self::IPMI_INTERFACE_ID,
 				'delay' => '11s',
-				'ipmi_sensor' => 'temp'
+				'ipmi_sensor' => 'temp',
+				'applications' => [5002, 5003]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -164,9 +174,10 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'snmp1',
 				'type' => 20,
 				'value_type' => 4,
-				'interfaceid'=> '40012',
+				'interfaceid'=> self::SNMP2_INTERFACE_ID,
 				'delay' => '9m',
-				'snmp_oid' => '.1.3.6.1.2.1.1.1.0'
+				'snmp_oid' => '.1.3.6.1.2.1.1.1.0',
+				'applications' => [5004, 5005]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -174,9 +185,10 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'snmp2',
 				'type' => 20,
 				'value_type' => 4,
-				'interfaceid'=> '40012',
+				'interfaceid'=> self::SNMP2_INTERFACE_ID,
 				'delay' => '101s',
-				'snmp_oid' => '.1.3.8.1.2.1.1.1.0'
+				'snmp_oid' => '.1.3.8.1.2.1.1.1.0',
+				'applications' => [5004, 5005]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -184,7 +196,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'ssh.run[]',
 				'type' => 13,
 				'value_type' => 1,
-				'interfaceid'=> '40011',
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '22s',
 				'username' => 'username1',
 				'params' => 'executed script 1'
@@ -195,7 +207,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'ssh.run[description]',
 				'type' => 13,
 				'value_type' => 1,
-				'interfaceid'=> '40011',
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '55s',
 				'username' => 'username2',
 				'params' => 'executed script 2'
@@ -206,7 +218,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'db.odbc.select',
 				'type' => 11,
 				'value_type' => 0,
-				'interfaceid'=> '40011',
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '10s',
 				'username' => 'test_username',
 				'password' => 'test_password',
@@ -218,7 +230,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'db.odbc.select',
 				'type' => 11,
 				'value_type' => 0,
-				'interfaceid'=> '40011',
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '90s',
 				'params' => 'SELECT * FROM items'
 			],
@@ -228,7 +240,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'calculated1',
 				'type' => 15,
 				'value_type' => 0,
-				'interfaceid'=> '40011',
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '50s',
 				'params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)'
 			],
@@ -238,7 +250,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'key_' => 'calculated2',
 				'type' => 15,
 				'value_type' => 0,
-				'interfaceid'=> '40011',
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '30s',
 				'params' => 'sum("Zabbix Server:zabbix[wcache,values]",900)'
 			]
@@ -927,10 +939,22 @@ class testPageMassUpdateItems extends CWebTest{
 						'Show value' => ['id' => 'valuemapid', 'value' => 'TruthValue'],
 						'Applications' => [
 							'action' => 'Add',
-							'application' => 'New application'
+							'applications' => ['New_application_1', 'New_application_2']
 						],
 						'Description' => ['id' => 'description', 'value' => 'New mass updated description'],
 						'Status' => ['id' => 'status', 'value' => 'Disabled']
+					],
+					'expected_applications' => [
+						'New_application_1',
+						'New_application_2',
+						'Old Application 1',
+						'Old Application 2'
+					],
+					'not_expected_applications' => [
+						'App for remove 1',
+						'App for remove 2',
+						'App for replace 1',
+						'App for replace 2',
 					]
 				]
 			],
@@ -1074,12 +1098,7 @@ class testPageMassUpdateItems extends CWebTest{
 									'period' => '1-2,7:00-8:00'
 								]
 							]
-						],
-//						'Applications' => [
-//							'action' => 'Replace',
-//							'applications' => ['1', '2']
-//						],
-//						'expected_applications' => []
+						]
 					]
 				]
 			],
@@ -1134,7 +1153,21 @@ class testPageMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix aggregate'],
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
 						'Units' => ['id' => 'units', 'value' => 'kB'],
-						'Update interval' => ['Delay' => '86400']
+						'Update interval' => ['Delay' => '86400'],
+						'Applications' => [
+							'action' => 'Remove',
+							'applications' => ['App for remove 2']
+						]
+					],
+					'expected_applications' => [
+						'App for remove 1'
+					],
+					'not_expected_applications' => [
+						'App for remove 2',
+						'App for replace 1',
+						'App for replace 2',
+						'Old Application 1',
+						'Old Application 2'
 					]
 				]
 			],
@@ -1218,6 +1251,18 @@ class testPageMassUpdateItems extends CWebTest{
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
 						'Units' => ['id' => 'units', 'value' => 'kB'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.3 : 10053'],
+						'Applications' => [
+							'action' => 'Replace'
+						]
+					],
+					'expected_applications' => null,
+					'not_expected_applications' => [
+						'Old Application 1',
+						'Old Application 2',
+						'App for remove 1',
+						'App for remove 2',
+						'App for replace 1',
+						'App for replace 2'
 					]
 				]
 			],
@@ -1239,11 +1284,22 @@ class testPageMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '99d']
 						],
 						'Status' => ['id' => 'status', 'value' => 'Enabled'],
-//						'Applications' => [
-//							'action' => 'Remove',
-//							'applications' => ['1']
-//						],
-//						'expected_applications' => []
+						'Applications' => [
+							'action' => 'Replace',
+							'applications' => ['Replaced_application_1', 'Replaced_application_2']
+						]
+					],
+					'expected_applications' => [
+						'Replaced_application_1',
+						'Replaced_application_2'
+					],
+					'not_expected_applications' => [
+						'Old Application 1',
+						'Old Application 2',
+						'App for remove 1',
+						'App for remove 2',
+						'App for replace 1',
+						'App for replace 2'
 					]
 				]
 			],
@@ -1256,7 +1312,20 @@ class testPageMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
 						'Type of information'=> ['id' => 'value_type', 'value' => 'Character'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 10055']
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 10055'],
+						'Applications' => [
+							'action' => 'Remove'
+						]
+					],
+					'expected_applications' => [
+						'App for remove 1',
+						'App for remove 2',
+					],
+					'not_expected_applications' => [
+						'Old Application 1',
+						'Old Application 2',
+						'App for replace 1',
+						'App for replace 2'
 					]
 				]
 			],
@@ -1419,7 +1488,9 @@ class testPageMassUpdateItems extends CWebTest{
 
 				case 'Applications':
 					$form->query('id:massupdate_app_action')->asSegmentedRadio()->one()->fill($value['action']);
-					$form->query('xpath://*[@id="applications_"]/..')->asMultiselect()->one()->fill($value['application']);
+					if(array_key_exists('applications', $value)){
+						$form->query('xpath://*[@id="applications_"]/..')->asMultiselect()->one()->fill($value['applications']);
+					}
 					break;
 
 				case 'Headers':
@@ -1479,7 +1550,7 @@ class testPageMassUpdateItems extends CWebTest{
 							else {
 								$this->assertEquals($value['radio']['value'], $form->query('id', $value['radio']['id'])
 										->one()->asSegmentedRadio()->getValue());
-								if(array_key_exists('input', $value)){
+								if (array_key_exists('input', $value)){
 									$this->assertEquals($value['input']['value'], $form->query('id', $value['input']['id'])
 											->one()->getValue());
 								}
@@ -1495,7 +1566,7 @@ class testPageMassUpdateItems extends CWebTest{
 							$this->assertEquals($value['Delay'], $form->getField($field)->getValue());
 							if(array_key_exists('Custom intervals', $value)){
 								// Remove action and index fields.
-								foreach ($value['Custom intervals'] as &$interval) {
+								foreach($value['Custom intervals'] as &$interval) {
 									unset($interval['action'], $interval['index']);
 								}
 								unset($interval);
@@ -1517,11 +1588,26 @@ class testPageMassUpdateItems extends CWebTest{
 							break;
 
 						case 'Applications':
+							if ($value['action'] === 'Replace' && $data['expected_applications'] === null) {
+								$this->assertTrue($form->query('xpath://select/option[@selected and text()="-None-"]')
+										->exists());
+							}
+							else {
+								foreach ($data['expected_applications'] as $application) {
+									$this->assertTrue($form->query('xpath://select/option[@selected and text()='.
+											zbx_dbstr($application).']')->exists());
+								}
+							}
 
+							foreach ($data['not_expected_applications'] as $not_application) {
+								$this->assertTrue($form->query('xpath://select/option[not(@selected) and text()='.
+										zbx_dbstr($not_application).']')->exists());
+							}
 							break;
+
 						case 'Master item':
-							$this->assertEquals([self::HOST_NAME.': '.$value['value']], $form->query('xpath://*[@id="master_itemid"]/..')
-									->asMultiselect()->one()->getValue());
+							$this->assertEquals([self::HOST_NAME.': '.$value['value']],
+								$form->query('xpath://*[@id="master_itemid"]/..')->asMultiselect()->one()->getValue());
 							break;
 					}
 				}
