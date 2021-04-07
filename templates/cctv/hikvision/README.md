@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 5.4 and higher  
-Sample device overview page: https://www.hikvision.com/en/products/IP-Products/Network-camera/
+Sample device overview page: https://www.hikvision.com/en/products/IP-Products/Network-Cameras/
 
 
 This template was tested on:
