@@ -104,7 +104,7 @@ class CPeriodParser extends CParser {
 		// Check format. Otherwaise, almost anything can be period.
 		$is_valid_num = (substr($parts[0], 0, 1) === '#' && ctype_digit(substr($parts[0], 1)));
 		$is_valid_sec = preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.ZBX_TIME_SUFFIXES_WITH_YEAR.'])$/', $parts[0]);
-		if (!$is_valid_num && !$is_valid_sec) {
+		if (!$is_valid_num && !$is_valid_sec && !$contains_macros[0]) {
 			return CParser::PARSE_FAIL;
 		}
 
