@@ -2608,7 +2608,7 @@ int	zbx_dbms_mariadb_used(void)
  **************************************************************************************************************/
 zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 {
-#define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)(x/100))*100))
+#define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 #if defined(HAVE_MYSQL)
 	int		flag;
 	const char	*info;

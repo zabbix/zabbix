@@ -1025,7 +1025,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
  ************************************************************************************/
 void	zbx_elastic_version_extract(struct zbx_json *json)
 {
-#define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)(x/100))*100))
+#define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 	zbx_httppage_t			page;
 	struct zbx_json_parse		jp, jp_values, jp_sub;
 	struct curl_slist		*curl_headers;
