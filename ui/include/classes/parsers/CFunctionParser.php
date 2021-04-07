@@ -77,7 +77,7 @@ class CFunctionParser extends CParser {
 	 * @return bool
 	 */
 	protected function isFunctionChar(string $c): bool {
-		return ($c >= 'a' && $c <= 'z');
+		return ($c >= 'a' && $c <= 'z') || $c === '_';
 	}
 
 	/**

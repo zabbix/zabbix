@@ -31,8 +31,14 @@ class C52ImportConverter extends CConverter {
 	 */
 	protected $trigger_expression_converter;
 
+	/**
+	 * @var C52AggregateItemKeyConverter
+	 */
+	protected $aggregate_item_key_converter;
+
 	public function __construct() {
 		$this->trigger_expression_converter = new C52TriggerExpressionConverter();
+		$this->aggregate_item_key_converter = new C52AggregateItemKeyConverter();
 	}
 
 	/**
@@ -95,6 +101,10 @@ class C52ImportConverter extends CConverter {
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
 						$item = $parser->convert($item);
 					}
+					else if ($item['type'] === CXmlConstantName::AGGREGATE) {
+						$item['type'] = CXmlConstantName::CALCULATED;
+						$item['params'] = $this->aggregate_item_key_converter->convert($item['key']);
+					}
 				}
 				unset($item);
 			}
@@ -134,6 +144,10 @@ class C52ImportConverter extends CConverter {
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
 						$item = $parser->convert($item);
+					}
+					else if ($item['type'] === CXmlConstantName::AGGREGATE) {
+						$item['type'] = CXmlConstantName::CALCULATED;
+						$item['params'] = $this->aggregate_item_key_converter->convert($item['key']);
 					}
 				}
 				unset($item);

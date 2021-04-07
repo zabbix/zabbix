@@ -453,8 +453,12 @@ class CItemKey extends CParser {
 		$pos++;
 
 		if (isset($source[$pos]) && $source[$pos] === '"') {
+			$value_end = $pos;
 			$pos++;
-			$value_end = strpos($source, '"', $pos);
+
+			do {
+				$value_end = strpos($source, '"', $value_end + 1);
+			} while ($value_end !== false && substr($source, $value_end - 1, 2) === '\\"');
 
 			if ($value_end === false) {
 				return false;

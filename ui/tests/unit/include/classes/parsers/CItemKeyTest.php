@@ -1439,6 +1439,18 @@ class CItemKeyTest extends TestCase {
 				['', 'b'],
 				$with_filter
 			],
+			[
+				'trap1?[tag="support escaped \\"quotes\\""]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'trap1?[tag="support escaped \\"quotes\\""]',
+					'key' => 'trap1',
+					'parameters' => []
+				],
+				[],
+				$with_filter
+			],
 
 			[
 				'*?[tag="noattributes"]', 0,
@@ -1578,6 +1590,18 @@ class CItemKeyTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'error' => _s('incorrect syntax near "%1$s"', 'and group="name"]'),
+					'match' => '',
+					'key' => 'key',
+					'parameters' => []
+				],
+				[],
+				$with_filter
+			],
+			[
+				'key?[group="quote escaped\\"]', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => _s('incorrect syntax near "%1$s"', 'quote escaped\\"]'),
 					'match' => '',
 					'key' => 'key',
 					'parameters' => []

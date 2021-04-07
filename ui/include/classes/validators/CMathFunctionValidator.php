@@ -76,6 +76,27 @@ class CMathFunctionValidator extends CValidator {
 	 */
 	protected $lld_macro_parser;
 
+	/**
+	 * If set to true, foreach functions will be allowed and validated as first parameter.
+	 */
+	protected $foreach_function = false;
+
+	/**
+	 * Array of function supports foreach function as first parameter.
+	 *
+	 * @var array
+	 */
+	protected $parameter_foreach_functions = ['avg', 'max', 'min', 'sum'];
+
+	/**
+	 * Array of supported foreach functions.
+	 *
+	 * @var array
+	 */
+	protected $foreach_functions = [
+		'avg_foreach', 'count_foreach', 'last_foreach', 'max_foreach', 'min_foreach', 'sum_foreach'
+	];
+
 	public function __construct(array $options = []) {
 		/*
 		 * CValidator is an abstract class, so no specific functionality should be bound to it. Thus putting
@@ -122,12 +143,25 @@ class CMathFunctionValidator extends CValidator {
 			return false;
 		}
 
+		$validate_foreach = ($this->foreach_function && in_array($fn->function, $this->parameter_foreach_functions));
+
 		foreach ($fn->params_raw['parameters'] as $param) {
 			if ($param instanceof CQueryParserResult) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
 				return false;
 			}
 			elseif ($param instanceof CFunctionParserResult) {
+				if (in_array($param->function, $this->foreach_functions)) {
+					if (!$validate_foreach) {
+						$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
+						return false;
+					}
+
+					if (!$this->validateForeachFunction($param)) {
+						return false;
+					}
+				}
+
 				continue;
 			}
 			elseif (!$this->user_macro_parser->parse($param->match)
@@ -137,6 +171,48 @@ class CMathFunctionValidator extends CValidator {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
 				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Will return true for valid foreach functions, false otherwise. Additionally will set error message.
+	 * Example of valid function: avg_foreach(/host/key, 5m)
+	 *
+	 * @param CFunctionParserResult $fn  Validated function.
+	 * @return bool
+	 */
+	protected function validateForeachFunction(CFunctionParserResult $fn): bool {
+		$params = $fn->params_raw['parameters'];
+
+		if (!$params || count($params) > 2) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+				_('Invalid number of parameters.')
+			);
+			return false;
+		}
+
+		if ((array_shift($params) instanceof CQueryParserResult) === false) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+				_('Invalid first parameter.')
+			);
+			return false;
+		}
+
+		if (!$params) {
+			return true;
+		}
+
+		$parser = new CSimpleIntervalParser();
+		$period = array_shift($params);
+
+		if (($period instanceof CFunctionParameterResult) === false
+				|| $parser->parse($period->match) === CParser::PARSE_FAIL) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+				_('Invalid second parameter.')
+			);
+			return false;
 		}
 
 		return true;
