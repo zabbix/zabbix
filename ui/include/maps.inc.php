@@ -64,10 +64,11 @@ function sysmapElementLabel($label = null) {
 /**
  * Get actions (data for popup menu) for map elements.
  *
- * @param array $sysmap
- * @param array $sysmap['selements']
- * @param array $options                    Options used to retrieve actions.
- * @param int   $options['severity_min']    Minimal severity used.
+ * @param array  $sysmap
+ * @param array  $sysmap['selements']
+ * @param array  $options                   Options used to retrieve actions.
+ * @param int    $options['severity_min']   Minimal severity used.
+ * @param int    $options['unique_id']
  *
  * @return array
  */
@@ -80,6 +81,10 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 	foreach ($sysmap['selements'] as $selementid => $elem) {
 		if ($elem['permission'] < PERM_READ) {
 			continue;
+		}
+
+		if (array_key_exists('unique_id', $options)) {
+			$elem['unique_id'] = $options['unique_id'];
 		}
 
 		$hostid = ($elem['elementtype_orig'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP

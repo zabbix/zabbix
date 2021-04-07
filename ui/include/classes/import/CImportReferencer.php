@@ -38,7 +38,6 @@ class CImportReferencer {
 	protected $graphs = [];
 	protected $iconMaps = [];
 	protected $maps = [];
-	protected $screens = [];
 	protected $templateDashboards = [];
 	protected $macros = [];
 	protected $proxies = [];
@@ -54,7 +53,6 @@ class CImportReferencer {
 	protected $graphsRefs;
 	protected $iconMapsRefs;
 	protected $mapsRefs;
-	protected $screensRefs;
 	protected $templateDashboardsRefs;
 	protected $macrosRefs;
 	protected $proxiesRefs;
@@ -254,21 +252,6 @@ class CImportReferencer {
 		}
 
 		return isset($this->mapsRefs[$name]) ? $this->mapsRefs[$name] : false;
-	}
-
-	/**
-	 * Get screen id by name.
-	 *
-	 * @param string $name
-	 *
-	 * @return string|bool
-	 */
-	public function resolveScreen($name) {
-		if ($this->screensRefs === null) {
-			$this->selectScreens();
-		}
-
-		return isset($this->screensRefs[$name]) ? $this->screensRefs[$name] : false;
 	}
 
 	/**
@@ -572,18 +555,9 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add screens names that need association with a database screen id.
+	 * Add templated dashboard names that need association with a database dashboard id.
 	 *
-	 * @param array $screens
-	 */
-	public function addScreens(array $screens) {
-		$this->screens = array_unique(array_merge($this->screens, $screens));
-	}
-
-	/**
-	 * Add templated screen names that need association with a database screen id.
-	 *
-	 * @param array $screens
+	 * @param array $dashboards
 	 */
 	public function addTemplateDashboards(array $dashboards) {
 		$this->templateDashboards = array_unique(array_merge($this->templateDashboards, $dashboards));
@@ -943,25 +917,6 @@ class CImportReferencer {
 			}
 
 			$this->maps = [];
-		}
-	}
-
-	/**
-	 * Select screen ids for previously added screen names.
-	 */
-	protected function selectScreens() {
-		if (!empty($this->screens)) {
-			$this->screensRefs = [];
-
-			$db_screens = API::Screen()->get([
-				'filter' => ['name' => $this->screens],
-				'output' => ['screenid', 'name']
-			]);
-			foreach ($db_screens as $db_screen) {
-				$this->screensRefs[$db_screen['name']] = $db_screen['screenid'];
-			}
-
-			$this->screens = [];
 		}
 	}
 

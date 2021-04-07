@@ -163,7 +163,7 @@ function get_icon($type, $params = []) {
 					->setTitle(_('Normal view'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 					->addClass(ZBX_LAYOUT_MODE)
-					->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
+					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
 					->addClass(ZBX_STYLE_BTN_MIN);
 			}
 			else {
@@ -175,11 +175,6 @@ function get_icon($type, $params = []) {
 			}
 
 			return $icon;
-
-		case 'screenconf':
-			return (new CRedirectButton(SPACE, null))
-				->addClass(ZBX_STYLE_BTN_CONF)
-				->setTitle(_('Refresh interval'));
 
 		case 'overviewhelp':
 			return (new CRedirectButton(SPACE, null))

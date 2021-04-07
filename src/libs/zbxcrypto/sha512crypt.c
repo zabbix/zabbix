@@ -18,7 +18,6 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #endif
 #include <errno.h>
 #include <limits.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

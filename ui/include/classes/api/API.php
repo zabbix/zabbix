@@ -340,20 +340,6 @@ class API {
 	}
 
 	/**
-	 * @return CScreen
-	 */
-	public static function Screen() {
-		return self::getApi('screen');
-	}
-
-	/**
-	 * @return CScreenItem
-	 */
-	public static function ScreenItem() {
-		return self::getApi('screenitem');
-	}
-
-	/**
 	 * @return CScript
 	 */
 	public static function Script() {

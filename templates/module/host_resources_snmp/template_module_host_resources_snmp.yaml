@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:51Z'
+  date: '2021-03-02T19:42:25Z'
   groups:
     -
       name: Templates/Modules
@@ -211,10 +211,6 @@ zabbix_export:
               height: '5'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -224,7 +220,7 @@ zabbix_export:
               type: GRAPH_PROTOTYPE
               'y': '5'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -233,11 +229,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -246,9 +238,9 @@ zabbix_export:
                     host: 'HOST-RESOURCES-MIB SNMP'
             -
               type: GRAPH_PROTOTYPE
-              'y': '10'
+              'y': '17'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -257,11 +249,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid

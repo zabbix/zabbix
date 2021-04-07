@@ -143,12 +143,6 @@ class CItemPrototypeManager {
 			CTriggerPrototypeManager::delete($del_triggerids);
 		}
 
-		// Screen items.
-		DB::delete('screens_items', [
-			'resourceid' => $del_itemids,
-			'resourcetype' => [SCREEN_RESOURCE_LLD_SIMPLE_GRAPH]
-		]);
-
 		DB::delete('items', ['itemid' => $del_itemids]);
 	}
 }

@@ -62,17 +62,6 @@ class CMenuHelper {
 					->setAction('latest.view')
 					->setAliases(['history.php', 'chart.php'])
 				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SCREENS)
-				? (new CMenuItem(_('Screens')))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Screens')))
-							->setUrl(new CUrl('screens.php'), 'screens.php')
-							->setAliases(['screenconf.php?!templateid=*', 'screenedit.php?!templateid=*']),
-						(new CMenuItem(_('Slide shows')))
-							->setUrl(new CUrl('slides.php'), 'slides.php')
-							->setAliases(['slideconf.php'])
-					]))
-				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_MAPS)
 				? (new CMenuItem(_('Maps')))
 					->setAction('map.view')

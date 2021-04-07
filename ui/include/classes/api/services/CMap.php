@@ -2310,10 +2310,6 @@ class CMap extends CMapElement {
 			'elementid' => $sysmapids,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
 		]);
-		DB::delete('screens_items', [
-			'resourceid' => $sysmapids,
-			'resourcetype' => SCREEN_RESOURCE_MAP
-		]);
 		DB::delete('profiles', [
 			'idx' => 'web.maps.sysmapid',
 			'value_id' => $sysmapids

@@ -630,7 +630,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The amount of time which jobs spend inthe buildable state.'
+          description: 'The amount of time which jobs spend in the buildable state.'
           preprocessing:
             -
               type: JSONPATH
@@ -650,7 +650,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The amount of time which jobs spend inthe buildable state.'
+          description: 'The amount of time which jobs spend in the buildable state.'
           preprocessing:
             -
               type: JSONPATH

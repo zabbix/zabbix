@@ -436,7 +436,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: |
-            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for backround merges, mutations and fetches).
+            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background merges, mutations and fetches).
              Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa. This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."
           preprocessing:
             -
@@ -450,7 +450,7 @@ zabbix_export:
               tag: Application
               value: ClickHouse
         -
-          name: 'ClickHouse: Memory used for backround moves'
+          name: 'ClickHouse: Memory used for background moves'
           type: DEPENDENT
           key: clickhouse.memory.tracking.background.moves
           delay: '0'
@@ -458,7 +458,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: |
-            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for backround moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.
+            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.
              This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."
           preprocessing:
             -
@@ -1140,9 +1140,9 @@ zabbix_export:
               tag: Application
               value: ClickHouse
         -
-          name: 'ClickHouse: ZooKeeper exeptions per second'
+          name: 'ClickHouse: ZooKeeper exceptions per second'
           type: DEPENDENT
-          key: clickhouse.zookeper.exeptions.rate
+          key: clickhouse.zookeper.exceptions.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1165,7 +1165,7 @@ zabbix_export:
               tag: Application
               value: 'ClickHouse ZooKeeper'
         -
-          name: 'ClickHouse: ZooKeeper hardware exeptions per second'
+          name: 'ClickHouse: ZooKeeper hardware exceptions per second'
           type: DEPENDENT
           key: clickhouse.zookeper.hw_exeptions.rate
           delay: '0'
@@ -1234,7 +1234,7 @@ zabbix_export:
                 "Number of sessions (connections) to ZooKeeper. 
                 Should be no more than one, because using more than one connection to ZooKeeper may lead to bugs due to lack of linearizability (stale reads) that ZooKeeper consistency model allows."
         -
-          name: 'ClickHouse: ZooKeeper user exeptions per second'
+          name: 'ClickHouse: ZooKeeper user exceptions per second'
           type: DEPENDENT
           key: clickhouse.zookeper.user_exeptions.rate
           delay: '0'
@@ -2144,13 +2144,13 @@ zabbix_export:
             host: 'ClickHouse by HTTP'
             key: clickhouse.uptime
     -
-      name: 'ClickHouse: Zookeeper exeptions rate'
+      name: 'ClickHouse: Zookeeper exceptions rate'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'ClickHouse by HTTP'
-            key: clickhouse.zookeper.exeptions.rate
+            key: clickhouse.zookeper.exceptions.rate
         -
           sortorder: '1'
           color: 2774A4

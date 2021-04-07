@@ -201,15 +201,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 */
-	public function buildScreens(array $screens) {
-		$this->data['screens'] = $this->formatScreens($screens);
-	}
-
-	/**
 	 * Format media types.
 	 *
 	 * @param array $schema       Tag schema from validation class.
@@ -1141,30 +1132,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 *
-	 * @return array
-	 */
-	protected function formatScreens(array $screens) {
-		$result = [];
-
-		CArrayHelper::sort($screens, ['name']);
-
-		foreach ($screens as $screen) {
-			$result[] = [
-				'name' => $screen['name'],
-				'hsize' => $screen['hsize'],
-				'vsize' => $screen['vsize'],
-				'screen_items' => $this->formatScreenItems($screen['screenitems'])
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format trigger dependencies.
 	 *
 	 * @param array $dependencies
@@ -1212,42 +1179,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format screen items.
-	 *
-	 * @param array $screenItems
-	 *
-	 * @return array
-	 */
-	protected function formatScreenItems(array $screenItems) {
-		$result = [];
-
-		CArrayHelper::sort($screenItems, ['y', 'x']);
-
-		foreach ($screenItems as $screenItem) {
-			$result[] = [
-				'resourcetype' => $screenItem['resourcetype'],
-				'width' => $screenItem['width'],
-				'height' => $screenItem['height'],
-				'x' => $screenItem['x'],
-				'y' => $screenItem['y'],
-				'colspan' => $screenItem['colspan'],
-				'rowspan' => $screenItem['rowspan'],
-				'elements' => $screenItem['elements'],
-				'valign' => $screenItem['valign'],
-				'halign' => $screenItem['halign'],
-				'style' => $screenItem['style'],
-				'url' => $screenItem['url'],
-				'dynamic' => $screenItem['dynamic'],
-				'sort_triggers' => $screenItem['sort_triggers'],
-				'resource' => $screenItem['resourceid'],
-				'max_columns' => $screenItem['max_columns']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format dashboards.
 	 *
 	 * @param array $dashboards
@@ -1262,7 +1193,30 @@ class CConfigurationExportBuilder {
 		foreach ($dashboards as $dashboard) {
 			$result[] = [
 				'name' => $dashboard['name'],
-				'widgets' => $this->formatWidgets($dashboard['widgets'])
+				'display_period' => $dashboard['display_period'],
+				'auto_start' => $dashboard['auto_start'],
+				'pages' => $this->formatDashboardPages($dashboard['pages'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format dashboard pages.
+	 *
+	 * @param array $dashboard_pages
+	 *
+	 * @return array
+	 */
+	protected function formatDashboardPages(array $dashboard_pages) {
+		$result = [];
+
+		foreach ($dashboard_pages as $dashboard_page) {
+			$result[] = [
+				'name' => $dashboard_page['name'],
+				'display_period' => $dashboard_page['display_period'],
+				'widgets' => $this->formatWidgets($dashboard_page['widgets'])
 			];
 		}
 

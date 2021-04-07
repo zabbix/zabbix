@@ -36,7 +36,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 
 		$data = [
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'style' => $fields['style'],
 			'user' => [

@@ -569,6 +569,10 @@ class CPage {
 	 * @param string $password  Password on login screen
 	 */
 	public function userLogin($alias, $password) {
+		if (self::$cookie === null) {
+			$this->driver->get(PHPUNIT_URL);
+		}
+
 		$this->logout();
 		$this->open('index.php');
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);

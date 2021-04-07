@@ -39,7 +39,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$error = null;
 
-		$dynamic_widget_name = $this->getDefaultHeader();
+		$dynamic_widget_name = $this->getDefaultName();
 		$same_host = true;
 		$items = [];
 		$histories = [];

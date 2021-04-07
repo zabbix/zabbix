@@ -21,22 +21,19 @@
 
 class CWidgetFieldWidgetSelect extends CWidgetField {
 
-	private $search_by_key;
 	private $search_by_value;
 
 	/**
 	 * Field that creates a select of widgets in current dashboard, filtered by given key of widget array.
 	 *
-	 * @param string $name             Name of field in config form and widget['fields'] array.
-	 * @param string $label            Field label in config form.
-	 * @param string $search_by_key    Key of widget array, by which widgets will be filtered.
-	 * @param mixed  $search_by_value  Value that will be searched in widget[$search_by_key].
+	 * @param string $name         Name of field in config form and widget['fields'] array.
+	 * @param string $label        Field label in config form.
+	 * @param mixed  $search_type  Value that will be searched in widgets.
 	 */
-	public function __construct($name, $label, $search_by_key, $search_by_value) {
+	public function __construct($name, $label, $search_by_value) {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->search_by_key = $search_by_key;
 		$this->search_by_value = $search_by_value;
 	}
 
@@ -68,26 +65,21 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	 * @return string
 	 */
 	public function getJavascript() {
-		return
-			'var dashboard_data = dashboard.$target.data("dashboardGrid"),'.
-				'filter_select = jQuery("#'.$this->getName().'").get(0);'.
-			'filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');'.
-			'filter_select.selectedIndex = 0;'.
-			'jQuery.each('.
-				'dashboard.$target.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
-				'function(i, widget) {'.
-					'if (widget !== dashboard_data["dialogue"]["widget"]) {'. // Widget currently edited or null for new widgets.
-						'filter_select.addOption({'.
-							'"label": widget["header"].length'.
-								'? widget["header"]'.
-								': dashboard_data["widget_defaults"][widget["type"]]["header"],'.
-							'"value": widget["fields"]["reference"]'.
-						'});'.
-						'if (widget["fields"]["reference"] === "'.$this->getValue().'") {'.
-							'filter_select.value = "'.$this->getValue().'";'.
-						'}'.
-					'}'.
-			'});';
+		return '
+			var filter_select = document.getElementById("'.$this->getName().'");
+
+			filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');
+			filter_select.selectedIndex = 0;
+
+			ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
+				if (widget.getType() === "'.$this->search_by_value.'") {
+					filter_select.addOption({label: widget.getHeaderName(), value: widget.getFields().reference});
+					if (widget.getFields().reference === "'.$this->getValue().'") {
+						filter_select.value = "'.$this->getValue().'";
+					}
+				}
+			});
+		';
 	}
 
 	public function setValue($value) {

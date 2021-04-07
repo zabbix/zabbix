@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:59Z'
+  date: '2021-03-02T19:42:20Z'
   groups:
     -
       name: 'Templates/Operating systems'
@@ -973,7 +973,7 @@ zabbix_export:
               description: 'The system is running out of free memory.'
               dependencies:
                 -
-                  name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+                  name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
                   expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
       discovery_rules:
         -
@@ -1338,7 +1338,7 @@ zabbix_export:
               recovery_expression: |
                 {Linux by Prom:net.if.in[node_exporter,"{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()} and
                 {Linux by Prom:net.if.out[node_exporter,"{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (> {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1356,7 +1356,7 @@ zabbix_export:
               recovery_expression: |
                 {Linux by Prom:net.if.in.errors[node_exporter,"{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and {Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (> {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -2043,7 +2043,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2052,11 +2052,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2072,10 +2068,6 @@ zabbix_export:
               height: '5'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -2088,10 +2080,6 @@ zabbix_export:
               height: '5'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -2103,10 +2091,6 @@ zabbix_export:
               width: '12'
               height: '5'
               fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
                 -
                   type: GRAPH
                   name: graphid
@@ -2121,10 +2105,6 @@ zabbix_export:
               height: '5'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -2134,7 +2114,7 @@ zabbix_export:
               type: GRAPH_PROTOTYPE
               'y': '10'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2143,11 +2123,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2156,9 +2132,9 @@ zabbix_export:
                     host: 'Linux by Prom'
             -
               type: GRAPH_PROTOTYPE
-              'y': '15'
+              'y': '22'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2167,11 +2143,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2180,9 +2152,9 @@ zabbix_export:
                     host: 'Linux by Prom'
             -
               type: GRAPH_PROTOTYPE
-              'y': '20'
+              'y': '34'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2191,11 +2163,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2204,9 +2172,9 @@ zabbix_export:
                     host: 'Linux by Prom'
             -
               type: GRAPH_PROTOTYPE
-              'y': '25'
+              'y': '46'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2215,11 +2183,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2228,22 +2192,14 @@ zabbix_export:
                     host: 'Linux by Prom'
             -
               type: GRAPH_PROTOTYPE
-              'y': '30'
+              'y': '58'
               width: '24'
-              height: '5'
+              height: '6'
               fields:
                 -
                   type: INTEGER
                   name: columns
                   value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2479,11 +2435,11 @@ zabbix_export:
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
           expression: '{Linux by Prom:vm.memory.util[node_exporter].min(5m)}>{$MEMORY.UTIL.MAX}'
         -
-          name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+          name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
           expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
     -
       expression: '{Linux by Prom:vm.memory.available[node_exporter].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux by Prom:vm.memory.total[node_exporter].last()}>0'
-      name: 'Lack of available memory (< {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
     -

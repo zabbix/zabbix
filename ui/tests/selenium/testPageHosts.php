@@ -399,6 +399,264 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Equals']
 					]
 				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Exists'],
+						['name' => 'test', 'operator' => 'Exists']
+					],
+					'result' => [
+						['Name' => 'Simple form test host']
+					]
+				]
+			],
+						[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'tag', 'operator' => 'Exists'],
+						['name' => 'test', 'operator' => 'Exists']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'test', 'operator' => 'Exists']
+					],
+					'result' => [
+						['Name' => 'Simple form test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Exists']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'test', 'operator' => 'Does not exist']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'test', 'operator' => 'Does not exist']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'test', 'operator' => 'Does not exist'],
+						['name' => 'tag', 'operator' => 'Does not exist']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'test', 'operator' => 'Does not exist'],
+						['name' => 'tag', 'operator' => 'Does not exist']
+					],
+					'result' => [
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'test', 'operator' => 'Does not equal']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Does not equal', 'value' => 'update'],
+						['name' => 'action', 'operator' => 'Does not equal', 'value' => 'simple']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Does not equal', 'value' => 'update'],
+						['name' => 'action', 'operator' => 'Does not equal', 'value' => 'simple']
+					],
+					'result' => [
+						['Name' => 'Host with tags for cloning'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone']
+					],
+					'result' => [
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone']
+					],
+					'result' => [
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clo'],
+						['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'ho']
+					],
+					'result' => [
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clo'],
+						['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'ho']
+					],
+					'result' => [
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host'],
+						['Name' => 'SLA reports host'],
+						['Name' => 'Template inheritance test host']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone'],
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'host']
+					],
+					'result' => [
+						['Name' => 'Host with tags for updating']
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone'],
+						['name' => 'tag', 'operator' => 'Exists']
+					],
+					'result' => [
+						['Name' => 'Host with tags for updating'],
+						['Name' => 'Simple form test host']
+					]
+				]
 			]
 		];
 	}
@@ -409,11 +667,8 @@ class testPageHosts extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageHosts_FilterByTags($data) {
-		$this->page->login()->open('hosts.php?groupid=0');
+		$this->page->login()->open('hosts.php?filter_groups%5B%5D=4&filter_host=host&filter_port=10051&&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		// Reset filter from possible previous scenario.
-		$form->query('button:Reset')->one()->click();
-
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
 		$form->submit();

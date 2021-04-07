@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,9 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+use PHPUnit\Framework\TestCase;
+
 class CRegexValidatorTest extends CValidatorTest
 {
-	public function validParamProvider()
+	public function dataProviderValidParam()
 	{
 		return [[
 			[
@@ -29,7 +31,7 @@ class CRegexValidatorTest extends CValidatorTest
 		]];
 	}
 
-	public function validValuesProvider()
+	public function dataProviderValidValues()
 	{
 		return [
 			[[], 'foobar'],
@@ -52,7 +54,7 @@ class CRegexValidatorTest extends CValidatorTest
 		];
 	}
 
-	public function invalidValuesProvider()
+	public function dataProviderInvalidValues()
 	{
 		return [
 			[
@@ -83,7 +85,7 @@ class CRegexValidatorTest extends CValidatorTest
 		];
 	}
 
-	public function invalidValuesWithObjectsProvider()
+	public function dataProviderInvalidValuesWithObjects()
 	{
 		return [
 			[

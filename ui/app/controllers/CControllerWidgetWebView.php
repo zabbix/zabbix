@@ -129,7 +129,7 @@ class CControllerWidgetWebView extends CControllerWidget {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'groups' => $groups,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

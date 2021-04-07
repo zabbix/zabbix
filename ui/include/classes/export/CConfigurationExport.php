@@ -48,14 +48,13 @@ class CConfigurationExport {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $options ids of elements that should be exported.
+	 * @param array $options IDs of elements that should be exported.
 	 */
 	public function __construct(array $options) {
 		$this->options = [
 			'hosts' => [],
 			'templates' => [],
 			'groups' => [],
-			'screens' => [],
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => []
@@ -71,7 +70,6 @@ class CConfigurationExport {
 			'triggerPrototypes' => [],
 			'graphs' => [],
 			'graphPrototypes' => [],
-			'screens' => [],
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => []
@@ -124,7 +122,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Export elements whose ids were passed to constructor.
+	 * Export elements whose IDs were passed to constructor.
 	 * The resulting export format depends on the export writer that was set,
 	 * the export structure depends on the builder that was set.
 	 *
@@ -149,7 +147,9 @@ class CConfigurationExport {
 			}
 
 			if ($this->data['templates']) {
-				$this->builder->buildTemplates($schema['rules']['templates'], $this->data['templates'], $simple_triggers);
+				$this->builder->buildTemplates($schema['rules']['templates'], $this->data['templates'],
+					$simple_triggers
+				);
 			}
 
 			if ($this->data['hosts']) {
@@ -162,10 +162,6 @@ class CConfigurationExport {
 
 			if ($this->data['graphs']) {
 				$this->builder->buildGraphs($schema['rules']['graphs'], $this->data['graphs']);
-			}
-
-			if ($this->data['screens']) {
-				$this->builder->buildScreens($this->data['screens']);
 			}
 
 			if ($this->data['images']) {
@@ -208,10 +204,6 @@ class CConfigurationExport {
 		if ($options['templates'] || $options['hosts']) {
 			$this->gatherGraphs($options['hosts'], $options['templates']);
 			$this->gatherTriggers($options['hosts'], $options['templates']);
-		}
-
-		if ($options['screens']) {
-			$this->gatherScreens($options['screens']);
 		}
 
 		if ($options['maps']) {
@@ -348,14 +340,14 @@ class CConfigurationExport {
 	 */
 	protected function gatherTemplateDashboards(array $templates) {
 		$dashboards = API::TemplateDashboard()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'selectWidgets' => API_OUTPUT_EXTEND,
+			'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
+			'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 			'templateids' => array_keys($templates),
 			'preservekeys' => true
 		]);
 
 		foreach ($dashboards as $dashboard) {
-			$dashboard['widgets'] = $this->prepareDashboardWidgets($dashboard['widgets']);
+			$dashboard['pages'] = $this->prepareDashboardPages($dashboard['pages']);
 
 			$templates[$dashboard['templateid']]['dashboards'][] = $dashboard;
 		}
@@ -364,32 +356,36 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get dashboard widgets related objects from database.
+	 * Get dashboard pages' related objects from database.
 	 *
-	 * @param array $widgets
+	 * @param array $dashboard_pages
 	 *
 	 * @return array
 	 */
-	protected function prepareDashboardWidgets(array $widgets): array {
+	protected function prepareDashboardPages(array $dashboard_pages): array {
 		$hostids = [];
 		$itemids = [];
 		$graphids = [];
 
-		// Collect ids.
-		foreach ($widgets as $widget) {
-			foreach ($widget['fields'] as $field) {
-				switch ($field['type']) {
-					case ZBX_WIDGET_FIELD_TYPE_HOST:
-						$hostids[$field['value']] = true;
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_ITEM:
-					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-						$itemids[$field['value']] = true;
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-						$graphids[$field['value']] = true;
-						break;
+		// Collect IDs.
+		foreach ($dashboard_pages as $dashboard_page) {
+			foreach ($dashboard_page['widgets'] as $widget) {
+				foreach ($widget['fields'] as $field) {
+					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_HOST:
+							$hostids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ITEM:
+						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+							$itemids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+							$graphids[$field['value']] = true;
+							break;
+					}
 				}
 			}
 		}
@@ -398,28 +394,33 @@ class CConfigurationExport {
 		$items = $this->getItemsReferences(array_keys($itemids));
 		$graphs = $this->getGraphsReferences(array_keys($graphids));
 
-		// Replace ids.
-		foreach ($widgets as &$widget) {
-			foreach ($widget['fields'] as &$field) {
-				switch ($field['type']) {
-					case ZBX_WIDGET_FIELD_TYPE_HOST:
-						$field['value'] = $hosts[$field['value']];
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_ITEM:
-					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-						$field['value'] = $items[$field['value']];
-						break;
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-						$field['value'] = $graphs[$field['value']];
-						break;
-				}
-			}
-			unset($field);
-		}
-		unset($widget);
+		// Replace IDs.
+		foreach ($dashboard_pages as &$dashboard_page) {
+			foreach ($dashboard_page['widgets'] as &$widget) {
+				foreach ($widget['fields'] as &$field) {
+					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_HOST:
+							$field['value'] = $hosts[$field['value']];
+							break;
 
-		return $widgets;
+						case ZBX_WIDGET_FIELD_TYPE_ITEM:
+						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+							$field['value'] = $items[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+							$field['value'] = $graphs[$field['value']];
+							break;
+					}
+				}
+				unset($field);
+			}
+			unset($widget);
+		}
+		unset($dashboard_page);
+
+		return $dashboard_pages;
 	}
 
 	/**
@@ -1104,125 +1105,19 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get screens for export from database.
+	 * Get value maps for export builder from database.
 	 *
-	 * @param array $screenIds
+	 * @param array $valuemapids
+	 *
+	 * return array
 	 */
-	protected function gatherScreens(array $screenIds) {
-		$screens = API::Screen()->get([
-			'screenids' => $screenIds,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+	protected function gatherValueMaps(array $valuemapids) {
+		$this->data['valueMaps'] = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'selectMappings' => ['value', 'newvalue'],
+			'valuemapids' => $valuemapids,
+			'preservekeys' => true
 		]);
-
-		$this->prepareScreenExport($screens);
-		$this->data['screens'] = $screens;
-	}
-
-	/**
-	 * Change screen elements real database resource id to unique field references.
-	 *
-	 * @param array $exportScreens
-	 */
-	protected function prepareScreenExport(array &$exportScreens) {
-		$sysmapIds = [];
-		$groupIds = [];
-		$hostIds = [];
-		$graphIds = [];
-		$itemIds = [];
-
-		// gather element ids that must be substituted
-		foreach ($exportScreens as $screen) {
-			foreach ($screen['screenitems'] as $screenItem) {
-				if ($screenItem['resourceid'] != 0) {
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOST_INFO:
-						case SCREEN_RESOURCE_TRIGGER_INFO:
-						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$groupIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$hostIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$graphIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$sysmapIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_CLOCK:
-							if ($screenItem['style'] == TIME_TYPE_HOST) {
-								$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							}
-							break;
-					}
-				}
-			}
-		}
-
-		$sysmaps = $this->getMapsReferences($sysmapIds);
-		$groups = $this->getGroupsReferences($groupIds);
-		$hosts = $this->getHostsReferences($hostIds);
-		$graphs = $this->getGraphsReferences($graphIds);
-		$items = $this->getItemsReferences($itemIds);
-
-		foreach ($exportScreens as &$screen) {
-			unset($screen['screenid']);
-
-			foreach ($screen['screenitems'] as &$screenItem) {
-				if ($screenItem['resourceid'] != 0) {
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOST_INFO:
-						case SCREEN_RESOURCE_TRIGGER_INFO:
-						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$screenItem['resourceid'] = $groups[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$screenItem['resourceid'] = $hosts[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$screenItem['resourceid'] = $graphs[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$screenItem['resourceid'] = $items[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$screenItem['resourceid'] = $sysmaps[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_CLOCK:
-							if ($screenItem['style'] == TIME_TYPE_HOST) {
-								$screenItem['resourceid'] = $items[$screenItem['resourceid']];
-							}
-							break;
-					}
-				}
-			}
-			unset($screenItem);
-		}
-		unset($screen);
 	}
 
 	/**
@@ -1233,7 +1128,7 @@ class CConfigurationExport {
 	protected function prepareMapExport(array &$exportMaps) {
 		$sysmapIds = $groupIds = $hostIds = $triggerIds = $imageIds = [];
 
-		// gather element ids that must be substituted
+		// gather element IDs that must be substituted
 		foreach ($exportMaps as $sysmap) {
 			foreach ($sysmap['selements'] as $selement) {
 				switch ($selement['elementtype']) {
@@ -1303,12 +1198,15 @@ class CConfigurationExport {
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$selement['elements'] = [$sysmaps[$selement['elements'][0]['sysmapid']]];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$selement['elements'] = [$groups[$selement['elements'][0]['groupid']]];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_HOST:
 						$selement['elements'] = [$hosts[$selement['elements'][0]['hostid']]];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						foreach ($selement['elements'] as &$element) {
 							$element = $triggers[$element['triggerid']];
@@ -1340,7 +1238,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get groups references by group ids.
+	 * Get groups references by group IDs.
 	 *
 	 * @param array $groupIds
 	 *
@@ -1367,7 +1265,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get hosts references by host ids.
+	 * Get hosts references by host IDs.
 	 *
 	 * @param array $hostIds
 	 *
@@ -1423,7 +1321,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get graphs references by graph ids.
+	 * Get graphs references by graph IDs.
 	 *
 	 * @param array $graphIds
 	 *
@@ -1458,7 +1356,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get items references by item ids.
+	 * Get items references by item IDs.
 	 *
 	 * @param array $itemIds
 	 *
@@ -1494,7 +1392,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get triggers references by trigger ids.
+	 * Get triggers references by trigger IDs.
 	 *
 	 * @param array $triggerIds
 	 *
@@ -1530,7 +1428,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get images references by image ids.
+	 * Get images references by image IDs.
 	 *
 	 * @param array $imageIds
 	 *

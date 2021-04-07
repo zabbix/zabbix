@@ -295,12 +295,16 @@ class CFormElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function submit() {
-		$buttons = $this->query('xpath:.//button[@type="submit"]')->all()
-				->filter(new CElementFilter(CElementFilter::VISIBLE));
+		$buttons = $this->query('xpath:.//button[@type="submit"]|.//input[@type="submit"]')->all();
+
+		if ($buttons->count() > 1) {
+			$buttons = $buttons->filter(new CElementFilter(CElementFilter::VISIBLE));
+		}
+
 		$submit = ($buttons->count() === 0) ? (new CNullElement()) : $buttons->first();
 
 		if ($submit->isValid()) {
-			$submit->click();
+			$submit->click(true);
 		}
 		else {
 			parent::submit();

@@ -88,11 +88,11 @@ abstract class CControllerWidget extends CController {
 	}
 
 	/**
-	 * Returns default widget header.
+	 * Returns default widget name.
 	 *
 	 * @return string
 	 */
-	protected function getDefaultHeader() {
+	protected function getDefaultName() {
 		return CWidgetConfig::getKnownWidgetTypes($this->getContext())[$this->type];
 	}
 
@@ -126,7 +126,7 @@ abstract class CControllerWidget extends CController {
 
 		if (!$ret) {
 			$output = [
-				'header' => $this->getDefaultHeader(),
+				'name' => $this->getDefaultName(),
 				'messages' => getMessages()->toString()
 			];
 

@@ -70,58 +70,7 @@ class testFormAction extends CLegacyWebTest {
 			[
 				[
 					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'add_opcondition' => true
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Custom script'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'IPMI'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'SSH'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'SSH',
-					'new_operation_opcommand_authtype' => 'Public key'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Telnet'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Global script'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Triggers',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Custom script',
+					'new_operation_operationtype' => 'Reboot',
 					'add_opcondition' => true
 				]
 			],
@@ -210,51 +159,7 @@ class testFormAction extends CLegacyWebTest {
 			[
 				[
 					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Custom script'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'IPMI'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'SSH'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'SSH',
-					'new_operation_opcommand_authtype' => 'Public key'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Telnet'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Global script'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Discovery',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Custom script'
+					'new_operation_operationtype' => 'Reboot'
 				]
 			],
 			[
@@ -304,49 +209,6 @@ class testFormAction extends CLegacyWebTest {
 					'eventsource' => 'Autoregistration',
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_custom_msg' => 'unchecked'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Autoregistration',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Custom script'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Autoregistration',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'IPMI'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Autoregistration',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'SSH'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Autoregistration',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'SSH',
-					'new_operation_opcommand_authtype' => 'Public key'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Autoregistration',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Telnet'
-				]
-			],
-			[
-				[
-					'eventsource' => 'Autoregistration',
-					'new_operation_operationtype' => 'Remote command',
-					'new_operation_opcommand_type' => 'Global script'
 				]
 			],
 			[
@@ -865,7 +727,7 @@ class testFormAction extends CLegacyWebTest {
 				case 'Discovery':
 				case 'Autoregistration':
 					$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operationtype'));
-					$this->zbxTestDropdownSelectWait('operationtype', $new_operation_operationtype);
+					$this->zbxTestDropdownSelectWait('operation-type-select', $new_operation_operationtype);
 					COverlayDialogElement::find()->one()->waitUntilReady();
 					break;
 				case 'Internal':
@@ -924,7 +786,7 @@ class testFormAction extends CLegacyWebTest {
 		if ($new_operation_operationtype != null && $eventsource == 'Triggers' || $eventsource == 'Internal') 	{
 			switch ($new_operation_operationtype) {
 				case 'Send message':
-				case 'Remote command':
+				case 'Reboot':
 					$this->zbxTestTextPresent('Steps');
 					$this->zbxTestAssertVisibleId('operation_esc_step_from');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'maxlength', 5);
@@ -952,11 +814,11 @@ class testFormAction extends CLegacyWebTest {
 			}
 
 		if (isset($data['new_operation_operationtype']) && $eventsource != 'Internal') {
-			$this->zbxTestTextPresent('Operation type');
-			$this->zbxTestAssertVisibleXpath('//z-select[@name=\'operationtype\']');
+			$this->zbxTestTextPresent('Operations');
+			$this->zbxTestAssertVisibleXpath('//z-select[@id=\'operation-type-select\']');
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath('//z-select[@name=\'operationtype\']');
+			$this->zbxTestAssertElementNotPresentXpath('//z-select[@id=\'operation-type-select\']');
 		}
 
 		if (isset($data['operationtype'])) {
@@ -1004,7 +866,7 @@ class testFormAction extends CLegacyWebTest {
 			}
 		}
 
-		if ($new_operation_operationtype === 'Remote command') {
+		if ($new_operation_operationtype === 'Reboot') {
 			$this->zbxTestTextPresent(['Target list', 'Current host', 'Host', 'Host group']);
 			$this->query('id:operation-command-chst')->one()->isSelected(false);
 			$this->zbxTestAssertVisibleId('operation_opcommand_hst__hostid');
@@ -1328,10 +1190,11 @@ class testFormAction extends CLegacyWebTest {
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$operation_details = $this->query('name:popup.operation')->asForm()->one();
 		// Check available operation types depending on event source and the selected operation type.
-		$message_types = ($eventsource === 'Triggers') ? ['Send message', 'Remote command', 'Notify all involved'] :
-				['Send message', 'Notify all involved'];
-		$this->zbxTestDropdownHasOptions('operationtype', $message_types);
-		$this->assertEquals('Send message', $operation_details->getField('Operation type')->getValue());
+		$message_types = ($eventsource === 'Triggers')
+			? ['Send message', 'Reboot', 'Selenium script']
+			: ['Send message', 'Notify all involved'];
+		$this->zbxTestDropdownHasOptions('operation-type-select', $message_types);
+		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
 		$this->assertFalse($operation_details->getField('Custom message')->getValue());
 		$this->zbxTestTextNotVisible(['Subject','Message']);
@@ -1420,8 +1283,7 @@ class testFormAction extends CLegacyWebTest {
 						'media' => 'Email'
 					],
 					[
-						'type' => 'Remote command',
-						'command' => 'command'
+						'type' => 'Reboot'
 					]
 				]
 			]],
@@ -1456,8 +1318,7 @@ class testFormAction extends CLegacyWebTest {
 						'media' => 'Email'
 					],
 					[
-						'type' => 'Remote command',
-						'command' => 'command'
+						'type' => 'Reboot'
 					]
 				]
 			]],
@@ -1491,8 +1352,7 @@ class testFormAction extends CLegacyWebTest {
 						'media' => 'Email'
 					],
 					[
-						'type' => 'Remote command',
-						'command' => 'command'
+						'type' => 'Reboot'
 					]
 				]
 			]],
@@ -1633,7 +1493,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
 			if ($data['eventsource']!= EVENT_SOURCE_INTERNAL){
-				$this->zbxTestDropdownSelectWait('operationtype', $operation['type']);
+				$this->zbxTestDropdownSelectWait('operation-type-select', $operation['type']);
 			}
 				switch ($operation['type']) {
 					case 'Send message':
@@ -1649,9 +1509,8 @@ class testFormAction extends CLegacyWebTest {
 
 						$this->zbxTestDropdownSelect('operation[opmessage][mediatypeid]', $operation['media']);
 						break;
-					case 'Remote command':
+					case 'Reboot':
 						$this->zbxTestCheckboxSelect('operation-command-chst');
-						$this->zbxTestInputType('operation_opcommand_command', $operation['command']);
 						break;
 				}
 				$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
@@ -1744,7 +1603,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
-		$this->zbxTestDropdownSelectWait('operationtype', 'Remote command');
+		$this->zbxTestDropdownSelectWait('operation-type-select', 'Reboot');
 
 // add target current host
 		$this->zbxTestCheckboxSelect('operation-command-chst');
@@ -1762,7 +1621,6 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
 
-		$this->zbxTestInputType('operation_opcommand_command', 'command');
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
@@ -1771,32 +1629,27 @@ class testFormAction extends CLegacyWebTest {
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
-			"Run remote commands on current host ".
-			"Run remote commands on hosts: Simple form test host ".
-			"Run remote commands on host groups: Zabbix servers");
+			"Run script \"Reboot\" on current host ".
+			"Run script \"Reboot\" on hosts: Simple form test host ".
+			"Run script \"Reboot\" on host groups: Zabbix servers");
 
 		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
 		$this->zbxTestInputTypeOverwrite('operation_esc_step_to', '2');
-		$this->zbxTestDropdownSelectWait('operationtype', 'Remote command');
+		$this->zbxTestDropdownSelectWait('operation-type-select', 'Reboot');
 		$this->zbxTestCheckboxSelect('operation-command-chst');
 
-		$this->zbxTestDropdownSelect('operation[opcommand][type]', 'SSH');
-		$this->zbxTestInputTypeWait('operation_opcommand_username', 'user');
-		$this->zbxTestInputType('operation_opcommand_password', 'pass');
-		$this->zbxTestInputType('operation_opcommand_port', '123');
-		$this->zbxTestInputType('operation_opcommand_command', 'command ssh');
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 		$this->page->waitUntilReady();
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
-			"Run remote commands on current host ".
-			"Run remote commands on hosts: Simple form test host ".
-			"Run remote commands on host groups: Zabbix servers");
+			"Run script \"Reboot\" on current host ".
+			"Run script \"Reboot\" on hosts: Simple form test host ".
+			"Run script \"Reboot\" on host groups: Zabbix servers");
 		$this->zbxTestAssertElementText("//tr[@id='operations_2']//span",
-			"Run remote commands on current host");
+			"Run script \"Reboot\" on current host");
 		$this->zbxTestAssertElementText('//tr[@id="operations_2"]//td', '1 - 2');
 
 		$this->zbxTestInputTypeOverwrite('esc_period', '123');
