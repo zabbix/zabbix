@@ -1072,25 +1072,6 @@ static void	rm_dequeue_report(zbx_rm_t *manager, zbx_rm_report_t *report)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_dequeue_report                                                *
- *                                                                            *
- * Purpose: remove report from queue if it was queued                         *
- *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             report  - [IN] the report                                      *
- *                                                                            *
- ******************************************************************************/
-static void	rm_dequeue_report(zbx_rm_t *manager, zbx_rm_report_t *report)
-{
-	if (0 != report->nextcheck)
-	{
-		zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
-		report->nextcheck = 0;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: rm_update_cache_reports                                          *
  *                                                                            *
  * Purpose: update reports cache                                              *
