@@ -20,11 +20,10 @@
 /*
  * NOTE!!!!!
  *
- * This is temporary update of trigger functions to support changes introduced
- * with new expression syntax.
- * The old functions must be kept to avoid breaking calculated and aggregate checks.
- * After those are updated, this code must be copied over the old implementation and
- * unused code removed.
+ * This is the new expression syntax support for trigger functions and calculated/aggregated
+ * checks. The old syntax is still used in simple macros. When the new expression syntax
+ * support is added to simple macros the evalfunc.c:evaluate_function (and related code)
+ * must be removed, this code must be copied over the old implementation and unused code removed.
  */
 
 #include "common.h"
