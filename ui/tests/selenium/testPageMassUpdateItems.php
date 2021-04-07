@@ -30,6 +30,7 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 class testPageMassUpdateItems extends CWebTest{
 
 	const HOSTID = 40001;	// Simple form test host.
+	const HOST_NAME = 'Simple form test host';
 
 	const INTERVAL_MAPPING = [
 		'Type' => [
@@ -198,6 +199,48 @@ class testPageMassUpdateItems extends CWebTest{
 				'delay' => '55s',
 				'username' => 'username2',
 				'params' => 'executed script 2'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '13_DB_Monitor',
+				'key_' => 'db.odbc.select',
+				'type' => 11,
+				'value_type' => 0,
+				'interfaceid'=> '40011',
+				'delay' => '10s',
+				'username' => 'test_username',
+				'password' => 'test_password',
+				'params' => 'SELECT * FROM hosts'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '14_DB_Monitor',
+				'key_' => 'db.odbc.select',
+				'type' => 11,
+				'value_type' => 0,
+				'interfaceid'=> '40011',
+				'delay' => '90s',
+				'params' => 'SELECT * FROM items'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '15_Calculated',
+				'key_' => 'calculated1',
+				'type' => 15,
+				'value_type' => 0,
+				'interfaceid'=> '40011',
+				'delay' => '50s',
+				'params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '16_Calculated',
+				'key_' => 'calculated2',
+				'type' => 15,
+				'value_type' => 0,
+				'interfaceid'=> '40011',
+				'delay' => '30s',
+				'params' => 'sum("Zabbix Server:zabbix[wcache,values]",900)'
 			]
 		]);
 	}
@@ -261,145 +304,101 @@ class testPageMassUpdateItems extends CWebTest{
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'names'=> [
-						'1_Item',
-						'2_Item'
+						'13_DB_Monitor',
+						'14_DB_Monitor'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix agent (active)'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
-						'Units'=> ['id' => 'units', 'value' => '$'],
-						'Update interval' => [
-							'Delay' => '99s',
-							'Custom intervals' => [
-								[
-									'action' => USER_ACTION_UPDATE,
-									'index' => 0,
-									'type' => 'Flexible',
-									'delay' => '60s',
-									'period' => '2-5,3:00-17:00'
-								],
-								[
-									'type' => 'Scheduling',
-									'delay' => 'wd3-4h1-15'
-								]
-							]
-						],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'history', 'value' => '400d']
-						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Do not keep trends']
-						],
-						'Show value' => ['id' => 'valuemapid', 'value' => 'TruthValue'],
-						'Applications' => [
-							'action' => 'Add',
-							'application' => 'New application'
-						],
-						'Description' => ['id' => 'description', 'value' => 'New mass updated description'],
-						'Status' => ['id' => 'status', 'value' => 'Disabled']
-					]
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+					],
+					'error' => 'Cannot update items',
+					'details' => 'No interface found.'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'history', 'value' => '0']
-						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'trends', 'value' => '0']
-						]
-					]
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051']
+					],
+					'error' => 'Cannot update items',
+					'details' => 'No authentication user name specified.'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'history', 'value' => '3600']
-						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'trends', 'value' => '86400']
-						]
-					]
+						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
+						'Authentication method' => ['id' => 'authtype', 'value' => 'Password'],
+						'User name' => ['id' => 'username', 'value' => '']
+					],
+					'error' => 'Cannot update items',
+					'details' => 'No authentication user name specified.'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'history', 'value' => '9125d']
-						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'trends', 'value' => '9125d']
-						]
-					]
+						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
+						'Authentication method' => ['id' => 'authtype', 'value' => 'Public key'],
+						'User name' => ['id' => 'username', 'value' => ''],
+						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
+						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
+					],
+					'error' => 'Cannot update items',
+					'details' => 'No authentication user name specified.'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'history', 'value' => '219000h']
-						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'trends', 'value' => '219000h']
-						]
-					]
+						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
+						'Authentication method' => ['id' => 'authtype', 'value' => 'Public key'],
+						'User name' => ['id' => 'username', 'value' => 'new_test_name'],
+						'Public key file' => ['id' => 'publickey', 'value' => ''],
+						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
+					],
+					'error' => 'Cannot update items',
+					'details' => 'No public key file specified.'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'History storage period' => [
-							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'history', 'value' => '13140000m']
-						],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'trends', 'value' => '13140000m']
-						]
-					]
+						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
+						'Authentication method' => ['id' => 'authtype', 'value' => 'Public key'],
+						'User name' => ['id' => 'username', 'value' => 'new_test_name'],
+						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
+						'Private key file' => ['id' => 'privatekey', 'value' => '']
+					],
+					'error' => 'Cannot update items',
+					'details' => 'No private key file specified.'
 				]
 			],
 			[
@@ -556,96 +555,6 @@ class testPageMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Simple check'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Log'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.2 : 10052'],
-						'User name' => ['id' => 'username', 'value' => 'test_username'],
-						'Password' => ['id' => 'password', 'value' => 'test_password'],
-						'Log time format' => ['id' => 'logtimefmt', 'value' => 'PPPPPP:YYYYMMDD:HHMMSS.mmm']
-					]
-				]
-			],
-			[
-				[
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix internal'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Text'],
-						'Update interval' => [
-							'Delay' => '1d',
-							'Custom intervals' => [
-								[
-									'action' => USER_ACTION_UPDATE,
-									'index' => 0,
-									'type' => 'Scheduling',
-									'delay' => 'wd3-4h1-15'
-								],
-								[
-									'type' => 'Flexible',
-									'delay' => '99s',
-									'period' => '1-2,7:00-8:00'
-								]
-							]
-						],
-//						'Applications' => [
-//							'action' => 'Replace',
-//							'applications' => ['1', '2']
-//						],
-//						'expected_applications' => []
-					]
-				]
-			],
-			[
-				[
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (unsigned)'],
-						'Show value' => ['id' => 'valuemapid', 'value' => 'Alarm state'],
-						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => '127.0.0.1']
-					]
-				]
-			],
-			[
-				[
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
-						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => '{HOST.HOST}']
-					]
-				]
-			],
-			[
-				[
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
-						'Allowed hosts' => [
-							'id' => 'trapper_hosts',
-							'value' => '192.168.1.0/24, 192.168.3.1-255, 192.168.1-10.1-255, ::1,2001:db8::/32, zabbix.domain'
-						]
-					]
-				]
-			],
-			[
-				[
 					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
@@ -657,20 +566,6 @@ class testPageMassUpdateItems extends CWebTest{
 					],
 					'error' => 'Cannot update items',
 					'details' => 'Incorrect value for field "trapper_hosts": invalid address range "Zabbix server".'
-				]
-			],
-			[
-				[
-					'names'=> [
-						'5_Aggregate',
-						'6_Aggregate'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix aggregate'],
-						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
-						'Units' => ['id' => 'units', 'value' => 'kB'],
-						'Update interval' => ['Delay' => '86400']
-					]
 				]
 			],
 			[
@@ -789,47 +684,6 @@ class testPageMassUpdateItems extends CWebTest{
 					],
 					'error' => 'Cannot update items',
 					'details' => 'Invalid interval "test".'
-				]
-			],
-			[
-				[
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'External check'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'Update interval' => ['Delay' => '1440m']
-					]
-				]
-			],
-			[
-				[
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
-						'Request body' => ['id' => 'posts', 'value' => '{"request": "active checks", "host": "host"}'],
-						'Headers' => [
-							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'name' => 'header name 1',
-								'value' => 'header value 1'
-							],
-							[
-								'name' => 'header name 2',
-								'value' => 'header value 2'
-							]
-						],
-						'Enable trapping' => ['id' => 'allow_traps', 'value' => true]
-					]
 				]
 			],
 			[
@@ -1010,6 +864,323 @@ class testPageMassUpdateItems extends CWebTest{
 			],
 			[
 				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 10055']
+					],
+					'error' => 'Cannot update items',
+					'details' => 'No SNMP OID specified.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
+					],
+					'error' => 'Cannot update items',
+					'details' => 'Incorrect value for field "master_itemid": cannot be empty.'
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent (active)'],
+						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Units'=> ['id' => 'units', 'value' => '$'],
+						'Update interval' => [
+							'Delay' => '99s',
+							'Custom intervals' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'type' => 'Flexible',
+									'delay' => '60s',
+									'period' => '2-5,3:00-17:00'
+								],
+								[
+									'type' => 'Scheduling',
+									'delay' => 'wd3-4h1-15'
+								]
+							]
+						],
+						'History storage period' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'history', 'value' => '400d']
+						],
+						'Trend storage period' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Do not keep trends']
+						],
+						'Show value' => ['id' => 'valuemapid', 'value' => 'TruthValue'],
+						'Applications' => [
+							'action' => 'Add',
+							'application' => 'New application'
+						],
+						'Description' => ['id' => 'description', 'value' => 'New mass updated description'],
+						'Status' => ['id' => 'status', 'value' => 'Disabled']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
+						'History storage period' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'history', 'value' => '0']
+						],
+						'Trend storage period' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'trends', 'value' => '0']
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
+						'History storage period' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'history', 'value' => '3600']
+						],
+						'Trend storage period' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'trends', 'value' => '86400']
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
+						'History storage period' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'history', 'value' => '9125d']
+						],
+						'Trend storage period' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'trends', 'value' => '9125d']
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
+						'History storage period' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'history', 'value' => '219000h']
+						],
+						'Trend storage period' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'trends', 'value' => '219000h']
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
+						'History storage period' => [
+							'radio' => ['id' => 'history_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'history', 'value' => '13140000m']
+						],
+						'Trend storage period' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'trends', 'value' => '13140000m']
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Simple check'],
+						'Type of information'=> ['id' => 'value_type', 'value' => 'Log'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.2 : 10052'],
+						'User name' => ['id' => 'username', 'value' => 'test_username'],
+						'Password' => ['id' => 'password', 'value' => 'test_password'],
+						'Log time format' => ['id' => 'logtimefmt', 'value' => 'PPPPPP:YYYYMMDD:HHMMSS.mmm']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix internal'],
+						'Type of information'=> ['id' => 'value_type', 'value' => 'Text'],
+						'Update interval' => [
+							'Delay' => '1d',
+							'Custom intervals' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'type' => 'Scheduling',
+									'delay' => 'wd3-4h1-15'
+								],
+								[
+									'type' => 'Flexible',
+									'delay' => '99s',
+									'period' => '1-2,7:00-8:00'
+								]
+							]
+						],
+//						'Applications' => [
+//							'action' => 'Replace',
+//							'applications' => ['1', '2']
+//						],
+//						'expected_applications' => []
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
+						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (unsigned)'],
+						'Show value' => ['id' => 'valuemapid', 'value' => 'Alarm state'],
+						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => '127.0.0.1']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
+						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => '{HOST.HOST}']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
+						'Allowed hosts' => [
+							'id' => 'trapper_hosts',
+							'value' => '192.168.1.0/24, 192.168.3.1-255, 192.168.1-10.1-255, ::1,2001:db8::/32, zabbix.domain'
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'5_Aggregate',
+						'6_Aggregate'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix aggregate'],
+						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Units' => ['id' => 'units', 'value' => 'kB'],
+						'Update interval' => ['Delay' => '86400']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'External check'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
+						'Update interval' => ['Delay' => '1440m']
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
+						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
+						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
+						'Request body' => ['id' => 'posts', 'value' => '{"request": "active checks", "host": "host"}'],
+						'Headers' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'name' => 'header name 1',
+								'value' => 'header value 1'
+							],
+							[
+								'name' => 'header name 2',
+								'value' => 'header value 2'
+							]
+						],
+						'Enable trapping' => ['id' => 'allow_traps', 'value' => true]
+					]
+				]
+			],
+			[
+				[
 					'names'=> [
 						'1_Item',
 						'2_Item'
@@ -1078,21 +1249,6 @@ class testPageMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'expected' => TEST_BAD,
-					'names'=> [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 10055']
-					],
-					'error' => 'Cannot update items',
-					'details' => 'No SNMP OID specified.'
-				]
-			],
-			[
-				[
 					'names'=> [
 						'9_SNMP_Agent',
 						'10_SNMP_Agent'
@@ -1135,74 +1291,54 @@ class testPageMassUpdateItems extends CWebTest{
 			],
 			[
 				[
-					'expected' => TEST_BAD,
 					'names'=> [
-						'1_Item',
-						'2_Item'
+						'13_DB_Monitor',
+						'14_DB_Monitor'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
-						'Authentication method' => ['id' => 'authtype', 'value' => 'Password'],
-						'User name' => ['id' => 'username', 'value' => '']
-					],
-					'error' => 'Cannot update items',
-					'details' => 'No authentication user name specified.'
+						'Type' => ['id' => 'type', 'value' => 'Database monitor'],
+						'User name' => ['id' => 'username', 'value' => 'db_monitor_name'],
+						'Password' => ['id' => 'password', 'value' => 'db_monitor_password']
+					]
 				]
 			],
 			[
 				[
-					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
-						'Authentication method' => ['id' => 'authtype', 'value' => 'Public key'],
-						'User name' => ['id' => 'username', 'value' => ''],
-						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
-						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
-					],
-					'error' => 'Cannot update items',
-					'details' => 'No authentication user name specified.'
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+						'User name' => ['id' => 'username', 'value' => 'telnet_name'],
+						'Password' => ['id' => 'password', 'value' => 'telnet_password']
+					]
 				]
 			],
 			[
 				[
-					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
-						'Authentication method' => ['id' => 'authtype', 'value' => 'Public key'],
-						'User name' => ['id' => 'username', 'value' => 'new_test_name'],
-						'Public key file' => ['id' => 'publickey', 'value' => ''],
-						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
-					],
-					'error' => 'Cannot update items',
-					'details' => 'No public key file specified.'
+						'Type' => ['id' => 'type', 'value' => 'Calculated'],
+						'Type of information'=> ['id' => 'value_type', 'value' => 'Numeric (float)'],
+					]
 				]
 			],
 			[
 				[
-					'expected' => TEST_BAD,
 					'names'=> [
 						'1_Item',
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'SSH agent'],
-						'Authentication method' => ['id' => 'authtype', 'value' => 'Public key'],
-						'User name' => ['id' => 'username', 'value' => 'new_test_name'],
-						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
-						'Private key file' => ['id' => 'privatekey', 'value' => '']
-					],
-					'error' => 'Cannot update items',
-					'details' => 'No private key file specified.'
+						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
+						'Master item'=> ['id' => 'master_item', 'value' => '7_IPMI'],
+					]
 				]
-			]
+			],
 		];
 	}
 
@@ -1270,7 +1406,6 @@ class testPageMassUpdateItems extends CWebTest{
 					if(array_key_exists('Custom intervals', $value)){
 						$container_table->getRow(1)->getColumn(1)->query('id:custom_intervals')->asMultifieldTable(
 								['mapping' => self::INTERVAL_MAPPING])->one()->fill($value['Custom intervals']);
-
 					}
 					break;
 
@@ -1289,6 +1424,11 @@ class testPageMassUpdateItems extends CWebTest{
 
 				case 'Headers':
 					$form->query('xpath:.//div[@id="headers_pairs"]/table')->asMultifieldTable()->one()->fill($value);
+					break;
+
+				case 'Master item':
+					$form->query('id', $value['id'])->one()->asMultiselect()->setFillMode(CMultiselectElement::MODE_SELECT)
+							->fill($value['value']);
 					break;
 			}
 		}
@@ -1378,6 +1518,10 @@ class testPageMassUpdateItems extends CWebTest{
 
 						case 'Applications':
 
+							break;
+						case 'Master item':
+							$this->assertEquals([self::HOST_NAME.': '.$value['value']], $form->query('xpath://*[@id="master_itemid"]/..')
+									->asMultiselect()->one()->getValue());
 							break;
 					}
 				}
