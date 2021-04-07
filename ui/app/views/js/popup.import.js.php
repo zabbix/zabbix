@@ -67,7 +67,10 @@ function submitImportPopup(overlay) {
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 	const form = document.getElementById('import-form');
-	const file = form.getElementById('import_file');
+	const file_input = document.getElementById('import_file');
+	const form_data = new FormData(form);
+
+	form_data.append('import_file', file_input.files.length ? file_input.files[0] : '');
 
 	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import');
@@ -75,15 +78,12 @@ function submitImportPopup(overlay) {
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		body: {
-			...new FormData(form),
-			import_file: file.files.length ? file.files[0] : ''
-		}
+		body: form_data
 	})
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
-			file.value = '';
+			file_input.value = '';
 			overlay.unsetLoading();
 			$(response.errors).insertBefore(form);
 		}
@@ -103,23 +103,23 @@ function openImportComparePopup(overlay) {
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 	const form = document.getElementById('import-form');
-	const file = form.getElementById('import_file');
+	const file_input = document.getElementById('import_file');
+	const form_data = new FormData(form);
+
+	form_data.append('import_file', file_input.files.length ? file_input.files[0] : '');
+	form_data.append('parent_overlayid', overlay.dialogueid);
 
 	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import.compare');
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		body: {
-			...new FormData(form),
-			import_file: file.files.length ? file.files[0] : '',
-			parent_overlayid: overlay.dialogueid
-		}
+		body: form_data
 	})
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
-			file.value = '';
+			file_input.value = '';
 			overlay.unsetLoading();
 			$(response.errors).insertBefore(form);
 		}
