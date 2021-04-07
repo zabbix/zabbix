@@ -1218,7 +1218,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 	{
 		if (FAIL == zbx_vector_uint64_bsearch(&reportids, report->reportid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
-			zbx_binary_heap_remove_direct(&manager->report_queue, report->reportid);
+			rm_dequeue_report(manager, report);
 			rm_report_clean(report);
 			zbx_hashset_iter_remove(&iter);
 		}
