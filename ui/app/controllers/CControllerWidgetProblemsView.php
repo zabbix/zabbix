@@ -80,7 +80,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'fields' => [
 				'show' => $fields['show'],

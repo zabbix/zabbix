@@ -1152,7 +1152,7 @@ zabbix_export:
               name: 'DB {#DBNAME}: Get bloating tables'
               key: 'pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               history: 7d
-              description: 'Number оf bloating tables'
+              description: 'Number of bloating tables'
               application_prototypes:
                 -
                   name: 'PostgreSQL: DB {#DBNAME}'
