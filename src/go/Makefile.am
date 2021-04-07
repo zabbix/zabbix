@@ -56,19 +56,9 @@ install-zabbix.com/cmd/zabbix_agent2:
 		go install -ldflags="${AGENT_GOLDFLAGS}" ${TARGETS}
 	$(MKDIR_P) "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@"
 	test -f "$(DESTDIR)@AGENT2_CONFIG_FILE@" || cp "conf/zabbix_agent2.conf" "$(DESTDIR)@AGENT2_CONFIG_FILE@"
-	for cfg in \
-		postgres.conf \
-		oracle.conf \
-		ceph.conf \
-		mysql.conf \
-		memcached.conf \
-		mongodb.conf \
-		redis.conf \
-		smart.conf \
-		docker.conf; \
-	do \
-		test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$$cfg" || \
-		cp "conf/zabbix_agent2.d/plugins.d/$$cfg" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/$$cfg"; \
+	for cfg in conf/zabbix_agent2.d/plugins.d/*.conf; do \
+		test -f "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/"`basename $$cfg` || \
+		cp "$$cfg" "$(DESTDIR)@AGENT2_CONFIG_PLUGINS_PATH@/"`basename $$cfg`; \
 	done
 
 install-zabbix.com/cmd/zabbix_web_service:
