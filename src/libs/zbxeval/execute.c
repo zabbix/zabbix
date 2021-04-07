@@ -1140,6 +1140,7 @@ static int	eval_execute_function_dayofweek(const zbx_eval_context_t *ctx, const 
 
 	return SUCCEED;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_function_dayofmonth                                 *
@@ -1178,6 +1179,60 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
 	}
 	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%d", tm->tm_mday));
 	eval_function_return(0, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_bitand                                     *
+ *                                                                            *
+ * Purpose: evaluate bitand() function                                        *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_bitand(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	zbx_variant_t	value, *left, *right;
+	int		ret;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	left = &output->values[output->values_num - 2];
+	right = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(left, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "invalid left operand value \"%s\" of type \"%s\"",
+				zbx_variant_value_desc(left), zbx_variant_type_desc(left));
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(right, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "invalid right operand value \"%s\" of type \"%s\"",
+				zbx_variant_value_desc(right), zbx_variant_type_desc(right));
+		return FAIL;
+	}
+
+	zbx_variant_set_ui64(&value, left->data.ui64 & right->data.ui64);
+	eval_function_return(2, &value, output);
 
 	return SUCCEED;
 }
@@ -1271,6 +1326,8 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_function_dayofweek(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "dayofmonth", ZBX_CONST_STRLEN("dayofmonth")))
 		return eval_execute_function_dayofmonth(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitand", ZBX_CONST_STRLEN("bitand")))
+		return eval_execute_function_bitand(ctx, token, output, error);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);

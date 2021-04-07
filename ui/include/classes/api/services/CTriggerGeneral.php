@@ -1565,8 +1565,16 @@ abstract class CTriggerGeneral extends CApiService {
 
 				// Validate functions of trigger expression. Colect trigger functions in $triggers_functions.
 				foreach ($expressionData->result->getFunctions() as $fn) {
+					$query = $fn->getFunctionTriggerQuery();
+					$fn_data = [
+						'fn' => $fn,
+						'value_type' => ($query !== null)
+							? $hosts_keys[$query->host]['keys'][$query->item]['value_type']
+							: null
+					];
+
 					foreach ([$math_function_validator, $trigger_function_validator] as $validator) {
-						if ($validator->validate($fn)) {
+						if ($validator->validate($fn_data)) {
 							$error_msg = '';
 							break;
 						}
@@ -1578,7 +1586,7 @@ abstract class CTriggerGeneral extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error_msg);
 					}
 
-					if (($query = $fn->getFunctionTriggerQuery()) !== null) {
+					if ($query !== null) {
 						$host_keys = $hosts_keys[$query->host];
 						$key = $host_keys['keys'][$query->item];
 
@@ -1593,7 +1601,7 @@ abstract class CTriggerGeneral extends CApiService {
 							));
 						}
 
-						if (!$trigger_function_validator->validateValueType($key['value_type'], $fn)) {
+						if (!$trigger_function_validator->validateValueType($fn_data)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, $trigger_function_validator->getError());
 						}
 

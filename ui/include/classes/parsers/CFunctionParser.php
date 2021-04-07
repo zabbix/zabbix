@@ -89,11 +89,6 @@ class CFunctionParser extends CParser {
 	public function parse($source, $pos = 0): int {
 		$this->errorClear();
 
-		if ($this->depth > TRIGGER_MAX_FUNCTION_DEPTH) {
-			$this->errorPos($source, $pos);
-			return self::PARSE_FAIL;
-		}
-
 		$this->result = new CFunctionParserResult();
 		$this->length = 0;
 
@@ -113,6 +108,11 @@ class CFunctionParser extends CParser {
 			'parameters' => []
 		];
 		if (!$this->parseFunctionParameters($source, $p, $params_raw['parameters'])) {
+			return self::PARSE_FAIL;
+		}
+
+		if ($this->depth > TRIGGER_MAX_FUNCTION_DEPTH) {
+			$this->errorPos($source, ++$pos);
 			return self::PARSE_FAIL;
 		}
 
@@ -154,6 +154,7 @@ class CFunctionParser extends CParser {
 		$num = 0;
 
 		$query_parser = new CQueryParser($this->options);
+		$period_parser = new CPeriodParser();
 		$function_parser = new self($this->options, $this->depth + 1);
 
 		if ($this->options['collapsed_expression']) {
@@ -211,6 +212,11 @@ class CFunctionParser extends CParser {
 								$_parameters[$num] = $functionid_parser->result;
 								$state = self::STATE_END;
 							}
+							elseif ($period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$p += $period_parser->getLength() - 1;
+								$_parameters[$num] = $period_parser->result;
+								$state = self::STATE_END;
+							}
 							else {
 								$error = $query_parser->getErrorDetails();
 
@@ -229,11 +235,13 @@ class CFunctionParser extends CParser {
 									$_parameters[$num] = new CFunctionParameterResult([
 										'type' => self::PARAM_UNQUOTED,
 										'match' => $source[$p],
-										'pos' => $p - $pos
+										'pos' => $p - $pos,
+										'length' => 1
 									]);
 								}
 								else {
 									$_parameters[$num]->match .= $source[$p];
+									$_parameters[$num]->length++;
 								}
 
 								$state = self::STATE_UNQUOTED;
@@ -275,12 +283,14 @@ class CFunctionParser extends CParser {
 
 						default:
 							$_parameters[$num]->match .= $source[$p];
+							$_parameters[$num]->length++;
 					}
 					break;
 
 				// a quoted parameter
 				case self::STATE_QUOTED:
 					$_parameters[$num]->match .= $source[$p];
+					$_parameters[$num]->length++;
 
 					if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
 						$state = self::STATE_END;

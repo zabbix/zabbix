@@ -1081,8 +1081,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							}
 							else {
 								$query = '/'.$function['host'].'/'.$function['key_'];
-								$value = $function['function'].
-										'('.str_replace(TRIGGER_QUERY_PLACEHOLDER, $query, $function['parameter']).')';
+								$params = (($pos = strpos($function['parameter'], TRIGGER_QUERY_PLACEHOLDER)) !== false)
+									? substr_replace($function['parameter'], $query, $pos, 1)
+									: $function['parameter'];
+								$value = $function['function'].'('.$params.')';
 							}
 						}
 						else {

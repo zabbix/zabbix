@@ -44,7 +44,9 @@
 				->addStyle('top: 0px;'),
 			(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 		]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-		(new CDiv('#{expression}'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+		(new CDiv('#{expression}'))
+			->setAttribute('data-expr', '')
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 		new CDiv('#{type_label}'),
 		(new CCol([
 			(new CVar('expressions[][value]', '#{expression}')),

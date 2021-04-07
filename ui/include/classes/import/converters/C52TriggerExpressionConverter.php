@@ -176,6 +176,13 @@ class C52TriggerExpressionConverter extends CConverter {
 				$new_expression = sprintf('abs(change(%1$s))', $query);
 				break;
 
+			case 'band':
+				$params = self::convertParameters($fn['functionParams'], $fn['functionName']);
+				$timeshift = self::paramsToString([$params[0]]);
+				$mask = self::paramsToString([$params[1]]);
+				$new_expression = sprintf('bitand(last(%1$s%2$s)%3$s)', $query, $timeshift, $mask);
+				break;
+
 			case 'delta':
 				$params = self::convertParameters($fn['functionParams'], $fn['functionName']);
 				$params = self::paramsToString($params);
@@ -224,6 +231,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				if (!$has_hanged_functions) {
 					$extra_expr = sprintf('(last(%1$s)<>last(%1$s))', $query);
 				}
+				break;
+
+			case 'logseverity':
+				$new_expression = sprintf('logseverity(%1$s)', $query);
 				break;
 
 			default:
@@ -295,6 +306,9 @@ class C52TriggerExpressionConverter extends CConverter {
 					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[3];
 				}
+				if ($parameters[2] === 'band') {
+					$parameters[2] = 'bitand';
+				}
 				unset($parameters[3]);
 				array_push($parameters, $parameters[1]);
 				unset($parameters[1]);
@@ -335,19 +349,20 @@ class C52TriggerExpressionConverter extends CConverter {
 				break;
 		}
 
-		if (in_array($fn_name, ['percentile', 'band', 'timeleft', 'forecast'])) {
-			$keys_strip = [0, 1];
-		}
-		elseif ($fn_name === 'logeventid' || $fn_name === 'logsource') {
-			$keys_strip = [];
-		}
-		else {
-			$keys_strip = [0];
+		// Keys in $parameters array to skip from quoting.
+		$functions_with_period_parameter = ['delta', 'avg', 'max', 'min', 'sum', 'last', 'strlen', 'percentile',
+			'timeleft', 'forecast', 'band', 'count', 'fuzzytime', 'nodata', 'iregexp', 'regexp', 'str', 'trendavg',
+			'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum'
+		];
+		$unquotable_parameters = in_array($fn_name, $functions_with_period_parameter) ? [0] : [];
+
+		// Time parameter don't need to be quoted for forecast() function.
+		if ($fn_name === 'forecast') {
+			$unquotable_parameters[] = 2;
 		}
 
-		$parameters = array_values($parameters);
-		array_walk($parameters, function (&$param, $i) use ($keys_strip) {
-			if (in_array($i, $keys_strip)) {
+		array_walk($parameters, function (&$param, $i) use ($unquotable_parameters) {
+			if (in_array($i, $unquotable_parameters)) {
 				return;
 			}
 

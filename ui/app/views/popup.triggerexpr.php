@@ -127,7 +127,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 
 			if (in_array($param_name, ['last'])) {
 				if (array_key_exists('M', $param_function)) {
-					if (in_array($data['selectedFunction'], ['last', 'band', 'strlen'])) {
+					if (in_array($data['selectedFunction'], ['last', 'bitand', 'strlen'])) {
 						$param_type_element = $param_function['M'][PARAM_TYPE_COUNTS];
 						$label = $param_function['C'];
 						$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_COUNTS))->removeId());

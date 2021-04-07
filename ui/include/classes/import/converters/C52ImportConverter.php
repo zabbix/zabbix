@@ -114,7 +114,7 @@ class C52ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('discovery_rules', $host)) {
-				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules'], $host);
+				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules'], $host['host']);
 			}
 		}
 		unset($host);
@@ -137,7 +137,7 @@ class C52ImportConverter extends CConverter {
 				foreach ($template['items'] as &$item) {
 					if (array_key_exists('triggers', $item)) {
 						foreach ($item['triggers'] as &$trigger) {
-							$trigger = $this->convertTrigger($trigger, $template['host'], $item['key']);
+							$trigger = $this->convertTrigger($trigger, $template['template'], $item['key']);
 						}
 						unset($trigger);
 					}
@@ -154,7 +154,9 @@ class C52ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('discovery_rules', $template)) {
-				$template['discovery_rules'] = $this->convertDiscoveryRules($template['discovery_rules']);
+				$template['discovery_rules'] = $this->convertDiscoveryRules($template['discovery_rules'],
+					$template['template']
+				);
 			}
 		}
 		unset($template);
@@ -202,12 +204,12 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert discover rules.
 	 *
-	 * @param array $discovery_rules
-	 * @param array $host
+	 * @param array  $discovery_rules
+	 * @param string $hostname
 	 *
 	 * @return array
 	 */
-	private function convertDiscoveryRules(array $discovery_rules, array $host): array {
+	private function convertDiscoveryRules(array $discovery_rules, string $hostname): array {
 		$result = [];
 
 		foreach ($discovery_rules as $discovery_rule) {
@@ -217,7 +219,7 @@ class C52ImportConverter extends CConverter {
 
 			if (array_key_exists('item_prototypes', $discovery_rule)) {
 				$discovery_rule['item_prototypes'] = $this->convertItemPrototypes($discovery_rule['item_prototypes'],
-					$host
+					$hostname
 				);
 			}
 			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
@@ -236,19 +238,18 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert item prototypes.
 	 *
-	 * @param array $item_prototypes
-	 * @param array $host
+	 * @param array  $item_prototypes
+	 * @param string $hostname
 	 *
 	 * @return array
 	 */
-	private function convertItemPrototypes(array $item_prototypes, array $host): array {
+	private function convertItemPrototypes(array $item_prototypes, string $hostname): array {
 		$result = [];
 
 		foreach ($item_prototypes as $item_prototype) {
 			if (array_key_exists('trigger_prototypes', $item_prototype)) {
 				foreach ($item_prototype['trigger_prototypes'] as &$trigger_prototype) {
-					$trigger_prototype = $this->convertTrigger($trigger_prototype, $host['host'], $item_prototype['key']
-					);
+					$trigger_prototype = $this->convertTrigger($trigger_prototype, $hostname, $item_prototype['key']);
 				}
 				unset($trigger_prototype);
 			}
