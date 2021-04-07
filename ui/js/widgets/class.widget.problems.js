@@ -31,7 +31,9 @@ class CWidgetProblems extends CWidget {
 					const overlay = overlays_stack.getById(overlays_stack.stack[i]);
 
 					if (overlay.type === 'hintbox') {
-						if (this._content_body.contains(overlay.element)) {
+						const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
+
+						if (this._content_body.contains(element)) {
 							hintBox.deleteHint(overlay.element);
 						}
 					}
