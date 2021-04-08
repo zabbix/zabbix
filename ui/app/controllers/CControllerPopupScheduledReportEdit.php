@@ -71,6 +71,7 @@ class CControllerPopupScheduledReportEdit extends CController {
 				'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
 				'recipient_name' => $current_user_name,
 				'recipient_inaccessible' => 0,
+				'creatorid' => CWebUser::$data['userid'],
 				'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
 				'creator_name' => $current_user_name,
 				'creator_inaccessible' => 0,
