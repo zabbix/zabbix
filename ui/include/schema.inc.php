@@ -3722,7 +3722,7 @@ return [
 				'length' => 64,
 				'default' => ''
 			],
-			'status' => [
+			'type' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

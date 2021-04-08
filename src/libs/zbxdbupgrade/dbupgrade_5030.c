@@ -1653,9 +1653,9 @@ static int	DBpatch_5030080(void)
 }
 /*  end of ZBXNEXT-6368 patches */
 
-static int	DBpatch_5030081(void)
+static int	DBpatch_5030110(void)
 {
-	const ZBX_FIELD	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("valuemap_mapping", &field);
 }
@@ -1746,6 +1746,6 @@ DBPATCH_ADD(5030077, 0, 1)
 DBPATCH_ADD(5030078, 0, 1)
 DBPATCH_ADD(5030079, 0, 1)
 DBPATCH_ADD(5030080, 0, 1)
-DBPATCH_ADD(5030081, 0, 1)
+DBPATCH_ADD(5030110, 0, 1)
 
 DBPATCH_END()

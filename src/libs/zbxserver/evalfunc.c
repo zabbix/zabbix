@@ -43,15 +43,15 @@ zbx_value_type_t;
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
-#define ZBX_VALUEMAP_STATUS_MATCH	0
-#define ZBX_VALUEMAP_STATUS_REGEXP	1
-#define ZBX_VALUEMAP_STATUS_RANGE	2
+#define ZBX_VALUEMAP_TYPE_MATCH		0
+#define ZBX_VALUEMAP_TYPE_REGEXP	1
+#define ZBX_VALUEMAP_TYPE_RANGE		2
 
 typedef struct
 {
 	char	value[ZBX_VALUEMAP_STRING_LEN];
 	char	newvalue[ZBX_VALUEMAP_STRING_LEN];
-	int	status;
+	int	type;
 }
 zbx_valuemaps_t;
 
@@ -3336,22 +3336,19 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	zbx_vector_valuemaps_ptr_create(&valuemaps);
 
 	result = DBselect(
-			"select value,newvalue,status"
+			"select value,newvalue,type"
 			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64,
 			valuemapid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED == DBis_null(row[1]))
-			continue;
-
 		del_zeros(row[1]);
 
 		valuemap = (zbx_valuemaps_t *)zbx_malloc(NULL, sizeof(zbx_valuemaps_t));
 		zbx_strlcpy_utf8(valuemap->value, row[0], ZBX_VALUEMAP_STRING_LEN);
 		zbx_strlcpy_utf8(valuemap->newvalue, row[1], ZBX_VALUEMAP_STRING_LEN);
-		valuemap->status = atoi(row[2]);
+		valuemap->type = atoi(row[2]);
 		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
 	}
 
@@ -3361,7 +3358,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	{
 		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
 
-		if (ZBX_VALUEMAP_STATUS_MATCH == valuemap->status && 0 == strcmp(valuemap->value, value))
+		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type && 0 == strcmp(valuemap->value, value))
 			goto map_value;
 	}
 
@@ -3373,7 +3370,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
 
-		if (ZBX_VALUEMAP_STATUS_REGEXP != valuemap->status)
+		if (ZBX_VALUEMAP_TYPE_REGEXP != valuemap->type)
 			continue;
 
 		zbx_vector_ptr_create(&regexps);
@@ -3409,7 +3406,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 			valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
 
-			if (ZBX_VALUEMAP_STATUS_RANGE != valuemap->status)
+			if (ZBX_VALUEMAP_TYPE_RANGE != valuemap->type)
 				continue;
 
 			if (1 == sscanf(valuemap->value, "<%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "s", threshold_max))
@@ -3450,15 +3447,13 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	{
 		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
 
-		if (ZBX_VALUEMAP_STATUS_RANGE == valuemap->status && 0 == strcmp(valuemap->value, "*"))
+		if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type && 0 == strcmp(valuemap->value, "*"))
 			goto map_value;
 	}
 
 map_value:
 	if (0 <= i && i < valuemaps.values_num)
 	{
-		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
-
 		value_tmp = zbx_dsprintf(NULL, "%s (%s)", valuemap->newvalue, value);
 		zbx_strlcpy_utf8(value, value_tmp, max_len);
 		zbx_free(value_tmp);
