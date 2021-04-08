@@ -336,6 +336,13 @@ class C52ImportConverter extends CConverter {
 			}
 		}
 
+		if (array_key_exists('dependencies', $trigger)) {
+			foreach ($trigger['dependencies'] as &$dep_trigger) {
+				$dep_trigger = $this->convertTrigger($dep_trigger);
+			}
+			unset($dep_trigger);
+		}
+
 		return $trigger;
 	}
 }
