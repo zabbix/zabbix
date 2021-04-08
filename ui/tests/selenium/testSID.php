@@ -34,7 +34,7 @@ class testSID extends CWebTest {
 
 	public static function getLinksData() {
 		return [
-			// Icon mapping delete
+			// Icon mapping delete.
 			[['link' => 'zabbix.php?action=iconmap.delete&iconmapid=101']],
 
 			// Icon mapping update.
@@ -42,6 +42,12 @@ class testSID extends CWebTest {
 					'101&iconmap%5Bname%5D=Icon+mapping+name+change&iconmap%5Bmappings%5D%5B0%5D%5Binventory_link'.
 					'%5D=4&iconmap%5Bmappings%5D%5B0%5D%5Bexpression%5D=%281%21%40%23%24%25%5E-%3D2*%29&iconmap'.
 					'%5Bmappings%5D%5B0%5D%5Biconid%5D=5&iconmap%5Bdefault_iconid%5D=15&update=Update']],
+
+			// Icon mapping creation.
+			[['link' => 'zabbix.php?action=iconmap.create&form_refresh=1&form=1&iconmap%5Bname%5D=ccccc&iconmap%5B'.
+					'mappings%5D%5Bnew0%5D%5Binventory_link%5D=1&iconmap%5Bmappings%5D%5Bnew0%5D%5Bexpression%5D='.
+					'ccccc&iconmap%5Bmappings%5D%5Bnew0%5D%5Biconid%5D=2&iconmap%5Bdefault_iconid%5D=2&add=Add
+']],
 
 			// Image icon delete.
 			[['link' => 'zabbix.php?action=image.delete&imageid=1&imagetype=1']],
@@ -51,6 +57,15 @@ class testSID extends CWebTest {
 
 			// Module scan.
 			[['link' => 'zabbix.php?form_refresh=1&action=module.scan&form=Scan+directory']],
+
+			// Module enable.
+			[['link' => 'zabbix.php?action=module.enable&moduleids[]=1']],
+
+			// Module disable.
+			[['link' => 'zabbix.php?action=module.disable&moduleids[]=1']],
+
+			// Module update.
+			[['link' => 'zabbix.php?action=module.update&moduleids%5B%5D=1&form_refresh=1&status=1']],
 
 			// Regular expressions delete.
 			[['link' => 'zabbix.php?action=regex.delete&regexids%5B0%5D=20']],
@@ -118,7 +133,202 @@ class testSID extends CWebTest {
 			// Trigger mass update.
 			[['link' => 'zabbix.php?form_refresh=1&action=popup.massupdate.trigger&ids%5B0%5D=100034&'.
 					'ids%5B1%5D=100036&update=1&location_url=triggers.php%3Fcontext%3Dhost&context=host&'.
-					'visible%5Bmanual_close%5D=1&manual_close=1']]
+					'visible%5Bmanual_close%5D=1&manual_close=1']],
+
+			// Application creation.
+			[['link' => 'zabbix.php?action=application.create&applicationid=0&hostid=50011&form_refresh=1&hostid=50011&'.
+					'name=%D0%B2%D0%B0%D0%BF%D0%B2%D0%BF%D0%B0%D0%B2&add=Add']],
+
+			// Application update.
+			[['link' => 'zabbix.php?action=application.update&applicationid=99010&hostid=50011&form_refresh=1&'.
+					'hostid=50011&name=1+application&update=Update']],
+
+			// Application delete.
+			[['link' => 'zabbix.php?action=application.delete&applicationids%5B0%5D=99014']],
+
+			// Dashboard properties update.
+			[['link' => 'zabbix.php?action=dashboard.update&dashboardid=143&userid=1&name=sssdfsfsdfNew+dashboardss']],
+
+			// Template dashboard update/create.
+			[['link' => 'zabbix.php?action=template.dashboard.update&templateid=10076&name=New+dashboard']],
+
+			// Template dashboard delete.
+			[['link' => 'zabbix.php?form_refresh=1&templateid=10076&dashboardids%5B146%5D=146&action=template.dashboard.delete']],
+
+			// Template dashboard widget edit.
+			[['link' => 'zabbix.php?action=dashboard.widget.edit&templateid=10076']],
+
+			// User token delete.
+			[['link' => 'zabbix.php?action=token.delete&action_src=user.token.list&tokenids%5B0%5D=1']],
+
+			// User token disable.
+			[['link' => 'zabbix.php?action_src=user.token.list&action=token.disable&tokenids[0]=2']],
+
+			// User token enable.
+			[['link' => 'zabbix.php?action_src=user.token.list&action=token.enable&tokenids[0]=2']],
+
+			// User token creation.
+			[['link' => 'zabbix.php?form_refresh=1&userid=1&action_src=user.token.edit&action_dst=user.token.view&'.
+					'action=token.create&tokenid=0&name=adad&description=&expires_state=1&'.
+					'expires_at=2021-04-20+00%3A00%3A00&status=0']],
+
+			// User token update.
+			[['link' => 'zabbix.php?form_refresh=1&userid=1&action_src=user.token.edit&action_dst=user.token.list&'.
+					'action=token.update&tokenid=3&name=aaaa&description=sssss&expires_state=1&'.
+					'expires_at=2021-04-21+00%3A00%3A00&status=0']],
+
+			// Macros update.
+			[['link' => 'zabbix.php?action=macros.update&form_refresh=1&macros%5B16%5D%5Bmacro%5D=%7B%24FGDFGDF%7D&'.
+					'macros%5B16%5D%5Bvalue%5D=dfsdfsfs&macros%5B16%5D%5Btype%5D=0&macros%5B16%5D%5Bdescription%5D=&'.
+					'update=Update']],
+
+			// Autoregistration update.
+			[['link' => 'zabbix.php?action=autoreg.edit&form_refresh=1&tls_accept=2&tls_in_psk=1&tls_psk_identity=sss&'.
+					'tls_psk=88888888888888888888888888888888&action=autoreg.update']],
+
+			// Token delete.
+			[['link' => 'zabbix.php?form_refresh=1&action_src=token.list&tokenids%5B2%5D=2&action=token.delete']],
+
+			// Token disable.
+			[['link' => 'zabbix.php?action_src=token.list&action=token.disable&tokenids[0]=2']],
+
+			// Token enable.
+			[['link' => 'zabbix.php?action_src=token.list&action=token.enable&tokenids[0]=2']],
+
+			// Token creation.
+			[['link' => 'zabbix.php?form_refresh=1&action_src=token.edit&action_dst=token.view&action=token.create&'.
+					'tokenid=0&name=ghfhf&userid=7&description=&expires_state=1&expires_at=2021-04-08+00%3A00%3A00&'.
+					'status=0']],
+
+			// Token update.
+			[['link' => 'zabbix.php?form_refresh=1&action_src=token.edit&action_dst=token.list&action=token.update&'.
+					'tokenid=3&name=aaaa&userid=1&description=ssssssss&expires_state=1&'.
+					'expires_at=2021-04-21+00%3A00%3A00&status=0']],
+
+			// Regex creation.
+			[['link' => 'zabbix.php?action=regex.create&form_refresh=1&name=cccc&expressions%5B0%5D%5Bexpression_type%5D=0&'.
+					'expressions%5B0%5D%5Bexpression%5D=ccccc&expressions%5B0%5D%5Bexp_delimiter%5D=%2C&test_string=&add=Add']],
+
+			// Regex delete.
+			[['link' => 'zabbix.php?form_refresh=1&regexids%5B20%5D=20&regexids%5B31%5D=31&action=regex.delete']],
+
+			// Regex update.
+			[['link' => 'zabbix.php?action=regex.update&regexid=32&form_refresh=1&name=ssss&expressions%5B0%5D%5B'.
+					'expression_type%5D=0&expressions%5B0%5D%5Bexpression%5D=ssssssss&expressions%5B0%5D%5Bexp_delimiter'.
+					'%5D=%2C&expressions%5B0%5D%5Bexpressionid%5D=32&test_string=&update=Update']],
+
+			// Correlation condition creation.
+			[['link' => 'zabbix.php?action=correlation.condition.add&form_refresh=3&name=dddd&evaltype=0&formula=&'.
+					'conditions%5B0%5D%5Bformulaid%5D=A&conditions%5B0%5D%5Btype%5D=0&conditions%5B0%5D%5Boperator%5D'.
+					'=0&conditions%5B0%5D%5Btag%5D=ddd&description=&op_close_old=1&status=0&action=correlation.create']],
+
+			// Correlation condition disable.
+			[['link' => 'zabbix.php?correlationids[0]=99004&action=correlation.disable']],
+
+			// Correlation condition enable.
+			[['link' => 'zabbix.php?correlationids[0]=99004&action=correlation.enable']],
+
+			// Correlation condition update.
+			[['link' => 'zabbix.php?action=correlation.condition.add?form_refresh=1&correlationid=99005&name='.
+					'%D1%81%D0%BC%D1%87%D1%81%D0%BC%D1%87&evaltype=0&formula=&conditions%5B0%5D%5Btype%5D=0&'.
+					'conditions%5B0%5D%5Btag%5D=%D0%BC%D1%81%D0%BC&conditions%5B0%5D%5Bformulaid%5D=A&'.
+					'conditions%5B0%5D%5Boperator%5D=0&description=%D1%81%D1%87%D1%81%D0%BC%D1%81%D1%81%D1%81%'.
+					'D1%81%D1%81%D1%81%D1%81&op_close_old=1&status=0&action=correlation.update']],
+
+			// Correlation condition delete.
+			[['link' => 'zabbix.php?action=correlation.delete&correlationids%5B0%5D=99005']],
+
+			// GUI update.
+			[['link' => 'zabbix.php?action=gui.update&form_refresh=1&default_lang=en_GB&default_timezone=system&'.
+					'default_theme=blue-theme&search_limit=1000&max_overview_table_size=50&max_in_table=51&'.
+					'server_check_interval=0&work_period=1-5%2C09%3A00-18%3A00&show_technical_errors=0&'.
+					'history_period=24h&period_default=1h&max_period=2y&update=Update']],
+
+			// Dashboard share update.
+			[['link' => 'zabbix.php?action=dashboard.share.update&form_refresh=1&dashboardid=143&users%5Bempty_user'.
+					'%5D=1&userGroups%5Bempty_group%5D=1&private=0']],
+
+			// Housekeeping update.
+			[['link' => 'zabbix.php?action=housekeeping.update&form_refresh=1&hk_events_mode=1&hk_events_trigger=365d&'.
+					'hk_events_internal=1d&hk_events_discovery=1d&hk_events_autoreg=1d&hk_services_mode=1&'.
+					'hk_services=365d&hk_audit_mode=1&hk_audit=365d&hk_sessions_mode=1&hk_sessions=365d&'.
+					'hk_history_mode=1&hk_history_global=1&hk_history=90d&hk_trends_mode=1&update=Update']],
+
+			// User group creation.
+			[['link' => 'zabbix.php?form_refresh=1&name=1111&gui_access=0&users_status=0&debug_mode=0&'.
+					'group_rights%5B0%5D%5Bname%5D=&group_rights%5B0%5D%5Bgrouped%5D=1&group_rights%5B0%5D%5B'.
+					'permission%5D=-1&new_group_right%5Bpermission%5D=-1&new_tag_filter%5Btag%5D=&new_tag_filter'.
+					'%5Bvalue%5D=&action=usergroup.create']],
+
+			// User group massupdate (disable/enable).
+			[['link' => 'zabbix.php?action=usergroup.massupdate&users_status=1&usrgrpids[0]=93']],
+
+			// User group update.
+			[['link' => 'zabbix.php?form_refresh=1&usrgrpid=93&name=1111&gui_access=0&users_status=1&debug_mode=0&'.
+					'group_rights%5B0%5D%5Bname%5D=&group_rights%5B0%5D%5Bgrouped%5D=1&group_rights%5B0%5D%5B'.
+					'permission%5D=-1&new_group_right%5Bpermission%5D=-1&new_tag_filter%5Btag%5D=&new_tag_filter'.
+					'%5Bvalue%5D=&action=usergroup.update']],
+
+			// User group delete.
+			[['link' => 'zabbix.php?action=usergroup.delete&usrgrpids%5B0%5D=93']],
+
+			// Script creation.
+			[['link' => 'zabbix.php?form_refresh=1&form=1&scriptid=0&name=11111&scope=1&menu_path=&type=5&execute_on=0&'.
+					'authtype=0&username=&publickey=&privatekey=&password=&passphrase=&port=&command=&commandipmi=&'.
+					'script=fdg&timeout=30s&description=&hgstype=0&usrgrpid=0&host_access=2&action=script.create']],
+
+			// Script update.
+			[['link' => 'zabbix.php?form_refresh=1&form=1&scriptid=203&name=11111&scope=1&menu_path=&type=5&'.
+					'execute_on=2&authtype=0&username=&publickey=&privatekey=&password=&passphrase=&port=&command=&'.
+					'commandipmi=&script=fdg&timeout=30s&description=zzzz&hgstype=0&usrgrpid=0&host_access=2&'.
+					'action=script.update']],
+
+			// Script delete.
+			[['link' => 'zabbix.php?action=script.delete&scriptids%5B%5D=203']],
+
+			// User role creation.
+			[['link' => 'zabbix.php?form_refresh=1&name=sadasda&type=1&action=userrole.create']],
+
+			// User role update.
+			[['link' => 'zabbix.php?form_refresh=1&roleid=5&name=sadasda&type=2&action=userrole.update']],
+
+			// User role delete.
+			[['link' => 'zabbix.php?action=userrole.delete&roleids%5B0%5D=5']],
+
+			// Popup acknowledge creation.
+			[['link' => 'zabbix.php?action=popup.acknowledge.create&eventids%5B0%5D=95&message=ddddd&scope=0']],
+
+			// Proxy creation.
+			[['link' => 'zabbix.php?form_refresh=1&proxyid=0&tls_accept=1&psk_edit_mode=1&host=dfsdfsdfsdfsf&status=5&'.
+					'ip=127.0.0.1&dns=localhost&useip=1&port=10051&proxy_address=&description=&tls_in_none=1&action=proxy.create']],
+
+			// Proxy update.
+			[['link' => 'zabbix.php?form_refresh=1&proxyid=99455&tls_accept=1&psk_edit_mode=1&host=1111111&status=5&'.
+					'ip=127.0.0.1&dns=localhost&useip=1&port=10051&proxy_address=&description=ffffff&'.
+					'tls_in_none=1&action=proxy.update']],
+
+			// Proxy delete.
+			[['link' => 'zabbix.php?action=proxy.delete&proxyids[]=99455']],
+
+			// Authentication update.
+			[['link' => 'zabbix.php?form_refresh=3&action=authentication.update&db_authentication_type=0&'.
+					'authentication_type=0&http_auth_enabled=1&http_login_form=0&http_strip_domains=&'.
+					'http_case_sensitive=1&ldap_configured=0&change_bind_password=1&saml_auth_enabled=0&update=Update']],
+
+			// Media type create.
+			[['link' => 'zabbix.php?form_refresh=1&form=1&mediatypeid=0&action=mediatype.create']],
+
+			// Media type update.
+			[['link' => 'zabbix.php?form_refresh=1&form=1&mediatypeid=105&status=1&name=1111&action=mediatype.update']],
+
+			// Media type disable.
+			[['link' => 'zabbix.php?action=mediatype.disable&mediatypeids[]=105']],
+
+			// Media type enable.
+			[['link' => 'zabbix.php?action=mediatype.enable&mediatypeids[]=105']],
+
+			// Media type delete.
+			[['link' => 'zabbix.php?action=mediatype.delete&mediatypeids[]=105']],
 		];
 	}
 
