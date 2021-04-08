@@ -201,6 +201,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '22s',
+				'authtype' => 0,
 				'username' => 'username1',
 				'params' => 'executed script 1'
 			],
@@ -212,6 +213,7 @@ class testPageMassUpdateItems extends CWebTest{
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '55s',
+				'authtype' => 0,
 				'username' => 'username2',
 				'params' => 'executed script 2'
 			],
@@ -1622,7 +1624,7 @@ class testPageMassUpdateItems extends CWebTest{
 	}
 
 	/**
-	 * Add items for mass updating.
+	 * Add items with preprocessing for mass updating.
 	 */
 	public function prepareItemPreprocessingData() {
 		CDataHelper::call('item.create', [
