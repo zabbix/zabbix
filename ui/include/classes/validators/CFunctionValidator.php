@@ -726,11 +726,6 @@ class CFunctionValidator extends CValidator {
 		$period = strpos($precisions, substr($period_value, -1));
 
 		if ($period !== false) {
-			if (substr($period_shift_value, 0, 4) !== 'now/') {
-				return false;
-			}
-			$period_shift_value = substr($period_shift_value, 4);
-
 			$relative_time_parser = new CRelativeTimeParser();
 			if ($relative_time_parser->parse($period_shift_value) !== CParser::PARSE_SUCCESS) {
 				return false;
