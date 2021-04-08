@@ -2197,7 +2197,7 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
  *                                                                            *
  * Function: rm_send_test_error_result                                        *
  *                                                                            *
- * Purpose: send error result in reponse to test request                      *
+ * Purpose: send error result in response to test request                     *
  *                                                                            *
  * Parameters: client - [IN] the connected trapper                            *
  *             error  - [IN] the error message                                *

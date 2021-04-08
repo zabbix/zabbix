@@ -92,7 +92,7 @@ static char	*rw_curl_error(CURLcode err)
  *             report      - [OUT] the downloaded report                      *
  *             report_size - [OUT] the report size                            *
  *                                                                            *
- * Return value: SUCCEED - the report was donwloaded successfully             *
+ * Return value: SUCCEED - the report was downloaded successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -272,7 +272,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "unsupported paramter: %s=%s", (char *)params.values[i].first,
+			zabbix_log(LOG_LEVEL_WARNING, "unsupported parameter: %s=%s", (char *)params.values[i].first,
 					(char *)params.values[i].second);
 		}
 	}
