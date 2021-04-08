@@ -37,7 +37,6 @@ extern char	*CONFIG_TLS_CA_FILE;
 extern char	*CONFIG_TLS_CERT_FILE;
 extern char	*CONFIG_TLS_KEY_FILE;
 
-
 typedef struct
 {
 	char	*data;
@@ -262,11 +261,11 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 
 	for (i = 0; i < params.values_num; i++)
 	{
-		if (0 == strcmp(params.values[i].first, "subject"))
+		if (0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_SUBJECT))
 		{
 			subject = (char *)params.values[i].second;
 		}
-		else if (0 == strcmp(params.values[i].first, "body"))
+		else if (0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_BODY))
 		{
 			message = (char *)params.values[i].second;
 		}

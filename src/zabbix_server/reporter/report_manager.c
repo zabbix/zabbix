@@ -32,6 +32,7 @@
 #include "../../libs/zbxcrypto/aes.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxalert.h"
+#include "zbxserver.h"
 
 #include "report_manager.h"
 #include "report_protocol.h"
@@ -1826,6 +1827,7 @@ out:
  *             userid        - [IN] the recipient user id                     *
  *             access_userid - [IN] the user id used to create the report     *
  *             now           - [IN] the current time                          *
+ *             params        - [IN] the report parameters                     *
  *             width         - [IN] the report width                          *
  *             height        - [IN] the report height                         *
  *             jobs          - [IN/OUT] the created jobs                      *
@@ -1837,7 +1839,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint64_t userid,
-		zbx_uint64_t access_userid, int now, int width, int height, zbx_vector_ptr_t *jobs, char **error)
+		zbx_uint64_t access_userid, int now, const zbx_vector_ptr_pair_t *params, int width, int height,
+		zbx_vector_ptr_t *jobs, char **error)
 {
 	int		i;
 	zbx_rm_job_t	*job;
@@ -1855,7 +1858,7 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
 	if (i == jobs->values_num)
 	{
 		if (NULL == (job = rm_create_job(manager, report->name, report->dashboardid, access_userid, now,
-				report->period, &userid, 1, width, height, &report->params, error)))
+				report->period, &userid, 1, width, height, params, error)))
 		{
 			return FAIL;
 		}
@@ -1876,6 +1879,7 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
  * Parameters: manager - [IN] the manager                                     *
  *             report  - [IN] the report to process                           *
  *             now     - [IN] the current time                                *
+ *             params  - [IN] the report parameters                           *
  *             width   - [IN] the report width                                *
  *             height  - [IN] the report height                               *
  *             jobs    - [IN/OUT] the created jobs                            *
@@ -1885,8 +1889,8 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int now, int width,
-		int height, zbx_vector_ptr_t *jobs, char **error)
+static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int now,
+		const zbx_vector_ptr_pair_t *params, int width, int height, zbx_vector_ptr_t *jobs, char **error)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -1927,8 +1931,8 @@ static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *r
 		if (0 == access_userid)
 			access_userid = userid;
 
-		if (SUCCEED != rm_jobs_add_user(manager, report, userid, access_userid, now, width, height, jobs,
-				error))
+		if (SUCCEED != rm_jobs_add_user(manager, report, userid, access_userid, now, params, width, height,
+				jobs, error))
 		{
 			goto out;
 		}
@@ -1965,12 +1969,30 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 	int			i, ret = FAIL, jobs_num, width, height;
 	zbx_uint64_t		access_userid;
 	zbx_rm_batch_t		*batch, batch_local;
+	zbx_vector_ptr_pair_t	params;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() reportid:" ZBX_FS_UI64 , __func__, report->reportid);
 
 	rm_get_report_dimensions(report->dashboardid, &width, &height);
 
 	zbx_vector_ptr_create(&jobs);
+	zbx_vector_ptr_pair_create(&params);
+
+	for (i = 0; i < report->params.values_num; i++)
+	{
+		zbx_ptr_pair_t	pair;
+
+		pair.first = zbx_strdup(NULL, report->params.values[i].first);
+		pair.second = zbx_strdup(NULL, report->params.values[i].second);
+
+		if (0 == strcmp(pair.first, ZBX_REPORT_PARAM_BODY) || 0 == strcmp(pair.first, ZBX_REPORT_PARAM_SUBJECT))
+		{
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					(char **)&pair.second, MACRO_TYPE_REPORT, NULL, 0);
+		}
+
+		zbx_vector_ptr_pair_append(&params, pair);
+	}
 
 	DBbegin();
 
@@ -1980,7 +2002,7 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 			access_userid = report->users.values[i].id;
 
 		if (SUCCEED != rm_jobs_add_user(manager, report, report->users.values[i].id, access_userid, now,
-				width, height, &jobs, error))
+				&params, width, height, &jobs, error))
 		{
 			goto out;
 		}
@@ -1988,8 +2010,11 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 	if (0 != report->usergroups.values_num)
 	{
-		if (SUCCEED != rm_report_create_usergroup_jobs(manager, report, now, width, height, &jobs, error))
+		if (SUCCEED != rm_report_create_usergroup_jobs(manager, report, now, &params, width, height, &jobs,
+				error))
+		{
 			goto out;
+		}
 	}
 
 	/* create job batch for result tracking */
@@ -2029,6 +2054,7 @@ out:
 		jobs_num = 0;
 	}
 
+	report_destroy_params(&params);
 	zbx_vector_ptr_destroy(&jobs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s jobs:%d %s", __func__, zbx_result_string(ret), jobs_num,

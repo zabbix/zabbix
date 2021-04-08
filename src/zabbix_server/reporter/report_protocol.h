@@ -24,6 +24,9 @@
 #include "zbxalgo.h"
 #include "db.h"
 
+#define ZBX_REPORT_PARAM_SUBJECT	"subject"
+#define ZBX_REPORT_PARAM_BODY		"body"
+
 #define ZBX_IPC_SERVICE_REPORTER	"reporter"
 
 /* manager -> writer */
