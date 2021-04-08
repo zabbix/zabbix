@@ -27,7 +27,6 @@
                     <name>Template B</name>
                 </template>
             </templates>
-            <screens/>
         </template>
         <template>
             <template>Template B</template>
@@ -108,7 +107,6 @@
             <httptests/>
             <macros/>
             <templates/>
-            <screens/>
         </template>
     </templates>
 </zabbix_export>

@@ -28,7 +28,6 @@ class CControllerExport extends CController {
 			'valuemapids' =>	'not_empty|array_db valuemaps.valuemapid',
 			'hosts' =>			'not_empty|array_db hosts.hostid',
 			'mediatypeids' =>	'not_empty|array_db media_type.mediatypeid',
-			'screens' =>		'not_empty|array_db screens.screenid',
 			'maps' =>			'not_empty|array_db sysmaps.sysmapid',
 			'templates' =>		'not_empty|array_db hosts.hostid',
 			'format' =>			'in '.implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON])
@@ -57,9 +56,6 @@ class CControllerExport extends CController {
 			case 'export.templates':
 				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-			case 'export.screens':
-				return $this->checkAccess(CRoleHelper::UI_MONITORING_SCREENS);
-
 			case 'export.sysmaps':
 				return $this->checkAccess(CRoleHelper::UI_MONITORING_MAPS);
 
@@ -87,10 +83,6 @@ class CControllerExport extends CController {
 
 			case 'export.mediatypes':
 				$params['options']['mediaTypes'] = $this->getInput('mediatypeids', []);
-				break;
-
-			case 'export.screens':
-				$params['options']['screens'] = $this->getInput('screens', []);
 				break;
 
 			case 'export.sysmaps':

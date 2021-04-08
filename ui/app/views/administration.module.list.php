@@ -29,7 +29,6 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CForm())
-				->cleanItems()
 				->addVar('action', 'module.scan')
 				->addItem((new CList())
 					->addItem(new CSubmit('form', _('Scan directory')))

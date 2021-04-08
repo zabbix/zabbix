@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,9 +19,11 @@
 **/
 
 
-class CAPITest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-	public function setUp() {
+class APITest extends TestCase {
+
+	protected function setUp(): void {
 		API::setWrapper(null);
 		API::setApiServiceFactory(new CApiServiceFactory());
 	}

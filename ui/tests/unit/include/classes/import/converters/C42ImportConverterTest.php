@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,150 +19,12 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class C42ImportConverterTest extends CImportConverterTest {
 
-	public function testConvertProvider() {
+	public function dataProviderConvert() {
 		return [
-			[
-				[
-					'screens' => [
-						[
-							'name' => 'Parent screen 1',
-							'hsize' => 1,
-							'vsize' => 4,
-							'screen_items' => [
-								'0' => [
-									'resourcetype' => 8,
-									'width' => 500,
-									'height' => 100,
-									'x' => 0,
-									'y' => 0,
-									'colspan' => 1,
-									'rowspan' => 1,
-									'valign' => 0,
-									'halign' => 0,
-									'resource' => [
-										'name' => 'Child screen'
-									],
-									'max_columns' => 3
-								],
-								'1' => [
-									'resourcetype' => 7,
-									'width' => 500,
-									'height' => 100,
-									'x' => 0,
-									'y' => 1,
-									'colspan' => 1,
-									'rowspan' => 1,
-									'valign' => 0,
-									'halign' => 0,
-									'resource' => [
-										'name' => 'Clock'
-									],
-									'max_columns' => 3
-								]
-							]
-						],
-						[
-							'name' => 'Parent screen 2',
-							'hsize' => 1,
-							'vsize' => 4,
-							'screen_items' => [
-								'0' => [
-									'resourcetype' => 8,
-									'width' => 500,
-									'height' => 100,
-									'x' => 0,
-									'y' => 0,
-									'colspan' => 1,
-									'rowspan' => 1,
-									'valign' => 0,
-									'halign' => 0,
-									'resource' => [
-										'name' => 'Child screen'
-									],
-									'max_columns' => 3
-								]
-							]
-						],
-						[
-							'name' => 'Child screen',
-							'hsize' => 1,
-							'vsize' => 4,
-							'screen_items' => [
-								'0' => [
-									'resourcetype' => 7,
-									'width' => 500,
-									'height' => 100,
-									'x' => 0,
-									'y' => 0,
-									'colspan' => 1,
-									'rowspan' => 1,
-									'valign' => 0,
-									'halign' => 0,
-									'resource' => [
-										'name' => 'Clock'
-									],
-									'max_columns' => 3
-								]
-							]
-						]
-					]
-				],
-				[
-					'screens' => [
-						[
-							'name' => 'Parent screen 1',
-							'hsize' => 1,
-							'vsize' => 4,
-							'screen_items' => [
-								'1' => [
-									'resourcetype' => 7,
-									'width' => 500,
-									'height' => 100,
-									'x' => 0,
-									'y' => 1,
-									'colspan' => 1,
-									'rowspan' => 1,
-									'valign' => 0,
-									'halign' => 0,
-									'resource' => [
-										'name' => 'Clock'
-									],
-									'max_columns' => 3
-								]
-							]
-						],
-						[
-							'name' => 'Parent screen 2',
-							'hsize' => 1,
-							'vsize' => 4
-						],
-						[
-							'name' => 'Child screen',
-							'hsize' => 1,
-							'vsize' => 4,
-							'screen_items' => [
-								'0' => [
-									'resourcetype' => 7,
-									'width' => 500,
-									'height' => 100,
-									'x' => 0,
-									'y' => 0,
-									'colspan' => 1,
-									'rowspan' => 1,
-									'valign' => 0,
-									'halign' => 0,
-									'resource' => [
-										'name' => 'Clock'
-									],
-									'max_columns' => 3
-								]
-							]
-						]
-					]
-				]
-			],
 			[
 				[
 					'hosts' => [
@@ -208,7 +70,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 	}
 
 	/**
-	 * @dataProvider testConvertProvider
+	 * @dataProvider dataProviderConvert
 	 *
 	 * @param $data
 	 * @param $expected

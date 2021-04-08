@@ -61,10 +61,10 @@ class CFilterTabElement extends CElement {
 		$xpath = 'xpath:(.//a[@class="tabfilter-item-link" and text()='.CXPathHelper::escapeQuotes($name).'])';
 
 		if ($count !== null) {
-			$this->query($xpath.'['.$count.']')->one()->click();
+			$this->query($xpath.'['.$count.']')->one()->click(true);
 		}
 		else {
-			$this->query($xpath)->one()->click();
+			$this->query($xpath)->one()->click(true);
 		}
 	}
 
@@ -79,6 +79,6 @@ class CFilterTabElement extends CElement {
 			$this->selectTab($name, $count);
 		}
 
-		$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click();
+		$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click(true);
 	}
 }

@@ -26,12 +26,12 @@ the server and any host name in that certificate. In this mode, TLS is susceptib
 *Default value:* false  
 *Limits:* false | true
 
-**Plugins.Ceph.Timeout** — The maximum time in seconds for waiting when a request has to be done. The timeout includes 
+**Plugins.Ceph.Timeout** — The maximum amount of time in seconds to wait for a request to be done. The timeout includes 
 connection time, any redirects, and reading the response body.  
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Ceph.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+**Plugins.Ceph.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 

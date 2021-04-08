@@ -77,7 +77,6 @@ class CConfigurationImport {
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
@@ -152,7 +151,6 @@ class CConfigurationImport {
 		$this->processImages();
 		$this->processMaps();
 		$this->processTemplateDashboards();
-		$this->processScreens();
 		$this->processMediaTypes();
 
 		// Missing applications should be deleted after new application changes are done to all inherited items.
@@ -179,7 +177,6 @@ class CConfigurationImport {
 		$graphsRefs = [];
 		$iconMapsRefs = [];
 		$mapsRefs = [];
-		$screensRefs = [];
 		$templateDashboardsRefs = [];
 		$macrosRefs = [];
 		$proxyRefs = [];
@@ -415,78 +412,31 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedScreens() as $screen) {
-			$screensRefs[$screen['name']] = $screen['name'];
-
-			if (!empty($screen['screenitems'])) {
-				foreach ($screen['screenitems'] as $screenItem) {
-					$resource = $screenItem['resource'];
-
-					if (empty($resource)) {
-						continue;
-					}
-
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOST_INFO:
-						case SCREEN_RESOURCE_TRIGGER_INFO:
-						case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$groupsRefs[$resource['name']] = $resource['name'];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$hostsRefs[$resource['host']] = $resource['host'];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-						case SCREEN_RESOURCE_LLD_GRAPH:
-							$hostsRefs[$resource['host']] = $resource['host'];
-							$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
-							break;
-
-						case SCREEN_RESOURCE_CLOCK:
-							if ($screenItem['style'] != TIME_TYPE_HOST) {
-								break;
-							}
-							// break; is not missing here
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$hostsRefs[$resource['host']] = $resource['host'];
-							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$mapsRefs[$resource['name']] = $resource['name'];
-							break;
-					}
-				}
-			}
-		}
-
 		foreach ($this->getFormattedTemplateDashboards() as $dashboards) {
 			foreach ($dashboards as $dashboard) {
 				$templateDashboardsRefs[$dashboard['name']] = $dashboard['name'];
 
-				if ($dashboard['widgets']) {
-					foreach ($dashboard['widgets'] as $widget) {
-						foreach ($widget['fields'] as $field) {
-							$value = $field['value'];
+				if ($dashboard['pages']) {
+					foreach ($dashboard['pages'] as $dashboard_page) {
+						if ($dashboard_page['widgets']) {
+							foreach ($dashboard_page['widgets'] as $widget) {
+								foreach ($widget['fields'] as $field) {
+									$value = $field['value'];
 
-							switch ($field['type']) {
-								case ZBX_WIDGET_FIELD_TYPE_ITEM:
-								case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-									$hostsRefs[$value['host']] = $value['host'];
-									$itemsRefs[$value['host']][$value['key']] = $value['key'];
-									break;
+									switch ($field['type']) {
+										case ZBX_WIDGET_FIELD_TYPE_ITEM:
+										case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+											$hostsRefs[$value['host']] = $value['host'];
+											$itemsRefs[$value['host']][$value['key']] = $value['key'];
+											break;
 
-								case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-								case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-									$hostsRefs[$value['host']] = $value['host'];
-									$graphsRefs[$value['host']][$value['name']] = $value['name'];
-									break;
+										case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+										case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+											$hostsRefs[$value['host']] = $value['host'];
+											$graphsRefs[$value['host']][$value['name']] = $value['name'];
+											break;
+									}
+								}
 							}
 						}
 					}
@@ -522,7 +472,6 @@ class CConfigurationImport {
 		$this->referencer->addGraphs($graphsRefs);
 		$this->referencer->addIconMaps($iconMapsRefs);
 		$this->referencer->addMaps($mapsRefs);
-		$this->referencer->addScreens($screensRefs);
 		$this->referencer->addTemplateDashboards($templateDashboardsRefs);
 		$this->referencer->addMacros($macrosRefs);
 		$this->referencer->addProxies($proxyRefs);
@@ -1822,21 +1771,6 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Import screens.
-	 */
-	protected function processScreens() {
-		if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
-			$screens = $this->getFormattedScreens();
-			if ($screens) {
-				$screenImporter = new CScreenImporter($this->options, $this->referencer,
-					$this->importedObjectContainer
-				);
-				$screenImporter->import($screens);
-			}
-		}
-	}
-
-	/**
 	 * Import template dashboards.
 	 */
 	protected function processTemplateDashboards() {
@@ -2539,20 +2473,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted screens.
-	 *
-	 * @return array
-	 */
-	protected function getFormattedScreens() {
-		if (!isset($this->formattedData['screens'])) {
-			$this->formattedData['screens'] = $this->adapter->getScreens();
-		}
-
-		return $this->formattedData['screens'];
-	}
-
-	/**
-	 * Get formatted template screens.
+	 * Get formatted template dashboards.
 	 *
 	 * @return array
 	 */

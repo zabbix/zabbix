@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,7 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CValidationRuleTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CValidationRuleTest extends TestCase {
 
 	public static function provider() {
 		return [
@@ -198,9 +200,9 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'id' => true
 				]
 			],
-			['in graphid,itemid,screenid,slideshowid,sysmapid|fatal|required', '',
+			['in graphid,itemid,sysmapid|fatal|required', '',
 				[
-					'in' => ['graphid', 'itemid', 'screenid', 'slideshowid', 'sysmapid'],
+					'in' => ['graphid', 'itemid', 'sysmapid'],
 					'fatal' => true,
 					'required' => true
 				]

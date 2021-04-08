@@ -1057,32 +1057,6 @@ class testFormUser extends CWebTest {
 					'error_details' => 'User "user-zabbix" is map "Local network" owner.'
 				]
 			],
-			// Attempt to delete a user that owns a screen.
-			[
-				[
-					'expected' => TEST_BAD,
-					'username' => 'test-user',
-					'parameters' => [
-						'DB_table' => 'screens',
-						'column' => 'name',
-						'value' => 'Zabbix server'
-					],
-					'error_details' => 'User "test-user" is screen "Zabbix server" owner.'
-				]
-			],
-			// Attempt to delete a user that owns a slide show.
-			[
-				[
-					'expected' => TEST_BAD,
-					'username' => 'admin-zabbix',
-					'parameters' => [
-						'DB_table' => 'slideshows',
-						'column' => 'name',
-						'value' => 'Test slide show 1'
-					],
-					'error_details' => 'User "admin-zabbix" is slide show "Test slide show 1" owner.'
-				]
-			],
 			// Attempt to delete a user that is mentioned in an action.
 			[
 				[

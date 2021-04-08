@@ -282,18 +282,6 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'screens' => [
-				'title' => _('Screens'),
-				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'screenid',
-				'form' => [
-					'name' => 'screenform',
-					'id' => 'screens'
-				],
-				'table_columns' => [
-					_('Name')
-				]
-			],
 			'graphs' => [
 				'title' => _('Graphs'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -365,19 +353,6 @@ class CControllerPopupGeneric extends CController {
 				'allowed_src_fields' => 'dcheckid,name',
 				'table_columns' => [
 					_('Name')
-				]
-			],
-			'scripts' => [
-				'title' => _('Global scripts'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'scriptid,name',
-				'form' => [
-					'name' => 'scriptform',
-					'id' => 'scripts'
-				],
-				'table_columns' => [
-					_('Name'),
-					_('Execute on')
 				]
 			],
 			'roles' => [
@@ -452,7 +427,6 @@ class CControllerPopupGeneric extends CController {
 			'hostid' =>								'db hosts.hostid',
 			'host' =>								'string',
 			'parent_discoveryid' =>					'db items.itemid',
-			'screenid' =>							'db screens.screenid',
 			'templates' =>							'string|not_empty',
 			'host_templates' =>						'string|not_empty',
 			'multiselect' =>						'in 1',
@@ -765,7 +739,7 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected function getPageOptions(): array {
 		$option_fields_binary = ['noempty', 'real_hosts', 'submit_parent', 'with_items', 'writeonly'];
-		$option_fields_value = ['host_templates', 'screenid'];
+		$option_fields_value = ['host_templates'];
 
 		$page_options = [
 			'srcfld1' => $this->getInput('srcfld1', ''),
@@ -1285,15 +1259,6 @@ class CControllerPopupGeneric extends CController {
 				CArrayHelper::sort($records, ['name']);
 				break;
 
-			case 'screens':
-				$options += [
-					'output' => ['screenid', 'name']
-				];
-
-				$records = API::Screen()->get($options);
-				CArrayHelper::sort($records, ['name']);
-				break;
-
 			case 'drules':
 				$records = API::DRule()->get([
 					'output' => ['druleid', 'name'],
@@ -1324,23 +1289,6 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id', 'host' => 'name']);
 				break;
 
-			case 'scripts':
-				$options += [
-					'output' => ['scriptid', 'name', 'type', 'execute_on'],
-					'groupids' => (!$this->hostids && $this->groupids) ? $this->groupids : null
-				];
-
-				if ((!$this->host_preselect_required && $this->hostids)
-						|| (!$this->group_preselect_required || $this->groupids)) {
-					$records = API::Script()->get($options);
-				}
-				else {
-					$records = [];
-				}
-
-				CArrayHelper::sort($records, ['name']);
-				break;
-
 			case 'roles':
 				$options += [
 					'output' => ['roleid', 'name'],
@@ -1351,6 +1299,7 @@ class CControllerPopupGeneric extends CController {
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
 				break;
+
 			case 'api_methods':
 				$user_type = $this->getInput('user_type', USER_TYPE_ZABBIX_USER);
 				$api_methods = CRoleHelper::getApiMethods($user_type);

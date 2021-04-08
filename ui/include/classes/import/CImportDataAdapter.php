@@ -378,23 +378,6 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get screens from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getScreens() {
-		$screens = [];
-
-		if (array_key_exists('screens', $this->data)) {
-			foreach ($this->data['screens'] as $screen) {
-				$screens[] = CArrayHelper::renameKeys($screen, ['screen_items' => 'screenitems']);
-			}
-		}
-
-		return $screens;
-	}
-
-	/**
 	 * Get template dashboards from the imported data.
 	 *
 	 * @return array
@@ -406,14 +389,17 @@ class CImportDataAdapter {
 			foreach ($this->data['templates'] as $template) {
 				if (array_key_exists('dashboards', $template)) {
 					foreach ($template['dashboards'] as $dashboard) {
-						// Rename hide_header to view_mode in widgets.
-						if (array_key_exists('widgets', $dashboard)) {
-							$dashboard['widgets'] = array_map(function (array $widget): array {
-								$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
+						foreach ($dashboard['pages'] as &$dashboard_page) {
+							// Rename hide_header to view_mode in widgets.
+							if (array_key_exists('widgets', $dashboard_page)) {
+								$dashboard_page['widgets'] = array_map(function (array $widget): array {
+									$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
 
-								return $widget;
-							}, $dashboard['widgets']);
+									return $widget;
+								}, $dashboard_page['widgets']);
+							}
 						}
+						unset($dashboard_page);
 
 						$dashboards[$template['template']][$dashboard['name']] = $dashboard;
 					}

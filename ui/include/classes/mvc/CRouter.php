@@ -54,7 +54,7 @@ class CRouter {
 	 * @var array
 	 */
 	private $routes = [
-		// action						controller											layout					view
+		// action							controller											layout					view
 		'action.operation.get'				=> ['CControllerActionOperationGet',				'layout.json',			null],
 		'action.operation.validate'			=> ['CControllerActionOperationValidate',			'layout.json',			null],
 		'application.create'				=> ['CControllerApplicationCreate',					null,					null],
@@ -81,6 +81,8 @@ class CRouter {
 		'correlation.update'				=> ['CControllerCorrelationUpdate',					null,					null],
 		'dashboard.delete'					=> ['CControllerDashboardDelete',					null,					null],
 		'dashboard.list'					=> ['CControllerDashboardList',						'layout.htmlpage',		'monitoring.dashboard.list'],
+		'dashboard.page.properties.check'	=> ['CControllerDashboardPagePropertiesCheck',		'layout.json',			null],
+		'dashboard.page.properties.edit'	=> ['CControllerDashboardPagePropertiesEdit',		'layout.json',			'dashboard.page.properties.edit'],
 		'dashboard.properties.check'		=> ['CControllerDashboardPropertiesCheck',			'layout.json',			null],
 		'dashboard.properties.edit'			=> ['CControllerDashboardPropertiesEdit',			'layout.json',			'dashboard.properties.edit'],
 		'dashboard.share.edit'				=> ['CControllerDashboardShareEdit',				'layout.json',			'dashboard.share.edit'],
@@ -91,7 +93,7 @@ class CRouter {
 		'dashboard.widget.configure'		=> ['CControllerDashboardWidgetConfigure',			'layout.json',			null],
 		'dashboard.widget.edit'				=> ['CControllerDashboardWidgetEdit',				'layout.json',			'monitoring.dashboard.widget.edit'],
 		'dashboard.widget.rfrate'			=> ['CControllerDashboardWidgetRfRate',				'layout.json',			null],
-		'dashboard.widget.sanitize'			=> ['CControllerDashboardWidgetSanitize',			'layout.json',			null],
+		'dashboard.widgets.sanitize'		=> ['CControllerDashboardWidgetsSanitize',			'layout.json',			null],
 		'discovery.create'					=> ['CControllerDiscoveryCreate',					null,					null],
 		'discovery.delete'					=> ['CControllerDiscoveryDelete',					null,					null],
 		'discovery.disable'					=> ['CControllerDiscoveryDisable',					null,					null],
@@ -102,7 +104,6 @@ class CRouter {
 		'discovery.view'					=> ['CControllerDiscoveryView',						'layout.htmlpage',		'monitoring.discovery.view'],
 		'export.hosts'						=> ['CControllerExport',							'layout.export',		null],
 		'export.mediatypes'					=> ['CControllerExport',							'layout.export',		null],
-		'export.screens'					=> ['CControllerExport',							'layout.export',		null],
 		'export.sysmaps'					=> ['CControllerExport',							'layout.export',		null],
 		'export.templates'					=> ['CControllerExport',							'layout.export',		null],
 		'export.valuemaps'					=> ['CControllerExport',							'layout.export',		null],
@@ -110,6 +111,7 @@ class CRouter {
 		'favourite.delete'					=> ['CControllerFavouriteDelete',					'layout.javascript',	null],
 		'gui.edit'							=> ['CControllerGuiEdit',							'layout.htmlpage',		'administration.gui.edit'],
 		'gui.update'						=> ['CControllerGuiUpdate',							null,					null],
+		'hint.box'							=> ['CControllerHintBox',							'layout.json',			'hint.box'],
 		'host.dashboard.view'				=> ['CControllerHostDashboardView',					'layout.htmlpage',		'monitoring.host.dashboard.view'],
 		'host.view'							=> ['CControllerHostView',							'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'					=> ['CControllerHostViewRefresh',					'layout.json',			'monitoring.host.view.refresh'],
@@ -262,7 +264,6 @@ class CRouter {
 		'widget.discovery.view'				=> ['CControllerWidgetDiscoveryView',				'layout.widget',		'monitoring.widget.discovery.view'],
 		'widget.favgraphs.view'				=> ['CControllerWidgetFavGraphsView',				'layout.widget',		'monitoring.widget.favgraphs.view'],
 		'widget.favmaps.view'				=> ['CControllerWidgetFavMapsView',					'layout.widget',		'monitoring.widget.favmaps.view'],
-		'widget.favscreens.view'			=> ['CControllerWidgetFavScreensView',				'layout.widget',		'monitoring.widget.favscreens.view'],
 		'widget.graph.view'					=> ['CControllerWidgetGraphView',					'layout.widget',		'monitoring.widget.graph.view'],
 		'widget.graphprototype.view'		=> ['CControllerWidgetIteratorGraphPrototypeView',	'layout.json',			null],
 		'widget.hostavail.view'				=> ['CControllerWidgetHostAvailView',				'layout.widget',		'monitoring.widget.hostavail.view'],
@@ -325,12 +326,7 @@ class CRouter {
 		'overview.php'					=> ['CLegacyAction', null, null],
 		'report2.php'					=> ['CLegacyAction', null, null],
 		'report4.php'					=> ['CLegacyAction', null, null],
-		'screenconf.php'				=> ['CLegacyAction', null, null],
-		'screenedit.php'				=> ['CLegacyAction', null, null],
-		'screens.php'					=> ['CLegacyAction', null, null],
 		'services.php'					=> ['CLegacyAction', null, null],
-		'slideconf.php'					=> ['CLegacyAction', null, null],
-		'slides.php'					=> ['CLegacyAction', null, null],
 		'srv_status.php'				=> ['CLegacyAction', null, null],
 		'sysmap.php'					=> ['CLegacyAction', null, null],
 		'sysmaps.php'					=> ['CLegacyAction', null, null],

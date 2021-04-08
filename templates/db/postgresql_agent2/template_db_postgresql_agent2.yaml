@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-03-02T19:42:24Z'
   groups:
     -
       name: Templates/Databases
@@ -1152,7 +1152,7 @@ zabbix_export:
               name: 'DB {#DBNAME}: Get bloating tables'
               key: 'pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               history: 7d
-              description: 'Number оf bloating tables'
+              description: 'Number of bloating tables'
               application_prototypes:
                 -
                   name: 'PostgreSQL: DB {#DBNAME}'
@@ -1994,7 +1994,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '12'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2003,11 +2003,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2018,7 +2014,7 @@ zabbix_export:
               type: GRAPH_PROTOTYPE
               x: '12'
               width: '12'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2027,11 +2023,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2040,9 +2032,9 @@ zabbix_export:
                     host: 'PostgreSQL Agent 2'
             -
               type: GRAPH_PROTOTYPE
-              'y': '5'
+              'y': '12'
               width: '12'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2051,11 +2043,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -2065,9 +2053,9 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               x: '12'
-              'y': '5'
+              'y': '12'
               width: '12'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -2076,11 +2064,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid

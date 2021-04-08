@@ -61,17 +61,6 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Monitoring',
-					'page' => 'Screens',
-					'third_level' =>
-					[
-						'Screens',
-						'Slide shows'
-					]
-				]
-			],
-			[
-				[
-					'section' => 'Monitoring',
 					'page' => 'Maps'
 				]
 			],
@@ -210,9 +199,9 @@ class testSidebarMenu extends CWebTest {
 						'Icon mapping',
 						'Regular expressions',
 						'Macros',
-						'Value mapping',
 						'Trigger displaying options',
 						'Modules',
+						'API tokens',
 						'Other'
 					]
 				]

@@ -80,7 +80,6 @@ class CControllerPopupImportCompare extends CController {
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],

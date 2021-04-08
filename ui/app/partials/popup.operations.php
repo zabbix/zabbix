@@ -34,9 +34,11 @@ $form_list = new CFormList();
 /*
  * Operation type row.
  */
-$select_operationtype = (new CSelect('operationtype'))->setFocusableElementId('operationtype');
+$select_operationtype = (new CSelect(''))
+	->setFocusableElementId('operationtype')
+	->setId('operation-type-select');
 
-$form_list->addRow(new CLabel(_('Operation type'), $select_operationtype->getFocusableElementId()),
+$form_list->addRow(new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()),
 	$select_operationtype,
 	'operation-type'
 );
@@ -189,147 +191,6 @@ $form_list->addRow((new CLabel(_('Target list')))->setAsteriskMark(),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	'operation-command-targets'
-);
-
-/*
- * Command type row.
- */
-$select_operation_opcommand_type = (new CSelect('operation[opcommand][type]'))
-	->setValue((string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
-	->setFocusableElementId('operation-opcommand-type')
-	->addOptions(CSelect::createOptionsFromArray([
-		ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
-		ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
-		ZBX_SCRIPT_TYPE_SSH => _('SSH'),
-		ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
-		ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-	]))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-
-$form_list->addRow(new CLabel(_('Type'), $select_operation_opcommand_type->getFocusableElementId()),
-	$select_operation_opcommand_type,
-	'operation-command-type'
-);
-
-/*
- * Command global script row.
- */
-$form_list->addRow((new CLabel(_('Script name'), 'operation_opcommand_script'))->setAsteriskMark(), (new CDiv([
-		(new CVar('operation[opcommand][scriptid]', 0)),
-		(new CTextBox('operation[opcommand][script]', '', true))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('operation-command-global-script-select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
-	]))->addClass(ZBX_STYLE_NOWRAP),
-	'operation-command-global-script'
-);
-
-/*
- * Command execute target row.
- */
-$form_list->addRow((new CLabel(_('Execute on'), 'operation_opcommand_execute_on')),
-	(new CRadioButtonList('operation[opcommand][execute_on]', ZBX_SCRIPT_EXECUTE_ON_AGENT))
-		->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-		->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
-		->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-		->setModern(true),
-	'operation-command-script-target'
-);
-
-/*
- * Command authentication method row.
- */
-$select_operation_opcommand_authtype = (new CSelect('operation[opcommand][authtype]'))
-	->setFocusableElementId('operation-opcommand-authtype')
-	->addOption(new CSelectOption(ITEM_AUTHTYPE_PASSWORD, _('Password')))
-	->addOption(new CSelectOption(ITEM_AUTHTYPE_PUBLICKEY, _('Public key')))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-
-$form_list->addRow(
-	new CLabel(_('Authentication method'), $select_operation_opcommand_authtype->getFocusableElementId()),
-	$select_operation_opcommand_authtype,
-	'operation-command-authtype'
-);
-
-/*
- * Command user name row.
- */
-$form_list->addRow((new CLabel(_('User name'), 'operation_opcommand_username'))->setAsteriskMark(),
-	(new CTextBox('operation[opcommand][username]'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired()
-		->disableAutocomplete(),
-	'operation-command-username'
-);
-
-/*
- * Command public key row.
- */
-$form_list->addRow((new CLabel(_('Public key file'), 'operation_opcommand_publickey'))->setAsteriskMark(),
-	(new CTextBox('operation[opcommand][publickey]'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired(),
-	'operation-command-pubkey'
-);
-
-/*
- * Command private key row.
- */
-$form_list->addRow((new CLabel(_('Private key file'), 'operation_opcommand_privatekey'))->setAsteriskMark(),
-	(new CTextBox('operation[opcommand][privatekey]'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired(),
-	'operation-command-privatekey'
-);
-
-/*
- * Command password row.
- */
-$form_list->addRow(_('Password'), (new CTextBox('operation[opcommand][password]'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->disableAutocomplete(),
-	'operation-command-password'
-);
-
-/*
- * Command passphrase row.
- */
-$form_list->addRow(_('Key passphrase'), (new CTextBox('operation[opcommand][password]'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setId('opcommand_passphrase')
-		->disableAutocomplete(),
-	'operation-command-passphrase'
-);
-
-/*
- * Command port row.
- */
-$form_list->addRow(_('Port'), (new CTextBox('operation[opcommand][port]'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	'operation-command-port'
-);
-
-/*
- * Command input row.
- */
-$form_list->addRow((new CLabel(_('Commands'), 'operation_opcommand_command'))->setAsteriskMark(),
-	(new CTextArea('operation[opcommand][command]'))
-		->addClass(ZBX_STYLE_MONOSPACE_FONT)
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
-	'operation-command-cmd'
-);
-
-/*
- * Command input row (ipmi).
- */
-$form_list->addRow((new CLabel(_('Commands'), 'operation_opcommand_command_ipmi'))->setAsteriskMark(),
-	(new CTextBox('operation[opcommand][command]'))
-		->addClass(ZBX_STYLE_MONOSPACE_FONT)
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('operation_opcommand_command_ipmi')
-		->setAriaRequired(),
-	'operation-command-cmd-ipmi'
 );
 
 /*
