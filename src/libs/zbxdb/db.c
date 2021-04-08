@@ -2716,6 +2716,14 @@ out:
 		ZBX_ORACLE_SVERSION = major_release_version * 100000000 + release_update_version * 1000000 +
 				release_update_version_revision * 10000 + increment_version * 100 +
 				reserved_for_future_use;
+#	ifndef HAVE_OCI_SERVER_RELEASE2
+		if (18 <= major_release_version)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Unable to determine the accurate Oracle DB version "
+					"(possibly there is a DB driver - DB version mismatch, "
+					"only the major Oracle DB version can be established): %s", version_friendly);
+		}
+#	endif
 	}
 
 	flag = zbx_db_version_check("Oracle", ZBX_ORACLE_SVERSION, ZBX_ORACLE_MIN_VERSION, ZBX_ORACLE_MAX_VERSION);
