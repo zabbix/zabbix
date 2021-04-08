@@ -316,10 +316,26 @@ class testSID extends CWebTest {
 					'http_case_sensitive=1&ldap_configured=0&change_bind_password=1&saml_auth_enabled=0&update=Update']],
 
 			// Media type create.
-			[['link' => 'zabbix.php?form_refresh=1&form=1&mediatypeid=0&action=mediatype.create']],
+			[['link' => 'zabbix.php?form_refresh=1&form=1&mediatypeid=0&status=1&name=1111&type=0&'.
+					'smtp_server=mail.example.com&smtp_port=25&smtp_helo=example.com&smtp_email=zabbix%40example.com&'.
+					'smtp_security=0&smtp_authentication=0&smtp_username=&exec_path=&gsm_modem=%2Fdev%2FttyS0&passwd=&'.
+					'content_type=1&parameters%5Bname%5D%5B%5D=URL&parameters%5Bvalue%5D%5B%5D=&parameters'.
+					'%5Bname%5D%5B%5D=HTTPProxy&parameters%5Bvalue%5D%5B%5D=&parameters%5Bname%5D%5B%5D=To&parameters'.
+					'%5Bvalue%5D%5B%5D=%7BALERT.SENDTO%7D&parameters%5Bname%5D%5B%5D=Subject&parameters%5Bvalue'.
+					'%5D%5B%5D=%7BALERT.SUBJECT%7D&parameters%5Bname%5D%5B%5D=Message&parameters%5Bvalue%5D%5B%5D='.
+					'%7BALERT.MESSAGE%7D&script=&timeout=30s&process_tags=0&show_event_menu=0&description=&status='.
+					'0&maxsessions_type=one&maxsessions=1&maxattempts=3&attempt_interval=10s&action=mediatype.create']],
 
 			// Media type update.
-			[['link' => 'zabbix.php?form_refresh=1&form=1&mediatypeid=105&status=1&name=1111&action=mediatype.update']],
+			[['link' => 'zabbix.php?form_refresh=1&form=1&mediatypeid=105&status=1&name=1111&type=0&smtp_server='.
+					'mail.example.com&smtp_port=25&smtp_helo=example.com&smtp_email=zabbix%40example.com&smtp_security=0&'.
+					'smtp_authentication=0&smtp_username=&exec_path=&gsm_modem=&passwd=&content_type=1&parameters%5Bname'.
+					'%5D%5B%5D=URL&parameters%5Bvalue%5D%5B%5D=&parameters%5Bname%5D%5B%5D=HTTPProxy&parameters%5Bvalue'.
+					'%5D%5B%5D=&parameters%5Bname%5D%5B%5D=To&parameters%5Bvalue%5D%5B%5D=%7BALERT.SENDTO%7D&parameters'.
+					'%5Bname%5D%5B%5D=Subject&parameters%5Bvalue%5D%5B%5D=%7BALERT.SUBJECT%7D&parameters%5Bname'.
+					'%5D%5B%5D=Message&parameters%5Bvalue%5D%5B%5D=%7BALERT.MESSAGE%7D&script=&timeout=30s&process_tags=0&'.
+					'show_event_menu=0&description=sssss&status=0&maxsessions_type=one&maxsessions=1&maxattempts=3&'.
+					'attempt_interval=10s&action=mediatype.update']],
 
 			// Media type disable.
 			[['link' => 'zabbix.php?action=mediatype.disable&mediatypeids[]=105']],
@@ -329,6 +345,23 @@ class testSID extends CWebTest {
 
 			// Media type delete.
 			[['link' => 'zabbix.php?action=mediatype.delete&mediatypeids[]=105']],
+
+			// Trigger display update.
+			[['link' => 'zabbix.php?action=trigdisplay.update& form_refresh=1&custom_color=1&problem_unack_color=CC0000&'.
+					'problem_unack_style=1&problem_ack_color=CC0000&problem_ack_style=1&ok_unack_color=009900&'.
+					'ok_unack_style=1&ok_ack_color=009900&ok_ack_style=1&ok_period=5m&blink_period=2m&'.
+					'severity_name_0=Not+classified&severity_color_0=97AAB3&severity_name_1=Information&'.
+					'severity_color_1=7499FF&severity_name_2=Warning&severity_color_2=FFC859&'.
+					'severity_name_3=Average&severity_color_3=FFA059&severity_name_4=High&severity_color_4=E97659&'.
+					'severity_name_5=Disaster&severity_color_5=E45959&update=Update']],
+
+			// Media type delete.
+			[['link' => 'zabbix.php?action=miscconfig.update&form_refresh=1&discovery_groupid=5&'.
+					'default_inventory_mode=-1&alert_usrgrpid=15&snmptrap_logging=1&login_attempts=5&'.
+					'login_block=30s&validate_uri_schemes=1&uri_valid_schemes=http%2Chttps%2Cftp%2Cfile'.
+					'%2Cmailto%2Ctel%2Cssh&x_frame_options=SAMEORIGIN&iframe_sandboxing_enabled=1&'.
+					'iframe_sandboxing_exceptions=&socket_timeout=4s&connect_timeout=3s&media_type_test_timeout=65s&'.
+					'script_timeout=60s&item_test_timeout=60s&update=Update']],
 		];
 	}
 
