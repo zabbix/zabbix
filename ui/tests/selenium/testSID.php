@@ -311,7 +311,52 @@ class testSID extends CWebTest {
 					'login_block=30s&validate_uri_schemes=1&uri_valid_schemes=http%2Chttps%2Cftp%2Cfile'.
 					'%2Cmailto%2Ctel%2Cssh&x_frame_options=SAMEORIGIN&iframe_sandboxing_enabled=1&'.
 					'iframe_sandboxing_exceptions=&socket_timeout=4s&connect_timeout=3s&media_type_test_timeout=65s&'.
-					'script_timeout=60s&item_test_timeout=60s&update=Update']]
+					'script_timeout=60s&item_test_timeout=60s&update=Update']],
+
+			// Event correlation delete.
+			[
+				[
+					'correlation' => true,
+					'link' => 'correlation.php?delete=1&form=update&correlationid=99005'
+				]
+			],
+
+			// Event correlation enable.
+			[
+				[
+					'correlation' => true,
+					'link' => 'correlation.php?action=correlation.massenable&g_correlationid[]=99004'
+				]
+			],
+
+			// Event correlation disable.
+			[
+				[
+					'correlation' => true,
+					'link' => 'correlation.php?action=correlation.massdisable&g_correlationid[]=99004'
+				]
+			],
+
+			// Event correlation creation.
+			[
+				[
+					'correlation' => true,
+					'link' => 'correlation.php?form_refresh=3&form=Create+correlation&name=11111&evaltype=0&formula=&'.
+							'conditions%5B0%5D%5Btype%5D=0&conditions%5B0%5D%5Boperator%5D=0&conditions%5B0%5D%5Btag%5D'.
+							'=ttt&conditions%5B0%5D%5Bformulaid%5D=A&description=&status=0&operations%5B%5D%5Btype%5D=0&add=Add'
+				]
+			],
+
+			// Event correlation update.
+			[
+				[
+					'correlation' => true,
+					'link' => 'correlation.php?form_refresh=1&form=update&correlationid=99004&name=11111&evaltype=0'.
+						'&formula=&conditions%5B0%5D%5Btype%5D=0&conditions%5B0%5D%5Btag%5D=ttt&conditions%5B0%5D%5B'.
+						'formulaid%5D=A&conditions%5B0%5D%5Boperator%5D=0&description=sssss&status=0&operations'.
+						'%5B%5D%5Btype%5D=0&update=Update'
+				]
+			]
 		];
 	}
 
@@ -321,9 +366,15 @@ class testSID extends CWebTest {
 	public function testSID_Links($data) {
 		foreach ([$data['link'], $data['link'].'&sid=test111116666666'] as $link) {
 			$this->page->login()->open($link)->waitUntilReady();
-			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
-			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
-			$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentUrl());
+			if (array_key_exists('correlation', $data)) {
+				$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
+						' performed due to unauthorized request.');
+			}
+			else {
+				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+				$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+				$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentUrl());
+			}
 		}
 	}
 }
