@@ -3819,6 +3819,14 @@ static int	DBpatch_5030127(void)
 
 	return DBadd_field("config", &field);
 }
+
+static int	DBpatch_5030128(void)
+{
+	const ZBX_FIELD	field = {"report_test_timeout", "60s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -3953,5 +3961,6 @@ DBPATCH_ADD(5030124, 0, 1)
 DBPATCH_ADD(5030125, 0, 1)
 DBPATCH_ADD(5030126, 0, 1)
 DBPATCH_ADD(5030127, 0, 1)
+DBPATCH_ADD(5030128, 0, 1)
 
 DBPATCH_END()
