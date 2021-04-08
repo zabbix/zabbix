@@ -2390,7 +2390,14 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 			result = (zbx_alerter_dispatch_result_t *)results.values[i];
 
 			if (SUCCEED == result->status)
+			{
 				sent_num++;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "failed to send report to \"%s\": %s", result->recipient,
+						result->info);
+			}
 
 			total_num++;
 		}
