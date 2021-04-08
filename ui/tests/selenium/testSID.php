@@ -46,8 +46,7 @@ class testSID extends CWebTest {
 			// Icon mapping creation.
 			[['link' => 'zabbix.php?action=iconmap.create&form_refresh=1&form=1&iconmap%5Bname%5D=ccccc&iconmap%5B'.
 					'mappings%5D%5Bnew0%5D%5Binventory_link%5D=1&iconmap%5Bmappings%5D%5Bnew0%5D%5Bexpression%5D='.
-					'ccccc&iconmap%5Bmappings%5D%5Bnew0%5D%5Biconid%5D=2&iconmap%5Bdefault_iconid%5D=2&add=Add
-']],
+					'ccccc&iconmap%5Bmappings%5D%5Bnew0%5D%5Biconid%5D=2&iconmap%5Bdefault_iconid%5D=2&add=Add']],
 
 			// Image icon delete.
 			[['link' => 'zabbix.php?action=image.delete&imageid=1&imagetype=1']],
@@ -67,14 +66,17 @@ class testSID extends CWebTest {
 			// Module update.
 			[['link' => 'zabbix.php?action=module.update&moduleids%5B%5D=1&form_refresh=1&status=1']],
 
+			// Regular expressions creation.
+			[['link' => 'zabbix.php?action=regex.create&form_refresh=1&name=cccc&expressions%5B0%5D%5Bexpression_type%5D=0&'.
+					'expressions%5B0%5D%5Bexpression%5D=ccccc&expressions%5B0%5D%5Bexp_delimiter%5D=%2C&test_string=&add=Add']],
+
 			// Regular expressions delete.
-			[['link' => 'zabbix.php?action=regex.delete&regexids%5B0%5D=20']],
+			[['link' => 'zabbix.php?form_refresh=1&regexids%5B20%5D=20&regexids%5B31%5D=31&action=regex.delete']],
 
 			// Regular expressions update.
-			[['link' => 'zabbix.php?action=regex.update&regexid=20&form_refresh=1&name=1_regexp_1_1&expressions'.
-					'%5B0%5D%5Bexpression_type%5D=0&expressions%5B0%5D%5Bexpression%5D=first+test+string&'.
-					'expressions%5B0%5D%5Bexp_delimiter%5D=%2C&expressions%5B0%5D%5Bcase_sensitive%5D='.
-					'1&expressions%5B0%5D%5Bexpressionid%5D=20&test_string=first+test+string&update=Update']],
+			[['link' => 'zabbix.php?action=regex.update&regexid=32&form_refresh=1&name=ssss&expressions%5B0%5D%5B'.
+					'expression_type%5D=0&expressions%5B0%5D%5Bexpression%5D=ssssssss&expressions%5B0%5D%5Bexp_delimiter'.
+					'%5D=%2C&expressions%5B0%5D%5Bexpressionid%5D=32&test_string=&update=Update']],
 
 			// Timeselector update.
 			[['link' => 'zabbix.php?action=timeselector.update&type=11&method=rangechange']],
@@ -205,18 +207,6 @@ class testSID extends CWebTest {
 					'tokenid=3&name=aaaa&userid=1&description=ssssssss&expires_state=1&'.
 					'expires_at=2021-04-21+00%3A00%3A00&status=0']],
 
-			// Regex creation.
-			[['link' => 'zabbix.php?action=regex.create&form_refresh=1&name=cccc&expressions%5B0%5D%5Bexpression_type%5D=0&'.
-					'expressions%5B0%5D%5Bexpression%5D=ccccc&expressions%5B0%5D%5Bexp_delimiter%5D=%2C&test_string=&add=Add']],
-
-			// Regex delete.
-			[['link' => 'zabbix.php?form_refresh=1&regexids%5B20%5D=20&regexids%5B31%5D=31&action=regex.delete']],
-
-			// Regex update.
-			[['link' => 'zabbix.php?action=regex.update&regexid=32&form_refresh=1&name=ssss&expressions%5B0%5D%5B'.
-					'expression_type%5D=0&expressions%5B0%5D%5Bexpression%5D=ssssssss&expressions%5B0%5D%5Bexp_delimiter'.
-					'%5D=%2C&expressions%5B0%5D%5Bexpressionid%5D=32&test_string=&update=Update']],
-
 			// Correlation condition creation.
 			[['link' => 'zabbix.php?action=correlation.condition.add&form_refresh=3&name=dddd&evaltype=0&formula=&'.
 					'conditions%5B0%5D%5Bformulaid%5D=A&conditions%5B0%5D%5Btype%5D=0&conditions%5B0%5D%5Boperator%5D'.
@@ -287,10 +277,40 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?action=script.delete&scriptids%5B%5D=203']],
 
 			// User role creation.
-			[['link' => 'zabbix.php?form_refresh=1&name=sadasda&type=1&action=userrole.create']],
+			[['link' => 'zabbix.php?form_refresh=1&name=sadasda&type=1&ui_monitoring_dashboard=1&ui_monitoring_problems='.
+					'1&ui_monitoring_hosts=1&ui_monitoring_overview=1&ui_monitoring_latest_data=1&ui_monitoring_screens=1'.
+					'&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_monitoring_services=1&ui_inventory_overview=1&'.
+					'ui_inventory_hosts=1&ui_reports_system_info=0&ui_reports_availability_report=1&ui_reports_top_triggers'.
+					'=1&ui_reports_audit=0&ui_reports_action_log=0&ui_reports_notifications=0&ui_configuration_host_groups=0'.
+					'&ui_configuration_templates=0&ui_configuration_hosts=0&ui_configuration_maintenance=0&'.
+					'ui_configuration_actions=0&ui_configuration_event_correlation=0&ui_configuration_discovery=0&'.
+					'ui_configuration_services=0&ui_administration_general=0&ui_administration_proxies=0&'.
+					'ui_administration_authentication=0&ui_administration_user_groups=0&ui_administration_user_roles=0&'.
+					'ui_administration_users=0&ui_administration_media_types=0&ui_administration_scripts=0&'.
+					'ui_administration_queue=0&ui_default_access=1&modules_default_access=1&api_access=1&api_mode=0&'.
+					'actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=0&actions_add_problem_comments'.
+					'=1&actions_change_severity=1&actions_acknowledge_problems=1&actions_close_problems=1&'.
+					'actions_execute_scripts=1&actions_manage_api_tokens=1&actions_default_access=1&action=userrole.create']],
 
 			// User role update.
-			[['link' => 'zabbix.php?form_refresh=1&roleid=5&name=sadasda&type=2&action=userrole.update']],
+			[['link' => 'zabbix.php?form_refresh=1&roleid=5&name=sadasda&type=2&ui_monitoring_dashboard=1&'.
+					'ui_monitoring_problems=1&ui_monitoring_hosts=1&ui_monitoring_overview=1&ui_monitoring_latest_data=1'.
+					'&ui_monitoring_screens=1&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_monitoring_discovery=1&'.
+					'ui_monitoring_services=1&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&'.
+					'ui_reports_availability_report=1&ui_reports_top_triggers=1&ui_reports_audit=0&ui_reports_action_log=0'.
+					'&ui_reports_notifications=0&ui_reports_notifications=1&ui_configuration_host_groups=0&'.
+					'ui_configuration_host_groups=1&ui_configuration_templates=0&ui_configuration_templates=1&'.
+					'ui_configuration_hosts=0&ui_configuration_hosts=1&ui_configuration_maintenance=0&'.
+					'ui_configuration_maintenance=1&ui_configuration_actions=0&ui_configuration_actions=1&'.
+					'ui_configuration_event_correlation=0&ui_configuration_discovery=0&ui_configuration_discovery=1&'.
+					'ui_configuration_services=0&ui_configuration_services=1&ui_administration_general=0&'.
+					'ui_administration_proxies=0&ui_administration_authentication=0&ui_administration_user_groups=0&'.
+					'ui_administration_user_roles=0&ui_administration_users=0&ui_administration_media_types=0&'.
+					'ui_administration_scripts=0&ui_administration_queue=0&ui_default_access=1&modules_default_access=1'.
+					'&api_access=1&api_mode=0&actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=0'.
+					'&actions_edit_maintenance=1&actions_add_problem_comments=1&actions_change_severity=1&'.
+					'actions_acknowledge_problems=1&actions_close_problems=1&actions_execute_scripts=1&'.
+					'actions_manage_api_tokens=1&actions_default_access=1&action=userrole.update']],
 
 			// User role delete.
 			[['link' => 'zabbix.php?action=userrole.delete&roleids%5B0%5D=5']],
@@ -347,7 +367,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?action=mediatype.delete&mediatypeids[]=105']],
 
 			// Trigger display update.
-			[['link' => 'zabbix.php?action=trigdisplay.update& form_refresh=1&custom_color=1&problem_unack_color=CC0000&'.
+			[['link' => 'zabbix.php?action=trigdisplay.update&form_refresh=1&custom_color=1&problem_unack_color=CC0000&'.
 					'problem_unack_style=1&problem_ack_color=CC0000&problem_ack_style=1&ok_unack_color=009900&'.
 					'ok_unack_style=1&ok_ack_color=009900&ok_ack_style=1&ok_period=5m&blink_period=2m&'.
 					'severity_name_0=Not+classified&severity_color_0=97AAB3&severity_name_1=Information&'.
@@ -361,7 +381,7 @@ class testSID extends CWebTest {
 					'login_block=30s&validate_uri_schemes=1&uri_valid_schemes=http%2Chttps%2Cftp%2Cfile'.
 					'%2Cmailto%2Ctel%2Cssh&x_frame_options=SAMEORIGIN&iframe_sandboxing_enabled=1&'.
 					'iframe_sandboxing_exceptions=&socket_timeout=4s&connect_timeout=3s&media_type_test_timeout=65s&'.
-					'script_timeout=60s&item_test_timeout=60s&update=Update']],
+					'script_timeout=60s&item_test_timeout=60s&update=Update']]
 		];
 	}
 
