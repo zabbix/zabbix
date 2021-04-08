@@ -33,6 +33,7 @@ import (
 	"os/user"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -128,6 +129,7 @@ const (
 	procInfoName
 	procInfoUser
 	procInfoCmdline
+	procInfoState
 )
 
 type procInfo struct {
@@ -136,6 +138,7 @@ type procInfo struct {
 	userid  int64
 	cmdline string
 	arg0    string
+	state   string
 }
 
 type cpuUtil struct {
@@ -311,6 +314,86 @@ const (
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	switch key {
+	case "proc.cpu.util":
+		return p.exportCpuUtil(params, ctx)
+	case "proc.num":
+		return p.exportProcNum(params)
+	}
+
+	return nil, plugin.UnsupportedMetricError
+}
+
+func (p *Plugin) exportProcNum(params []string) (interface{}, error) {
+	var name, userName, state, cmdline string
+	switch len(params) {
+	case 4:
+		cmdline = params[3]
+		fallthrough
+	case 3:
+		switch params[2] {
+		case "all", "":
+		case "disk":
+			state = "D"
+		case "run":
+			state = "R"
+		case "sleep":
+			state = "S"
+		case "trace":
+			state = "T"
+		case "zomb":
+			state = "Z"
+		default:
+			return nil, errors.New("Invalid third parameter.")
+		}
+		fallthrough
+	case 2:
+		userName = params[1]
+		fallthrough
+	case 1:
+		name = params[0]
+	case 0:
+	default:
+		return nil, errors.New("Too many parameters.")
+	}
+
+	procs, err := getProcesses(procInfoName | procInfoCmdline | procInfoUser | procInfoState)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int
+
+	for _, proc := range procs {
+		if name != proc.name && name != "" {
+			continue
+		}
+
+		u, err := user.LookupId(strconv.FormatInt(proc.userid, 10))
+		if err != nil {
+			return nil, fmt.Errorf("Failed to find user for process %d: %s", proc.pid, err.Error())
+		}
+
+		if userName != strings.ToLower(u.Name) && userName != "" {
+			continue
+		}
+
+		splitCmd := strings.Split(proc.cmdline, " ")
+		if (len(splitCmd) < 1 || cmdline != splitCmd[0]) && cmdline != "" {
+			continue
+		}
+
+		if state != proc.state && state != "" {
+			continue
+		}
+
+		count++
+	}
+
+	return count, nil
+}
+
+func (p *Plugin) exportCpuUtil(params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if ctx == nil {
 		return nil, errors.New("This item is available only in daemon mode.")
 	}
@@ -674,6 +757,10 @@ func (p *PluginExport) validFile(proc *procInfo, name string, uid int64, cmdRgx 
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
+	plugin.RegisterMetrics(&impl, "Proc",
+		"proc.cpu.util", "Process CPU utilization percentage.",
+		"proc.num", "The number of processes.",
+	)
+
 	plugin.RegisterMetrics(&implExport, "ProcExporter", "proc.mem", "Process memory utilization values.")
 }
