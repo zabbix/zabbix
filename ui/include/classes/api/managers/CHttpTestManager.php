@@ -1239,7 +1239,9 @@ class CHttpTestManager {
 			foreach ($item_tags_add[$stepitemid] as $new_tag_key => $tag_add) {
 				if (array_key_exists($tag_add['tag'], $item_tags_del)
 						&& array_key_exists($tag_add['value'], $item_tags_del[$tag_add['tag']])) {
-					unset($item_tags_add[$stepitemid][$new_tag_key], $db_tags[$stepitemid][$tag_add['tag']]);
+					unset($item_tags_add[$stepitemid][$new_tag_key],
+						$db_tags[$stepitemid][$tag_add['tag']][$tag_add['value']]
+					);
 				}
 			}
 		}
@@ -1248,7 +1250,9 @@ class CHttpTestManager {
 		$del_tagids = [];
 		foreach ($db_tags as $db_tag) {
 			foreach ($db_tag as $db_tagids) {
-				$del_tagids = array_merge($del_tagids, array_values($db_tagids));
+				if ($db_tagids) {
+					$del_tagids = array_merge($del_tagids, array_values($db_tagids));
+				}
 			}
 		}
 		if ($del_tagids) {
