@@ -112,7 +112,7 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 	data += zbx_deserialize_value(data, period);
 	data += zbx_deserialize_value(data, &params_num);
 
-	zbx_vector_ptr_pair_reserve(params, params_num);
+	zbx_vector_ptr_pair_reserve(params, (size_t)params_num);
 	for (i = 0; i < params_num; i++)
 	{
 		zbx_ptr_pair_t	pair;
@@ -206,7 +206,7 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
 
 		if (0 != results_num)
 		{
-			zbx_vector_ptr_reserve(results, results_num);
+			zbx_vector_ptr_reserve(results, (size_t)results_num);
 
 			for (i = 0; i < results_num; i++)
 			{
@@ -282,7 +282,7 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
 	data += zbx_deserialize_value(data, height);
 
 	data += zbx_deserialize_value(data, &params_num);
-	zbx_vector_ptr_pair_reserve(params, params_num);
+	zbx_vector_ptr_pair_reserve(params, (size_t)params_num);
 	for (i = 0; i < params_num; i++)
 	{
 		zbx_ptr_pair_t	pair;
@@ -342,7 +342,7 @@ void	report_deserialize_send_report(const unsigned char *data, DB_MEDIATYPE *mt,
 	data += zbx_deserialize_mediatype(data, mt);
 
 	data += zbx_deserialize_value(data, &sendto_num);
-	zbx_vector_str_reserve(sendtos, sendto_num);
+	zbx_vector_str_reserve(sendtos, (size_t)sendto_num);
 	for (i = 0; i < sendto_num; i++)
 	{
 		char	*sendto;

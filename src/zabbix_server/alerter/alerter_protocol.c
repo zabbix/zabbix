@@ -869,7 +869,7 @@ static void	zbx_alerter_deserialize_top_mediatypes_result(const unsigned char *d
 
 	if (0 != mediatypes_num)
 	{
-		zbx_vector_uint64_pair_reserve(mediatypes, mediatypes_num);
+		zbx_vector_uint64_pair_reserve(mediatypes, (size_t)mediatypes_num);
 
 		for (i = 0; i < mediatypes_num; i++)
 		{
@@ -935,7 +935,7 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 
 	if (0 != sources_num)
 	{
-		zbx_vector_ptr_reserve(sources, sources_num);
+		zbx_vector_ptr_reserve(sources, (size_t)sources_num);
 
 		for (i = 0; i < sources_num; i++)
 		{
@@ -1158,7 +1158,7 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, DB_MEDIATY
 	data += zbx_deserialize_mediatype(data, mt);
 	data += zbx_deserialize_value(data, &recipients_num);
 
-	zbx_vector_str_reserve(recipients, recipients_num);
+	zbx_vector_str_reserve(recipients, (size_t)recipients_num);
 	for (i = 0; i < recipients_num; i++)
 	{
 		char	*recipient;
@@ -1328,7 +1328,7 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error)
 			goto out;
 		}
 
-		if (FAIL == zbx_ipc_async_socket_recv(&dispatch->alerter, time_stop - now, &message))
+		if (FAIL == zbx_ipc_async_socket_recv(&dispatch->alerter, time_stop - (int)now, &message))
 		{
 			*error = zbx_strdup(NULL, "cannot receive response");
 			goto out;

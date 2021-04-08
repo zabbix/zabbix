@@ -90,8 +90,8 @@ typedef struct
 }
 zbx_rm_recipient_t;
 
-ZBX_VECTOR_DECL(recipient, zbx_rm_recipient_t);
-ZBX_VECTOR_IMPL(recipient, zbx_rm_recipient_t);
+ZBX_VECTOR_DECL(recipient, zbx_rm_recipient_t)
+ZBX_VECTOR_IMPL(recipient, zbx_rm_recipient_t)
 
 typedef struct
 {
@@ -446,7 +446,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	memcpy(data, j.buffer, j.buffer_size);
 
 	if (j.buffer_size < size)
-		memset(data + j.buffer_size, size - j.buffer_size, size - j.buffer_size);
+		memset(data + j.buffer_size, (int)(size - j.buffer_size), size - j.buffer_size);
 
 	AES_init_ctx(&ctx, (unsigned char *)manager->session_key);
 
@@ -491,7 +491,7 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 	zbx_rm_session_t	*session;
 	int			now;
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	if (NULL != (session = (zbx_rm_session_t *)zbx_hashset_search(&manager->sessions, &userid)))
 	{
@@ -1533,7 +1533,7 @@ static void	rm_update_cache(zbx_rm_t *manager)
 {
 	int	now;
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	rm_update_cache_settings(manager);
 	rm_update_cache_reports(manager, now);
@@ -1623,7 +1623,7 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
 			}
 		}
 
-		coeff = (dashboard_width < min_width ? ceil((double)min_width / dashboard_width) : 1);
+		coeff = (dashboard_width < min_width ? (int)ceil((double)min_width / dashboard_width) : 1);
 
 		if (coeff > x_coeff)
 			x_coeff = coeff;
@@ -1757,7 +1757,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 			mt.gsm_modem = zbx_strdup(NULL, row[6]);
 			mt.username = zbx_strdup(NULL, row[7]);
 			mt.passwd = zbx_strdup(NULL, row[8]);
-			mt.smtp_port = atoi(row[9]);
+			mt.smtp_port = (unsigned short)atoi(row[9]);
 			ZBX_STR2UCHAR(mt.smtp_security, row[10]);
 			ZBX_STR2UCHAR(mt.smtp_verify_peer, row[11]);
 			ZBX_STR2UCHAR(mt.smtp_verify_host, row[12]);
@@ -2452,7 +2452,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 			time_sync = time_now;
 		}
 
-		created_num += rm_schedule_jobs(&manager, time(NULL));
+		created_num += rm_schedule_jobs(&manager, (int)time(NULL));
 		processed_num += rm_process_jobs(&manager);
 
 		sec = zbx_time();

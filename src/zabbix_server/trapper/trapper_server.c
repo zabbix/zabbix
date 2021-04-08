@@ -91,6 +91,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	zbx_uint32_t		size;
 	zbx_user_t		user;
 	unsigned short		smtp_port;
+	unsigned char		type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -128,7 +129,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 		size_t	string_offset = 0;
 
 		zbx_strncpy_alloc(&params, &string_alloc, &string_offset, jp_params.start,
-				jp_params.end - jp_params.start + 1);
+				(size_t)(jp_params.end - jp_params.start + 1));
 	}
 
 	result = DBselect("select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
@@ -156,8 +157,9 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(smtp_verify_host, row[11]);
 	ZBX_STR2UCHAR(smtp_authentication, row[12]);
 	ZBX_STR2UCHAR(content_type, row[17]);
+	ZBX_STR2UCHAR(type, row[0]);
 
-	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, atoi(row[0]), row[1], row[2], row[3], row[4],
+	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[1], row[2], row[3], row[4],
 			row[5], row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
 			smtp_authentication, row[13], atoi(row[14]), atoi(row[15]), row[16], content_type, row[18],
 			row[19], sendto, subject, message, params);

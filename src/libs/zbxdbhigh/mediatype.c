@@ -127,5 +127,5 @@ zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *
 
 	mt->type = type;
 
-	return data - start;
+	return (zbx_uint32_t)(data - start);
 }

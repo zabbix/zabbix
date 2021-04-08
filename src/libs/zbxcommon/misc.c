@@ -3966,7 +3966,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 		tm->tm_min = tm_min;
 		tm->tm_hour = tm_hour;
 
-		nextcheck = mktime(tm);
+		nextcheck = (int)mktime(tm);
 	}
 	while (-1 != nextcheck && nextcheck <= now);
 
