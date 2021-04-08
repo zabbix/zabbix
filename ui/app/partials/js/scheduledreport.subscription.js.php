@@ -90,13 +90,15 @@
 				recipient.addEventListener('click', (event) => {
 					const popup_options = Object.assign(this.data, {
 						edit: 1,
-						old_recipientid: this.data.recipientid,
-						userids: Array.from(userids),
-						usrgrpids: Array.from(usrgrpids)
+						old_recipientid: this.data.recipientid
 					});
 
 					if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
 						popup_options.exclude = recipient.parentNode.parentNode.querySelector('[name*=exclude]').value;
+						popup_options.userids = Array.from(userids);
+					}
+					else {
+						popup_options.usrgrpids = Array.from(usrgrpids);
 					}
 
 					PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
@@ -104,6 +106,10 @@
 			}
 			else {
 				recipient = document.createElement('span');
+
+				if (this.data.recipient_inaccessible) {
+					recipient.classList.add('<?= ZBX_STYLE_GREY ?>');
+				}
 			}
 
 			recipient.innerHTML = this.data.recipient_name;
@@ -114,6 +120,7 @@
 			cell.appendChild(this.createHiddenInput('[recipientid]', this.data.recipientid));
 			cell.appendChild(this.createHiddenInput('[recipient_type]', this.data.recipient_type));
 			cell.appendChild(this.createHiddenInput('[recipient_name]', this.data.recipient_name));
+			cell.appendChild(this.createHiddenInput('[recipient_inaccessible]', this.data.recipient_inaccessible));
 
 			return cell;
 		}
@@ -122,19 +129,18 @@
 			const cell = document.createElement('td');
 			const span = document.createElement('span');
 
-			if (this.data.creator_type == <?= ZBX_REPORT_CREATOR_TYPE_USER ?>) {
-				const creator_name = <?= json_encode(getUserFullname(CWebUser::$data)) ?>;
+			span.innerHTML = this.data.creator_name;
+			span.setAttribute('title', this.data.creator_name);
 
-				span.innerHTML = creator_name;
-				span.setAttribute('title', creator_name);
-			}
-			else {
-				span.innerHTML = <?= json_encode(_('Recipient')) ?>;
+			if (this.data.creator_type == <?= ZBX_REPORT_CREATOR_TYPE_RECIPIENT ?> || this.data.creator_inaccessible) {
 				span.classList.add('<?= ZBX_STYLE_GREY ?>');
 			}
 
 			cell.appendChild(span);
+			cell.appendChild(this.createHiddenInput('[creatorid]', this.data.creatorid));
 			cell.appendChild(this.createHiddenInput('[creator_type]', this.data.creator_type));
+			cell.appendChild(this.createHiddenInput('[creator_name]', this.data.creator_name));
+			cell.appendChild(this.createHiddenInput('[creator_inaccessible]', this.data.creator_inaccessible));
 
 			return cell;
 		}

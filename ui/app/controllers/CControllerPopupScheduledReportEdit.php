@@ -52,7 +52,7 @@ class CControllerPopupScheduledReportEdit extends CController {
 
 	protected function doAction() {
 		$db_defaults = DB::getDefaults('report');
-
+		$current_user_name = getUserFullname(CWebUser::$data);
 		$data = [
 			'userid' => CWebUser::$data['userid'],
 			'name' => $db_defaults['name'],
@@ -69,8 +69,11 @@ class CControllerPopupScheduledReportEdit extends CController {
 			'subscriptions' => [[
 				'recipientid' => CWebUser::$data['userid'],
 				'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
-				'recipient_name' => getUserFullname(CWebUser::$data),
+				'recipient_name' => $current_user_name,
+				'recipient_inaccessible' => 0,
 				'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
+				'creator_name' => $current_user_name,
+				'creator_inaccessible' => 0,
 				'exclude' => ZBX_REPORT_EXCLUDE_USER_FALSE
 			]],
 			'description' => $db_defaults['description'],
@@ -101,7 +104,7 @@ class CControllerPopupScheduledReportEdit extends CController {
 				$user_name = $users ? getUserFullname($users[0]) : _('Inaccessible user');
 			}
 			else {
-				$user_name = getUserFullname(CWebUser::$data);
+				$user_name = $current_user_name;
 			}
 
 			$data['ms_user'] = [['id' => $data['userid'], 'name' => $user_name]];

@@ -1511,6 +1511,7 @@ form {
 }
 
 .radio-list-control {
+	display: inline-block;
 	white-space: nowrap;
 
 	li {
@@ -1603,6 +1604,10 @@ form {
 			transition: none;
 			@extend %form-disabled;
 		}
+	}
+
+	+ .icon-info {
+		margin-left: 5px;
 	}
 }
 

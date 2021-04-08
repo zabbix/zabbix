@@ -90,7 +90,7 @@ class CControllerScheduledReportEdit extends CController {
 
 	protected function doAction() {
 		$db_defaults = DB::getDefaults('report');
-		$current_user = getUserFullname(CWebUser::$data);
+		$current_user_name = getUserFullname(CWebUser::$data);
 		$data = [
 			'reportid' => 0,
 			'userid' => CWebUser::$data['userid'],
@@ -108,11 +108,14 @@ class CControllerScheduledReportEdit extends CController {
 			'subscriptions' => [[
 				'recipientid' => CWebUser::$data['userid'],
 				'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
-				'recipient_name' => $current_user,
+				'recipient_name' => $current_user_name,
+				'recipient_inaccessible' => 0,
 				'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
+				'creator_name' => $current_user_name,
+				'creator_inaccessible' => 0,
 				'exclude' => ZBX_REPORT_EXCLUDE_USER_FALSE
 			]],
-			'ms_user' => [['id' => CWebUser::$data['userid'], 'name' => $current_user]],
+			'ms_user' => [['id' => CWebUser::$data['userid'], 'name' => $current_user_name]],
 			'ms_dashboard' => [],
 			'description' => $db_defaults['description'],
 			'status' => $db_defaults['status'],
@@ -142,29 +145,63 @@ class CControllerScheduledReportEdit extends CController {
 			$data['status'] = $this->report['status'];
 			$data['subscriptions'] = [];
 
-			$userids = ($data['userid'] == CWebUser::$data['userid'])
-				? array_column($this->report['users'], 'userid')
-				: array_unique(array_merge([$data['userid']], array_column($this->report['users'], 'userid')));
+			$userids = [$data['userid']];
+			$usrgrpids = [];
 
-			$db_users = API::User()->get([
-				'output' => ['username', 'name', 'surname'],
-				'userids' => $userids,
-				'preservekeys' => true
-			]);
+			foreach ($this->report['users'] as $user) {
+				$userids[$user['userid']] = true;
+				$userids[$user['access_userid']] = true;
+			}
+
+			foreach ($this->report['user_groups'] as $usrgrp) {
+				$usrgrpids[$usrgrp['usrgrpid']] = true;
+				$userids[$usrgrp['access_userid']] = true;
+			}
+
+			unset($userids[CWebUser::$data['userid']]);
+
+			$db_users = $userids
+				? API::User()->get([
+					'output' => ['username', 'name', 'surname'],
+					'userids' => array_keys($userids),
+					'preservekeys' => true
+				])
+				: [];
 
 			foreach ($this->report['users'] as $user) {
 				$subscription = [
 					'recipientid' => $user['userid'],
 					'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
 					'recipient_name' => _('Inaccessible user'),
-					'creator_type' => ($user['access_userid'] == CWebUser::$data['userid'])
-						? ZBX_REPORT_CREATOR_TYPE_USER
-						: ZBX_REPORT_CREATOR_TYPE_RECIPIENT,
+					'recipient_inaccessible' => 1,
+					'creatorid' => $user['access_userid'],
+					'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
+					'creator_name' => _('Inaccessible user'),
+					'creator_inaccessible' => 1,
 					'exclude' => $user['exclude']
 				];
 
-				if (array_key_exists($user['userid'], $db_users)) {
+				if ($user['userid'] == CWebUser::$data['userid']) {
+					$subscription['recipient_name'] = $current_user_name;
+					$subscription['recipient_inaccessible'] = 0;
+				}
+				elseif (array_key_exists($user['userid'], $db_users)) {
 					$subscription['recipient_name'] = getUserFullname($db_users[$user['userid']]);
+					$subscription['recipient_inaccessible'] = 0;
+				}
+
+				if ($user['access_userid'] == 0) {
+					$subscription['creator_type'] = ZBX_REPORT_CREATOR_TYPE_RECIPIENT;
+					$subscription['creator_name'] = _('Recipient');
+					$subscription['creator_inaccessible'] = $subscription['recipient_inaccessible'];
+				}
+				elseif ($user['access_userid'] == CWebUser::$data['userid']) {
+					$subscription['creator_name'] = $current_user_name;
+					$subscription['creator_inaccessible'] = 0;
+				}
+				elseif (array_key_exists($user['access_userid'], $db_users)) {
+					$subscription['creator_name'] = getUserFullname($db_users[$user['access_userid']]);
+					$subscription['creator_inaccessible'] = 0;
 				}
 
 				$data['subscriptions'][] = $subscription;
@@ -179,24 +216,43 @@ class CControllerScheduledReportEdit extends CController {
 				]];
 			}
 
-			$db_usrgrps = API::UserGroup()->get([
-				'output' => ['name'],
-				'usrgrpids' => array_column($this->report['user_groups'], 'usrgrpid'),
-				'preservekeys' => true
-			]);
+			$db_usrgrps = $usrgrpids
+				? API::UserGroup()->get([
+					'output' => ['name'],
+					'usrgrpids' => array_keys($usrgrpids),
+					'preservekeys' => true
+				])
+				: [];
 
-			foreach ($this->report['user_groups'] as $user_group) {
+			foreach ($this->report['user_groups'] as $usrgrp) {
 				$subscription = [
-					'recipientid' => $user_group['usrgrpid'],
+					'recipientid' => $usrgrp['usrgrpid'],
 					'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP,
 					'recipient_name' => _('Inaccessible user group'),
-					'creator_type' => ($user_group['access_userid'] == CWebUser::$data['userid'])
-						? ZBX_REPORT_CREATOR_TYPE_USER
-						: ZBX_REPORT_CREATOR_TYPE_RECIPIENT
+					'recipient_inaccessible' => 1,
+					'creatorid' => $usrgrp['access_userid'],
+					'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
+					'creator_name' => _('Inaccessible user'),
+					'creator_inaccessible' => 1
 				];
 
-				if (array_key_exists($user_group['usrgrpid'], $db_usrgrps)) {
-					$subscription['recipient_name'] = $db_usrgrps[$user_group['usrgrpid']]['name'];
+				if (array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)) {
+					$subscription['recipient_name'] = $db_usrgrps[$usrgrp['usrgrpid']]['name'];
+					$subscription['recipient_inaccessible'] = 0;
+				}
+
+				if ($usrgrp['access_userid'] == 0) {
+					$subscription['creator_type'] = ZBX_REPORT_CREATOR_TYPE_RECIPIENT;
+					$subscription['creator_name'] = _('Recipient');
+					$subscription['creator_inaccessible'] = $subscription['recipient_inaccessible'];
+				}
+				elseif ($usrgrp['access_userid'] == CWebUser::$data['userid']) {
+					$subscription['creator_name'] = $current_user_name;
+					$subscription['creator_inaccessible'] = 0;
+				}
+				elseif (array_key_exists($usrgrp['access_userid'], $db_users)) {
+					$subscription['creator_name'] = getUserFullname($db_users[$usrgrp['access_userid']]);
+					$subscription['creator_inaccessible'] = 0;
 				}
 
 				$data['subscriptions'][] = $subscription;
@@ -225,7 +281,7 @@ class CControllerScheduledReportEdit extends CController {
 					$user_name = $users ? getUserFullname($users[0]) : _('Inaccessible user');
 				}
 				else {
-					$user_name = getUserFullname(CWebUser::$data);
+					$user_name = $current_user_name;
 				}
 
 				$data['ms_user'] = [['id' => $data['userid'], 'name' => $user_name]];

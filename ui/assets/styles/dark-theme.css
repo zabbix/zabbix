@@ -2959,6 +2959,7 @@ form.is-loading {
     text-align: right; }
 
 .radio-list-control {
+  display: inline-block;
   white-space: nowrap; }
   .radio-list-control li {
     position: relative;
@@ -3017,6 +3018,8 @@ form.is-loading {
       transition: none; }
     .radio-list-control input[type="radio"][disabled] + label {
       transition: none; }
+  .radio-list-control + .icon-info {
+    margin-left: 5px; }
 
 label.form-label-asterisk::before {
   color: #e45959;

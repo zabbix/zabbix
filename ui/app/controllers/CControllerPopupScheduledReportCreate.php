@@ -90,17 +90,13 @@ class CControllerPopupScheduledReportCreate extends CController {
 				$report['users'][] = [
 					'userid' => $subscription['recipientid'],
 					'exclude' => $subscription['exclude'],
-					'access_userid' => ($subscription['creator_type'] == ZBX_REPORT_CREATOR_TYPE_USER)
-						? CWebUser::$data['userid']
-						: 0
+					'access_userid' => $subscription['creatorid']
 				];
 			}
 			else {
 				$report['user_groups'][] = [
 					'usrgrpid' => $subscription['recipientid'],
-					'access_userid' => ($subscription['creator_type'] == ZBX_REPORT_CREATOR_TYPE_USER)
-						? CWebUser::$data['userid']
-						: 0
+					'access_userid' => $subscription['creatorid']
 				];
 			}
 		}

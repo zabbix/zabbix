@@ -27,16 +27,19 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'recipientid' =>		'id',
-			'old_recipientid' =>	'id',
-			'recipient_type' =>		'in '.ZBX_REPORT_RECIPIENT_TYPE_USER.','.ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP,
-			'recipient_name' =>		'string',
-			'creator_type' =>		'in '.ZBX_REPORT_CREATOR_TYPE_USER.','.ZBX_REPORT_CREATOR_TYPE_RECIPIENT,
-			'exclude' =>			'in '.ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE,
-			'userids' =>			'array',
-			'usrgrpids' =>			'array',
-			'edit' =>				'in 1',
-			'update' =>				'in 1'
+			'recipientid' =>			'id',
+			'old_recipientid' =>		'id',
+			'recipient_type' =>			'in '.ZBX_REPORT_RECIPIENT_TYPE_USER.','.ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP,
+			'recipient_name' =>			'string',
+			'recipient_inaccessible' =>	'in 0,1',
+			'creatorid' =>				'id',
+			'creator_type' =>			'in '.ZBX_REPORT_CREATOR_TYPE_USER.','.ZBX_REPORT_CREATOR_TYPE_RECIPIENT,
+			'creator_name' =>			'string',
+			'exclude' =>				'in '.ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE,
+			'userids' =>				'array',
+			'usrgrpids' =>				'array',
+			'edit' =>					'in 1',
+			'update' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateSubscription();
@@ -107,12 +110,23 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 	 */
 	protected function prepareJsonResponse(): CControllerResponse {
 		$data = [];
-		$this->getInputs($data, ['recipientid', 'old_recipientid', 'recipient_type', 'recipient_name', 'creator_type',
-			'edit'
+		$this->getInputs($data, ['recipientid', 'old_recipientid', 'recipient_type', 'recipient_name',
+			'recipient_inaccessible', 'creator_type', 'edit'
 		]);
 
 		if ($data['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
 			$data['exclude'] = $this->getInput('exclude');
+		}
+
+		if ($data['creator_type'] == ZBX_REPORT_CREATOR_TYPE_USER) {
+			$data['creatorid'] = CWebUser::$data['userid'];
+			$data['creator_name'] = getUserFullname(CWebUser::$data);
+			$data['creator_inaccessible'] = 0;
+		}
+		else {
+			$data['creatorid'] = 0;
+			$data['creator_name'] = _('Recipient');
+			$data['creator_inaccessible'] = $data['recipient_inaccessible'];
 		}
 
 		return (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();
@@ -131,14 +145,19 @@ class CControllerPopupScheduledReportSubscriptionEdit extends CController {
 			'old_recipientid' => 0,
 			'recipient_type' => ZBX_REPORT_RECIPIENT_TYPE_USER,
 			'recipient_name' => '',
+			'recipient_inaccessible' => 0,
+			'creatorid' => 0,
 			'creator_type' => ZBX_REPORT_CREATOR_TYPE_USER,
-			'userids' => [],
-			'usrgrpids' => []
+			'creator_name' => ''
 		];
 		$this->getInputs($data, array_keys($data));
 
 		if ($data['recipient_type'] == ZBX_REPORT_RECIPIENT_TYPE_USER) {
 			$data['exclude'] = $this->getInput('exclude', ZBX_REPORT_EXCLUDE_USER_FALSE);
+			$data['userids'] = $this->getInput('userids', []);
+		}
+		else {
+			$data['usrgrpids'] = $this->getInput('usrgrpids', []);
 		}
 
 		$data['recipient_ms'] = ($data['recipientid'] != 0)
