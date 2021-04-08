@@ -30,20 +30,21 @@ function confirmSubmit(overlay) {
 	}
 	else {
 		overlayDialogue({
-			'content': jQuery('<span>').text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
-			'buttons': [
+			content: jQuery('<span>')
+						.text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
+			buttons: [
 				{
-					'title': <?= json_encode(_('OK')) ?>,
-					'focused': true,
-					'action': function() {
+					title: <?= json_encode(_('OK')) ?>,
+					focused: true,
+					action: function() {
 						return submitPopup(overlay);
 					}
 				},
 				{
-					'title': <?= json_encode(_('Cancel')) ?>,
-					'cancel': true,
-					'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-					'action': function() {
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: function() {
 						overlay.unsetLoading();
 						return true;
 					}
@@ -67,38 +68,33 @@ function openImportComparePopup(overlay) {
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 	const form = document.getElementById('import-form');
-	const file_input = document.getElementById('import_file');
-	const form_data = new FormData(form);
-
-	form_data.append('import_file', file_input.files.length ? file_input.files[0] : '');
-	form_data.append('parent_overlayid', overlay.dialogueid);
 
 	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import.compare');
+	url.setArgument('parent_overlayid', overlay.dialogueid);
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		body: form_data
+		body: new FormData(form)
 	})
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
-			file_input.value = '';
-			overlay.unsetLoading();
+			document.getElementById('import_file').value = '';
 			$(response.errors).insertBefore(form);
 		}
 		else {
 			overlayDialogue({
-				'title': response.header,
-				'class': 'modal-popup modal-popup-fullscreen',
-				'content': response.body,
-				'buttons': response.buttons,
-				'script_inline': response.script_inline,
-				'debug': response.debug // TODO VM: check with no debug mode
+				title: response.header,
+				class: 'modal-popup modal-popup-fullscreen',
+				content: response.body,
+				buttons: response.buttons,
+				script_inline: response.script_inline,
+				debug: response.debug // TODO VM: check with no debug mode
 			}, overlay.$btn_submit);
-
-			overlay.unsetLoading();
 		}
+
+		overlay.unsetLoading();
 	});
 }
 
@@ -107,10 +103,6 @@ function submitImportPopup(overlay) {
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 	const form = document.getElementById('import-form');
-	const file_input = document.getElementById('import_file');
-	const form_data = new FormData(form);
-
-	form_data.append('import_file', file_input.files.length ? file_input.files[0] : '');
 
 	const url = new Curl('zabbix.php', false);
 	url.setArgument('action', 'popup.import');
@@ -118,17 +110,17 @@ function submitImportPopup(overlay) {
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		body: form_data
+		body: new FormData(form)
 	})
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
-			file_input.value = '';
+			document.getElementById('import_file').value = '';
 			overlay.unsetLoading();
 			$(response.errors).insertBefore(form);
 		}
 		else {
-			postMessageOk(response['title']);
+			postMessageOk(response.title);
 			if ('messages' in response) {
 				postMessageDetails('success', response.messages);
 			}
@@ -141,18 +133,18 @@ function submitImportPopup(overlay) {
 function updateWarning(obj, content) {
 	if (jQuery(obj).is(':checked')) {
 		overlayDialogue({
-			'content': jQuery('<span>').text(content),
-			'buttons': [
+			content: jQuery('<span>').text(content),
+			buttons: [
 				{
-					'title': <?= json_encode(_('OK')) ?>,
-					'focused': true,
-					'action': function() {}
+					title: <?= json_encode(_('OK')) ?>,
+					focused: true,
+					action: function() {}
 				},
 				{
-					'title': <?= json_encode(_('Cancel')) ?>,
-					'cancel': true,
-					'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-					'action': function() {
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: function() {
 						jQuery(obj).prop('checked', false);
 					}
 				}
