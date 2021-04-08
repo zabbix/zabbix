@@ -1164,7 +1164,7 @@ zabbix_export:
           trigger_prototypes:
             -
               expression: '{GitLab by HTTP:gitlab.puma.active_connections[{#SINGLETON}].min(5m)}/{GitLab by HTTP:gitlab.puma.max_threads[{#SINGLETON}].last()}*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
-              name: 'GitLab: Puma instance thread utilization is too hight (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
+              name: 'GitLab: Puma instance thread utilization is too high (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
           url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
           preprocessing:

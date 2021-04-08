@@ -61,17 +61,6 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Monitoring',
-					'page' => 'Screens',
-					'third_level' =>
-					[
-						'Screens',
-						'Slide shows'
-					]
-				]
-			],
-			[
-				[
-					'section' => 'Monitoring',
 					'page' => 'Maps'
 				]
 			],

@@ -75,7 +75,7 @@ function createFontSelect(string $name): CSelect {
 ?>
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Map element'))))
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('formDragHandler')
 			->toString()
 	?>
@@ -329,7 +329,7 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="mapShapeFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Map shape'))))
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('shapeDragHandler')
 			->toString().
 		(new CForm())
@@ -482,7 +482,7 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="mapMassShapeFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Mass update shapes'))))
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('massShapeDragHandler')
 			->toString().
 		(new CForm())
@@ -606,7 +606,7 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
 	<?= (new CDiv(new CTag('h4', true, _('Mass update elements'))))
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('massDragHandler')
 			->toString()
 	?>

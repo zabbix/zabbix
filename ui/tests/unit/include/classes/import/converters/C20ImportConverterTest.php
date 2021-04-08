@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,9 +19,11 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class C20ImportConverterTest extends CImportConverterTest {
 
-	public function testConvertProvider() {
+	public function dataProviderConvert() {
 		return [
 			[
 				[],
@@ -346,39 +348,6 @@ class C20ImportConverterTest extends CImportConverterTest {
 							]
 						],
 						[
-							'screens' => [
-								[],
-								[
-									'screen_items' => [
-										[
-											'rowspan' => 0,
-											'colspan' => 0,
-											'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
-											'resource' => [
-												'key' => 'net.tcp.service[ntp]'
-											]
-										],
-										[
-											'rowspan' => 1,
-											'colspan' => 2,
-											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
-											'resource' => [
-												'key' => 'net.tcp.service[ntp]'
-											]
-										],
-										[
-											'rowspan' => 3,
-											'colspan' => 4,
-											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
-											'resource' => [
-												'key' => 'net.tcp.service[tcp,,5432]'
-											]
-										]
-									]
-								]
-							]
-						],
-						[
 							'discovery_rules' => [
 								[
 									'type' => ITEM_TYPE_SNMPV3,
@@ -461,46 +430,6 @@ class C20ImportConverterTest extends CImportConverterTest {
 								['key' => 'agent.ping', 'status' => ITEM_STATUS_ACTIVE],
 								['key' => 'net.udp.service[ntp]', 'status' => ITEM_STATUS_DISABLED],
 								['key' => 'net.tcp.service[tcp,,5432]', 'status' => ITEM_STATUS_ACTIVE]
-							],
-							'description' => ''
-						],
-						[
-							'screens' => [
-								[],
-								[
-									'screen_items' => [
-										[
-											'rowspan' => '1',
-											'colspan' => '1',
-											'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
-											'resource' => [
-												'key' => 'net.udp.service[ntp]'
-											],
-											'application' => '',
-											'max_columns' => ''
-										],
-										[
-											'rowspan' => 1,
-											'colspan' => 2,
-											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
-											'resource' => [
-												'key' => 'net.udp.service[ntp]'
-											],
-											'application' => '',
-											'max_columns' => ''
-										],
-										[
-											'rowspan' => 3,
-											'colspan' => 4,
-											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
-											'resource' => [
-												'key' => 'net.tcp.service[tcp,,5432]'
-											],
-											'application' => '',
-											'max_columns' => ''
-										]
-									]
-								]
 							],
 							'description' => ''
 						],
@@ -602,86 +531,12 @@ class C20ImportConverterTest extends CImportConverterTest {
 						]
 					]
 				]
-			],
-			[
-				[
-					'screens' => [
-						[],
-						[
-							'screen_items' => [
-								[
-									'rowspan' => 0,
-									'colspan' => 0,
-									'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
-									'resource' => [
-										'key' => 'net.tcp.service[ntp]'
-									]
-								],
-								[
-									'rowspan' => 1,
-									'colspan' => 2,
-									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
-									'resource' => [
-										'key' => 'net.tcp.service[ntp]'
-									]
-								],
-								[
-									'rowspan' => 3,
-									'colspan' => 4,
-									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
-									'resource' => [
-										'key' => 'net.tcp.service[tcp,,5432]'
-									]
-								]
-							]
-						]
-					]
-				],
-				[
-					'screens' => [
-						[],
-						[
-							'screen_items' => [
-								[
-									'rowspan' => '1',
-									'colspan' => '1',
-									'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
-									'resource' => [
-										'key' => 'net.udp.service[ntp]'
-									],
-									'application' => '',
-									'max_columns' => ''
-								],
-								[
-									'rowspan' => 1,
-									'colspan' => 2,
-									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
-									'resource' => [
-										'key' => 'net.udp.service[ntp]'
-									],
-									'application' => '',
-									'max_columns' => ''
-								],
-								[
-									'rowspan' => 3,
-									'colspan' => 4,
-									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
-									'resource' => [
-										'key' => 'net.tcp.service[tcp,,5432]'
-									],
-									'application' => '',
-									'max_columns' => ''
-								]
-							]
-						]
-					]
-				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider testConvertProvider
+	 * @dataProvider dataProviderConvert
 	 *
 	 * @param $data
 	 * @param $expected

@@ -389,7 +389,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$db_template_dashboards = API::TemplateDashboard()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'templateids' => $cloneTemplateId,
-				'selectWidgets' => API_OUTPUT_EXTEND,
+				'selectPages' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			]);
 

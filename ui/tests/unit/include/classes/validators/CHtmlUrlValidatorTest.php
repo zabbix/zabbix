@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,8 +19,10 @@
 **/
 
 
-class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
-	public function setUp() {
+use PHPUnit\Framework\TestCase;
+
+class CHtmlUrlValidatorTest extends TestCase {
+	protected function setUp(): void {
 		$settings = $this->createMock(CSettings::class);
 		$settings->method('get')
 			->will($this->returnValue([

@@ -533,7 +533,17 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function forceClick() {
-		CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		try {
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		}
+		catch (StaleElementReferenceException $exception) {
+			if (!$this->reload_staled) {
+				throw $exception;
+			}
+
+			$this->reload();
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		}
 
 		return $this;
 	}

@@ -41,7 +41,6 @@
 				'<?= CRoleHelper::UI_MONITORING_HOSTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
 				'<?= CRoleHelper::UI_MONITORING_OVERVIEW; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
 				'<?= CRoleHelper::UI_MONITORING_LATEST_DATA; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_MONITORING_SCREENS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
 				'<?= CRoleHelper::UI_MONITORING_MAPS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
 				'<?= CRoleHelper::UI_MONITORING_DISCOVERY; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
 				'<?= CRoleHelper::UI_MONITORING_SERVICES; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,

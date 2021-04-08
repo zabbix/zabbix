@@ -282,18 +282,6 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'screens' => [
-				'title' => _('Screens'),
-				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'screenid',
-				'form' => [
-					'name' => 'screenform',
-					'id' => 'screens'
-				],
-				'table_columns' => [
-					_('Name')
-				]
-			],
 			'graphs' => [
 				'title' => _('Graphs'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -439,7 +427,6 @@ class CControllerPopupGeneric extends CController {
 			'hostid' =>								'db hosts.hostid',
 			'host' =>								'string',
 			'parent_discoveryid' =>					'db items.itemid',
-			'screenid' =>							'db screens.screenid',
 			'templates' =>							'string|not_empty',
 			'host_templates' =>						'string|not_empty',
 			'multiselect' =>						'in 1',
@@ -752,7 +739,7 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected function getPageOptions(): array {
 		$option_fields_binary = ['noempty', 'real_hosts', 'submit_parent', 'with_items', 'writeonly'];
-		$option_fields_value = ['host_templates', 'screenid'];
+		$option_fields_value = ['host_templates'];
 
 		$page_options = [
 			'srcfld1' => $this->getInput('srcfld1', ''),
@@ -1269,15 +1256,6 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::Map()->get($options);
 
-				CArrayHelper::sort($records, ['name']);
-				break;
-
-			case 'screens':
-				$options += [
-					'output' => ['screenid', 'name']
-				];
-
-				$records = API::Screen()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				break;
 

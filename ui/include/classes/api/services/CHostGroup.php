@@ -599,19 +599,6 @@ class CHostGroup extends CApiService {
 	public function delete(array $groupids, $nopermissions = false) {
 		$this->validateDelete($groupids, $db_groups, $nopermissions);
 
-		// delete screens items
-		$resources = [
-			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
-			SCREEN_RESOURCE_HOST_INFO,
-			SCREEN_RESOURCE_TRIGGER_INFO,
-			SCREEN_RESOURCE_TRIGGER_OVERVIEW,
-			SCREEN_RESOURCE_DATA_OVERVIEW
-		];
-		DB::delete('screens_items', [
-			'resourceid' => $groupids,
-			'resourcetype' => $resources
-		]);
-
 		// delete sysmap element
 		if (!empty($groupids)) {
 			DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);

@@ -404,24 +404,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define EVENT_TYPE_TRIGGER_UNKNOWN		4
 /* #define EVENT_TYPE_TRIGGER_NORMAL		5	 deprecated */
 
-#define SCREEN_RESOURCE_GRAPH			0
-#define SCREEN_RESOURCE_SIMPLE_GRAPH		1
-#define SCREEN_RESOURCE_MAP			2
-#define SCREEN_RESOURCE_PLAIN_TEXT		3
-#define SCREEN_RESOURCE_HOST_INFO		4
-#define SCREEN_RESOURCE_TRIGGER_INFO		5
-#define SCREEN_RESOURCE_SERVER_INFO		6
-#define SCREEN_RESOURCE_CLOCK			7
-#define SCREEN_RESOURCE_SCREEN			8
-#define SCREEN_RESOURCE_TRIGGER_OVERVIEW	9
-#define SCREEN_RESOURCE_DATA_OVERVIEW		10
-#define SCREEN_RESOURCE_URL			11
-#define SCREEN_RESOURCE_ACTIONS			12
-#define SCREEN_RESOURCE_EVENTS			13
-#define SCREEN_RESOURCE_HOSTGROUP_TRIGGERS	14
-#define SCREEN_RESOURCE_SYSTEM_STATUS		15
-#define SCREEN_RESOURCE_HOST_TRIGGERS		16
-
 typedef enum
 {
 	SYSMAP_ELEMENT_TYPE_HOST = 0,
@@ -922,8 +904,8 @@ while (0)
 														\
 do														\
 {														\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s] Something impossible has just happened.",    \
-			__FILE__, __func__, ZABBIX_REVISION);							\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
+			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
 	zbx_backtrace();											\
 }														\
 while (0)

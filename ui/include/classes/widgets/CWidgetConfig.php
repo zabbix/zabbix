@@ -48,7 +48,6 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> _('Discovery status'),
 			WIDGET_FAV_GRAPHS			=> _('Favourite graphs'),
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
-			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
 			WIDGET_GRAPH				=> _('Graph (classic)'),
 			WIDGET_GRAPH_PROTOTYPE		=> _('Graph prototype'),
 			WIDGET_HOST_AVAIL			=> _('Host availability'),
@@ -75,6 +74,31 @@ class CWidgetConfig {
 		return $types;
 	}
 
+	public static function getTypeJSClasses() {
+		return [
+			WIDGET_ACTION_LOG			=> 'CWidget',
+			WIDGET_CLOCK				=> 'CWidgetClock',
+			WIDGET_DATA_OVER			=> 'CWidget',
+			WIDGET_DISCOVERY			=> 'CWidget',
+			WIDGET_FAV_GRAPHS			=> 'CWidget',
+			WIDGET_FAV_MAPS				=> 'CWidget',
+			WIDGET_GRAPH				=> 'CWidgetGraph',
+			WIDGET_GRAPH_PROTOTYPE		=> 'CWidgetGraphPrototype',
+			WIDGET_HOST_AVAIL			=> 'CWidget',
+			WIDGET_MAP					=> 'CWidgetMap',
+			WIDGET_NAV_TREE				=> 'CWidgetNavTree',
+			WIDGET_PLAIN_TEXT			=> 'CWidget',
+			WIDGET_PROBLEM_HOSTS		=> 'CWidget',
+			WIDGET_PROBLEMS				=> 'CWidgetProblems',
+			WIDGET_PROBLEMS_BY_SV		=> 'CWidgetProblemsBySv',
+			WIDGET_SVG_GRAPH			=> 'CWidgetSvgGraph',
+			WIDGET_SYSTEM_INFO			=> 'CWidget',
+			WIDGET_TRIG_OVER			=> 'CWidgetTrigerOver',
+			WIDGET_URL					=> 'CWidget',
+			WIDGET_WEB					=> 'CWidget'
+		];
+	}
+
 	/**
 	 * Get default widget dimensions.
 	 *
@@ -90,7 +114,6 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> ['width' => 6,	'height' => 3],
 			WIDGET_FAV_GRAPHS			=> ['width' => 4,	'height' => 3],
 			WIDGET_FAV_MAPS				=> ['width' => 4,	'height' => 3],
-			WIDGET_FAV_SCREENS			=> ['width' => 4,	'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 12,	'height' => 5],
 			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 16,	'height' => 5],
 			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 3],
@@ -119,13 +142,17 @@ class CWidgetConfig {
 	 */
 	public static function getDefaults(string $context): array {
 		$ret = [];
+
 		$dimensions = self::getDefaultDimensions();
+		$type_js_clases = self::getTypeJSClasses();
 
 		foreach (self::getKnownWidgetTypes($context) as $type => $name) {
 			$ret[$type] = [
-				'header' => $name,
+				'name' => $name,
 				'size' => $dimensions[$type],
-				'iterator' => self::isIterator($type)
+				'js_class' => $type_js_clases[$type],
+				'iterator' => self::isIterator($type),
+				'dialogue_stick_to_top' => self::getDialogueStickToTop($type)
 			];
 		}
 
@@ -190,7 +217,6 @@ class CWidgetConfig {
 			case WIDGET_CLOCK:
 			case WIDGET_FAV_GRAPHS:
 			case WIDGET_FAV_MAPS:
-			case WIDGET_FAV_SCREENS:
 			case WIDGET_HOST_AVAIL:
 			case WIDGET_MAP:
 			case WIDGET_NAV_TREE:
