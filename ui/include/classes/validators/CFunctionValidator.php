@@ -347,8 +347,6 @@ class CFunctionValidator extends CValidator {
 				return false;
 			}
 
-			$parameter_value = $fn->params_raw['parameters'][$num]->getValue();
-
 			if ($arg['mandat'] != 0x00 && !$this->validateParameter($fn->params_raw['parameters'][$num], $arg)) {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]

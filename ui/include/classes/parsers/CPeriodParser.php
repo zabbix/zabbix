@@ -97,7 +97,8 @@ class CPeriodParser extends CParser {
 			}
 		}
 
-		if (count($parts) > 2) {
+		// Valid period consists of 1 or 2 non-empty parts.
+		if (count($parts) > 2 || $parts[0] === '' || (array_key_exists(1, $parts) && $parts[1] === '')) {
 			return CParser::PARSE_FAIL;
 		}
 
