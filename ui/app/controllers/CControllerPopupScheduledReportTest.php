@@ -69,7 +69,8 @@ class CControllerPopupScheduledReportTest extends CController {
 
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT)),
+			ZBX_SOCKET_BYTES_LIMIT
 		);
 
 		$result = $server->testReport($params, CSessionHelper::getId());

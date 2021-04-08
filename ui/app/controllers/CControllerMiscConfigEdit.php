@@ -43,7 +43,8 @@ class CControllerMiscConfigEdit extends CController {
 			'connect_timeout' =>				'db config.connect_timeout',
 			'media_type_test_timeout' =>		'db config.media_type_test_timeout',
 			'script_timeout' =>					'db config.script_timeout',
-			'item_test_timeout' =>				'db config.item_test_timeout'
+			'item_test_timeout' =>				'db config.item_test_timeout',
+			'report_test_timeout' =>			'db config.report_test_timeout'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -107,6 +108,9 @@ class CControllerMiscConfigEdit extends CController {
 			)),
 			'item_test_timeout' => $this->getInput('item_test_timeout', CSettingsHelper::get(
 				CSettingsHelper::ITEM_TEST_TIMEOUT
+			)),
+			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
+				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
 			))
 		];
 

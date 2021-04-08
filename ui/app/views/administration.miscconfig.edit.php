@@ -166,6 +166,14 @@ $from_list = (new CFormList())
 		))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Network timeout for scheduled report test'), 'report_test_timeout'))->setAsteriskMark(),
+		(new CTextBox('report_test_timeout', $data['report_test_timeout'], false,
+			DB::getFieldLength('config', 'report_test_timeout')
+		))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	);
 
 $form = (new CForm())

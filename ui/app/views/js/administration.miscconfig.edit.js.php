@@ -93,6 +93,7 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 							);
 							$('#script_timeout').val("<?= DB::getDefault('config', 'script_timeout') ?>");
 							$('#item_test_timeout').val("<?= DB::getDefault('config', 'item_test_timeout') ?>");
+							$('#report_test_timeout').val("<?= DB::getDefault('config', 'report_test_timeout') ?>");
 						}
 					}
 				]

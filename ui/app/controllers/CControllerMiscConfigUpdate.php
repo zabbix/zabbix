@@ -39,7 +39,8 @@ class CControllerMiscConfigUpdate extends CController {
 			'connect_timeout' =>				'required|db config.connect_timeout|time_unit '.implode(':', [1, 30]),
 			'media_type_test_timeout' =>		'required|db config.media_type_test_timeout|time_unit '.implode(':', [1, 300]),
 			'script_timeout' =>					'required|db config.script_timeout|time_unit '.implode(':', [1, 300]),
-			'item_test_timeout' =>				'required|db config.item_test_timeout|time_unit '.implode(':', [1, 300])
+			'item_test_timeout' =>				'required|db config.item_test_timeout|time_unit '.implode(':', [1, 300]),
+			'report_test_timeout' =>			'required|db config.report_test_timeout|time_unit '.implode(':', [1, 300])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -88,7 +89,8 @@ class CControllerMiscConfigUpdate extends CController {
 			CSettingsHelper::CONNECT_TIMEOUT => $this->getInput('connect_timeout'),
 			CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT => $this->getInput('media_type_test_timeout'),
 			CSettingsHelper::SCRIPT_TIMEOUT => $this->getInput('script_timeout'),
-			CSettingsHelper::ITEM_TEST_TIMEOUT => $this->getInput('item_test_timeout')
+			CSettingsHelper::ITEM_TEST_TIMEOUT => $this->getInput('item_test_timeout'),
+			CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT => $this->getInput('report_test_timeout')
 		];
 
 		$settings[CSettingsHelper::ALERT_USRGRPID] = $this->hasInput('alert_usrgrpid')
