@@ -359,7 +359,7 @@ func (p *Plugin) exportProcNum(params []string) (interface{}, error) {
 
 	procs, err := getProcesses(procInfoName | procInfoCmdline | procInfoUser | procInfoState)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to get local processes: %s", err.Error())
 	}
 
 	var count int
