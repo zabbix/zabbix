@@ -430,7 +430,7 @@ static int	eval_has_usermacro(const char *str, size_t len)
  *                                                                            *
  * Function: eval_query_expand_user_macros                                    *
  *                                                                            *
- * Purpose: expand user macros in itemq uery                                  *
+ * Purpose: expand user macros in item query                                  *
  *                                                                            *
  * Parameters: itemquery   - [IN] the evaluation context                      *
  *             len         - [IN] the item query length                       *
@@ -493,8 +493,6 @@ static int	eval_query_expand_user_macros(const char *itemquery, size_t len, zbx_
 						hostids, hostids_num, &value, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
-			case ZBX_EVAL_TOKEN_VAR_NUM:
-			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				if (SUCCEED != eval_has_usermacro(ctx.expression + token->loc.l,
 						token->loc.r - token->loc.l + 1))
 				{
