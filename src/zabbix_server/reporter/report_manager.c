@@ -1601,7 +1601,11 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dashboardid:" ZBX_FS_UI64, __func__, dashboardid);
 
-	result = DBselect("select type,width,y,height from widget where dashboardid=" ZBX_FS_UI64, dashboardid);
+	result = DBselect("select w.type,w.width,w.y,w.height"
+			" from widget w,dashboard_page p"
+			" where w.dashboard_pageid=p.dashboard_pageid"
+				" and p.dashboardid=" ZBX_FS_UI64
+				" and p.sortorder=0", dashboardid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
