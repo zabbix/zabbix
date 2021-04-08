@@ -1059,11 +1059,9 @@ function getItemFormData(array $item = [], array $options = []) {
 	// types, http items only for internal processes
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
+
 	if ($data['is_discovery_rule']) {
-		unset($data['types'][ITEM_TYPE_AGGREGATE],
-			$data['types'][ITEM_TYPE_CALCULATED],
-			$data['types'][ITEM_TYPE_SNMPTRAP]
-		);
+		unset($data['types'][ITEM_TYPE_CALCULATED], $data['types'][ITEM_TYPE_SNMPTRAP]);
 	}
 
 	// item

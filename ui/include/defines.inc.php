@@ -486,7 +486,7 @@ define('ITEM_TYPE_SNMPV2C',			4); // Deprecated. Now only used in XML converters
 define('ITEM_TYPE_INTERNAL',		5);
 define('ITEM_TYPE_SNMPV3',			6); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
-define('ITEM_TYPE_AGGREGATE',		8);
+define('ITEM_TYPE_AGGREGATE',		8); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_CALCULATED instead.
 define('ITEM_TYPE_HTTPTEST',		9);
 define('ITEM_TYPE_EXTERNAL',		10);
 define('ITEM_TYPE_DB_MONITOR',		11);

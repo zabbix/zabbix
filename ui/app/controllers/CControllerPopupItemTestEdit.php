@@ -41,7 +41,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interfaceid'			=> 'db interface.interfaceid',
 			'ipmi_sensor'			=> 'string',
 			'itemid'				=> 'db items.itemid',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT]),
 			'jmx_endpoint'			=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
@@ -90,20 +90,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()));
 					$ret = false;
-				}
-				elseif ($this->item_type == ITEM_TYPE_AGGREGATE) {
-					$params_num = $item_key_parser->getParamsNum();
-
-					if (!str_in_array($item_key_parser->getKey(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
-							|| $params_num > 4 || $params_num < 3
-							|| ($params_num == 3 && $item_key_parser->getParam(2) !== 'last')
-							|| !str_in_array($item_key_parser->getParam(2),
-									['last', 'min', 'max', 'avg', 'sum', 'count'])) {
-						error(_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
-							' "<last|min|max|avg|sum|count>", "parameter"].', $item_key_parser->getKey()
-						));
-						$ret = false;
-					}
 				}
 			}
 

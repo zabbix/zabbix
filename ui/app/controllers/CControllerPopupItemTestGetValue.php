@@ -143,7 +143,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		// Apply effective macros values to properties.
 		$data = $this->resolveItemPropertyMacros($data);
 
-		if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {
+		if ($this->item_type != ITEM_TYPE_CALCULATED) {
 			unset($data['value_type']);
 		}
 

@@ -42,8 +42,8 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @var array
 	 */
-	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
-		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
+	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
+		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
 		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 	];
 
@@ -100,7 +100,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @var array
 	 */
 	protected $item_types_has_key_mandatory = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI,
+		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI,
 		ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED
 	];
 
@@ -541,12 +541,6 @@ abstract class CControllerPopupItemTest extends CController {
 						'maintenance_type' => $this->host['maintenance_type']
 					];
 				}
-				break;
-
-			case ITEM_TYPE_AGGREGATE:
-				$data += [
-					'key' => $input['key']
-				];
 				break;
 
 			case ITEM_TYPE_EXTERNAL:
