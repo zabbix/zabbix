@@ -183,6 +183,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				$new_expression = sprintf('bitand(last(%1$s%2$s)%3$s)', $query, $timeshift, $mask);
 				break;
 
+			case 'change':
+				$new_expression = sprintf('change(%1$s)', $query);
+				break;
+
 			case 'delta':
 				$params = self::convertParameters($fn['functionParams'], $fn['functionName']);
 				$params = self::paramsToString($params);
