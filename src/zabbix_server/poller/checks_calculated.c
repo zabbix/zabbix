@@ -40,6 +40,8 @@
 					ZBX_CALC_QUERY_KEY_SOME | ZBX_CALC_QUERY_KEY_ANY |\
 					ZBX_CALC_QUERY_FILTER)
 
+#define ZBX_CALC_QUERY_ITEM_ANY		(ZBX_CALC_QUERY_HOST_ANY | ZBX_CALC_QUERY_KEY_ANY)
+
 /* one item query data - index in hostkeys items */
 typedef struct
 {
@@ -708,9 +710,17 @@ static void	calc_init_query_many(zbx_calc_eval_t *eval, zbx_calc_query_t *query)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() /%s/%s?[%s]", __func__, ZBX_NULL2EMPTY_STR(query->ref.host),
 			ZBX_NULL2EMPTY_STR(query->ref.key), ZBX_NULL2EMPTY_STR(query->ref.filter));
 
+	zbx_eval_init(&ctx);
+
 	zbx_vector_uint64_create(&itemids);
 	zbx_vector_uint64_pair_create(&itemhosts);
 	zbx_vector_str_create(&groups);
+
+	if (ZBX_CALC_QUERY_ITEM_ANY == (query->flags & ZBX_CALC_QUERY_ITEM_ANY))
+	{
+		error = zbx_strdup(NULL, "item query must have at least a host or an item key defined");
+		goto out;
+	}
 
 	if (0 != (query->flags & ZBX_CALC_QUERY_FILTER))
 	{
