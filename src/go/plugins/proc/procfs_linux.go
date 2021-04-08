@@ -185,7 +185,6 @@ func getProcesses(flags int) (processes []*procInfo, err error) {
 		}
 		if flags&procInfoState != 0 {
 			if info.state, tmperr = getProcessState(entries[0].Name()); tmperr != nil {
-				fmt.Printf("cannot get process %s state: %s", entries[0].Name(), tmperr)
 				impl.Debugf("cannot get process %s state: %s", entries[0].Name(), tmperr)
 				continue
 			}
