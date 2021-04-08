@@ -863,6 +863,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param bool   $options['resolve_functionids']  Resolve finctionid macros. Default: true.
 	 * @param array  $options['sources']			  An array of the field names. Default: ['expression'].
 	 * @param string $options['context']              Additional parameter in URL to identify main section.
+	 *                                                Default: 'host'.
 	 *
 	 * @return string|array
 	 */
@@ -872,7 +873,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'resolve_usermacros' => false,
 			'resolve_macros' => false,
 			'resolve_functionids' => true,
-			'sources' => ['expression']
+			'sources' => ['expression'],
+			'context' => 'host'
 		];
 
 		$functionids = [];
@@ -1038,10 +1040,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 												->setArgument('form', 'update')
 												->setArgument('itemid', $function['itemid'])
 												->setArgument('parent_discoveryid', $function['parent_itemid'])
-												->setArgument('context', array_key_exists('context', $options)
-													? $options['context']
-													: 'host'
-												)
+												->setArgument('context', $options['context'])
 										))
 											->addClass(ZBX_STYLE_LINK_ALT)
 											->addClass($style)
@@ -1054,10 +1053,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										(new CUrl('items.php'))
 											->setArgument('form', 'update')
 											->setArgument('itemid', $function['itemid'])
-											->setArgument('context', array_key_exists('context', $options)
-												? $options['context']
-												: 'host'
-											)
+											->setArgument('context', $options['context'])
 									))
 										->addClass(ZBX_STYLE_LINK_ALT)
 										->setAttribute('data-itemid', $function['itemid'])
