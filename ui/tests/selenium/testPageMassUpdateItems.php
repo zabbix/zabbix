@@ -21,6 +21,7 @@
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/traits/PreprocessingTrait.php';
 
 /**
  * Test the mass update of items.
@@ -28,6 +29,8 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  * @backup items, interface
  */
 class testPageMassUpdateItems extends CWebTest{
+
+	use PreprocessingTrait;
 
 	const HOSTID = 40001;	// Simple form test host.
 	const HOST_NAME = 'Simple form test host';
@@ -1618,10 +1621,297 @@ class testPageMassUpdateItems extends CWebTest{
 		}
 	}
 
-/*
-	public function testPageMassUpdateItems_ChangePreprocessing($data) {
-
+	/**
+	 * Add items for mass updating.
+	 */
+	public function prepareItemPreprocessingData() {
+		CDataHelper::call('item.create', [
+			[
+				'hostid' => self::HOSTID,
+				'name' => '1_Item_Preprocessing',
+				'key_' => '1agent.preproc',
+				'type' => 0,
+				'value_type' => 0,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '1m',
+				'preprocessing' => [
+					[
+						'type' => '4',
+						'params' => '123',
+						'error_handler' => 0,
+						'error_handler_params' => ''
+					],
+					[
+						'type' => '25',
+						'params' => "error\nmistake",
+						'error_handler' => 0,
+						'error_handler_params' => ''
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '2_Item_Preprocessing',
+				'key_' => '2agent.preproc',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'applications' => [5000, 5001],
+				'preprocessing' => [
+					[
+						'type' => '5',
+						'params' => "pattern\noutput",
+						'error_handler' => 2,
+						'error_handler_params' => 'custom_value'
+					],
+					[
+						'type' => '16',
+						'params' => '$path',
+						'error_handler' => 3,
+						'error_handler_params' => 'custom_error'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '1_Item_No_Preprocessing',
+				'key_' => '1agent.no.preproc',
+				'type' => 0,
+				'value_type' => 0,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '1m'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '2_Item_No_Preprocessing',
+				'key_' => '2agent.no.preproc',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m'
+			]
+		]);
 	}
- */
+
+	public function getItemPreprocessingChangeData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item_Preprocessing',
+						'1_Item_No_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						['type' => 'Custom multiplier', 'parameter_1' => 'abc']
+					],
+					'details' => 'Incorrect value for field "params": a numeric value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item_Preprocessing',
+						'1_Item_No_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						['type' => 'Simple change'],
+						['type' => 'Simple change']
+					],
+					'details' => 'Only one change step is allowed.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item_Preprocessing',
+						'1_Item_No_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
+					],
+					'details' => 'Incorrect value for field "params": "min" value must be less than or equal to "max" value.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item_Preprocessing',
+						'1_Item_No_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'test']
+					],
+					'details' => 'Incorrect value for field "params": second parameter is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item_Preprocessing',
+						'1_Item_No_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						['type' => 'Discard unchanged'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
+					],
+					'details' => 'Only one throttling step is allowed.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item_Preprocessing',
+						'1_Item_No_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						['type' => 'Regular expression']
+					],
+					'details' => 'Incorrect value for field "params": first parameter is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'2_Item_Preprocessing',
+						'2_Item_No_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						[
+							'type' => 'XML XPath',
+							'parameter_1' => "//path/one",
+							'on_fail' => true,
+							'error_handler' => 'Set error to'
+						]
+					],
+					'details' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item_Preprocessing',
+						'2_Item_Preprocessing'
+					],
+					'Preprocessing steps' => []
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item_Preprocessing',
+						'1_Item_No_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						[
+							'type' => 'Custom multiplier',
+							'parameter_1' => '3',
+							'on_fail' => true,
+							'error_handler' => 'Set error to',
+							'error_handler_params' => 'New_error1'
+						],
+						[
+							'type' => 'In range',
+							'parameter_1' => '10',
+							'parameter_2' => '20',
+							'on_fail' => true,
+							'error_handler' => 'Set value to',
+							'error_handler_params' => 'New_value_2'
+						],
+						[
+							'type' => 'JSONPath',
+							'parameter_1' => '$path',
+							'on_fail' => true,
+							'error_handler' => 'Discard value'
+						],
+						[
+							'type' => 'Discard unchanged'
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item_Preprocessing',
+						'2_Item_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'Right trim', 'parameter_1' => 'abc'],
+						['type' => 'Left trim', 'parameter_1' => 'def'],
+						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'Custom multiplier', 'parameter_1' => '123'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Boolean to decimal'],
+						['type' => 'Octal to decimal'],
+						['type' => 'Hexadecimal to decimal'],
+						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
+						['type' => 'Simple change'],
+						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @on-before-once prepareItemPreprocessingData
+	 *
+	 * @dataProvider getItemPreprocessingChangeData
+	 */
+	public function testPageMassUpdateItems_ChangePreprocessing($data) {
+		$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+
+		$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID);
+
+		// Get item table.
+		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+		foreach ($data['names'] as $name) {
+			$table->findRow('Name', $name)->select();
+		}
+
+		// Open mass update form and Preprocessing tab.
+		$this->query('button:Mass update')->one()->click();
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Preprocessing');
+
+		$form->getLabel('Preprocessing steps')->click();
+
+		if ($data['Preprocessing steps'] !== []) {
+			$this->addPreprocessingSteps($data['Preprocessing steps']);
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Cannot update items', $data['details']);
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'Items updated');
+
+			// Check changed fields in saved item form.
+			foreach ($data['names'] as $name) {
+				$table->query('link', $name)->one()->waitUntilClickable()->click();
+				$form->invalidate();
+				$form->selectTab('Preprocessing');
+				$this->assertPreprocessingSteps($data['Preprocessing steps']);
+				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$this->page->waitUntilReady();
+			}
+		}
+	}
 }
 
