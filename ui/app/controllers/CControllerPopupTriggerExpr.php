@@ -551,7 +551,7 @@ class CControllerPopupTriggerExpr extends CController {
 					$param_values = [];
 					foreach ($params as $i => $param) {
 						if ($param instanceof CFunctionParserResult) {
-							$param_values[] = $param->getFunctionTriggerQuery()->getValue();
+							continue;
 						}
 						elseif ($i == 0 && ($param instanceof CPeriodParserResult)) {
 							$param_values[] = $is_num ? substr($param->sec_num, 1) : $param->sec_num;
