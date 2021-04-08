@@ -2654,15 +2654,23 @@ zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 			ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY, ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY, flag);
 	zbx_free(version_friendly);
 #elif defined(HAVE_ORACLE)
+#	ifdef HAVE_OCI_SERVER_RELEASE2
+	char	*version_str = "Version ";
+	ub4	oci_ver = 0;
+#	endif
 	char	*start, *release_str = "Release ";
 	char	version_friendly[MAX_STRING_LEN / 8];
 	int	flag, major_release_version, release_update_version, release_update_version_revision,
 			increment_version, reserved_for_future_use, overall_status = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
+#	ifdef HAVE_OCI_SERVER_RELEASE2
+	if (OCI_SUCCESS != OCIServerRelease2(oracle.svchp, oracle.errhp, (OraText *) version_friendly,
+			(ub4)sizeof(version_friendly), OCI_HTYPE_SVCCTX, &oci_ver, OCI_DEFAULT))
+#	else
 	if (OCI_SUCCESS != OCIServerVersion(oracle.svchp, oracle.errhp, (OraText *) version_friendly,
-			sizeof(version_friendly), OCI_HTYPE_SVCCTX))
+			(ub4)sizeof(version_friendly), OCI_HTYPE_SVCCTX))
+#	endif
 	{
 		overall_status = FAIL;
 		goto out;
@@ -2670,11 +2678,15 @@ zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "OracleDB version retrieved unparsed: %s", version_friendly);
 
-	if ((start = strstr(version_friendly, release_str)))
+	if (
+#	ifdef HAVE_OCI_SERVER_RELEASE2
+			NULL != (start = strstr(version_friendly, version_str)) ||
+#	endif
+			NULL != (start = strstr(version_friendly, release_str)))
 	{
 		size_t	next_start_index;
 
-		next_start_index = start - version_friendly + strlen(release_str);
+		next_start_index = start - version_friendly + strlen(release_str); /* same length for version_str */
 
 		if (5 != sscanf(version_friendly + next_start_index, "%d.%d.%d.%d.%d", &major_release_version,
 				&release_update_version, &release_update_version_revision, &increment_version,
