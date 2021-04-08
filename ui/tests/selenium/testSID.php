@@ -355,7 +355,7 @@ class testSID extends CWebTest {
 					'severity_name_3=Average&severity_color_3=FFA059&severity_name_4=High&severity_color_4=E97659&'.
 					'severity_name_5=Disaster&severity_color_5=E45959&update=Update']],
 
-			// Media type delete.
+			// Other configuration parameters update.
 			[['link' => 'zabbix.php?action=miscconfig.update&form_refresh=1&discovery_groupid=5&'.
 					'default_inventory_mode=-1&alert_usrgrpid=15&snmptrap_logging=1&login_attempts=5&'.
 					'login_block=30s&validate_uri_schemes=1&uri_valid_schemes=http%2Chttps%2Cftp%2Cfile'.
