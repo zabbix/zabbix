@@ -1302,5 +1302,1084 @@ in:
 out:
   return: SUCCEED
   value: -5
+---
+test case: Evaluate abs() <- 1.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: abs
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.5
+---
+test case: Evaluate abs() <- -1.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: abs
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.5
+---
+test case: Evaluate cbrt() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cbrt
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.35720880829745
+---
+test case: Evaluate cbrt() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cbrt
+  params: ''
+out:
+  return: SUCCEED
+  value: -1.35720880829745
+---
+test case: Evaluate cbrt() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cbrt
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.25992104989487
+---
+test case: Evaluate ceil() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: ceil
+  params: ''
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate ceil() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: ceil
+  params: ''
+out:
+  return: SUCCEED
+  value: -2
+---
+test case: Evaluate degrees() <- 25
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 25
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: degrees
+  params: ''
+out:
+  return: SUCCEED
+  value: 1432.394488
+---
+test case: Evaluate degrees() <- -9.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -9.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: degrees
+  params: ''
+out:
+  return: SUCCEED
+  value: -544.309905
+---
+test case: Evaluate exp() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: exp
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.082084998623899
+---
+test case: Evaluate exp() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: exp
+  params: ''
+out:
+  return: SUCCEED
+  value: 12.1824939607035
+---
+test case: Evaluate exp() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: exp
+  params: ''
+out:
+  return: SUCCEED
+  value: 7.38905609893065
+---
+test case: Evaluate expm1() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: expm1
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.917915001376101
+---
+test case: Evaluate expm1() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: expm1
+  params: ''
+out:
+  return: SUCCEED
+  value: 11.1824939607035
+---
+test case: Evaluate expm1() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: expm1
+  params: ''
+out:
+  return: SUCCEED
+  value: 6.38905609893065
+---
+test case: Evaluate floor() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: floor
+  params: ''
+out:
+  return: SUCCEED
+  value: -3
+---
+test case: Evaluate floor() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: floor
+  params: ''
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate log() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: log
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.916290731874155
+---
+test case: Evaluate log() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: log
+  params: ''
+out:
+  return: FAIL
+  value: 
+---
+test case: Evaluate log10() <- 0.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: log10
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.301029995663981
+---
+test case: Evaluate log10() <- 1.3
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.3
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: log10
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.113943352306837
+---
+test case: Evaluate log10() <- 0
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: log10
+  params: ''
+out:
+  return: FAIL
+  value: 
+---
+test case: Evaluate log10() <- -1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: log10
+  params: ''
+out:
+  return: FAIL
+  value: 
+---
+test case: Evaluate mod(7) <- 25
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 25
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: mod
+  params: '7'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate mod(5) <- 9.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 9.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: mod
+  params: '5'
+out:
+  return: SUCCEED
+  value: 4.5
+---
+test case: Evaluate radians() <- 25
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 25
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: radians
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.436332
+---
+test case: Evaluate radians() <- -9.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -9.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: radians
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.165806
+---
+test case: Evaluate power(3) <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: power
+  params: '3'
+out:
+  return: SUCCEED
+  value: 15.625
+---
+test case: Evaluate power(3) <- 16
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 16
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: power
+  params: '3'
+out:
+  return: SUCCEED
+  value: 4096
+---
+test case: Evaluate round() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: round
+  params: '0'
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate round() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: round
+  params: '0'
+out:
+  return: SUCCEED
+  value: -3
+---
+test case: Evaluate signum() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: signum
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate signum() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: signum
+  params: ''
+out:
+  return: SUCCEED
+  value: -1
+---
+test case: Evaluate signum() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: signum
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate sqrt() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sqrt
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.58113883008419
+---
+test case: Evaluate sqrt() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sqrt
+  params: ''
+out:
+  return: FAIL
+  value: 
+---
+test case: Evaluate sqrt() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sqrt
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.4142135623731
+---
+test case: Evaluate truncate() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: truncate
+  params: '0'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate truncate() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: truncate
+  params: '0'
+out:
+  return: SUCCEED
+  value: -2
+---
+test case: Evaluate acos() <- 0.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: acos
+  params: '0'
+out:
+  return: SUCCEED
+  value: 1.0471975511966
+---
+test case: Evaluate acos() <- 1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: acos
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate acos() <- -0.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -0.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: acos
+  params: ''
+out:
+  return: SUCCEED
+  value: 2.0943951023932
+---
+test case: Evaluate acos() <- -1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: acos
+  params: ''
+out:
+  return: SUCCEED
+  value: 3.14159265358979
+---
+test case: Evaluate acos() <- -9.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -9.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: acos
+  params: ''
+out:
+  return: FAIL
+  value: 
+---
+test case: Evaluate acos() <- -9
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -9
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: acos
+  params: ''
+out:
+  return: FAIL
+  value: 
+---
+test case: Evaluate asin() <- 0.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: asin
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.523598775598299
+---
+test case: Evaluate asin() <- 1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: asin
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.5707963267949
+---
+test case: Evaluate asin() <- -0.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -0.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: asin
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.523598775598299
+---
+test case: Evaluate asin() <- -1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: asin
+  params: ''
+out:
+  return: SUCCEED
+  value: -1.5707963267949
+---
+test case: Evaluate asin() <- -9.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -9.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: asin
+  params: ''
+out:
+  return: FAIL
+  value: 
+---
+test case: Evaluate asin() <- -9
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -9
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: asin
+  params: ''
+out:
+  return: FAIL
+  value: 
+---
+test case: Evaluate atan() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: atan
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.19028994968253
+---
+test case: Evaluate atan() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: atan
+  params: ''
+out:
+  return: SUCCEED
+  value: -1.19028994968253
+---
+test case: Evaluate atan() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: atan
+  params: ''
+out:
+  return: SUCCEED
+  value: 1.10714871779409
+---
+test case: Evaluate atan(2) <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: atan2
+  params: '2'
+out:
+  return: SUCCEED
+  value: 0.896055
+---
+test case: Evaluate atan(2) <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: atan2
+  params: '2'
+out:
+  return: SUCCEED
+  value: -0.896055
+---
+test case: Evaluate atan(2) <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: atan2
+  params: '2'
+out:
+  return: SUCCEED
+  value: 0.785398
+---
+test case: Evaluate cos() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cos
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.801143615546934
+---
+test case: Evaluate cos() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cos
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.801143615546934
+---
+test case: Evaluate cos() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cos
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.416146836547142
+---
+test case: Evaluate cosh() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cosh
+  params: ''
+out:
+  return: SUCCEED
+  value: 6.13228947966369
+---
+test case: Evaluate cosh() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cosh
+  params: ''
+out:
+  return: SUCCEED
+  value: 6.13228947966369
+---
+test case: Evaluate cosh() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: cosh
+  params: ''
+out:
+  return: SUCCEED
+  value: 3.76219569108363
+---
+test case: Evaluate sin() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sin
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.598472144103956
+---
+test case: Evaluate sin() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sin
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.598472144103956
+---
+test case: Evaluate sin() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sin
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.909297426825682
+---
+test case: Evaluate sinh() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sinh
+  params: ''
+out:
+  return: SUCCEED
+  value: 6.05020448103979
+---
+test case: Evaluate sinh() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sinh
+  params: ''
+out:
+  return: SUCCEED
+  value: -6.05020448103979
+---
+test case: Evaluate sinh() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: sinh
+  params: ''
+out:
+  return: SUCCEED
+  value: 3.62686040784702
+---
+test case: Evaluate tan() <- 2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: tan
+  params: ''
+out:
+  return: SUCCEED
+  value: -0.74702229723866
+---
+test case: Evaluate tan() <- -2.5
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -2.5
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: tan
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.74702229723866
+---
+test case: Evaluate tan() <- 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:00:00.000000000 +00:00
+  function: tan
+  params: ''
+out:
+  return: SUCCEED
+  value: -2.18503986326152
 ...
-
