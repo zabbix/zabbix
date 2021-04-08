@@ -1169,14 +1169,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$pos_left = 0;
 
 		foreach ($expression_data->getTokens() as $token) {
-			if ($token instanceof CParserResult) {
-				$token_pos = $token->pos;
-				$token_length = $token->length;
-			}
-			else {
-				$token_pos = $token->pos;
-				$token_length = $token->length;
-			}
+			$token_pos = $token->pos;
+			$token_length = $token->length;
 
 			if ($pos_left != $token_pos) {
 				$expression[] = substr($source, $pos_left, $token_pos - $pos_left);
@@ -1213,19 +1207,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 	private static function makeTriggerFunctionExpression(CFunctionParserResult $fn, array &$macro_values,
 			array &$usermacro_values, array $options) {
+		$parameters_str = $fn->parameters;
 		$left = $fn->params_raw['pos'] + $fn->pos + 1;
 		$expression = [];
 
-		$parameters_str = $fn->parameters;
 		for ($i = count($fn->params_raw['parameters']) - 1; $i >= 0; $i--) {
 			$param = $fn->params_raw['parameters'][$i];
 
-			if ($param instanceof CParserResult) {
-				$string_after = substr($parameters_str, $param->pos - $left + $param->length);
-				$parameters_str = substr($parameters_str, 0, $param->pos - $left);
-				array_unshift($expression, $string_after);
-			}
+			// Add substring located between parsed parameters (like comma and space).
+			array_unshift($expression, substr($parameters_str, $param->pos - $left + $param->length));
+			$parameters_str = substr($parameters_str, 0, $param->pos - $left);
 
+			// Add parameter.
 			if ($param instanceof CFunctionIdParserResult) {
 				array_unshift($expression, $macro_values[$param->match]);
 			}
@@ -1234,11 +1227,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$options
 				));
 			}
+			else {
+				array_unshift($expression, $param->match);
+			}
 		}
 
-		if ($parameters_str) {
-			array_unshift($expression, $parameters_str);
-		}
+		array_unshift($expression, $parameters_str);
 		$expression = array_filter($expression);
 
 		array_unshift($expression, $options['html'] ? bold($fn->function.'(') : $fn->function.'(');
