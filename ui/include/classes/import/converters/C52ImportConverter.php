@@ -247,6 +247,11 @@ class C52ImportConverter extends CConverter {
 		$result = [];
 
 		foreach ($item_prototypes as $item_prototype) {
+			if ($item_prototype['type'] === CXmlConstantName::AGGREGATE) {
+				$item_prototype['type'] = CXmlConstantName::CALCULATED;
+				$item_prototype['params'] = $this->aggregate_item_key_converter->convert($item_prototype['key']);
+			}
+
 			if (array_key_exists('trigger_prototypes', $item_prototype)) {
 				foreach ($item_prototype['trigger_prototypes'] as &$trigger_prototype) {
 					$trigger_prototype = $this->convertTrigger($trigger_prototype, $hostname, $item_prototype['key']);
