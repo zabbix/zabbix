@@ -6,6 +6,8 @@ New features:
 ...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+.........T [ZBX-18667] fixed code spelling in templates (abakaldin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
 .........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
 ..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
