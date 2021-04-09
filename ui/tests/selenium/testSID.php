@@ -142,17 +142,6 @@ class testSID extends CWebTest {
 					'ids%5B1%5D=100036&update=1&location_url=triggers.php%3Fcontext%3Dhost&context=host&'.
 					'visible%5Bmanual_close%5D=1&manual_close=1']],
 
-			// Application creation.
-			[['link' => 'zabbix.php?action=application.create&applicationid=0&hostid=50011&form_refresh=1&hostid=50011&'.
-					'name=%D0%B2%D0%B0%D0%BF%D0%B2%D0%BF%D0%B0%D0%B2&add=Add']],
-
-			// Application update.
-			[['link' => 'zabbix.php?action=application.update&applicationid=99010&hostid=50011&form_refresh=1&'.
-					'hostid=50011&name=1+application&update=Update']],
-
-			// Application delete.
-			[['link' => 'zabbix.php?action=application.delete&applicationids%5B0%5D=99014']],
-
 			// Dashboard properties update.
 			[['link' => 'zabbix.php?action=dashboard.update&dashboardid=143&userid=1&name=sssdfsfsdfNew+dashboardss']],
 
@@ -638,12 +627,7 @@ class testSID extends CWebTest {
 					'refresh=30s&rows_per_page=50&url=&roleid=1&user_type=User&action=user.update']],
 
 			// User unblock.
-			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']],
-
-			// User update.
-			[['link' => 'zabbix.php?form_refresh=1&action=user.edit&userid=4&username=admin-zabbix&name=&surname=&'.
-					'user_groups%5B%5D=7&lang=en_GB&timezone=default&theme=default&autologin=0&autologout=0&refresh=29&'.
-					'rows_per_page=50&url=toptriggers.php&roleid=2&user_type=Admin&action=user.update']]
+			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']]
 		];
 	}
 
