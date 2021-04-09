@@ -78,6 +78,11 @@ class testSID extends CWebTest {
 					'expression_type%5D=0&expressions%5B0%5D%5Bexpression%5D=ssssssss&expressions%5B0%5D%5Bexp_delimiter'.
 					'%5D=%2C&expressions%5B0%5D%5Bexpressionid%5D=32&test_string=&update=Update']],
 
+			// Regular expressions test.
+			[['link' => 'zabbix.php?ajaxdata%5BtestString%5D=&ajaxdata%5Bexpressions%5D%5B0%5D%5Bexpression%5D=2&'.
+					'ajaxdata%5Bexpressions%5D%5B0%5D%5Bexpression_type%5D=0&ajaxdata%5Bexpressions%5D%5B0%5D%5B'.
+					'exp_delimiter%5D=%2C&ajaxdata%5Bexpressions%5D%5B0%5D%5Bcase_sensitive%5D=0&action=regex.test']],
+
 			// Timeselector update.
 			[['link' => 'zabbix.php?action=timeselector.update&type=11&method=rangechange']],
 
@@ -150,6 +155,30 @@ class testSID extends CWebTest {
 
 			// Dashboard properties update.
 			[['link' => 'zabbix.php?action=dashboard.update&dashboardid=143&userid=1&name=sssdfsfsdfNew+dashboardss']],
+
+			// Dashboard share update.
+			[['link' => 'zabbix.php?action=dashboard.share.update&form_refresh=1&dashboardid=143&users%5Bempty_user'.
+					'%5D=1&userGroups%5Bempty_group%5D=1&private=0']],
+
+			// Dashboard delete.
+			[['link' => 'zabbix.php?action=dashboard.delete&dashboardids[]=142']],
+
+			// Dashboard update.
+			[['link' => 'zabbix.php?action=dashboard.update&dashboardid=142&userid=1&name=1111&widgets%5B0%5D%5B'.
+					'pos%5D%5Bwidth%5D=12&widgets%5B0%5D%5Bpos%5D%5Bheight%5D=5&widgets%5B0%5D%5Bpos%5D%5Bx%5D=0&'.
+					'widgets%5B0%5D%5Bpos%5D%5By%5D=0&widgets%5B0%5D%5Btype%5D=actionlog&widgets%5B0%5D%5Bname%5D=&'.
+					'widgets%5B0%5D%5Bview_mode%5D=0&widgets%5B0%5D%5Bfields%5D=%7B%22rf_rate%22%3A%22-1%22%2C%22'.
+					'sort_triggers%22%3A%224%22%2C%22show_lines%22%3A%2225%22%7D']],
+
+			// Dashboard widget configure.
+			[['link' => 'zabbix.php?action=dashboard.widget.configure&type=actionlog&view_mode=0&fields=%7B%22rf_rate'.
+					'%22%3A%22-1%22%2C%22sort_triggers%22%3A%224%22%2C%22show_lines%22%3A%2225%22%7D']],
+
+			// Dashboard widget refresh rate.
+			[['link' => 'zabbix.php?action=dashboard.widget.rfrate&widgetid=2002&rf_rate=120']],
+
+			// Dashboard widget sanitize.
+			[['link' => 'zabbix.php?action=dashboard.widget.sanitize&fields=%7B%22reference%22%3A%22IACGE%22%7D&type=navtree']],
 
 			// Template dashboard update/create.
 			[['link' => 'zabbix.php?action=template.dashboard.update&templateid=10076&name=New+dashboard']],
@@ -228,15 +257,16 @@ class testSID extends CWebTest {
 			// Correlation condition delete.
 			[['link' => 'zabbix.php?action=correlation.delete&correlationids%5B0%5D=99005']],
 
+			// Correlation condition add.
+			[['link' => 'zabbix.php?action=correlation.condition.add&form_refresh=2&name=add&evaltype=0&formula=&'.
+					'description=ssdsd&op_close_old=1&op_close_new=1&status=0&new_condition%5Btype%5D=0&new_condition%5B'.
+					'operator%5D=0&new_condition%5Btag%5D=1111&add_condition=1']],
+
 			// GUI update.
 			[['link' => 'zabbix.php?action=gui.update&form_refresh=1&default_lang=en_GB&default_timezone=system&'.
 					'default_theme=blue-theme&search_limit=1000&max_overview_table_size=50&max_in_table=51&'.
 					'server_check_interval=0&work_period=1-5%2C09%3A00-18%3A00&show_technical_errors=0&'.
 					'history_period=24h&period_default=1h&max_period=2y&update=Update']],
-
-			// Dashboard share update.
-			[['link' => 'zabbix.php?action=dashboard.share.update&form_refresh=1&dashboardid=143&users%5Bempty_user'.
-					'%5D=1&userGroups%5Bempty_group%5D=1&private=0']],
 
 			// Housekeeping update.
 			[['link' => 'zabbix.php?action=housekeeping.update&form_refresh=1&hk_events_mode=1&hk_events_trigger=365d&'.
@@ -261,6 +291,15 @@ class testSID extends CWebTest {
 
 			// User group delete.
 			[['link' => 'zabbix.php?action=usergroup.delete&usrgrpids%5B0%5D=93']],
+
+			// User group group right add.
+			[['link' => 'zabbix.php?new_group_right%5Bgroupids%5D%5B%5D=50012&new_group_right%5Binclude_subgroups%5D=0&'.
+					'new_group_right%5Bpermission%5D=-1&group_rights%5B0%5D%5Bname%5D=&group_rights%5B0%5D%5Bgrouped%5D=1&'.
+					'group_rights%5B0%5D%5Bpermission%5D=-1&action=usergroup.groupright.add']],
+
+			// User group tag filter add.
+			[['link' => 'zabbix.php?new_tag_filter%5Binclude_subgroups%5D=0&new_tag_filter%5Btag%5D=&new_tag_filter'.
+					'%5Bvalue%5D=&action=usergroup.tagfilter.add']],
 
 			// Script creation.
 			[['link' => 'zabbix.php?form_refresh=1&form=1&scriptid=0&name=11111&scope=1&menu_path=&type=5&execute_on=0&'.
@@ -330,6 +369,12 @@ class testSID extends CWebTest {
 			// Proxy delete.
 			[['link' => 'zabbix.php?action=proxy.delete&proxyids[]=99455']],
 
+			// Proxy host disable.
+			[['link' => 'zabbix.php?form_refresh=1&proxyids%5B20000%5D=20000&action=proxy.hostdisable']],
+
+			// Proxy host enable.
+			[['link' => 'zabbix.php?form_refresh=1&proxyids%5B20000%5D=20000&action=proxy.hostenable']],
+
 			// Authentication update.
 			[['link' => 'zabbix.php?form_refresh=3&action=authentication.update&db_authentication_type=0&'.
 					'authentication_type=0&http_auth_enabled=1&http_login_form=0&http_strip_domains=&'.
@@ -381,7 +426,199 @@ class testSID extends CWebTest {
 					'login_block=30s&validate_uri_schemes=1&uri_valid_schemes=http%2Chttps%2Cftp%2Cfile'.
 					'%2Cmailto%2Ctel%2Cssh&x_frame_options=SAMEORIGIN&iframe_sandboxing_enabled=1&'.
 					'iframe_sandboxing_exceptions=&socket_timeout=4s&connect_timeout=3s&media_type_test_timeout=65s&'.
-					'script_timeout=60s&item_test_timeout=60s&update=Update']]
+					'script_timeout=60s&item_test_timeout=60s&update=Update']],
+
+			// Application creation.
+			[['link' => 'zabbix.php?action=application.create&applicationid=0&hostid=50013&form_refresh=1&hostid=50013&'.
+					'name=1111&add=Add']],
+
+			// Application delete.
+			[['link' => 'zabbix.php?action=application.delete&applicationids%5B0%5D=99014']],
+
+			// Application disable.
+			[['link' => 'zabbix.php?form_refresh=1&applicationids%5B99013%5D=99013&action=application.disable']],
+
+			// Application enable.
+			[['link' => 'zabbix.php?form_refresh=1&applicationids%5B99013%5D=99013&action=application.enable']],
+
+			// Application update.
+			[['link' => 'zabbix.php?action=application.update&applicationid=99014&hostid=50013&form_refresh=1&'.
+					'hostid=50013&name=111111&update=Update']],
+
+			// Discovery create.
+			[['link' => 'zabbix.php?form_refresh=1&name=11111&proxy_hostid=0&iprange=192.168.0.1-254&delay=1h&'.
+					'dchecks%5Bnew1%5D%5Btype%5D=3&dchecks%5Bnew1%5D%5Bports%5D=21&dchecks%5Bnew1%5D%5B'.
+					'snmpv3_securitylevel%5D=0&dchecks%5Bnew1%5D%5Bsnmpv3_authprotocol%5D=0&dchecks%5Bnew1%5D%5B'.
+					'snmpv3_privprotocol%5D=0&dchecks%5Bnew1%5D%5Bname%5D=FTP&dchecks%5Bnew1%5D%5Bhost_source%5D=1&dchecks'.
+					'%5Bnew1%5D%5Bname_source%5D=0&dchecks%5Bnew1%5D%5Bdcheckid%5D=new1&uniqueness_criteria=-1&host_source='.
+					'1&name_source=0&status=0&action=discovery.create']],
+
+			// Discovery delete.
+			[['link' => 'zabbix.php?form_refresh=1&druleids%5B7%5D=7&action=discovery.delete']],
+
+			// Discovery disable.
+			[['link' => 'zabbix.php?druleids[0]=2&action=discovery.disable']],
+
+			// Discovery enable.
+			[['link' => 'zabbix.php?druleids[0]=2&action=discovery.enable']],
+
+			// Discovery update.
+			[['link' => 'zabbix.php?form_refresh=1&druleid=2&name=Local+network&proxy_hostid=0&iprange=192.168.0.1-254&'.
+					'delay=2h&dchecks%5B2%5D%5Btype%5D=9&dchecks%5B2%5D%5Bdcheckid%5D=2&dchecks%5B2%5D%5Bports%5D=10050&'.
+					'dchecks%5B2%5D%5Buniq%5D=0&dchecks%5B2%5D%5Bhost_source%5D=1&dchecks%5B2%5D%5Bname_source%5D=0&'.
+					'dchecks%5B2%5D%5Bname%5D=Zabbix+agent+%22system.uname%22&dchecks%5B2%5D%5Bkey_%5D=system.uname&'.
+					'uniqueness_criteria=-1&host_source=1&name_source=0&status=1&action=discovery.update']],
+
+			// Export.
+			[['link' => 'zabbix.php?action=export.hosts&format=yaml&backurl=hosts.php&form_refresh=1&hosts%5B50011%5D=50011']],
+
+			// Favourite create.
+			[['link' => 'zabbix.php?action=favourite.create&object=screenid&objectid=200021']],
+
+			// Favourite delete.
+			[['link' => 'zabbix.php?action=favourite.delete&object=screenid&objectid=200021']],
+
+			// Host creation.
+			[['link' => 'hosts.php?form_refresh=1&form=create&flags=0&tls_connect=1&tls_accept=1&host=1111&visiblename=&'.
+					'groups%5B%5D%5Bnew%5D=111&interfaces%5B1%5D%5Bitems%5D=&interfaces%5B1%5D%5Blocked%5D=&'.
+					'interfaces%5B1%5D%5BisNew%5D=true&interfaces%5B1%5D%5Binterfaceid%5D=1&interfaces%5B1%5D%5Btype%5D=1&'.
+					'interfaces%5B1%5D%5Bip%5D=127.0.0.1&interfaces%5B1%5D%5Bdns%5D=&interfaces%5B1%5D%5Buseip%5D=1&'.
+					'interfaces%5B1%5D%5Bport%5D=10050&mainInterfaces%5B1%5D=1&description=&proxy_hostid=0&status=0&'.
+					'ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&tags%5B0%5D%5Btag%5D=&'.
+					'tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&'.
+					'macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&tls_connect=1&'.
+					'tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject=&add=Add']],
+
+			// Host update.
+			[['link' => 'hosts.php?form_refresh=1&form=update&flags=0&tls_connect=1&tls_accept=1&psk_edit_mode=1&'.
+					'hostid=99452&host=11111111&visiblename=&groups%5B%5D=50020&interfaces%5B55079%5D%5Bitems%5D=false&'.
+					'interfaces%5B55079%5D%5BisNew%5D=&interfaces%5B55079%5D%5Binterfaceid%5D=55079&interfaces'.
+					'%5B55079%5D%5Btype%5D=1&interfaces%5B55079%5D%5Bip%5D=127.0.0.1&interfaces%5B55079%5D%5Bdns%5D=&'.
+					'interfaces%5B55079%5D%5Buseip%5D=1&interfaces%5B55079%5D%5Bport%5D=10050&mainInterfaces%5B1%5D=55079&'.
+					'description=&proxy_hostid=0&status=0&ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&'.
+					'tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&'.
+					'macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&'.
+					'tls_connect=1&tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject=&update=Update']],
+
+			// Host delete.
+			[['link' => 'hosts.php?delete=1&form=update&hostid=99452']],
+
+			// Host disable.
+			[['link' => 'hosts.php?action=host.massdisable&hosts[0]=50011']],
+
+			// Host enable.
+			[['link' => 'hosts.php?action=host.massenable&hosts[0]=50011']],
+
+			// Notifications get.
+			[['link' => 'zabbix.php?action=notifications.get&known_eventids%5B%5D=126']],
+
+			// Notifications mute.
+			[['link' => 'zabbix.php?action=notifications.mute&muted=1']],
+
+			// Popup import.
+			[['link' => 'zabbix.php?rules_preset=host&action=popup.import']],
+
+			// Popup item test edit.
+			[['link' => 'zabbix.php?action=popup.itemtest.edit&key=agent.hostname&delay=1m&value_type=3&item_type=0&'.
+					'itemid=0&interfaceid=50040&hostid=50012&test_type=0&step_obj=-2&show_final_result=1&get_value=1']],
+
+			// Popup item test get value.
+			[['link' => 'zabbix.php?action=popup.itemtest.getvalue&key=agent.hostname&value_type=3&item_type=0&itemid=0&'.
+					'interface%5Baddress%5D=127.0.0.1&interface%5Bport%5D=10050&proxy_hostid=0&test_type=0&hostid=50012&value=']],
+
+			// Popup item test send.
+			[['link' => 'zabbix.php?key=agent.hostname&delay=&value_type=4&item_type=0&itemid=0&interfaceid=0&get_value=1&'.
+					'interface%5Baddress%5D=127.0.0.1&interface%5Bport%5D=10050&proxy_hostid=0&show_final_result=1&'.
+					'test_type=0&hostid=10386&valuemapid=0&value=&action=popup.itemtest.send']],
+
+			// Popup maintenance period.
+			[['link' => 'zabbix.php?index=1&action=popup.maintenance.period']],
+
+			// Popup massupdate host.
+			[['link' => 'zabbix.php?ids%5B%5D=50011&ids%5B%5D=50012&action=popup.massupdate.host']],
+
+			// Popup massupdate item.
+			[['link' => 'zabbix.php?ids%5B%5D=99086&context=host&prototype=0&action=popup.massupdate.item']],
+
+			// Popup massupdate template.
+			[['link' => 'zabbix.php?ids%5B%5D=10076&action=popup.massupdate.template']],
+
+			// Popup massupdate trigger.
+			[['link' => 'zabbix.php?ids%5B%5D=100034&context=host&action=popup.massupdate.trigger']],
+
+			// Popup media type test edit.
+			[['link' => 'zabbix.php?mediatypeid=29&action=popup.mediatypetest.edit']],
+
+			// Popup media type test send.
+			[['link' => 'zabbix.php?action=popup.mediatypetest.send&mediatypeid=10&parameters%5B0%5D%5Bname%5D=alert_message&'.
+					'parameters%5B0%5D%5Bvalue%5D=%7BALERT.MESSAGE%7D&parameters%5B1%5D%5Bname%5D=alert_subject&'.
+					'parameters%5B1%5D%5Bvalue%5D=%7BALERT.SUBJECT%7D&parameters%5B2%5D%5Bname%5D=discord_endpoint&'.
+					'parameters%5B2%5D%5Bvalue%5D=%7BALERT.SENDTO%7D&parameters%5B3%5D%5Bname%5D=event_date&parameters'.
+					'%5B3%5D%5Bvalue%5D=%7BEVENT.DATE%7D&parameters%5B4%5D%5Bname%5D=event_id&parameters%5B4%5D%5Bvalue'.
+					'%5D=%7BEVENT.ID%7D&parameters%5B5%5D%5Bname%5D=event_name&parameters%5B5%5D%5Bvalue%5D=%7'.
+					'BEVENT.NAME%7D&parameters%5B6%5D%5Bname%5D=event_nseverity&parameters%5B6%5D%5Bvalue%5D=%7'.
+					'BEVENT.NSEVERITY%7D&parameters%5B7%5D%5Bname%5D=event_opdata&parameters%5B7%5D%5Bvalue%5D=%7'.
+					'BEVENT.OPDATA%7D&parameters%5B8%5D%5Bname%5D=event_recovery_date&parameters%5B8%5D%5Bvalue%5D=%7'.
+					'BEVENT.RECOVERY.DATE%7D&parameters%5B9%5D%5Bname%5D=event_recovery_time&parameters%5B9%5D%5Bvalue'.
+					'%5D=%7BEVENT.RECOVERY.TIME%7D&parameters%5B10%5D%5Bname%5D=event_severity&parameters%5B10%5D%5Bvalue'.
+					'%5D=%7BEVENT.SEVERITY%7D&parameters%5B11%5D%5Bname%5D=event_source&parameters%5B11%5D%5Bvalue%5D=%7'.
+					'BEVENT.SOURCE%7D&parameters%5B12%5D%5Bname%5D=event_tags&parameters%5B12%5D%5Bvalue%5D=%7BEVENT.TAGS%7'.
+					'D&parameters%5B13%5D%5Bname%5D=event_time&parameters%5B13%5D%5Bvalue%5D=%7BEVENT.TIME%7D&parameters'.
+					'%5B14%5D%5Bname%5D=event_update_action&parameters%5B14%5D%5Bvalue%5D=%7BEVENT.UPDATE.ACTION%7D'.
+					'&parameters%5B15%5D%5Bname%5D=event_update_date&parameters%5B15%5D%5Bvalue%5D=%7BEVENT.UPDATE.DATE%7'.
+					'D&parameters%5B16%5D%5Bname%5D=event_update_message&parameters%5B16%5D%5Bvalue%5D=%7BEVENT.'.
+					'UPDATE.MESSAGE%7D&parameters%5B17%5D%5Bname%5D=event_update_status&parameters%5B17%5D%5Bvalue%5D=%7'.
+					'BEVENT.UPDATE.STATUS%7D&parameters%5B18%5D%5Bname%5D=event_update_time&parameters%5B18%5D%5Bvalue%5D=%7'.
+					'BEVENT.UPDATE.TIME%7D&parameters%5B19%5D%5Bname%5D=event_update_user&parameters%5B19%5D%5Bvalue%5D=%7'.
+					'BUSER.FULLNAME%7D&parameters%5B20%5D%5Bname%5D=event_value&parameters%5B20%5D%5Bvalue%5D='.
+					'%7BEVENT.VALUE%7D&parameters%5B21%5D%5Bname%5D=host_ip&parameters%5B21%5D%5Bvalue%5D=%7BHOST.IP%7D&'.
+					'parameters%5B22%5D%5Bname%5D=host_name&parameters%5B22%5D%5Bvalue%5D=%7BHOST.NAME%7D&parameters'.
+					'%5B23%5D%5Bname%5D=trigger_description&parameters%5B23%5D%5Bvalue%5D=%7BTRIGGER.DESCRIPTION%7D&'.
+					'parameters%5B24%5D%5Bname%5D=trigger_id&parameters%5B24%5D%5Bvalue%5D=%7BTRIGGER.ID%7D&parameters'.
+					'%5B25%5D%5Bname%5D=use_default_message&parameters%5B25%5D%5Bvalue%5D=false&parameters%5B26%5D%5Bname'.
+					'%5D=zabbix_url&parameters%5B26%5D%5Bvalue%5D=%7B%24ZABBIX.URL%7D']],
+
+			// Popup script execution.
+			[['link' => 'zabbix.php?scriptid=1&hostid=10386&action=popup.scriptexec']],
+
+			// Profile update.
+			[['link' => 'zabbix.php?form_refresh=1&action=userprofile.edit&userid=1&medias%5B3%5D%5Bmediatypeid%5D=10&'.
+					'medias%5B3%5D%5Bperiod%5D=1-7%2C00%3A00-24%3A00&medias%5B3%5D%5Bsendto%5D=test%40jabber.com&'.
+					'medias%5B3%5D%5Bseverity%5D=16&medias%5B3%5D%5Bactive%5D=0&medias%5B3%5D%5Bname%5D=Discord&'.
+					'medias%5B3%5D%5Bmediatype%5D=4&medias%5B1%5D%5Bmediatypeid%5D=1&medias%5B1%5D%5Bperiod%5D='.
+					'1-7%2C00%3A00-24%3A00&medias%5B1%5D%5Bsendto%5D%5B0%5D=test2%40zabbix.com&medias%5B1%5D%5B'.
+					'severity%5D=60&medias%5B1%5D%5Bactive%5D=1&medias%5B1%5D%5Bname%5D=Email&medias%5B1%5D%5B'.
+					'mediatype%5D=0&medias%5B0%5D%5Bmediatypeid%5D=1&medias%5B0%5D%5Bperiod%5D=1-7%2C00%3A00-24%3A00&'.
+					'medias%5B0%5D%5Bsendto%5D%5B0%5D=test%40zabbix.com&medias%5B0%5D%5Bseverity%5D=63&medias%5B0%5D%5B'.
+					'active%5D=0&medias%5B0%5D%5Bname%5D=Email&medias%5B0%5D%5Bmediatype%5D=0&medias%5B4%5D%5B'.
+					'mediatypeid%5D=12&medias%5B4%5D%5Bperiod%5D=6-7%2C09%3A00-18%3A00&medias%5B4%5D%5Bsendto%5D='.
+					'test_account&medias%5B4%5D%5Bseverity%5D=63&medias%5B4%5D%5Bactive%5D=0&medias%5B4%5D%5Bname%5D='.
+					'Jira&medias%5B4%5D%5Bmediatype%5D=4&medias%5B2%5D%5Bmediatypeid%5D=3&medias%5B2%5D%5Bperiod%5D='.
+					'1-7%2C00%3A00-24%3A00&medias%5B2%5D%5Bsendto%5D=123456789&medias%5B2%5D%5Bseverity%5D=32&'.
+					'medias%5B2%5D%5Bactive%5D=0&medias%5B2%5D%5Bname%5D=SMS&medias%5B2%5D%5Bmediatype%5D=2&lang=default&'.
+					'timezone=default&theme=default&autologin=1&autologout=0&refresh=30s&rows_per_page=99&url=&'.
+					'messages%5Benabled%5D=0&action=userprofile.update']],
+
+			// User creation.
+			[['link' => 'zabbix.php?form_refresh=2&action=user.edit&userid=0&username=1111&name=&surname=&'.
+					'user_groups%5B%5D=8&password1=1&password2=1&lang=default&timezone=default&theme=default&autologin=0&'.
+					'autologout=0&refresh=30s&rows_per_page=50&url=&roleid=1&user_type=User&action=user.create']],
+
+			// User delete.
+			[['link' => 'zabbix.php?action=user.delete&userids[]=95']],
+
+			// User update.
+			[['link' => 'zabbix.php?form_refresh=1&action=user.edit&userid=95&username=11111&name=&surname=&'.
+					'user_groups%5B%5D=8&lang=default&timezone=default&theme=default&autologin=0&autologout=0&'.
+					'refresh=30s&rows_per_page=50&url=&roleid=1&user_type=User&action=user.update']],
+
+			// User unblock.
+			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']],
+
+			// User update.
+			[['link' => 'zabbix.php?form_refresh=1&action=user.edit&userid=4&username=admin-zabbix&name=&surname=&'.
+					'user_groups%5B%5D=7&lang=en_GB&timezone=default&theme=default&autologin=0&autologout=0&refresh=29&'.
+					'rows_per_page=50&url=toptriggers.php&roleid=2&user_type=Admin&action=user.update']]
 		];
 	}
 
