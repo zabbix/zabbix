@@ -393,9 +393,10 @@ class C52TriggerExpressionConverter extends CConverter {
 	}
 
 	private static function convertTimeshift(string $param): string {
-		return (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
-			? 'now-'.$m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
+		$param = (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
+			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
+		return 'now-'.$param;
 	}
 
 	private static function paramsToString(array $parameters): string {
