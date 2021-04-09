@@ -2339,6 +2339,880 @@ out:
 	return ret;
 }
 
+static int	validate_params_and_get_data(DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		zbx_vector_history_record_t *values, char **error)
+{
+	int			arg1, seconds = 0, nvalues = 0, time_shift;
+	zbx_value_type_t	arg1_type;
+	zbx_timespec_t		ts_end = *ts;
+
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+	{
+		*error = zbx_strdup(*error, "invalid value type");
+		return FAIL;
+	}
+
+	if (1 != num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		return FAIL;
+	}
+
+	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
+			ZBX_VALUE_NONE == arg1_type)
+	{
+		*error = zbx_strdup(*error, "invalid parameter");
+		return FAIL;
+	}
+
+	ts_end.sec -= time_shift;
+
+	switch (arg1_type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = arg1;
+			break;
+		case ZBX_VALUE_NVALUES:
+			nvalues = arg1;
+			break;
+		case ZBX_VALUE_NONE:
+		default:
+			*error = zbx_strdup(*error, "invalid type of first argument");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_FIRST                                                   *
+ *                                                                            *
+ * Purpose: evaluate function 'first' for the item                            *
+ *                                                                            *
+ * Parameters: value - dynamic buffer                                         *
+ *             item - item (performance metric)                               *
+ *             parameters - Nth first value and time shift (optional)         *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_FIRST(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
+{
+	int				arg1 = 1, ret = FAIL, seconds = 0, time_shift;
+	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			ts_end = *ts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (1 != num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift))
+	{
+		*error = zbx_strdup(*error, "invalid parameter");
+		goto out;
+	}
+
+	switch (arg1_type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = arg1;
+			break;
+		case ZBX_VALUE_NONE:
+			*error = zbx_strdup(*error, "the first argument is not specified");
+			goto out;
+		case ZBX_VALUE_NVALUES:
+			*error = zbx_strdup(*error, "the first argument cannot be number of value");
+			goto out;
+		default:
+			*error = zbx_strdup(*error, "invalid type of first argument");
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+	}
+
+	if (0 >= arg1)
+	{
+		*error = zbx_strdup(*error, "the first argument must be greater than 0");
+		goto out;
+	}
+
+	ts_end.sec -= time_shift;
+
+	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, 0, &ts_end))
+	{
+		if (0 < values.values_num)
+		{
+			zbx_history_value2variant(&values.values[values.values_num - 1].value, item->value_type, value);
+			ret = SUCCEED;
+		}
+		else
+		{
+			*error = zbx_strdup(*error, "not enough data");
+			goto out;
+		}
+	}
+	else
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: arithmetic_mean_dbl                                              *
+ *                                                                            *
+ * Purpose: calculate arithmetic mean (i.e. average)                          *
+ *                                                                            *
+ * Parameters: v - [IN] vector with input data                                *
+ *             n - [IN] number of elements in 'v', must be > 0.               *
+ *                                                                            *
+ ******************************************************************************/
+static double	arithmetic_mean_dbl(const zbx_history_record_t *v, int n)
+{
+	double	sum = 0;
+	int	i;
+
+	for (i = 0; i < n; i++)
+		sum += v[i].value.dbl;
+
+	return sum / n;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: arithmetic_mean_uint64                                           *
+ *                                                                            *
+ * Purpose: calculate arithmetic mean (i.e. average)                          *
+ *                                                                            *
+ * Parameters: v - [IN] vector with input data                                *
+ *             n - [IN] number of elements in 'v', must be > 0.               *
+ *                                                                            *
+ ******************************************************************************/
+static double	arithmetic_mean_uint64(const zbx_history_record_t *v, int n)
+{
+	zbx_uint64_t	sum = 0;
+	int		i;
+
+	for (i = 0; i < n; i++)
+		sum += v[i].value.ui64;
+
+	return (double)sum / n;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_KURTOSIS                                                *
+ *                                                                            *
+ * Purpose: evaluate function 'kurtosis' for the item                         *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_KURTOSIS(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != validate_params_and_get_data(item, parameters, ts, &values, error))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		double	mean, second_moment = 0, fourth_moment = 0, second_moment2, result = 0;
+		int	i;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_dbl(values.values, values.values_num);
+
+			/* step 2: calculate the second and the fourth moments */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = values.values[i].value.dbl - mean;
+
+				second_moment += diff * diff;
+				fourth_moment += diff * diff * diff * diff;
+			}
+		}
+		else	/* ITEM_VALUE_TYPE_UINT64 */
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_uint64(values.values, values.values_num);
+
+			/* step 2: calculate the second and the fourth moments */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = (double)values.values[i].value.ui64 - mean;
+
+				second_moment += diff * diff;
+				fourth_moment += diff * diff * diff * diff;
+			}
+		}
+
+		second_moment /= values.values_num;
+		fourth_moment /= values.values_num;
+
+		/* step 3: calculate kurtosis */
+
+		second_moment2 = second_moment * second_moment;
+
+		if (FP_NORMAL != fpclassify(second_moment2) ||
+				(FP_ZERO != fpclassify(fourth_moment) && FP_NORMAL != fpclassify(fourth_moment)))
+		{
+			*error = zbx_strdup(*error, "cannot calculate kurtosis() value");
+			goto out;
+		}
+
+		result = fourth_moment / second_moment2;
+
+		if (FP_ZERO != fpclassify(result) && FP_NORMAL != fpclassify(result))
+		{
+			*error = zbx_strdup(*error, "cannot calculate kurtosis() value");
+			goto out;
+		}
+
+		zbx_variant_set_dbl(value, result);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "not enough data");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: median_dbl                                                       *
+ *                                                                            *
+ * Purpose: find median (helper function)                                     *
+ *                                                                            *
+ * Parameters: v - [IN/OUT] history data vector. NOTE: it will be modified    *
+ *                 (sorted in place)                                          *
+ *                                                                            *
+ * Return value: median                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static double	median_dbl(zbx_vector_history_record_t *v)
+{
+	zbx_vector_history_record_sort(v, (zbx_compare_func_t)history_record_float_compare);
+
+	if (0 == v->values_num % 2)	/* number of elements is even */
+	{
+		return (v->values[v->values_num / 2 - 1].value.dbl + v->values[v->values_num / 2].value.dbl) / 2.0;
+	}
+	else
+		return v->values[v->values_num / 2].value.dbl;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: median_ui64                                                      *
+ *                                                                            *
+ * Purpose: find median (helper function)                                     *
+ *                                                                            *
+ * Parameters: v - [IN/OUT] history data vector. NOTE: it will be modified    *
+ *                 (sorted in place)                                          *
+ *                                                                            *
+ * Return value: median                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static double	median_ui64(zbx_vector_history_record_t *v)
+{
+	zbx_vector_history_record_sort(v, (zbx_compare_func_t)history_record_uint64_compare);
+
+	if (0 == v->values_num % 2)	/* number of elements is even */
+	{
+		return (double)(v->values[v->values_num / 2 - 1].value.ui64 +
+				v->values[v->values_num / 2].value.ui64) / 2.0;
+	}
+	else
+		return (double)v->values[v->values_num / 2].value.ui64;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_MAD                                                     *
+ *                                                                            *
+ * Purpose: calculate 'median absolute deviation' for the item                *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_MAD(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != validate_params_and_get_data(item, parameters, ts, &values, error))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		double	median;
+		int	i;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			/* step 1: find median of input data */
+			median = median_dbl(&values);
+
+			/* step 2: find absolute differences of input data and median. Reuse history data vector. */
+
+			for (i = 0; i < values.values_num; i++)
+				values.values[i].value.dbl = fabs(values.values[i].value.dbl - median);
+
+			/* step 3: find median of the differences */
+			median = median_dbl(&values);
+		}
+		else	/* ITEM_VALUE_TYPE_UINT64 */
+		{
+			/* step 1: find median of input data */
+			median = median_ui64(&values);
+
+			/* step 2: find absolute differences of input data and median. Reuse history data vector and */
+			/* take advantage of storage union of 'ui64' and 'dbl' elements of type 'history_value_t' in */
+			/* the history data vector. */
+
+			for (i = 0; i < values.values_num; i++)
+				values.values[i].value.dbl = fabs((double)values.values[i].value.ui64 - median);
+
+			/* step 3: find median of the differences */
+			median = median_dbl(&values);
+		}
+
+		zbx_variant_set_dbl(value, median);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "not enough data");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_SKEWNESS                                                *
+ *                                                                            *
+ * Purpose: evaluate 'skewness' function for the item                         *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_SKEWNESS(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != validate_params_and_get_data(item, parameters, ts, &values, error))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		double	mean, std_dev = 0, sum_diff3 = 0, divisor, result = 0;
+		int	i;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_dbl(values.values, values.values_num);
+
+			/* step 2: calculate the standard deviation and sum_diff3 */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = values.values[i].value.dbl - mean;
+
+				std_dev += diff * diff;
+				sum_diff3 += diff * diff * diff;
+			}
+		}
+		else	/* ITEM_VALUE_TYPE_UINT64 */
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_uint64(values.values, values.values_num);
+
+			/* step 2: calculate the standard deviation and sum_diff3 */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = (double)values.values[i].value.ui64 - mean;
+
+				std_dev += diff * diff;
+				sum_diff3 += diff * diff * diff;
+			}
+		}
+
+		std_dev = sqrt(std_dev / values.values_num);
+
+		/* step 3: calculate skewness */
+
+		divisor = values.values_num * std_dev * std_dev * std_dev;
+
+		if (FP_NORMAL != fpclassify(divisor) ||
+				(FP_ZERO != fpclassify(sum_diff3) && FP_NORMAL != fpclassify(sum_diff3)))
+		{
+			*error = zbx_strdup(*error, "cannot calculate skewness() value");
+			goto out;
+		}
+
+		result = sum_diff3 / divisor;
+
+		zbx_variant_set_dbl(value, result);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "not enough data");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_STDDEVPOP                                               *
+ *                                                                            *
+ * Purpose: evaluate function 'stdevpop' (population standard deviation) for  *
+ *          the item                                                          *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Comments: algorithm was taken from "Population standard deviation of       *
+ *           grades of eight students" in                                     *
+ *           https://en.wikipedia.org/wiki/Standard_deviation                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_STDDEVPOP(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != validate_params_and_get_data(item, parameters, ts, &values, error))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		double	mean, std_dev = 0;
+		int	i;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_dbl(values.values, values.values_num);
+
+			/* step 2: calculate the standard deviation */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = values.values[i].value.dbl - mean;
+
+				std_dev += diff * diff;
+			}
+		}
+		else	/* ITEM_VALUE_TYPE_UINT64 */
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_uint64(values.values, values.values_num);
+
+			/* step 2: calculate the standard deviation */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = (double)values.values[i].value.ui64 - mean;
+
+				std_dev += diff * diff;
+			}
+		}
+
+		std_dev = sqrt(std_dev / values.values_num);
+
+		zbx_variant_set_dbl(value, std_dev);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "not enough data");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_STDDEVSAMP                                              *
+ *                                                                            *
+ * Purpose: evaluate function 'stddevsamp' (sample standard deviation) for    *
+ *          the item                                                          *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Comments: algorithm was taken from "Population standard deviation of       *
+ *           grades of eight students" in                                     *
+ *           https://en.wikipedia.org/wiki/Standard_deviation                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_STDDEVSAMP(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != validate_params_and_get_data(item, parameters, ts, &values, error))
+		goto out;
+
+	if (1 < values.values_num)
+	{
+		double	mean, std_dev = 0;
+		int	i;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_dbl(values.values, values.values_num);
+
+			/* step 2: calculate the standard deviation */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = values.values[i].value.dbl - mean;
+
+				std_dev += diff * diff;
+			}
+		}
+		else	/* ITEM_VALUE_TYPE_UINT64 */
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_uint64(values.values, values.values_num);
+
+			/* step 2: calculate the standard deviation */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = (double)values.values[i].value.ui64 - mean;
+
+				std_dev += diff * diff;
+			}
+		}
+
+		std_dev = sqrt(std_dev / (values.values_num - 1));	/* divided by 'n - 1' because */
+									/* sample standard deviation */
+		zbx_variant_set_dbl(value, std_dev);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "not enough data");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_SUMOFSQUARES                                            *
+ *                                                                            *
+ * Purpose: evaluate sum of squares for the item                              *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_SUMOFSQUARES(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != validate_params_and_get_data(item, parameters, ts, &values, error))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		double	sum = 0;
+		int	i;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			for (i = 0; i < values.values_num; i++)
+				sum += values.values[i].value.dbl * values.values[i].value.dbl;
+		}
+		else	/* ITEM_VALUE_TYPE_UINT64 */
+		{
+			for (i = 0; i < values.values_num; i++)
+				sum += (double)values.values[i].value.ui64 * (double)values.values[i].value.ui64;
+		}
+
+		if (FP_ZERO != fpclassify(sum) && FP_NORMAL != fpclassify(sum))
+		{
+			*error = zbx_strdup(*error, "cannot calculate sumofsquares() value");
+			goto out;
+		}
+
+		zbx_variant_set_dbl(value, sum);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "not enough data");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_VARPOP                                                  *
+ *                                                                            *
+ * Purpose: evaluate function 'varpop' (population variance) for the item     *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Comments: algorithm was taken from "Population variance" in                *
+ *           https://en.wikipedia.org/wiki/Variance#Population_variance       *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_VARPOP(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != validate_params_and_get_data(item, parameters, ts, &values, error))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		double	mean, result = 0;
+		int	i;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_dbl(values.values, values.values_num);
+
+			/* step 2: calculate the population variance */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = values.values[i].value.dbl - mean;
+
+				result += diff * diff;
+			}
+		}
+		else	/* ITEM_VALUE_TYPE_UINT64 */
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_uint64(values.values, values.values_num);
+
+			/* step 2: calculate the population variance */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = (double)values.values[i].value.ui64 - mean;
+
+				result += diff * diff;
+			}
+		}
+
+		result /= values.values_num;	/* divide by 'number of values' for population variance */
+
+		zbx_variant_set_dbl(value, result);
+
+		ret = SUCCEED;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "result for VARPOP is empty");
+		*error = zbx_strdup(*error, "not enough data");
+	}
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_VARSAMP                                                 *
+ *                                                                            *
+ * Purpose: evaluate function 'varsamp' (sample variance) for the item        *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Comments: algorithm was taken from "Sample variance" in                    *
+ *           https://en.wikipedia.org/wiki/Variance#Population_variance       *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_VARSAMP(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
+{
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != validate_params_and_get_data(item, parameters, ts, &values, error))
+		goto out;
+
+	if (1 < values.values_num)	/* varsamp requires at least 2 data values*/
+	{
+		double	mean, result = 0;
+		int	i;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_dbl(values.values, values.values_num);
+
+			/* step 2: calculate the sample variance */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = values.values[i].value.dbl - mean;
+
+				result += diff * diff;
+			}
+		}
+		else	/* ITEM_VALUE_TYPE_UINT64 */
+		{
+			/* step 1: calculate arithmetic mean */
+			mean = arithmetic_mean_uint64(values.values, values.values_num);
+
+			/* step 2: calculate the sample variance */
+
+			for (i = 0; i < values.values_num; i++)
+			{
+				double	diff = (double)values.values[i].value.ui64 - mean;
+
+				result += diff * diff;
+			}
+		}
+
+		result /= values.values_num - 1; /* divide by 'number of values' - 1 for unbiased sample variance */
+
+		zbx_variant_set_dbl(value, result);
+
+		ret = SUCCEED;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "not enough data for VARSAMP");
+		*error = zbx_strdup(*error, "not enough data");
+	}
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_function                                                *
@@ -2437,6 +3311,42 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	{
 		ret = evaluate_TREND(value, item, function + 5, parameter, ts, error);
 	}
+	else if (0 == strcmp(function, "first"))
+	{
+		ret = evaluate_FIRST(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "kurtosis"))
+	{
+		ret = evaluate_KURTOSIS(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "mad"))
+	{
+		ret = evaluate_MAD(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "skewness"))
+	{
+		ret = evaluate_SKEWNESS(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "stddevpop"))
+	{
+		ret = evaluate_STDDEVPOP(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "stddevsamp"))
+	{
+		ret = evaluate_STDDEVSAMP(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "sumofsquares"))
+	{
+		ret = evaluate_SUMOFSQUARES(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "varpop"))
+	{
+		ret = evaluate_VARPOP(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "varsamp"))
+	{
+		ret = evaluate_VARSAMP(value, item, parameter, ts, error);
+	}
 	else
 	{
 		*error = zbx_strdup(*error, "function is not supported");
@@ -2466,7 +3376,8 @@ int	zbx_is_trigger_function(const char *name, size_t len)
 {
 	const char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "countdistinct",
 			"nodata", "change", "find", "fuzzytime", "logeventid", "logseverity", "logsource", "band",
-			"forecast", "timeleft", "trendavg", "trendcount", "trendmax", "trendmin", "trendsum",
+			"forecast", "timeleft", "trendavg", "trendcount", "trendmax", "trendmin", "trendsum", "first",
+			"kurtosis", "mad", "skewness", "stddevpop", "stddevsamp", "sumofsquares", "varpop", "varsamp",
 		NULL};
 	const char	**ptr;
 
