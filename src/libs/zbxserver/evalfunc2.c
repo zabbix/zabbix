@@ -517,6 +517,93 @@ out:
 	return ret;
 }
 
+static int	history_record_float_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+{
+	ZBX_RETURN_IF_NOT_EQUAL(d1->value.dbl, d2->value.dbl);
+
+	return 0;
+}
+
+static int	history_record_uint64_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+{
+	ZBX_RETURN_IF_NOT_EQUAL(d1->value.ui64, d2->value.ui64);
+
+	return 0;
+}
+
+static int	history_record_str_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+{
+	return strcmp(d1->value.str, d2->value.str);
+}
+
+static int	history_record_log_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+{
+	int	value_match;
+
+	if (0 != (value_match = strcmp(d1->value.log->value, d2->value.log->value)))
+		return value_match;
+
+	if (NULL != d1->value.log->source && NULL != d2->value.log->source)
+		return strcmp(d1->value.log->source, d2->value.log->source);
+
+	if (NULL != d2->value.log->source)
+		return -1;
+
+	if (NULL != d1->value.log->source)
+		return 1;
+
+	return 0;
+}
+
+/* specialized versions of zbx_vector_history_record_*_uniq() because */
+/* standard versions do not release memory occupied by duplicate elements */
+
+static void	zbx_vector_history_record_str_uniq(zbx_vector_history_record_t *vector, zbx_compare_func_t compare_func)
+{
+	if (2 <= vector->values_num)
+	{
+		int	i = 0, j = 1;
+
+		while (j < vector->values_num)
+		{
+			if (0 != compare_func(&vector->values[i], &vector->values[j]))
+			{
+				i++;
+				j++;
+			}
+			else
+			{
+				zbx_free(vector->values[j].value.str);
+				zbx_vector_history_record_remove(vector, j);
+			}
+		}
+	}
+}
+
+static void	zbx_vector_history_record_log_uniq(zbx_vector_history_record_t *vector, zbx_compare_func_t compare_func)
+{
+	if (2 <= vector->values_num)
+	{
+		int	i = 0, j = 1;
+
+		while (j < vector->values_num)
+		{
+			if (0 != compare_func(&vector->values[i], &vector->values[j]))
+			{
+				i++;
+				j++;
+			}
+			else
+			{
+				zbx_free(vector->values[j].value.log->source);
+				zbx_free(vector->values[j].value.log->value);
+				zbx_free(vector->values[j].value.log);
+				zbx_vector_history_record_remove(vector, j);
+			}
+		}
+	}
+}
+
 #define OP_UNKNOWN	-1
 #define OP_EQ		0
 #define OP_NE		1
@@ -625,6 +712,10 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 	}
 }
 
+/* flags for evaluate_COUNT() */
+#define COUNT_ALL	0
+#define COUNT_DISTINCT	1
+
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_COUNT                                                   *
@@ -645,6 +736,8 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *             ts         - [IN] the function evaluation time                 *
  *             limit      - [IN] the limit of counted values, will return     *
  *                              when the limit is reached                     *
+ *             distinct   - [IN] COUNT_ALL - count all values,                *
+ *                               COUNT_DISTINCT - count distinct values       *
  *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
@@ -652,7 +745,7 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		int limit, char **error)
+		int limit, int distinct, char **error)
 {
 	int				arg1, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
 	int				seconds = 0, nvalues = 0, time_shift;
@@ -846,6 +939,36 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 	{
 		*error = zbx_strdup(*error, "cannot get values from value cache");
 		goto out;
+	}
+
+	if (COUNT_DISTINCT == distinct)
+	{
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_vector_history_record_sort(&values,
+						(zbx_compare_func_t)history_record_uint64_compare);
+				zbx_vector_history_record_uniq(&values,
+						(zbx_compare_func_t)history_record_uint64_compare);
+				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_vector_history_record_sort(&values,
+						(zbx_compare_func_t)history_record_float_compare);
+				zbx_vector_history_record_uniq(&values,
+						(zbx_compare_func_t)history_record_float_compare);
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				zbx_vector_history_record_sort(&values,
+						(zbx_compare_func_t)history_record_log_compare);
+				zbx_vector_history_record_log_uniq(&values,
+						(zbx_compare_func_t)history_record_log_compare);
+				break;
+			default:
+				zbx_vector_history_record_sort(&values,
+						(zbx_compare_func_t)history_record_str_compare);
+				zbx_vector_history_record_str_uniq(&values,
+						(zbx_compare_func_t)history_record_str_compare);
+		}
 	}
 
 	/* skip counting values one by one if both pattern and operator are empty or "" is searched in text values */
@@ -1387,20 +1510,6 @@ out:
 	return ret;
 }
 
-static int	__history_record_float_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(d1->value.dbl, d2->value.dbl);
-
-	return 0;
-}
-
-static int	__history_record_uint64_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(d1->value.ui64, d2->value.ui64);
-
-	return 0;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_PERCENTILE                                              *
@@ -1481,9 +1590,9 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, DC_ITEM *item, const char 
 		int	index;
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)__history_record_float_compare);
+			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)history_record_float_compare);
 		else
-			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)__history_record_uint64_compare);
+			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)history_record_uint64_compare);
 
 		if (0 == percentage)
 			index = 1;
@@ -2278,7 +2387,11 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	}
 	else if (0 == strcmp(function, "count"))
 	{
-		ret = evaluate_COUNT(value, item, parameter, ts, ZBX_MAX_UINT31_1, error);
+		ret = evaluate_COUNT(value, item, parameter, ts, ZBX_MAX_UINT31_1, COUNT_ALL, error);
+	}
+	else if (0 == strcmp(function, "countdistinct"))
+	{
+		ret = evaluate_COUNT(value, item, parameter, ts, ZBX_MAX_UINT31_1, COUNT_DISTINCT, error);
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
@@ -2290,7 +2403,7 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	}
 	else if (0 == strcmp(function, "find"))
 	{
-		ret = evaluate_COUNT(value, item, parameter, ts, 1, error);
+		ret = evaluate_COUNT(value, item, parameter, ts, 1, COUNT_ALL, error);
 	}
 	else if (0 == strcmp(function, "fuzzytime"))
 	{
@@ -2351,9 +2464,9 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
  ******************************************************************************/
 int	zbx_is_trigger_function(const char *name, size_t len)
 {
-	const char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "nodata", "change",
-			"find", "fuzzytime", "logeventid", "logseverity", "logsource", "band", "forecast", "timeleft",
-			"trendavg", "trendcount", "trendmax", "trendmin", "trendsum",
+	const char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "countdistinct",
+			"nodata", "change", "find", "fuzzytime", "logeventid", "logseverity", "logsource", "band",
+			"forecast", "timeleft", "trendavg", "trendcount", "trendmax", "trendmin", "trendsum",
 		NULL};
 	const char	**ptr;
 
