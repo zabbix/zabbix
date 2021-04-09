@@ -29,23 +29,24 @@ class CControllerScheduledReportEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'reportid' =>		'db report.reportid',
-			'userid' =>			'db report.userid',
-			'name' =>			'db report.name',
-			'dashboardid' =>	'db report.dashboardid',
-			'period' =>			'db report.period|in '.implode(',', [ZBX_REPORT_PERIOD_DAY, ZBX_REPORT_PERIOD_WEEK, ZBX_REPORT_PERIOD_MONTH, ZBX_REPORT_PERIOD_YEAR]),
-			'cycle' =>			'db report.cycle|in '.implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY]),
-			'weekdays' =>		'array',
-			'hours' =>			'int32',
-			'minutes' =>		'int32',
-			'active_since' =>	'string',
-			'active_till' =>	'string',
-			'subject' =>		'string',
-			'message' =>		'string',
-			'subscriptions' =>	'array',
-			'description' =>	'db report.description',
-			'status' =>			'db report.status|in '.ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED,
-			'form_refresh' =>	'int32'
+			'reportid' =>			'db report.reportid',
+			'userid' =>				'db report.userid',
+			'name' =>				'db report.name',
+			'dashboardid' =>		'db report.dashboardid',
+			'old_dashboardid' =>	'db report.dashboardid',
+			'period' =>				'db report.period|in '.implode(',', [ZBX_REPORT_PERIOD_DAY, ZBX_REPORT_PERIOD_WEEK, ZBX_REPORT_PERIOD_MONTH, ZBX_REPORT_PERIOD_YEAR]),
+			'cycle' =>				'db report.cycle|in '.implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY]),
+			'weekdays' =>			'array',
+			'hours' =>				'int32',
+			'minutes' =>			'int32',
+			'active_since' =>		'string',
+			'active_till' =>		'string',
+			'subject' =>			'string',
+			'message' =>			'string',
+			'subscriptions' =>		'array',
+			'description' =>		'db report.description',
+			'status' =>				'db report.status|in '.ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED,
+			'form_refresh' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -96,6 +97,7 @@ class CControllerScheduledReportEdit extends CController {
 			'userid' => CWebUser::$data['userid'],
 			'name' => $db_defaults['name'],
 			'dashboardid' => 0,
+			'old_dashboardid' => 0,
 			'period' => $db_defaults['period'],
 			'cycle' => $db_defaults['cycle'],
 			'hours' => '00',
@@ -129,6 +131,7 @@ class CControllerScheduledReportEdit extends CController {
 			$data['userid'] = $this->report['userid'];
 			$data['name'] = $this->report['name'];
 			$data['dashboardid'] = $this->report['dashboardid'];
+			$data['old_dashboardid'] = $this->report['dashboardid'];
 			$data['period'] = $this->report['period'];
 			$data['cycle'] = $this->report['cycle'];
 			$data['hours'] = sprintf("%02d", floor($this->report['start_time'] / SEC_PER_HOUR));
@@ -262,8 +265,8 @@ class CControllerScheduledReportEdit extends CController {
 			CArrayHelper::sort($data['subscriptions'], ['recipient_name']);
 		}
 
-		$this->getInputs($data, ['reportid', 'name', 'dashboardid', 'period', 'cycle', 'hours', 'minutes',
-			'active_since', 'active_till', 'subject', 'message', 'description', 'status', 'form_refresh'
+		$this->getInputs($data, ['reportid', 'name', 'dashboardid', 'old_dashboardid', 'period', 'cycle', 'hours',
+			'minutes', 'active_since', 'active_till', 'subject', 'message', 'description', 'status', 'form_refresh'
 		]);
 
 		if ($data['form_refresh'] != 0) {
@@ -289,15 +292,21 @@ class CControllerScheduledReportEdit extends CController {
 			}
 		}
 
+		$data['dashboard_inaccessible'] = false;
+
 		if ($data['dashboardid'] != 0) {
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name'],
 				'dashboardids' => $data['dashboardid']
 			]);
 
-			$dashboard_name = $dashboards ? $dashboards[0]['name'] : _('Inaccessible dashboard');
-
-			$data['ms_dashboard'] = [['id' => $data['dashboardid'], 'name' => $dashboard_name]];
+			if ($dashboards) {
+				$data['ms_dashboard'] = [['id' => $data['dashboardid'], 'name' => $dashboards[0]['name']]];
+			}
+			else {
+				$data['ms_dashboard'] = [['id' => $data['dashboardid'], 'name' => _('Inaccessible dashboard')]];
+				$data['dashboard_inaccessible'] = true;
+			}
 		}
 
 		$response = new CControllerResponseData($data);

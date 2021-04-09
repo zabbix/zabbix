@@ -25,17 +25,29 @@
 
 $this->addJsFile('multiselect.js');
 $this->addJsFile('class.calendar.js');
-$this->includeJsFile('reports.scheduledreport.edit.js.php');
+$this->includeJsFile('reports.scheduledreport.edit.js.php', [
+	'old_dashboardid' => $data['old_dashboardid'],
+	'dashboard_inaccessible' => $data['dashboard_inaccessible']
+]);
 
 $widget = (new CWidget())->setTitle(_('Scheduled reports'));
 
 $form = (new CForm())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')
+	->setAction(
+		(new CUrl('zabbix.php'))
+			->setArgument('action', ($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
+			->getUrl()
+	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['reportid'] != 0) {
 	$form->addVar('reportid', $data['reportid']);
+}
+
+if ($data['old_dashboardid'] != 0) {
+	$form->addVar('old_dashboardid', $data['old_dashboardid']);
 }
 
 $form_grid = new CPartial('scheduledreport.formgrid.html', [
