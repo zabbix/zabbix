@@ -6024,3 +6024,27 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 
 	return str;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_substr                                                       *
+ *                                                                            *
+ * Purpose: extracts substring at the specified location                      *
+ *                                                                            *
+ * Parameters: src   - [IN] the source string                                 *
+ *             left  - [IN] the left substring position 9start)               *
+ *             right - [IN] the right substirng position (end)                *
+ *                                                                            *
+ * Return value: The unquoted and copied substring.                           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_substr(const char *src, size_t left, size_t right)
+{
+	char	*str;
+
+	str = zbx_malloc(NULL, right - left + 2);
+	memcpy(str, src + left, right - left + 1);
+	str[right - left + 1] = '\0';
+
+	return str;
+}
