@@ -77,7 +77,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?action=regex.update&regexid=32&form_refresh=1&name=ssss&expressions%5B0%5D%5B'.
 					'expression_type%5D=0&expressions%5B0%5D%5Bexpression%5D=ssssssss&expressions%5B0%5D%5Bexp_delimiter'.
 					'%5D=%2C&expressions%5B0%5D%5Bexpressionid%5D=32&test_string=&update=Update']],
-			
+
 			// Regular expressions test.
 			[['link' => 'zabbix.php?ajaxdata%5BtestString%5D=&ajaxdata%5Bexpressions%5D%5B0%5D%5Bexpression%5D=2&'.
 					'ajaxdata%5Bexpressions%5D%5B0%5D%5Bexpression_type%5D=0&ajaxdata%5Bexpressions%5D%5B0%5D%5B'.
@@ -150,14 +150,14 @@ class testSID extends CWebTest {
 
 			// Dashboard properties update.
 			[['link' => 'zabbix.php?action=dashboard.update&dashboardid=143&userid=1&name=sssdfsfsdfNew+dashboardss']],
-			
+
 			// Dashboard delete.
 			[['link' => 'zabbix.php?action=dashboard.delete&dashboardids[]=142']],
-			
+
 			// Dashboard share update.
 			[['link' => 'zabbix.php?action=dashboard.share.update&form_refresh=1&dashboardid=143&users%5Bempty_user'.
 					'%5D=1&userGroups%5Bempty_group%5D=1&private=0']],
-			
+
 			// Dashboard update.
 			[['link' => 'zabbix.php?action=dashboard.update&dashboardid=142&userid=1&name=1111&widgets%5B0%5D%5B'.
 					'pos%5D%5Bwidth%5D=12&widgets%5B0%5D%5Bpos%5D%5Bheight%5D=5&widgets%5B0%5D%5Bpos%5D%5Bx%5D=0&'.
@@ -222,7 +222,7 @@ class testSID extends CWebTest {
 
 			// User group delete.
 			[['link' => 'zabbix.php?action=usergroup.delete&usrgrpids%5B0%5D=93']],
-			
+
 			// User group group right add.
 			[['link' => 'zabbix.php?new_group_right%5Bgroupids%5D%5B%5D=50012&new_group_right%5Binclude_subgroups%5D=0&'.
 					'new_group_right%5Bpermission%5D=-1&group_rights%5B0%5D%5Bname%5D=&group_rights%5B0%5D%5Bgrouped%5D=1&'.
@@ -299,7 +299,7 @@ class testSID extends CWebTest {
 
 			// Proxy delete.
 			[['link' => 'zabbix.php?action=proxy.delete&proxyids[]=99455']],
-			
+
 			// Proxy host disable.
 			[['link' => 'zabbix.php?form_refresh=1&proxyids%5B20000%5D=20000&action=proxy.hostdisable']],
 
@@ -403,7 +403,7 @@ class testSID extends CWebTest {
 						'%5B%5D%5Btype%5D=0&update=Update'
 				]
 			],
-			
+
 			// Discovery creation.
 			[
 				[
@@ -415,7 +415,7 @@ class testSID extends CWebTest {
 						'1%5D%5Bdcheckid%5D=new1&uniqueness_criteria=-1&host_source=1&name_source=0&status=1&add=Add'
 				]
 			],
-			
+
 			// Discovery delete.
 			[
 				[
@@ -423,7 +423,7 @@ class testSID extends CWebTest {
 					'link' => 'discoveryconf.php?form_refresh=1&g_druleid%5B7%5D=7&action=drule.massdelete'
 				]
 			],
-			
+
 			// Discovery disable.
 			[
 				[
@@ -431,7 +431,7 @@ class testSID extends CWebTest {
 					'link' => 'discoveryconf.php?action=drule.massdisable&g_druleid[]=4'
 				]
 			],
-			
+
 			// Discovery enable.
 			[
 				[
@@ -439,7 +439,7 @@ class testSID extends CWebTest {
 					'link' => 'discoveryconf.php?action=drule.massenable&g_druleid[]=6'
 				]
 			],
-			
+
 			// Discovery update.
 			[
 				[
@@ -452,16 +452,16 @@ class testSID extends CWebTest {
 						'status=1&update=Update'
 				]
 			],
-			
+
 			// Export.
 			[['link' => 'zabbix.php?action=export.hosts&format=yaml&backurl=hosts.php&form_refresh=1&hosts%5B50011%5D=50011']],
-			
+
 			// Favourite create.
 			[['link' => 'zabbix.php?action=favourite.create&object=screenid&objectid=200021']],
 
 			// Favourite delete.
 			[['link' => 'zabbix.php?action=favourite.delete&object=screenid&objectid=200021']],
-			
+
 			// Host creation.
 			[
 				[
@@ -517,13 +517,13 @@ class testSID extends CWebTest {
 					'link' => 'hosts.php?action=host.massenable&hosts[0]=50011'
 				]
 			],
-			
+
 			// Notifications get.
 			[['link' => 'zabbix.php?action=notifications.get&known_eventids%5B%5D=126']],
 
 			// Notifications mute.
 			[['link' => 'zabbix.php?action=notifications.mute&muted=1']],
-			
+
 			// Popup item test edit.
 			[['link' => 'zabbix.php?action=popup.itemtest.edit&key=agent.hostname&delay=1m&value_type=3&item_type=0&'.
 					'itemid=0&interfaceid=50040&hostid=50012&test_type=0&step_obj=-2&show_final_result=1&get_value=1']],
@@ -536,13 +536,13 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?key=agent.hostname&delay=&value_type=4&item_type=0&itemid=0&interfaceid=0&get_value=1&'.
 					'interface%5Baddress%5D=127.0.0.1&interface%5Bport%5D=10050&proxy_hostid=0&show_final_result=1&'.
 					'test_type=0&hostid=10386&valuemapid=0&value=&action=popup.itemtest.send']],
-			
+
 			// Popup maintenance period.
 			[['link' => 'zabbix.php?index=1&action=popup.maintenance.period']],
-			
+
 			// Popup media type test edit.
 			[['link' => 'zabbix.php?mediatypeid=29&action=popup.mediatypetest.edit']],
-			
+
 			// Popup media type test send.
 			[['link' => 'zabbix.php?action=popup.mediatypetest.send&mediatypeid=10&parameters%5B0%5D%5Bname%5D=alert_message&'.
 					'parameters%5B0%5D%5Bvalue%5D=%7BALERT.MESSAGE%7D&parameters%5B1%5D%5Bname%5D=alert_subject&'.
@@ -571,10 +571,10 @@ class testSID extends CWebTest {
 					'parameters%5B24%5D%5Bname%5D=trigger_id&parameters%5B24%5D%5Bvalue%5D=%7BTRIGGER.ID%7D&parameters'.
 					'%5B25%5D%5Bname%5D=use_default_message&parameters%5B25%5D%5Bvalue%5D=false&parameters%5B26%5D%5Bname'.
 					'%5D=zabbix_url&parameters%5B26%5D%5Bvalue%5D=%7B%24ZABBIX.URL%7D']],
-			
+
 			// Popup script execution.
 			[['link' => 'zabbix.php?scriptid=1&hostid=10386&action=popup.scriptexec']],
-			
+
 			// Profile update.
 			[['link' => 'zabbix.php?form_refresh=1&action=userprofile.edit&userid=1&medias%5B3%5D%5Bmediatypeid%5D=10&'.
 					'medias%5B3%5D%5Bperiod%5D=1-7%2C00%3A00-24%3A00&medias%5B3%5D%5Bsendto%5D=test%40jabber.com&'.
@@ -592,7 +592,7 @@ class testSID extends CWebTest {
 					'medias%5B2%5D%5Bactive%5D=0&medias%5B2%5D%5Bname%5D=SMS&medias%5B2%5D%5Bmediatype%5D=2&lang=default&'.
 					'timezone=default&theme=default&autologin=1&autologout=0&refresh=30s&rows_per_page=99&url=&'.
 					'messages%5Benabled%5D=0&action=userprofile.update']],
-			
+
 			// User creation.
 			[['link' => 'zabbix.php?form_refresh=2&action=user.edit&userid=0&username=1111&name=&surname=&'.
 					'user_groups%5B%5D=8&password1=1&password2=1&lang=default&timezone=default&theme=default&autologin=0&'.
@@ -605,7 +605,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=1&action=user.edit&userid=95&username=11111&name=&surname=&'.
 					'user_groups%5B%5D=8&lang=default&timezone=default&theme=default&autologin=0&autologout=0&'.
 					'refresh=30s&rows_per_page=50&url=&roleid=1&user_type=User&action=user.update']],
-			
+
 			// User unblock.
 			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']],
 
