@@ -88,7 +88,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[1].diff()} = 0',
-				'(last(/Trapper/trap[1],1)<>last(/Trapper/trap[1],2)) = 0'
+				'(last(/Trapper/trap[1],#1)<>last(/Trapper/trap[1],#2)) = 0'
 			],
 			[
 				'{Trapper:trap[1].fuzzytime(60)} > 0',
@@ -186,7 +186,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[2].band(#1, 32)} > 0 and {Trapper:trap[2].band(#2, 64, 1h)} > 0',
-				'bitand(last(/Trapper/trap[2],#1),"32") > 0 and bitand(last(/Trapper/trap[2],#2:now-1h),"64") > 0'
+				'bitand(last(/Trapper/trap[2],#1),32) > 0 and bitand(last(/Trapper/trap[2],#2:now-1h),64) > 0'
 			],
 			[
 				'{Trapper:trap[2].forecast(#10,,100)} > 0'.
@@ -246,7 +246,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[3].prev()} > 0',
-				'last(/Trapper/trap[3],2) > 0'
+				'last(/Trapper/trap[3],#2) > 0'
 			],
 			[
 				'{Trapper:trap[3].regexp("^error", #10)} > 0'.

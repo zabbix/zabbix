@@ -194,11 +194,11 @@ class C52TriggerExpressionConverter extends CConverter {
 				break;
 
 			case 'diff':
-				$new_expression = sprintf('(last(%1$s,1)<>last(%1$s,2))', $query);
+				$new_expression = sprintf('(last(%1$s,#1)<>last(%1$s,#2))', $query);
 				break;
 
 			case 'prev':
-				$new_expression = sprintf('last(%1$s,2)', $query);
+				$new_expression = sprintf('last(%1$s,#2)', $query);
 				break;
 
 			case 'trenddelta':
