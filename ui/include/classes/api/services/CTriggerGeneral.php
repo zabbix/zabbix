@@ -1569,12 +1569,12 @@ abstract class CTriggerGeneral extends CApiService {
 						$error_msg = $math_function_validator->getError();
 
 						if ($value_type !== null
-								&& (!$trigger_function_validator->validate($fn)
-									|| !$trigger_function_validator->validateValueType($value_type, $fn))) {
-							$error_msg = $trigger_function_validator->getError();
-						}
-						else {
+								&& $trigger_function_validator->validate($fn)
+								&& $trigger_function_validator->validateValueType($value_type, $fn)) {
 							$error_msg = '';
+						}
+						elseif ($value_type !== null) {
+							$error_msg = $trigger_function_validator->getError();
 						}
 					}
 
