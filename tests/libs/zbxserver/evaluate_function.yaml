@@ -522,6 +522,269 @@ out:
   return: FAIL
   value: 2
 ---
+test case: Evaluate countdistinct(5m) FLOAT 5 3 3 1 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 5
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countdistinct
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate countdistinct(5m) FLOAT 1 1 1 1 1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countdistinct
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate countdistinct(5m) UINT64 5 3 3 1 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 5
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countdistinct
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate countdistinct(5m) UINT64 1 1 1 1 1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 1
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countdistinct
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate countdistinct(5m) STR One One One One One
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countdistinct
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate countdistinct(5m) STR One Two Three Four One
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: One
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: countdistinct
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate countdistinct(11m) LOG 'abc', 'abc' no sources
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countdistinct
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate countdistinct(11m) LOG 'qwerty' 'abc' no sources
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: qwerty
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countdistinct
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate countdistinct(11m) LOG 'abc' 'abc' different sources
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source: serv1
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source: serv2
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countdistinct
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate countdistinct(11m) LOG 'abc' 'abc' only source 1
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source: serv1
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countdistinct
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate countdistinct(11m) LOG 'abc' 'abc' only source 2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source: serv2
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: countdistinct
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 2
+---
 test case: Evaluate forecast(#5,1h) 
 in:
   history:
@@ -1303,4 +1566,3 @@ out:
   return: SUCCEED
   value: -5
 ...
-
