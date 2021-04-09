@@ -193,9 +193,9 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and {Trapper:trap[2].forecast(3600,7200,600,linear,avg)} > 0'.
 				' and {Trapper:trap[2].forecast(30m,1d,600,,avg)} > 0',
 
-				'forecast(/Trapper/trap[2],#10,"100s") > 0'.
-				' and forecast(/Trapper/trap[2],3600s:now-7200s,"600s","linear","avg") > 0'.
-				' and forecast(/Trapper/trap[2],30m:now-1d,"600s",,"avg") > 0'
+				'forecast(/Trapper/trap[2],#10,100s) > 0'.
+				' and forecast(/Trapper/trap[2],3600s:now-7200s,600s,"linear","avg") > 0'.
+				' and forecast(/Trapper/trap[2],30m:now-1d,600s,,"avg") > 0'
 			],
 
 			[
