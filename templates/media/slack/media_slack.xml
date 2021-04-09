@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-03-19T09:00:23Z</date>
+    <date>2021-04-06T06:29:40Z</date>
     <media_types>
         <media_type>
             <name>Slack</name>
@@ -169,16 +169,18 @@ function isEventResolve(params) {&#13;
 function getPermalink(channelId, messageTimestamp) {&#13;
     var req = new CurlHttpRequest();&#13;
 &#13;
+    if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
+        req.SetProxy(params.HTTPProxy);&#13;
+    }&#13;
+&#13;
     req.AddHeader('Content-Type: application/x-www-form-urlencoded; charset=utf-8');&#13;
     req.AddHeader('Authorization: Bearer ' + params.bot_token);&#13;
 &#13;
-    var resp = JSON.parse(req.Get(&#13;
-        '{0}?channel={1}&amp;message_ts={2}'.format(&#13;
+    var query = '{0}?channel={1}&amp;message_ts={2}'.format(&#13;
             Slack.getPermalink,&#13;
             encodeURIComponent(channelId),&#13;
-            encodeURIComponent(messageTimestamp)&#13;
-        )&#13;
-    ));&#13;
+            encodeURIComponent(messageTimestamp)),&#13;
+        resp = JSON.parse(req.Get(query));&#13;
 &#13;
     if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {&#13;
         throw 'message was created, but getting message link was failed with reason &quot;' + resp.error + '&quot;';&#13;
