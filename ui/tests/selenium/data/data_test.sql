@@ -2144,12 +2144,12 @@ INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99006, 99117, 'acti
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99007, 99117, 'without value', '');
 
 INSERT INTO items (itemid, type, hostid, name, key_, params, flags, description, posts, headers) VALUES (99118, 2, 40001, 'Item prototype with tags for updating', 'prototype.tags.update', '', 2, '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15090, 99118, 33800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15090, 99118, 133800);
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99008, 99118, 'action', 'update');
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99009, 99118, 'without value prototype', '');
 
 INSERT INTO items (itemid, type, hostid, name, key_, params, flags, description, posts, headers) VALUES (99119, 2, 40001, 'Item prototype with tags for cloning', 'prototype.tags.cloning', '', 2,  '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15091, 99119, 33800);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15091, 99119, 133800);
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99010, 99119, 'action', 'clone');
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99011, 99119, 'without value prototype', '');
 

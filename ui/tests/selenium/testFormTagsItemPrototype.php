@@ -27,8 +27,8 @@ class testFormTagsItemPrototype extends testFormTags {
 
 	public $update_name = 'Item prototype with tags for updating';
 	public $clone_name = 'Item prototype with tags for cloning';
-	public $link = 'disc_prototypes.php?parent_discoveryid=33800&context=host';
-	public $saved_link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid=33800&itemid=';
+	public $link = 'disc_prototypes.php?parent_discoveryid=133800&context=host';
+	public $saved_link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid=133800&itemid=';
 	public $new_name = 'Cloned Item prototype {#KEY}';
 
 	/**
