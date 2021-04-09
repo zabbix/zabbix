@@ -2692,6 +2692,7 @@ Changes for 4.0.31rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
 ..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
 
