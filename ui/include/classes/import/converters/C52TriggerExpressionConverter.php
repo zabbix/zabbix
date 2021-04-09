@@ -396,7 +396,7 @@ class C52TriggerExpressionConverter extends CConverter {
 		$param = (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
 			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
-		return 'now-'.$param;
+		return ($param !== '') ? 'now-'.$param : '';
 	}
 
 	private static function paramsToString(array $parameters): string {
