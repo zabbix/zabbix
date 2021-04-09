@@ -834,21 +834,21 @@ out:
  ******************************************************************************/
 static void	calc_cache_dcitems_hk(zbx_calc_eval_t *eval)
 {
-	int i;
+	int	i;
 
-	eval->hostkeys = (zbx_host_key_t*) zbx_malloc(NULL, sizeof(zbx_host_key_t) * eval->one_num);
-	eval->dcitems_hk = (DC_ITEM*) zbx_malloc(NULL, sizeof(DC_ITEM) * eval->one_num);
-	eval->errcodes_hk = (int*) zbx_malloc(NULL, sizeof(int) * eval->one_num);
+	eval->hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * eval->one_num);
+	eval->dcitems_hk = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * eval->one_num);
+	eval->errcodes_hk = (int *)zbx_malloc(NULL, sizeof(int) * eval->one_num);
 
 	for (i = 0; i < eval->queries.values_num; i++)
 	{
-		zbx_calc_query_t *query = (zbx_calc_query_t*) eval->queries.values[i];
-		zbx_calc_query_one_t *data;
+		zbx_calc_query_t	*query = (zbx_calc_query_t *)eval->queries.values[i];
+		zbx_calc_query_one_t	*data;
 
 		if (0 != (query->flags & ZBX_CALC_QUERY_MANY) || ZBX_CALC_QUERY_ERROR == query->flags)
 			continue;
 
-		data = (zbx_calc_query_one_t*) query->data;
+		data = (zbx_calc_query_one_t *)query->data;
 
 		if (NULL == query->ref.host)
 			eval->hostkeys[data->dcitem_hk_index].host = eval->calcitem->host.host;
