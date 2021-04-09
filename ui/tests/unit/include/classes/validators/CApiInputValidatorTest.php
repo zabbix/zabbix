@@ -3523,15 +3523,15 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION, 'length' => 10],
-				'{host:item.last()} = 0',
+				'last(/host/item) = 0',
 				'/1/expression',
 				'Invalid parameter "/1/expression": value is too long.'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last() = 0',
+				'last(/host/item = 0',
 				'/1/expression',
-				'Invalid parameter "/1/expression": incorrect trigger expression starting from "{host:item.last() = 0".'
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from "last(/host/item = 0".'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
@@ -3541,27 +3541,27 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = {#LLD_MACRO}',
+				'last(/host/item) = {#LLD_MACRO}',
 				'/1/expression',
 				'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#LLD_MACRO}".'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
-				'{host:item.last()} = {#LLD_MACRO}',
+				'last(/host/item) = {#LLD_MACRO}',
 				'/1/expression',
-				'{host:item.last()} = {#LLD_MACRO}'
+				'last(/host/item) = {#LLD_MACRO}'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = 0',
+				'last(/host/item) = 0',
 				'/1/expression',
-				'{host:item.last()} = 0'
+				'last(/host/item) = 0'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = {$USER_MACRO}',
+				'last(/host/item) = {$USER_MACRO}',
 				'/1/expression',
-				'{host:item.last()} = {$USER_MACRO}'
+				'last(/host/item) = {$USER_MACRO}'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
@@ -3607,15 +3607,15 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_EVENT_NAME],
-				'event name {?{host:item.last()} = 0}',
+				'event name {?last(/host/item) = 0}',
 				'/1/event_name',
-				'event name {?{host:item.last()} = 0}'
+				'event name {?last(/host/item) = 0}'
 			],
 			[
 				['type' => API_EVENT_NAME],
-				'event name {?{host:item.last()} = {$USER_MACRO}}',
+				'event name {?last(/host/item) = {$USER_MACRO}}',
 				'/1/event_name',
-				'event name {?{host:item.last()} = {$USER_MACRO}}'
+				'event name {?last(/host/item) = {$USER_MACRO}}'
 			],
 			[
 				['type' => API_EVENT_NAME],
