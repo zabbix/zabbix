@@ -137,11 +137,11 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and {Trapper:trap[1].percentile(60,3600,80)} > 4'.
 				' and {Trapper:trap[1].percentile(1m,1h,90)} > 5',
 
-				'percentile(/Trapper/trap[1],30m,"50") > 0'.
-				' and percentile(/Trapper/trap[1],60s,"60") > 1'.
-				' and percentile(/Trapper/trap[1],#10,"70") > 3'.
-				' and percentile(/Trapper/trap[1],60s:now-3600s,"80") > 4'.
-				' and percentile(/Trapper/trap[1],1m:now-1h,"90") > 5'
+				'percentile(/Trapper/trap[1],30m,50) > 0'.
+				' and percentile(/Trapper/trap[1],60s,60) > 1'.
+				' and percentile(/Trapper/trap[1],#10,70) > 3'.
+				' and percentile(/Trapper/trap[1],60s:now-3600s,80) > 4'.
+				' and percentile(/Trapper/trap[1],1m:now-1h,90) > 5'
 			],
 			[
 				'{Trapper:trap[1].sum(30m)} > 0'.
@@ -203,9 +203,9 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and {Trapper:trap[2].timeleft(3600,7200,600,linear)} > 0'.
 				' and {Trapper:trap[2].timeleft(30m,1d,600)} > 0',
 
-				'timeleft(/Trapper/trap[2],#10,"100") > 0'.
-				' and timeleft(/Trapper/trap[2],3600s:now-7200s,"600","linear") > 0'.
-				' and timeleft(/Trapper/trap[2],30m:now-1d,"600") > 0'
+				'timeleft(/Trapper/trap[2],#10,100) > 0'.
+				' and timeleft(/Trapper/trap[2],3600s:now-7200s,600,"linear") > 0'.
+				' and timeleft(/Trapper/trap[2],30m:now-1d,600) > 0'
 			],
 			[
 				'{Trapper:trap[3].count(#1, 0, eq)} > 0'.

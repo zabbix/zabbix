@@ -391,12 +391,9 @@ class CFunctionValidator extends CValidator {
 			case 'period':
 			case 'sec_neg':
 			case 'sec_zero':
-				return !self::isQuoted($parameter->getValue(true));
-
-			// Optionally quoted.
-			case 'percent':
 			case 'num_suffix':
-				return true;
+			case 'percent':
+				return !self::isQuoted($parameter->getValue(true));
 
 			// Mandatory quoted.
 			default:
