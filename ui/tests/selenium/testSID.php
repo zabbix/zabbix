@@ -607,12 +607,7 @@ class testSID extends CWebTest {
 					'refresh=30s&rows_per_page=50&url=&roleid=1&user_type=User&action=user.update']],
 
 			// User unblock.
-			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']],
-
-			// User update.
-			[['link' => 'zabbix.php?form_refresh=1&action=user.edit&userid=4&username=admin-zabbix&name=&surname=&'.
-					'user_groups%5B%5D=7&lang=en_GB&timezone=default&theme=default&autologin=0&autologout=0&refresh=29&'.
-					'rows_per_page=50&url=toptriggers.php&roleid=2&user_type=Admin&action=user.update']]
+			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']]
 		];
 	}
 
