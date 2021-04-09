@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-19T08:52:45Z'
+  date: '2021-04-06T06:25:23Z'
   media_types:
     -
       name: Slack
@@ -139,16 +139,18 @@ zabbix_export:
         function getPermalink(channelId, messageTimestamp) {
             var req = new CurlHttpRequest();
         
+            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+                req.SetProxy(params.HTTPProxy);
+            }
+        
             req.AddHeader('Content-Type: application/x-www-form-urlencoded; charset=utf-8');
             req.AddHeader('Authorization: Bearer ' + params.bot_token);
         
-            var resp = JSON.parse(req.Get(
-                '{0}?channel={1}&message_ts={2}'.format(
+            var query = '{0}?channel={1}&message_ts={2}'.format(
                     Slack.getPermalink,
                     encodeURIComponent(channelId),
-                    encodeURIComponent(messageTimestamp)
-                )
-            ));
+                    encodeURIComponent(messageTimestamp)),
+                resp = JSON.parse(req.Get(query));
         
             if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {
                 throw 'message was created, but getting message link was failed with reason "' + resp.error + '"';
