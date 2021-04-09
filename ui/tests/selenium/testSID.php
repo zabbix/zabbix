@@ -479,7 +479,10 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?action=favourite.delete&object=screenid&objectid=200021']],
 
 			// Host creation.
-			[['link' => 'hosts.php?form_refresh=1&form=create&flags=0&tls_connect=1&tls_accept=1&host=1111&visiblename=&'.
+			[
+				[
+					'other' => true,
+					'link' => 'hosts.php?form_refresh=1&form=create&flags=0&tls_connect=1&tls_accept=1&host=1111&visiblename=&'.
 					'groups%5B%5D%5Bnew%5D=111&interfaces%5B1%5D%5Bitems%5D=&interfaces%5B1%5D%5Blocked%5D=&'.
 					'interfaces%5B1%5D%5BisNew%5D=true&interfaces%5B1%5D%5Binterfaceid%5D=1&interfaces%5B1%5D%5Btype%5D=1&'.
 					'interfaces%5B1%5D%5Bip%5D=127.0.0.1&interfaces%5B1%5D%5Bdns%5D=&interfaces%5B1%5D%5Buseip%5D=1&'.
@@ -487,10 +490,15 @@ class testSID extends CWebTest {
 					'ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&tags%5B0%5D%5Btag%5D=&'.
 					'tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&'.
 					'macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&tls_connect=1&'.
-					'tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject=&add=Add']],
+					'tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject=&add=Add'
+				]
+			],
 
 			// Host update.
-			[['link' => 'hosts.php?form_refresh=1&form=update&flags=0&tls_connect=1&tls_accept=1&psk_edit_mode=1&'.
+			[
+				[
+					'other' => true,
+					'link' => 'hosts.php?form_refresh=1&form=update&flags=0&tls_connect=1&tls_accept=1&psk_edit_mode=1&'.
 					'hostid=99452&host=11111111&visiblename=&groups%5B%5D=50020&interfaces%5B55079%5D%5Bitems%5D=false&'.
 					'interfaces%5B55079%5D%5BisNew%5D=&interfaces%5B55079%5D%5Binterfaceid%5D=55079&interfaces'.
 					'%5B55079%5D%5Btype%5D=1&interfaces%5B55079%5D%5Bip%5D=127.0.0.1&interfaces%5B55079%5D%5Bdns%5D=&'.
@@ -498,16 +506,33 @@ class testSID extends CWebTest {
 					'description=&proxy_hostid=0&status=0&ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&'.
 					'tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&'.
 					'macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&'.
-					'tls_connect=1&tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject=&update=Update']],
+					'tls_connect=1&tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject=&update=Update'
+				]
+			],
 
 			// Host delete.
-			[['link' => 'hosts.php?delete=1&form=update&hostid=99452']],
+			[
+				[
+					'other' => true,
+					'link' => 'hosts.php?delete=1&form=update&hostid=99452'
+				]
+			],
 
 			// Host disable.
-			[['link' => 'hosts.php?action=host.massdisable&hosts[0]=50011']],
+			[
+				[
+					'other' => true,
+					'link' => 'hosts.php?action=host.massdisable&hosts[0]=50011'
+				]
+			],
 
 			// Host enable.
-			[['link' => 'hosts.php?action=host.massenable&hosts[0]=50011']],
+			[
+				[
+					'other' => true,
+					'link' => 'hosts.php?action=host.massenable&hosts[0]=50011'
+				]
+			],
 
 			// Notifications get.
 			[['link' => 'zabbix.php?action=notifications.get&known_eventids%5B%5D=126']],
@@ -628,9 +653,15 @@ class testSID extends CWebTest {
 	public function testSID_Links($data) {
 		foreach ([$data['link'], $data['link'].'&sid=test111116666666'] as $link) {
 			$this->page->login()->open($link)->waitUntilReady();
-			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
-			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
-			$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentUrl());
+			if (array_key_exists('other', $data)) {
+				$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
+						' performed due to unauthorized request.');
+			}
+			else {
+				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+				$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+				$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentUrl());
+			}
 		}
 	}
 }
