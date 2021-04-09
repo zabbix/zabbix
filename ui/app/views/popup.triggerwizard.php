@@ -43,7 +43,7 @@ if (array_key_exists('triggerid', $options)) {
 $expression_table = (new CTable())
 	->addClass('ui-sortable')
 	->setId('expressions_list')
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%; white-space: normal;')
 	->setHeader(['', _('Expression'), _('Type'), _('Action')]);
 
 $expressions = [];
