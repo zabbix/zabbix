@@ -1077,7 +1077,7 @@ out:
  ******************************************************************************/
 static int	evaluate_SUM(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
 {
-	int				nparams, arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
+	int				arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
 	history_value_t			result;
@@ -1093,7 +1093,7 @@ static int	evaluate_SUM(zbx_variant_t *value, DC_ITEM *item, const char *paramet
 		goto out;
 	}
 
-	if (1 != (nparams = num_param(parameters)))
+	if (1 != num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1166,7 +1166,7 @@ out:
  ******************************************************************************/
 static int	evaluate_AVG(zbx_variant_t  *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
 {
-	int				nparams, arg1, ret = FAIL, i, seconds = 0, nvalues = 0, time_shift;
+	int				arg1, ret = FAIL, i, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts_end = *ts;
@@ -1181,7 +1181,7 @@ static int	evaluate_AVG(zbx_variant_t  *value, DC_ITEM *item, const char *parame
 		goto out;
 	}
 
-	if (1 != (nparams = num_param(parameters)))
+	if (1 != num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1324,7 +1324,7 @@ out:
  ******************************************************************************/
 static int	evaluate_MIN(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
 {
-	int				nparams, arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
+	int				arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts_end = *ts;
@@ -1339,7 +1339,7 @@ static int	evaluate_MIN(zbx_variant_t *value, DC_ITEM *item, const char *paramet
 		goto out;
 	}
 
-	if (1 != (nparams = num_param(parameters)))
+	if (1 != num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1424,7 +1424,7 @@ out:
  ******************************************************************************/
 static int	evaluate_MAX(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
 {
-	int				nparams, arg1, ret = FAIL, i, seconds = 0, nvalues = 0, time_shift;
+	int				arg1, ret = FAIL, i, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts_end = *ts;
@@ -1439,7 +1439,7 @@ static int	evaluate_MAX(zbx_variant_t *value, DC_ITEM *item, const char *paramet
 		goto out;
 	}
 
-	if (1 != (nparams = num_param(parameters)))
+	if (1 != num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1528,7 +1528,7 @@ out:
 static int	evaluate_PERCENTILE(zbx_variant_t  *value, DC_ITEM *item, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
-	int				nparams, arg1, time_shift, ret = FAIL, seconds = 0, nvalues = 0;
+	int				arg1, time_shift, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_value_type_t		arg1_type;
 	double				percentage;
 	zbx_vector_history_record_t	values;
@@ -1544,7 +1544,7 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, DC_ITEM *item, const char 
 		goto out;
 	}
 
-	if (2 != (nparams = num_param(parameters)))
+	if (2 != num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1903,7 +1903,7 @@ static int	evaluate_BAND(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		char **error)
 {
 	char		*last_parameters = NULL;
-	int		nparams, ret = FAIL;
+	int		ret = FAIL;
 	zbx_uint64_t	mask;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1914,7 +1914,7 @@ static int	evaluate_BAND(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		goto clean;
 	}
 
-	if (2 < (nparams = num_param(parameters)))
+	if (2 < num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto clean;
