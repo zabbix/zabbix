@@ -143,8 +143,8 @@ static void	calc_query_free(zbx_calc_query_t *query)
  * Purpose: check if key parameter is a wildcard '*'                          *
  *                                                                            *
  ******************************************************************************/
-static int	test_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
-		char **param)
+static int	test_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted,
+		void *cb_data, char **param)
 {
 	ZBX_UNUSED(key_type);
 	ZBX_UNUSED(num);
@@ -156,7 +156,7 @@ static int	test_key_param_wildcard_cb(const char *data, int key_type, int level,
 
 	if ('*' == data[0] && '\0' == data[1])
 	{
-		*(int*) cb_data = 1;
+		*(int *)cb_data = 1;
 		return FAIL;
 	}
 
@@ -972,7 +972,7 @@ static void	calc_cache_dcitems(zbx_calc_eval_t *eval)
  *             ctx      - [IN] parsed calculated item formula                 *
  *                                                                            *
  ******************************************************************************/
-static void calc_eval_init(zbx_calc_eval_t *eval, DC_ITEM *dc_item, zbx_eval_context_t *ctx)
+static void	calc_eval_init(zbx_calc_eval_t *eval, DC_ITEM *dc_item, zbx_eval_context_t *ctx)
 {
 	int			i;
 	zbx_calc_query_t	*query;
@@ -1370,7 +1370,6 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() serialized formula is not set", __func__);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot evaluate calculated item:"
 				" serialized formula is not set"));
-		error = NULL;
 		goto out;
 	}
 
@@ -1378,7 +1377,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		char *expression = NULL;
+		char	*expression = NULL;
 
 		zbx_eval_compose_expression(&ctx, &expression);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() expanded expression:'%s'", __func__, expression);
@@ -1389,7 +1388,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	zbx_timespec(&ts);
 	zbx_variant_set_none(&value);
 
-	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, calcitem_eval_common, calcitem_eval_history, (void*) &eval,
+	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, calcitem_eval_common, calcitem_eval_history, (void *)&eval,
 			&value, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() error:%s", __func__, error);
