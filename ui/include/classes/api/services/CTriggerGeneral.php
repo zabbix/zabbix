@@ -1560,20 +1560,17 @@ abstract class CTriggerGeneral extends CApiService {
 					$query = $fn->getFunctionTriggerQuery();
 
 					// Validate trigger function.
-					$fn_data = [
-						'fn' => $fn,
-						'value_type' => ($query !== null)
-							? $hosts_keys[$query->host]['keys'][$query->item]['value_type']
-							: null
-					];
+					$value_type = ($query !== null)
+						? $hosts_keys[$query->host]['keys'][$query->item]['value_type']
+						: null;
 					$error_msg = '';
 
-					if (!$math_function_validator->validate($fn_data)) {
+					if (!$math_function_validator->validate($fn)) {
 						$error_msg = $math_function_validator->getError();
 
-						if ($fn_data['value_type'] !== null
-								&& (!$trigger_function_validator->validate($fn_data)
-									|| !$trigger_function_validator->validateValueType($fn_data))) {
+						if ($value_type !== null
+								&& (!$trigger_function_validator->validate($fn)
+									|| !$trigger_function_validator->validateValueType($value_type, $fn))) {
 							$error_msg = $trigger_function_validator->getError();
 						}
 						else {
@@ -1598,10 +1595,6 @@ abstract class CTriggerGeneral extends CApiService {
 								'Incorrect item key "%1$s" provided for trigger expression on "%2$s".', $key['key'],
 								$host_keys['host']
 							));
-						}
-
-						if (!$trigger_function_validator->validateValueType($fn_data)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $trigger_function_validator->getError());
 						}
 
 						if (!array_key_exists($fn->match, $triggers_functions[$tnum])) {

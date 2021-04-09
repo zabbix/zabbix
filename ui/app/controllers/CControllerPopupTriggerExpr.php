@@ -727,11 +727,7 @@ class CControllerPopupTriggerExpr extends CController {
 					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
 						// Validate trigger function.
 						$trigger_function_validator = new CFunctionValidator();
-
-						$fn_data = [
-							'fn' => $result->getTokens()[0]
-						];
-						if (!$trigger_function_validator->validate($fn_data)) {
+						if (!$trigger_function_validator->validate($result->getTokens()[0])) {
 							error($trigger_function_validator->getError());
 						}
 					}
@@ -835,17 +831,14 @@ class CControllerPopupTriggerExpr extends CController {
 						// Validate trigger function.
 						$math_function_validator = new CMathFunctionValidator();
 						$trigger_function_validator = new CFunctionValidator();
-						$fn_data = [
-							'fn' => $result->getTokens()[0],
-							'value_type' => $data['itemValueType']
-						];
+						$fn = $result->getTokens()[0];
 						$error_msg = '';
 
-						if (!$math_function_validator->validate($fn_data)) {
+						if (!$math_function_validator->validate($fn)) {
 							$error_msg = $math_function_validator->getError();
 
-							if (!$trigger_function_validator->validate($fn_data)
-									|| !$trigger_function_validator->validateValueType($fn_data)) {
+							if (!$trigger_function_validator->validate($fn)
+									|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
 								$error_msg = $trigger_function_validator->getError();
 							}
 							else {

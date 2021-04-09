@@ -104,15 +104,12 @@ class CMathFunctionValidator extends CValidator {
 	/**
 	 * Validate trigger math function.
 	 *
-	 * @param array                  $value
-	 * @param CFunctionParserResult  $value['fn']
+	 * @param CFunctionParserResult  $fn
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($fn) {
 		$this->setError('');
-
-		$fn = $value['fn'];
 
 		if (!in_array($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.

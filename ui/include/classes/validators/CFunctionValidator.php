@@ -297,17 +297,12 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate trigger function like last(0), time(), etc.
 	 *
-	 * @param array                  $value
-	 * @param CFunctionParserResult  $value['fn']
-	 * @param int                    $value['value_type']  Used only to enable some parameters unquoted.
+	 * @param CFunctionParserResult  $fn
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($fn) {
 		$this->setError('');
-
-		$value_type = array_key_exists('value_type', $value) ? $value['value_type'] : ITEM_VALUE_TYPE_STR;
-		$fn = $value['fn'];
 
 		if (!array_key_exists($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
@@ -340,7 +335,7 @@ class CFunctionValidator extends CValidator {
 				continue;
 			}
 
-			if (!$this->checkQuotes($arg['type'], $value_type, $fn->params_raw['parameters'][$num])) {
+			if (!$this->checkQuotes($arg['type'], $fn->params_raw['parameters'][$num])) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					$param_labels[$num]
 				);
@@ -361,16 +356,15 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate value type.
 	 *
-	 * @param array                 $value
-	 * @param CFunctionParserResult $value['fn']
-	 * @param int                   $value['value_type']  To check if function support particular type of values.
+	 * @param int                   $value_type  To check if function support particular type of values.
+	 * @param CFunctionParserResult $fn
 	 *
 	 * @return bool
 	 */
-	public function validateValueType(array $value): bool {
-		if (!array_key_exists($value['value_type'], $this->allowed[$value['fn']->function]['value_types'])) {
+	public function validateValueType(int $value_type, CFunctionParserResult $fn): bool {
+		if (!array_key_exists($value_type, $this->allowed[$fn->function]['value_types'])) {
 			$this->setError(_s('Incorrect item value type "%1$s" provided for trigger function "%2$s".',
-				itemValueTypeString($value['value_type']), $value['fn']->match));
+				itemValueTypeString($value_type), $fn->match));
 			return false;
 		}
 
@@ -381,12 +375,11 @@ class CFunctionValidator extends CValidator {
 	 * Check if parameter is properly quoted.
 	 *
 	 * @param string         $type
-	 * @param int            $value_type
 	 * @param CParserResult  $param
 	 *
 	 * @return bool
 	 */
-	private function checkQuotes(string $type, int $value_type, CParserResult $parameter): bool {
+	private function checkQuotes(string $type, CParserResult $parameter): bool {
 		if ($parameter->getValue() === '') {
 			return true;
 		}
@@ -399,15 +392,6 @@ class CFunctionValidator extends CValidator {
 			case 'sec_neg':
 			case 'sec_zero':
 				return !self::isQuoted($parameter->getValue(true));
-
-			// Mandatory quoted based on value type.
-			case 'pattern':
-				$support_unquoted = (ctype_digit((string) $parameter->getValue())
-						&& in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]));
-				if (!$support_unquoted && !self::isQuoted($parameter->getValue(true))) {
-					return false;
-				}
-				break;
 
 			// Optionally quoted.
 			case 'percent':
