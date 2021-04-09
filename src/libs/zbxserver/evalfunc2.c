@@ -2351,11 +2351,11 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
  ******************************************************************************/
 int	zbx_is_trigger_function(const char *name, size_t len)
 {
-	char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "nodata", "change", "find",
-			"fuzzytime", "logeventid", "logseverity", "logsource", "band", "forecast", "timeleft",
+	const char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "nodata", "change",
+			"find", "fuzzytime", "logeventid", "logseverity", "logsource", "band", "forecast", "timeleft",
 			"trendavg", "trendcount", "trendmax", "trendmin", "trendsum",
 		NULL};
-	char	**ptr;
+	const char	**ptr;
 
 	for (ptr = functions; NULL != *ptr; ptr++)
 	{
