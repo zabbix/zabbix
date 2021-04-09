@@ -215,7 +215,7 @@ $dashboard-shared-bg-color: darken(desaturate($alt-yellow, 9%), 20%) !default;
 $dashboard-my-bg-color: darken(desaturate($alt-green, 10%), 20%) !default;
 
 // Import compare.
-$importcompare-toc-title-color: #ffffff !default;
-$importcompare-toc-title-bg-color: #768d99 !default;
-$importcompare-added-bg-color: $lighter-green !default;
-$importcompare-removed-bg-color: $lighter-red !default;
+$toc-title-color: #ffffff !default;
+$toc-title-bg-color: #768d99 !default;
+$diff-added-bg-color: $lighter-green !default;
+$diff-removed-bg-color: $lighter-red !default;

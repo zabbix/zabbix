@@ -25,10 +25,9 @@
 ?>
 
 jQuery(function($) {
-	$(document).on('click', '.import-compare .toc .arrow', function() {
-		$(this).closest('li').children('.sublist').toggle();
-		$(this).children('span')
-			.toggleClass('arrow-down arrow-up');
+	$(document).on('click', '.import-compare .<?= ZBX_STYLE_TOC_ARROW ?>', function() {
+		$(this).parent().siblings('.<?= ZBX_STYLE_TOC_SUBLIST ?>').toggle();
+		$('span', $(this)).toggleClass('<?= ZBX_STYLE_ARROW_DOWN ?> <?= ZBX_STYLE_ARROW_UP ?>');
 
 		return false;
 	});

@@ -24,99 +24,84 @@
  */
 
 
-function drawToc($toc) {
-	$list = (new CTag('ul', true));
+function drawToc(array $toc): CDiv {
+	$change_types_list = (new CTag('ul', true))
+		->addClass(ZBX_STYLE_TOC_LIST);
 
 	foreach ($toc as $change_type => $entity_types) {
-		$list->addItem(tocDrawChangeType($change_type, $entity_types));
+		$change_types_list->addItem(drawChangeType($change_type, $entity_types));
 	}
 
-	$wrapper = (new CDiv())
-		->addClass('toc')
-		->addItem($list);
-
-	return $wrapper;
+	return (new CDiv())
+		->addClass(ZBX_STYLE_TOC)
+		->addItem($change_types_list);
 }
 
-function tocDrawChangeType($name, $entity_types) {
-	$sub_list = (new CTag('ul', true))
-		->addClass('sublist');
+function drawChangeType(string $name, array $entity_types): CTag {
+	$entity_types_list = (new CTag('ul', true))
+		->addClass(ZBX_STYLE_TOC_SUBLIST);
 
 	foreach ($entity_types as $entity_type => $entities) {
-		$sub_list->addItem(drawEntityType($entity_type, $entities));
+		$entity_types_list->addItem(drawEntityType($entity_type, $entities));
 	}
 
-	$item = (new CTag('li', true))
-		->addClass('toc-level1')
+	return (new CTag('li', true))
 		->addItem((new CDiv())
-			->addClass('toc-level1-row')
+			->addClass(ZBX_STYLE_TOC_ROW)
 			->addItem((new CTag('button', true))
-				->addClass('arrow')
+				->addClass(ZBX_STYLE_TOC_ARROW)
 				->addItem((new CSpan())
-					->addClass('arrow-down')
+					->addClass(ZBX_STYLE_ARROW_DOWN)
 				)
 			)
-			->addItem(new CSpan($name))
+			->addItem((new CSpan($name))
+				->addClass(ZBX_STYLE_TOC_ITEM)
+			)
 		)
-		->addItem($sub_list);
-
-	return $item;
+		->addItem($entity_types_list);
 }
 
-function drawEntityType($name, $entities) {
-	$sub_list = (new CTag('ul', true))
-		->addClass('sublist');
+function drawEntityType(string $name, array $entities): CTag {
+	$entities_list = (new CTag('ul', true))
+		->addClass(ZBX_STYLE_TOC_SUBLIST);
 
 	foreach ($entities as $entity) {
-		$sub_list->addItem(drawEntity($entity));
+		$entities_list->addItem(drawEntity($entity));
 	}
 
-	$item = (new CTag('li', true))
-		->addClass('toc-level2')
+	return (new CTag('li', true))
 		->addItem((new CDiv())
-			->addClass('toc-level2-row')
+			->addClass(ZBX_STYLE_TOC_ROW)
 			->addItem((new CTag('button', true))
-				->addClass('arrow')
+				->addClass(ZBX_STYLE_TOC_ARROW)
 				->addItem((new CSpan())
-					->addClass('arrow-down')
+					->addClass(ZBX_STYLE_ARROW_DOWN)
 				)
 			)
-			->addItem(new CSpan($name))
+			->addItem((new CSpan($name))
+				->addClass(ZBX_STYLE_TOC_ITEM)
+			)
 		)
-		->addItem($sub_list);
-
-	return $item;
+		->addItem($entities_list);
 }
 
-function drawEntity($entity) {
-	$item = (new CTag('li', true))
-		->addClass('toc-level3')
+function drawEntity(array $entity): CTag {
+	return (new CTag('li', true))
 		->addItem((new CDiv())
-			->addClass('toc-level3-row')
-			->addItem((new CLink($entity['name'], '#importcompare_toc_' . $entity['id']))
-				->addClass('item-name')
+			->addClass(ZBX_STYLE_TOC_ROW)
+			->addItem((new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))
+				->addClass(ZBX_STYLE_TOC_ITEM)
 			)
 		);
-
-	return $item;
 }
 
-function drawDiff($diff) {
-	$wrapper = (new CDiv())
-		->addClass('diff');
-
-	$divs = rowsToDivs($diff);
-	$pre = new CPre();
-
-	foreach ($divs as $div) {
-		$pre->addItem($div);
-	}
-	$wrapper->addItem($pre);
-
-	return $wrapper;
+function drawDiff(array $diff): CDiv {
+	return (new CDiv())
+		->addClass(ZBX_STYLE_DIFF)
+		->addItem(new CPre(rowsToDivs($diff)));
 }
 
-function rowsToDivs($rows) {
+function rowsToDivs(array $rows): array {
 	$divs = [];
 
 	$first_characters = [
@@ -126,8 +111,8 @@ function rowsToDivs($rows) {
 	];
 
 	$classes = [
-		CControllerPopupImportCompare::CHANGE_ADDED => 'diff-add',
-		CControllerPopupImportCompare::CHANGE_REMOVED => 'diff-remove'
+		CControllerPopupImportCompare::CHANGE_ADDED => ZBX_STYLE_DIFF_ADDED,
+		CControllerPopupImportCompare::CHANGE_REMOVED => ZBX_STYLE_DIFF_REMOVED
 	];
 
 	foreach ($rows as $row) {
