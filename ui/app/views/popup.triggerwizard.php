@@ -64,7 +64,11 @@ $ms_itemid = (new CMultiSelect([
 	'name' => 'itemid',
 	'object_name' => 'items',
 	'multiple' => false,
-	'data' => [['id' => $options['itemid'], 'name' => $options['item_name']]],
+	'data' => [[
+		'id' => $options['itemid'],
+		'name' => $options['item_name'],
+		'query' => $options['query']
+	]],
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'items',

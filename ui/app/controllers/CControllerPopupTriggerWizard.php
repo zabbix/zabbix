@@ -294,13 +294,16 @@ class CControllerPopupTriggerWizard extends CController {
 			if ($page_options['itemid']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'key_', 'name'],
-					'selectHosts' => ['name'],
+					'selectHosts' => ['name', 'host'],
 					'itemids' => $page_options['itemid']
 				]);
 
 				if ($items) {
 					$items = CMacrosResolverHelper::resolveItemNames($items);
-					$page_options['item_name'] = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded'];
+					$page_options = [
+						'query' => '/'.$items[0]['hosts'][0]['host'].'/'.$items[0]['key_'],
+						'item_name' => $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded']
+					] + $page_options;
 				}
 			}
 
