@@ -565,8 +565,13 @@ static int	eval_parse_function_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
 {
 	const char	*ptr = ctx->expression + pos;
 
-	while (0 != isalpha((unsigned char)*ptr) || '_' == *ptr)
+	if (0 != isdigit(*ptr))
+		return FAIL;
+
+	while (0 != isalpha((unsigned char)*ptr) || '_' == *ptr || 0 != isdigit((unsigned char)*ptr))
+	{
 		ptr++;
+	}
 
 	if ('(' == *ptr)
 	{
@@ -995,6 +1000,14 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 
 				if (0 != (ctx->rules & ZBX_EVAL_PARSE_PROPERTY) &&
 						SUCCEED == eval_parse_property_token(ctx, pos, token))
+				{
+					return SUCCEED;
+				}
+			}
+			else if (0 != isdigit((unsigned char)ctx->expression[pos]))
+			{
+				if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION_NAME) &&
+						SUCCEED == eval_parse_function_token(ctx, pos, token))
 				{
 					return SUCCEED;
 				}

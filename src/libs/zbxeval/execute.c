@@ -533,7 +533,7 @@ int	eval_compare_token(const zbx_eval_context_t *ctx, const zbx_strloc_t *loc, c
  *           return value.                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	eval_function_return(int args_num, zbx_variant_t *value, zbx_vector_var_t *output)
+static void	eval_function_return(zbx_uint32_t args_num, zbx_variant_t *value, zbx_vector_var_t *output)
 {
 	int	i;
 
@@ -1243,11 +1243,11 @@ static int	eval_execute_function_bitand(const zbx_eval_context_t *ctx, const zbx
  *                                                                            *
  * Purpose: evaluate function by calling custom callback (if configured)      *
  *                                                                            *
- * Parameters: ctx        - [IN] the evaluation context                       *
- *             token      - [IN] the function token                           *
- *             functio_cb - [IN] the callback function                        *
- *             output     - [IN/OUT] the output value stack                   *
- *             error      - [OUT] the error message in the case of failure    *
+ * parameters: ctx        - [in] the evaluation context                       *
+ *             token      - [in] the function token                           *
+ *             functio_cb - [in] the callback function                        *
+ *             output     - [in/out] the output value stack                   *
+ *             error      - [out] the error message in the case of failure    *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
@@ -1281,11 +1281,16 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_math_function_single_param                            *
+ * Function: eval_execute_math_function_single_param                          *
  *                                                                            *
- * Purpose: TODO                                                              *
+ * Purpose: evaluate mathematical function by calling passed function         *
+ *          with 1 double argument                                            *
  *                                                                            *
- * Parameters: TODO                                                           *
+ * parameters: ctx        - [in] the evaluation context                       *
+ *             token      - [in] the function token                           *
+ *             output     - [in/out] the output value stack                   *
+ *             error      - [out] the error message in the case of failure    *
+ *             func       - [in] the pointer to math function                 *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1348,11 +1353,16 @@ static double	math_truncate(double n, double decimal_points)
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_math_function_double_param                            *
+ * Function: eval_execute_math_function_double_param                          *
  *                                                                            *
- * Purpose: TODO                                                              *
+ * Purpose: evaluate mathematical function by calling passed function         *
+ *          with 2 double arguments                                           *
  *                                                                            *
- * Parameters: TODO                                                           *
+ * parameters: ctx        - [in] the evaluation context                       *
+ *             token      - [in] the function token                           *
+ *             output     - [in/out] the output value stack                   *
+ *             error      - [out] the error message in the case of failure    *
+ *             func       - [in] the pointer to math function                 *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1377,7 +1387,7 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 	arg1 = &output->values[output->values_num - 2];
 	arg2 = &output->values[output->values_num - 1];
 
-	if ((math_round == func || math_truncate == func) && 0 > arg2)
+	if ((math_round == func || math_truncate == func) && 0 > arg2->data.dbl)
 	{
 		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
 		return FAIL;
@@ -1421,17 +1431,35 @@ static double	math_rand()
 {
 	double	rand_val;
 
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 	rand_val = (double)rand();
 
 	return rand_val;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_math_function_return_value                          *
+ *                                                                            *
+ * Purpose: evaluate mathematical function that returns constant value        *
+ *                                                                            *
+ * parameters: ctx        - [in] the evaluation context                       *
+ *             token      - [in] the function token                           *
+ *             output     - [in/out] the output value stack                   *
+ *             error      - [out] the error message in the case of failure    *
+ *             value      - [in] the constant value to return                 *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error, double value)
 {
-	zbx_variant_set_dbl(&value, value);
-	eval_function_return(0, &value, output);
+	zbx_variant_t	ret_value;
+
+	zbx_variant_set_dbl(&ret_value, value);
+	eval_function_return(0, &ret_value, output);
 
 	return SUCCEED;
 }
@@ -1530,6 +1558,8 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_math_function_double_param(ctx, token, output, error, pow);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "round", ZBX_CONST_STRLEN("round")))
 		return eval_execute_math_function_double_param(ctx, token, output, error, math_round);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "mod", ZBX_CONST_STRLEN("mod")))
+		return eval_execute_math_function_double_param(ctx, token, output, error, fmod);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "truncate", ZBX_CONST_STRLEN("truncate")))
 		return eval_execute_math_function_double_param(ctx, token, output, error, math_truncate);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "atan2", ZBX_CONST_STRLEN("atan2")))
