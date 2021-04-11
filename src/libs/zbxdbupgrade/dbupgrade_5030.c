@@ -24,7 +24,6 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
-#include "log.h"
 
 /*
  * 5.4 development database patches
@@ -4087,8 +4086,8 @@ typedef struct
 }
 patch_filtertag_t;
 
-ZBX_PTR_VECTOR_DECL(patch_filtertag, patch_filtertag_t);
-ZBX_PTR_VECTOR_IMPL(patch_filtertag, patch_filtertag_t);
+ZBX_PTR_VECTOR_DECL(patch_filtertag, patch_filtertag_t)
+ZBX_PTR_VECTOR_IMPL(patch_filtertag, patch_filtertag_t)
 
 static void	patch_filtertag_free(patch_filtertag_t tag)
 {
