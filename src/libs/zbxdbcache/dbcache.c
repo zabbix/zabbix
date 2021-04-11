@@ -40,6 +40,7 @@
 #include "zbxavailability.h"
 #include "zbxtrends.h"
 #include "zbxalgo.h"
+#include "../zbxalgo/vectorimpl.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -187,6 +188,9 @@ static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 static int	hc_queue_get_size(void);
 static int	hc_get_history_compression_age(void);
+
+ZBX_PTR_VECTOR_DECL(item_tag, zbx_tag_t)
+ZBX_PTR_VECTOR_IMPL(item_tag, zbx_tag_t)
 
 /******************************************************************************
  *                                                                            *
@@ -1043,7 +1047,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	char			*name;
 	DC_ITEM			*item;
-	zbx_vector_str_t	item_tags;
+	zbx_vector_item_tag_t	item_tags;
 }
 zbx_item_info_t;
 
@@ -1087,12 +1091,9 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,it.tag"
-			" from item_tag it"
-			" where it.itemid=i.itemid"
-				" and");
+			"select itemid,tag,value from item_tag where");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids->values, itemids->values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
 	result = DBselect("%s", sql);
 
@@ -1100,6 +1101,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 	{
 		zbx_uint64_t	itemid;
 		zbx_item_info_t	*item_info;
+		zbx_tag_t	item_tag;
 
 		ZBX_DBROW2UINT64(itemid, row[0]);
 
@@ -1109,9 +1111,26 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 			continue;
 		}
 
-		zbx_vector_str_append(&item_info->item_tags, zbx_strdup(NULL, row[1]));
+		item_tag.tag = zbx_strdup(NULL, row[1]);
+		item_tag.value = zbx_strdup(NULL, row[2]);
+		zbx_vector_item_tag_append(&item_info->item_tags, item_tag);
 	}
 	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_tag_free                                                    *
+ *                                                                            *
+ * Purpose: frees resources allocated to store item tag                       *
+ *                                                                            *
+ * Parameters: item_tag - [IN] item tag                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	item_tag_free(zbx_tag_t item_tag)
+{
+	zbx_free(item_tag.tag);
+	zbx_free(item_tag.value);
 }
 
 /******************************************************************************
@@ -1125,8 +1144,8 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
  ******************************************************************************/
 static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 {
-	zbx_vector_str_clear_ext(&item_info->item_tags, zbx_str_free);
-	zbx_vector_str_destroy(&item_info->item_tags);
+	zbx_vector_item_tag_clear_ext(&item_info->item_tags, item_tag_free);
+	zbx_vector_item_tag_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
 }
 
@@ -1187,7 +1206,14 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
 
 		for (j = 0; j < item_info->item_tags.values_num; j++)
-			zbx_json_addstring(&json, NULL, item_info->item_tags.values[j], ZBX_JSON_TYPE_STRING);
+		{
+			zbx_tag_t	item_tag = item_info->item_tags.values[j];
+
+			zbx_json_addobject(&json, NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag.tag, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, item_tag.value, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json);
+		}
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
@@ -1285,7 +1311,14 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
 
 		for (j = 0; j < item_info->item_tags.values_num; j++)
-			zbx_json_addstring(&json, NULL, item_info->item_tags.values[j], ZBX_JSON_TYPE_STRING);
+		{
+			zbx_tag_t	item_tag = item_info->item_tags.values[j];
+
+			zbx_json_addobject(&json, NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag.tag, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, item_tag.value, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json);
+		}
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
@@ -1389,7 +1422,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 		item_info.itemid = item->itemid;
 		item_info.name = NULL;
 		item_info.item = item;
-		zbx_vector_str_create(&item_info.item_tags);
+		zbx_vector_item_tag_create(&item_info.item_tags);
 		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 	}
 
@@ -1417,7 +1450,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 			item_info.itemid = item->itemid;
 			item_info.name = NULL;
 			item_info.item = item;
-			zbx_vector_str_create(&item_info.item_tags);
+			zbx_vector_item_tag_create(&item_info.item_tags);
 			zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 		}
 	}
