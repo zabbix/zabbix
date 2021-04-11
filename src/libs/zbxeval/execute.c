@@ -1327,7 +1327,7 @@ static int	eval_execute_math_function_single_param(const zbx_eval_context_t *ctx
 	return SUCCEED;
 }
 
-static double	math_round(double n, double decimal_points)
+static double	eval_math_func_round(double n, double decimal_points)
 {
 	double	multiplier;
 
@@ -1336,13 +1336,13 @@ static double	math_round(double n, double decimal_points)
 	return round(n * multiplier ) / multiplier;
 }
 
-static double	math_truncate(double n, double decimal_points)
+static double	eval_math_func_truncate(double n, double decimal_points)
 {
 	double	multiplier = 1;
 
-	if (decimal_points > 0)
+	if (0 < decimal_points)
 		multiplier = pow(10, decimal_points);
-	else if (decimal_points == 0)
+	else if (0 == decimal_points)
 		multiplier = 1;
 
 	if (0 > n)
@@ -1387,7 +1387,7 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 	arg1 = &output->values[output->values_num - 2];
 	arg2 = &output->values[output->values_num - 1];
 
-	if ((math_round == func || math_truncate == func) && 0 > arg2->data.dbl)
+	if ((eval_math_func_round == func || eval_math_func_truncate == func) && 0 > arg2->data.dbl)
 	{
 		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
 		return FAIL;
@@ -1403,31 +1403,31 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 #define ZBX_MATH_CONST_PI	3.141592653589793238463
 #define ZBX_MATH_CONST_E	2.718281828459045
 
-static double	degrees(double radians)
+static double	eval_math_func_degrees(double radians)
 {
 	return radians * (180.0 / ZBX_MATH_CONST_PI);
 }
 
-static double	radians(double degrees)
+static double	eval_math_func_radians(double degrees)
 {
 	return degrees * (ZBX_MATH_CONST_PI / 180);
 }
 
-static double	cot(double x)
+static double	eval_math_func_cot(double x)
 {
 	return cos(x) / sin(x);
 }
 
-static double	signum(double x)
+static double	eval_math_func_signum(double x)
 {
-	if (x < 0)
+	if (0 > x)
 		return -1;
-	if (x == 0)
+	if (0 == x)
 		return 0;
 	return 1;
 }
 
-static double	math_rand()
+static double	eval_math_func_rand()
 {
 	double	rand_val;
 
@@ -1525,11 +1525,11 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "floor", ZBX_CONST_STRLEN("floor")))
 		return eval_execute_math_function_single_param(ctx, token, output, error, floor);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "signum", ZBX_CONST_STRLEN("signum")))
-		return eval_execute_math_function_single_param(ctx, token, output, error, signum);
+		return eval_execute_math_function_single_param(ctx, token, output, error, eval_math_func_signum);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "degrees", ZBX_CONST_STRLEN("degrees")))
-		return eval_execute_math_function_single_param(ctx, token, output, error, degrees);
+		return eval_execute_math_function_single_param(ctx, token, output, error, eval_math_func_degrees);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "radians", ZBX_CONST_STRLEN("radians")))
-		return eval_execute_math_function_single_param(ctx, token, output, error, radians);
+		return eval_execute_math_function_single_param(ctx, token, output, error, eval_math_func_radians);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "acos", ZBX_CONST_STRLEN("acos")))
 		return eval_execute_math_function_single_param(ctx, token, output, error, acos);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "asin", ZBX_CONST_STRLEN("asin")))
@@ -1541,7 +1541,7 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "cosh", ZBX_CONST_STRLEN("cosh")))
 		return eval_execute_math_function_single_param(ctx, token, output, error, cosh);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "cot", ZBX_CONST_STRLEN("cot")))
-		return eval_execute_math_function_single_param(ctx, token, output, error, cot);
+		return eval_execute_math_function_single_param(ctx, token, output, error, eval_math_func_cot);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "sin", ZBX_CONST_STRLEN("sin")))
 		return eval_execute_math_function_single_param(ctx, token, output, error, sin);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "sinh", ZBX_CONST_STRLEN("sinh")))
@@ -1557,11 +1557,11 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "power", ZBX_CONST_STRLEN("power")))
 		return eval_execute_math_function_double_param(ctx, token, output, error, pow);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "round", ZBX_CONST_STRLEN("round")))
-		return eval_execute_math_function_double_param(ctx, token, output, error, math_round);
+		return eval_execute_math_function_double_param(ctx, token, output, error, eval_math_func_round);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "mod", ZBX_CONST_STRLEN("mod")))
 		return eval_execute_math_function_double_param(ctx, token, output, error, fmod);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "truncate", ZBX_CONST_STRLEN("truncate")))
-		return eval_execute_math_function_double_param(ctx, token, output, error, math_truncate);
+		return eval_execute_math_function_double_param(ctx, token, output, error, eval_math_func_truncate);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "atan2", ZBX_CONST_STRLEN("atan2")))
 		return eval_execute_math_function_double_param(ctx, token, output, error, atan2);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "pi", ZBX_CONST_STRLEN("pi")))
@@ -1569,7 +1569,7 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "e", ZBX_CONST_STRLEN("e")))
 		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_CONST_E);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "rand", ZBX_CONST_STRLEN("rand")))
-		return eval_execute_math_return_value(ctx, token, output, error, math_rand());
+		return eval_execute_math_return_value(ctx, token, output, error, eval_math_func_rand());
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);
