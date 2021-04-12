@@ -714,7 +714,7 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 
 /* flags for evaluate_COUNT() */
 #define COUNT_ALL	0
-#define COUNT_DISTINCT	1
+#define COUNT_UNIQUE	1
 
 /******************************************************************************
  *                                                                            *
@@ -736,8 +736,8 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *             ts         - [IN] the function evaluation time                 *
  *             limit      - [IN] the limit of counted values, will return     *
  *                              when the limit is reached                     *
- *             distinct   - [IN] COUNT_ALL - count all values,                *
- *                               COUNT_DISTINCT - count distinct values       *
+ *             unique     - [IN] COUNT_ALL - count all values,                *
+ *                               COUNT_UNIQUE - count unique values           *
  *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
@@ -745,7 +745,7 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		int limit, int distinct, char **error)
+		int limit, int unique, char **error)
 {
 	int				arg1, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
 	int				seconds = 0, nvalues = 0, time_shift;
@@ -941,7 +941,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 		goto out;
 	}
 
-	if (COUNT_DISTINCT == distinct)
+	if (COUNT_UNIQUE == unique)
 	{
 		switch (item->value_type)
 		{
@@ -3265,7 +3265,7 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	}
 	else if (0 == strcmp(function, "countunique"))
 	{
-		ret = evaluate_COUNT(value, item, parameter, ts, ZBX_MAX_UINT31_1, COUNT_DISTINCT, error);
+		ret = evaluate_COUNT(value, item, parameter, ts, ZBX_MAX_UINT31_1, COUNT_UNIQUE, error);
 	}
 	else if (0 == strcmp(function, "nodata"))
 	{
