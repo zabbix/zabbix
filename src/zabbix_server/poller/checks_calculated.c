@@ -796,7 +796,7 @@ static void	calc_init_query_many(zbx_calc_eval_t *eval, zbx_calc_query_t *query)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64, __func__, itemids.values[i]);
 	}
 
-	data = (zbx_calc_query_many_t*) zbx_malloc(NULL, sizeof(zbx_calc_query_many_t));
+	data = (zbx_calc_query_many_t *)zbx_malloc(NULL, sizeof(zbx_calc_query_many_t));
 	data->itemids = itemids;
 	query->data = data;
 	eval->many_num++;
@@ -1096,7 +1096,7 @@ static int	calcitem_eval_one(zbx_calc_eval_t *eval, zbx_calc_query_t *query, con
 			ZBX_NULL2EMPTY_STR(query->ref.host), ZBX_NULL2EMPTY_STR(query->ref.key),
 			ZBX_NULL2EMPTY_STR(query->ref.filter));
 
-	data = (zbx_calc_query_one_t*) query->data;
+	data = (zbx_calc_query_one_t *)query->data;
 
 	if (SUCCEED != eval->errcodes_hk[data->dcitem_hk_index])
 	{
@@ -1209,13 +1209,13 @@ static int	calcitem_eval_many(zbx_calc_eval_t *eval, zbx_calc_query_t *query, co
 	zbx_calc_query_many_t	*data;
 	int			ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int )len, name,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int)len, name,
 			ZBX_NULL2EMPTY_STR(query->ref.host), ZBX_NULL2EMPTY_STR(query->ref.key),
 			ZBX_NULL2EMPTY_STR(query->ref.filter));
 
 	ZBX_UNUSED(args_num);
 
-	data = (zbx_calc_query_many_t*) query->data;
+	data = (zbx_calc_query_many_t *)query->data;
 
 	ret = evaluate_aggregate(&data->itemids, &eval->dcitem_refs, ts, name, len, args_num, args, value, error);
 
@@ -1268,10 +1268,10 @@ static int	calcitem_eval_history(const char *name, size_t len, int args_num, con
 		goto out;
 	}
 
-	eval = (zbx_calc_eval_t*) data;
+	eval = (zbx_calc_eval_t *)data;
 
 	/* the historical function item query argument is replaced with corresponding itemrefs index */
-	query = (zbx_calc_query_t*) eval->queries.values[(int) args[0].data.ui64];
+	query = (zbx_calc_query_t *)eval->queries.values[(int) args[0].data.ui64];
 
 	if (ZBX_CALC_QUERY_ERROR == query->flags)
 	{
@@ -1289,7 +1289,6 @@ static int	calcitem_eval_history(const char *name, size_t len, int args_num, con
 		*error = zbx_dsprintf(NULL, "Cannot evaluate function: %s", errmsg);
 		zbx_free(errmsg);
 	}
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:%s", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
