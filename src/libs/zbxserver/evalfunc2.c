@@ -2340,3 +2340,36 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_is_trigger_function                                          *
+ *                                                                            *
+ * Purpose: check if the specified function is a trigger function             *
+ *                                                                            *
+ * Parameters: name - [IN] the function name to check                         *
+ *             len  - [IN] the length of function name                        *
+ *                                                                            *
+ * Return value: SUCCEED - the function is a trigger function                 *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_trigger_function(const char *name, size_t len)
+{
+	char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "nodata", "change", "find",
+			"fuzzytime", "logeventid", "logseverity", "logsource", "band", "forecast", "timeleft",
+			"trendavg", "trendcount", "trendmax", "trendmin", "trendsum",
+		NULL};
+	char	**ptr;
+
+	for (ptr = functions; NULL != *ptr; ptr++)
+	{
+		size_t	compare_len;
+
+		compare_len = strlen(*ptr);
+		if (compare_len == len && 0 == memcmp(*ptr, name, len))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}

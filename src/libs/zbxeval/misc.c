@@ -277,9 +277,7 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 		const zbx_eval_token_t *token)
 {
 	int		quoted = 0, check_value = 0;
-	const char	*src, *value_str;
-	char		*dst;
-	size_t		size;
+	const char	*value_str;
 
 	if (ZBX_VARIANT_NONE == token->value.type)
 		return;
@@ -338,55 +336,9 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	value_str = zbx_variant_value_desc(&token->value);
 
 	if (0 == quoted)
-	{
 		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
-		return;
-	}
-
-	for (size = 2, src = value_str; '\0' != *src; src++)
-	{
-		switch (*src)
-		{
-			case '\\':
-			case '"':
-				size++;
-		}
-		size++;
-	}
-
-	if (*str_alloc <= *str_offset + size)
-	{
-		if (0 == *str_alloc)
-			*str_alloc = size;
-
-		do
-		{
-			*str_alloc *= 2;
-		}
-		while (*str_alloc - *str_offset <= size);
-
-		*str = zbx_realloc(*str, *str_alloc);
-	}
-
-	dst = *str + *str_offset;
-	*dst++ = '"';
-
-	for (src = value_str; '\0' != *src; src++, dst++)
-	{
-		switch (*src)
-		{
-			case '\\':
-			case '"':
-				*dst++ = '\\';
-				break;
-		}
-
-		*dst = *src;
-	}
-
-	*dst++ = '"';
-	*dst = '\0';
-	*str_offset += size;
+	else
+		zbx_strquote_alloc(str, str_alloc, str_offset, value_str);
 }
 
 /******************************************************************************
@@ -473,6 +425,8 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *hos
 						hostids, hostids_num, &value, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
+			case ZBX_EVAL_TOKEN_VAR_NUM:
+			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				if (NULL == (ptr = strstr(ctx->expression + token->loc.l, "{$")) ||
 						ptr >= ctx->expression + token->loc.r)
 				{
@@ -969,4 +923,30 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 	zbx_chrcpy_alloc(&msg, &msg_alloc, &msg_offset, '.');
 
 	return msg;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_extract_history_queries                                 *
+ *                                                                            *
+ * Purpose: copy history query into vector and replace it with vector index   *
+ *                                                                            *
+ * Parameters: ctx  - [IN] the evaluation context                             *
+ *             refs - [OUT] the item references                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs)
+{
+	int	i;
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		if (ZBX_EVAL_TOKEN_ARG_QUERY != token->type)
+			continue;
+
+		zbx_variant_set_ui64(&token->value, refs->values_num);
+		zbx_vector_str_append(refs, zbx_substr(ctx->expression, token->loc.l, token->loc.r));
+	}
 }

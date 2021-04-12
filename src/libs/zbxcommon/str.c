@@ -358,6 +358,58 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
 	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
 }
 
+void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
+{
+	size_t		size;
+	const char	*src;
+	char		*dst;
+
+	for (size = 2, src = value_str; '\0' != *src; src++)
+	{
+		switch (*src)
+		{
+			case '\\':
+			case '"':
+				size++;
+		}
+		size++;
+	}
+
+	if (*str_alloc <= *str_offset + size)
+	{
+		if (0 == *str_alloc)
+			*str_alloc = size;
+
+		do
+		{
+			*str_alloc *= 2;
+		}
+		while (*str_alloc - *str_offset <= size);
+
+		*str = zbx_realloc(*str, *str_alloc);
+	}
+
+	dst = *str + *str_offset;
+	*dst++ = '"';
+
+	for (src = value_str; '\0' != *src; src++, dst++)
+	{
+		switch (*src)
+		{
+			case '\\':
+			case '"':
+				*dst++ = '\\';
+				break;
+		}
+
+		*dst = *src;
+	}
+
+	*dst++ = '"';
+	*dst = '\0';
+	*str_offset += size;
+}
+
 /* Has to be rewritten to avoid malloc */
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
@@ -3687,6 +3739,7 @@ static int	token_parse_expression_macro(const char *expression, const char *macr
 			{
 				switch (tmp.type)
 				{
+					case ZBX_TOKEN_MACRO:
 					case ZBX_TOKEN_LLD_MACRO:
 					case ZBX_TOKEN_LLD_FUNC_MACRO:
 					case ZBX_TOKEN_USER_MACRO:

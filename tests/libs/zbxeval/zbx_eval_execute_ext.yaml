@@ -52,7 +52,7 @@ in:
   callbacks:
   - name: err
     args_num: 0
-    reterr: 'forced return error'
+    error: 'forced return error'
 out:
   result: SUCCEED
   value: 1
@@ -64,7 +64,7 @@ in:
   callbacks:
   - name: err
     args_num: 0
-    reterr: 'forced return error'
+    error: 'forced return error'
 out:
   result: FAIL
 ---
@@ -75,7 +75,7 @@ in:
   callbacks:
   - name: err
     args_num: 0
-    reterr: 'forced return error'
+    error: 'forced return error'
 out:
   result: SUCCEED
   value: 0
@@ -87,7 +87,7 @@ in:
   callbacks:
   - name: err
     args_num: 0
-    reterr: 'forced return error'
+    error: 'forced return error'
 out:
   result: FAIL
 ---
