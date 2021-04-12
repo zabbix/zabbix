@@ -598,9 +598,6 @@ class CControllerPopupTriggerExpr extends CController {
 									? $value_token->data['string']
 									: $value_token->match;
 							}
-							else {
-								break;
-							}
 
 							if (!in_array($fn_name, getStandaloneFunctions())
 									&& ($query = $function_token->getFunctionTriggerQuery()) !== null) {
