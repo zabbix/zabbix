@@ -3263,7 +3263,7 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	{
 		ret = evaluate_COUNT(value, item, parameter, ts, ZBX_MAX_UINT31_1, COUNT_ALL, error);
 	}
-	else if (0 == strcmp(function, "countdistinct"))
+	else if (0 == strcmp(function, "countunique"))
 	{
 		ret = evaluate_COUNT(value, item, parameter, ts, ZBX_MAX_UINT31_1, COUNT_DISTINCT, error);
 	}
@@ -3374,7 +3374,7 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
  ******************************************************************************/
 int	zbx_is_trigger_function(const char *name, size_t len)
 {
-	const char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "countdistinct",
+	const char	*functions[] = {"last", "min", "max", "avg", "sum", "percentile", "count", "countunique",
 			"nodata", "change", "find", "fuzzytime", "logeventid", "logseverity", "logsource", "band",
 			"forecast", "timeleft", "trendavg", "trendcount", "trendmax", "trendmin", "trendsum", "first",
 			"kurtosis", "mad", "skewness", "stddevpop", "stddevsamp", "sumofsquares", "varpop", "varsamp",

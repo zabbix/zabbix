@@ -522,7 +522,7 @@ out:
   return: FAIL
   value: 2
 ---
-test case: Evaluate countdistinct(5m) FLOAT 5 3 3 1 2
+test case: Evaluate countunique(5m) FLOAT 5 3 3 1 2
 in:
   history:
   - itemid: 1
@@ -539,13 +539,13 @@ in:
     - value: 2
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '5m'
 out:
   return: SUCCEED
   value: 4
 ---
-test case: Evaluate countdistinct(5m) FLOAT 1 1 1 1 1
+test case: Evaluate countunique(5m) FLOAT 1 1 1 1 1
 in:
   history:
   - itemid: 1
@@ -562,13 +562,13 @@ in:
     - value: 1
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '5m'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate countdistinct(5m) UINT64 5 3 3 1 2
+test case: Evaluate countunique(5m) UINT64 5 3 3 1 2
 in:
   history:
   - itemid: 1
@@ -585,13 +585,13 @@ in:
     - value: 2
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '5m'
 out:
   return: SUCCEED
   value: 4
 ---
-test case: Evaluate countdistinct(5m) UINT64 1 1 1 1 1
+test case: Evaluate countunique(5m) UINT64 1 1 1 1 1
 in:
   history:
   - itemid: 1
@@ -608,13 +608,13 @@ in:
     - value: 1
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '5m'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate countdistinct(5m) STR One One One One One
+test case: Evaluate countunique(5m) STR One One One One One
 in:
   history:
   - itemid: 1
@@ -631,13 +631,13 @@ in:
     - value: One
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '5m'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate countdistinct(5m) STR One Two Three Four One
+test case: Evaluate countunique(5m) STR One Two Three Four One
 in:
   history:
   - itemid: 1
@@ -654,13 +654,13 @@ in:
     - value: One
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '5m'
 out:
   return: SUCCEED
   value: 4
 ---
-test case: Evaluate countdistinct(11m) LOG 'abc', 'abc' no sources
+test case: Evaluate countunique(11m) LOG 'abc', 'abc' no sources
 in:
   history:
   - itemid: 1
@@ -679,13 +679,13 @@ in:
       timestamp: 2
       ts: 2017-01-10 10:00:30.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '11m'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate countdistinct(11m) LOG 'qwerty' 'abc' no sources
+test case: Evaluate countunique(11m) LOG 'qwerty' 'abc' no sources
 in:
   history:
   - itemid: 1
@@ -704,13 +704,13 @@ in:
       timestamp: 2
       ts: 2017-01-10 10:00:30.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '11m'
 out:
   return: SUCCEED
   value: 2
 ---
-test case: Evaluate countdistinct(11m) LOG 'abc' 'abc' different sources
+test case: Evaluate countunique(11m) LOG 'abc' 'abc' different sources
 in:
   history:
   - itemid: 1
@@ -729,13 +729,13 @@ in:
       timestamp: 2
       ts: 2017-01-10 10:00:30.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '11m'
 out:
   return: SUCCEED
   value: 2
 ---
-test case: Evaluate countdistinct(11m) LOG 'abc' 'abc' only source 1
+test case: Evaluate countunique(11m) LOG 'abc' 'abc' only source 1
 in:
   history:
   - itemid: 1
@@ -754,13 +754,13 @@ in:
       timestamp: 2
       ts: 2017-01-10 10:00:30.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '11m'
 out:
   return: SUCCEED
   value: 2
 ---
-test case: Evaluate countdistinct(11m) LOG 'abc' 'abc' only source 2
+test case: Evaluate countunique(11m) LOG 'abc' 'abc' only source 2
 in:
   history:
   - itemid: 1
@@ -779,7 +779,7 @@ in:
       timestamp: 2
       ts: 2017-01-10 10:00:30.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
-  function: countdistinct
+  function: countunique
   params: '11m'
 out:
   return: SUCCEED
