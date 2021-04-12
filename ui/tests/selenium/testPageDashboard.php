@@ -163,15 +163,23 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_RemoveFavouriteMaps() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$FavouriteScreens = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr("web.favorite.sysmapids")));
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
+		$widget_content = CDashboardElement::find()->one()->getWidget('Favourite maps')->getContent();
+		$FavouriteScreens = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.
+				zbx_dbstr("web.favorite.sysmapids")));
+
 		foreach ($FavouriteScreens as $FavouriteScreen) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashboard-grid-widget-container']/div[2]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
-			$this->zbxTestClickXpathWait("//div[@class='dashboard-grid-widget-container']/div[2]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashboard-grid']/div[2]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
+			$widget_content->query('xpath://button[contains(@onclick, "(\'sysmapid\',\''.
+					$FavouriteScreen['value_id'].'\')")]')->waitUntilClickable()->one()->click();
+			$map_name = CDBHelper::getValue('SELECT name FROM sysmaps WHERE sysmapid='.
+					zbx_dbstr($FavouriteScreen['value_id']));
+			$widget_content->query('link', $map_name)->waitUntilNotPresent();
 		}
-		$this->zbxTestAssertElementText("//div[@class='dashboard-grid-widget-container']/div[2]//tr[@class='nothing-to-show']/td", 'No maps added.');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr("web.favorite.sysmapids")));
+
+		$this->assertTrue($widget_content->query('xpath://table//td[text()="No maps added."]')->waitUntilVisible()
+				->one()->isPresent());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
+				zbx_dbstr("web.favorite.sysmapids")));
 	}
 
 	public function testPageDashboard_KioskMode() {
