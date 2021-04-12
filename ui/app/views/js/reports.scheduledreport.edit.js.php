@@ -26,7 +26,7 @@
 
 <script>
 	const current_userid = <?= CWebUser::$data['userid'] ?>;
-	const current_user_name = '<?= getUserFullname(CWebUser::$data) ?>';
+	const current_user_name = <?= json_encode(getUserFullname(CWebUser::$data)) ?>;
 	const old_dashboardid = <?= $data['old_dashboardid'] ?>;
 	let dashboard_inaccessible = <?= json_encode($data['dashboard_inaccessible']) ?>;
 	let subscriptions_sanitized = true;
