@@ -30,7 +30,7 @@ This guide describes how to integrate your Zabbix 5.0 and higher installation wi
 	- **alarm** (default)
 		- Update messages will be attached as replies to Slack message thread
 		- Recovery message from Zabbix will update initial message<br>
-		**Note:** alarm mode is working correctly only if you are sending messages to only one channel because webhook use non-unique event tags for storing data about created threads, and we can not perform multiple threads updating.
+		**Note:** alarm mode works correctly only if you send messages to only one channel because the webhook uses non-unique event tags for storing data about created threads, and we cannot perform multiple threads updating.
 	- **event**
 		- Recovery and update messages from Zabbix will be posted as new messages
 
