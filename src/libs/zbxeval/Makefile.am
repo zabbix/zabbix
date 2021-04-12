@@ -5,5 +5,5 @@ noinst_LIBRARIES = libzbxeval.a
 libzbxeval_a_SOURCES = \
 	parse.c \
 	execute.c \
-	misc.c
-
+	misc.c \
+	query.c

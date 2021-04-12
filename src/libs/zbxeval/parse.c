@@ -468,19 +468,7 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 	len += offset;
 
-	switch (ctx->expression[pos + len - 1])
-	{
-		case 's':
-		case 'm':
-		case 'h':
-		case 'd':
-		case 'w':
-			token->type = ZBX_EVAL_TOKEN_VAR_TIME;
-			break;
-		default:
-			token->type = ZBX_EVAL_TOKEN_VAR_NUM;
-			break;
-	}
+	token->type = ZBX_EVAL_TOKEN_VAR_NUM;
 
 	tmp = strtod(ctx->expression + pos, &end) * suffix2factor(ctx->expression[pos + len - 1]);
 	if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
@@ -594,7 +582,7 @@ static int	eval_parse_function_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
  ******************************************************************************/
 static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
-#define MVAR_HOST_HOST	"{HOST.HOST}"
+#define MVAR_HOST_HOST	"{HOST.HOST"
 
 	const char	*ptr = ctx->expression + pos + 1, *key;
 
@@ -605,8 +593,25 @@ static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_
 			break;
 		case '{':
 			if (0 == strncmp(ptr, MVAR_HOST_HOST, ZBX_CONST_STRLEN(MVAR_HOST_HOST)))
-				ptr += ZBX_CONST_STRLEN(MVAR_HOST_HOST);
-			break;
+			{
+				int	offset = 0;
+
+				if ('}' == ptr[ZBX_CONST_STRLEN(MVAR_HOST_HOST)])
+				{
+					offset = 1;
+				}
+				else if (0 != isdigit((unsigned char)ptr[ZBX_CONST_STRLEN(MVAR_HOST_HOST)]) &&
+					'}' == ptr[ZBX_CONST_STRLEN(MVAR_HOST_HOST) + 1])
+				{
+					offset = 2;
+				}
+
+				if (0 != offset)
+				{
+					ptr += ZBX_CONST_STRLEN(MVAR_HOST_HOST) + offset;
+					break;
+				}
+			}
 		default:
 			while (SUCCEED == is_hostname_char(*ptr))
 				ptr++;
@@ -614,7 +619,13 @@ static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_
 
 	if ('/' != *ptr)
 	{
-		*error = zbx_dsprintf(*error, "invalid host name in query starting at \"%s\"", ctx->expression + pos);
+		if (ptr == ctx->expression + pos + 1)
+		{
+			*error = zbx_dsprintf(*error, "invalid host name in query starting at \"%s\"", ctx->expression + pos);
+			return FAIL;
+		}
+
+		*error = zbx_dsprintf(*error, "missing item key in query starting at \"%s\"", ctx->expression + pos);
 		return FAIL;
 	}
 
@@ -953,7 +964,8 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 			goto out;
 		}
 
-		if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx->last_token_type && ZBX_EVAL_TOKEN_COMMA != token.type)
+		if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx->last_token_type && ZBX_EVAL_TOKEN_COMMA != token.type &&
+				ZBX_EVAL_TOKEN_GROUP_CLOSE != token.type)
 		{
 			*error = zbx_dsprintf(*error, "invalid expression following query token at \"%s\"",
 					ctx->expression + pos);
@@ -1169,30 +1181,6 @@ out:
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error)
 {
 	return eval_parse_expression(ctx, expression, rules, error);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_eval_parse_expression                                        *
- *                                                                            *
- * Purpose: parse expression into tokens in postfix notation order            *
- *                                                                            *
- * Parameters: expression - [IN] the expression to parse                      *
- *             rules      - [IN] the parsing rules                            *
- *             error      - [OUT] the error message in the case of failure    *
- *                                                                            *
- * Return value: The evaluation context or NULL in the case of error.         *
- *                                                                            *
- ******************************************************************************/
-zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_uint64_t rules, char **error)
-{
-	zbx_eval_context_t	*ctx;
-
-	ctx = (zbx_eval_context_t *)zbx_malloc(NULL, sizeof(zbx_eval_context_t));
-	if (SUCCEED != zbx_eval_parse_expression(ctx, expression, rules, error))
-		zbx_free(ctx);
-
-	return ctx;
 }
 
 /******************************************************************************
