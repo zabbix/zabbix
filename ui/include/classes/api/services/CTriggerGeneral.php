@@ -1406,24 +1406,38 @@ abstract class CTriggerGeneral extends CApiService {
 				continue;
 			}
 
-			$expressionData->parse($trigger['expression']);
-			foreach ($expressionData->result->getItemsGroupedByHosts() as $key => $host) {
-				if (array_key_exists($key, $hosts_keys)) {
-					$hosts_keys[$key]['keys'] += $host['keys'];
-				}
-				else {
-					$hosts_keys[$key] = $host;
-				}
-			}
+			$expression_fields = ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
+				? ['expression', 'recovery_expression']
+				: ['expression'];
 
-			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-				$expressionData->parse($trigger['recovery_expression']);
-				foreach ($expressionData->result->getItemsGroupedByHosts() as $key => $host) {
-					if (array_key_exists($key, $hosts_keys)) {
-						$hosts_keys[$key]['keys'] += $host['keys'];
-					}
-					else {
-						$hosts_keys[$key] = $host;
+			foreach ($expression_fields as $expression_field) {
+				$expressionData->parse($trigger[$expression_field]);
+				$params_stack = $expressionData->result->getTokens();
+
+				while ($params_stack) {
+					$param = array_shift($params_stack);
+					if ($param instanceof CFunctionParserResult) {
+						$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
+
+						foreach ($param->getItemsGroupedByHosts() as $host => $items) {
+							if (!array_key_exists($host, $hosts_keys)) {
+								$hosts_keys[$host] = [
+									'hostid' => null,
+									'host' => $host,
+									'status' => null,
+									'keys' => []
+								];
+							}
+
+							foreach ($items as $item) {
+								$hosts_keys[$host]['keys'][$item] = [
+									'itemid' => null,
+									'key' => $item,
+									'value_type' => null,
+									'flags' => null
+								];
+							}
+						}
 					}
 				}
 			}
