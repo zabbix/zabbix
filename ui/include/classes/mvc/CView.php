@@ -206,12 +206,7 @@ class CView {
 	 */
 	public function getLayoutMode() {
 		if ($this->layout_modes_enabled) {
-			if ($this->layout_mode !== null) {
-				return $this->layout_mode;
-			}
-			else {
-				CViewHelper::loadLayoutMode();
-			}
+			return ($this->layout_mode !== null) ? $this->layout_mode : CViewHelper::loadLayoutMode();
 		}
 
 		return ZBX_LAYOUT_NORMAL;
