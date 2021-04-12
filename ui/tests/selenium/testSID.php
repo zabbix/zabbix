@@ -37,7 +37,7 @@ class testSID extends CWebTest {
 			// Icon mapping delete
 			[['link' => 'zabbix.php?action=iconmap.delete&iconmapid=101']],
 
-			// Icon maping update.
+			// Icon mapping update.
 			[['link' => 'zabbix.php?action=iconmap.update&form_refresh=1&form=1&iconmapid='.
 					'101&iconmap%5Bname%5D=Icon+mapping+name+change&iconmap%5Bmappings%5D%5B0%5D%5Binventory_link'.
 					'%5D=4&iconmap%5Bmappings%5D%5B0%5D%5Bexpression%5D=%281%21%40%23%24%25%5E-%3D2*%29&iconmap'.
