@@ -216,9 +216,11 @@ static int	calcitem_eval_single(zbx_calc_eval_t *eval, zbx_item_query_t *query, 
 
 	if (0 == args_num)
 	{
-		ret = evaluate_function2(value, item, func_name, "", ts, &errmsg);
-		*error = zbx_dsprintf(NULL,"Cannot evaluate calculated item formula: %s", errmsg);
-		zbx_free(errmsg);
+		if (SUCCEED != (ret = evaluate_function2(value, item, func_name, "", ts, &errmsg)))
+		{
+			*error = zbx_dsprintf(NULL,"Cannot evaluate calculated item formula: %s", errmsg);
+			zbx_free(errmsg);
+		}
 		goto out;
 	}
 
@@ -250,7 +252,11 @@ static int	calcitem_eval_single(zbx_calc_eval_t *eval, zbx_item_query_t *query, 
 		}
 	}
 
-	ret = evaluate_function2(value, item, func_name, params, ts, error);
+	if (SUCCEED != (ret = evaluate_function2(value, item, func_name, params, ts, &errmsg)))
+	{
+		*error = zbx_dsprintf(NULL,"Cannot evaluate calculated item formula: %s", errmsg);
+		zbx_free(errmsg);
+	}
 out:
 	zbx_free(params);
 

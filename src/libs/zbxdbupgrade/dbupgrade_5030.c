@@ -2803,7 +2803,7 @@ static int	DBpatch_5030083(void)
 
 		if (ITEM_PARAM_LEN < zbx_strlen_utf8(out))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\"formula:"
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\" formula:"
 					" too long expression", itemid);
 		}
 		else
