@@ -253,7 +253,7 @@ class CTextTriggerConstructor {
 				case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
 					// look for an "or" or "and" operator on the top parentheses level
 					// if such an expression is found, save all of the tokens before it as a separate expression
-					if ($level == 0 && ($token->value === 'or' || $token->value === 'and')) {
+					if ($level == 0 && ($token->match === 'or' || $token->match === 'and')) {
 						$expressions[] = $currentExpression;
 						$currentExpression = [];
 
