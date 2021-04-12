@@ -494,7 +494,7 @@ class CTextTriggerConstructorTest extends TestCase {
 	public function testGetPartsFromExpression(string $expression, array $expected_parts) {
 		$parts = $this->constructor->getPartsFromExpression($expression);
 
-		$this->assertIsArray($parts);
+		$this->assertTrue(is_array($parts));
 		unset($parts[0]['details'], $parts[1]['details'], $parts[2]['details']);
 
 		$this->assertSame($expected_parts, $parts);
