@@ -374,7 +374,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				return;
 			}
 
-			if ($param === '' || ($param[0] === '"' && substr($param, -1) === '"')) {
+			if ($param !== '' && $param[0] === '"' && substr($param, -1) === '"') {
 				return;
 			}
 
