@@ -99,7 +99,6 @@ class CControllerDashboardPrint extends CController {
 				'id' => $dashboard['userid'],
 				'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
 			];
-			$dashboard['has_related_reports'] = false;
 		}
 		else {
 			$error = _('No permissions to referred object or it does not exist!');
