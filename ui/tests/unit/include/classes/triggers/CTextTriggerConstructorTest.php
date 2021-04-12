@@ -264,7 +264,7 @@ class CTextTriggerConstructorTest extends TestCase {
 	 * @param string $expected_expressions
 	 */
 	public function testGetExpressionFromPartsValid(array $expressions, string $expected_expressions) {
-		$expression = $this->constructor->getExpressionFromParts('', '', $expressions);
+		$expression = $this->constructor->getExpressionFromParts($expressions);
 
 		$this->assertSame($expected_expressions, $expression);
 	}
