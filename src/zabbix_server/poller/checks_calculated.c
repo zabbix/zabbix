@@ -1400,21 +1400,21 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 		switch (value.type)
 		{
-		case ZBX_VARIANT_DBL:
-			SET_DBL_RESULT(result, value.data.dbl);
-			break;
-		case ZBX_VARIANT_UI64:
-			SET_UI64_RESULT(result, value.data.ui64);
-			break;
-		case ZBX_VARIANT_STR:
-			SET_TEXT_RESULT(result, value.data.str);
-			break;
-		default:
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "unsupported calculated value result \"%s\""
-					" of flags \"%s\"", zbx_variant_value_desc(&value),
-					zbx_variant_type_desc(&value)));
-			zbx_variant_clear(&value);
-			break;
+			case ZBX_VARIANT_DBL:
+				SET_DBL_RESULT(result, value.data.dbl);
+				break;
+			case ZBX_VARIANT_UI64:
+				SET_UI64_RESULT(result, value.data.ui64);
+				break;
+			case ZBX_VARIANT_STR:
+				SET_TEXT_RESULT(result, value.data.str);
+				break;
+			default:
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "unsupported calculated value result \"%s\""
+						" of flags \"%s\"", zbx_variant_value_desc(&value),
+						zbx_variant_type_desc(&value)));
+				zbx_variant_clear(&value);
+				break;
 		}
 
 		if (ZBX_VARIANT_NONE != value.type)
