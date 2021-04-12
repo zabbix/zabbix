@@ -132,6 +132,11 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			],
 			'o' => [
 				'C' => 'O',
 				'T' => T_ZBX_STR,
@@ -140,11 +145,6 @@ class CControllerPopupTriggerExpr extends CController {
 			'v' => [
 				'C' => 'V',
 				'T' => T_ZBX_STR,
-				'A' => false
-			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
 				'A' => false
 			]
 		];
@@ -156,6 +156,11 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => false
 			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			],
 			'o' => [
 				'C' => 'O',
 				'T' => T_ZBX_STR,
@@ -164,11 +169,6 @@ class CControllerPopupTriggerExpr extends CController {
 			'v' => [
 				'C' => 'V',
 				'T' => T_ZBX_STR,
-				'A' => false
-			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
 				'A' => false
 			]
 		];
@@ -199,15 +199,15 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
-			'mask' => [
-				'C' => _('Mask'),
-				'T' => T_ZBX_STR,
-				'A' => true
-			],
 			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT,
 				'A' => false
+			],
+			'mask' => [
+				'C' => _('Mask'),
+				'T' => T_ZBX_STR,
+				'A' => true
 			]
 		];
 
