@@ -325,9 +325,11 @@ class CReport extends CApiService {
 			$db_report = $db_reports ? $db_reports[$report['reportid']] : [];
 
 			if (array_key_exists('userid', $report) && (!$db_report || $report['userid'] != $db_report['userid'])) {
-				if ($report['userid'] != self::$userData['userid']
-						&& self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only super admins can set report owner.'));
+				if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+					if ((!$db_report && $report['userid'] != self::$userData['userid'])
+							|| ($db_report && $report['userid'] != $db_report['userid'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Only super admins can set report owner.'));
+					}
 				}
 
 				$userids[$report['userid']] = true;
