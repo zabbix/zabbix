@@ -209,7 +209,7 @@ class CMultifieldTableElement extends CTableElement {
 		}
 
 		return $result;
-		}
+	}
 
 	/**
 	 * Get controls from row.

@@ -25,59 +25,68 @@ require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
  *
  * @backup items, interface
  */
-class testPageMassUpdateItems extends testMassUpdateItems{
+class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 
 	/**
 	 * Add items for mass updating.
 	 */
-	public function prepareItemData() {
+	public function prepareItemPrototypesData() {
 		CDataHelper::setSessionId(null);
 
-		CDataHelper::call('item.create', [
+		CDataHelper::call('itemprototype.create', [
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '1_Item',
-				'key_' => '1agent',
+				'key_' => '1agent[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '1m',
-				'applications' => [5000, 5001]
+				'applications' => [5000, 5001],
+				'applicationPrototypes' => [['name' => 'Old Application proto']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '2_Item',
-				'key_' => '2agent',
+				'key_' => '2agent[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
-				'applications' => [5000, 5001]
+				'applications' => [5000, 5001],
+				'applicationPrototypes' => [['name' => 'Old Application proto']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '3_SNMP_trap',
-				'key_' => 'snmptrap.fallback',
+				'key_' => 'snmptrap[{#KEY1}]',
 				'type' => 17,
 				'value_type' => 0,
 				'interfaceid'=> self::SNMP2_INTERFACE_ID,
 				'delay' => '3m',
-				'applications' => [5002, 5003]
+				'applications' => [5002, 5003],
+				'applicationPrototypes' => [['name' => 'App proto for replace']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '4_SNMP_trap',
-				'key_' => 'snmptrap[regexp]',
+				'key_' => 'snmptrap[{#KEY2}]',
 				'type' => 17,
 				'value_type' => 1,
 				'interfaceid'=> self::SNMP2_INTERFACE_ID,
 				'delay' => '4m',
-				'applications' => [5002, 5003]
+				'applications' => [5002, 5003],
+				'applicationPrototypes' => [['name' => 'App proto for replace']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '5_Aggregate',
-				'key_' => 'grpavg["host group","key",avg,last]',
+				'key_' => 'grpavg["host group", [{#KEY}], avg, last]',
 				'type' => 8,
 				'value_type' => 0,
 				'interfaceid'=> self::SNMP2_INTERFACE_ID,
@@ -86,62 +95,73 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '6_Aggregate',
-				'key_' => 'grpmin["host group","key",avg,min]',
+				'key_' => 'grpmin["host group", [{#KEY}], avg, min]',
 				'type' => 8,
 				'value_type' => 3,
 				'interfaceid'=> self::SNMP2_INTERFACE_ID,
 				'delay' => '30s',
-				'applications' => [5004, 5005]
+				'applications' => [5004, 5005],
+				'applicationPrototypes' => [['name' => 'App proto for remove']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '7_IPMI',
-				'key_' => 'ipmi1',
+				'key_' => 'ipmi1[{#KEY}]',
 				'type' => 12,
 				'value_type' => 0,
 				'interfaceid'=> self::IPMI_INTERFACE_ID,
 				'delay' => '10m',
 				'ipmi_sensor' => 'temp',
-				'applications' => [5002, 5003]
+				'applications' => [5002, 5003],
+				'applicationPrototypes' => [['name' => 'App proto for replace']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '8_IPMI',
-				'key_' => 'ipmi2',
+				'key_' => 'ipmi2[{#KEY}]',
 				'type' => 12,
 				'value_type' => 3,
 				'interfaceid'=> self::IPMI_INTERFACE_ID,
 				'delay' => '11s',
 				'ipmi_sensor' => 'temp',
-				'applications' => [5002, 5003]
+				'applications' => [5002, 5003],
+				'applicationPrototypes' => [['name' => 'App proto for replace']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '9_SNMP_Agent',
-				'key_' => 'snmp1',
+				'key_' => 'snmp1[{#KEY}]',
 				'type' => 20,
 				'value_type' => 4,
 				'interfaceid'=> self::SNMP2_INTERFACE_ID,
 				'delay' => '9m',
 				'snmp_oid' => '.1.3.6.1.2.1.1.1.0',
-				'applications' => [5004, 5005]
+				'applications' => [5004, 5005],
+				'applicationPrototypes' => [['name' => 'App proto for remove']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '10_SNMP_Agent',
-				'key_' => 'snmp2',
+				'key_' => 'snmp2[{#KEY}]',
 				'type' => 20,
 				'value_type' => 4,
 				'interfaceid'=> self::SNMP2_INTERFACE_ID,
 				'delay' => '101s',
 				'snmp_oid' => '.1.3.8.1.2.1.1.1.0',
-				'applications' => [5004, 5005]
+				'applications' => [5004, 5005],
+				'applicationPrototypes' => [['name' => 'App proto for remove']]
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '11_SSH_Agent',
-				'key_' => 'ssh.run[]',
+				'key_' => 'ssh.run[{#KEY}]',
 				'type' => 13,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -152,8 +172,9 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '12_SSH_Agent',
-				'key_' => 'ssh.run[description]',
+				'key_' => 'ssh.run[{#KEY}]',
 				'type' => 13,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -164,8 +185,9 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '13_DB_Monitor',
-				'key_' => 'db.odbc.select',
+				'key_' => 'db.odbc.select[{#KEY}]',
 				'type' => 11,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -184,8 +206,9 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '14_DB_Monitor',
-				'key_' => 'db.odbc.select',
+				'key_' => 'db.odbc.select[{#KEY}]',
 				'type' => 11,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -202,8 +225,9 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '15_Calculated',
-				'key_' => 'calculated1',
+				'key_' => 'calculated1[{#KEY}]',
 				'type' => 15,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -212,8 +236,9 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '16_Calculated',
-				'key_' => 'calculated2',
+				'key_' => 'calculated2[{#KEY}]',
 				'type' => 15,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -224,20 +249,57 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 	}
 
 	/**
-	 * Data for mass updating of items.
+	 * Data for mass updating of item prototypes.
 	 */
-	public function getItemChangeData() {
+	public function getItemPrototypesChangeData() {
 		return [
 			[
 				[
 					'names'=> [
-						'3_SNMP_trap',
-						'4_SNMP_trap'
+						'1_Item',
+						'2_Item'
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'Status' => ['id' => 'status', 'value' => 'Disabled']
+						'Create enabled' => ['id' => 'status', 'value' => 'Disabled'],
+						'Discover' => ['id' => 'discover', 'value' => 'No'],
+						'Application prototypes' => [
+							'action' => 'Add',
+							'applications' => ['New_application_proto_1', 'New_application_proto_2']
+						]
+					],
+					'expected_applications' => [
+						'New_application_proto_1',
+						'New_application_proto_2',
+						'Old Application proto'
+					],
+					'not_expected_applications' => [
+						'App proto for remove',
+						'App proto for replace'
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'7_IPMI',
+						'8_IPMI'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'IPMI agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.3 : 10053'],
+						'Create enabled' => ['id' => 'status', 'value' => 'Enabled'],
+						'Discover' => ['id' => 'discover', 'value' => 'Yes'],
+						'Application prototypes' => [
+							'action' => 'Replace'
+						]
+					],
+					'expected_applications' => null,
+					'not_expected_applications' => [
+						'Old Application proto',
+						'App proto for remove',
+						'App proto for replace'
 					]
 				]
 			],
@@ -245,12 +307,46 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 				[
 					'names'=> [
 						'3_SNMP_trap',
-						'4_SNMP_trap'
+						'3_SNMP_trap'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1 : 10051'],
-						'Status' => ['id' => 'status', 'value' => 'Enabled']
+						'Type' => ['id' => 'type', 'value' => 'SNMP trap'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 10055'],
+					'Application prototypes' => [
+							'action' => 'Replace',
+							'applications' => ['Replaced_application_proto_1', 'Replaced_application_proto_2']
+						]
+					],
+					'expected_applications' => [
+						'Replaced_application_proto_1',
+						'Replaced_application_proto_2'
+					],
+					'not_expected_applications' => [
+						'Old Application proto',
+						'App proto for remove',
+						'App proto for replace'
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'9_SNMP_Agent',
+						'10_SNMP_Agent'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5 : 10055'],
+						'Application prototypes' => [
+							'action' => 'Remove'
+						]
+					],
+					'expected_applications' => [
+						'App proto for remove'
+					],
+					'not_expected_applications' => [
+						'Old Application proto',
+						'App proto for replace'
 					]
 				]
 			]
@@ -258,26 +354,27 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 	}
 
 	/**
-	 * @on-before-once prepareItemData, prepareInterfaceData
+	 * @on-before-once prepareItemPrototypesData, prepareInterfaceData
 	 *
 	 * @dataProvider getCommonChangeData
-	 * @dataProvider getItemChangeData
+	 * @dataProvider getItemPrototypesChangeData
 	 */
-	public function testPageMassUpdateItems_ChangeItems($data) {
-		$this->executeItemsMassUpdate($data);
+	public function testPageMassUpdateItemPrototypes_ChangeItems($data) {
+		$this->executeItemsMassUpdate($data, true);
 	}
 
 	/**
 	 * Add items with preprocessing for mass updating.
 	 */
-	public function prepareItemPreprocessingData() {
+	public function prepareItemPrototypePreprocessingData() {
 		CDataHelper::setSessionId(null);
 
-		CDataHelper::call('item.create', [
+		CDataHelper::call('itemprototype.create', [
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '1_Item_Preprocessing',
-				'key_' => '1agent.preproc',
+				'key_' => '1agent.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -299,8 +396,9 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '2_Item_Preprocessing',
-				'key_' => '2agent.preproc',
+				'key_' => '2agent.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -323,8 +421,9 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '1_Item_No_Preprocessing',
-				'key_' => '1agent.no.preproc',
+				'key_' => '1agent.no.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -332,8 +431,9 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
 				'name' => '2_Item_No_Preprocessing',
-				'key_' => '2agent.no.preproc',
+				'key_' => '2agent.no.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
@@ -343,11 +443,11 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 	}
 
 	/**
-	 * @on-before-once prepareItemPreprocessingData
+	 * @on-before-once prepareItemPrototypePreprocessingData
 	 *
 	 * @dataProvider getCommonPreprocessingChangeData
 	 */
-	public function testPageMassUpdateItems_ChangePreprocessing($data) {
-		$this->executeItemsPreprocessingMassUpdate($data);
+	public function testPageMassUpdateItemPrototypes_ChangePreprocessing($data) {
+		$this->executeItemsPreprocessingMassUpdate($data, true);
 	}
 }
