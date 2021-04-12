@@ -6013,75 +6013,149 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
 	zbx_free(context);
 }
 
+static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **filter,
+		char **error)
+{
+	zbx_item_query_t	query;
+	char			err[128];
+	int			ret;
+
+	zbx_eval_parse_query(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1, &query);
+
+	if (ZBX_ITEM_QUERY_UNKNOWN == query.type)
+	{
+		*error = zbx_strdup(NULL, "invalid item reference");
+		return FAIL;
+	}
+
+	if (SUCCEED == (ret = substitute_key_macros(&query.key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
+			err, sizeof(err))))
+	{
+		*filter = zbx_dsprintf(NULL, "/%s/%s", ZBX_NULL2EMPTY_STR(query.host), query.key);
+	}
+	else
+		*error = zbx_strdup(NULL, err);
+
+	zbx_eval_clear_query(&query);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_expression_macros                                     *
+ *                                                                            *
+ * Purpose: substitutes lld macros in an expression                           *
+ *                                                                            *
+ * Parameters: data            - [IN/OUT] the expression                      *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             error           - [IN] pointer to string for reporting errors  *
+ *             max_error_len   - [IN] size of 'error' string                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_expression_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+{
+	char			*exp = NULL;
+	int			i, ret = FAIL;
+	zbx_eval_context_t	ctx;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:%s", __func__, *data);
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, *data, rules, error))
+		goto out;
+
+	for (i = 0; i < ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx.stack.values[i];
+		char			*value, err[128];
+
+		switch(token->type)
+		{
+			case ZBX_EVAL_TOKEN_ARG_QUERY:
+				if (FAIL == substitute_item_filter_macros(&ctx, token, jp_row, lld_macro_paths, &value,
+						error))
+				{
+					goto clean;
+				}
+				break;
+			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
+			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+			case ZBX_EVAL_TOKEN_VAR_STR:
+			case ZBX_EVAL_TOKEN_VAR_NUM:
+			case ZBX_EVAL_TOKEN_ARG_PERIOD:
+				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+
+				if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err,
+						sizeof(err)))
+				{
+					*error = zbx_strdup(NULL, err);
+					zbx_free(value);
+					goto clean;
+				}
+				break;
+			default:
+				continue;
+		}
+
+		zbx_variant_clear(&token->value);
+		zbx_variant_set_str(&token->value, value);
+	}
+
+	zbx_eval_compose_expression(&ctx, &exp);
+
+	zbx_free(*data);
+	*data = exp;
+	exp = NULL;
+
+	ret = SUCCEED;
+clean:
+	zbx_free(exp);
+	zbx_eval_clear(&ctx);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:%s", __func__, *data);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: process_expression_macro_token                                   *
  *                                                                            *
  * Purpose: expand discovery macro in expression macro                        *
  *                                                                            *
- * Parameters: data            - [IN/OUT] the expression containing lld macro *
- *             token           - [IN/OUT] the token with user macro location data   *
- *             jp_row          - [IN] discovery data                                *
- *             lld_macro_paths - [IN] discovery data                                   *
- *             error  - [OUT] error message                                   *
- *             max_error_len - [IN] the size of error buffer                  *
+ * Parameters: data            - [IN/OUT] the expression containing macro     *
+ *             token           - [IN/OUT] the macro token                     *
+ *             jp_row          - [IN] discovery data                          *
+ *             lld_macro_paths - [IN] discovery data                          *
+ *             error           - [OUT] error message                          *
+ *             max_error_len   - [IN] the size of error buffer                *
  *                                                                            *
  ******************************************************************************/
-static int	process_expression_macro_token(char **data, zbx_token_t *token,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char *error,
-		size_t error_len)
+static int	process_expression_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t error_len)
 {
-	zbx_token_t	cur_token, tmp_token;
-	int		pos, quoted = 0, last_pos;
-	size_t		i;
+	char	*errmsg = NULL, *expression;
+	size_t	right = token->data.expression_macro.expression.r;
 
-	last_pos = pos = token->data.expression_macro.expression.l;
+	expression = zbx_substr(*data, token->data.expression_macro.expression.l,
+			token->data.expression_macro.expression.r);
 
-	while (SUCCEED == zbx_token_find(*data, pos, &cur_token, ZBX_TOKEN_SEARCH_BASIC) &&
-			cur_token.loc.l < token->loc.r)
+	if (FAIL == substitute_expression_macros(&expression, ZBX_EVAL_EXPRESSION_MACRO_LLD, jp_row,
+			lld_macro_paths, &errmsg))
 	{
-		for (i = last_pos + 1; i < cur_token.loc.l; i++)
-		{
-			switch ((*data)[i])
-			{
-				case '\\':
-					if (1 == quoted)
-						i++;
-					break;
-				case '"':
-					quoted = !quoted;
-					break;
-			}
-		}
+		zbx_free(expression);
+		zbx_strlcpy(error, errmsg, error_len);
+		zbx_free(errmsg);
 
-		tmp_token = cur_token;
-
-		switch (cur_token.type)
-		{
-			case ZBX_TOKEN_LLD_MACRO:
-			case ZBX_TOKEN_LLD_FUNC_MACRO:
-				if (FAIL == process_lld_macro_token(data, &cur_token, ZBX_TOKEN_STRING, jp_row,
-						lld_macro_paths, error, error_len, quoted))
-				{
-					return FAIL;
-				}
-				token->loc.r += cur_token.loc.r - tmp_token.loc.r;
-				pos = cur_token.loc.r;
-				break;
-			case ZBX_TOKEN_USER_MACRO:
-				process_user_macro_token(data, &cur_token, jp_row, lld_macro_paths);
-				token->loc.r += cur_token.loc.r - tmp_token.loc.r;
-				pos = cur_token.loc.r;
-				break;
-			case ZBX_TOKEN_SIMPLE_MACRO:
-				process_simple_macro_token(data, &cur_token, jp_row, lld_macro_paths, error, error_len);
-				token->loc.r += cur_token.loc.r - tmp_token.loc.r;
-				pos = cur_token.loc.r;
-				break;
-		}
-
-		last_pos = ++pos;
+		return FAIL;
 	}
+
+	zbx_replace_string(data, token->data.expression_macro.expression.l, &right, expression);
+	token->loc.r += right - token->data.expression_macro.expression.r;
+	zbx_free(expression);
 
 	return SUCCEED;
 }
@@ -6105,19 +6179,33 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token,
 static int	substitute_func_macro(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
 {
-	int	ret;
-	char	*exp = NULL;
-	size_t	exp_alloc = 0, exp_offset = 0;
-	size_t	par_l = token->data.func_macro.func_param.l, par_r = token->data.func_macro.func_param.r;
+	int		ret, offset = 0;
+	char		*exp = NULL;
+	size_t		exp_alloc = 0, exp_offset = 0, right;
+	size_t		par_l = token->data.func_macro.func_param.l, par_r = token->data.func_macro.func_param.r;
+	zbx_token_t	tok;
 
-	ret = substitute_function_lld_param(*data + par_l + 1, par_r - (par_l + 1), 0, &exp, &exp_alloc, &exp_offset,
-			jp_row, lld_macro_paths, error, max_error_len);
+	if (SUCCEED == zbx_token_find(*data, (int)token->data.func_macro.macro.l, &tok,
+			ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) && tok.loc.r <= token->data.func_macro.macro.r)
+	{
+		offset = (int)tok.loc.r;
+
+		if (SUCCEED == process_expression_macro_token(data, &tok, jp_row, lld_macro_paths, error,
+				max_error_len))
+		{
+			offset = tok.loc.r - offset;
+			zabbix_log(LOG_LEVEL_DEBUG, "OFFSET: %d", offset);
+		}
+	}
+
+	ret = substitute_function_lld_param(*data + par_l + offset + 1, par_r - (par_l + 1), 0, &exp, &exp_alloc,
+			&exp_offset, jp_row, lld_macro_paths, error, max_error_len);
 
 	if (SUCCEED == ret)
 	{
-		/* copy what is left including closing parenthesis and replace function parameters */
-		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, *data + par_r, token->loc.r - (par_r - 1));
-		zbx_replace_string(data, par_l + 1, &token->loc.r, exp);
+		right = par_r + offset - 1;
+		zbx_replace_string(data, par_l + offset + 1, &right, exp);
+		token->loc.r = right + 1;
 	}
 
 	zbx_free(exp);
@@ -6208,9 +6296,11 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 					}
 					break;
 				case ZBX_TOKEN_EXPRESSION_MACRO:
-					process_expression_macro_token(data, &token, jp_row, lld_macro_paths, error,
-							max_error_len);
-					pos = token.loc.r;
+					if (SUCCEED == process_expression_macro_token(data, &token, jp_row,
+							lld_macro_paths, error, max_error_len))
+					{
+						pos = token.loc.r;
+					}
 					break;
 			}
 		}
