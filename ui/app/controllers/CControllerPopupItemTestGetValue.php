@@ -146,6 +146,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		if ($this->item_type != ITEM_TYPE_CALCULATED) {
 			unset($data['value_type']);
 		}
+		else {
+			$data['hostid'] = $this->getInput('hostid');
+		}
 
 		// Rename fields according protocol.
 		$data = CArrayHelper::renameKeys($data, [
