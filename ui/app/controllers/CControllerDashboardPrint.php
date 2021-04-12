@@ -86,7 +86,7 @@ class CControllerDashboardPrint extends CController {
 		$error = null;
 
 		$dashboards = API::Dashboard()->get([
-			'output' => ['dashboardid', 'name', 'userid', 'display_period', 'auto_start'],
+			'output' => ['dashboardid', 'name', 'userid', 'display_period'],
 			'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 			'dashboardids' => [$this->getInput('dashboardid')],
 			'preservekeys' => true
