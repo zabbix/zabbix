@@ -178,7 +178,7 @@ static zbx_calc_query_t*	calc_create_query(const char *itemquery)
 {
 	zbx_calc_query_t	*query;
 
-	query = (zbx_calc_query_t*) zbx_malloc(NULL, sizeof(zbx_calc_query_t));
+	query = (zbx_calc_query_t *)zbx_malloc(NULL, sizeof(zbx_calc_query_t));
 	memset(query, 0, sizeof(zbx_calc_query_t));
 
 	query->flags = ZBX_CALC_QUERY_UNSET;
@@ -201,7 +201,7 @@ static zbx_calc_query_t*	calc_create_query(const char *itemquery)
 		}
 		else if (NULL != strchr(query->ref.key, '*'))
 		{
-			int wildcard = 0;
+			int	wildcard = 0;
 
 			replace_key_params_dyn(&query->ref.key, ZBX_KEY_TYPE_ITEM, test_key_param_wildcard_cb,
 					&wildcard, NULL, 0);
@@ -251,13 +251,13 @@ static zbx_calc_group_t	*calc_get_group(zbx_calc_eval_t *eval, const char *name)
 
 	for (i = 0; i < eval->groups.values_num; i++)
 	{
-		group = (zbx_calc_group_t*) eval->groups.values[i];
+		group = (zbx_calc_group_t *)eval->groups.values[i];
 
 		if (0 == strcmp(group->name, name))
 			return group;
 	}
 
-	group = (zbx_calc_group_t*) zbx_malloc(NULL, sizeof(zbx_calc_group_t));
+	group = (zbx_calc_group_t *)zbx_malloc(NULL, sizeof(zbx_calc_group_t));
 	group->name = zbx_strdup(NULL, name);
 	zbx_vector_uint64_create(&group->hostids);
 	zbx_dc_get_hostids_by_group_name(name, &group->hostids);
@@ -287,13 +287,13 @@ static zbx_calc_item_t	*calc_get_item(zbx_calc_eval_t *eval, zbx_uint64_t itemid
 
 	for (i = 0; i < eval->itemtags.values_num; i++)
 	{
-		item = (zbx_calc_item_t*) eval->itemtags.values[i];
+		item = (zbx_calc_item_t *)eval->itemtags.values[i];
 
 		if (item->itemid == itemid)
 			return item;
 	}
 
-	item = (zbx_calc_item_t*) zbx_malloc(NULL, sizeof(zbx_calc_group_t));
+	item = (zbx_calc_item_t *)zbx_malloc(NULL, sizeof(zbx_calc_group_t));
 	item->itemid = itemid;
 	zbx_vector_ptr_create(&item->tags);
 	zbx_dc_get_item_tags(itemid, &item->tags);
@@ -517,7 +517,7 @@ static void	calc_get_item_candidates(zbx_calc_eval_t *eval, const zbx_calc_query
 				continue;
 
 			if (SUCCEED != is_uint64_n(filter_template + token.loc.l + 1, token.loc.r - token.loc.l - 1,
-					&index) && (int) index < groups->values_num)
+					&index) && (int)index < groups->values_num)
 			{
 				continue;
 			}
@@ -550,7 +550,7 @@ static void	calc_get_item_candidates(zbx_calc_eval_t *eval, const zbx_calc_query
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_pair_t pair;
+		zbx_uint64_pair_t	pair;
 
 		if (0 == (query->flags & ZBX_CALC_QUERY_KEY_SOME) ||
 				(NULL != pattern.key && SUCCEED == calc_match_item_key(row[2], &pattern)))
@@ -597,7 +597,7 @@ static int	calc_item_check_tag(zbx_calc_item_t *item, const char *tag)
 
 	for (i = 0; i < item->tags.values_num; i++)
 	{
-		zbx_item_tag_t *itemtag = (zbx_item_tag_t*) item->tags.values[i];
+		zbx_item_tag_t	*itemtag = (zbx_item_tag_t *)item->tags.values[i];
 
 		if (taglen != strlen(itemtag->tag.tag) || 0 != memcmp(tag, itemtag->tag.tag, taglen))
 			continue;
@@ -637,7 +637,7 @@ static int	calc_item_check_tag(zbx_calc_item_t *item, const char *tag)
 static int	calc_eval_filter(const char *name, size_t len, int args_num, const zbx_variant_t *args, void *data,
 		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
-	zbx_calc_eval_many_t	*many = (zbx_calc_eval_many_t*) data;
+	zbx_calc_eval_many_t	*many = (zbx_calc_eval_many_t *)data;
 
 	ZBX_UNUSED(ts);
 	ZBX_UNUSED(len);
@@ -669,7 +669,7 @@ static int	calc_eval_filter(const char *name, size_t len, int args_num, const zb
 	}
 	else if (0 == strncmp(name, "tag", ZBX_CONST_STRLEN("tag")))
 	{
-		zbx_calc_item_t *item;
+		zbx_calc_item_t	*item;
 
 		item = calc_get_item(many->eval, many->itemid);
 
@@ -756,7 +756,7 @@ static void	calc_init_query_many(zbx_calc_eval_t *eval, zbx_calc_query_t *query)
 			eval_data.itemid = itemhosts.values[i].first;
 			eval_data.hostid = itemhosts.values[i].second;
 
-			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, calc_eval_filter, NULL, (void*) &eval_data,
+			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, calc_eval_filter, NULL, (void *)&eval_data,
 					&filter_value, &errmsg))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "failed to evaluate calculated item filter: %s", errmsg);

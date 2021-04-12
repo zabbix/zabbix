@@ -123,7 +123,6 @@ void	zbx_eval_prepare_filter(zbx_eval_context_t *ctx)
 				func->opt = 1;
 				func->type = ZBX_EVAL_TOKEN_FUNCTION;
 
-
 				if (ZBX_EVAL_TOKEN_OP_NE == op->type)
 					op->type = ZBX_EVAL_TOKEN_OP_NOT;
 				else
@@ -196,7 +195,7 @@ static void	eval_filter_apply_op2(zbx_eval_token_t *token, zbx_vector_eval_token
  *                                                                            *
  ******************************************************************************/
 static void	eval_filter_apply_op1(zbx_eval_token_t *token, zbx_vector_eval_token_t *stack,
-		zbx_vector_uint64_t *index)
+		const zbx_vector_uint64_t *index)
 {
 	zbx_eval_token_t	*right;
 	int			ri;
@@ -221,7 +220,7 @@ static void	eval_filter_apply_op1(zbx_eval_token_t *token, zbx_vector_eval_token
  *                                                                            *
  ******************************************************************************/
 static void	eval_filter_apply_func(zbx_eval_context_t *ctx, zbx_eval_token_t *token,
-		zbx_vector_eval_token_t *stack, zbx_vector_uint64_t *index)
+		zbx_vector_eval_token_t *stack, const zbx_vector_uint64_t *index)
 {
 	zbx_eval_token_t	*left;
 	int			li;
