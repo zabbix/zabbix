@@ -86,7 +86,7 @@ class CControllerDashboardPrint extends CController {
 		$error = null;
 
 		$dashboards = API::Dashboard()->get([
-			'output' => ['dashboardid', 'name', 'userid', 'display_period'],
+			'output' => ['dashboardid', 'name', 'display_period'],
 			'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 			'dashboardids' => [$this->getInput('dashboardid')],
 			'preservekeys' => true
@@ -95,10 +95,6 @@ class CControllerDashboardPrint extends CController {
 		if ($dashboards) {
 			$dashboard = array_shift($dashboards);
 			$dashboard['pages'] = CDashboardHelper::preparePagesForGrid([$dashboard['pages'][0]], null, true);
-			$dashboard['owner'] = [
-				'id' => $dashboard['userid'],
-				'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
-			];
 		}
 		else {
 			$error = _('No permissions to referred object or it does not exist!');

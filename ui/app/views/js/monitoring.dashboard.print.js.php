@@ -44,7 +44,7 @@
 				data: {
 					dashboardid: dashboard.dashboardid,
 					name: dashboard.name,
-					userid: dashboard.owner.id,
+					userid: null,
 					templateid: null,
 					display_period: dashboard.display_period,
 					auto_start: false
