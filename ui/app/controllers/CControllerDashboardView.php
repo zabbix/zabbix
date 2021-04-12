@@ -33,8 +33,7 @@ class CControllerDashboardView extends CController {
 			'new' => 'in 1',
 			'cancel' => 'in 1',
 			'from' => 'range_time',
-			'to' => 'range_time',
-			'service' => 'in 1'
+			'to' => 'range_time'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -98,16 +97,12 @@ class CControllerDashboardView extends CController {
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		];
 
-		if (!$this->hasInput('service')) {
-			updateTimeSelectorPeriod($time_selector_options);
-		}
+		updateTimeSelectorPeriod($time_selector_options);
 
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
-			'has_time_selector' => (!$this->hasInput('service')
-				&& CDashboardHelper::hasTimeSelector($dashboard['pages'])
-			),
+			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
 			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 		];
@@ -248,9 +243,7 @@ class CControllerDashboardView extends CController {
 						'limit' => 1
 					]);
 
-					if (!$this->hasInput('service')) {
-						CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
-					}
+					CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
 				elseif ($this->hasInput('dashboardid')) {
 					$error = _('No permissions to referred object or it does not exist!');

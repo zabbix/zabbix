@@ -40,6 +40,8 @@ class CView {
 	 */
 	private $layout_modes_enabled = false;
 
+	private $layout_mode;
+
 	/**
 	 * View name.
 	 *
@@ -204,10 +206,19 @@ class CView {
 	 */
 	public function getLayoutMode() {
 		if ($this->layout_modes_enabled) {
-			return (getRequest('service') === '1') ? ZBX_LAYOUT_SERVICE : CViewHelper::loadLayoutMode();
+			if ($this->layout_mode !== null) {
+				return $this->layout_mode;
+			}
+			else {
+				CViewHelper::loadLayoutMode();
+			}
 		}
 
 		return ZBX_LAYOUT_NORMAL;
+	}
+
+	public function setLayoutMode($layout_mode) {
+		$this->layout_mode = $layout_mode;
 	}
 
 	/**
