@@ -81,9 +81,15 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_CALC_FORMULA],
-				'sum(last_foreach(/*/*[/,total]?[group="MySQL Servers"]))',
+				'sum(last_foreach(/*/*[/,total]?[group="Any host and item is prohibited"]))',
 				'/1/formula',
-				'Incorrect trigger function "sum(last_foreach(/*/*[/,total]?[group="MySQL Servers"]))" provided in expression. Mandatory parameter is missing.'
+				'Incorrect trigger function "sum(last_foreach(/*/*[/,total]?[group="Any host and item is prohibited"]))" provided in expression. Mandatory parameter is missing.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])) + last_foreach(/host/key)',
+				'/1/formula',
+				'Incorrect trigger function "last_foreach(/host/key)" provided in expression. Unknown function.'
 			],
 			[
 				['type' => API_CALC_FORMULA],
