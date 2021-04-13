@@ -1142,6 +1142,7 @@ class CApiInputValidator {
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS
 	 * @param array  $rule['fields']
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1162,6 +1163,11 @@ class CApiInputValidator {
 
 		if (($flags & API_NOT_EMPTY) && !$data) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && count($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
 

@@ -38,10 +38,6 @@ $scripts = [];
 $field = $fields[CWidgetFieldReference::FIELD_NAME];
 $form->addItem((new CVar($field->getName(), $field->getValue()))->removeId());
 
-if ($field->getValue() === '') {
-	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
-}
-
 // Add dynamically created fields navtree.name.<N>, navtree.parent.<N>, navtree.order.<N> and navtree.sysmapid.<N>.
 $field = $fields['navtree'];
 $navtree_items = $field->getValue();

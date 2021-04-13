@@ -65,7 +65,7 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'drules' => $drules,
 			'error' => $error,
 			'user' => [

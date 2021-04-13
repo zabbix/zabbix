@@ -154,8 +154,6 @@ class testPageMaps extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
-		$sql = "select * from screens_items where resourcetype=".SCREEN_RESOURCE_MAP." and resourceid=$sysmapid;";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public function testPageMaps_CreateCancel() {

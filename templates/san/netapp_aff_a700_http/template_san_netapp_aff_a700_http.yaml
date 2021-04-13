@@ -176,7 +176,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+          description: 'The number of I/O operations observed at the storage object. Performance metric for write I/O operations.'
           applications:
             -
               name: General
@@ -252,7 +252,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '!iops'
-          description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+          description: 'The number of I/O operations observed at the storage object. Performance metric for write I/O operations.'
           applications:
             -
               name: 'Zabbix raw items'
@@ -319,7 +319,7 @@ zabbix_export:
             (last(netapp.cluster.statistics.latency_raw.write) - prev(netapp.cluster.statistics.latency_raw.write)) /
             ( last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) +
             (last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) = 0) ) * 0.001
-          description: 'The average latency per I/O operation in milliseconds observed at the storage object. Peformance metric for write I/O operations.'
+          description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.'
           applications:
             -
               name: General
@@ -384,7 +384,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '!mcs'
-          description: 'The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Peformance metric for write I/O operations.'
+          description: 'The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for write I/O operations.'
           applications:
             -
               name: 'Zabbix raw items'
@@ -472,7 +472,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Throughput bytes observed at the storage object. Peformance metric for write I/O operations.'
+          description: 'Throughput bytes observed at the storage object. Performance metric for write I/O operations.'
           applications:
             -
               name: General
@@ -622,7 +622,7 @@ zabbix_export:
           timeout: '{$HTTP.AGENT.TIMEOUT}'
           url: '{$URL}/api/cluster/nodes?fields=*'
         -
-          name: 'Get ehternet ports'
+          name: 'Get ethernet ports'
           type: HTTP_AGENT
           key: netapp.ports.eth.get
           history: '0'
@@ -1606,7 +1606,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!iops'
-              description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+              description: 'The number of I/O operations observed at the storage object. Performance metric for write I/O operations.'
               application_prototypes:
                 -
                   name: 'Volume "{#VOLUMENAME}"'
@@ -1682,7 +1682,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!iops'
-              description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+              description: 'The number of I/O operations observed at the storage object. Performance metric for write I/O operations.'
               applications:
                 -
                   name: 'Zabbix raw items'
@@ -1814,7 +1814,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!mcs'
-              description: 'The raw latency in microseconds observed at the storage object. Peformance metric for write I/O operations.'
+              description: 'The raw latency in microseconds observed at the storage object. Performance metric for write I/O operations.'
               applications:
                 -
                   name: 'Zabbix raw items'
@@ -1902,7 +1902,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'Throughput bytes observed at the storage object. Peformance metric for write I/O operations.'
+              description: 'Throughput bytes observed at the storage object. Performance metric for write I/O operations.'
               application_prototypes:
                 -
                   name: 'Volume "{#VOLUMENAME}"'

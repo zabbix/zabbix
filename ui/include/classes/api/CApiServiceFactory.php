@@ -63,8 +63,6 @@ class CApiServiceFactory extends CRegistryFactory {
 		'proxy' => CProxy::class,
 		'role' => CRole::class,
 		'service' => CService::class,
-		'screen' => CScreen::class,
-		'screenitem' => CScreenItem::class,
 		'script' => CScript::class,
 		'settings' => CSettings::class,
 		'task' => CTask::class,

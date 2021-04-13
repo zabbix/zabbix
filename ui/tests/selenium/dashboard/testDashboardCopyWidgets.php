@@ -21,8 +21,7 @@
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  */
 class testDashboardCopyWidgets extends CWebTest {
 
@@ -36,7 +35,14 @@ class testDashboardCopyWidgets extends CWebTest {
 	 * Data provider for copying widgets.
 	 */
 	public static function getCopyWidgetsData() {
-		return CDBHelper::getDataProvider('SELECT * FROM widget WHERE dashboardid ='.self::DASHBOARD_ID);
+		return CDBHelper::getDataProvider('SELECT * FROM widget w'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM dashboard_page dp'.
+				' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+					' AND dp.dashboardid='.self::DASHBOARD_ID.
+			')'
+		);
 	}
 
 	/**
@@ -95,8 +101,14 @@ class testDashboardCopyWidgets extends CWebTest {
 		$original_form = $fields->asValues();
 		$original_widget_size = $replace
 			? self::$replaced_widget_size
-			: CDBHelper::getRow('SELECT width, height FROM widget WHERE dashboardid='.zbx_dbstr(self::DASHBOARD_ID).
-					' AND name='.zbx_dbstr($name).' ORDER BY widgetid DESC');
+			: CDBHelper::getRow('SELECT w.width, w.height'.
+					' FROM widget w WHERE EXISTS ('.
+						'SELECT NULL FROM dashboard_page dp'.
+						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+							' AND dp.dashboardid='.self::DASHBOARD_ID.
+					')'.
+					' AND w.name='.zbx_dbstr($name).' ORDER BY w.widgetid DESC'
+			);
 
 		// Close widget configuration overlay.
 		COverlayDialogElement::find()->one()->close();
@@ -139,9 +151,14 @@ class testDashboardCopyWidgets extends CWebTest {
 		$dashboard->save();
 		$this->page->waitUntilReady();
 
-		$copied_widget_size = CDBHelper::getRow('SELECT width, height FROM widget'.
-				' WHERE dashboardid='.zbx_dbstr($new_dashboard ? self::PASTE_DASHBOARD_ID : self::DASHBOARD_ID).
-				' AND name='.zbx_dbstr($name).' ORDER BY widgetid DESC'
+		$copied_widget_size = CDBHelper::getRow('SELECT w.width, w.height'.
+				' FROM widget w WHERE EXISTS ('.
+					'SELECT NULL'.
+					' FROM dashboard_page dp'.
+					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+						' AND dp.dashboardid='.($new_dashboard ? self::PASTE_DASHBOARD_ID : self::DASHBOARD_ID).
+				')'.
+				' AND w.name='.zbx_dbstr($name).' ORDER BY w.widgetid DESC'
 		);
 		$this->assertEquals($original_widget_size, $copied_widget_size);
 	}

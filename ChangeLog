@@ -1,8 +1,21 @@
 Changes for 5.4.0rc1
 
 New features:
+A.F.....S. [ZBXNEXT-6288,ZBXNEXT-6289] removed screens and slideshows (akozlovs, talbergs)
+A.F.....S. [ZBXNEXT-6309] added support for multi-page dashboards (arimdjonoks, ashubin, averza)
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
+.........T [ZBX-19220] fixed broken link to Hikvision camera manufacturer page (abakaldin)
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+..F....... [ZBX-19199] fixed console errors when updating problem widgets when other popups are active (averza)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.0beta2
@@ -164,8 +177,18 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.7rc1
 
 New features:
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-18667] fixed code spelling in templates (abakaldin)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.6
@@ -647,8 +670,17 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.11rc1
 
 New features:
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
 
 Bug fixes:
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+.........T [ZBX-18667] fixed code spelling in templates (abakaldin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.10
@@ -2671,6 +2703,9 @@ Changes for 4.0.31rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.30

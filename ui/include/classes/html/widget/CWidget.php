@@ -23,10 +23,12 @@ class CWidget {
 	private const ZBX_STYLE_HEADER_TITLE = 'header-title';
 	private const ZBX_STYLE_HEADER_NAVIGATION = 'header-navigation';
 	private const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
+	private const ZBX_STYLE_HEADER_KIOSKMODE_CONTROLS = 'header-kioskmode-controls';
 
 	private $title;
 	private $title_submenu;
 	private $controls;
+	private $kiosk_mode_controls;
 
 	/**
 	 * Navigation, displayed exclusively in ZBX_LAYOUT_NORMAL mode.
@@ -63,6 +65,12 @@ class CWidget {
 
 	public function setControls($controls) {
 		$this->controls = $controls;
+
+		return $this;
+	}
+
+	public function setKioskModeControls($kiosk_mode_controls) {
+		$this->kiosk_mode_controls = $kiosk_mode_controls;
 
 		return $this;
 	}
@@ -112,8 +120,13 @@ class CWidget {
 
 		if ($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
 			$this->addItem(
-				get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
-					->setAttribute('aria-label', _('Content controls'))
+				(new CList())
+					->addClass(self::ZBX_STYLE_HEADER_KIOSKMODE_CONTROLS)
+					->addItem($this->kiosk_mode_controls)
+					->addItem(
+						get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
+							->setAttribute('aria-label', _('Content controls'))
+					)
 			);
 		}
 		elseif ($this->title !== null || $this->controls !== null) {

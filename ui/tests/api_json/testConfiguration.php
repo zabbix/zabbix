@@ -156,8 +156,8 @@ class testConfiguration extends CAPITest {
 			['hosts'],
 			['images'],
 			['maps'],
-			['screens'],
-			['templates']
+			['templates'],
+			['valueMaps']
 		];
 	}
 
@@ -235,13 +235,6 @@ class testConfiguration extends CAPITest {
 				[
 					'options' => [
 						'maps' => ['1']
-					]
-				]
-			],
-			[
-				[
-					'options' => [
-						'screens' => ['3']
 					]
 				]
 			],
@@ -450,11 +443,6 @@ class testConfiguration extends CAPITest {
 			]],
 			[[
 				'parameter' => 'maps',
-				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => ['deleteMissing']
-			]],
-			[[
-				'parameter' => 'screens',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]],
@@ -820,49 +808,6 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'xml',
 				'rules' => [
-					'screens' => [
-						'createMissing' => true
-					]
-				],
-				'source' => '<?xml version="1.0" encoding="UTF-8"?>
-								<zabbix_export>
-								<version>3.2</version>
-								<date>2016-12-12T07:18:00Z</date>
-								<screens>
-									<screen>
-										<name>API screen xml import</name>
-										<hsize>1</hsize>
-										<vsize>1</vsize>
-									</screen>
-								</screens>
-								</zabbix_export>',
-				'sql' => 'select * from screens where name=\'API screen xml import\''
-			],
-			[
-				'format' => 'json',
-				'rules' => [
-					'screens' => [
-						'createMissing' => true
-					]
-				],
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","screens":[{"name":"API screen json import",'
-							. '"hsize":"1","vsize":"1"}]}}',
-				'sql' => 'select * from screens where name=\'API screen json import\''
-			],
-			[
-				'format' => 'yaml',
-				'rules' => [
-					'screens' => [
-						'createMissing' => true
-					]
-				],
-				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:44:35Z\"\n".
-						"  screens:\n  - name: API screen yaml import\n    hsize: \"1\"\n    vsize: \"1\"\n    screen_items: []\n...\n",
-				'sql' => 'select * from screens where name=\'API screen yaml import\''
-			],
-			[
-				'format' => 'xml',
-				'rules' => [
 					'valueMaps' => [
 						'createMissing' => true
 					],
@@ -871,8 +816,7 @@ class testConfiguration extends CAPITest {
 					]
 				],
 				'source' => '<?xml version="1.0" encoding="UTF-8"?> <zabbix_export> <version>5.4</version> <date>2016-12-12T07:18:00Z</date> <hosts> <host> <host>API xml import host</host> <name>API xml import host</name> <groups> <group> <name>Linux servers</name> </group> </groups> <valuemaps> <valuemap> <name>API valueMap xml import</name> <mappings> <mapping> <value>1</value> <newvalue>Up</newvalue> </mapping> </mappings> </valuemap> </valuemaps> </host> </hosts> </zabbix_export>',
-				'sql' => 'select * from valuemap where name=\'API valueMap xml import\''
-			],
+				'sql' => 'select * from valuemap where name=\'API valueMap xml import\''			],
 			[
 				'format' => 'json',
 				'rules' => [

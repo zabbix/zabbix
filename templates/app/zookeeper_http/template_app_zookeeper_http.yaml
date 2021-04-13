@@ -1098,7 +1098,7 @@ zabbix_export:
         -
           macro: '{$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}'
           value: '85'
-          description: 'Maximum percentage of file descriptors usage alert treshold (for trigger expression).'
+          description: 'Maximum percentage of file descriptors usage alert threshold (for trigger expression).'
         -
           macro: '{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}'
           value: '10'

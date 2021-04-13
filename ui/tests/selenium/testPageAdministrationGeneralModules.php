@@ -75,7 +75,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Name' => 'шестой модуль',
 				'Version' => 'бета 2',
 				'Author' => 'Работник Заббикса',
-				'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Scripts" из секции "Administration".',
+				'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
 				'Status' => 'Disabled'
 			]
 		];
@@ -172,7 +172,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Name' => 'шестой модуль',
 					'Version' => 'бета 2',
 					'Author' => 'Работник Заббикса',
-					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Scripts" из секции "Administration".',
+					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
 					'Directory' => 'module_number_6',
 					'Namespace' => 'Example_F',
 					'Homepage' => '-',
@@ -311,14 +311,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					]
 				]
 			],
-			// Enable шестой модуль - Top level menu Reports and menu entry Screens are removed.
+			// Enable шестой модуль - Top level menu Reports and menu entry Maps are removed.
 			[
 				[
 					[
 						'module_name' => 'шестой модуль',
 						'remove' => true,
 						'top_menu_entry' => 'Reports',
-						'menu_entry' => 'Screens'
+						'menu_entry' => 'Maps'
 					]
 				]
 			]
@@ -567,7 +567,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$xpath = 'xpath://ul[@class="menu-main"]//li/a[text()="';
 		// If module removes a menu entry or top level menu entry, check that entries are back after disabling the module.
 		if (CTestArrayHelper::get($module, 'remove', false)) {
-			$this->assertEquals(2, $this->query($xpath.$module['menu_entry'].'"]')->count());
+			$this->assertEquals(1, $this->query($xpath.$module['menu_entry'].'"]')->count());
 			if (array_key_exists('top_menu_entry', $module)) {
 				$this->assertEquals(1, $this->query($xpath.$module['top_menu_entry'].'"]')->count());
 			}
