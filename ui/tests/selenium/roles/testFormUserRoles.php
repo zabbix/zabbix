@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup role
- * @backup role_rule
  * @on-before prepareRoleData
  */
 class testFormUserRoles extends CWebTest {
@@ -77,7 +76,7 @@ class testFormUserRoles extends CWebTest {
 
 	public static function getCreateData() {
 		return [
-			// same name for 3 types of roles
+			// Same name for 3 types of roles.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -111,7 +110,7 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'User role with name "Super admin role" already exists.'
 				]
 			],
-			// empty name field
+			// Empty name field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -145,7 +144,7 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
-			// empty space in name field
+			// Empty space in name field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -179,7 +178,7 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'Invalid parameter "/1/name": cannot be empty.'
 				]
 			],
-			// All UI elements checked out
+			// All UI elements checked out.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -225,7 +224,7 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'At least one UI element must be checked.'
 				]
 			],
-			// remove everything
+			// Remove everything.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -349,7 +348,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// Remove all Access to actions
+			// Remove all Access to actions.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -406,7 +405,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// API methods deny list
+			// API methods deny list.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -452,7 +451,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// API methods allow list
+			// API methods allow list.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -571,7 +570,7 @@ class testFormUserRoles extends CWebTest {
 
 	public static function getUpdateData() {
 		return [
-			// empty name
+			// Empty name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -583,7 +582,7 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
-			// empty space
+			// Empty space.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -595,7 +594,7 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'Invalid parameter "/1/name": cannot be empty.'
 				]
 			],
-			// existing name
+			// Existing name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -607,7 +606,7 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'User role with name "User role" already exists.'
 				]
 			],
-			// all UI elements disabled
+			// All UI elements disabled.
 			[
 				[
 					'expected' => TEST_BAD,
