@@ -33,7 +33,7 @@ jQuery(function($) {
 	});
 });
 
-function submitImportComparePopup(overlay) {
+function submitImportComparePopup() {
 	const form = document.querySelector('.import-compare');
 	const parent_overlayid = form.querySelector('#parent_overlayid').value;
 	const parent_overlay = overlays_stack.getById(parent_overlayid);

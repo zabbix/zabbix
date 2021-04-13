@@ -86,7 +86,7 @@ function openImportComparePopup(overlay) {
 		else {
 			overlayDialogue({
 				title: response.header,
-				class: 'modal-popup modal-popup-fullscreen',
+				class: `modal-popup${response.no_changes ? '' : ' modal-popup-fullscreen'}`,
 				content: response.body,
 				buttons: response.buttons,
 				script_inline: response.script_inline,

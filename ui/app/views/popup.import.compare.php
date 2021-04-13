@@ -147,12 +147,30 @@ if ($data['errors'] !== null) {
 	];
 }
 else {
+	$buttons = [];
+
+	if ($data['diff']) {
+		$buttons[] = [
+			'title' => _('Import'),
+			'class' => '',
+			'isSubmit' => true,
+			'action' => 'submitImportComparePopup();'
+		];
+	}
+
+	$buttons[] = [
+		'title' => $data['diff'] ? _('Cancel') : _('Close'),
+		'cancel' => true,
+		'class' => ZBX_STYLE_BTN_ALT,
+		'action' => ''
+	];
+
 	$output = [
 		'header' => $data['title'],
 		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
-		'body' => (!$data['diff'])
+		'body' => !$data['diff']
 			? (new CTableInfo())
-					->setNoDataMessage(_('No changes.')) // TODO VM: (?) need a better style
+					->setNoDataMessage(_('No changes.'))
 					->toString()
 			: (new CForm())
 				->addClass('import-compare')
@@ -160,20 +178,8 @@ else {
 				->addItem(drawToc($data['diff_toc']))
 				->addItem(drawDiff($data['diff']))
 				->toString(),
-		'buttons' => [
-			[
-				'title' => _('Import'),
-				'class' => '',
-				'isSubmit' => true,
-				'action' => 'return submitImportComparePopup(overlay);'
-			],
-			[
-				'title' => _('Cancel'),
-				'cancel' => true,
-				'class' => ZBX_STYLE_BTN_ALT,
-				'action' => ''
-			]
-		]
+		'buttons' => $buttons,
+		'no_changes' => !$data['diff']
 	];
 }
 
