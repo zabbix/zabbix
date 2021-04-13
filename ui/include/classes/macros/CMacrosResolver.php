@@ -1232,7 +1232,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$expression = array_filter($expression);
 
 		array_unshift($expression, $options['html'] ? bold($fn->function.'(') : $fn->function.'(');
-		array_push($expression, $options['html'] ? bold(')') : ')');
+		$expression[] = $options['html'] ? bold(')') : ')';
 
 		return $options['html'] ? $expression : implode('', $expression);
 	}

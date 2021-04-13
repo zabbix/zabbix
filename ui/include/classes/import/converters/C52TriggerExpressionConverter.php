@@ -302,7 +302,7 @@ class C52TriggerExpressionConverter extends CConverter {
 					$parameters[2] = 'bitand';
 				}
 				unset($parameters[3]);
-				array_push($parameters, $parameters[1]);
+				$parameters[] = $parameters[1];
 				unset($parameters[1]);
 				break;
 
