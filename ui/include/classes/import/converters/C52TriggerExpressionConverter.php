@@ -75,8 +75,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 * Converts trigger expression to new syntax.
 	 *
 	 * @param array  $trigger_data
-	 * @param string $trigger_data['expression']           (optional)
-	 * @param string $trigger_data['recovery_expression']  (optional)
+	 * @param string $trigger_data['expression']
 	 * @param string $trigger_data['host']                 (optional)
 	 * @param string $trigger_data['item']                 (optional)
 	 *
@@ -86,23 +85,12 @@ class C52TriggerExpressionConverter extends CConverter {
 		$this->item = array_key_exists('item', $trigger_data) ? $trigger_data['item'] : null;
 		$this->host = (array_key_exists('host', $trigger_data) && $this->item) ? $trigger_data['host'] : null;
 
-		$extra_expressions = [];
-
-		if (array_key_exists('recovery_expression', $trigger_data) && $trigger_data['recovery_expression'] !== ''
-				&& ($this->parser->parse($trigger_data['recovery_expression'])) !== false) {
+		if (($this->parser->parse($trigger_data['expression'])) !== false) {
 			$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO);
 			$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
-			$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
+			$parts = $this->getExpressionParts(0, $this->parser->result->length - 1);
 			$this->wrap_subexpressions = ($parts['type'] === 'operator');
-			$this->convertExpressionParts($trigger_data['recovery_expression'], [$parts], $extra_expressions);
-		}
-
-		if (array_key_exists('expression', $trigger_data) && $trigger_data['expression'] !== ''
-				&& ($this->parser->parse($trigger_data['expression'])) !== false) {
-			$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO);
-			$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
-			$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
-			$this->wrap_subexpressions = ($parts['type'] === 'operator');
+			$extra_expressions = [];
 			$this->convertExpressionParts($trigger_data['expression'], [$parts], $extra_expressions);
 
 			$extra_expressions = array_filter($extra_expressions);
@@ -116,7 +104,7 @@ class C52TriggerExpressionConverter extends CConverter {
 			}
 		}
 
-		return array_intersect_key($trigger_data, array_flip(['recovery_expression', 'expression']));
+		return $trigger_data['expression'];
 	}
 
 	private function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr) {
