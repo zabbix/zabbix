@@ -31,8 +31,16 @@ class C52ImportConverter extends CConverter {
 	 */
 	protected $trigger_expression_converter;
 
+	/**
+	 * Converter used to convert calculated item formula from 5.2 to 5.4 syntax.
+	 *
+	 * @var C52CalculatedItemConverter
+	 */
+	protected $calculated_item_converter;
+
 	public function __construct() {
 		$this->trigger_expression_converter = new C52TriggerExpressionConverter();
+		$this->calculated_item_converter = new C52CalculatedItemConverter();
 	}
 
 	/**
@@ -75,7 +83,6 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private function convertHosts(array $hosts): array {
-		$parser = new C52CalculatedItemConverter();
 		$tls_fields = array_flip(['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
 			'tls_psk'
 		]);
@@ -93,7 +100,7 @@ class C52ImportConverter extends CConverter {
 					}
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item = $parser->convert($item);
+						$item = $this->calculated_item_converter->convert($item);
 					}
 				}
 				unset($item);
@@ -120,8 +127,6 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private function convertTemplates(array $templates): array {
-		$parser = new C52CalculatedItemConverter();
-
 		foreach ($templates as &$template) {
 			if (array_key_exists('items', $template)) {
 				foreach ($template['items'] as &$item) {
@@ -133,7 +138,7 @@ class C52ImportConverter extends CConverter {
 					}
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item = $parser->convert($item);
+						$item = $this->calculated_item_converter->convert($item);
 					}
 				}
 				unset($item);
