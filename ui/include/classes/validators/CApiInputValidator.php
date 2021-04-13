@@ -342,7 +342,7 @@ class CApiInputValidator {
 				 * as standalone functions. Example:
 				 * Do not validate "last_foreach" as standalone function in expression "sum(last_foreach(...))".
 				 */
-				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos);
+				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos, $func->length);
 			}
 			elseif (trim(substr($skip_valid, $func->pos, $func->length)) !== '' && !$validator->validate($func)) {
 				$error = $validator->getError();
