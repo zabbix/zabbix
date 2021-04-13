@@ -42,7 +42,7 @@ class CEventNameValidatorTest extends TestCase {
 			['Incorrect macro except expression macro are ignored {ANY_MACRO_HERE_ {}', true, null],
 			['Simple expression macro {?100+1} test', true, null],
 			['Expression macro with modificator {{?100+1-(2)}.anyfunc(2)}', true, null],
-			['Macro as host name {?{{HOST.HOST}:item.func(1)}}', true, null],
+			['Macro as host name {?func(/{HOST.HOST}/item)}', true, null],
 			['Expression macro with incorrect syntax {?123++321}', false, 'incorrect syntax near "+321}"'],
 			['{?Expression macro without closing bracket', false, 'incorrect syntax near "Expression macro without closing bracket"'],
 			['Expression macro without closing bracket at the end of event name {?', false, 'unexpected end of string'],

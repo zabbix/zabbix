@@ -173,7 +173,7 @@ class CFunctionParser extends CParser {
 							$_parameters[$num++] = new CFunctionParameterResult([
 								'type' => self::PARAM_UNQUOTED,
 								'match' => '',
-								'pos' => $p - $pos
+								'pos' => $p
 							]);
 							break;
 
@@ -181,7 +181,7 @@ class CFunctionParser extends CParser {
 							$_parameters[$num] = new CFunctionParameterResult([
 								'type' => self::PARAM_UNQUOTED,
 								'match' => '',
-								'pos' => $p - $pos
+								'pos' => $p
 							]);
 							$state = self::STATE_END_OF_PARAMS;
 							break;
@@ -190,7 +190,8 @@ class CFunctionParser extends CParser {
 							$_parameters[$num] = new CFunctionParameterResult([
 								'type' => self::PARAM_QUOTED,
 								'match' => $source[$p],
-								'pos' => $p - $pos
+								'pos' => $p,
+								'length' => 1
 							]);
 							$state = self::STATE_QUOTED;
 							break;
@@ -235,7 +236,7 @@ class CFunctionParser extends CParser {
 									$_parameters[$num] = new CFunctionParameterResult([
 										'type' => self::PARAM_UNQUOTED,
 										'match' => $source[$p],
-										'pos' => $p - $pos,
+										'pos' => $p,
 										'length' => 1
 									]);
 								}

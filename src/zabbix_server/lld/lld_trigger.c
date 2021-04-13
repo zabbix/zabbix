@@ -1504,7 +1504,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		}
 
 		buffer = zbx_strdup(buffer, trigger_prototype->event_name);
-		substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_ANY | ZBX_TOKEN_EXPRESSION_MACRO, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, lld_macros,
+				ZBX_MACRO_ANY | ZBX_TOKEN_EXPRESSION_MACRO | ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(trigger->event_name, buffer))
 		{

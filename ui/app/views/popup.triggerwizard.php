@@ -43,7 +43,7 @@ if (array_key_exists('triggerid', $options)) {
 $expression_table = (new CTable())
 	->addClass('ui-sortable')
 	->setId('expressions_list')
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%; white-space: normal; overflow-wrap: break-word;')
 	->setHeader(['', _('Expression'), _('Type'), _('Action')]);
 
 $expressions = [];
@@ -64,7 +64,11 @@ $ms_itemid = (new CMultiSelect([
 	'name' => 'itemid',
 	'object_name' => 'items',
 	'multiple' => false,
-	'data' => [['id' => $options['itemid'], 'name' => $options['item_name']]],
+	'data' => [[
+		'id' => $options['itemid'],
+		'name' => $options['item_name'],
+		'query' => $options['query']
+	]],
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'items',

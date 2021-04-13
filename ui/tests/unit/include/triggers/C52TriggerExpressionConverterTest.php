@@ -88,7 +88,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[1].diff()} = 0',
-				'(last(/Trapper/trap[1],1)<>last(/Trapper/trap[1],2)) = 0'
+				'(last(/Trapper/trap[1],#1)<>last(/Trapper/trap[1],#2)) = 0'
 			],
 			[
 				'{Trapper:trap[1].fuzzytime(60)} > 0',
@@ -137,11 +137,11 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and {Trapper:trap[1].percentile(60,3600,80)} > 4'.
 				' and {Trapper:trap[1].percentile(1m,1h,90)} > 5',
 
-				'percentile(/Trapper/trap[1],30m,"50") > 0'.
-				' and percentile(/Trapper/trap[1],60s,"60") > 1'.
-				' and percentile(/Trapper/trap[1],#10,"70") > 3'.
-				' and percentile(/Trapper/trap[1],60s:now-3600s,"80") > 4'.
-				' and percentile(/Trapper/trap[1],1m:now-1h,"90") > 5'
+				'percentile(/Trapper/trap[1],30m,50) > 0'.
+				' and percentile(/Trapper/trap[1],60s,60) > 1'.
+				' and percentile(/Trapper/trap[1],#10,70) > 3'.
+				' and percentile(/Trapper/trap[1],60s:now-3600s,80) > 4'.
+				' and percentile(/Trapper/trap[1],1m:now-1h,90) > 5'
 			],
 			[
 				'{Trapper:trap[1].sum(30m)} > 0'.
@@ -186,16 +186,16 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[2].band(#1, 32)} > 0 and {Trapper:trap[2].band(#2, 64, 1h)} > 0',
-				'bitand(last(/Trapper/trap[2],#1),"32") > 0 and bitand(last(/Trapper/trap[2],#2:now-1h),"64") > 0'
+				'bitand(last(/Trapper/trap[2],#1),32) > 0 and bitand(last(/Trapper/trap[2],#2:now-1h),64) > 0'
 			],
 			[
 				'{Trapper:trap[2].forecast(#10,,100)} > 0'.
 				' and {Trapper:trap[2].forecast(3600,7200,600,linear,avg)} > 0'.
 				' and {Trapper:trap[2].forecast(30m,1d,600,,avg)} > 0',
 
-				'forecast(/Trapper/trap[2],#10,"100s") > 0'.
-				' and forecast(/Trapper/trap[2],3600s:now-7200s,"600s","linear","avg") > 0'.
-				' and forecast(/Trapper/trap[2],30m:now-1d,"600s",,"avg") > 0'
+				'forecast(/Trapper/trap[2],#10,100s) > 0'.
+				' and forecast(/Trapper/trap[2],3600s:now-7200s,600s,"linear","avg") > 0'.
+				' and forecast(/Trapper/trap[2],30m:now-1d,600s,"","avg") > 0'
 			],
 
 			[
@@ -203,9 +203,9 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and {Trapper:trap[2].timeleft(3600,7200,600,linear)} > 0'.
 				' and {Trapper:trap[2].timeleft(30m,1d,600)} > 0',
 
-				'timeleft(/Trapper/trap[2],#10,"100") > 0'.
-				' and timeleft(/Trapper/trap[2],3600s:now-7200s,"600","linear") > 0'.
-				' and timeleft(/Trapper/trap[2],30m:now-1d,"600") > 0'
+				'timeleft(/Trapper/trap[2],#10,100) > 0'.
+				' and timeleft(/Trapper/trap[2],3600s:now-7200s,600,"linear") > 0'.
+				' and timeleft(/Trapper/trap[2],30m:now-1d,600) > 0'
 			],
 			[
 				'{Trapper:trap[3].count(#1, 0, eq)} > 0'.
@@ -222,7 +222,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and count(/Trapper/trap[1],5m:now-2d,"gt","100") > 0'.
 				' and count(/Trapper/trap[1],1m,"bitand","32") > 0'.
 				' and count(/Trapper/trap[1],1m,"bitand","32/8") > 0'.
-				' and count(/Trapper/trap[1],1m) > 0'
+				' and count(/Trapper/trap[1],1m,"","") > 0'
 			],
 			[
 				'{Trapper:trap[3].iregexp("^error", #10)} > 0'.
@@ -246,7 +246,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[3].prev()} > 0',
-				'last(/Trapper/trap[3],2) > 0'
+				'last(/Trapper/trap[3],#2) > 0'
 			],
 			[
 				'{Trapper:trap[3].regexp("^error", #10)} > 0'.
@@ -328,36 +328,6 @@ class C52TriggerExpressionConverterTest extends TestCase {
 		];
 	}
 
-	public function twoFieldExpressionProvideData() {
-		return [
-			'no repeating missing references' => [
-				[
-					'expression' => '{Trapper:trap[1].dayofweek()} > 0'.
-									' and {Host:trap[1].last()} > 0',
-					'recovery_expression' => '{Trapper:trap[1].dayofweek()} > 0'.
-									' and {Host:trap[1].last()} > 0'
-				],
-				[
-					'expression' => '(dayofweek() > 0 and last(/Host/trap[1]) > 0)'.
-									' or (last(/Trapper/trap[1])<>last(/Trapper/trap[1]))',
-					'recovery_expression' => 'dayofweek() > 0 and last(/Host/trap[1]) > 0'
-				]
-			],
-			'are references gathered in expression field' => [
-				[
-					'expression' => '{Trapper:trap[1].dayofweek()} > 0',
-					'recovery_expression' => '{Trapper2:trap[1].dayofweek()} > 0'
-				],
-				[
-					'expression' => '(dayofweek() > 0)'.
-									' or (last(/Trapper/trap[1])<>last(/Trapper/trap[1]))'.
-									' or (last(/Trapper2/trap[1])<>last(/Trapper2/trap[1]))',
-					'recovery_expression' => 'dayofweek() > 0'
-				]
-			]
-		];
-	}
-
 	public function shortExpressionProvideData() {
 		return [
 			'enrich simple trigger expression' => [
@@ -366,21 +336,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 					'host' => 'Zabbix server',
 					'item' => 'trap'
 				],
-				[
-					'expression' => '(dayofweek()=0) or (last(/Zabbix server/trap)<>last(/Zabbix server/trap))'
-				]
-			],
-			'two short expressions' => [
-				[
-					'expression' => '{dayofweek()}=0',
-					'recovery_expression' => '{dayofweek()}=0',
-					'host' => 'Zabbix server',
-					'item' => 'trap'
-				],
-				[
-					'expression' => '(dayofweek()=0) or (last(/Zabbix server/trap)<>last(/Zabbix server/trap))',
-					'recovery_expression' => 'dayofweek()=0'
-				]
+				'expression' => '(dayofweek()=0) or (last(/Zabbix server/trap)<>last(/Zabbix server/trap))'
 			]
 		];
 	}
@@ -392,26 +348,16 @@ class C52TriggerExpressionConverterTest extends TestCase {
 	 * @param string $new_expression
 	 */
 	public function testSimpleConversion(string $old_expression, string $new_expression) {
-		$this->assertSame($new_expression, $this->converter->convert(['expression' => $old_expression])['expression']);
-	}
-
-	/**
-	 * @dataProvider twoFieldExpressionProvideData
-	 *
-	 * @param array $old_expressions
-	 * @param array $new_expressions
-	 */
-	public function testTwoExpressionConversion(array $old_expressions, array $new_expressions) {
-		$this->assertSame($new_expressions, $this->converter->convert($old_expressions));
+		$this->assertSame($new_expression, $this->converter->convert(['expression' => $old_expression]));
 	}
 
 	/**
 	 * @dataProvider shortExpressionProvideData
 	 *
-	 * @param array $old_expression
-	 * @param array $new_expression
+	 * @param array  $old_expression
+	 * @param string $new_expression
 	 */
-	public function testShortExpressionConversion(array $old_expression, array $new_expression) {
+	public function testShortExpressionConversion(array $old_expression, string $new_expression) {
 		$this->assertSame($new_expression, $this->converter->convert($old_expression));
 	}
 }

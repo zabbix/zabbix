@@ -132,6 +132,11 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			],
 			'o' => [
 				'C' => 'O',
 				'T' => T_ZBX_STR,
@@ -140,11 +145,6 @@ class CControllerPopupTriggerExpr extends CController {
 			'v' => [
 				'C' => 'V',
 				'T' => T_ZBX_STR,
-				'A' => false
-			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
 				'A' => false
 			]
 		];
@@ -156,6 +156,11 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => false
 			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			],
 			'o' => [
 				'C' => 'O',
 				'T' => T_ZBX_STR,
@@ -164,11 +169,6 @@ class CControllerPopupTriggerExpr extends CController {
 			'v' => [
 				'C' => 'V',
 				'T' => T_ZBX_STR,
-				'A' => false
-			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
 				'A' => false
 			]
 		];
@@ -199,15 +199,15 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
-			'mask' => [
-				'C' => _('Mask'),
-				'T' => T_ZBX_STR,
-				'A' => true
-			],
 			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT,
 				'A' => false
+			],
+			'mask' => [
+				'C' => _('Mask'),
+				'T' => T_ZBX_STR,
+				'A' => true
 			]
 		];
 
@@ -551,7 +551,7 @@ class CControllerPopupTriggerExpr extends CController {
 					$param_values = [];
 					foreach ($params as $i => $param) {
 						if ($param instanceof CFunctionParserResult) {
-							$param_values[] = $param->getFunctionTriggerQuery()->getValue();
+							continue;
 						}
 						elseif ($i == 0 && ($param instanceof CPeriodParserResult)) {
 							$param_values[] = $is_num ? substr($param->sec_num, 1) : $param->sec_num;
@@ -593,14 +593,11 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($fn_name, $this->functions)
 									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
 								$operator = $operator_token->match;
-								$value = (($value_token instanceof CTriggerExprParserResult)
-										&& array_key_exists('string', $value_token->data))
-									? $value_token->data['string']
-									: $value_token->match;
 							}
-							else {
-								break;
-							}
+							$value = (($value_token instanceof CTriggerExprParserResult)
+									&& array_key_exists('string', $value_token->data))
+								? $value_token->data['string']
+								: $value_token->match;
 
 							if (!in_array($fn_name, getStandaloneFunctions())
 									&& ($query = $function_token->getFunctionTriggerQuery()) !== null) {
@@ -727,11 +724,7 @@ class CControllerPopupTriggerExpr extends CController {
 					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
 						// Validate trigger function.
 						$trigger_function_validator = new CFunctionValidator();
-
-						$fn_data = [
-							'fn' => $result->getTokens()[0]
-						];
-						if (!$trigger_function_validator->validate($fn_data)) {
+						if (!$trigger_function_validator->validate($result->getTokens()[0])) {
 							error($trigger_function_validator->getError());
 						}
 					}
@@ -835,17 +828,14 @@ class CControllerPopupTriggerExpr extends CController {
 						// Validate trigger function.
 						$math_function_validator = new CMathFunctionValidator();
 						$trigger_function_validator = new CFunctionValidator();
-						$fn_data = [
-							'fn' => $result->getTokens()[0],
-							'value_type' => $data['itemValueType']
-						];
+						$fn = $result->getTokens()[0];
 						$error_msg = '';
 
-						if (!$math_function_validator->validate($fn_data)) {
+						if (!$math_function_validator->validate($fn)) {
 							$error_msg = $math_function_validator->getError();
 
-							if (!$trigger_function_validator->validate($fn_data)
-									|| !$trigger_function_validator->validateValueType($fn_data)) {
+							if (!$trigger_function_validator->validate($fn)
+									|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
 								$error_msg = $trigger_function_validator->getError();
 							}
 							else {

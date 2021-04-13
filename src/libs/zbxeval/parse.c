@@ -582,7 +582,7 @@ static int	eval_parse_function_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
  ******************************************************************************/
 static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
-#define MVAR_HOST_HOST	"{HOST.HOST}"
+#define MVAR_HOST_HOST	"{HOST.HOST"
 
 	const char	*ptr = ctx->expression + pos + 1, *key;
 
@@ -593,8 +593,25 @@ static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_
 			break;
 		case '{':
 			if (0 == strncmp(ptr, MVAR_HOST_HOST, ZBX_CONST_STRLEN(MVAR_HOST_HOST)))
-				ptr += ZBX_CONST_STRLEN(MVAR_HOST_HOST);
-			break;
+			{
+				int	offset = 0;
+
+				if ('}' == ptr[ZBX_CONST_STRLEN(MVAR_HOST_HOST)])
+				{
+					offset = 1;
+				}
+				else if (0 != isdigit((unsigned char)ptr[ZBX_CONST_STRLEN(MVAR_HOST_HOST)]) &&
+					'}' == ptr[ZBX_CONST_STRLEN(MVAR_HOST_HOST) + 1])
+				{
+					offset = 2;
+				}
+
+				if (0 != offset)
+				{
+					ptr += ZBX_CONST_STRLEN(MVAR_HOST_HOST) + offset;
+					break;
+				}
+			}
 		default:
 			while (SUCCEED == is_hostname_char(*ptr))
 				ptr++;

@@ -10927,6 +10927,42 @@ int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *h
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_dc_expand_user_macros_len                                    *
+ *                                                                            *
+ * Purpose: expand user macros in the specified text                          *
+ *                                                                            *
+ * Parameters: text         - [IN] the text value to expand                   *
+ *             len          - [IN] the text length                            *
+ *             hostids      - [IN] an array of related hostids                *
+ *             hostids_num  - [IN] the number of hostids                      *
+ *             value        - [IN] the expanded macro with expanded user      *
+ *                                 macros. Unknown or invalid macros will be  *
+ *                                 left unresolved.                           *
+ *             error        - [IN] the error message, optional. If specified  *
+ *                                 the function will return failure on first  *
+ *                                 unknown user macro                         *
+ *                                                                            *
+ * Return value: SUCCEED - the macros were expanded successfully              *
+ *               FAIL    - error parameter was given and at least one of      *
+ *                         macros was not expanded                            *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
+		char **value, char **error)
+{
+	int	ret;
+
+	RDLOCK_CACHE;
+	ret = dc_expand_user_macros_len(text, text_len, hostids, hostids_num, value, error);
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_expand_user_macros                                            *
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
