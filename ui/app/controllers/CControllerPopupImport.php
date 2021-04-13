@@ -63,6 +63,7 @@ class CControllerPopupImport extends CController {
 	}
 
 	protected function doAction() {
+		$rules = [];
 
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
@@ -165,8 +166,9 @@ class CControllerPopupImport extends CController {
 				'title' => _('Import'),
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
-				'can_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
 				'user' => [
+					'type' => $this->getUserType(),
+					'can_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
 					'debug_mode' => $this->getDebugMode()
 				]
 			]));

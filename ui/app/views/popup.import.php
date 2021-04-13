@@ -42,9 +42,7 @@ $titles = [
 	'maps' => _('Maps')
 ];
 
-$user_type = CWebUser::getType();
-
-if ($user_type == USER_TYPE_SUPER_ADMIN) {
+if ($data['user']['type'] == USER_TYPE_SUPER_ADMIN) {
 	$titles['images'] = _('Images');
 	$titles['mediaTypes'] = _('Media types');
 }
@@ -86,13 +84,13 @@ foreach ($titles as $key => $title) {
 
 	switch ($key) {
 		case 'maps':
-			if (!$data['can_edit_maps']) {
+			if (!$data['user']['can_edit_maps']) {
 				$checkbox_update->setAttribute('disabled', 'disabled');
 				$checkbox_create->setAttribute('disabled', 'disabled');
 			}
 			break;
 		default:
-			if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+			if ($data['user']['type'] != USER_TYPE_SUPER_ADMIN && $data['user']['type'] != USER_TYPE_ZABBIX_ADMIN) {
 				if ($checkbox_update !== null) {
 					$checkbox_update->setAttribute('disabled', 'disabled');
 				}
@@ -132,7 +130,7 @@ $form = (new CForm('post', null, 'multipart/form-data'))
 	->addItem($form_list);
 
 $output = [
-	'header' => $data['title'].' - '.$data['rules_preset'],
+	'header' => $data['title'],
 	'script_inline' => trim($this->readJsFile('popup.import.js.php')),
 	'body' => $form->toString(),
 	'buttons' => [
