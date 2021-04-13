@@ -2900,7 +2900,7 @@ void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
  * Purpose: flush locally cached statistics                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vc_flush_stats()
+void	zbx_vc_flush_stats(void)
 {
 	int		i, now;
 	zbx_vc_item_t	*item = NULL;
