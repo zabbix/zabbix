@@ -557,6 +557,15 @@ class testFormUserRoles extends CWebTest {
 		}
 	}
 
+	public function testFormUserRoles_SimpleUpdate() {
+		$hash_before = CDBHelper::getHash('SELECT * FROM role_rule where roleid=2');
+		$this->page->login()->open('zabbix.php?action=userrole.list');
+		$this->query('link', 'Admin role')->one()->click();
+		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'User role updated');
+		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role_rule where roleid=2'));
+	}
+
 	public static function getUpdateData() {
 		return [
 			// Empty name.
@@ -664,6 +673,48 @@ class testFormUserRoles extends CWebTest {
 					'api_methods' => [],
 					'message_header' => 'User role updated'
 				]
+			],
+			// Allow API list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'link' => 'user_changed_name',
+					'fields' => [
+						'API methods' => 'Allow list'
+					],
+					'api_methods' => ['*.create'],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Deny API list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'link' => 'user_changed_name',
+					'fields' => [
+						'API methods' => 'Deny list'
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to actions removed.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'link' => 'user_changed_name',
+					'fields' => [
+						'API methods' => 'Deny list',
+						'Create and edit dashboards and screens' => false,
+						'Create and edit maps' => false,
+						'Add problem comments' => false,
+						'Change severity' => false,
+						'Acknowledge problems' => false,
+						'Close problems' => false,
+						'Execute scripts' => false,
+						'Default access to new actions' => false
+					],
+					'message_header' => 'User role updated'
+				]
 			]
 		];
 	}
@@ -675,14 +726,6 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('link', $data['link'])->one()->click();
 		$this->CreateUpdate($data, 'update');
-	}
-
-	public function testFormUserRoles_SimpleUpdate() {
-		$hash_before = CDBHelper::getHash('SELECT * FROM role_rule where roleid='.zbx_dbstr(self::$roleid));
-		$this->page->login()->open('zabbix.php?action=userrole.list');
-		$this->query('link', 'user_changed_name')->one()->click();
-		$this->query('button:Update')->one()->click();
-		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role_rule where roleid='.zbx_dbstr(self::$roleid)));
 	}
 
 	public function testFormUserRoles_Clone() {
