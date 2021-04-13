@@ -46,6 +46,13 @@ class CFunctionValidator extends CValidator {
 	private $allowed;
 
 	/**
+	 * Position at which error was detected.
+	 *
+	 * @var int
+	 */
+	public $error_pos;
+
+	/**
 	 * If set to true, LLD macros can be used inside functions and are properly validated using LLD macro parser.
 	 *
 	 * @var bool
@@ -303,16 +310,14 @@ class CFunctionValidator extends CValidator {
 	 */
 	public function validate($fn) {
 		$this->setError('');
+		$this->error_pos = 0;
 
 		if (!array_key_exists($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-				_('Unknown function.'));
-			return false;
-		}
+				_('Unknown function.')
+			);
+			$this->error_pos = $fn->pos;
 
-		if (count($this->allowed[$fn->function]['args']) < count($fn->params_raw['parameters'])) {
-			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-				_('Invalid number of parameters.'));
 			return false;
 		}
 
@@ -324,11 +329,19 @@ class CFunctionValidator extends CValidator {
 			_('Invalid fifth parameter.')
 		];
 
+		$next_param_num = 0;
+		$last_valid_pos = $fn->pos + $fn->params_raw['pos'] + 1;
+
 		foreach ($this->allowed[$fn->function]['args'] as $num => $arg) {
+			$next_param_num = $num + 1;
+
 			// Mandatory check.
 			if ($arg['mandat'] && !array_key_exists($num, $fn->params_raw['parameters'])) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-					_('Mandatory parameter is missing.'));
+					_('Mandatory parameter is missing.')
+				);
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
 			elseif (!array_key_exists($num, $fn->params_raw['parameters'])) {
@@ -339,10 +352,14 @@ class CFunctionValidator extends CValidator {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					$param_labels[$num]
 				);
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
 
 			if ($arg['mandat'] == 0x00 && $fn->params_raw['parameters'][$num]->getValue() === '') {
+				$last_valid_pos++;
+
 				continue;
 			}
 
@@ -350,6 +367,8 @@ class CFunctionValidator extends CValidator {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					$param_labels[$num]
 				);
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
 
@@ -357,8 +376,20 @@ class CFunctionValidator extends CValidator {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
 				);
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
+
+			$last_valid_pos = $fn->params_raw['parameters'][$num]->pos + $fn->params_raw['parameters'][$num]->length;
+		}
+
+		if (array_key_exists($next_param_num, $fn->params_raw['parameters'])) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+				_('Invalid number of parameters.'));
+			$this->error_pos = $fn->params_raw['parameters'][$next_param_num]->pos;
+
+			return false;
 		}
 
 		return true;

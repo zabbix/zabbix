@@ -72,6 +72,13 @@ class CMathFunctionValidator extends CValidator {
 	protected $user_macro_parser;
 
 	/**
+	 * Position at which error was detected.
+	 *
+	 * @var int
+	 */
+	public $error_pos;
+
+	/**
 	 * Parser for LLD macros.
 	 *
 	 * @var CLLDMacroParser
@@ -110,35 +117,68 @@ class CMathFunctionValidator extends CValidator {
 	 */
 	public function validate($fn) {
 		$this->setError('');
+		$this->error_pos = 0;
 
 		if (!in_array($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-				_('Unknown function.'));
+				_('Unknown function.')
+			);
+
 			return false;
 		}
 
-		if (count($fn->params_raw['parameters']) == 0
-				|| (array_key_exists($fn->function, $this->number_of_parameters)
-						&& count($fn->params_raw['parameters']) != $this->number_of_parameters[$fn->function])) {
+		$last_valid_pos = $fn->pos + $fn->params_raw['pos'] + 1;
+
+		if (count($fn->params_raw['parameters']) == 0) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-				_('Invalid number of parameters.'));
+				_('Mandatory parameter is missing.')
+			);
+			$this->error_pos = $last_valid_pos;
+
 			return false;
 		}
 
-		foreach ($fn->params_raw['parameters'] as $param) {
+		foreach ($fn->params_raw['parameters'] as $num => $param) {
+
+			if (array_key_exists($fn->function, $this->number_of_parameters)
+					&& $num == $this->number_of_parameters[$fn->function]) {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+					_('Invalid number of parameters.')
+				);
+				$this->error_pos = $last_valid_pos;
+
+				return false;
+			}
+
 			if ($param instanceof CQueryParserResult) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
+				$this->error_pos = $last_valid_pos;
 
 				return false;
 			}
 			elseif ($param instanceof CFunctionParserResult) {
+				$last_valid_pos = $param->pos;
+
 				continue;
 			}
 			elseif (!$this->checkValidConstant($param->getValue(true))) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
+				$this->error_pos = $last_valid_pos;
 
 				return false;
 			}
+
+			$last_valid_pos = $param->pos + $param->length;
+		}
+
+		if (array_key_exists($fn->function, $this->number_of_parameters)
+					&& $this->number_of_parameters[$fn->function] > count($fn->params_raw['parameters'])) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+				_('Mandatory parameter is missing.')
+			);
+			$this->error_pos = $last_valid_pos;
+
+			return false;
 		}
 
 		return true;
