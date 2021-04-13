@@ -27,9 +27,6 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testFormUserRoles extends CWebTest {
 
-	const TABLE_FORM = 'div[contains(@class, "form-grid")]';
-	const TABLE_CONTAINER = '/following-sibling::div[1][contains(@class, "form-field") and not(contains(@class, "offset-1"))]';
-
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
