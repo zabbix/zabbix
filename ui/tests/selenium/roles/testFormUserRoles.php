@@ -545,17 +545,13 @@ class testFormUserRoles extends CWebTest {
 		foreach (['User', 'Admin', 'Super admin'] as $role) {
 			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
 			$this->page->removeFocus();
-			$this->assertScreenshotExcept($screenshot_area,
-			['query' => 'xpath://input[@id="name"]'],
-			$role);
+			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
 		// Screens for super admin.
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=3');
 		$this->page->removeFocus();
-		$this->assertScreenshotExcept($screenshot_area, [
-			['query' => 'xpath://input[@id="name"]']
-		]);
+		$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]']);
 		foreach (['Clone', 'Cancel'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isClickable());
 		}
