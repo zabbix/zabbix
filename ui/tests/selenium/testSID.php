@@ -644,7 +644,7 @@ class testSID extends CWebTest {
 			else {
 				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
 				$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
-				$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentUrl());
+				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
 		}
 	}
