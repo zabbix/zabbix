@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-16T09:40:16Z</date>
+   <date>2021-04-01T09:52:18Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -36,9 +36,9 @@ Template tooling version used: 0.38</description>
          </applications>
          <items>
             <item>
-               <name>MongoDB cluster: Configserver heartbear</name>
+               <name>MongoDB cluster: Configserver heartbeat</name>
                <type>DEPENDENT</type>
-               <key>mongodb.config_server_heartbit</key>
+               <key>mongodb.config_server_heartbeat</key>
                <delay>0</delay>
                <history>7d</history>
                <status>ENABLED</status>
@@ -1019,7 +1019,8 @@ Secondary nodes send getMore operations as part of the replication process."</de
                      </condition>
                   </conditions>
                </filter>
-               <description>Collect collections metrics.</description>
+               <description>Collect collections metrics.&#13;
+Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>MongoDB {#DBNAME}.{#COLLECTION}: Objects, avg size</name>
@@ -1265,7 +1266,8 @@ Secondary nodes send getMore operations as part of the replication process."</de
                      </condition>
                   </conditions>
                </filter>
-               <description>Collect database metrics.</description>
+               <description>Collect database metrics.&#13;
+Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>MongoDB {#DBNAME}: Size, data</name>

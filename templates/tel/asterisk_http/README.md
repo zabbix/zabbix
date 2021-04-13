@@ -89,7 +89,7 @@ There are no template links in this template.
 |Asterisk |PJSIP trunk "{#OBJECTNAME}": Active channels |<p>The total number of active PJSIP trunk channels.</p> |DEPENDENT |asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pjsip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()`</p> |
 |Asterisk |"{#QUEUE}": Logged in |<p>The number of queue members.</p> |DEPENDENT |asterisk.queue.loggedin[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].LoggedIn.first()`</p> |
 |Asterisk |"{#QUEUE}": Available |<p>The number of available queue members.</p> |DEPENDENT |asterisk.queue.available[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Available.first()`</p> |
-|Asterisk |"{#QUEUE}": Callers |<p>The number incomming calls in queue.</p> |DEPENDENT |asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()`</p> |
+|Asterisk |"{#QUEUE}": Callers |<p>The number incoming  calls in queue.</p> |DEPENDENT |asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()`</p> |
 |Zabbix_raw_items |Asterisk: Get stats |<p>Asterisk system information in JSON format.</p> |HTTP_AGENT |asterisk.get_stats<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 
 ## Triggers
