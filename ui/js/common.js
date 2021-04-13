@@ -326,10 +326,10 @@ function getPosition(obj) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action         Popup controller related action.
- * @param {array}  options        (optional) Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid     (optional) id of overlay dialogue.
- * @param {object} trigger_elmnt  (optional) UI element which was clicked to open overlay dialogue.
+ * @param {string} action          Popup controller related action.
+ * @param {array|object}  options  (optional) Array with key/value pairs that will be used as query for popup request.
+ * @param {string} dialogueid      (optional) id of overlay dialogue.
+ * @param {object} trigger_elmnt   (optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns {Overlay}
  */
