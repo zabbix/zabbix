@@ -136,7 +136,7 @@ class CControllerScheduledReportEdit extends CController {
 			$data['cycle'] = $this->report['cycle'];
 			$data['hours'] = sprintf("%02d", floor($this->report['start_time'] / SEC_PER_HOUR));
 			$data['minutes'] = sprintf("%02d", floor(($this->report['start_time'] % SEC_PER_HOUR) / SEC_PER_MIN));
-			$data['weekdays'] = $this->report['weekdays'];
+			$data['weekdays'] = ($this->report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY) ? $this->report['weekdays'] : 127;
 			$data['active_since'] = ($this->report['active_since'] > 0)
 				? (new DateTime('@'.$this->report['active_since']))->format(ZBX_DATE)
 				: '';

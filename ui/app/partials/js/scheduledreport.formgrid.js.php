@@ -36,8 +36,7 @@
 		document
 			.querySelector('#cycle')
 			.addEventListener('change', (event) => {
-				const show_weekdays = (event.target.value == <?= ZBX_REPORT_CYCLE_DAILY ?>
-						|| event.target.value == <?= ZBX_REPORT_CYCLE_WEEKLY ?>);
+				const show_weekdays = (event.target.value == <?= ZBX_REPORT_CYCLE_WEEKLY ?>);
 
 				document
 					.querySelectorAll('#weekdays-label, #weekdays')

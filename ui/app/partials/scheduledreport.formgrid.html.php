@@ -23,18 +23,6 @@
  * @var CPartial $this
  */
 
-$show_weekdays = ($data['cycle'] == ZBX_REPORT_CYCLE_DAILY || $data['cycle'] == ZBX_REPORT_CYCLE_WEEKLY);
-
-$weekdays = [];
-foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
-	$value = 1 << ($day - 1);
-	$weekdays[] = [
-		'name' => getDayOfWeekCaption($day),
-		'value' => $value,
-		'checked' => ($show_weekdays && (bool) ($value & $data['weekdays']))
-	];
-}
-
 $form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
 
 if ($data['source'] === 'reports') {
@@ -132,7 +120,21 @@ $form_grid
 					->setEnabled($data['allowed_edit'])
 			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-	])
+	]);
+
+$show_weekdays = ($data['cycle'] == ZBX_REPORT_CYCLE_WEEKLY);
+
+$weekdays = [];
+foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
+	$value = 1 << ($day - 1);
+	$weekdays[] = [
+		'name' => getDayOfWeekCaption($day),
+		'value' => $value,
+		'checked' => (bool) ($value & $data['weekdays'])
+	];
+}
+
+$form_grid
 	->addItem([
 		(new CLabel(_('Repeat on'), 'weekdays'))
 			->setId('weekdays-label')

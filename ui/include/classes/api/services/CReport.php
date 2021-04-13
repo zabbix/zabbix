@@ -171,11 +171,8 @@ class CReport extends CApiService {
 			'status' =>				['type' => API_INT32, 'in' => ZBX_REPORT_STATUS_DISABLED.','.ZBX_REPORT_STATUS_ENABLED],
 			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'period' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_REPORT_PERIOD_DAY, ZBX_REPORT_PERIOD_WEEK, ZBX_REPORT_PERIOD_MONTH, ZBX_REPORT_PERIOD_YEAR])],
-			'cycle' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY])],
-			'weekdays' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'cycle', 'in' => ZBX_REPORT_CYCLE_DAILY.','.ZBX_REPORT_CYCLE_WEEKLY], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:127', 'default' => 127],
-										['if' => ['field' => 'cycle', 'in' => ZBX_REPORT_CYCLE_MONTHLY.','.ZBX_REPORT_CYCLE_YEARLY], 'type' => API_INT32, 'in' => 0]
-			]],
+			'cycle' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY]), 'default' => DB::getDefault('report', 'cycle')],
+			'weekdays' =>			['type' => API_INT32, 'default' => DB::getDefault('report', 'weekdays')],
 			'start_time' =>			['type' => API_INT32, 'in' => '0:86340'],
 			'active_since' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'default' => DB::getDefault('report', 'active_since')],
 			'active_till' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'default' => DB::getDefault('report', 'active_till')],
@@ -196,7 +193,23 @@ class CReport extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$rnum = 0;
 		foreach ($reports as $report) {
+			$rnum++;
+
+			if ($report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY) {
+				if ($report['weekdays'] < 1 || $report['weekdays'] > 127) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.$rnum.'/weekdays', _s('value must be one of %1$s', '1-127')
+					));
+				}
+			}
+			elseif ($report['weekdays'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.$rnum.'/weekdays', _s('value must be %1$s', '0')
+				));
+			}
+
 			if ($report['active_till'] > 0 && $report['active_since'] > $report['active_till']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('"%1$s" must be greater than "%2$s" or equal to %3$s.', 'active_till', 'active_since', 0)
@@ -504,10 +517,7 @@ class CReport extends CApiService {
 			'dashboardid' =>		['type' => API_ID],
 			'period' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_REPORT_PERIOD_DAY, ZBX_REPORT_PERIOD_WEEK, ZBX_REPORT_PERIOD_MONTH, ZBX_REPORT_PERIOD_YEAR])],
 			'cycle' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY])],
-			'weekdays' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'cycle', 'in' => ZBX_REPORT_CYCLE_DAILY.','.ZBX_REPORT_CYCLE_WEEKLY], 'type' => API_INT32, 'in' => '1:127'],
-										['if' => ['field' => 'cycle', 'in' => ZBX_REPORT_CYCLE_MONTHLY.','.ZBX_REPORT_CYCLE_YEARLY], 'type' => API_INT32, 'in' => '0']
-			]],
+			'weekdays' =>			['type' => API_INT32],
 			'start_time' =>			['type' => API_INT32, 'in' => '0:86340'],
 			'active_since' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE],
 			'active_till' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE],
@@ -539,7 +549,10 @@ class CReport extends CApiService {
 		$names = [];
 		$dashboardids = [];
 
+		$rnum = 0;
 		foreach ($reports as $report) {
+			$rnum++;
+
 			if (!array_key_exists($report['reportid'], $db_reports)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Report with ID "%1$s" is not available.', $report['reportid'])
@@ -554,6 +567,24 @@ class CReport extends CApiService {
 
 			if (array_key_exists('dashboardid', $report) && $report['dashboardid'] != $db_report['dashboardid']) {
 				$dashboardids[$report['dashboardid']] = true;
+			}
+
+			if (array_key_exists('cycle', $report) || array_key_exists('weekdays', $report)) {
+				$cycle = array_key_exists('cycle', $report) ? $report['cycle'] : $db_report['cycle'];
+				$weekdays = array_key_exists('weekdays', $report) ? $report['weekdays'] : $db_report['weekdays'];
+
+				if ($cycle == ZBX_REPORT_CYCLE_WEEKLY) {
+					if ($weekdays < 1 || $weekdays > 127) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.$rnum.'/weekdays', _s('value must be one of %1$s', '1-127')
+						));
+					}
+				}
+				elseif ($weekdays != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.$rnum.'/weekdays', _s('value must be %1$s', '0')
+					));
+				}
 			}
 
 			$active_since = $db_report['active_since'];

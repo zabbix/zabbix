@@ -44,6 +44,11 @@ class CControllerScheduledReportCreate extends CController {
 		$ret = $this->validateInput($fields);
 		$error = $this->getValidationError();
 
+		if ($ret && !$this->validateWeekdays()) {
+			$error = self::VALIDATION_ERROR;
+			$ret = false;
+		}
+
 		if (!$ret) {
 			switch ($error) {
 				case self::VALIDATION_ERROR:
@@ -64,6 +69,26 @@ class CControllerScheduledReportCreate extends CController {
 		return $ret;
 	}
 
+	/**
+	 * Validate days of the week.
+	 *
+	 * @return bool
+	 */
+	private function validateWeekdays(): bool {
+		$cycle = $this->getInput('cycle', ZBX_REPORT_CYCLE_DAILY);
+		$weekdays = array_sum($this->getInput('weekdays', []));
+
+		if ($cycle == ZBX_REPORT_CYCLE_WEEKLY && $weekdays == 0) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Repeat on'),
+				_('at least one day of the week must be selected'))
+			);
+
+			return false;
+		}
+
+		return true;
+	}
+
 	protected function checkPermissions() {
 		return $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS)
 			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
@@ -76,10 +101,10 @@ class CControllerScheduledReportCreate extends CController {
 			'subject', 'message', 'description', 'status'
 		]);
 
-		$report['weekdays'] = ($report['cycle'] == ZBX_REPORT_CYCLE_DAILY
-				|| $report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY)
-			? array_sum($this->getInput('weekdays', []))
-			: 0;
+		if ($report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY) {
+			$report['weekdays'] = array_sum($this->getInput('weekdays', []));
+		}
+
 		$report['start_time'] = ($this->getInput('hours') * SEC_PER_HOUR) + ($this->getInput('minutes') * SEC_PER_MIN);
 		$report['active_since'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_since']) !== false)
 			? (new DateTime($report['active_since'], new DateTimeZone('UTC')))->getTimestamp()
