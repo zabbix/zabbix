@@ -255,8 +255,6 @@ class CFormElement extends CElement {
 	 * @param string $name    field label text
 	 *
 	 * @return CElement
-	 *
-	 * @throws Exception
 	 */
 	public function getFieldContainer($name) {
 		return $this->getLabel($name)->query('xpath:./../../'.self::TABLE_FORM_RIGHT)->one();

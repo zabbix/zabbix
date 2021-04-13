@@ -661,7 +661,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role updated'
 				]
 			],
-			// Change type from super admin to user
+			// Change type from super admin to user.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -672,7 +672,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role updated'
 				]
 			],
-			// Remove all API methods
+			// Remove all API methods.
 			[
 				[
 					'expected' => TEST_GOOD,
