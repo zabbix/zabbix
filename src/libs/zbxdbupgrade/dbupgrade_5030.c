@@ -2750,12 +2750,10 @@ static void	dbpatch_convert_simple_macro(const char *expression, const zbx_token
 	host = zbx_substr(expression, data->host.l, data->host.r);
 	key = zbx_substr(expression, data->key.l, data->key.r);
 
-	/* TODO: clarify if {HOST.HOST} should be replaced with //
 	if (0 == strcmp(host, "{HOST.HOST}"))
 		func->arg0 = zbx_dsprintf(NULL, "//%s", key);
 	else
-	*/
-	func->arg0 = zbx_dsprintf(NULL, "/%s/%s", host, key);
+		func->arg0 = zbx_dsprintf(NULL, "/%s/%s", host, key);
 
 	zbx_vector_ptr_append(&functions, func);
 
