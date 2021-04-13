@@ -20,11 +20,10 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../CElement.php';
 require_once dirname(__FILE__).'/CFormElement.php';
 
 /**
- * Form element.
+ * Fluid form element.
  */
 class CFluidFormElement extends CFormElement {
 
@@ -58,11 +57,10 @@ class CFluidFormElement extends CFormElement {
 			return $element;
 		}
 
-		if (!$element->isValid()) {
+		else {
 			$element = $label->query('xpath:./../../'.self::TABLE_FORM_FIELD)->one(false);
+			return $element;
 		}
-
-		return $element;
 	}
 
 	/**
