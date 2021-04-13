@@ -668,8 +668,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'link' => 'user_changed_name',
-					'fields' => [
-					],
+					'fields' => [],
 					'api_methods' => [],
 					'message_header' => 'User role updated'
 				]
@@ -741,8 +740,9 @@ class testFormUserRoles extends CWebTest {
 		$form->submit();
 
 		$this->assertMessage(TEST_GOOD, 'User role created');
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM role WHERE name='.zbx_dbstr($role_name)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM role WHERE name='.zbx_dbstr('Cloned_'.$role_name)));
+		foreach([$role_name, 'Cloned_'.$role_name] as $role) {
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM role WHERE name='.zbx_dbstr($role)));
+		}
 
 		$id = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr('Cloned_'.$role_name));
 		$this->page->open('zabbix.php?action=userrole.edit&roleid='.$id);
