@@ -175,7 +175,7 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'Invalid parameter "/1/name": cannot be empty.'
 				]
 			],
-			// All UI elements checked out.
+			// All UI elements unchecked.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -536,12 +536,11 @@ class testFormUserRoles extends CWebTest {
 		$this->assertFalse($this->query('button:Select')->one()->isClickable());
 		$this->assertTrue($this->query('xpath://div[@id="api_methods_" and @aria-disabled="true"]')->exists());
 		$this->page->refresh()->waitUntilReady();
-		foreach (['Update', 'Clone', 'Delete', 'Cancel'] as $button) {
-			$this->assertTrue($this->query('button', $button)->one()->isClickable());
-		}
+		$this->assertEquals(4, $form->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		// New role check with screenshots.
-		$this->page->login()->open('zabbix.php?action=userrole.edit');
+		$this->page->open('zabbix.php?action=userrole.edit');
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach (['User', 'Admin', 'Super admin'] as $role) {
 			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
