@@ -732,7 +732,7 @@ class testFormUserRoles extends CWebTest {
 		$form = $this->query('id:userrole-form')->waitUntilReady()->asFluidForm()->one();
 		$values = $form->getFields()->asValues();
 		$role_name = $values['Name'];
-		$this->query('button:Clone')->waitUntilReady()->one()->click();
+		$this->query('button:Clone')->one()->click();
 		$this->page->waitUntilReady();
 
 		$form->invalidate();
@@ -756,9 +756,11 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	public function testFormUserRoles_Delete() {
-		$hash_before = CDBHelper::getHash('SELECT * FROM role');
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		foreach (['Admin role', 'role_for_delete'] as $role) {
+			if ($role === 'Admin role') {
+				$hash_before = CDBHelper::getHash('SELECT * FROM role');
+			}
 			$this->query('link', $role)->one()->click();
 			$this->query('button:Delete')->one()->click();
 			$this->page->acceptAlert();
@@ -770,7 +772,7 @@ class testFormUserRoles extends CWebTest {
 			}
 			else {
 				$this->assertMessage(TEST_GOOD, 'User role deleted');
-				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM role WHERE name=\'role_for_delete\''));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM role WHERE name='. zbx_dbstr('role_for_delete')));
 			}
 		}
 	}
