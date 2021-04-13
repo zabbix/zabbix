@@ -322,10 +322,24 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		$parser = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
+		$result = $parser->parse($data);
+
+		if (!$result) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $parser->error);
+
 			return false;
+		}
+
+		$validator = new CFunctionValidator(['calculated' => true]);
+		$math_validator = new CMathFunctionValidator(['calculated' => true]);
+
+		foreach ($result->getFunctions() as $func) {
+			if (!$math_validator->validate($func) && !$validator->validate($func)) {
+				$error = $validator->getError();
+
+				return false;
+			}
 		}
 
 		return true;

@@ -78,6 +78,13 @@ class CMathFunctionValidator extends CValidator {
 	 */
 	protected $lld_macro_parser;
 
+	/**
+	 * Validate as part of calculated item formula: allow CQueryParserResult as first argument.
+	 *
+	 * @var bool
+	 */
+	protected $calculated = false;
+
 	public function __construct(array $options = []) {
 		/*
 		 * CValidator is an abstract class, so no specific functionality should be bound to it. Thus putting
@@ -126,7 +133,7 @@ class CMathFunctionValidator extends CValidator {
 		}
 
 		foreach ($fn->params_raw['parameters'] as $param) {
-			if ($param instanceof CQueryParserResult) {
+			if ($param instanceof CQueryParserResult && !$this->calculated) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
 
 				return false;
