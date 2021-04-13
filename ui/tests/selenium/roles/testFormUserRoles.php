@@ -621,7 +621,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role updated'
 				]
 			],
-			// Change type from user to admin.
+			// Change type to admin.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -632,7 +632,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role updated'
 				]
 			],
-			// Change type from admin to super admin.
+			// Change type to super admin.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -643,7 +643,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role updated'
 				]
 			],
-			// Change type from super admin to user.
+			// Change type to user.
 			[
 				[
 					'expected' => TEST_GOOD,
