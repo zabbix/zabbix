@@ -79,9 +79,11 @@ class CMathFunctionValidator extends CValidator {
 	protected $lld_macro_parser;
 
 	/**
-	 * If set to true, foreach functions will be allowed and validated as first parameter.
+	 * Validate as part of calculated item formula: allow CQueryParserResult as first argument.
+	 *
+	 * @var bool
 	 */
-	protected $foreach_function = false;
+	protected $calculated = false;
 
 	/**
 	 * Array of function supports foreach function as first parameter.
@@ -139,17 +141,17 @@ class CMathFunctionValidator extends CValidator {
 		}
 
 		if (count($fn->params_raw['parameters']) == 0
-				|| (in_array($fn->function, $this->number_of_parameters)
+				|| (array_key_exists($fn->function, $this->number_of_parameters)
 						&& count($fn->params_raw['parameters']) != $this->number_of_parameters[$fn->function])) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid number of parameters.'));
 			return false;
 		}
 
-		$validate_foreach = ($this->foreach_function && in_array($fn->function, $this->parameter_foreach_functions));
+		$validate_foreach = ($this->calculated && in_array($fn->function, $this->parameter_foreach_functions));
 
 		foreach ($fn->params_raw['parameters'] as $param) {
-			if ($param instanceof CQueryParserResult) {
+			if ($param instanceof CQueryParserResult && !$this->calculated) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
 
 				return false;
