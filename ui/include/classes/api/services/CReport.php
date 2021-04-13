@@ -625,9 +625,12 @@ class CReport extends CApiService {
 			}
 
 			if (array_key_exists('users', $report) || array_key_exists('user_groups', $report)) {
-				$this->checkHasRecipients(array_key_exists('users', $report) ? $report['users'] : $db_report['users'],
-					array_key_exists('user_groups', $report) ? $report['user_groups'] : $db_report['user_groups']
-				);
+				$users = array_key_exists('users', $report) ? $report['users'] : $db_report['users'];
+				$user_groups = array_key_exists('user_groups', $report)
+					? $report['user_groups']
+					: $db_report['user_groups'];
+
+				$this->checkHasRecipients($users, $user_groups);
 			}
 		}
 
