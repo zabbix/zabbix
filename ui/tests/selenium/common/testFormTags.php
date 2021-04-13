@@ -125,7 +125,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
+					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
 			[
@@ -145,7 +145,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'host_and_template_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.',
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			],
 			[
@@ -260,7 +260,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.',
+					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
 			[
@@ -275,7 +275,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'host_and_template_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.',
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
 			[

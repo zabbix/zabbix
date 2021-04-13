@@ -385,7 +385,7 @@ class testPageOverview extends CLegacyWebTest {
 				[
 					'general_filter' => 'Data overview',
 					'filter' => [
-						'Host groups' => 'Group to check Overview',
+						'Host groups' => 'Group to check Overview'
 					],
 					'tags' => [
 						['name' => 'DataBase', 'value' => 'mysql', 'operator' => 'Contains']
