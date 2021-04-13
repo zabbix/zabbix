@@ -42,6 +42,10 @@ class C52ImportConverter extends CConverter {
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
 
+		if (array_key_exists('maps', $data['zabbix_export'])) {
+			$data['zabbix_export']['maps'] = self::convertMaps($data['zabbix_export']['maps']);
+		}
+
 		if (array_key_exists('value_maps', $data['zabbix_export'])) {
 			$data['zabbix_export'] = self::convertValueMaps($data['zabbix_export']);
 		}
@@ -66,6 +70,10 @@ class C52ImportConverter extends CConverter {
 		foreach ($hosts as &$host) {
 			$host = array_diff_key($host, $tls_fields);
 
+			if (array_key_exists('items', $host)) {
+				$host['items'] = self::convertItems($host['items']);
+			}
+
 			if (array_key_exists('interfaces', $host)) {
 				$host['interfaces'] = self::convertIntefaces($host['interfaces']);
 			}
@@ -73,6 +81,12 @@ class C52ImportConverter extends CConverter {
 			if (array_key_exists('discovery_rules', $host)) {
 				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
 			}
+
+			if (array_key_exists('httptests', $host)) {
+				$host['httptests'] = self::convertHttpTests($host['httptests']);
+			}
+
+			unset($host['applications']);
 		}
 		unset($host);
 
@@ -89,21 +103,28 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertTemplates(array $templates): array {
-		$result = [];
+		foreach ($templates as &$template) {
+			if (array_key_exists('items', $template)) {
+				$template['items'] = self::convertItems($template['items']);
+			}
 
-		foreach ($templates as $template) {
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
 			}
 
+			if (array_key_exists('httptests', $template)) {
+				$template['httptests'] = self::convertHttpTests($template['httptests']);
+			}
+
+			unset($template['applications']);
+
 			if (array_key_exists('dashboards', $template)) {
 				$template['dashboards'] = self::convertTemplateDashboards($template['dashboards']);
 			}
-
-			$result[] = $template;
 		}
+		unset($template);
 
-		return $result;
+		return $templates;
 	}
 
 	/**
@@ -168,29 +189,6 @@ class C52ImportConverter extends CConverter {
 			}
 
 			$result[] = $interface;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Convert discover rules.
-	 *
-	 * @static
-	 *
-	 * @param array $discovery_rules
-	 *
-	 * @return array
-	 */
-	private static function convertDiscoveryRules(array $discovery_rules): array {
-		$result = [];
-
-		foreach ($discovery_rules as $discovery_rule) {
-			if (array_key_exists('host_prototypes', $discovery_rule)) {
-				$discovery_rule['host_prototypes'] = self::convertHostPrototypes($discovery_rule['host_prototypes']);
-			}
-
-			$result[] = $discovery_rule;
 		}
 
 		return $result;
@@ -270,5 +268,139 @@ class C52ImportConverter extends CConverter {
 		unset($host);
 
 		return $hosts;
+	}
+
+	/**
+	 * Convert discover rules.
+	 *
+	 * @static
+	 *
+	 * @param array $discovery_rules
+	 *
+	 * @return array
+	 */
+	private static function convertDiscoveryRules(array $discovery_rules): array {
+		$result = [];
+
+		foreach ($discovery_rules as $discovery_rule) {
+			if (array_key_exists('host_prototypes', $discovery_rule)) {
+				$discovery_rule['host_prototypes'] = self::convertHostPrototypes($discovery_rule['host_prototypes']);
+			}
+
+			if (array_key_exists('item_prototypes', $discovery_rule)) {
+				$discovery_rule['item_prototypes'] = self::convertItems($discovery_rule['item_prototypes']);
+			}
+
+			$result[] = $discovery_rule;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert items.
+	 *
+	 * @static
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	private static function convertItems(array $items): array {
+		foreach ($items as &$item) {
+			$item['tags'] = [];
+			$i = 0;
+			if (array_key_exists('applications', $item)) {
+				foreach (self::convertApplicationsToTags($item['applications']) as $tag) {
+					$item['tags']['tag'.($i ? $i : '')] = $tag;
+					$i++;
+				}
+			}
+			if (array_key_exists('application_prototypes', $item)) {
+				foreach (self::convertApplicationsToTags($item['application_prototypes']) as $tag) {
+					$item['tags']['tag'.($i ? $i : '')] = $tag;
+					$i++;
+				}
+			}
+			unset($item['applications'], $item['application_prototypes']);
+		}
+		unset($item);
+
+		return $items;
+	}
+
+	/**
+	 * Convert applications to item tags.
+	 *
+	 * @static
+	 *
+	 * @param array $applications
+	 *
+	 * @return array
+	 */
+	private static function convertApplicationsToTags(array $applications): array {
+		$tags = [];
+
+		foreach (array_values($applications) as $i => $app) {
+			$tags['tag'.($i ? $i : '')] = [
+				'tag' => 'Application',
+				'value' => $app['name']
+			];
+		}
+
+		return $tags;
+	}
+
+	/**
+	 * Convert maps.
+	 *
+	 * @static
+	 *
+	 * @param array $maps
+	 *
+	 * @return array
+	 */
+	private static function convertMaps(array $maps): array {
+		foreach ($maps as $i => $map) {
+			if (array_key_exists('selements', $map)) {
+				foreach ($map['selements'] as $s => $selement) {
+					$maps[$i]['selements'][$s]['evaltype'] = (string) CONDITION_EVAL_TYPE_AND_OR;
+
+					if (array_key_exists('application', $selement) && $selement['application'] !== '') {
+						$maps[$i]['selements'][$s]['tags'] = self::convertApplicationsToTags([[
+							'name' => $selement['application']
+						]]);
+
+						$maps[$i]['selements'][$s]['tags'] = array_map(function ($tag) {
+							return $tag + ['operator' => (string) TAG_OPERATOR_LIKE];
+						}, $maps[$i]['selements'][$s]['tags']);
+					}
+					unset($maps[$i]['selements'][$s]['application']);
+				}
+			}
+		}
+
+		return $maps;
+	}
+
+	/**
+	 * Convert http tests.
+	 *
+	 * @static
+	 *
+	 * @param array $http_tests
+	 *
+	 * @return array
+	 */
+	private static function convertHttpTests(array $http_tests): array {
+		foreach ($http_tests as &$http_test) {
+			if (array_key_exists('application', $http_test)) {
+				$http_test['tags'] = self::convertApplicationsToTags([$http_test['application']]);
+				unset($http_test['application']);
+			}
+		}
+		unset($http_test);
+
+		return $http_tests;
 	}
 }

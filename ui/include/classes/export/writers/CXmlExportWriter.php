@@ -91,8 +91,6 @@ class CXmlExportWriter extends CExportWriter {
 	 */
 	private function mapName($name) {
 		$map = [
-			'application_prototypes' => 'application_prototype',
-			'applications' => 'application',
 			'conditions' => 'condition',
 			'dashboards' => 'dashboard',
 			'dependencies' => 'dependency',

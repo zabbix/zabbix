@@ -53,7 +53,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array       $options
 	 * @param array|null  $options['groupids']
 	 * @param array|null  $options['hostids']
-	 * @param array|null  $options['applicationids']
 	 * @param array|null  $options['objectids']
 	 * @param string|null $options['eventid_till']
 	 * @param int|null    $options['time_from']
@@ -85,7 +84,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array       $options
 	 * @param array|null  $options['groupids']
 	 * @param array|null  $options['hostids']
-	 * @param array|null  $options['applicationids']
 	 * @param array|null  $options['objectids']
 	 * @param string|null $options['eventid_till']
 	 * @param bool        $options['recent']
@@ -125,7 +123,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $filter['inventory']             (optional)
 	 * @param string $filter['inventory'][]['field']
 	 * @param string $filter['inventory'][]['value']
-	 * @param string $filter['application']           (optional)
 	 * @param string $filter['name']                  (optional)
 	 * @param int    $filter['show']                  TRIGGERS_OPTION_*
 	 * @param int    $filter['from']                  (optional) usable together with 'to' and only for
@@ -154,7 +151,6 @@ class CScreenProblem extends CScreenBase {
 			? getSubGroups($filter['groupids'])
 			: null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
-		$filter_applicationids = null;
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
 			? $filter['triggerids']
 			: null;
@@ -208,18 +204,6 @@ class CScreenProblem extends CScreenBase {
 			$filter_hostids = ($filter_hostids !== null) ? array_intersect($filter_hostids, $hostids) : $hostids;
 		}
 
-		if (array_key_exists('application', $filter) && $filter['application'] !== '') {
-			$filter_applicationids = array_keys(API::Application()->get([
-				'output' => [],
-				'groupids' => $filter_groupids,
-				'hostids' => $filter_hostids,
-				'search' => ['name' => $filter['application']],
-				'preservekeys' => true
-			]));
-			$filter_groupids = null;
-			$filter_hostids = null;
-		}
-
 		$data = [
 			'problems' => [],
 			'triggers' => []
@@ -232,7 +216,6 @@ class CScreenProblem extends CScreenBase {
 			$options = [
 				'groupids' => $filter_groupids,
 				'hostids' => $filter_hostids,
-				'applicationids' => $filter_applicationids,
 				'objectids' => $filter_triggerids,
 				'eventid_till' => $eventid_till,
 				'suppressed' => false,

@@ -92,7 +92,11 @@ function getMenuPopupHistory(options) {
  * @param {array}  options['urls']                    (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
- * @param {string} options['filter_application']      (optional) Application name for filter by application.
+ * @param {array}  options['tags']                    (optional)
+ * @param {string} options['tags'][]['tag']
+ * @param {string} options['tags'][]['value']
+ * @param {number} options['tags'][]['operator']
+ * @param {number} options['evaltype']                (optional)
  * @param {bool}   options['allowed_ui_inventory']    Whether user has access to inventory hosts page.
  * @param {bool}   options['allowed_ui_latest_data']  Whether user has access to latest data page.
  * @param {bool}   options['allowed_ui_problems']     Whether user has access to problems page.
@@ -134,8 +138,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		// latest data link
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
-		if (typeof options.filter_application !== 'undefined') {
-			url.setArgument('filter_application', options.filter_application);
+		if (typeof options.tags !== 'undefined') {
+			url.setArgument('filter_tags', options.tags);
+			url.setArgument('filter_evaltype', options.evaltype);
 		}
 		url.setArgument('filter_hostids[]', options.hostid);
 		url.setArgument('filter_set', '1');
@@ -155,8 +160,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 				url.setArgument('show_suppressed', '1');
 			}
-			if (typeof options.filter_application !== 'undefined') {
-				url.setArgument('application', options.filter_application);
+			if (typeof options.tags !== 'undefined') {
+				url.setArgument('tags', options.tags);
+				url.setArgument('evaltype', options.evaltype);
 			}
 
 			problems.url = url.getUrl();
@@ -329,7 +335,11 @@ function getMenuPopupMapElementSubmap(options) {
  * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
- * @param {string} options['filter_application'] (optional) Application name for filter by application.
+ * @param {array}  options['tags']               (optional)
+ * @param {string} options['tags'][]['tag']
+ * @param {string} options['tags'][]['value']
+ * @param {number} options['tags'][]['operator']
+ * @param {number} options['evaltype']           (optional)
  *
  * @return array
  */
@@ -350,8 +360,9 @@ function getMenuPopupMapElementGroup(options) {
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('show_suppressed', '1');
 	}
-	if (typeof options.filter_application !== 'undefined') {
-		problems_url.setArgument('application', options.filter_application);
+	if (typeof options.tags !== 'undefined') {
+		problems_url.setArgument('tags', options.tags);
+		problems_url.setArgument('evaltype', options.evaltype);
 	}
 
 	sections.push({

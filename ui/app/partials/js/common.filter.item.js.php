@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -20,24 +20,28 @@
 
 
 /**
- * @var CView $this
+ * @var CPartial $this
  */
 ?>
 
+<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
+	<?= CTagFilterFieldHelper::getTemplate(); ?>
+</script>
+
 <script type="text/javascript">
-	jQuery(function($) {
-		$('#application-form').submit(function() {
-			$(this).trimValues(['#name']);
+	(function($) {
+		$(function() {
+			$('#filter-tags')
+				.dynamicRows({ template: '#filter-tag-row-tmpl' })
+				.on('afteradd.dynamicRows', function() {
+					var rows = this.querySelectorAll('.form_row');
+					new CTagFilterItem(rows[rows.length - 1]);
+				});
+
+			// Init existing fields once loaded.
+			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+				new CTagFilterItem(row);
+			});
 		});
-
-		$('#clone').click(function() {
-			var url = new Curl('zabbix.php');
-
-			url.setArgument('action', 'application.edit');
-			url.setArgument('name', $('#name').val());
-			url.setArgument('hostid', $('#hostid').val());
-
-			redirect(url.getUrl(), 'post', 'action');
-		});
-	});
+	})(jQuery);
 </script>

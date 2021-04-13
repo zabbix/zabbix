@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:53Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -24,21 +24,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: 'Disk arrays'
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Physical disks'
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
-        -
-          name: 'Virtual disks'
       discovery_rules:
         -
           name: 'Array Controller Cache Discovery'
@@ -56,11 +41,12 @@ zabbix_export:
               history: 1w
               trends: 0d
               description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1'
@@ -95,9 +81,10 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
-              applications:
+              tags:
                 -
-                  name: 'Disk arrays'
+                  tag: Application
+                  value: 'Disk arrays'
             -
               name: '{#DISKARRAY_LOCATION}: Disk array controller status'
               type: SNMP_AGENT
@@ -106,11 +93,12 @@ zabbix_export:
               history: 1w
               trends: 0d
               description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1'
@@ -159,11 +147,12 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
                 Cisco UCS equipment:Fan:operState managed object property
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS:"inoperable"},eq)}=1'
@@ -201,9 +190,10 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
                 Cisco UCS storage:LocalDisk:model managed object property. Actually returns 'HDD' or 'SSD'
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_LOCATION}: Physical disk model name'
               type: SNMP_AGENT
@@ -216,9 +206,10 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
                 Cisco UCS storage:LocalDisk:serial managed object property. Actually returns part number code
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_LOCATION}: Disk size'
               type: SNMP_AGENT
@@ -231,14 +222,15 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
                 Cisco UCS storage:LocalDisk:size managed object property. In MB.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_LOCATION}: Physical disk status'
               type: SNMP_AGENT
@@ -249,11 +241,12 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
                 Cisco UCS storage:LocalDisk:diskState managed object property.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_CRIT_STATUS:"bad"},eq)}=1 or {count(#1,{$DISK_CRIT_STATUS:"predictiveFailure"},eq)}=1'
@@ -289,11 +282,12 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
                 Cisco UCS equipment:Psu:operState managed object property
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS:"inoperable"},eq)}=1'
@@ -329,9 +323,10 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB
                 Cisco UCS processor:EnvStats:temperature managed object property
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"CPU"}'
@@ -379,9 +374,10 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
                 Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
@@ -422,9 +418,10 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
                 Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
@@ -465,9 +462,10 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
                 Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
@@ -508,9 +506,10 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
                 Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
@@ -559,14 +558,15 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
                 Cisco UCS compute:RackUnit:model managed object property
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '{#UNIT_LOCATION}: Hardware serial number'
               type: SNMP_AGENT
@@ -579,14 +579,15 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
                 Cisco UCS compute:RackUnit:serial managed object property
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -605,11 +606,12 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
                 Cisco UCS compute:RackUnit:operState managed object property
-              applications:
-                -
-                  name: Status
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState'
+              tags:
+                -
+                  tag: Application
+                  value: Status
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$HEALTH_CRIT_STATUS:"computeFailed"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"configFailure"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"unconfigFailure"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"inoperable"},eq)}=1'
@@ -645,11 +647,12 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
                 Cisco UCS storage:LocalLun:type managed object property
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
               name: '{#VDISK_LOCATION}: Disk size'
               type: SNMP_AGENT
@@ -662,9 +665,6 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
                 Cisco UCS storage:LocalLun:size managed object property in MB.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
               preprocessing:
@@ -672,6 +672,10 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
               name: '{#VDISK_LOCATION}: Status'
               type: SNMP_AGENT
@@ -682,11 +686,12 @@ zabbix_export:
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
                 Cisco UCS storage:LocalLun:presence managed object property
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$VDISK_OK_STATUS:"equipped"},ne)}=1'

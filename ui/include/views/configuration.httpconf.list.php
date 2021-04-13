@@ -22,61 +22,70 @@
 /**
  * @var CView $this
  */
+require_once dirname(__FILE__).'/js/configuration.httpconf.list.js.php';
+
 $hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+
+$filter_column_left = (new CFormList())
+	->addRow(
+		(new CLabel(_('Host groups'), 'filter_groups__ms')),
+		(new CMultiSelect([
+			'name' => 'filter_groupids[]',
+			'object_name' => 'hostGroup',
+			'data' => $data['filter']['groups'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'filter_groupids_',
+					'with_hosts_and_templates' => 1,
+					'editable' => 1,
+					'enrich_parent_groups' => true
+				] + $hg_ms_params
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+	)
+	->addRow(
+		(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hosts__ms')),
+		(new CMultiSelect([
+			'name' => 'filter_hostids[]',
+			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+			'data' => $data['filter']['hosts'],
+			'popup' => [
+				'filter_preselect_fields' => [
+					'hostgroups' => 'filter_groupids_'
+				],
+				'parameters' => [
+					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+					'srcfld1' => 'hostid',
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'filter_hostids_',
+					'editable' => 1
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+	)
+	->addRow(_('Status'),
+		(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+			->addValue(_('all'), -1)
+			->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)
+			->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
+			->setModern(true)
+	);
+
+$filter_column_right = (new CFormList())->addRow(_('Tags'),
+	CTagFilterFieldHelper::getTagFilterField([
+		'evaltype' => $data['filter']['evaltype'],
+		'tags' => $data['filter']['tags']
+	])
+);
 
 $filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data['context'])))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addvar('context', $data['context'])
-	->addFilterTab(_('Filter'), [
-		(new CFormList())
-			->addRow(
-				(new CLabel(_('Host groups'), 'filter_groups__ms')),
-				(new CMultiSelect([
-					'name' => 'filter_groupids[]',
-					'object_name' => 'hostGroup',
-					'data' => $data['filter']['groups'],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'host_groups',
-							'srcfld1' => 'groupid',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_groupids_',
-							'with_hosts_and_templates' => 1,
-							'editable' => 1,
-							'enrich_parent_groups' => true
-						] + $hg_ms_params
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(
-				(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hosts__ms')),
-				(new CMultiSelect([
-					'name' => 'filter_hostids[]',
-					'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
-					'data' => $data['filter']['hosts'],
-					'popup' => [
-						'filter_preselect_fields' => [
-							'hostgroups' => 'filter_groupids_'
-						],
-						'parameters' => [
-							'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
-							'srcfld1' => 'hostid',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_hostids_',
-							'editable' => 1
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(_('Status'),
-				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-					->addValue(_('all'), -1)
-					->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)
-					->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
-					->setModern(true)
-			)
-	]);
+	->addFilterTab(_('Filter'), [$filter_column_left, $filter_column_right]);
 
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
@@ -127,15 +136,15 @@ $httpTable = (new CTableInfo())
 		_('Attempts'),
 		_('Authentication'),
 		_('HTTP proxy'),
-		_('Application'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Tags'),
 		($data['context'] === 'host') ? _('Info') : null
 	]);
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
-$httpTests = $this->data['httpTests'];
+$http_tests = $data['http_tests'];
 
-foreach ($httpTests as $httpTestId => $httpTest) {
+foreach ($http_tests as $httpTestId => $httpTest) {
 	$name = [];
 	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
 	$name[] = new CLink(CHtml::encode($httpTest['name']),
@@ -176,7 +185,6 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$httpTest['retries'],
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
-		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
 		(new CLink(
 			httptest_status2str($httpTest['status']),
 			(new CUrl('httpconf.php'))
@@ -192,6 +200,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status']))
 			->addSID(),
+		$data['tags'][$httpTest['httptestid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }

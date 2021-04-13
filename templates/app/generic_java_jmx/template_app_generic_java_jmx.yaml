@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:01Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:36Z'
   groups:
     -
       name: Templates/Applications
@@ -12,9 +12,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: JMX
       items:
         -
           name: 'ClassLoading: Loaded class count'
@@ -22,45 +19,48 @@ zabbix_export:
           key: 'jmx["java.lang:type=ClassLoading","LoadedClassCount"]'
           history: 7d
           description: 'Displays number of classes that are currently loaded in the Java virtual machine.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'ClassLoading: Total loaded class count'
           type: JMX
           key: 'jmx["java.lang:type=ClassLoading","TotalLoadedClassCount"]'
           history: 7d
           description: 'Displays the total number of classes that have been loaded since the Java virtual machine has started execution.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'ClassLoading: Unloaded class count'
           type: JMX
           key: 'jmx["java.lang:type=ClassLoading","UnloadedClassCount"]'
           history: 7d
           description: 'Displays the total number of classes that have been loaded since the Java virtual machine has started execution.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Compilation: Name of the current JIT compiler'
           type: JMX
@@ -69,15 +69,16 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Displays the total number of classes unloaded since the Java virtual machine has started execution.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
           triggers:
             -
               expression: '{str(Client)}=1'
@@ -92,9 +93,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Displays the approximate accumulated elapsed time spent in compilation, in seconds.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
@@ -105,6 +103,10 @@ zabbix_export:
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: ConcurrentMarkSweep number of collections per second'
           type: JMX
@@ -112,15 +114,16 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Displays the total number of collections that have occurred per second.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: ConcurrentMarkSweep accumulated time spent in collection'
           type: JMX
@@ -129,9 +132,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
@@ -142,6 +142,10 @@ zabbix_export:
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: Copy number of collections per second'
           type: JMX
@@ -149,15 +153,16 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Displays the total number of collections that have occurred per second.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: Copy accumulated time spent in collection'
           type: JMX
@@ -166,9 +171,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
@@ -179,6 +181,10 @@ zabbix_export:
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: MarkSweepCompact number of collections per second'
           type: JMX
@@ -186,15 +192,16 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Displays the total number of collections that have occurred per second.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: MarkSweepCompact accumulated time spent in collection'
           type: JMX
@@ -203,9 +210,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
@@ -216,6 +220,10 @@ zabbix_export:
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: ParNew number of collections per second'
           type: JMX
@@ -223,15 +231,16 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Displays the total number of collections that have occurred per second.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: ParNew accumulated time spent in collection'
           type: JMX
@@ -240,9 +249,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
@@ -253,6 +259,10 @@ zabbix_export:
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: PS MarkSweep number of collections per second'
           type: JMX
@@ -260,15 +270,16 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Displays the total number of collections that have occurred per second.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: PS MarkSweep accumulated time spent in collection'
           type: JMX
@@ -277,9 +288,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
@@ -290,6 +298,10 @@ zabbix_export:
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: PS Scavenge number of collections per second'
           type: JMX
@@ -297,15 +309,16 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Displays the total number of collections that have occurred per second.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'GarbageCollector: PS Scavenge accumulated time spent in collection'
           type: JMX
@@ -314,9 +327,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
@@ -327,6 +337,10 @@ zabbix_export:
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Memory: Heap memory committed'
           type: JMX
@@ -334,10 +348,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current heap memory allocated. This amount of memory is guaranteed for the Java virtual machine to use.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Memory: Heap memory maximum size'
           type: JMX
@@ -345,15 +360,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of heap that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Memory: Heap memory used'
           type: JMX
@@ -361,15 +377,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage outside the heap.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Memory: Non-Heap memory committed'
           type: JMX
@@ -377,15 +394,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory allocated outside the heap. This amount of memory is guaranteed for the Java virtual machine to use.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Memory: Non-Heap memory maximum size'
           type: JMX
@@ -393,15 +411,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of non-heap memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Memory: Non-Heap memory used'
           type: JMX
@@ -409,30 +428,32 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage outside the heap'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Memory: Object pending finalization count'
           type: JMX
           key: 'jmx["java.lang:type=Memory","ObjectPendingFinalizationCount"]'
           history: 7d
           description: 'The approximate number of objects for which finalization is pending.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: CMS Old Gen committed'
           type: JMX
@@ -440,15 +461,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory allocated'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: CMS Old Gen maximum size'
           type: JMX
@@ -456,10 +478,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: CMS Old Gen used'
           type: JMX
@@ -467,10 +490,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: CMS Perm Gen committed'
           type: JMX
@@ -478,15 +502,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory allocated'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: CMS Perm Gen maximum size'
           type: JMX
@@ -494,10 +519,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: CMS Perm Gen used'
           type: JMX
@@ -505,10 +531,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: Code Cache committed'
           type: JMX
@@ -516,15 +543,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory allocated'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: CodeCache maximum size'
           type: JMX
@@ -532,10 +560,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: Code Cache used'
           type: JMX
@@ -543,10 +572,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: Perm Gen committed'
           type: JMX
@@ -554,15 +584,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory allocated'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: Perm Gen maximum size'
           type: JMX
@@ -570,10 +601,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: Perm Gen used'
           type: JMX
@@ -581,10 +613,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: PS Old Gen'
           type: JMX
@@ -592,15 +625,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory allocated'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: PS Old Gen maximum size'
           type: JMX
@@ -608,10 +642,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: PS Old Gen used'
           type: JMX
@@ -619,10 +654,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: PS Perm Gen committed'
           type: JMX
@@ -630,15 +666,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory allocated'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: PS Perm Gen maximum size'
           type: JMX
@@ -646,10 +683,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: PS Perm Gen used'
           type: JMX
@@ -657,10 +695,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: Tenured Gen committed'
           type: JMX
@@ -668,15 +707,16 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory allocated'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: Tenured Gen maximum size'
           type: JMX
@@ -684,10 +724,11 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'MemoryPool: Tenured Gen used'
           type: JMX
@@ -695,35 +736,38 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Current memory usage'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'OperatingSystem: File descriptors maximum count'
           type: JMX
           key: 'jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"]'
           history: 7d
           description: 'This is the number of file descriptors we can have opened in the same process, as determined by the operating system. You can never have more file descriptors than this number.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'OperatingSystem: File descriptors opened'
           type: JMX
           key: 'jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"]'
           history: 7d
           description: 'This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you’re are opening file descriptors and never closing them.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'OperatingSystem: Process CPU Load'
           type: JMX
@@ -732,15 +776,16 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'ProcessCpuLoad represents the CPU load in this process.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '100'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
           triggers:
             -
               expression: '{min({$JMX.CPU.LOAD.TIME})}>{$JMX.CPU.LOAD.MAX}'
@@ -751,15 +796,16 @@ zabbix_export:
           type: JMX
           key: 'jmx["java.lang:type=Runtime","Uptime"]'
           history: 7d
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
           triggers:
             -
               expression: '{nodata(5m)}=1'
@@ -774,15 +820,16 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
           triggers:
             -
               expression: '{str(Server)}<>1'
@@ -797,60 +844,65 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Threading: Daemon thread count'
           type: JMX
           key: 'jmx["java.lang:type=Threading","DaemonThreadCount"]'
           history: 7d
           description: 'Number of daemon threads running.'
-          applications:
-            -
-              name: JMX
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Threading: Peak thread count'
           type: JMX
           key: 'jmx["java.lang:type=Threading","PeakThreadCount"]'
           history: 7d
           description: 'Maximum number of threads being executed at the same time since the JVM was started or the peak was reset.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Threading: Thread count'
           type: JMX
           key: 'jmx["java.lang:type=Threading","ThreadCount"]'
           history: 7d
           description: 'The number of threads running at the current moment.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
         -
           name: 'Threading: Total started thread count'
           type: JMX
           key: 'jmx["java.lang:type=Threading","TotalStartedThreadCount"]'
           history: 7d
           description: 'The number of threads started since the JVM was launched.'
-          applications:
-            -
-              name: JMX
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: JMX
       macros:
         -
           macro: '{$JMX.CPU.LOAD.MAX}'
