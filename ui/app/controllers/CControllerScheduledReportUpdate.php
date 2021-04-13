@@ -112,10 +112,9 @@ class CControllerScheduledReportUpdate extends CController {
 			'active_till', 'subject', 'message', 'description', 'status'
 		]);
 
-		if ($report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY) {
-			$report['weekdays'] = array_sum($this->getInput('weekdays', []));
-		}
-
+		$report['weekdays'] = ($report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY)
+			? array_sum($this->getInput('weekdays', []))
+			: 0;
 		$report['start_time'] = ($this->getInput('hours') * SEC_PER_HOUR) + ($this->getInput('minutes') * SEC_PER_MIN);
 		$report['active_since'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_since']) !== false)
 			? (new DateTime($report['active_since'], new DateTimeZone('UTC')))->getTimestamp()
