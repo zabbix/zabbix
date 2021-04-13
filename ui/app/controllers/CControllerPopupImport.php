@@ -24,7 +24,7 @@ class CControllerPopupImport extends CController {
 	protected function checkInput() {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'in host,template,mediatype,valuemap,map',
+			'rules_preset' => 'in host,template,mediatype,map',
 			'rules' => 'array'
 		];
 
@@ -32,6 +32,7 @@ class CControllerPopupImport extends CController {
 
 		if (!$ret) {
 			$output = [];
+
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
 			}
@@ -62,29 +63,14 @@ class CControllerPopupImport extends CController {
 	}
 
 	protected function doAction() {
-		$rules = [
-			'groups' => ['createMissing' => false],
-			'hosts' => ['updateExisting' => false, 'createMissing' => false],
-			'templates' => ['updateExisting' => false, 'createMissing' => false],
-			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
-			'applications' => ['createMissing' => false, 'deleteMissing' => false],
-			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'maps' => ['updateExisting' => false, 'createMissing' => false],
-			'images' => ['updateExisting' => false, 'createMissing' => false],
-			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
-		];
 
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
 			case 'host':
 				$rules['groups'] = ['createMissing' => true];
 				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['applications'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
@@ -93,16 +79,16 @@ class CControllerPopupImport extends CController {
 				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
 
 			case 'template':
 				$rules['groups'] = ['createMissing' => true];
 				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => false
 				];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['applications'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
@@ -111,8 +97,6 @@ class CControllerPopupImport extends CController {
 				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
 
 			case 'mediatype':
@@ -181,7 +165,7 @@ class CControllerPopupImport extends CController {
 				'title' => _('Import'),
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
-				'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
+				'can_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]
