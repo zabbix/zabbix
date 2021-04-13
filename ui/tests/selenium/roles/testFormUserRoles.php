@@ -814,14 +814,13 @@ class testFormUserRoles extends CWebTest {
 			if ($action === 'create') {
 				$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM role WHERE name='.zbx_dbstr($data['fields']['Name'])));
 				$this->query('link', $data['fields']['Name'])->one()->click();
-				$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-				$form->checkValue($data['fields']);
 			}
 			else {
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$roleid);
-				$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-				$form->checkValue($data['fields']);
 			}
+
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			$form->checkValue($data['fields']);
 		}
 	}
 }
