@@ -782,12 +782,14 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	/**
+	 * Create or update role.
+	 *
 	 * @param array $data		given data provider
 	 * @param string $action	create or update
 	 */
 	private function CreateUpdate($data, $action) {
 		if ($action === 'create') {
-			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			if ($data['expected'] === TEST_BAD) {
 				$hash_before = CDBHelper::getHash('SELECT * FROM role');
 			}
 		}
@@ -797,7 +799,7 @@ class testFormUserRoles extends CWebTest {
 			$this->fillMultiselect($data['api_methods']);
 		}
 		$form->submit();
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
 			if ($action === 'create') {
 				$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role'));
