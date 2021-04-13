@@ -1,0 +1,1011 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-03-24T11:46:51Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'TiDB TiKV by HTTP'
+      name: 'TiDB TiKV by HTTP'
+      description: |
+        The template to monitor TiKV server of TiDB cluster by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        Don't forget to change the macros {$TIKV.URL}, {$TIKV.PORT}. 
+        
+        Template `TiDB TiKV by HTTP` — collects metrics by HTTP agent from TiKV /metrics endpoint.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: 'TiKV node'
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'TiKV: Scheduler: High priority commands total, rate'
+          type: DEPENDENT
+          key: tikv.commands_pri.high.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total count of high priority commands per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_scheduler_commands_pri_total" && @.labels.priority == "high")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Scheduler: Low priority commands total, rate'
+          type: DEPENDENT
+          key: tikv.commands_pri.low.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total count of low priority commands per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_scheduler_commands_pri_total" && @.labels.priority == "low")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Scheduler: Normal priority commands total, rate'
+          type: DEPENDENT
+          key: tikv.commands_pri.normal.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total count of normal priority commands per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_scheduler_commands_pri_total" && @.labels.priority == "normal")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Coprocessor: Requests, rate'
+          type: DEPENDENT
+          key: tikv.coprocessor_request.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'Total number of coprocessor requests per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_coprocessor_request_duration_seconds_count")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Coprocessor: Errors, rate'
+          type: DEPENDENT
+          key: tikv.coprocessor_request_error.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'Total number of push down request error per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_coprocessor_request_error")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}'
+              name: 'TiKV: Too many coprocessor request error (over {$TIKV.COPOCESSOR.ERRORS.MAX.WARN} in 5m)'
+              priority: WARNING
+        -
+          name: 'TiKV: Coprocessor: RocksDB ops, rate'
+          type: DEPENDENT
+          key: tikv.coprocessor_rocksdb_perf.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'Total number of RocksDB internal operations from PerfContext per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_coprocessor_rocksdb_perf")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Coprocessor: Response size, rate'
+          type: DEPENDENT
+          key: tikv.coprocessor_scan_keys.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The total size of coprocessor response per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_coprocessor_response_bytes")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: CPU util'
+          type: DEPENDENT
+          key: tikv.cpu.util
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The CPU usage ratio on TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_thread_cpu_seconds_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '100'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Bytes read'
+          type: DEPENDENT
+          key: tikv.engine_flow_bytes.read
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The total bytes of read in TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_engine_flow_bytes" && @.labels.db == "kv" && @.labels.type =~ "bytes_read|iter_bytes_read")].value.sum()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Bytes write'
+          type: DEPENDENT
+          key: tikv.engine_flow_bytes.write
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The total bytes of write in TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_engine_flow_bytes" && @.labels.db == "kv" && @.labels.type == "wal_file_bytes")].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Store size'
+          type: DEPENDENT
+          key: tikv.engine_size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The storage size of TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_engine_size_bytes")].value.sum()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Get instance metrics'
+          type: HTTP_AGENT
+          key: tikv.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get TiKV instance metrics.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - ''
+          url: '{$TIKV.URL}:{$TIKV.PORT}/metrics'
+        -
+          name: 'TiKV: Total query, rate'
+          type: DEPENDENT
+          key: tikv.grpc_msg.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The total QPS in TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_grpc_msg_duration_seconds_count")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Total query errors, rate'
+          type: DEPENDENT
+          key: tikv.grpc_msg_fail.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The total number of gRPC message handling failure per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_grpc_msg_fail_total")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Server: failure messages total, rate'
+          type: DEPENDENT
+          key: tikv.messages.failure.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of reporting failure messages per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_server_report_failure_msg_total")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Regions, count'
+          type: DEPENDENT
+          key: tikv.region_count
+          delay: '0'
+          history: 7d
+          description: 'The number of regions collected in TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_raftstore_region_count" && @.labels.type == "region" )].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Regions, leader'
+          type: DEPENDENT
+          key: tikv.region_leader
+          delay: '0'
+          history: 7d
+          description: 'The number of leaders in TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_raftstore_region_count" && @.labels.type == "leader" )].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: RSS memory usage'
+          type: DEPENDENT
+          key: tikv.rss_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "process_resident_memory_bytes")].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Scheduler: Commands total, rate'
+          type: DEPENDENT
+          key: tikv.scheduler_commands.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of commands per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_scheduler_stage_total")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Snapshot: Pending tasks'
+          type: DEPENDENT
+          key: tikv.scheduler_contex
+          delay: '0'
+          history: 7d
+          description: 'The number of tasks currently running by the worker or pending.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_worker_pending_task_total")].value.first()'
+          master_item:
+            key: tikv.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$TIKV.PENDING_COMMANDS.MAX.WARN}'
+              name: 'TiKV: Too many pending commands (over {$TIKV.PENDING_COMMANDS.MAX.WARN} for 5m)'
+              priority: AVERAGE
+            -
+              expression: '{min(5m)}>{$TIKV.PENDING_TASKS.MAX.WARN}'
+              name: 'TiKV: Too many pending commands (over {$TIKV.PENDING_TASKS.MAX.WARN} for 5m)'
+              priority: AVERAGE
+        -
+          name: 'TiKV: Scheduler: Busy, rate'
+          type: DEPENDENT
+          key: tikv.scheduler_too_busy.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The total count of too busy schedulers per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_scheduler_too_busy_total")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Snapshot: Applying'
+          type: DEPENDENT
+          key: tikv.snapshot.applying
+          delay: '0'
+          history: 7d
+          description: 'The total amount of raftstore snapshot traffic.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_raftstore_snapshot_traffic_total" && @.labels.type == "applying")].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Snapshot: Receiving'
+          type: DEPENDENT
+          key: tikv.snapshot.receiving
+          delay: '0'
+          history: 7d
+          description: 'The total amount of raftstore snapshot traffic.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_raftstore_snapshot_traffic_total" && @.labels.type == "receiving")].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Snapshot: Sending'
+          type: DEPENDENT
+          key: tikv.snapshot.sending
+          delay: '0'
+          history: 7d
+          description: 'The total amount of raftstore snapshot traffic.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_raftstore_snapshot_traffic_total" && @.labels.type == "sending")].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Storage: commands total, rate'
+          type: DEPENDENT
+          key: tikv.storage_command.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of commands received per second.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_storage_command_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Available size'
+          type: DEPENDENT
+          key: tikv.store_size.available
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The available capacity of TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_store_size_bytes" && @.labels.type == "available")].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Capacity size'
+          type: DEPENDENT
+          key: tikv.store_size.capacity
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The capacity size of TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_store_size_bytes" && @.labels.type == "capacity")].value.first()'
+          master_item:
+            key: tikv.get_metrics
+        -
+          name: 'TiKV: Uptime'
+          type: DEPENDENT
+          key: tikv.uptime
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: uptime
+          description: 'The runtime of each TiKV instance.'
+          applications:
+            -
+              name: 'TiKV node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="process_start_time_seconds")].value.first()'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //use boottime to calculate uptime
+                  return (Math.floor(Date.now()/1000)-Number(value));
+                  
+          master_item:
+            key: tikv.get_metrics
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'TiKV: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Coprocessor metrics discovery'
+          type: DEPENDENT
+          key: tikv.coprocessor.discovery
+          delay: '0'
+          description: 'Discovery coprocessor metrics.'
+          item_prototypes:
+            -
+              name: 'TiKV: Coprocessor: {#REQ_TYPE} requests, rate'
+              type: DEPENDENT
+              key: 'tikv.coprocessor_request.rate[{#REQ_TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'Total number of coprocessor requests per second.'
+              applications:
+                -
+                  name: 'TiKV node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tikv_coprocessor_request_duration_seconds_count" && @.labels.req == "{#REQ_TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tikv.get_metrics
+            -
+              name: 'TiKV: Coprocessor: {#REQ_TYPE} errors, rate'
+              type: DEPENDENT
+              key: 'tikv.coprocessor_request_error.rate[{#REQ_TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'Total number of push down request error per second.'
+              applications:
+                -
+                  name: 'TiKV node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tikv_coprocessor_request_error" && @.labels.req == "{#REQ_TYPE}")].value.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tikv.get_metrics
+            -
+              name: 'TiKV: Coprocessor: {#REQ_TYPE} RocksDB ops, rate'
+              type: DEPENDENT
+              key: 'tikv.coprocessor_rocksdb_perf.rate[{#REQ_TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'Total number of RocksDB internal operations from PerfContext per second.'
+              applications:
+                -
+                  name: 'TiKV node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tikv_coprocessor_rocksdb_perf" && @.labels.req == "{#REQ_TYPE}")].value.sum()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tikv.get_metrics
+            -
+              name: 'TiKV: Coprocessor: {#REQ_TYPE} scan keys, rate'
+              type: DEPENDENT
+              key: 'tikv.coprocessor_scan_keys.rate[{#REQ_TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'Total number of scan keys observed per request per second.'
+              applications:
+                -
+                  name: 'TiKV node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tikv_coprocessor_scan_keys_count" && @.labels.req == "{#REQ_TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tikv.get_metrics
+          master_item:
+            key: tikv.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_coprocessor_request_duration_seconds_count")]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#REQ_TYPE}": item.labels.req,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'QPS metrics discovery'
+          type: DEPENDENT
+          key: tikv.qps.discovery
+          delay: '0'
+          description: 'Discovery QPS metrics.'
+          item_prototypes:
+            -
+              name: 'TiKV: Query: {#TYPE}, rate'
+              type: DEPENDENT
+              key: 'tikv.grpc_msg.rate[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'The QPS per command in TiKV instance.'
+              applications:
+                -
+                  name: 'TiKV node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tikv_grpc_msg_duration_seconds_count" && @.labels.type == "{#TYPE}")].value.first()'
+                  error_handler: CUSTOM_VALUE
+              master_item:
+                key: tikv.get_metrics
+          master_item:
+            key: tikv.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_grpc_msg_duration_seconds_count")]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'Scheduler metrics discovery'
+          type: DEPENDENT
+          key: tikv.scheduler.discovery
+          delay: '0'
+          description: 'Discovery scheduler metrics.'
+          item_prototypes:
+            -
+              name: 'TiKV: Scheduler: commands {#STAGE}, rate'
+              type: DEPENDENT
+              key: 'tikv.scheduler_stage.rate[{#STAGE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of commands on each stage per second.'
+              applications:
+                -
+                  name: 'TiKV node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tikv_scheduler_stage_total" && @.labels.stage == "{#STAGE}")].value.sum()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tikv.get_metrics
+          master_item:
+            key: tikv.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_scheduler_stage_total")]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                  result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                  var stage = item.labels.stage;
+                  if (!(lookup[stage])) {
+                  lookup[stage] = 1;
+                  result.push({ "{#STAGE}": stage });
+                  }
+                  })
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'Server errors discovery'
+          type: DEPENDENT
+          key: tikv.server_report_failure.discovery
+          delay: '0'
+          description: 'Discovery server errors metrics.'
+          item_prototypes:
+            -
+              name: 'TiKV: Store_id {#STORE_ID}: failure messages "{#TYPE}", rate'
+              type: DEPENDENT
+              key: 'tikv.messages.failure.rate[{#STORE_ID},{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of reporting failure messages. The metric has two labels: type and store_id. type represents the failure type, and store_id represents the destination peer store id.'
+              applications:
+                -
+                  name: 'TiKV node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tikv_server_report_failure_msg_total" && @.labels.store_id == "{#STORE_ID}"  && @.labels.type == "{#TYPE}")].value.sum()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tikv.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$TIKV.STORE.ERRORS.MAX.WARN}'
+                  name: 'TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" (over {$TIKV.STORE.ERRORS.MAX.WARN} in 5m)'
+                  discover: NO_DISCOVER
+                  priority: WARNING
+                  description: 'Indicates that the remote TiKV cannot be connected.'
+          master_item:
+            key: tikv.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tikv_server_report_failure_msg_total")]'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#STORE_ID}": item.labels.store_id,
+                  "{#TYPE}": item.labels.type,
+                  
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          overrides:
+            -
+              name: 'Too many unreachable messages trigger'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: unreachable
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'Too many failure messages'
+                  status: ENABLED
+                  discover: DISCOVER
+      macros:
+        -
+          macro: '{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of coprocessor request errors'
+        -
+          macro: '{$TIKV.PENDING_COMMANDS.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of pending commands'
+        -
+          macro: '{$TIKV.PENDING_TASKS.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of tasks currently running by the worker or pending'
+        -
+          macro: '{$TIKV.PORT}'
+          value: '20180'
+          description: 'The port of TiKV server metrics web endpoint'
+        -
+          macro: '{$TIKV.STORE.ERRORS.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of failure messages'
+        -
+          macro: '{$TIKV.URL}'
+          value: localhost
+          description: 'TiKV server URL'
+  graphs:
+    -
+      name: 'TiKV: Scheduler priority commands rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'TiDB TiKV by HTTP'
+            key: tikv.commands_pri.normal.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'TiDB TiKV by HTTP'
+            key: tikv.commands_pri.high.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'TiDB TiKV by HTTP'
+            key: tikv.commands_pri.low.rate
+    -
+      name: 'TiKV: Snapshot state count'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'TiDB TiKV by HTTP'
+            key: tikv.snapshot.applying
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'TiDB TiKV by HTTP'
+            key: tikv.snapshot.receiving
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'TiDB TiKV by HTTP'
+            key: tikv.snapshot.sending

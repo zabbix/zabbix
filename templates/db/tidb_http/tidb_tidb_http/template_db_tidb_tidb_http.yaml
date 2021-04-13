@@ -1,0 +1,1274 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-03-24T11:46:42Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'TiDB by HTTP'
+      name: 'TiDB by HTTP'
+      description: |
+        The template to monitor TiDB server of TiDB cluster by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        Don't forget to change the macros {$TIDB.URL}, {$TIDB.PORT}. 
+        
+        Template `TiDB by HTTP` — collects metrics by HTTP agent from PD /metrics endpoint and from monitoring API.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: 'TiDB node'
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'TiDB: CPU'
+          type: DEPENDENT
+          key: tidb.cpu.util
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Total user and system CPU usage ratio.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="process_cpu_seconds_total")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '100'
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: DDL waiting jobs'
+          type: DEPENDENT
+          key: tidb.ddl_waiting_jobs
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_ddl_waiting_jobs")].value.sum()'
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$TIDB.DDL.WAITING.MAX.WARN}'
+              name: 'TiDB: Too many DDL waiting jobs (over {$TIDB.DDL.WAITING.MAX.WARN} for 5m)'
+              priority: WARNING
+        -
+          name: 'TiDB: Load schema failed, rate'
+          type: DEPENDENT
+          key: tidb.domain_load_schema.failed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The total number of failures to reload the latest schema information in TiDB per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_domain_load_schema_total && @.labels.type == "failed"")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}'
+              name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN} for 5m)'
+              priority: AVERAGE
+        -
+          name: 'TiDB: Load schema total, rate'
+          type: DEPENDENT
+          key: tidb.domain_load_schema.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The statistics of the schemas that TiDB obtains from TiKV per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_domain_load_schema_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Failed Query, rate'
+          type: DEPENDENT
+          key: tidb.execute_error.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of error occurred when executing SQL statements per second (such as syntax errors and primary key conflicts).'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_server_execute_error_total")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Get instance metrics'
+          type: HTTP_AGENT
+          key: tidb.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get TiDB instance metrics.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - ''
+          url: '{$TIDB.URL}:{$TIDB.PORT}/metrics'
+        -
+          name: 'TiDB: Get instance status'
+          type: HTTP_AGENT
+          key: tidb.get_status
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get TiDB instance status info.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"status": "0"}'
+          url: '{$TIDB.URL}:{$TIDB.PORT}/status'
+        -
+          name: 'TiDB: Goroutine count'
+          type: DEPENDENT
+          key: tidb.goroutines
+          delay: '0'
+          history: 7d
+          description: 'The number of Goroutines on TiDB instance.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="go_goroutines")].value.first()'
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Heap memory usage'
+          type: DEPENDENT
+          key: tidb.heap_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Number of heap bytes that are in use.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="go_memstats_heap_inuse_bytes")].value.first()'
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$TIDB.HEAP.USAGE.MAX.WARN}'
+              name: 'TiDB: Heap memory usage is too high (over {$TIDB.HEAP.USAGE.MAX.WARN} for 5m)'
+              priority: WARNING
+        -
+          name: 'TiDB: Keep alive, rate'
+          type: DEPENDENT
+          key: tidb.monitor_keep_alive.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The number of times that the metrics are refreshed on TiDB instance per minute.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_monitor_keep_alive_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{max(5m)}<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}'
+              name: 'TiDB: Too few keep alive operations (less {$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN} for 5m)'
+              priority: AVERAGE
+              description: 'Indicates whether the TiDB process still exists. If the number of times for tidb_monitor_keep_alive_total increases less than 10 per minute, the TiDB process might already exit and an alert is triggered.'
+        -
+          name: 'TiDB: Time jump back, rate'
+          type: DEPENDENT
+          key: tidb.monitor_time_jump_back.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The number of times that the operating system rewinds every second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_monitor_time_jump_back_total")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$TIDB.TIME_JUMP_BACK.MAX.WARN}'
+              name: 'TiDB: Too many time jump backs (over {$TIDB.TIME_JUMP_BACK.MAX.WARN} for 5m)'
+              priority: WARNING
+        -
+          name: 'TiDB: PD TSO commands, rate'
+          type: DEPENDENT
+          key: tidb.pd_tso_cmd.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The number of TSO commands that TiDB obtains from PD per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="pd_client_cmd_handle_cmds_duration_seconds_count" && @.labels.type == "tso")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: PD TSO requests, rate'
+          type: DEPENDENT
+          key: tidb.pd_tso_request.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The number of TSO requests that TiDB obtains from PD per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="pd_client_request_handle_requests_duration_seconds_count" && @.labels.type == "tso")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Open file descriptors, max'
+          type: DEPENDENT
+          key: tidb.process_max_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum number of open file descriptors.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="process_max_fds")].value.first()'
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Open file descriptors'
+          type: DEPENDENT
+          key: tidb.process_open_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open file descriptors.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="process_open_fds")].value.first()'
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: RSS memory usage'
+          type: DEPENDENT
+          key: tidb.rss_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="process_resident_memory_bytes")].value.first()'
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Total "error" server query, rate'
+          type: DEPENDENT
+          key: tidb.server_query.error.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Qps
+          description: 'The number of queries on TiDB instance per second with failure of command execution results.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tidb_server_query_total" && @.labels.result == "Error")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Total "ok" server query, rate'
+          type: DEPENDENT
+          key: tidb.server_query.ok.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Qps
+          description: 'The number of queries on TiDB instance per second with success of command execution results.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tidb_server_query_total" && @.labels.result == "OK")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Total server query, rate'
+          type: DEPENDENT
+          key: tidb.server_query.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Qps
+          description: 'The number of queries per second on TiDB instance.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "tidb_server_query_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Schema lease "change" errors, rate'
+          type: DEPENDENT
+          key: tidb.session_schema_lease_error.change.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            The number of schema lease errors per second. 
+            "change" means that the schema has changed
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_session_schema_lease_error_total && @.labels.type == "change"")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Schema lease "outdate" errors , rate'
+          type: DEPENDENT
+          key: tidb.session_schema_lease_error.outdate.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            The number of schema lease errors per second. 
+            "outdate" errors means that the schema cannot be updated, which is a more serious error and triggers an alert.
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_session_schema_lease_error_total && @.labels.type == "outdate"")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}'
+              name: 'TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN} for 5m)'
+              priority: AVERAGE
+              description: 'The latest schema information is not reloaded in TiDB within one lease.'
+        -
+          name: 'TiDB: SQL statements, rate'
+          type: DEPENDENT
+          key: tidb.statement_total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The total number of SQL statements executed per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_executor_statement_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Status'
+          type: DEPENDENT
+          key: tidb.status
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Status of PD instance.'
+          applications:
+            -
+              name: 'TiDB node'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: tidb.get_status
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'TiDB: Instance is not responding'
+              priority: AVERAGE
+        -
+          name: 'TiDB: Server connections'
+          type: DEPENDENT
+          key: tidb.tidb_server_connections
+          delay: '0'
+          history: 7d
+          description: 'The connection number of current TiDB instance.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_server_connections")].value.first()'
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Server critical error, rate'
+          type: DEPENDENT
+          key: tidb.tidb_server_critical_error_total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of critical errors occurred in TiDB per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_server_critical_error_total")].value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Server panic, rate'
+          type: DEPENDENT
+          key: tidb.tidb_server_panic_total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of panics occurred in TiDB per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_server_panic_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{last()}>0'
+              name: 'TiDB: There are panicked TiDB threads'
+              priority: AVERAGE
+              description: 'When a panic occurs, an alert is triggered. The thread is often recovered, otherwise, TiDB will frequently restart.'
+        -
+          name: 'TiDB: KV backoff, rate'
+          type: DEPENDENT
+          key: tidb.tikvclient_backoff.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The number of errors returned by TiKV.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_tikvclient_backoff_total")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Lock resolves, rate'
+          type: DEPENDENT
+          key: tidb.tikvclient_lock_resolver_action.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The number of DDL tasks that are waiting.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_tikvclient_lock_resolver_actions_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: TiClient region errors, rate'
+          type: DEPENDENT
+          key: tidb.tikvclient_region_err.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The number of region related errors returned by TiKV per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_tikvclient_region_err_total")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{min(5m)}>{$TIDB.REGION_ERROR.MAX.WARN}'
+              name: 'TiDB: Too many region related errors (over {$TIDB.REGION_ERROR.MAX.WARN} for 5m)'
+              priority: AVERAGE
+        -
+          name: 'TiDB: KV commands, rate'
+          type: DEPENDENT
+          key: tidb.tikvclient_txn.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Ops
+          description: 'The number of executed KV commands per second.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_tikvclient_txn_cmd_duration_seconds_count")].value.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: tidb.get_metrics
+        -
+          name: 'TiDB: Uptime'
+          type: DEPENDENT
+          key: tidb.uptime
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: uptime
+          description: 'The runtime of each TiDB instance.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="process_start_time_seconds")].value.first()'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //use boottime to calculate uptime
+                  return (Math.floor(Date.now()/1000)-Number(value));
+                  
+          master_item:
+            key: tidb.get_metrics
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'TiDB: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'TiDB: Version'
+          type: DEPENDENT
+          key: tidb.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the TiDB instance.'
+          applications:
+            -
+              name: 'TiDB node'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: tidb.get_status
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'TiDB: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'TiDB version has changed. Ack to close.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'KV metrics discovery'
+          type: DEPENDENT
+          key: tidb.kv_ops.discovery
+          delay: '0'
+          description: 'Discovery KV specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB: KV Commands: {#TYPE}, rate'
+              type: DEPENDENT
+              key: 'tidb.tikvclient_txn.rate[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'The number of executed KV commands per second.'
+              applications:
+                -
+                  name: 'TiDB node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="tidb_tikvclient_txn_cmd_duration_seconds_count" && @.labels.type == "{#TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tidb.get_metrics
+          master_item:
+            key: tidb.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_tikvclient_txn_cmd_duration_seconds_count")]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'QPS metrics discovery'
+          type: DEPENDENT
+          key: tidb.qps.discovery
+          delay: '0'
+          description: 'Discovery QPS specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB: Server query "Error": {#TYPE}, rate'
+              type: DEPENDENT
+              key: 'tidb.server_query.error.rate[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Qps
+              description: 'The number of queries on TiDB instance per second with failure of command execution results.'
+              applications:
+                -
+                  name: 'TiDB node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tidb_server_query_total" && @.labels.result == "Error" && @.labels.type == "{#TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tidb.get_metrics
+            -
+              name: 'TiDB: Server query "OK": {#TYPE}, rate'
+              type: DEPENDENT
+              key: 'tidb.server_query.ok.rate[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Qps
+              description: 'The number of queries on TiDB instance per second with success of command execution results.'
+              applications:
+                -
+                  name: 'TiDB node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "tidb_server_query_total" && @.labels.result == "OK" && @.labels.type == "{#TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tidb.get_metrics
+          master_item:
+            key: tidb.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_server_query_total")]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                  result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                  var type = item.labels.type;
+                  if (!(lookup[type])) {
+                  lookup[type] = 1;
+                  result.push({ "{#TYPE}": type });
+                  }
+                  })
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'Statement metrics discovery'
+          type: DEPENDENT
+          key: tidb.statement.discover
+          delay: '0'
+          description: 'Discovery statement specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB: SQL statements: {#TYPE}, rate'
+              type: DEPENDENT
+              key: 'tidb.statement.rate[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of SQL statements executed per second.'
+              applications:
+                -
+                  name: 'TiDB node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="tidb_executor_statement_total" && @.labels.type == "{#TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tidb.get_metrics
+          master_item:
+            key: tidb.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_executor_statement_total")]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'KV backoff discovery'
+          type: DEPENDENT
+          key: tidb.tikvclient_backoff.discovery
+          delay: '0'
+          description: 'Discovery KV backoff specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB: KV backoff: {#TYPE}, rate'
+              type: DEPENDENT
+              key: 'tidb.tikvclient_backoff.rate[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'
+              applications:
+                -
+                  name: 'TiDB node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="tidb_tikvclient_backoff_total" && @.labels.type == "{#TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tidb.get_metrics
+          master_item:
+            key: tidb.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_tikvclient_backoff_total")]'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'GC action results discovery'
+          type: DEPENDENT
+          key: tidb.tikvclient_gc_action.discovery
+          delay: '0'
+          description: 'Discovery GC action results metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB: GC action result: {#TYPE}, rate'
+              type: DEPENDENT
+              key: 'tidb.tikvclient_gc_action.rate[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'The number of results of GC-related operations per second.'
+              applications:
+                -
+                  name: 'TiDB node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="tidb_tikvclient_gc_action_result" && @.labels.type == "{#TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tidb.get_metrics
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$TIDB.GC_ACTIONS.ERRORS.MAX.WARN}'
+                  name: 'TiDB: Too many failed GC-related operations (over {$TIDB.GC_ACTIONS.ERRORS.MAX.WARN} in 5m)'
+                  discover: NO_DISCOVER
+                  priority: WARNING
+          master_item:
+            key: tidb.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_tikvclient_gc_action_result")]'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          overrides:
+            -
+              name: 'Failed GC-related operations trigger'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: failed
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'Too many failed GC-related operations'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          name: 'Lock resolves discovery'
+          type: DEPENDENT
+          key: tidb.tikvclient_lock_resolver_action.discovery
+          delay: '0'
+          description: 'Discovery lock resolves specific metrics.'
+          item_prototypes:
+            -
+              name: 'TiDB: Lock resolves: {#TYPE}, rate'
+              type: DEPENDENT
+              key: 'tidb.tikvclient_lock_resolver_action.rate[{#TYPE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Ops
+              description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'
+              applications:
+                -
+                  name: 'TiDB node'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="tidb_tikvclient_lock_resolver_actions_total" && @.labels.type == "{#TYPE}")].value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: tidb.get_metrics
+          master_item:
+            key: tidb.get_metrics
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="tidb_tikvclient_lock_resolver_actions_total")]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  output = JSON.parse(value).map(function(item){
+                  return {
+                  "{#TYPE}": item.labels.type,
+                  }})
+                  return JSON.stringify({"data": output})
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+      macros:
+        -
+          macro: '{$TIDB.DDL.WAITING.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of DDL tasks that are waiting'
+        -
+          macro: '{$TIDB.GC_ACTIONS.ERRORS.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of GC-related operations failures'
+        -
+          macro: '{$TIDB.HEAP.USAGE.MAX.WARN}'
+          value: 10G
+          description: 'Maximum heap memory used'
+        -
+          macro: '{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}'
+          value: '10'
+          description: 'Minimum number of keep alive operations'
+        -
+          macro: '{$TIDB.OPEN.FDS.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used file descriptors'
+        -
+          macro: '{$TIDB.PORT}'
+          value: '10080'
+          description: 'The port of TiDB server metrics web endpoint'
+        -
+          macro: '{$TIDB.REGION_ERROR.MAX.WARN}'
+          value: '50'
+          description: 'Maximum number of region related errors'
+        -
+          macro: '{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}'
+          value: '0'
+          description: 'Maximum number of schema lease errors'
+        -
+          macro: '{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of load schema errors'
+        -
+          macro: '{$TIDB.TIME_JUMP_BACK.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of times that the operating system rewinds every second'
+        -
+          macro: '{$TIDB.URL}'
+          value: localhost
+          description: 'TiDB server URL'
+  triggers:
+    -
+      expression: '{TiDB by HTTP:tidb.process_open_fds.min(5m)}/{TiDB by HTTP:tidb.process_max_fds.last()}*100>{$TIDB.OPEN.FDS.MAX.WARN}'
+      name: 'TiDB: Current number of open files is too high (over {$TIDB.OPEN.FDS.MAX.WARN}% for 5m)'
+      priority: WARNING
+      description: '"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue."'
+  graphs:
+    -
+      name: 'TiDB: File descriptors'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'TiDB by HTTP'
+            key: tidb.process_open_fds
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: 'TiDB by HTTP'
+            key: tidb.process_max_fds
+    -
+      name: 'TiDB: Memory usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'TiDB by HTTP'
+            key: tidb.heap_bytes
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'TiDB by HTTP'
+            key: tidb.rss_bytes
+    -
+      name: 'TiDB: Server query rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'TiDB by HTTP'
+            key: tidb.server_query.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'TiDB by HTTP'
+            key: tidb.server_query.ok.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'TiDB by HTTP'
+            key: tidb.server_query.error.rate
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
