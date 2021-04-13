@@ -333,9 +333,18 @@ class CApiInputValidator {
 
 		$validator = new CFunctionValidator(['calculated' => true]);
 		$math_validator = new CMathFunctionValidator(['calculated' => true]);
+		$skip_valid = $data;
 
 		foreach ($result->getFunctions() as $func) {
-			if (!$math_validator->validate($func) && !$validator->validate($func)) {
+			if ($math_validator->validate($func)) {
+				/**
+				 * Replace validated math functions with space to not validate functions in parameters
+				 * as standalone functions. Example:
+				 * Do not validate "last_foreach" as standalone function in expression "sum(last_foreach(...))".
+				 */
+				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos);
+			}
+			elseif (trim(substr($skip_valid, $func->pos, $func->length)) !== '' && !$validator->validate($func)) {
 				$error = $validator->getError();
 
 				return false;

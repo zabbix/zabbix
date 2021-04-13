@@ -91,7 +91,8 @@ class CHostNameParser extends CParser {
 			break;
 		}
 
-		if (isset($source[$p]) && $source[$p] === '*' && $this->options['allow_host_all']) {
+		if ($this->options['allow_host_all']
+				&& isset($source[$p]) && $source[$p] === CQueryParserResult::HOST_ITEMKEY_WILDCARD) {
 			$p++;
 		}
 

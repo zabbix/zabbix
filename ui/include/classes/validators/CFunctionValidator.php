@@ -57,7 +57,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @var bool
 	 */
-	private $calculated = false;
+	protected $calculated = false;
 
 	public function __construct(array $options = []) {
 		/*
@@ -69,10 +69,6 @@ class CFunctionValidator extends CValidator {
 		if (array_key_exists('lldmacros', $options)) {
 			$this->lldmacros = $options['lldmacros'];
 			unset($options['lldmacros']);
-		}
-		if (array_key_exists('calculated', $options)) {
-			$this->calculated = (bool) $options['calculated'];
-			unset($options['calculated']);
 		}
 		parent::__construct($options);
 
@@ -343,6 +339,9 @@ class CFunctionValidator extends CValidator {
 				return false;
 			}
 			elseif (!array_key_exists($num, $fn->params_raw['parameters'])) {
+				continue;
+			}
+			elseif (($fn->params_raw['parameters'][$num] instanceof CFunctionParameterResult) == false) {
 				continue;
 			}
 

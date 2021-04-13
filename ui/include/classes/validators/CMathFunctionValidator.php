@@ -197,7 +197,11 @@ class CMathFunctionValidator extends CValidator {
 			return false;
 		}
 
-		if ((array_shift($params) instanceof CQueryParserResult) === false) {
+		$query = array_shift($params);
+
+		if (($query instanceof CQueryParserResult) === false
+				|| ($query->host === CQueryParserResult::HOST_ITEMKEY_WILDCARD
+				&& $query->item[0] === CQueryParserResult::HOST_ITEMKEY_WILDCARD)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid first parameter.')
 			);

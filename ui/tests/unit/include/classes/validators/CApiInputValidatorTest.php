@@ -50,6 +50,12 @@ class CApiInputValidatorTest extends TestCase {
 				'last(//agent.ping) = 1 or "text" = {$MACRO}'
 			],
 			[
+				['type' => API_CALC_FORMULA, 'flags' => API_ALLOW_LLD_MACRO],
+				'last(//agent.ping) = 1 or "text" = {#LLD}',
+				'/1/formula',
+				'last(//agent.ping) = 1 or "text" = {#LLD}'
+			],
+			[
 				['type' => API_CALC_FORMULA],
 				'10+sum(/*/counter?[tag="test:1" and group="test-hosts"],1m)',
 				'/1/formula',
@@ -69,6 +75,30 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
+				'/1/formula',
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/*[/,total]?[group="MySQL Servers"]))',
+				'/1/formula',
+				'Incorrect trigger function "sum(last_foreach(/*/*[/,total]?[group="MySQL Servers"]))" provided in expression. Mandatory parameter is missing.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
+				'/1/formula',
+				'Incorrect trigger function "last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])" provided in expression. Unknown function.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])',
+				'/1/formula',
+				'Incorrect trigger function "last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])" provided in expression. Unknown function.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
 				'last(//agent.ping) = 1 or "text" = {$MACRO}',
 				'/1/formula',
 				'Incorrect trigger function "last(agent.ping)" provided in expression. Invalid first parameter.'
@@ -78,12 +108,6 @@ class CApiInputValidatorTest extends TestCase {
 				'last(//agent.ping) = 1 or "text" = {#LLD}',
 				'/1/formula',
 				'Invalid parameter "/1/formula": incorrect calculated item formula starting from " {#LLD}".'
-			],
-			[
-				['type' => API_CALC_FORMULA, 'flags' => API_ALLOW_LLD_MACRO],
-				'last(//agent.ping) = 1 or "text" = {#LLD}',
-				'/1/formula',
-				'last(//agent.ping) = 1 or "text" = {#LLD}'
 			],
 			[
 				['type' => API_CALC_FORMULA],
