@@ -2031,7 +2031,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (!$expression_data->expressions) {
+		if (!$expression_data->result->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_QUERY)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('trigger expression must contain at least one /host/key reference')
 			);
