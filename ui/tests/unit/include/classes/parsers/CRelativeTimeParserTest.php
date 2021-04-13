@@ -19,12 +19,14 @@
 **/
 
 
-class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CRelativeTimeParserTest extends TestCase {
 
 	/**
 	 * An array of relative times and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			[
 				'now', 0,
@@ -452,7 +454,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

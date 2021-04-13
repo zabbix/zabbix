@@ -144,14 +144,15 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['show_suppressed']       (optional)
 	 * @param int    $filter['show_opdata']           (optional)
 	 * @param bool   $resolve_comments
-	 * @param bool   $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, $resolve_comments = false, $resolve_urls = false) {
-		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
+	public static function getData(array $filter, bool $resolve_comments = false) {
+		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids']
+			? getSubGroups($filter['groupids'])
+			: null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
@@ -159,6 +160,8 @@ class CScreenProblem extends CScreenBase {
 			: null;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
+
 			if ($filter_hostids === null) {
 				// get all groups if no selected groups defined
 				if ($filter_groupids === null) {
@@ -169,7 +172,7 @@ class CScreenProblem extends CScreenBase {
 					]));
 				}
 
-				$filter_groupids = array_diff($filter_groupids, $filter['exclude_groupids']);
+				$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
 
 				// get available hosts
 				$filter_hostids = array_keys(API::Host()->get([
@@ -181,7 +184,7 @@ class CScreenProblem extends CScreenBase {
 
 			$exclude_hostids = array_keys(API::Host()->get([
 				'output' => [],
-				'groupids' => $filter['exclude_groupids'],
+				'groupids' => $exclude_groupids,
 				'preservekeys' => true
 			]));
 
@@ -317,7 +320,7 @@ class CScreenProblem extends CScreenBase {
 							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
 					}
 
-					if ($resolve_comments || $resolve_urls || $show_opdata || $details) {
+					if ($resolve_comments || $show_opdata || $details) {
 						$options['output'][] = 'expression';
 					}
 
@@ -327,10 +330,6 @@ class CScreenProblem extends CScreenBase {
 
 					if ($resolve_comments) {
 						$options['output'][] = 'comments';
-					}
-
-					if ($resolve_urls) {
-						$options['output'][] = 'url';
 					}
 
 					$data['triggers'] += API::Trigger()->get($options);
@@ -548,13 +547,12 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['show']
 	 * @param int   $filter['show_opdata']
 	 * @param bool  $resolve_comments
-	 * @param bool  $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter, $resolve_comments = false, $resolve_urls = false) {
+	public static function makeData(array $data, array $filter, bool $resolve_comments = false) {
 		// unset unused triggers
 		$triggerids = [];
 
@@ -618,15 +616,6 @@ class CScreenProblem extends CScreenBase {
 				unset($trigger['comments']);
 			}
 			unset($trigger);
-		}
-
-		if ($resolve_urls) {
-			foreach ($data['problems'] as &$problem) {
-				$trigger = $data['triggers'][$problem['objectid']];
-				$trigger['eventid'] = $problem['eventid'];
-				$problem['url'] = CMacrosResolverHelper::resolveTriggerUrl($trigger, $url) ? $url : '';
-			}
-			unset($problem);
 		}
 
 		// get additional data

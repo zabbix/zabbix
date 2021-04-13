@@ -114,10 +114,12 @@ class CEncryptHelper {
 	 * @return boolean
 	 */
 	public static function updateKey(string $key): bool {
+		$db_config = DB::select('config', ['output' => ['configid']])[0];
+
 		return DBexecute(
 			'UPDATE config'.
 			' SET session_key='.zbx_dbstr($key).
-			' WHERE '.dbConditionInt('configid', [1])
+			' WHERE '.dbConditionInt('configid', [$db_config['configid']])
 		);
 	}
 }

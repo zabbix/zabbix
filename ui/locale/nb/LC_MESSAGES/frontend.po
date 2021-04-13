@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-05 19:54+0200\n"
-"PO-Revision-Date: 2019-12-09 09:51+0300\n"
+"POT-Creation-Date: 2021-04-02 19:53+0300\n"
+"PO-Revision-Date: 2021-03-19 18:07+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
 "Language: nb\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1575877894.000000\n"
+"X-POOTLE-MTIME: 1616170040.000000\n"
 
 #: include/classes/items/CHelpItems.php:1087
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -48,9 +48,9 @@ msgstr "\"%1$s\" er forventet"
 #: include/classes/api/services/CMaintenance.php:359
 #: include/classes/api/services/CMaintenance.php:366
 #: include/classes/api/services/CMaintenance.php:409
-#: include/classes/api/services/CMaintenance.php:597
-#: include/classes/api/services/CMaintenance.php:613
-#: include/classes/api/services/CMaintenance.php:682 maintenance.php:137
+#: include/classes/api/services/CMaintenance.php:599
+#: include/classes/api/services/CMaintenance.php:615
+#: include/classes/api/services/CMaintenance.php:684 maintenance.php:137
 #: maintenance.php:143 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
@@ -239,14 +239,14 @@ msgid_plural "%1$s unacknowledged problems"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/views/monitoring.widget.problems.view.php:303
+#: app/views/monitoring.widget.problems.view.php:301
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s widget"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
-#: app/views/monitoring.widget.problems.view.php:212
+#: app/views/monitoring.widget.problems.view.php:210
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
@@ -423,13 +423,12 @@ msgstr ""
 msgid "Access to modules"
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:66
+#: app/views/hint.box.php:77 app/views/monitoring.widget.problems.view.php:66
 #: include/actions.inc.php:155 include/blocks.inc.php:820
 #: include/classes/screens/CScreenHostTriggers.php:225
-#: include/classes/screens/CScreenProblem.php:889
-#: include/classes/screens/CScreenProblem.php:914
-#: include/classes/screens/CScreenProblem.php:1182 include/events.inc.php:286
-#: include/events.inc.php:501
+#: include/classes/screens/CScreenProblem.php:878
+#: include/classes/screens/CScreenProblem.php:903
+#: include/classes/screens/CScreenProblem.php:1171 include/events.inc.php:286
 msgid "Ack"
 msgstr "Ack"
 
@@ -589,10 +588,10 @@ msgstr "Handling oppdatert"
 #: include/classes/helpers/CMenuHelper.php:169
 #: include/classes/helpers/CRoleHelper.php:429
 #: include/classes/screens/CScreenHostTriggers.php:225
-#: include/classes/screens/CScreenProblem.php:890
-#: include/classes/screens/CScreenProblem.php:915
-#: include/classes/screens/CScreenProblem.php:1183
-#: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:287
+#: include/classes/screens/CScreenProblem.php:879
+#: include/classes/screens/CScreenProblem.php:904
+#: include/classes/screens/CScreenProblem.php:1172
+#: include/classes/screens/CScreenProblem.php:1233 include/events.inc.php:287
 #: include/forms.inc.php:1312 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:78
 #: include/views/monitoring.screen.list.php:80
@@ -639,8 +638,8 @@ msgstr "Aktiv til"
 #: app/partials/popup.operations.php:87 app/partials/popup.operations.php:107
 #: app/partials/popup.operations.php:400
 #: app/views/administration.iconmap.edit.php:104
-#: app/views/administration.iconmap.edit.php:152
-#: app/views/administration.image.edit.php:94
+#: app/views/administration.iconmap.edit.php:153
+#: app/views/administration.image.edit.php:95
 #: app/views/administration.macros.edit.php:87
 #: app/views/administration.mediatype.edit.php:117
 #: app/views/administration.mediatype.edit.php:199
@@ -648,7 +647,7 @@ msgstr "Aktiv til"
 #: app/views/administration.mediatype.edit.php:355
 #: app/views/administration.proxy.edit.php:135
 #: app/views/administration.regex.edit.php:98
-#: app/views/administration.regex.edit.php:161
+#: app/views/administration.regex.edit.php:163
 #: app/views/administration.script.edit.php:132
 #: app/views/administration.user.edit.php:323
 #: app/views/administration.user.edit.php:623
@@ -657,7 +656,7 @@ msgstr "Aktiv til"
 #: app/views/administration.usergroup.edit.php:234
 #: app/views/administration.userrole.edit.php:305
 #: app/views/administration.valuemap.edit.php:75
-#: app/views/administration.valuemap.edit.php:124
+#: app/views/administration.valuemap.edit.php:126
 #: app/views/configuration.application.edit.php:60
 #: app/views/dashboard.share.edit.php:33 app/views/dashboard.share.edit.php:54
 #: app/views/js/administration.mediatype.edit.js.php:134
@@ -760,7 +759,7 @@ msgstr "Aktiv til"
 #: include/views/js/monitoring.sysmaps.js.php:200
 #: include/views/js/monitoring.sysmaps.js.php:301
 #: include/views/js/monitoring.sysmaps.js.php:779
-#: include/views/monitoring.screen.constructor.edit.php:857
+#: include/views/monitoring.screen.constructor.edit.php:858
 #: include/views/monitoring.screen.edit.php:121
 #: include/views/monitoring.screen.edit.php:157
 #: include/views/monitoring.screen.edit.php:224
@@ -1067,7 +1066,7 @@ msgstr "Og/Eller"
 #: app/partials/common.filter.trigger.php:47
 #: app/partials/monitoring.host.filter.php:120
 #: app/views/administration.mediatype.list.php:50
-#: app/views/administration.module.list.php:52
+#: app/views/administration.module.list.php:51
 #: app/views/administration.proxy.list.php:49
 #: app/views/administration.usergroup.list.php:51
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:34
@@ -1100,7 +1099,7 @@ msgstr "En hvilken som helst tegnstreng er inkludert"
 #: include/views/inventory.host.view.php:216
 #: include/views/js/monitoring.sysmaps.js.php:230
 #: include/views/monitoring.overview.items.php:136
-#: include/views/monitoring.screen.constructor.edit.php:604
+#: include/views/monitoring.screen.constructor.edit.php:605
 msgid "Application"
 msgstr "Applikasjon"
 
@@ -1119,7 +1118,7 @@ msgid_plural "Applications deleted"
 msgstr[0] "Applikasjon slettet"
 msgstr[1] "Applikasjoner slettet"
 
-#: include/classes/core/CJsonRpc.php:213
+#: include/classes/core/CJsonRpc.php:200
 msgid "Application error."
 msgstr "Programfeil."
 
@@ -1282,15 +1281,15 @@ msgid "At least one active user must exist with role \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CMaintenance.php:286
-#: include/classes/api/services/CMaintenance.php:711
+#: include/classes/api/services/CMaintenance.php:713
 #: include/views/configuration.maintenance.edit.php:245
 msgid "At least one host group or host must be selected."
 msgstr ""
 
 #: include/classes/api/services/CMaintenance.php:380
 #: include/classes/api/services/CMaintenance.php:388
-#: include/classes/api/services/CMaintenance.php:633
-#: include/classes/api/services/CMaintenance.php:641
+#: include/classes/api/services/CMaintenance.php:635
+#: include/classes/api/services/CMaintenance.php:643
 msgid "At least one maintenance period must be created."
 msgstr "Minst en vedlikeholdsperiode må opprettes."
 
@@ -1399,7 +1398,7 @@ msgid "Authentication settings updated"
 msgstr ""
 
 #: app/views/administration.module.edit.php:40
-#: app/views/administration.module.list.php:76
+#: app/views/administration.module.list.php:75
 msgid "Author"
 msgstr ""
 
@@ -1594,7 +1593,7 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:146
 #: include/views/js/monitoring.sysmaps.js.php:644
-#: include/views/monitoring.screen.constructor.edit.php:813
+#: include/views/monitoring.screen.constructor.edit.php:814
 #: include/views/monitoring.sysmap.edit.php:248
 msgid "Bottom"
 msgstr "Bunn"
@@ -1627,12 +1626,12 @@ msgstr "Ved utløsermalen"
 msgid "CERT"
 msgstr "CERT"
 
+#: app/views/hint.box.php:117
 #: app/views/monitoring.widget.problems.view.php:109
-#: include/classes/graph/CSvgGraph.php:1077
+#: include/classes/graph/CSvgGraph.php:1080
 #: include/classes/screens/CScreenEvents.php:114
-#: include/classes/screens/CScreenProblem.php:995
-#: include/classes/screens/CScreenProblem.php:1205 include/events.inc.php:377
-#: include/events.inc.php:587
+#: include/classes/screens/CScreenProblem.php:984
+#: include/classes/screens/CScreenProblem.php:1194 include/events.inc.php:377
 msgid "CLOSING"
 msgstr "LUKKER"
 
@@ -1713,15 +1712,15 @@ msgctxt "screen reader"
 msgid "Can not be removed"
 msgstr ""
 
-#: app/views/administration.iconmap.edit.php:144
-#: app/views/administration.iconmap.edit.php:154
-#: app/views/administration.image.edit.php:85
-#: app/views/administration.image.edit.php:96
+#: app/views/administration.iconmap.edit.php:145
+#: app/views/administration.iconmap.edit.php:155
+#: app/views/administration.image.edit.php:86
+#: app/views/administration.image.edit.php:97
 #: app/views/administration.mediatype.edit.php:349
 #: app/views/administration.module.edit.php:61
 #: app/views/administration.proxy.edit.php:128
-#: app/views/administration.regex.edit.php:153
-#: app/views/administration.regex.edit.php:163
+#: app/views/administration.regex.edit.php:155
+#: app/views/administration.regex.edit.php:165
 #: app/views/administration.script.edit.php:126
 #: app/views/administration.user.edit.php:602
 #: app/views/administration.user.edit.php:633
@@ -1805,10 +1804,6 @@ msgstr "Kan ikke legge til graf prototype"
 msgid "Cannot add group"
 msgstr "Kan ikke legge til gruppe"
 
-#: include/classes/api/services/CTemplate.php:345
-msgid "Cannot add group."
-msgstr "Kan ikke legge til gruppe."
-
 #: hosts.php:720
 msgid "Cannot add host"
 msgstr "Kan ikke legge til vert"
@@ -1854,7 +1849,7 @@ msgstr ""
 msgid "Cannot add media type"
 msgstr "Kan ikke legge til medietype"
 
-#: app/controllers/CControllerModuleScan.php:107
+#: app/controllers/CControllerModuleScan.php:103
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
@@ -1958,11 +1953,6 @@ msgstr ""
 msgid "Cannot bind to LDAP server."
 msgstr ""
 
-#: include/classes/api/clients/CLocalApiClient.php:87
-#, c-format
-msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr "Kan ikke hente metode \"%1$s.%2$s\" uten parametere."
-
 #: httpconf.php:201 httpconf.php:514 items.php:934
 msgid "Cannot clear history"
 msgstr "Kan ikke fjerne historie"
@@ -2063,10 +2053,6 @@ msgstr "Kan ikke opprette ikonskart"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Kan ikke opprette nytt program, webscenario er allerede tildelt til applikasjon."
 
-#: include/classes/api/services/CTemplate.php:363
-msgid "Cannot create template."
-msgstr "Kan ikke opprette mal."
-
 #: include/classes/setup/CSetupWizard.php:666
 msgid "Cannot create the configuration file."
 msgstr "Kan ikke opprette konfigurasjonsfil."
@@ -2152,14 +2138,14 @@ msgstr[1] "Kan ikke slette gruppene"
 msgid "Cannot delete host"
 msgstr "Kan ikke slette verten"
 
-#: include/classes/api/services/CHost.php:1414
+#: include/classes/api/services/CHost.php:1446
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/api/services/CHostGroup.php:1543
+#: include/classes/api/services/CHostGroup.php:1576
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2170,11 +2156,11 @@ msgstr[1] ""
 msgid "Cannot delete host prototypes"
 msgstr "Kan ikke slette vertsprototyper"
 
-#: app/controllers/CControllerIconMapDelete.php:68
+#: app/controllers/CControllerIconMapDelete.php:64
 msgid "Cannot delete icon map"
 msgstr "Kan ikke slette ikonet kart"
 
-#: app/controllers/CControllerImageDelete.php:74
+#: app/controllers/CControllerImageDelete.php:70
 msgid "Cannot delete image"
 msgstr "Kan ikke slette bilde"
 
@@ -2183,7 +2169,7 @@ msgstr "Kan ikke slette bilde"
 msgid "Cannot delete interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1201
+#: include/classes/api/services/CHost.php:1233
 msgid "Cannot delete inventory."
 msgstr "Kan ikke slette beholdning."
 
@@ -2213,7 +2199,7 @@ msgid_plural "Cannot delete media types"
 msgstr[0] "Kan ikke slette medietype"
 msgstr[1] "Kan ikke slette medietypene"
 
-#: app/controllers/CControllerModuleScan.php:122
+#: app/controllers/CControllerModuleScan.php:118
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
@@ -2235,7 +2221,7 @@ msgstr[1] "Kan ikke slette proxyer"
 msgid "Cannot delete readonly user role \"%1$s\"."
 msgstr ""
 
-#: app/controllers/CControllerRegExDelete.php:83
+#: app/controllers/CControllerRegExDelete.php:79
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Kan ikke slette vanlig uttrykk"
@@ -2272,7 +2258,7 @@ msgstr "Kan ikke slette tjenesten"
 msgid "Cannot delete slide show"
 msgstr "Kan ikke slette lysbildefremvisning"
 
-#: templates.php:707 templates.php:721 templates.php:754
+#: templates.php:704 templates.php:718 templates.php:751
 msgid "Cannot delete template"
 msgstr "Kan ikke slette mal"
 
@@ -2288,7 +2274,7 @@ msgstr ""
 msgid "Cannot delete templated graph."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:1235
+#: include/classes/api/services/CHostPrototype.php:1247
 msgid "Cannot delete templated host prototype."
 msgstr "Kan ikke slette templated host prototype."
 
@@ -2353,7 +2339,7 @@ msgid_plural "Cannot delete user roles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/controllers/CControllerValuemapDelete.php:70
+#: app/controllers/CControllerValuemapDelete.php:66
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Kan ikke slette verdikart"
@@ -2657,7 +2643,7 @@ msgstr "Kan ikke formatere treet. Kontroller logikkstrukturen i servicelinkene."
 msgid "Cannot format tree."
 msgstr "Kan ikke formatere tre."
 
-#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:901
 msgid "Cannot have empty visible template name."
 msgstr "Kan ikke ha tomt synlig malnavn."
 
@@ -2672,12 +2658,12 @@ msgstr[1] "Kan ikke importere mal \"%1$s\", koblete maler \"%2$s\" eksisterer ik
 msgid "Cannot insert trigger expression"
 msgstr "Kan ikke sette inn trigger-uttrykk"
 
-#: include/classes/api/services/CHost.php:1179
+#: include/classes/api/services/CHost.php:1211
 msgid "Cannot link template"
 msgstr "Kan ikke koble til mal"
 
-#: include/classes/api/services/CTemplate.php:990
-#: include/classes/api/services/CTemplate.php:1004
+#: include/classes/api/services/CTemplate.php:988
+#: include/classes/api/services/CTemplate.php:1002
 msgid "Cannot link template."
 msgstr "Kan ikke koble til mal."
 
@@ -2693,19 +2679,19 @@ msgstr[1] ""
 msgid "Cannot logout."
 msgstr "Kan ikke logge ut."
 
-#: include/classes/api/services/CHost.php:1045
+#: include/classes/api/services/CHost.php:1077
 msgid "Cannot mass update host name."
 msgstr "Kan ikke masse oppdatere vertsnavn."
 
-#: include/classes/api/services/CTemplate.php:1128
+#: include/classes/api/services/CTemplate.php:1126
 msgid "Cannot mass update template name."
 msgstr "Kan ikke masseoppdatere malnavn."
 
-#: include/classes/api/services/CHost.php:1031
+#: include/classes/api/services/CHost.php:1063
 msgid "Cannot mass update visible host name."
 msgstr "Kan ikke masse oppdatere synlig vertsnavn."
 
-#: include/classes/api/services/CTemplate.php:1093
+#: include/classes/api/services/CTemplate.php:1091
 msgid "Cannot mass update visible template name."
 msgstr "Kan ikke masse oppdatere synlig malnavn."
 
@@ -2714,17 +2700,17 @@ msgstr "Kan ikke masse oppdatere synlig malnavn."
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr ""
 
-#: include/classes/db/DB.php:863
+#: include/classes/db/DB.php:864
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Kan ikke utføre slett setning på tabell \"%1$s\" uten hvor tilstand."
 
-#: include/classes/db/DB.php:576
+#: include/classes/db/DB.php:577
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Kan ikke utføre oppdateringsoppsett på tabell \"%1$s\" uten verdier."
 
-#: include/classes/db/DB.php:589
+#: include/classes/db/DB.php:590
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Kan ikke utføre oppdateringsoppgave på tabell \"%1$s\" uten hvor tilstand."
@@ -2810,9 +2796,9 @@ msgstr "Kan ikke angi \"%1$s\" for elementet \"%2$s\"."
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
 msgstr "Kan ikke angi \"templateid\" -felt for applikasjonsprototype i prototype prototype \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1096
-#: include/classes/api/services/CHost.php:2048
-#: include/classes/api/services/CHost.php:2209
+#: include/classes/api/services/CHost.php:1128
+#: include/classes/api/services/CHost.php:2078
+#: include/classes/api/services/CHost.php:2239
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Kan ikke angi lagerfelt for funksjonshemmede inventar."
 
@@ -2844,24 +2830,24 @@ msgid_plural "Cannot unblock users"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/api/services/CHostGeneral.php:565
+#: include/classes/api/services/CHostGeneral.php:554
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Kan ikke oppheve og slette webscenarier."
 
-#: include/classes/api/services/CHostGeneral.php:626
+#: include/classes/api/services/CHostGeneral.php:615
 msgid "Cannot unlink and clear applications."
 msgstr "Kan ikke fjerne og fjerne programmer."
 
-#: include/classes/api/services/CHost.php:1154
+#: include/classes/api/services/CHost.php:1186
 msgid "Cannot unlink template"
 msgstr "Kan ikke koble fra mal"
 
-#: include/classes/api/services/CTemplate.php:955
-#: include/classes/api/services/CTemplate.php:978
+#: include/classes/api/services/CTemplate.php:953
+#: include/classes/api/services/CTemplate.php:976
 msgid "Cannot unlink template."
 msgstr "Kan ikke koble fra mal."
 
-#: include/classes/api/services/CHostGeneral.php:278
+#: include/classes/api/services/CHostGeneral.php:267
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr ""
@@ -2897,7 +2883,7 @@ msgstr "Kan ikke oppdatere \"%1$s\" for templated trigger \"%2$s\"."
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Kan ikke oppdatere \"%1$s\" for templated trigger prototype \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:2186
+#: include/classes/api/services/CHost.php:2216
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere \"%2$s\" for en oppdaget vert \"%1$s\"."
@@ -2923,7 +2909,7 @@ msgstr "Kan ikke oppdatere \"imagetype\" for bilde \"%1$s\"."
 msgid "Cannot update a discovered graph."
 msgstr "Kan ikke oppdatere en oppdaget graf."
 
-#: include/classes/api/services/CHostGroup.php:843
+#: include/classes/api/services/CHostGroup.php:876
 msgid "Cannot update a discovered host group."
 msgstr "Kan ikke oppdatere en oppdaget vertsgruppe."
 
@@ -2988,9 +2974,9 @@ msgstr "Kan ikke oppdatere graf prototype"
 msgid "Cannot update group"
 msgstr "Kan ikke oppdatere gruppe"
 
-#: include/classes/api/services/CHostGroup.php:1049
-#: include/classes/api/services/CHostGroup.php:1153
-#: include/classes/api/services/CHostGroup.php:1289
+#: include/classes/api/services/CHostGroup.php:1082
+#: include/classes/api/services/CHostGroup.php:1186
+#: include/classes/api/services/CHostGroup.php:1322
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere grupper for oppdaget vert \"%1$s\"."
@@ -2999,7 +2985,7 @@ msgstr "Kan ikke oppdatere grupper for oppdaget vert \"%1$s\"."
 msgid "Cannot update host"
 msgstr "Kan ikke oppdatere verten"
 
-#: include/classes/api/services/CHost.php:993
+#: include/classes/api/services/CHost.php:1025
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Kan ikke oppdatere verts kryptering innstillinger. Tilkoblingsinnstillinger for begge retninger bør angis."
 
@@ -3112,7 +3098,7 @@ msgstr "Kan ikke oppdatere lysbildefremvisning"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "Kan ikke oppdatere trinn for et templert webscenario \"%1$s\":%2$s."
 
-#: templates.php:524
+#: templates.php:523
 msgid "Cannot update template"
 msgstr "Kan ikke oppdatere mal"
 
@@ -3124,8 +3110,8 @@ msgstr "Kan ikke oppdatere templiserte applikasjoner."
 msgid "Cannot update templates"
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:854
-#: include/classes/api/services/CTemplate.php:1189
+#: include/classes/api/services/CTemplate.php:852
+#: include/classes/api/services/CTemplate.php:1187
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere maler på oppdaget vert \"%1$s\"."
@@ -3207,7 +3193,7 @@ msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Fanger alle SNMP-feller som ikke ble fanget av noen av snmptrap [] -elementene."
 
 #: include/views/js/monitoring.sysmaps.js.php:35
-#: include/views/monitoring.screen.constructor.edit.php:800
+#: include/views/monitoring.screen.constructor.edit.php:801
 msgid "Centre"
 msgstr ""
 
@@ -3403,8 +3389,7 @@ msgstr "Kinesisk (zh_TW)"
 msgid "Circular reference in templates: %1$s."
 msgstr "Sirkulær referanse i maler: %1$s."
 
-#: include/classes/api/services/CHostBase.php:207
-#: include/classes/api/services/CHostBase.php:264
+#: include/classes/api/services/CHostBase.php:220
 msgid "Circular template linkage is not allowed."
 msgstr "Sirkulær malkobling er ikke tillatt."
 
@@ -3540,7 +3525,7 @@ msgstr "Kolonne lagt til"
 msgid "Column deleted"
 msgstr "Kolonne slettet"
 
-#: include/views/monitoring.screen.constructor.edit.php:817 screenedit.php:75
+#: include/views/monitoring.screen.constructor.edit.php:818 screenedit.php:75
 msgid "Column span"
 msgstr "Kolonne spenning"
 
@@ -3975,7 +3960,7 @@ msgstr ""
 #: app/views/administration.iconmap.list.php:36
 #: app/views/administration.image.list.php:70
 #: app/views/administration.mediatype.list.php:37
-#: app/views/administration.module.list.php:37
+#: app/views/administration.module.list.php:36
 #: app/views/administration.proxy.list.php:36
 #: app/views/administration.regex.list.php:40
 #: app/views/administration.script.list.php:36
@@ -4919,7 +4904,7 @@ msgstr "Slett historie av utvalgte elementer?"
 msgid "Delete history of selected web scenarios?"
 msgstr "Slett historie av utvalgte webscenarier?"
 
-#: app/views/administration.iconmap.edit.php:142
+#: app/views/administration.iconmap.edit.php:143
 msgid "Delete icon map?"
 msgstr "Slett ikon kart?"
 
@@ -4951,7 +4936,7 @@ msgstr "Slett mangler"
 msgid "Delete proxy?"
 msgstr "Slett proxy?"
 
-#: app/views/administration.regex.edit.php:151
+#: app/views/administration.regex.edit.php:153
 msgid "Delete regular expression?"
 msgstr "Slett vanlig uttrykk?"
 
@@ -5026,7 +5011,7 @@ msgstr "Slett valgt vert?"
 msgid "Delete selected hosts?"
 msgstr "Slett valgte verter?"
 
-#: app/views/administration.image.edit.php:83
+#: app/views/administration.image.edit.php:84
 msgid "Delete selected image?"
 msgstr "Slett valgt bilde?"
 
@@ -5150,17 +5135,17 @@ msgstr "Slett utløseren?"
 msgid "Delete web scenario?"
 msgstr "Slett webscenario?"
 
-#: include/classes/api/services/CHost.php:1566
+#: include/classes/api/services/CHost.php:1595
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Slettet: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1103
+#: include/classes/api/services/CHostPrototype.php:1115
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Slettet: Vertsprototype \"%1$s\" på \"%2$s\"."
 
-#: include/classes/api/services/CTemplate.php:784
+#: include/classes/api/services/CTemplate.php:818
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Slettet: Mal \"%1$s\"."
@@ -5217,7 +5202,7 @@ msgstr "Distribusjonsstatus"
 #: app/views/administration.macros.edit.php:39
 #: app/views/administration.mediatype.edit.php:265
 #: app/views/administration.module.edit.php:41
-#: app/views/administration.module.list.php:77
+#: app/views/administration.module.list.php:76
 #: app/views/administration.proxy.edit.php:83
 #: app/views/administration.script.edit.php:73
 #: app/views/popup.triggerwizard.php:137
@@ -5287,7 +5272,7 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:172
 #: app/views/administration.mediatype.list.php:163
-#: app/views/administration.module.list.php:124
+#: app/views/administration.module.list.php:123
 #: app/views/administration.usergroup.list.php:218
 #: app/views/configuration.application.list.php:160
 #: include/views/configuration.action.list.php:150
@@ -5363,7 +5348,7 @@ msgstr "Deaktivere valgte elementer?"
 msgid "Disable selected media types?"
 msgstr "Deaktivere valgte medietyper?"
 
-#: app/views/administration.module.list.php:124
+#: app/views/administration.module.list.php:123
 msgid "Disable selected modules?"
 msgstr ""
 
@@ -5380,8 +5365,8 @@ msgstr "Deaktiver valgte webscenarier?"
 #: app/views/administration.mediatype.list.php:52
 #: app/views/administration.mediatype.list.php:130
 #: app/views/administration.miscconfig.edit.php:54
-#: app/views/administration.module.list.php:54
-#: app/views/administration.module.list.php:101
+#: app/views/administration.module.list.php:53
+#: app/views/administration.module.list.php:100
 #: app/views/administration.user.edit.php:260
 #: app/views/administration.user.edit.php:453
 #: app/views/administration.usergroup.list.php:53
@@ -5769,14 +5754,14 @@ msgstr "Dupliserer avhengigheter i utløseren \"%1$s\"."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Dupliserer avhengigheter i triggerprototypen \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1983
-#: include/classes/api/services/CHost.php:2238
+#: include/classes/api/services/CHost.php:2013
+#: include/classes/api/services/CHost.php:2268
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1990
-#: include/classes/api/services/CHost.php:2258
+#: include/classes/api/services/CHost.php:2020
+#: include/classes/api/services/CHost.php:2288
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
@@ -5805,11 +5790,11 @@ msgstr "Dupliser usrgrpid \"%1$s\" i brukergrupper for kart \"%2$s\"."
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Dupliser usrgrpid \"%1$s\" i brukergrupper for skjermbildet \"%2$s\"."
 
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:819
-#: include/classes/screens/CScreenProblem.php:888
-#: include/classes/screens/CScreenProblem.php:913
-#: include/classes/screens/CScreenProblem.php:1181 include/events.inc.php:285
-#: include/events.inc.php:500 include/views/configuration.action.edit.php:171
+#: app/views/hint.box.php:76 app/views/monitoring.widget.problems.view.php:65
+#: include/blocks.inc.php:819 include/classes/screens/CScreenProblem.php:877
+#: include/classes/screens/CScreenProblem.php:902
+#: include/classes/screens/CScreenProblem.php:1170 include/events.inc.php:285
+#: include/views/configuration.action.edit.php:171
 msgid "Duration"
 msgstr "Varighet"
 
@@ -5820,7 +5805,7 @@ msgstr "Nederlandsk (nl_NO)"
 #: include/classes/widgets/forms/CWidgetFormGraph.php:88
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
 #: include/classes/widgets/forms/CWidgetFormUrl.php:42
-#: include/views/monitoring.screen.constructor.edit.php:839
+#: include/views/monitoring.screen.constructor.edit.php:840
 msgid "Dynamic item"
 msgstr "Dynamisk element"
 
@@ -5978,10 +5963,10 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:194
 #: include/classes/api/services/CDRule.php:320
 #: include/classes/api/services/CHostInterface.php:584
-#: include/classes/api/services/CHost.php:1378
-#: include/classes/api/services/CHostPrototype.php:1031
+#: include/classes/api/services/CHost.php:1410
+#: include/classes/api/services/CHostPrototype.php:1043
 #: include/classes/api/services/CImage.php:430
-#: include/classes/api/services/CMaintenance.php:540
+#: include/classes/api/services/CMaintenance.php:542
 #: include/classes/api/services/CMap.php:562
 #: include/classes/api/services/CMap.php:588
 #: include/classes/api/services/CMap.php:1029
@@ -5994,7 +5979,7 @@ msgstr ""
 #: include/classes/api/services/CService.php:378
 #: include/classes/api/services/CService.php:442
 #: include/classes/api/services/CService.php:510
-#: include/classes/api/services/CTemplate.php:590
+#: include/classes/api/services/CTemplate.php:626
 #: include/classes/api/services/CTrigger.php:803
 #: include/classes/api/services/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -6030,7 +6015,7 @@ msgstr "Tom skjerm-ID."
 
 #: app/controllers/CControllerAuditLogList.php:171
 #: app/views/administration.mediatype.list.php:162
-#: app/views/administration.module.list.php:123
+#: app/views/administration.module.list.php:122
 #: app/views/administration.usergroup.list.php:212
 #: app/views/configuration.application.list.php:159
 #: include/views/configuration.action.list.php:149
@@ -6132,7 +6117,7 @@ msgstr "Aktiver valgte elementer?"
 msgid "Enable selected media types?"
 msgstr "Aktiver valgte medietyper?"
 
-#: app/views/administration.module.list.php:123
+#: app/views/administration.module.list.php:122
 msgid "Enable selected modules?"
 msgstr ""
 
@@ -6158,8 +6143,8 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:51
 #: app/views/administration.mediatype.list.php:126
 #: app/views/administration.module.edit.php:45
-#: app/views/administration.module.list.php:53
-#: app/views/administration.module.list.php:95
+#: app/views/administration.module.list.php:52
+#: app/views/administration.module.list.php:94
 #: app/views/administration.user.edit.php:254
 #: app/views/administration.user.edit.php:453
 #: app/views/administration.usergroup.edit.php:80
@@ -6430,11 +6415,6 @@ msgstr ""
 msgid "Expand single problem"
 msgstr "Utvid enkelt problem"
 
-#: include/classes/core/CJsonRpc.php:109
-#, c-format
-msgid "Expecting JSON-rpc version 2.0, \"%1$s\" is given."
-msgstr ""
-
 #: include/views/configuration.maintenance.list.php:67
 #: include/views/configuration.maintenance.list.php:97
 msgctxt "maintenance status"
@@ -6553,7 +6533,7 @@ msgstr "Kunne ikke analysere nettadressen."
 msgid "Failed to update dashboard"
 msgstr "Kunne ikke oppdatere oversikten"
 
-#: include/classes/api/services/CTemplate.php:539
+#: include/classes/api/services/CTemplate.php:575
 msgid "Failed to update template."
 msgstr "Kunne ikke oppdatere mal."
 
@@ -6589,7 +6569,7 @@ msgstr "Februar"
 msgid "Field"
 msgstr "Felt"
 
-#: include/classes/db/DB.php:352
+#: include/classes/db/DB.php:331
 #, c-format
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Feltet \"%1$s\" kan ikke settes til NULL."
@@ -6603,9 +6583,9 @@ msgstr "Feltet \"%1$s\" kan ikke settes til NULL."
 #: include/classes/api/services/CDRule.php:325
 #: include/classes/api/services/CDRule.php:528
 #: include/classes/api/services/CDRule.php:538
-#: include/classes/api/services/CHostGroup.php:960
-#: include/classes/api/services/CHost.php:951
-#: include/classes/api/services/CTemplate.php:882
+#: include/classes/api/services/CHostGroup.php:993
+#: include/classes/api/services/CHost.php:983
+#: include/classes/api/services/CTemplate.php:880
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6657,7 +6637,7 @@ msgstr "Felt \"%1$s\" kreves for medietype \"%2$s\"."
 msgid "Field \"%1$s\" must be missing."
 msgstr "Felt \"%1$s\" må mangle."
 
-#: include/classes/api/services/CTemplate.php:428
+#: include/classes/api/services/CTemplate.php:464
 msgid "Field \"host\" is mandatory."
 msgstr "Felt \"vert\" er obligatorisk."
 
@@ -6711,7 +6691,7 @@ msgstr "Fylt område"
 
 #: app/partials/common.filter.trigger.php:179
 #: app/views/administration.mediatype.list.php:42
-#: app/views/administration.module.list.php:44
+#: app/views/administration.module.list.php:43
 #: app/views/administration.proxy.list.php:41
 #: app/views/administration.script.list.php:41
 #: app/views/administration.usergroup.list.php:43
@@ -7049,8 +7029,8 @@ msgstr "Gradient linje"
 #: app/partials/monitoring.latest.view.html.php:239
 #: app/views/monitoring.charts.view.php:56
 #: include/classes/macros/CMacrosResolverGeneral.php:857
-#: include/classes/screens/CScreenProblem.php:1325
-#: include/classes/screens/CScreenProblem.php:1330
+#: include/classes/screens/CScreenProblem.php:1314
+#: include/classes/screens/CScreenProblem.php:1319
 #: include/classes/widgets/CWidgetConfig.php:61
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:66
@@ -7265,17 +7245,17 @@ msgstr "Rutenett"
 #: include/classes/screens/CScreenTriggersOverview.php:37
 #: include/screens.inc.php:693 include/views/inventory.host.list.php:84
 #: include/views/monitoring.screen.constructor.edit.php:437
-#: include/views/monitoring.screen.constructor.edit.php:578
-#: include/views/monitoring.screen.constructor.edit.php:640
+#: include/views/monitoring.screen.constructor.edit.php:579
+#: include/views/monitoring.screen.constructor.edit.php:641
 msgid "Group"
 msgstr "Gruppe"
 
-#: include/classes/api/services/CHostGroup.php:766
+#: include/classes/api/services/CHostGroup.php:799
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Gruppe \"%1$s\" kan ikke slettes fordi den brukes av en vert prototype."
 
-#: include/classes/api/services/CHostGroup.php:810
+#: include/classes/api/services/CHostGroup.php:843
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "Gruppe \"%1$s\" kan ikke slettes fordi den brukes i en korrelasjonsbetingelse."
@@ -7309,7 +7289,7 @@ msgstr "Gruppe for oppdagede verter"
 msgid "Group name"
 msgstr "Gruppe navn"
 
-#: include/classes/api/services/CHostPrototype.php:1193
+#: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Gruppeprototype kan ikke baseres på en oppdaget vertsgruppe \"%1$s\"."
@@ -7435,7 +7415,7 @@ msgstr "Hebraisk (he_IL)"
 #: include/views/configuration.graph.list.php:138
 #: include/views/js/monitoring.sysmaps.js.php:123
 #: include/views/js/monitoring.sysmaps.js.php:453
-#: include/views/monitoring.screen.constructor.edit.php:777
+#: include/views/monitoring.screen.constructor.edit.php:778
 #: include/views/monitoring.sysmap.edit.php:105
 #: include/views/monitoring.sysmap.list.php:67 screenedit.php:71
 #: sysmaps.php:42
@@ -7501,8 +7481,8 @@ msgstr ""
 #: app/views/administration.housekeeping.edit.php:125
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:862
-#: include/classes/screens/CScreenProblem.php:1332
-#: include/classes/screens/CScreenProblem.php:1337
+#: include/classes/screens/CScreenProblem.php:1321
+#: include/classes/screens/CScreenProblem.php:1326
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:277 include/forms.inc.php:717
@@ -7557,13 +7537,13 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:49
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:122
-#: include/views/monitoring.screen.constructor.edit.php:739
+#: include/views/monitoring.screen.constructor.edit.php:740
 msgid "Horizontal"
 msgstr "Horisontal"
 
 #: include/views/js/monitoring.sysmaps.js.php:369
 #: include/views/js/monitoring.sysmaps.js.php:531
-#: include/views/monitoring.screen.constructor.edit.php:797
+#: include/views/monitoring.screen.constructor.edit.php:798
 msgid "Horizontal align"
 msgstr "Horisontal justering"
 
@@ -7582,9 +7562,9 @@ msgstr "Horisontal justering"
 #: include/classes/screens/CScreenHostTriggers.php:146
 #: include/classes/screens/CScreenHostTriggers.php:190
 #: include/classes/screens/CScreenHttpTest.php:105
-#: include/classes/screens/CScreenProblem.php:884
-#: include/classes/screens/CScreenProblem.php:908
-#: include/classes/screens/CScreenProblem.php:1178
+#: include/classes/screens/CScreenProblem.php:873
+#: include/classes/screens/CScreenProblem.php:897
+#: include/classes/screens/CScreenProblem.php:1167
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:439
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
@@ -7603,7 +7583,7 @@ msgstr "Horisontal justering"
 #: include/views/inventory.host.view.php:215
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
-#: include/views/monitoring.screen.constructor.edit.php:475
+#: include/views/monitoring.screen.constructor.edit.php:476
 #: include/views/monitoring.screen.php:57
 #: include/views/monitoring.slides.php:67
 #: include/views/reports.toptriggers.php:83 items.php:954 items.php:1383
@@ -7613,17 +7593,17 @@ msgid_plural "Hosts"
 msgstr[0] "Vert"
 msgstr[1] "Verter"
 
-#: include/classes/api/services/CHost.php:1058
-#: include/classes/api/services/CTemplate.php:460
+#: include/classes/api/services/CHost.php:1090
+#: include/classes/api/services/CTemplate.php:496
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Verten \"%1$s\" eksisterer allerede."
 
-#: include/classes/api/services/CHostGroup.php:1506
-#: include/classes/api/services/CHost.php:1017
-#: include/classes/api/services/CHost.php:1954
-#: include/classes/api/services/CHost.php:2149
+#: include/classes/api/services/CHostGroup.php:1539
+#: include/classes/api/services/CHost.php:1049
+#: include/classes/api/services/CHost.php:1984
+#: include/classes/api/services/CHost.php:2179
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Verten \"%1$s\" kan ikke være uten vertsgruppe."
@@ -7633,7 +7613,7 @@ msgstr "Verten \"%1$s\" kan ikke være uten vertsgruppe."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Verten \"%1$s\" overvåkes med proxy \"%2$s\"."
 
-#: include/views/monitoring.screen.constructor.edit.php:515
+#: include/views/monitoring.screen.constructor.edit.php:516
 msgid "Host (ascending)"
 msgstr "Vert (stigende)"
 
@@ -7704,17 +7684,17 @@ msgstr[1] "Verter aktivert"
 msgid "Host group"
 msgstr "Vertsgruppe"
 
-#: include/classes/api/services/CHostGroup.php:694
+#: include/classes/api/services/CHostGroup.php:727
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Vertsgruppen \"%1$s\" eksisterer allerede."
 
-#: include/classes/api/services/CHostGroup.php:795
+#: include/classes/api/services/CHostGroup.php:828
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Vertsgruppen \"%1$s\" kan ikke slettes fordi den brukes i et globalt skript."
 
-#: include/classes/api/services/CHostGroup.php:752
+#: include/classes/api/services/CHostGroup.php:785
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Vertsgruppen \"%1$s\" er intern og kan ikke slettes."
@@ -7844,12 +7824,12 @@ msgstr "Vertsnettverk"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:909
+#: include/classes/api/services/CHostPrototype.php:921
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Vertsprototypen \"%1$s\" eksisterer allerede på \"%2$s\", arvet fra en annen mal."
 
-#: include/classes/api/services/CHostPrototype.php:897
+#: include/classes/api/services/CHostPrototype.php:909
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Vertsprototypen \"%1$s\" eksisterer allerede på \"%2$s\"."
@@ -7858,7 +7838,7 @@ msgstr "Vertsprototypen \"%1$s\" eksisterer allerede på \"%2$s\"."
 msgid "Host prototype added"
 msgstr "Vert prototype lagt til"
 
-#: include/classes/api/services/CHostPrototype.php:1698
+#: include/classes/api/services/CHostPrototype.php:1710
 msgid "Host prototype cannot have more than one default interface of the same type."
 msgstr ""
 
@@ -7906,11 +7886,11 @@ msgid "Host subnet mask"
 msgstr "Vertsundernettmaske"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:34
-#: include/views/monitoring.screen.constructor.edit.php:681
+#: include/views/monitoring.screen.constructor.edit.php:682
 msgid "Host time"
 msgstr "Vert tid"
 
-#: include/classes/api/services/CHost.php:880
+#: include/classes/api/services/CHost.php:912
 msgid "Host update failed."
 msgstr "Vertsoppdatering mislyktes."
 
@@ -7923,17 +7903,17 @@ msgstr "Vert oppdatert"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Vert med ID \"%1$s\" er ikke tilgjengelig."
 
-#: include/classes/api/services/CHost.php:2079
-#: include/classes/api/services/CHost.php:2319
-#: include/classes/api/services/CTemplate.php:1154
+#: include/classes/api/services/CHost.php:2109
+#: include/classes/api/services/CHost.php:2349
+#: include/classes/api/services/CTemplate.php:1152
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Vert med samme navn \"%1$s\" eksisterer allerede."
 
-#: include/classes/api/services/CHost.php:2085
-#: include/classes/api/services/CHost.php:2326
-#: include/classes/api/services/CTemplate.php:486
-#: include/classes/api/services/CTemplate.php:1119
+#: include/classes/api/services/CHost.php:2115
+#: include/classes/api/services/CHost.php:2356
+#: include/classes/api/services/CTemplate.php:522
+#: include/classes/api/services/CTemplate.php:1117
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Vert med samme synlige navn \"%1$s\" eksisterer allerede."
@@ -7992,7 +7972,7 @@ msgstr "verter"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:85
 #: include/views/monitoring.overview.items.php:74
 #: include/views/monitoring.overview.triggers.php:110
-#: include/views/monitoring.screen.constructor.edit.php:745
+#: include/views/monitoring.screen.constructor.edit.php:746
 msgid "Hosts location"
 msgstr "Verter plassering"
 
@@ -8140,7 +8120,7 @@ msgstr "Ikonkartet \"%1$s\" kan ikke slettes. Brukes i kart \"%2$s\"."
 msgid "Icon map created"
 msgstr "Ikonkart opprettet"
 
-#: app/controllers/CControllerIconMapDelete.php:61
+#: app/controllers/CControllerIconMapDelete.php:57
 msgid "Icon map deleted"
 msgstr "Ikon kart slettet"
 
@@ -8220,7 +8200,7 @@ msgstr "Bilde \"%1$s\" eksisterer allerede."
 msgid "Image added"
 msgstr "Bilde lagt til"
 
-#: app/controllers/CControllerImageDelete.php:67
+#: app/controllers/CControllerImageDelete.php:63
 msgid "Image deleted"
 msgstr "Bilde slettet"
 
@@ -8329,7 +8309,7 @@ msgid "Inaccessible item prototype"
 msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:95
-#: include/classes/screens/CScreenProblem.php:389
+#: include/classes/screens/CScreenProblem.php:388
 #: include/hostgroups.inc.php:293 include/triggers.inc.php:2184
 #: include/views/configuration.host.list.php:259
 #: include/views/inventory.host.view.php:40
@@ -8626,11 +8606,11 @@ msgstr "Feil argumenter passert for å fungere"
 #: include/classes/api/services/CHostInterface.php:1108
 #: include/classes/api/services/CHostInterface.php:1126
 #: include/classes/api/services/CHostInterface.php:1143
-#: include/classes/api/services/CHost.php:1342
-#: include/classes/api/services/CHost.php:2033
-#: include/classes/api/services/CHost.php:2226
-#: include/classes/api/services/CHostPrototype.php:527
-#: include/classes/api/services/CHostPrototype.php:548
+#: include/classes/api/services/CHost.php:1374
+#: include/classes/api/services/CHost.php:2063
+#: include/classes/api/services/CHost.php:2256
+#: include/classes/api/services/CHostPrototype.php:539
+#: include/classes/api/services/CHostPrototype.php:560
 #: include/classes/api/services/CItemGeneral.php:258
 #: include/classes/api/services/CItemGeneral.php:1244
 #: include/classes/api/services/CItemGeneral.php:1281
@@ -8684,9 +8664,9 @@ msgstr "Feil masseverdi for grensesnitt."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Feil beregne SLA-verdien for tjenesten \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1040
-#: include/classes/api/services/CHost.php:1942
-#: include/classes/api/services/CHost.php:2232
+#: include/classes/api/services/CHost.php:1072
+#: include/classes/api/services/CHost.php:1972
+#: include/classes/api/services/CHost.php:2262
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
@@ -8697,8 +8677,8 @@ msgstr ""
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Feil tegn brukt til proxy navn \"%1$s\"."
 
-#: include/classes/api/services/CTemplate.php:438
-#: include/classes/api/services/CTemplate.php:1164
+#: include/classes/api/services/CTemplate.php:474
+#: include/classes/api/services/CTemplate.php:1162
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Feil tegn brukt til malnavn \"%1$s\"."
@@ -8765,7 +8745,7 @@ msgstr "Feil eventobjekt verdi."
 msgid "Incorrect eventsource value."
 msgstr "Feil hendelseskildeverdi."
 
-#: include/classes/db/DB.php:596 include/classes/db/DB.php:870
+#: include/classes/db/DB.php:597 include/classes/db/DB.php:871
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Feil felt \"%1$s\" navn eller verdi i hvor setning for tabell \"%2$s\"."
@@ -8860,9 +8840,9 @@ msgstr "Feil bildeindeks."
 #: include/classes/api/services/CAction.php:2919
 #: include/classes/api/services/CAction.php:2931
 #: include/classes/api/services/CAction.php:2943
-#: include/classes/api/services/CHost.php:1023
-#: include/classes/api/services/CHost.php:1936
-#: include/classes/api/services/CHost.php:2135
+#: include/classes/api/services/CHost.php:1055
+#: include/classes/api/services/CHost.php:1966
+#: include/classes/api/services/CHost.php:2165
 #: include/classes/api/services/CImage.php:442
 #: include/classes/api/services/CImage.php:483
 #: include/classes/api/services/CProxy.php:626
@@ -8870,8 +8850,8 @@ msgstr "Feil bildeindeks."
 #: include/classes/api/services/CProxy.php:736
 #: include/classes/api/services/CProxy.php:758
 #: include/classes/api/services/CScreen.php:432
-#: include/classes/api/services/CTemplate.php:433
-#: include/classes/api/services/CTemplate.php:570
+#: include/classes/api/services/CTemplate.php:469
+#: include/classes/api/services/CTemplate.php:606
 msgid "Incorrect input parameters."
 msgstr "Feil innspillingsparametere."
 
@@ -8885,8 +8865,8 @@ msgstr ""
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2054
-#: include/classes/api/services/CHost.php:2215
+#: include/classes/api/services/CHost.php:2084
+#: include/classes/api/services/CHost.php:2245
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
@@ -8989,7 +8969,7 @@ msgid "Incorrect parameters for condition."
 msgstr "Feil parametere for tilstand."
 
 #: include/classes/api/services/CMaintenance.php:332
-#: include/classes/api/services/CMaintenance.php:550
+#: include/classes/api/services/CMaintenance.php:552
 msgid "Incorrect parameters for maintenance."
 msgstr "Feil parametre for vedlikehold."
 
@@ -9059,8 +9039,8 @@ msgstr "Feil sorteringsrekkefølge for service \"%1$s\"."
 msgid "Incorrect source value."
 msgstr "Feil kildeverdi."
 
-#: include/classes/api/services/CHost.php:2025
-#: include/classes/api/services/CHost.php:2181
+#: include/classes/api/services/CHost.php:2055
+#: include/classes/api/services/CHost.php:2211
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Feil status for verten \"%1$s\"."
@@ -9211,19 +9191,19 @@ msgstr ""
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Feil verdi \"%1$s\" for \"%2$s\" -feltet: må være mellom %3$s og %4$s."
 
-#: include/classes/db/DB.php:382
+#: include/classes/db/DB.php:361
 #, c-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr "Feil verdi \"%1$s\" for flytfelt \"%2$s\"."
 
-#: include/classes/db/DB.php:376
+#: include/classes/db/DB.php:355
 #, c-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr "Feil verdi \"%1$s\" for int felt \"%2$s\"."
 
 #: include/classes/api/services/CMaintenance.php:400
-#: include/classes/api/services/CMaintenance.php:666
-#: include/classes/db/DB.php:370
+#: include/classes/api/services/CMaintenance.php:668
+#: include/classes/db/DB.php:349
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Feil verdi \"%1$s\" for usignert int felt \"%2$s\"."
@@ -9342,21 +9322,21 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:801
 #: include/classes/api/services/CEvent.php:842
 #: include/classes/api/services/CEvent.php:899
-#: include/classes/api/services/CHost.php:981
-#: include/classes/api/services/CHost.php:1838
-#: include/classes/api/services/CHost.php:1844
-#: include/classes/api/services/CHost.php:1859
-#: include/classes/api/services/CHost.php:1865
-#: include/classes/api/services/CHost.php:1870
-#: include/classes/api/services/CHost.php:1876
-#: include/classes/api/services/CHost.php:1884
-#: include/classes/api/services/CHost.php:1890
-#: include/classes/api/services/CHost.php:1899
-#: include/classes/api/services/CHost.php:1905
-#: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHost.php:2019
-#: include/classes/api/services/CHost.php:2158
-#: include/classes/api/services/CHost.php:2175
+#: include/classes/api/services/CHost.php:1013
+#: include/classes/api/services/CHost.php:1868
+#: include/classes/api/services/CHost.php:1874
+#: include/classes/api/services/CHost.php:1889
+#: include/classes/api/services/CHost.php:1895
+#: include/classes/api/services/CHost.php:1900
+#: include/classes/api/services/CHost.php:1906
+#: include/classes/api/services/CHost.php:1914
+#: include/classes/api/services/CHost.php:1920
+#: include/classes/api/services/CHost.php:1929
+#: include/classes/api/services/CHost.php:1935
+#: include/classes/api/services/CHost.php:1993
+#: include/classes/api/services/CHost.php:2049
+#: include/classes/api/services/CHost.php:2188
+#: include/classes/api/services/CHost.php:2205
 #: include/classes/api/services/CHttpTest.php:964
 #: include/classes/api/services/CHttpTest.php:1060
 #: include/classes/api/services/CItemGeneral.php:217
@@ -9414,8 +9394,8 @@ msgstr ""
 #: include/classes/api/services/CItem.php:844
 #: include/classes/api/services/CItemPrototype.php:997
 #: include/classes/api/services/CItemPrototype.php:1005
-#: include/classes/api/services/CMaintenance.php:500
-#: include/classes/api/services/CMaintenance.php:722
+#: include/classes/api/services/CMaintenance.php:502
+#: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMapElement.php:85
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
@@ -9454,7 +9434,7 @@ msgstr ""
 #: include/classes/api/services/CScreen.php:400
 #: include/classes/api/services/CScreen.php:406
 #: include/classes/api/services/CSettings.php:309
-#: include/classes/api/services/CTemplate.php:393
+#: include/classes/api/services/CTemplate.php:429
 #: include/classes/api/services/CTriggerGeneral.php:705
 #: include/classes/api/services/CTriggerGeneral.php:711
 #: include/classes/api/services/CTriggerGeneral.php:731
@@ -9550,8 +9530,8 @@ msgstr ""
 #: include/actions.inc.php:1833 include/actions.inc.php:1916
 #: include/blocks.inc.php:815 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:225
-#: include/classes/screens/CScreenProblem.php:883
-#: include/classes/screens/CScreenProblem.php:907
+#: include/classes/screens/CScreenProblem.php:872
+#: include/classes/screens/CScreenProblem.php:896
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.graph.list.php:127
 #: include/views/configuration.host.discovery.list.php:196
@@ -9674,7 +9654,7 @@ msgctxt "user type"
 msgid "Internal"
 msgstr "intern"
 
-#: include/classes/core/CJsonRpc.php:209
+#: include/classes/core/CJsonRpc.php:196
 msgid "Internal JSON-RPC error."
 msgstr "Intern JSON-RPC-feil."
 
@@ -9694,7 +9674,7 @@ msgstr "Intern datalagringsperiode"
 #: include/classes/api/services/CTriggerGeneral.php:1169
 #: include/classes/api/services/CTriggerGeneral.php:1360
 #: include/classes/api/services/CTriggerGeneral.php:1737
-#: include/classes/core/CJsonRpc.php:208
+#: include/classes/core/CJsonRpc.php:195
 #: include/classes/import/validators/CXmlValidatorGeneral.php:197
 #: include/classes/widgets/fields/CWidgetField.php:103
 msgid "Internal error."
@@ -9740,11 +9720,11 @@ msgstr ""
 msgid "Invalid IP address \"%1$s\"."
 msgstr "Ugyldig IP-adresse \"%1$s\"."
 
-#: include/classes/core/CJsonRpc.php:189
+#: include/classes/core/CJsonRpc.php:176
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "Ugyldig JSON. Det oppsto en feil på serveren mens du analyserte JSON-teksten."
 
-#: include/classes/core/CJsonRpc.php:193
+#: include/classes/core/CJsonRpc.php:180
 msgid "Invalid Request."
 msgstr "Ugyldig forespørsel."
 
@@ -9757,7 +9737,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr "Ugyldig handlingstilstand: %1$s."
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:222
+#: app/controllers/CControllerTimeSelectorUpdate.php:220
 msgid "Invalid date."
 msgstr ""
 
@@ -9832,7 +9812,7 @@ msgstr "Ugyldig makro \"%1$s\" : %2$s."
 #: include/classes/api/services/CService.php:212
 #: include/classes/api/services/CService.php:383
 #: include/classes/api/services/CService.php:1214
-#: include/classes/core/CJsonRpc.php:204
+#: include/classes/core/CJsonRpc.php:191
 msgid "Invalid method parameters."
 msgstr "Ugyldige metodeparametere."
 
@@ -9861,15 +9841,15 @@ msgstr "Ugyldig antall parametere."
 #: include/classes/api/services/CDiscoveryRule.php:1971
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDiscoveryRule.php:1997
-#: include/classes/api/services/CHostPrototype.php:1598
-#: include/classes/api/services/CHostPrototype.php:1603
 #: include/classes/api/services/CHostPrototype.php:1610
 #: include/classes/api/services/CHostPrototype.php:1615
-#: include/classes/api/services/CHostPrototype.php:1626
-#: include/classes/api/services/CHostPrototype.php:1631
+#: include/classes/api/services/CHostPrototype.php:1622
+#: include/classes/api/services/CHostPrototype.php:1627
 #: include/classes/api/services/CHostPrototype.php:1638
-#: include/classes/api/services/CHostPrototype.php:1644
-#: include/classes/api/services/CHostPrototype.php:1654
+#: include/classes/api/services/CHostPrototype.php:1643
+#: include/classes/api/services/CHostPrototype.php:1650
+#: include/classes/api/services/CHostPrototype.php:1656
+#: include/classes/api/services/CHostPrototype.php:1666
 #: include/classes/api/services/CItemGeneral.php:2513
 #: include/classes/api/services/CItemGeneral.php:2520
 #: include/classes/api/services/CItemGeneral.php:2526
@@ -9889,86 +9869,88 @@ msgstr "Ugyldig antall parametere."
 #: include/classes/helpers/CDashboardHelper.php:361
 #: include/classes/helpers/CDashboardHelper.php:367
 #: include/classes/helpers/CDashboardHelper.php:373
-#: include/classes/validators/CApiInputValidator.php:282
-#: include/classes/validators/CApiInputValidator.php:287
-#: include/classes/validators/CApiInputValidator.php:292
-#: include/classes/validators/CApiInputValidator.php:319
-#: include/classes/validators/CApiInputValidator.php:349
-#: include/classes/validators/CApiInputValidator.php:410
-#: include/classes/validators/CApiInputValidator.php:417
-#: include/classes/validators/CApiInputValidator.php:449
-#: include/classes/validators/CApiInputValidator.php:454
-#: include/classes/validators/CApiInputValidator.php:496
-#: include/classes/validators/CApiInputValidator.php:501
-#: include/classes/validators/CApiInputValidator.php:535
-#: include/classes/validators/CApiInputValidator.php:540
-#: include/classes/validators/CApiInputValidator.php:581
-#: include/classes/validators/CApiInputValidator.php:586
-#: include/classes/validators/CApiInputValidator.php:640
-#: include/classes/validators/CApiInputValidator.php:674
-#: include/classes/validators/CApiInputValidator.php:679
-#: include/classes/validators/CApiInputValidator.php:735
-#: include/classes/validators/CApiInputValidator.php:768
-#: include/classes/validators/CApiInputValidator.php:773
-#: include/classes/validators/CApiInputValidator.php:814
-#: include/classes/validators/CApiInputValidator.php:819
-#: include/classes/validators/CApiInputValidator.php:824
-#: include/classes/validators/CApiInputValidator.php:860
-#: include/classes/validators/CApiInputValidator.php:915
-#: include/classes/validators/CApiInputValidator.php:922
-#: include/classes/validators/CApiInputValidator.php:949
-#: include/classes/validators/CApiInputValidator.php:994
-#: include/classes/validators/CApiInputValidator.php:1021
-#: include/classes/validators/CApiInputValidator.php:1026
-#: include/classes/validators/CApiInputValidator.php:1033
-#: include/classes/validators/CApiInputValidator.php:1064
-#: include/classes/validators/CApiInputValidator.php:1109
-#: include/classes/validators/CApiInputValidator.php:1114
-#: include/classes/validators/CApiInputValidator.php:1151
-#: include/classes/validators/CApiInputValidator.php:1156
-#: include/classes/validators/CApiInputValidator.php:1201
-#: include/classes/validators/CApiInputValidator.php:1210
-#: include/classes/validators/CApiInputValidator.php:1216
-#: include/classes/validators/CApiInputValidator.php:1244
-#: include/classes/validators/CApiInputValidator.php:1254
-#: include/classes/validators/CApiInputValidator.php:1260
-#: include/classes/validators/CApiInputValidator.php:1298
-#: include/classes/validators/CApiInputValidator.php:1310
-#: include/classes/validators/CApiInputValidator.php:1319
-#: include/classes/validators/CApiInputValidator.php:1326
-#: include/classes/validators/CApiInputValidator.php:1331
-#: include/classes/validators/CApiInputValidator.php:1363
-#: include/classes/validators/CApiInputValidator.php:1373
-#: include/classes/validators/CApiInputValidator.php:1398
-#: include/classes/validators/CApiInputValidator.php:1403
-#: include/classes/validators/CApiInputValidator.php:1427
-#: include/classes/validators/CApiInputValidator.php:1432
-#: include/classes/validators/CApiInputValidator.php:1458
-#: include/classes/validators/CApiInputValidator.php:1465
-#: include/classes/validators/CApiInputValidator.php:1492
-#: include/classes/validators/CApiInputValidator.php:1499
-#: include/classes/validators/CApiInputValidator.php:1526
-#: include/classes/validators/CApiInputValidator.php:1535
-#: include/classes/validators/CApiInputValidator.php:1572
-#: include/classes/validators/CApiInputValidator.php:1588
-#: include/classes/validators/CApiInputValidator.php:1599
-#: include/classes/validators/CApiInputValidator.php:1632
-#: include/classes/validators/CApiInputValidator.php:1687
-#: include/classes/validators/CApiInputValidator.php:1774
-#: include/classes/validators/CApiInputValidator.php:1779
-#: include/classes/validators/CApiInputValidator.php:1806
-#: include/classes/validators/CApiInputValidator.php:1816
-#: include/classes/validators/CApiInputValidator.php:1848
-#: include/classes/validators/CApiInputValidator.php:1860
-#: include/classes/validators/CApiInputValidator.php:1892
-#: include/classes/validators/CApiInputValidator.php:1903
-#: include/classes/validators/CApiInputValidator.php:1926
-#: include/classes/validators/CApiInputValidator.php:1941
-#: include/classes/validators/CApiInputValidator.php:1994
-#: include/classes/validators/CApiInputValidator.php:2004
-#: include/classes/validators/CApiInputValidator.php:2009
-#: include/classes/validators/CApiInputValidator.php:2035
-#: include/classes/validators/CApiInputValidator.php:2042
+#: include/classes/validators/CApiInputValidator.php:290
+#: include/classes/validators/CApiInputValidator.php:295
+#: include/classes/validators/CApiInputValidator.php:300
+#: include/classes/validators/CApiInputValidator.php:327
+#: include/classes/validators/CApiInputValidator.php:357
+#: include/classes/validators/CApiInputValidator.php:418
+#: include/classes/validators/CApiInputValidator.php:425
+#: include/classes/validators/CApiInputValidator.php:457
+#: include/classes/validators/CApiInputValidator.php:462
+#: include/classes/validators/CApiInputValidator.php:504
+#: include/classes/validators/CApiInputValidator.php:509
+#: include/classes/validators/CApiInputValidator.php:543
+#: include/classes/validators/CApiInputValidator.php:548
+#: include/classes/validators/CApiInputValidator.php:589
+#: include/classes/validators/CApiInputValidator.php:594
+#: include/classes/validators/CApiInputValidator.php:648
+#: include/classes/validators/CApiInputValidator.php:682
+#: include/classes/validators/CApiInputValidator.php:687
+#: include/classes/validators/CApiInputValidator.php:743
+#: include/classes/validators/CApiInputValidator.php:776
+#: include/classes/validators/CApiInputValidator.php:781
+#: include/classes/validators/CApiInputValidator.php:822
+#: include/classes/validators/CApiInputValidator.php:827
+#: include/classes/validators/CApiInputValidator.php:832
+#: include/classes/validators/CApiInputValidator.php:868
+#: include/classes/validators/CApiInputValidator.php:923
+#: include/classes/validators/CApiInputValidator.php:930
+#: include/classes/validators/CApiInputValidator.php:957
+#: include/classes/validators/CApiInputValidator.php:1002
+#: include/classes/validators/CApiInputValidator.php:1029
+#: include/classes/validators/CApiInputValidator.php:1034
+#: include/classes/validators/CApiInputValidator.php:1041
+#: include/classes/validators/CApiInputValidator.php:1072
+#: include/classes/validators/CApiInputValidator.php:1117
+#: include/classes/validators/CApiInputValidator.php:1122
+#: include/classes/validators/CApiInputValidator.php:1159
+#: include/classes/validators/CApiInputValidator.php:1164
+#: include/classes/validators/CApiInputValidator.php:1209
+#: include/classes/validators/CApiInputValidator.php:1218
+#: include/classes/validators/CApiInputValidator.php:1224
+#: include/classes/validators/CApiInputValidator.php:1252
+#: include/classes/validators/CApiInputValidator.php:1262
+#: include/classes/validators/CApiInputValidator.php:1268
+#: include/classes/validators/CApiInputValidator.php:1306
+#: include/classes/validators/CApiInputValidator.php:1318
+#: include/classes/validators/CApiInputValidator.php:1327
+#: include/classes/validators/CApiInputValidator.php:1334
+#: include/classes/validators/CApiInputValidator.php:1339
+#: include/classes/validators/CApiInputValidator.php:1371
+#: include/classes/validators/CApiInputValidator.php:1381
+#: include/classes/validators/CApiInputValidator.php:1406
+#: include/classes/validators/CApiInputValidator.php:1411
+#: include/classes/validators/CApiInputValidator.php:1435
+#: include/classes/validators/CApiInputValidator.php:1440
+#: include/classes/validators/CApiInputValidator.php:1466
+#: include/classes/validators/CApiInputValidator.php:1473
+#: include/classes/validators/CApiInputValidator.php:1500
+#: include/classes/validators/CApiInputValidator.php:1507
+#: include/classes/validators/CApiInputValidator.php:1534
+#: include/classes/validators/CApiInputValidator.php:1543
+#: include/classes/validators/CApiInputValidator.php:1580
+#: include/classes/validators/CApiInputValidator.php:1596
+#: include/classes/validators/CApiInputValidator.php:1607
+#: include/classes/validators/CApiInputValidator.php:1640
+#: include/classes/validators/CApiInputValidator.php:1695
+#: include/classes/validators/CApiInputValidator.php:1782
+#: include/classes/validators/CApiInputValidator.php:1787
+#: include/classes/validators/CApiInputValidator.php:1814
+#: include/classes/validators/CApiInputValidator.php:1824
+#: include/classes/validators/CApiInputValidator.php:1856
+#: include/classes/validators/CApiInputValidator.php:1868
+#: include/classes/validators/CApiInputValidator.php:1900
+#: include/classes/validators/CApiInputValidator.php:1911
+#: include/classes/validators/CApiInputValidator.php:1934
+#: include/classes/validators/CApiInputValidator.php:1949
+#: include/classes/validators/CApiInputValidator.php:2002
+#: include/classes/validators/CApiInputValidator.php:2012
+#: include/classes/validators/CApiInputValidator.php:2017
+#: include/classes/validators/CApiInputValidator.php:2043
+#: include/classes/validators/CApiInputValidator.php:2050
+#: include/classes/validators/CApiInputValidator.php:2072
+#: include/classes/validators/CApiInputValidator.php:2092
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:130
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
@@ -9976,7 +9958,7 @@ msgstr "Ugyldig antall parametere."
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr "Ugyldig parameter \"%1$s\" : %2$s."
 
-#: include/classes/core/CJsonRpc.php:203
+#: include/classes/core/CJsonRpc.php:190
 msgid "Invalid params."
 msgstr "Ugyldige parametere."
 
@@ -10070,7 +10052,7 @@ msgstr ""
 msgid "Inventory"
 msgstr "Inventar"
 
-#: include/classes/api/services/CHost.php:1220
+#: include/classes/api/services/CHost.php:1252
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventar deaktivert for verten \"%1$s\"."
@@ -10122,12 +10104,12 @@ msgstr "Italiensk (it_IT)"
 #: include/views/configuration.item.massupdate.php:525
 #: include/views/monitoring.screen.constructor.edit.php:228
 #: include/views/monitoring.screen.constructor.edit.php:378
-#: include/views/monitoring.screen.constructor.edit.php:701 items.php:953
+#: include/views/monitoring.screen.constructor.edit.php:702 items.php:953
 #: items.php:1383
 msgid "Item"
 msgstr "artikkel"
 
-#: include/classes/api/services/CHostPrototype.php:1137
+#: include/classes/api/services/CHostPrototype.php:1149
 #: include/classes/api/services/CItem.php:52
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -10417,22 +10399,10 @@ msgstr ""
 msgid "JSON string is expected"
 msgstr "JSON-streng er forventet"
 
-#: include/classes/core/CJsonRpc.php:161
+#: include/classes/core/CJsonRpc.php:150
 #, c-format
-msgid "JSON-rpc error generation failed. No such error \"%1$s\"."
+msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
 msgstr ""
-
-#: include/classes/core/CJsonRpc.php:116
-msgid "JSON-rpc method is not defined."
-msgstr "JSON-rpc-metoden er ikke definert."
-
-#: include/classes/core/CJsonRpc.php:122
-msgid "JSON-rpc params is not an Array."
-msgstr "JSON-rpc-parameter er ikke et Array."
-
-#: include/classes/core/CJsonRpc.php:102
-msgid "JSON-rpc version is not specified."
-msgstr "JSON-rpc-versjonen er ikke spesifisert."
 
 #: include/items.inc.php:1807
 #: include/views/configuration.host.discovery.edit.php:759
@@ -10653,7 +10623,7 @@ msgstr "Siste 7 dager"
 msgid "Last change"
 msgstr "Siste endring"
 
-#: include/views/monitoring.screen.constructor.edit.php:513
+#: include/views/monitoring.screen.constructor.edit.php:514
 msgid "Last change (descending)"
 msgstr "Siste endring (synkende)"
 
@@ -10737,8 +10707,8 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:645
 #: include/views/monitoring.overview.items.php:81
 #: include/views/monitoring.overview.triggers.php:117
-#: include/views/monitoring.screen.constructor.edit.php:747
-#: include/views/monitoring.screen.constructor.edit.php:799
+#: include/views/monitoring.screen.constructor.edit.php:748
+#: include/views/monitoring.screen.constructor.edit.php:800
 #: include/views/monitoring.sysmap.edit.php:249
 msgid "Left"
 msgstr "Venstre"
@@ -10952,7 +10922,7 @@ msgstr "Lokal"
 #: include/classes/screens/CScreenHistory.php:268
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
 #: include/views/monitoring.history.php:289
-#: include/views/monitoring.screen.constructor.edit.php:679
+#: include/views/monitoring.screen.constructor.edit.php:680
 msgid "Local time"
 msgstr "Lokal tid"
 
@@ -11142,8 +11112,8 @@ msgstr "Vedlikehold"
 
 #: include/classes/api/services/CMaintenance.php:338
 #: include/classes/api/services/CMaintenance.php:352
-#: include/classes/api/services/CMaintenance.php:584
-#: include/classes/api/services/CMaintenance.php:740
+#: include/classes/api/services/CMaintenance.php:586
+#: include/classes/api/services/CMaintenance.php:742
 #, c-format
 msgid "Maintenance \"%1$s\" already exists."
 msgstr "Vedlikehold \"%1$s\" eksisterer allerede."
@@ -11153,7 +11123,7 @@ msgstr "Vedlikehold \"%1$s\" eksisterer allerede."
 msgid "Maintenance \"%1$s\" value cannot be bigger than \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMaintenance.php:626
+#: include/classes/api/services/CMaintenance.php:628
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "Vedlikeholdsverdien \"Aktiv siden\" kan ikke være større enn \"Aktiv til\"."
 
@@ -11339,7 +11309,7 @@ msgstr "Marker valgt"
 msgid "Mask"
 msgstr "Maske"
 
-#: include/classes/screens/CScreenProblem.php:1155
+#: include/classes/screens/CScreenProblem.php:1144
 #: include/views/configuration.host.list.php:489
 #: include/views/configuration.item.list.php:264
 #: include/views/configuration.item.prototype.list.php:198
@@ -11410,7 +11380,7 @@ msgstr "Maks antall åpne filer støttet av OS. Returnerer heltall"
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Maks antall prosesser som støttes av OS. Returnerer heltall"
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:252
+#: app/controllers/CControllerTimeSelectorUpdate.php:250
 #: include/classes/mvc/CController.php:259
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:451
 #: include/validate.inc.php:477
@@ -11582,7 +11552,7 @@ msgid "Message/Command"
 msgstr ""
 
 #: app/views/administration.authentication.edit.php:201
-#: include/classes/screens/CScreenProblem.php:1237
+#: include/classes/screens/CScreenProblem.php:1226
 msgid "Messages"
 msgstr "meldinger"
 
@@ -11590,7 +11560,7 @@ msgstr "meldinger"
 msgid "Messaging"
 msgstr "Meldinger"
 
-#: include/classes/core/CJsonRpc.php:198
+#: include/classes/core/CJsonRpc.php:185
 msgid "Method not found."
 msgstr "Metode ikke funnet."
 
@@ -11599,7 +11569,7 @@ msgid "Microsoft Edge"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:41
-#: include/views/monitoring.screen.constructor.edit.php:812
+#: include/views/monitoring.screen.constructor.edit.php:813
 msgid "Middle"
 msgstr "Midten"
 
@@ -11646,7 +11616,7 @@ msgstr ""
 msgid "Minimum severity"
 msgstr "Minste alvorlighetsgrad"
 
-#: app/controllers/CControllerTimeSelectorUpdate.php:247
+#: app/controllers/CControllerTimeSelectorUpdate.php:245
 #: include/classes/mvc/CController.php:252
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:446
 #: include/validate.inc.php:470
@@ -11720,14 +11690,14 @@ msgstr "Modell"
 msgid "Module"
 msgstr ""
 
-#: app/controllers/CControllerModuleScan.php:102
+#: app/controllers/CControllerModuleScan.php:98
 #, c-format
 msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/controllers/CControllerModuleScan.php:117
+#: app/controllers/CControllerModuleScan.php:113
 #, c-format
 msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
@@ -11770,7 +11740,7 @@ msgstr ""
 msgid "Modules"
 msgstr ""
 
-#: app/controllers/CControllerModuleScan.php:131
+#: app/controllers/CControllerModuleScan.php:127
 msgid "Modules updated"
 msgstr ""
 
@@ -11889,7 +11859,7 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupLldOverride.php:79
 #: app/controllers/CControllerPopupTriggerWizard.php:136
 #: app/controllers/CControllerRegExCreate.php:78
-#: app/controllers/CControllerRegExDelete.php:68
+#: app/controllers/CControllerRegExDelete.php:64
 #: app/controllers/CControllerRegExUpdate.php:87
 #: app/partials/common.filter.trigger.php:114
 #: app/partials/configuration.tags.tab.php:39
@@ -11905,8 +11875,8 @@ msgstr "NTLM"
 #: app/views/administration.mediatype.list.php:43
 #: app/views/administration.mediatype.list.php:73
 #: app/views/administration.module.edit.php:38
-#: app/views/administration.module.list.php:45
-#: app/views/administration.module.list.php:70
+#: app/views/administration.module.list.php:44
+#: app/views/administration.module.list.php:69
 #: app/views/administration.proxy.list.php:42
 #: app/views/administration.proxy.list.php:68
 #: app/views/administration.regex.edit.php:105
@@ -12165,9 +12135,10 @@ msgid "Next step"
 msgstr "Neste steg"
 
 #: app/views/administration.user.list.php:135
-#: app/views/administration.user.list.php:139
-#: app/views/monitoring.widget.problems.view.php:269
-#: app/views/monitoring.widget.problems.view.php:273
+#: app/views/administration.user.list.php:139 app/views/hint.box.php:179
+#: app/views/hint.box.php:183
+#: app/views/monitoring.widget.problems.view.php:267
+#: app/views/monitoring.widget.problems.view.php:271
 #: app/views/popup.condition.common.php:662
 #: app/views/popup.lldoperation.php:85 app/views/popup.lldoperation.php:97
 #: include/actions.inc.php:33 include/blocks.inc.php:665
@@ -12175,12 +12146,11 @@ msgstr "Neste steg"
 #: include/blocks.inc.php:946
 #: include/classes/screens/CScreenHostTriggers.php:293
 #: include/classes/screens/CScreenHostTriggers.php:297
-#: include/classes/screens/CScreenProblem.php:1119
-#: include/classes/screens/CScreenProblem.php:1123
-#: include/classes/screens/CScreenProblem.php:1265 include/events.inc.php:195
+#: include/classes/screens/CScreenProblem.php:1108
+#: include/classes/screens/CScreenProblem.php:1112
+#: include/classes/screens/CScreenProblem.php:1254 include/events.inc.php:195
 #: include/events.inc.php:199 include/events.inc.php:393
-#: include/events.inc.php:397 include/events.inc.php:651
-#: include/events.inc.php:655 include/triggers.inc.php:1217
+#: include/events.inc.php:397 include/triggers.inc.php:1217
 #: include/triggers.inc.php:1222
 #: include/views/configuration.graph.list.php:190
 #: include/views/configuration.host.prototype.list.php:135
@@ -12340,13 +12310,13 @@ msgid "No data."
 msgstr "Ingen data."
 
 #: include/classes/api/services/CHostInterface.php:1019
-#: include/classes/api/services/CHostPrototype.php:1691
+#: include/classes/api/services/CHostPrototype.php:1703
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Ingen standardgrensesnitt for \"%1$s\" type på \"%2$s\"."
 
-#: include/classes/core/CJsonRpc.php:214 include/classes/core/CJsonRpc.php:219
-#: include/classes/core/CJsonRpc.php:224
+#: include/classes/core/CJsonRpc.php:201 include/classes/core/CJsonRpc.php:206
+#: include/classes/core/CJsonRpc.php:211
 msgid "No details"
 msgstr "Ingen detaljer"
 
@@ -12496,7 +12466,7 @@ msgstr "Ingen kart lagt til."
 msgid "No matches found"
 msgstr "Ingen treff funnet"
 
-#: app/controllers/CControllerModuleScan.php:132
+#: app/controllers/CControllerModuleScan.php:128
 msgid "No new modules discovered"
 msgstr ""
 
@@ -12510,7 +12480,7 @@ msgstr "Ingen operasjonstype gitt for korrelasjon \"%1$s\"."
 msgid "No permissions for system access."
 msgstr "Ingen tillatelser for systemtilgang."
 
-#: include/classes/api/clients/CLocalApiClient.php:115
+#: include/classes/api/clients/CLocalApiClient.php:105
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr ""
@@ -12521,6 +12491,7 @@ msgstr ""
 #: app/controllers/CControllerDashboardShareUpdate.php:93
 #: app/controllers/CControllerDashboardView.php:186
 #: app/controllers/CControllerDashboardView.php:229
+#: app/controllers/CControllerHintBox.php:153
 #: app/controllers/CControllerHostDashboardView.php:116
 #: app/controllers/CControllerMenuPopup.php:74
 #: app/controllers/CControllerMenuPopup.php:176
@@ -12579,28 +12550,28 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:718
 #: include/classes/api/services/CHostBase.php:56
 #: include/classes/api/services/CHostGeneral.php:66
-#: include/classes/api/services/CHostGroup.php:747
-#: include/classes/api/services/CHostGroup.php:851
-#: include/classes/api/services/CHostGroup.php:1090
-#: include/classes/api/services/CHostGroup.php:1121
-#: include/classes/api/services/CHostGroup.php:1222
-#: include/classes/api/services/CHostGroup.php:1344
-#: include/classes/api/services/CHostGroup.php:1364
+#: include/classes/api/services/CHostGroup.php:780
+#: include/classes/api/services/CHostGroup.php:884
+#: include/classes/api/services/CHostGroup.php:1123
+#: include/classes/api/services/CHostGroup.php:1154
+#: include/classes/api/services/CHostGroup.php:1255
+#: include/classes/api/services/CHostGroup.php:1377
+#: include/classes/api/services/CHostGroup.php:1397
 #: include/classes/api/services/CHostInterface.php:301
 #: include/classes/api/services/CHostInterface.php:321
 #: include/classes/api/services/CHostInterface.php:595
 #: include/classes/api/services/CHostInterface.php:866
 #: include/classes/api/services/CHostInterface.php:895
-#: include/classes/api/services/CHost.php:1347
-#: include/classes/api/services/CHost.php:1382
-#: include/classes/api/services/CHost.php:2008
-#: include/classes/api/services/CHost.php:2141
-#: include/classes/api/services/CHostPrototype.php:488
-#: include/classes/api/services/CHostPrototype.php:534
-#: include/classes/api/services/CHostPrototype.php:555
-#: include/classes/api/services/CHostPrototype.php:1162
-#: include/classes/api/services/CHostPrototype.php:1184
-#: include/classes/api/services/CHostPrototype.php:1218
+#: include/classes/api/services/CHost.php:1379
+#: include/classes/api/services/CHost.php:1414
+#: include/classes/api/services/CHost.php:2038
+#: include/classes/api/services/CHost.php:2171
+#: include/classes/api/services/CHostPrototype.php:500
+#: include/classes/api/services/CHostPrototype.php:546
+#: include/classes/api/services/CHostPrototype.php:567
+#: include/classes/api/services/CHostPrototype.php:1174
+#: include/classes/api/services/CHostPrototype.php:1196
+#: include/classes/api/services/CHostPrototype.php:1230
 #: include/classes/api/services/CHousekeeping.php:170
 #: include/classes/api/services/CHttpTest.php:453
 #: include/classes/api/services/CHttpTest.php:546
@@ -12620,10 +12591,10 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:270
 #: include/classes/api/services/CMaintenance.php:299
 #: include/classes/api/services/CMaintenance.php:312
-#: include/classes/api/services/CMaintenance.php:573
-#: include/classes/api/services/CMaintenance.php:655
-#: include/classes/api/services/CMaintenance.php:757
-#: include/classes/api/services/CMaintenance.php:775
+#: include/classes/api/services/CMaintenance.php:575
+#: include/classes/api/services/CMaintenance.php:657
+#: include/classes/api/services/CMaintenance.php:759
+#: include/classes/api/services/CMaintenance.php:777
 #: include/classes/api/services/CMapElement.php:189
 #: include/classes/api/services/CMapElement.php:319
 #: include/classes/api/services/CMap.php:574
@@ -12658,8 +12629,7 @@ msgstr ""
 #: include/classes/api/services/CTemplateDashboard.php:233
 #: include/classes/api/services/CTemplateDashboard.php:295
 #: include/classes/api/services/CTemplateDashboard.php:342
-#: include/classes/api/services/CTemplate.php:822
-#: include/classes/api/services/CTemplate.php:844
+#: include/classes/api/services/CTemplate.php:842
 #: include/classes/api/services/CTriggerGeneral.php:964
 #: include/classes/api/services/CTrigger.php:654
 #: include/classes/api/services/CTrigger.php:701
@@ -12744,7 +12714,7 @@ msgstr "Ingen utløsere definert."
 msgid "No value"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:885
+#: include/classes/validators/CApiInputValidator.php:893
 msgid "Non-boolean flags are deprecated."
 msgstr "Ikke-boolske flagg er foreldet."
 
@@ -12823,7 +12793,7 @@ msgstr "Ikke lov til å angi passord for brukerens \"gjest\"."
 msgid "Not allowed to set theme for user \"guest\"."
 msgstr ""
 
-#: include/classes/api/clients/CLocalApiClient.php:174
+#: include/classes/api/clients/CLocalApiClient.php:164
 msgid "Not authorised."
 msgstr "Ikke autorisert."
 
@@ -13177,7 +13147,7 @@ msgstr "En gang"
 msgid "One"
 msgstr "En"
 
-#: include/classes/api/services/CHostGroup.php:1232
+#: include/classes/api/services/CHostGroup.php:1265
 msgid "One of the objects is left without a host group."
 msgstr "En av objektene er igjen uten vertsgruppe."
 
@@ -13190,7 +13160,7 @@ msgstr "Kun en gang"
 msgid "One-time downtime"
 msgstr "Engangs nedetid"
 
-#: include/classes/api/services/CHostGroup.php:706
+#: include/classes/api/services/CHostGroup.php:739
 msgid "Only Super Admins can create host groups."
 msgstr "Bare superadministratorer kan opprette vertsgrupper."
 
@@ -13335,8 +13305,8 @@ msgid "Operation type"
 msgstr "Operasjonstype"
 
 #: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:818
-#: include/classes/screens/CScreenProblem.php:911
-#: include/classes/screens/CScreenProblem.php:1180 include/events.inc.php:181
+#: include/classes/screens/CScreenProblem.php:900
+#: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:181
 #: include/views/configuration.trigger.prototype.edit.php:80
 #: include/views/configuration.trigger.prototype.list.php:56
 #: include/views/configuration.triggers.edit.php:101
@@ -13733,13 +13703,13 @@ msgstr "PHP xmlwriter-utvidelsen mangler."
 msgid "POP"
 msgstr "POP"
 
+#: app/views/hint.box.php:117
 #: app/views/monitoring.widget.problems.view.php:109 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:1072
+#: include/classes/graph/CSvgGraph.php:1075
 #: include/classes/screens/CScreenEvents.php:114
-#: include/classes/screens/CScreenProblem.php:995
-#: include/classes/screens/CScreenProblem.php:1205 include/events.inc.php:377
-#: include/events.inc.php:587 include/triggers.inc.php:250
-#: include/views/monitoring.overview.items.php:36
+#: include/classes/screens/CScreenProblem.php:984
+#: include/classes/screens/CScreenProblem.php:1194 include/events.inc.php:377
+#: include/triggers.inc.php:250 include/views/monitoring.overview.items.php:36
 #: include/views/monitoring.overview.triggers.php:45
 msgid "PROBLEM"
 msgstr "PROBLEM"
@@ -13801,7 +13771,7 @@ msgstr "Parameter"
 
 #: include/classes/api/services/CUser.php:318
 #: include/classes/api/services/CUser.php:477
-#: include/classes/validators/CApiInputValidator.php:945
+#: include/classes/validators/CApiInputValidator.php:953
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
 msgstr "Parameteret \"%1$s\" er utdatert."
@@ -13861,7 +13831,7 @@ msgstr "Tolk"
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "Parsel SQL-feil [%1$s] i [%2$s]."
 
-#: include/classes/core/CJsonRpc.php:188
+#: include/classes/core/CJsonRpc.php:175
 msgid "Parse error"
 msgstr "Parsefeil"
 
@@ -14258,10 +14228,10 @@ msgstr "Privilege nivå"
 #: app/views/popup.acknowledge.edit.php:33
 #: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:817
 #: include/classes/helpers/CMediatypeHelper.php:45
-#: include/classes/screens/CScreenProblem.php:886
-#: include/classes/screens/CScreenProblem.php:909
-#: include/classes/screens/CScreenProblem.php:1086
-#: include/classes/screens/CScreenProblem.php:1179
+#: include/classes/screens/CScreenProblem.php:875
+#: include/classes/screens/CScreenProblem.php:898
+#: include/classes/screens/CScreenProblem.php:1075
+#: include/classes/screens/CScreenProblem.php:1168
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:61
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:61
 #: include/classes/widgets/forms/CWidgetFormProblems.php:76
@@ -14394,9 +14364,9 @@ msgstr "Egenskaper"
 
 #: app/controllers/CControllerMenuPopup.php:305
 #: app/controllers/CControllerMenuPopup.php:607
-#: app/controllers/CControllerWidgetUrlView.php:64
+#: app/controllers/CControllerWidgetUrlView.php:64 app/views/hint.box.php:45
 #: include/classes/helpers/CVaultHelper.php:107
-#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:470
+#: include/classes/screens/CScreenUrl.php:70
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr ""
@@ -14525,12 +14495,11 @@ msgstr ""
 msgid "Queue overview by proxy"
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:1068
+#: app/views/hint.box.php:101 app/views/monitoring.widget.problems.view.php:93
+#: include/classes/graph/CSvgGraph.php:1071
 #: include/classes/screens/CScreenEvents.php:119
-#: include/classes/screens/CScreenProblem.php:979
-#: include/classes/screens/CScreenProblem.php:1193 include/events.inc.php:361
-#: include/events.inc.php:571
+#: include/classes/screens/CScreenProblem.php:968
+#: include/classes/screens/CScreenProblem.php:1182 include/events.inc.php:361
 msgid "RESOLVED"
 msgstr "LØST"
 
@@ -14615,11 +14584,11 @@ msgstr "Nylige problemer"
 msgid "Recipient"
 msgstr "Mottaker"
 
-#: include/views/monitoring.screen.constructor.edit.php:543
+#: include/views/monitoring.screen.constructor.edit.php:544
 msgid "Recipient (ascending)"
 msgstr "Mottaker (stigende)"
 
-#: include/views/monitoring.screen.constructor.edit.php:542
+#: include/views/monitoring.screen.constructor.edit.php:543
 msgid "Recipient (descending)"
 msgstr "Mottaker (synkende)"
 
@@ -14628,7 +14597,7 @@ msgid "Recipients"
 msgstr ""
 
 #: app/views/administration.user.edit.php:529
-#: include/classes/screens/CScreenProblem.php:1087
+#: include/classes/screens/CScreenProblem.php:1076
 #: include/views/configuration.item.list.php:175
 #: include/views/configuration.trigger.prototype.list.php:153
 #: include/views/configuration.triggers.list.php:304
@@ -14653,12 +14622,11 @@ msgstr "Syntaksfeil for gjenopprettingsuttrykk."
 msgid "Recovery operations"
 msgstr "Gjenopprettingsoperasjoner"
 
-#: app/views/monitoring.widget.problems.view.php:55
+#: app/views/hint.box.php:74 app/views/monitoring.widget.problems.view.php:55
 #: include/classes/screens/CScreenEvents.php:30
-#: include/classes/screens/CScreenProblem.php:881
-#: include/classes/screens/CScreenProblem.php:904
-#: include/classes/screens/CScreenProblem.php:1176 include/events.inc.php:282
-#: include/events.inc.php:498
+#: include/classes/screens/CScreenProblem.php:870
+#: include/classes/screens/CScreenProblem.php:893
+#: include/classes/screens/CScreenProblem.php:1165 include/events.inc.php:282
 msgid "Recovery time"
 msgstr "Restitusjonstid"
 
@@ -14699,7 +14667,7 @@ msgstr ""
 msgid "Regular expression added"
 msgstr "Regelmessig uttrykk lagt til"
 
-#: app/controllers/CControllerRegExDelete.php:78
+#: app/controllers/CControllerRegExDelete.php:74
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Vanlig uttrykk slettet"
@@ -15051,26 +15019,26 @@ msgstr "Løst av"
 
 #: app/views/monitoring.widget.problems.view.php:154
 #: include/classes/screens/CScreenHostTriggers.php:255
-#: include/classes/screens/CScreenProblem.php:1011
+#: include/classes/screens/CScreenProblem.php:1000
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "Løst av korrelasjonsregel \"%1$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:157
 #: include/classes/screens/CScreenHostTriggers.php:258
-#: include/classes/screens/CScreenProblem.php:1014
+#: include/classes/screens/CScreenProblem.php:1003
 msgid "Resolved by correlation rule."
 msgstr "Løst av korrelasjonsregel."
 
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenHostTriggers.php:265
-#: include/classes/screens/CScreenProblem.php:1021
+#: include/classes/screens/CScreenProblem.php:1010
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:163
 #: include/classes/screens/CScreenHostTriggers.php:264
-#: include/classes/screens/CScreenProblem.php:1020
+#: include/classes/screens/CScreenProblem.php:1009
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "Løst av bruker \"%1$s\"."
@@ -15212,7 +15180,7 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:36
 #: include/views/js/monitoring.sysmaps.js.php:148
 #: include/views/js/monitoring.sysmaps.js.php:646
-#: include/views/monitoring.screen.constructor.edit.php:801
+#: include/views/monitoring.screen.constructor.edit.php:802
 #: include/views/monitoring.sysmap.edit.php:250
 msgid "Right"
 msgstr "Ikke sant"
@@ -15245,7 +15213,7 @@ msgstr "Rå lagt til"
 msgid "Row deleted"
 msgstr "Rad slettet"
 
-#: include/views/monitoring.screen.constructor.edit.php:823 screenedit.php:76
+#: include/views/monitoring.screen.constructor.edit.php:824 screenedit.php:76
 msgid "Row span"
 msgstr "Radspenning"
 
@@ -15462,13 +15430,12 @@ msgstr "SQL-teller: %1$s (velges: %2$s | kjører ut: %3$s)"
 msgid "SQL query"
 msgstr "SQL spørring"
 
-#: include/classes/db/DB.php:880
+#: include/classes/db/DB.php:881
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "SQL setningsutførelse har mislyktes \"%1$s\""
 
-#: include/classes/db/DB.php:501 include/classes/db/DB.php:548
-#: include/classes/db/DB.php:607
+#: include/classes/db/DB.php:549 include/classes/db/DB.php:608
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "SQL setningens utførelse har mislyktes \"%1$s\"."
@@ -15564,7 +15531,7 @@ msgstr "Lagre endringer"
 msgid "Save it as \"%1$s\""
 msgstr "Lagre det som \"%1$s\""
 
-#: app/views/administration.module.list.php:35
+#: app/views/administration.module.list.php:34
 msgid "Scan directory"
 msgstr ""
 
@@ -15835,7 +15802,7 @@ msgstr "Sikkerhetsnavn"
 #: include/views/monitoring.overview.items.php:140
 #: include/views/monitoring.screen.constructor.edit.php:284
 #: include/views/monitoring.screen.constructor.edit.php:341
-#: include/views/monitoring.screen.constructor.edit.php:608 jsLoader.php:268
+#: include/views/monitoring.screen.constructor.edit.php:609 jsLoader.php:268
 msgid "Select"
 msgstr "Valgt"
 
@@ -15974,7 +15941,7 @@ msgid "Server (proxy)"
 msgstr "Server (proxy)"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
-#: include/views/monitoring.screen.constructor.edit.php:680
+#: include/views/monitoring.screen.constructor.edit.php:681
 msgid "Server time"
 msgstr "Server tid"
 
@@ -16125,9 +16092,9 @@ msgstr ""
 #: app/views/popup.lldoperation.php:227 app/views/popup.triggerwizard.php:93
 #: include/classes/screens/CScreenEvents.php:31
 #: include/classes/screens/CScreenHistory.php:273
-#: include/classes/screens/CScreenProblem.php:878
-#: include/classes/screens/CScreenProblem.php:900
-#: include/classes/screens/CScreenProblem.php:1174
+#: include/classes/screens/CScreenProblem.php:867
+#: include/classes/screens/CScreenProblem.php:889
+#: include/classes/screens/CScreenProblem.php:1163
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:70
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:70
 #: include/classes/widgets/forms/CWidgetFormProblems.php:85
@@ -16148,7 +16115,7 @@ msgstr ""
 msgid "Severity"
 msgstr "Viktighet"
 
-#: include/views/monitoring.screen.constructor.edit.php:514
+#: include/views/monitoring.screen.constructor.edit.php:515
 msgid "Severity (descending)"
 msgstr "Alvorlighetsgrad (synkende)"
 
@@ -16158,7 +16125,7 @@ msgid "Severity changed"
 msgstr ""
 
 #: include/actions.inc.php:1753
-#: include/classes/screens/CScreenProblem.php:1241
+#: include/classes/screens/CScreenProblem.php:1230
 msgid "Severity changes"
 msgstr ""
 
@@ -16254,9 +16221,9 @@ msgstr "Vis legenden"
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:55
 #: include/classes/widgets/forms/CWidgetFormProblems.php:231
 #: include/views/monitoring.screen.constructor.edit.php:407
-#: include/views/monitoring.screen.constructor.edit.php:502
-#: include/views/monitoring.screen.constructor.edit.php:525
-#: include/views/monitoring.screen.constructor.edit.php:553 screenedit.php:77
+#: include/views/monitoring.screen.constructor.edit.php:503
+#: include/views/monitoring.screen.constructor.edit.php:526
+#: include/views/monitoring.screen.constructor.edit.php:554 screenedit.php:77
 msgid "Show lines"
 msgstr "Vis linjer"
 
@@ -16559,7 +16526,7 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:30
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
-#: include/views/monitoring.screen.constructor.edit.php:531
+#: include/views/monitoring.screen.constructor.edit.php:532
 msgid "Sort entries by"
 msgstr "Sorter oppføringer etter"
 
@@ -16567,7 +16534,7 @@ msgstr "Sorter oppføringer etter"
 msgid "Sort order (0->999)"
 msgstr "Sorteringsrekkefølge (0-> 999)"
 
-#: include/views/monitoring.screen.constructor.edit.php:508
+#: include/views/monitoring.screen.constructor.edit.php:509
 msgid "Sort triggers by"
 msgstr "Sorter triggere av"
 
@@ -16662,24 +16629,24 @@ msgstr ""
 #: app/partials/monitoring.host.view.html.php:34
 #: app/views/administration.mediatype.list.php:48
 #: app/views/administration.mediatype.list.php:75
-#: app/views/administration.module.list.php:50
-#: app/views/administration.module.list.php:78
+#: app/views/administration.module.list.php:49
+#: app/views/administration.module.list.php:77
 #: app/views/administration.usergroup.list.php:49
 #: app/views/administration.usergroup.list.php:77
-#: app/views/administration.user.list.php:116
+#: app/views/administration.user.list.php:116 app/views/hint.box.php:75
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
 #: include/actions.inc.php:1833 include/actions.inc.php:1916
 #: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:109
-#: include/classes/screens/CScreenProblem.php:882
-#: include/classes/screens/CScreenProblem.php:906
-#: include/classes/screens/CScreenProblem.php:1177
+#: include/classes/screens/CScreenProblem.php:871
+#: include/classes/screens/CScreenProblem.php:895
+#: include/classes/screens/CScreenProblem.php:1166
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
-#: include/events.inc.php:283 include/events.inc.php:499
-#: include/forms.inc.php:245 include/forms.inc.php:692
+#: include/events.inc.php:283 include/forms.inc.php:245
+#: include/forms.inc.php:692
 #: include/views/administration.auditacts.list.php:67
 #: include/views/configuration.action.list.php:68
 #: include/views/configuration.action.list.php:91
@@ -16701,11 +16668,11 @@ msgstr ""
 msgid "Status"
 msgstr "Status"
 
-#: include/views/monitoring.screen.constructor.edit.php:541
+#: include/views/monitoring.screen.constructor.edit.php:542
 msgid "Status (ascending)"
 msgstr "Status (stigende)"
 
-#: include/views/monitoring.screen.constructor.edit.php:540
+#: include/views/monitoring.screen.constructor.edit.php:541
 msgid "Status (descending)"
 msgstr "Status (synkende)"
 
@@ -16825,7 +16792,7 @@ msgstr ""
 msgid "Structured data"
 msgstr "Strukturerte data"
 
-#: include/views/monitoring.screen.constructor.edit.php:737
+#: include/views/monitoring.screen.constructor.edit.php:738
 msgid "Style"
 msgstr "Stil"
 
@@ -16937,7 +16904,7 @@ msgstr "System standard"
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr ""
 
-#: include/classes/core/CJsonRpc.php:218
+#: include/classes/core/CJsonRpc.php:205
 msgid "System error."
 msgstr "Systemfeil."
 
@@ -17001,7 +16968,7 @@ msgstr "TRUE"
 msgid "Table \"%1$s\" does not exist."
 msgstr "Tabellen \"%1$s\" eksisterer ikke."
 
-#: include/classes/db/DB.php:449
+#: include/classes/db/DB.php:428
 #, c-format
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "Tabellen \"%1$s\" har ikke et felt som heter \"%2$s\"."
@@ -17043,18 +17010,17 @@ msgstr "Merkverdien"
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/monitoring.host.filter.php:126
 #: app/partials/monitoring.host.view.html.php:32
-#: app/partials/monitoring.problem.filter.php:231
+#: app/partials/monitoring.problem.filter.php:231 app/views/hint.box.php:78
 #: app/views/monitoring.widget.problems.view.php:68
 #: app/views/popup.lldoperation.php:264 include/blocks.inc.php:822
-#: include/classes/screens/CScreenProblem.php:860
-#: include/classes/screens/CScreenProblem.php:916
-#: include/classes/screens/CScreenProblem.php:1184
+#: include/classes/screens/CScreenProblem.php:849
+#: include/classes/screens/CScreenProblem.php:905
+#: include/classes/screens/CScreenProblem.php:1173
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:79
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:79
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
-#: include/events.inc.php:259 include/events.inc.php:502
-#: include/views/configuration.host.edit.php:352
+#: include/events.inc.php:259 include/views/configuration.host.edit.php:352
 #: include/views/configuration.host.list.php:170
 #: include/views/configuration.host.list.php:198
 #: include/views/configuration.host.massupdate.php:232
@@ -17109,16 +17075,16 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Mal"
 
-#: include/classes/api/services/CHost.php:1069
-#: include/classes/api/services/CTemplate.php:450
+#: include/classes/api/services/CHost.php:1101
+#: include/classes/api/services/CTemplate.php:486
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Mal \"%1$s\" eksisterer allerede."
 
-#: include/classes/api/services/CHostGroup.php:1511
-#: include/classes/api/services/CTemplate.php:384
-#: include/classes/api/services/CTemplate.php:1086
+#: include/classes/api/services/CHostGroup.php:1544
+#: include/classes/api/services/CTemplate.php:420
+#: include/classes/api/services/CTemplate.php:1084
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Mal \"%1$s\" kan ikke være uten vertsgruppe."
@@ -17136,7 +17102,7 @@ msgstr "Mal lagt til"
 msgid "Template and host properties that are inherited through template linkage will be unlinked and cleared."
 msgstr ""
 
-#: include/classes/api/services/CHostBase.php:267
+#: include/classes/api/services/CHostBase.php:292
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Mal kan ikke kobles til en annen mal mer enn en gang, selv gjennom andre maler."
 
@@ -17148,7 +17114,7 @@ msgstr ""
 msgid "Template dashboards"
 msgstr ""
 
-#: templates.php:707 templates.php:721 templates.php:754
+#: templates.php:704 templates.php:718 templates.php:751
 msgid "Template deleted"
 msgstr "Mal slettet"
 
@@ -17172,7 +17138,7 @@ msgstr "Malnavn"
 msgid "Template trigger"
 msgstr "Template utløser"
 
-#: templates.php:523
+#: templates.php:522
 msgid "Template updated"
 msgstr "Mal oppdatert"
 
@@ -17180,17 +17146,17 @@ msgstr "Mal oppdatert"
 msgid "Template value"
 msgstr "Mal verdi"
 
-#: include/classes/api/services/CHost.php:2100
-#: include/classes/api/services/CHost.php:2344
-#: include/classes/api/services/CTemplate.php:1141
+#: include/classes/api/services/CHost.php:2130
+#: include/classes/api/services/CHost.php:2374
+#: include/classes/api/services/CTemplate.php:1139
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Mal med samme navn \"%1$s\" eksisterer allerede."
 
-#: include/classes/api/services/CHost.php:2106
-#: include/classes/api/services/CHost.php:2352
-#: include/classes/api/services/CTemplate.php:473
-#: include/classes/api/services/CTemplate.php:1106
+#: include/classes/api/services/CHost.php:2136
+#: include/classes/api/services/CHost.php:2382
+#: include/classes/api/services/CTemplate.php:509
+#: include/classes/api/services/CTemplate.php:1104
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Mal med det samme synlige navnet \"%1$s\" eksisterer allerede."
@@ -17218,7 +17184,7 @@ msgstr "Mal med det samme synlige navnet \"%1$s\" eksisterer allerede."
 msgid "Templates"
 msgstr "maler"
 
-#: include/classes/api/services/CHostBase.php:245
+#: include/classes/api/services/CHostBase.php:205
 #, c-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Maler \"%1$s\" koblet fra verter \"%2$s\"."
@@ -17306,7 +17272,7 @@ msgstr ""
 msgid "Text"
 msgstr "Tekst"
 
-#: include/classes/api/clients/CLocalApiClient.php:99
+#: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "Metoden \"%1$s.%2$s\" må kalles uten \"auth\" -parameteren."
@@ -17411,11 +17377,11 @@ msgstr "Antall prosesser. Returnerer heltall"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
 
-#: include/classes/core/CJsonRpc.php:194
+#: include/classes/core/CJsonRpc.php:181
 msgid "The received JSON is not a valid JSON-RPC Request."
 msgstr "Den mottatte JSON er ikke en gyldig JSON-RPC-forespørsel."
 
-#: include/classes/core/CJsonRpc.php:199
+#: include/classes/core/CJsonRpc.php:186
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Den forespurte fjernprosedyren eksisterer ikke / er ikke tilgjengelig"
 
@@ -17511,6 +17477,7 @@ msgstr "Inntil"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:202
+#: app/views/hint.box.php:62 app/views/hint.box.php:68
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
 #: app/views/popup.itemtestedit.view.php:274
@@ -17520,14 +17487,13 @@ msgstr "Inntil"
 #: include/actions.inc.php:1916 include/actions.inc.php:1967
 #: include/blocks.inc.php:797 include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:30
-#: include/classes/screens/CScreenProblem.php:837
-#: include/classes/screens/CScreenProblem.php:1175
+#: include/classes/screens/CScreenProblem.php:826
+#: include/classes/screens/CScreenProblem.php:1164
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/events.inc.php:189 include/events.inc.php:281
-#: include/events.inc.php:486 include/events.inc.php:492
 #: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.services.edit.php:311
 #: include/views/configuration.services.edit.php:325
@@ -17535,11 +17501,11 @@ msgstr "Inntil"
 msgid "Time"
 msgstr "Tid"
 
-#: include/views/monitoring.screen.constructor.edit.php:537
+#: include/views/monitoring.screen.constructor.edit.php:538
 msgid "Time (ascending)"
 msgstr "Tid (stigende)"
 
-#: include/views/monitoring.screen.constructor.edit.php:536
+#: include/views/monitoring.screen.constructor.edit.php:537
 msgid "Time (descending)"
 msgstr "Tid (synkende)"
 
@@ -17577,7 +17543,7 @@ msgid "Time shift"
 msgstr "Time shift"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:31
-#: include/views/monitoring.screen.constructor.edit.php:673
+#: include/views/monitoring.screen.constructor.edit.php:674
 msgid "Time type"
 msgstr "Tidstype"
 
@@ -17622,7 +17588,7 @@ msgstr "Til"
 msgid "To set a host interface select a single item type for all items"
 msgstr "For å angi et vertsgrensesnitt, velg en enkelt gjenstandstype for alle elementer"
 
-#: include/classes/screens/CScreenProblem.php:722 include/func.inc.php:2479
+#: include/classes/screens/CScreenProblem.php:711 include/func.inc.php:2479
 #: srv_status.php:38
 msgid "Today"
 msgstr "I dag"
@@ -17639,8 +17605,8 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:647
 #: include/views/monitoring.overview.items.php:80
 #: include/views/monitoring.overview.triggers.php:116
-#: include/views/monitoring.screen.constructor.edit.php:748
-#: include/views/monitoring.screen.constructor.edit.php:811
+#: include/views/monitoring.screen.constructor.edit.php:749
+#: include/views/monitoring.screen.constructor.edit.php:812
 #: include/views/monitoring.sysmap.edit.php:251
 msgid "Top"
 msgstr "Topp"
@@ -17708,7 +17674,7 @@ msgstr ""
 msgid "Transparency"
 msgstr ""
 
-#: include/classes/core/CJsonRpc.php:223
+#: include/classes/core/CJsonRpc.php:210
 msgid "Transport error."
 msgstr "Transportfeil."
 
@@ -17820,7 +17786,7 @@ msgid_plural "Triggers enabled"
 msgstr[0] "Utløser aktivert"
 msgstr[1] "Utløsere aktivert"
 
-#: include/classes/api/services/CHostBase.php:160
+#: include/classes/api/services/CHostBase.php:166
 #, c-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
 msgstr "Trigger har elementer fra mal \"%1$s\" som ikke er koblet til verten."
@@ -18059,11 +18025,11 @@ msgstr "Type (full detaljer)"
 msgid "Type (OK)"
 msgstr "Skriv inn (OK)"
 
-#: include/views/monitoring.screen.constructor.edit.php:539
+#: include/views/monitoring.screen.constructor.edit.php:540
 msgid "Type (ascending)"
 msgstr "Type (stigende)"
 
-#: include/views/monitoring.screen.constructor.edit.php:538
+#: include/views/monitoring.screen.constructor.edit.php:539
 msgid "Type (descending)"
 msgstr "Type (synkende)"
 
@@ -18115,7 +18081,7 @@ msgstr "UKJENT"
 #: include/views/configuration.trigger.prototype.edit.php:526
 #: include/views/configuration.triggers.edit.php:552
 #: include/views/js/monitoring.sysmaps.js.php:298
-#: include/views/monitoring.screen.constructor.edit.php:757
+#: include/views/monitoring.screen.constructor.edit.php:758
 #: include/views/monitoring.sysmap.edit.php:278 items.php:167 jsLoader.php:313
 msgid "URL"
 msgstr "URL"
@@ -18352,32 +18318,32 @@ msgstr "Fjern koblingen fra mal"
 msgid "Unlink from templates"
 msgstr "Fjern kobling fra maler"
 
-#: include/classes/api/services/CHostGeneral.php:632
+#: include/classes/api/services/CHostGeneral.php:621
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Ukoblet: Program \"%1$s\" på \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:446
+#: include/classes/api/services/CHostGeneral.php:435
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Ukoblet: Oppdagelsesregel \"%1$s\" på \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:536
+#: include/classes/api/services/CHostGeneral.php:525
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ukoblet: Vertsprototype \"%1$s\" på \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:462
+#: include/classes/api/services/CHostGeneral.php:451
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Ukoblet: Element \"%1$s\" på \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:481
+#: include/classes/api/services/CHostGeneral.php:470
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ukoblet: Vare prototype \"%1$s\" på \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:574
+#: include/classes/api/services/CHostGeneral.php:563
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Ukoblet: Webscenario \"%1$s\" på \"%2$s\"."
@@ -18494,7 +18460,7 @@ msgstr "Opp"
 #: include/views/configuration.trigger.prototype.massupdate.php:193
 #: include/views/configuration.triggers.edit.php:637
 #: include/views/configuration.triggers.massupdate.php:173
-#: include/views/monitoring.screen.constructor.edit.php:848
+#: include/views/monitoring.screen.constructor.edit.php:849
 #: include/views/monitoring.screen.edit.php:213
 #: include/views/monitoring.slideconf.edit.php:277
 #: include/views/monitoring.sysmap.constructor.php:76
@@ -18531,7 +18497,7 @@ msgstr ""
 msgid "Update problem"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1315
+#: include/classes/api/services/CHost.php:1347
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "Oppdatert status for verten \"%1$s\"."
@@ -19227,7 +19193,7 @@ msgstr "Verdi \"%1$s\" er ugyldig for parameter \"grid_show\". Valg er: \"%2$s\"
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "Verdi \"%1$s\" er ugyldig for parameter \"grid_show\". Valg er: \"%2$s\"."
 
-#: include/classes/db/DB.php:362 include/classes/db/DB.php:391
+#: include/classes/db/DB.php:341 include/classes/db/DB.php:370
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Verdien \"%1$s\" er for lang for felt \"%2$s\" %3$d tegn. Tillatt lengde er %4$d tegn."
@@ -19258,7 +19224,7 @@ msgstr "Verdikart \"%1$s\" eksisterer allerede."
 msgid "Value map added"
 msgstr "Verdikart lagt til"
 
-#: app/controllers/CControllerValuemapDelete.php:67
+#: app/controllers/CControllerValuemapDelete.php:63
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Verdikkart slettet"
@@ -19368,7 +19334,7 @@ msgid "Verify database certificate"
 msgstr ""
 
 #: app/views/administration.module.edit.php:39
-#: app/views/administration.module.list.php:75 include/items.inc.php:1259
+#: app/views/administration.module.list.php:74 include/items.inc.php:1259
 #: include/items.inc.php:1263
 msgid "Version"
 msgstr ""
@@ -19384,13 +19350,13 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:50
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:123
-#: include/views/monitoring.screen.constructor.edit.php:740
+#: include/views/monitoring.screen.constructor.edit.php:741
 msgid "Vertical"
 msgstr "Vertikal"
 
 #: include/views/js/monitoring.sysmaps.js.php:376
 #: include/views/js/monitoring.sysmaps.js.php:540
-#: include/views/monitoring.screen.constructor.edit.php:809
+#: include/views/monitoring.screen.constructor.edit.php:810
 msgid "Vertical align"
 msgstr "Vertikaljustering"
 
@@ -19420,7 +19386,7 @@ msgstr "Virtuell plassstørrelse i byte eller i prosent fra totalt. Returnerer h
 msgid "Visible name"
 msgstr "Synlig navn"
 
-#: include/classes/api/services/CHost.php:2250
+#: include/classes/api/services/CHost.php:2280
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Synlig navn kan ikke være tomt hvis vertsnavnet mangler."
 
@@ -19579,7 +19545,7 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:117
 #: include/views/js/monitoring.sysmaps.js.php:402
 #: include/views/js/monitoring.sysmaps.js.php:444
-#: include/views/monitoring.screen.constructor.edit.php:774
+#: include/views/monitoring.screen.constructor.edit.php:775
 #: include/views/monitoring.sysmap.edit.php:100
 #: include/views/monitoring.sysmap.list.php:66 screenedit.php:70
 #: sysmaps.php:41
@@ -19646,8 +19612,8 @@ msgstr ""
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Feil felt for avhengighet for tjenesten \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1930
-#: include/classes/api/services/CHost.php:2129
+#: include/classes/api/services/CHost.php:1960
+#: include/classes/api/services/CHost.php:2159
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Feil felt for verten \"%1$s\"."
@@ -19818,21 +19784,21 @@ msgid "Yearly"
 msgstr "Årlig"
 
 #: app/views/administration.user.list.php:133
-#: app/views/administration.valuemap.list.php:82
-#: app/views/monitoring.widget.problems.view.php:269
-#: app/views/monitoring.widget.problems.view.php:273
+#: app/views/administration.valuemap.list.php:82 app/views/hint.box.php:179
+#: app/views/hint.box.php:183
+#: app/views/monitoring.widget.problems.view.php:267
+#: app/views/monitoring.widget.problems.view.php:271
 #: app/views/popup.condition.common.php:663
 #: app/views/popup.lldoperation.php:84 app/views/popup.lldoperation.php:96
 #: include/actions.inc.php:32 include/blocks.inc.php:665
 #: include/blocks.inc.php:942 include/blocks.inc.php:946
 #: include/classes/screens/CScreenHostTriggers.php:293
 #: include/classes/screens/CScreenHostTriggers.php:297
-#: include/classes/screens/CScreenProblem.php:1119
-#: include/classes/screens/CScreenProblem.php:1123
-#: include/classes/screens/CScreenProblem.php:1265 include/events.inc.php:195
+#: include/classes/screens/CScreenProblem.php:1108
+#: include/classes/screens/CScreenProblem.php:1112
+#: include/classes/screens/CScreenProblem.php:1254 include/events.inc.php:195
 #: include/events.inc.php:199 include/events.inc.php:393
-#: include/events.inc.php:397 include/events.inc.php:651
-#: include/events.inc.php:655 include/triggers.inc.php:1216
+#: include/events.inc.php:397 include/triggers.inc.php:1216
 #: include/triggers.inc.php:1221
 #: include/views/configuration.graph.list.php:190
 #: include/views/configuration.host.prototype.list.php:135
@@ -19852,7 +19818,7 @@ msgstr "Årlig"
 msgid "Yes"
 msgstr "Ja"
 
-#: include/classes/screens/CScreenProblem.php:730 include/func.inc.php:2473
+#: include/classes/screens/CScreenProblem.php:719 include/func.inc.php:2473
 msgid "Yesterday"
 msgstr "I går"
 
@@ -19887,13 +19853,13 @@ msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:79
 #: include/classes/api/services/CCorrelation.php:481
-#: include/classes/api/services/CHost.php:907
-#: include/classes/api/services/CHost.php:972
+#: include/classes/api/services/CHost.php:939
+#: include/classes/api/services/CHost.php:1004
 #: include/classes/api/services/CIconMap.php:185
 #: include/classes/api/services/CIconMap.php:256
-#: include/classes/api/services/CMaintenance.php:533
-#: include/classes/api/services/CMaintenance.php:964
-#: include/classes/api/services/CMaintenance.php:976
+#: include/classes/api/services/CMaintenance.php:535
+#: include/classes/api/services/CMaintenance.php:956
+#: include/classes/api/services/CMaintenance.php:967
 #: include/classes/api/services/CModule.php:55
 #: include/classes/api/services/CModule.php:149
 #: include/classes/api/services/CModule.php:210
@@ -19903,11 +19869,11 @@ msgstr ""
 #: include/classes/api/services/CScript.php:569
 #: include/classes/api/services/CTask.php:49
 #: include/classes/api/services/CTask.php:247
-#: include/classes/api/services/CTemplate.php:413
-#: include/classes/api/services/CTemplate.php:565
-#: include/classes/api/services/CTemplate.php:602
-#: include/classes/api/services/CTemplate.php:1078
-#: include/classes/api/services/CTemplate.php:1184
+#: include/classes/api/services/CTemplate.php:449
+#: include/classes/api/services/CTemplate.php:601
+#: include/classes/api/services/CTemplate.php:637
+#: include/classes/api/services/CTemplate.php:1076
+#: include/classes/api/services/CTemplate.php:1182
 #: include/classes/api/services/CUserMacro.php:262
 #: include/classes/api/services/CUserMacro.php:366
 #: include/classes/api/services/CUserMacro.php:474
@@ -20042,54 +20008,54 @@ msgstr ""
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1903
+#: include/classes/validators/CApiInputValidator.php:1911
 msgid "a DNS name is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:860
+#: include/classes/validators/CApiInputValidator.php:868
 msgid "a boolean is expected"
 msgstr "en boolean verdi forventes"
 
 #: include/classes/api/services/CUser.php:791
 #: include/classes/import/validators/CXmlValidatorGeneral.php:240
 #: include/classes/validators/CActionCondValidator.php:185
-#: include/classes/validators/CApiInputValidator.php:282
+#: include/classes/validators/CApiInputValidator.php:290
 #: include/classes/validators/CEventCorrCondValidator.php:91
 #: include/classes/validators/CNewValidator.php:326
 msgid "a character string is expected"
 msgstr "en tegnstreng forventes"
 
-#: include/classes/validators/CApiInputValidator.php:640
+#: include/classes/validators/CApiInputValidator.php:648
 msgid "a floating point value is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:350
+#: include/classes/validators/CApiInputValidator.php:358
 #: include/classes/validators/CNewValidator.php:313
 msgid "a hexadecimal colour code (6 symbols) is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1432
+#: include/classes/validators/CApiInputValidator.php:1440
 msgid "a low-level discovery macro is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1331
+#: include/classes/validators/CApiInputValidator.php:1339
 #: include/validate.inc.php:194
 msgid "a number has too many fractional digits"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:814
-#: include/classes/validators/CApiInputValidator.php:1310
-#: include/classes/validators/CApiInputValidator.php:1926
+#: include/classes/validators/CApiInputValidator.php:822
+#: include/classes/validators/CApiInputValidator.php:1318
+#: include/classes/validators/CApiInputValidator.php:1934
 #: include/validate.inc.php:175
 msgid "a number is expected"
 msgstr "et nummer er forventet"
 
-#: include/classes/validators/CApiInputValidator.php:501
-#: include/classes/validators/CApiInputValidator.php:540
-#: include/classes/validators/CApiInputValidator.php:824
-#: include/classes/validators/CApiInputValidator.php:1319
-#: include/classes/validators/CApiInputValidator.php:1326
-#: include/classes/validators/CApiInputValidator.php:1599
+#: include/classes/validators/CApiInputValidator.php:509
+#: include/classes/validators/CApiInputValidator.php:548
+#: include/classes/validators/CApiInputValidator.php:832
+#: include/classes/validators/CApiInputValidator.php:1327
+#: include/classes/validators/CApiInputValidator.php:1334
+#: include/classes/validators/CApiInputValidator.php:1607
 #: include/validate.inc.php:183 include/validate.inc.php:189
 msgid "a number is too large"
 msgstr "et nummer er for stort"
@@ -20107,29 +20073,33 @@ msgstr "en numerisk verdi er forventet"
 msgid "a relative time is expected"
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:2092
+msgid "a string, number or null value is expected"
+msgstr ""
+
 #: include/classes/validators/CNewValidator.php:273
 msgid "a time is expected"
 msgstr "en tid er forventet"
 
-#: include/classes/validators/CApiInputValidator.php:1499
+#: include/classes/validators/CApiInputValidator.php:1507
 #: include/classes/validators/CNewValidator.php:285
 msgid "a time period is expected"
 msgstr "en tidsperiode er forventet"
 
-#: include/classes/validators/CApiInputValidator.php:1465
+#: include/classes/validators/CApiInputValidator.php:1473
 #: include/validate.inc.php:221
 msgid "a time range is expected"
 msgstr ""
 
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupLldOperation.php:154
-#: include/classes/validators/CApiInputValidator.php:1588
+#: include/classes/validators/CApiInputValidator.php:1596
 #: include/classes/validators/CNewValidator.php:524
 #: include/validate.inc.php:213 include/validate.inc.php:594
 msgid "a time unit is expected"
 msgstr "en tidsenhet er forventet"
 
-#: include/classes/validators/CApiInputValidator.php:1403
+#: include/classes/validators/CApiInputValidator.php:1411
 msgid "a user macro is expected"
 msgstr "en brukermakro er forventet"
 
@@ -20174,7 +20144,7 @@ msgstr "alle"
 msgid "all media"
 msgstr "alle medier"
 
-#: include/classes/validators/CApiInputValidator.php:1860
+#: include/classes/validators/CApiInputValidator.php:1868
 msgid "an IP address is expected"
 msgstr ""
 
@@ -20194,28 +20164,32 @@ msgstr ""
 #: include/classes/import/validators/C52XmlValidator.php:2645
 #: include/classes/import/validators/C52XmlValidator.php:2684
 #: include/classes/import/validators/CXmlValidatorGeneral.php:254
-#: include/classes/validators/CApiInputValidator.php:449
-#: include/classes/validators/CApiInputValidator.php:581
-#: include/classes/validators/CApiInputValidator.php:674
-#: include/classes/validators/CApiInputValidator.php:768
-#: include/classes/validators/CApiInputValidator.php:915
-#: include/classes/validators/CApiInputValidator.php:1109
-#: include/classes/validators/CApiInputValidator.php:1151
+#: include/classes/validators/CApiInputValidator.php:457
+#: include/classes/validators/CApiInputValidator.php:589
+#: include/classes/validators/CApiInputValidator.php:682
+#: include/classes/validators/CApiInputValidator.php:776
+#: include/classes/validators/CApiInputValidator.php:923
+#: include/classes/validators/CApiInputValidator.php:1117
+#: include/classes/validators/CApiInputValidator.php:1159
 msgid "an array is expected"
 msgstr "en matrise er forventet"
 
-#: include/classes/validators/CApiInputValidator.php:994
-#: include/classes/validators/CApiInputValidator.php:1064
+#: include/classes/validators/CApiInputValidator.php:1002
+#: include/classes/validators/CApiInputValidator.php:1072
 msgid "an array or a character string is expected"
 msgstr "en matrise eller en tegnstreng forventes"
+
+#: include/classes/validators/CApiInputValidator.php:2072
+msgid "an array or object is expected"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:385
 #: include/classes/import/validators/C10XmlValidator.php:407
 msgid "an empty string is expected"
 msgstr "en tom streng forventes"
 
-#: include/classes/api/services/CHost.php:1871
-#: include/classes/validators/CApiInputValidator.php:1027
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/validators/CApiInputValidator.php:1035
 msgid "an even number of hexadecimal characters is expected"
 msgstr "et jevnt antall heksadesimale tegn forventes"
 
@@ -20223,11 +20197,11 @@ msgstr "et jevnt antall heksadesimale tegn forventes"
 msgid "an explicit time is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:496
+#: include/classes/validators/CApiInputValidator.php:504
 msgid "an integer is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:535
+#: include/classes/validators/CApiInputValidator.php:543
 msgid "an unsigned integer is expected"
 msgstr ""
 
@@ -20341,11 +20315,11 @@ msgstr "kan ikke endres"
 #: include/classes/api/services/CDRule.php:364
 #: include/classes/api/services/CDRule.php:547
 #: include/classes/api/services/CEvent.php:842
-#: include/classes/api/services/CHost.php:1859
-#: include/classes/api/services/CHost.php:1865
-#: include/classes/api/services/CHostPrototype.php:1604
+#: include/classes/api/services/CHost.php:1889
+#: include/classes/api/services/CHost.php:1895
 #: include/classes/api/services/CHostPrototype.php:1616
-#: include/classes/api/services/CHostPrototype.php:1632
+#: include/classes/api/services/CHostPrototype.php:1628
+#: include/classes/api/services/CHostPrototype.php:1644
 #: include/classes/api/services/CItemGeneral.php:487
 #: include/classes/api/services/CItemGeneral.php:514
 #: include/classes/api/services/CItemGeneral.php:520
@@ -20396,14 +20370,14 @@ msgstr "kan ikke endres"
 #: include/classes/validators/CActionCondValidator.php:175
 #: include/classes/validators/CActionCondValidator.php:181
 #: include/classes/validators/CActionCondValidator.php:191
-#: include/classes/validators/CApiInputValidator.php:292
-#: include/classes/validators/CApiInputValidator.php:454
-#: include/classes/validators/CApiInputValidator.php:586
-#: include/classes/validators/CApiInputValidator.php:679
-#: include/classes/validators/CApiInputValidator.php:773
-#: include/classes/validators/CApiInputValidator.php:819
-#: include/classes/validators/CApiInputValidator.php:1114
-#: include/classes/validators/CApiInputValidator.php:1156
+#: include/classes/validators/CApiInputValidator.php:300
+#: include/classes/validators/CApiInputValidator.php:462
+#: include/classes/validators/CApiInputValidator.php:594
+#: include/classes/validators/CApiInputValidator.php:687
+#: include/classes/validators/CApiInputValidator.php:781
+#: include/classes/validators/CApiInputValidator.php:827
+#: include/classes/validators/CApiInputValidator.php:1122
+#: include/classes/validators/CApiInputValidator.php:1164
 #: include/classes/validators/CEventCorrCondValidator.php:55
 #: include/classes/validators/CEventCorrCondValidator.php:61
 #: include/classes/validators/CEventCorrCondValidator.php:67
@@ -20537,7 +20511,7 @@ msgstr ""
 msgid "diff() - Difference between last and preceding values (1 - true, 0 - false)"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1373
+#: include/classes/validators/CApiInputValidator.php:1381
 msgid "directory or script name cannot be empty"
 msgstr "katalog- eller skriptnavn kan ikke være tomt"
 
@@ -20748,7 +20722,7 @@ msgstr ""
 msgid "invalid address range \"%1$s\""
 msgstr "ugyldig adressesort \"%1$s\""
 
-#: include/classes/validators/CApiInputValidator.php:287
+#: include/classes/validators/CApiInputValidator.php:295
 msgid "invalid byte sequence in UTF-8"
 msgstr "ugyldig byte-sekvens i UTF-8"
 
@@ -20762,15 +20736,15 @@ msgstr "ugyldig forsinkelse"
 msgid "invalid history storage period"
 msgstr "ugyldig historisk lagringsperiode"
 
-#: include/classes/validators/CApiInputValidator.php:1210
+#: include/classes/validators/CApiInputValidator.php:1218
 msgid "invalid host group name"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1254
+#: include/classes/validators/CApiInputValidator.php:1262
 msgid "invalid host name"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1535
+#: include/classes/validators/CApiInputValidator.php:1543
 msgid "invalid regular expression"
 msgstr "ugyldig regulært uttrykk"
 
@@ -20792,7 +20766,7 @@ msgstr ""
 msgid "is less than or equals"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1779
+#: include/classes/validators/CApiInputValidator.php:1787
 msgid "is not enclosed in {} or is malformed"
 msgstr "er ikke vedlagt {} eller er misdannet"
 
@@ -20813,12 +20787,15 @@ msgstr ""
 msgid "key is empty"
 msgstr "nøkkelen er tom"
 
-#: app/views/popup.maintenance.period.php:128
 #: include/classes/graphdraw/CLineGraphDraw.php:1377
 #: include/classes/graphdraw/CPieGraphDraw.php:296 include/graphs.inc.php:88
-#: include/maintenances.inc.php:109
 #: include/views/js/configuration.graph.edit.js.php:215
 #: include/views/js/configuration.graph.edit.js.php:282
+msgid "last"
+msgstr "siste"
+
+#: app/views/popup.maintenance.period.php:128 include/maintenances.inc.php:109
+msgctxt "week of month"
 msgid "last"
 msgstr "siste"
 
@@ -20940,8 +20917,8 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1877
-#: include/classes/validators/CApiInputValidator.php:1021
+#: include/classes/api/services/CHost.php:1907
+#: include/classes/validators/CApiInputValidator.php:1029
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "Minste lengde er %1$s tegn"
@@ -20974,8 +20951,8 @@ msgstr "må være en gyldig LDAP-bruker"
 msgid "must be between \"%1$s\" and \"%2$s\""
 msgstr "må være mellom \"%1$s\" og \"%2$s\""
 
-#: include/classes/validators/CApiInputValidator.php:1217
-#: include/classes/validators/CApiInputValidator.php:1261
+#: include/classes/validators/CApiInputValidator.php:1225
+#: include/classes/validators/CApiInputValidator.php:1269
 msgid "must contain at least one low-level discovery macro"
 msgstr ""
 
@@ -20994,7 +20971,7 @@ msgid "new"
 msgstr "ny"
 
 #: disc_prototypes.php:1346 disc_prototypes.php:1370 hosts.php:1349
-#: include/views/configuration.item.massupdate.php:423 templates.php:955
+#: include/views/configuration.item.massupdate.php:423 templates.php:952
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "ny"
@@ -21231,11 +21208,11 @@ msgid "short description"
 msgstr "Kort beskrivelse"
 
 #: include/classes/api/services/CAutoregistration.php:163
-#: include/classes/api/services/CHost.php:1884
-#: include/classes/api/services/CHost.php:1890
-#: include/classes/api/services/CHost.php:1899
-#: include/classes/api/services/CHost.php:1905
-#: include/classes/api/services/CHostPrototype.php:1655
+#: include/classes/api/services/CHost.php:1914
+#: include/classes/api/services/CHost.php:1920
+#: include/classes/api/services/CHost.php:1929
+#: include/classes/api/services/CHost.php:1935
+#: include/classes/api/services/CHostPrototype.php:1667
 #: include/classes/api/services/CHttpTest.php:964
 #: include/classes/api/services/CHttpTest.php:1060
 #: include/classes/api/services/CItemGeneral.php:501
@@ -21247,8 +21224,8 @@ msgstr "Kort beskrivelse"
 #: include/classes/api/services/CItemGeneral.php:1680
 #: include/classes/api/services/CItemGeneral.php:1718
 #: include/classes/api/services/CItemGeneral.php:2499
-#: include/classes/api/services/CMaintenance.php:500
-#: include/classes/api/services/CMaintenance.php:722
+#: include/classes/api/services/CMaintenance.php:502
+#: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CProxy.php:671
 #: include/classes/api/services/CProxy.php:797
@@ -21331,21 +21308,21 @@ msgstr "mal ID \"%1$s\" er passert %2$s ganger"
 #: include/classes/api/services/CDiscoveryRule.php:1632
 #: include/classes/api/services/CDiscoveryRule.php:1990
 #: include/classes/api/services/CDiscoveryRule.php:1998
-#: include/classes/api/services/CHost.php:1964
-#: include/classes/api/services/CHost.php:2159
-#: include/classes/api/services/CHostPrototype.php:1599
+#: include/classes/api/services/CHost.php:1994
+#: include/classes/api/services/CHost.php:2189
 #: include/classes/api/services/CHostPrototype.php:1611
-#: include/classes/api/services/CHostPrototype.php:1627
+#: include/classes/api/services/CHostPrototype.php:1623
 #: include/classes/api/services/CHostPrototype.php:1639
+#: include/classes/api/services/CHostPrototype.php:1651
 #: include/classes/api/services/CHttpTest.php:749
 #: include/classes/api/services/CTemplateDashboard.php:334
-#: include/classes/api/services/CTemplate.php:394
+#: include/classes/api/services/CTemplate.php:430
 #: include/classes/helpers/CDashboardHelper.php:347
 #: include/classes/helpers/CDashboardHelper.php:354
 #: include/classes/helpers/CDashboardHelper.php:362
 #: include/classes/helpers/CDashboardHelper.php:368
 #: include/classes/helpers/CDashboardHelper.php:374
-#: include/classes/validators/CApiInputValidator.php:950
+#: include/classes/validators/CApiInputValidator.php:958
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "parameteren \"%1$s\" mangler"
@@ -21425,7 +21402,7 @@ msgstr "avtrekker"
 msgid "trigger does not allow manual closing"
 msgstr "utløser tillater ikke manuell lukking"
 
-#: include/classes/validators/CApiInputValidator.php:2010
+#: include/classes/validators/CApiInputValidator.php:2018
 msgid "trigger expression must contain at least one host:key reference"
 msgstr ""
 
@@ -21442,7 +21419,7 @@ msgstr "Utløseren med koblinger kan ikke flyttes til en annen mal eller vert"
 msgid "type here to search"
 msgstr "skriv her for å søke"
 
-#: include/classes/validators/CApiInputValidator.php:1816
+#: include/classes/validators/CApiInputValidator.php:1824
 msgid "unacceptable URL"
 msgstr ""
 
@@ -21475,10 +21452,10 @@ msgstr "uventet slutten av makroen"
 #: include/classes/api/services/CDiscoveryRule.php:1683
 #: include/classes/api/services/CDiscoveryRule.php:1706
 #: include/classes/api/services/CDiscoveryRule.php:1725
-#: include/classes/api/services/CHostPrototype.php:1645
+#: include/classes/api/services/CHostPrototype.php:1657
 #: include/classes/api/services/CHttpTest.php:463
 #: include/classes/api/services/CHttpTest.php:487
-#: include/classes/validators/CApiInputValidator.php:922
+#: include/classes/validators/CApiInputValidator.php:930
 #, c-format
 msgid "unexpected parameter \"%1$s\""
 msgstr "uventet parameter \"%1$s\""
@@ -21498,8 +21475,8 @@ msgstr "uventet tekst \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:766
 #: include/classes/api/services/CEvent.php:900
-#: include/classes/api/services/CHost.php:1839
-#: include/classes/api/services/CHost.php:1845
+#: include/classes/api/services/CHost.php:1869
+#: include/classes/api/services/CHost.php:1875
 #: include/classes/api/services/CItemGeneral.php:1293
 #: include/classes/api/services/CItemGeneral.php:1640
 #: include/classes/api/services/CItemGeneral.php:1666
@@ -21574,33 +21551,33 @@ msgstr ""
 msgid "value \"%1$s\" not found"
 msgstr "verdien \"%1$s\" ble ikke funnet"
 
-#: include/classes/validators/CApiInputValidator.php:1633
-#: include/classes/validators/CApiInputValidator.php:1687
+#: include/classes/validators/CApiInputValidator.php:1641
+#: include/classes/validators/CApiInputValidator.php:1695
 #, c-format
 msgid "value %1$s already exists"
 msgstr "verdien %1$s eksisterer allerede"
 
 #: include/classes/api/services/CTriggerGeneral.php:1692
 #: include/classes/api/services/CTriggerGeneral.php:1709
-#: include/classes/validators/CApiInputValidator.php:417
-#: include/classes/validators/CApiInputValidator.php:1033
-#: include/classes/validators/CApiInputValidator.php:1201
-#: include/classes/validators/CApiInputValidator.php:1244
-#: include/classes/validators/CApiInputValidator.php:1298
-#: include/classes/validators/CApiInputValidator.php:1363
-#: include/classes/validators/CApiInputValidator.php:1398
-#: include/classes/validators/CApiInputValidator.php:1427
-#: include/classes/validators/CApiInputValidator.php:1458
-#: include/classes/validators/CApiInputValidator.php:1492
-#: include/classes/validators/CApiInputValidator.php:1526
-#: include/classes/validators/CApiInputValidator.php:1572
-#: include/classes/validators/CApiInputValidator.php:1774
-#: include/classes/validators/CApiInputValidator.php:1806
-#: include/classes/validators/CApiInputValidator.php:1848
-#: include/classes/validators/CApiInputValidator.php:1892
-#: include/classes/validators/CApiInputValidator.php:1941
-#: include/classes/validators/CApiInputValidator.php:1994
-#: include/classes/validators/CApiInputValidator.php:2035
+#: include/classes/validators/CApiInputValidator.php:425
+#: include/classes/validators/CApiInputValidator.php:1041
+#: include/classes/validators/CApiInputValidator.php:1209
+#: include/classes/validators/CApiInputValidator.php:1252
+#: include/classes/validators/CApiInputValidator.php:1306
+#: include/classes/validators/CApiInputValidator.php:1371
+#: include/classes/validators/CApiInputValidator.php:1406
+#: include/classes/validators/CApiInputValidator.php:1435
+#: include/classes/validators/CApiInputValidator.php:1466
+#: include/classes/validators/CApiInputValidator.php:1500
+#: include/classes/validators/CApiInputValidator.php:1534
+#: include/classes/validators/CApiInputValidator.php:1580
+#: include/classes/validators/CApiInputValidator.php:1782
+#: include/classes/validators/CApiInputValidator.php:1814
+#: include/classes/validators/CApiInputValidator.php:1856
+#: include/classes/validators/CApiInputValidator.php:1900
+#: include/classes/validators/CApiInputValidator.php:1949
+#: include/classes/validators/CApiInputValidator.php:2002
+#: include/classes/validators/CApiInputValidator.php:2043
 msgid "value is too long"
 msgstr "verdien er for lang"
 
@@ -21620,17 +21597,17 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1715
 #: include/classes/api/services/CDiscoveryRule.php:1737
 #: include/classes/api/services/CEvent.php:802
-#: include/classes/api/services/CHost.php:982
-#: include/classes/api/services/CHost.php:2020
-#: include/classes/api/services/CHost.php:2176
+#: include/classes/api/services/CHost.php:1014
+#: include/classes/api/services/CHost.php:2050
+#: include/classes/api/services/CHost.php:2206
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:682
 #: include/classes/api/services/CMap.php:688
 #: include/classes/api/services/CMap.php:1147
 #: include/classes/api/services/CMap.php:1153
 #: include/classes/import/validators/C52XmlValidator.php:2679
-#: include/classes/validators/CApiInputValidator.php:411
-#: include/classes/validators/CApiInputValidator.php:736
+#: include/classes/validators/CApiInputValidator.php:419
+#: include/classes/validators/CApiInputValidator.php:744
 #: include/classes/validators/CNewValidator.php:517
 #: include/validate.inc.php:587
 #, c-format

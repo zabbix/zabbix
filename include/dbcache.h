@@ -1014,4 +1014,6 @@ void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
 int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);
 
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
+
 #endif

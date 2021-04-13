@@ -922,7 +922,7 @@ zabbix_export:
               key: 'asterisk.queue.callers[{#QUEUE}]'
               delay: '0'
               history: 7d
-              description: 'The number incomming calls in queue.'
+              description: 'The number incoming calls in queue.'
               application_prototypes:
                 -
                   name: 'Asterisk queue "{#QUEUE}"'

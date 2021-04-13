@@ -69,12 +69,14 @@ class testPageProblems extends CLegacyWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('evaltype_00'));
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
 		$this->assertTrue($this->zbxTestCheckboxSelected('tags_000'));
+		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 
 		// Select "AND" option and two tag names with partial "Contains" value match
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
 		$this->query('name:tags_add')->one()->click();
 		$form->query('name:tags[1][tag]')->one()->clear()->sendKeys('Database');
 		$this->query('name:filter_apply')->one()->click();
+		$result_form->waitUntilReloaded();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestTextNotPresent('Test trigger with tag');
@@ -95,11 +97,13 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
+		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 
 		// Search by partial "Contains" tag value match
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('service');
 		$form->query('name:tags[0][value]')->one()->clear()->sendKeys('abc');
 		$this->query('name:filter_apply')->one()->click();
+		$result_form->waitUntilReloaded();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestTextNotPresent('Test trigger with tag');
@@ -204,12 +208,14 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
-		$form = $this->query('id:tabfilter_0')->asForm()->one();
+		$form = $this->query('id:tabfilter_0')->asForm()->one()->waitUntilVisible();
+		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 
 		// Check Show tags NONE
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('service');
 		$this->zbxTestClickXpath('//label[@for="show_tags_00"]');
 		$this->query('name:filter_apply')->one()->click();
+		$result_form->waitUntilReloaded();
 		// Check result
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
@@ -402,13 +408,17 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
+		$this->page->waitUntilReady();
+		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 
 		$this->zbxTestClickButtonMultiselect('hostids_0');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		COverlayDialogElement::find()->one()->setDataContext('Host group for suppression');
+		COverlayDialogElement::find()->one()->waitUntilReady()->setDataContext('Host group for suppression');
 
 		$this->zbxTestClickLinkTextWait('Host for suppression');
-		$this->query('name:filter_apply')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
+		$this->query('name:filter_apply')->one()->waitUntilClickable()->click();
+		$result_form->waitUntilReloaded();
 
 		$this->zbxTestTextNotPresent('Trigger_for_suppression');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');

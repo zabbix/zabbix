@@ -693,78 +693,110 @@ class CHost extends CHostGeneral {
 
 		$this->validateCreate($hosts);
 
-		$hostids = [];
 		foreach ($hosts as &$host) {
 			// If visible name is not given or empty it should be set to host name.
-			if (!array_key_exists('name', $host) || !trim($host['name'])) {
+			if (!array_key_exists('name', $host) || trim($host['name']) === '') {
 				$host['name'] = $host['host'];
-			}
-
-			$hostid = DB::insert('hosts', [$host]);
-			$hostid = reset($hostid);
-			$host['hostid'] = $hostid;
-			$hostids[] = $hostid;
-			$host['groups'] = zbx_toArray($host['groups']);
-
-			// Save groups. Groups must be added before calling massAdd() for permission validation to work.
-			$groupsToAdd = [];
-			foreach ($host['groups'] as $group) {
-				$groupsToAdd[] = [
-					'hostid' => $hostid,
-					'groupid' => $group['groupid']
-				];
-			}
-			DB::insert('hosts_groups', $groupsToAdd);
-
-			if (array_key_exists('tags', $host) && $host['tags']) {
-				$this->createTags([$hostid => zbx_toArray($host['tags'])]);
-			}
-
-			$options = [
-				'hosts' => $host
-			];
-
-			if (isset($host['templates']) && !is_null($host['templates'])) {
-				$options['templates'] = $host['templates'];
-			}
-
-			if (isset($host['macros']) && !is_null($host['macros'])) {
-				$options['macros'] = $host['macros'];
-			}
-
-			if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
-				$options['interfaces'] = $host['interfaces'];
-			}
-
-			$result = API::Host()->massAdd($options);
-			if (!$result) {
-				self::exception();
-			}
-
-			if (array_key_exists('inventory', $host) && $host['inventory']) {
-				$hostInventory = $host['inventory'];
-				$hostInventory['inventory_mode'] = HOST_INVENTORY_MANUAL;
-			}
-			else {
-				$hostInventory = [];
-			}
-
-			if (array_key_exists('inventory_mode', $host) && $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-				$hostInventory['inventory_mode'] = $host['inventory_mode'];
-			}
-
-			if (array_key_exists('inventory_mode', $hostInventory)
-					&& ($hostInventory['inventory_mode'] == HOST_INVENTORY_MANUAL
-						|| $hostInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
-				$hostInventory['hostid'] = $hostid;
-				DB::insert('host_inventory', [$hostInventory], false);
 			}
 		}
 		unset($host);
 
+		$hosts_groups = [];
+		$hosts_tags = [];
+		$hosts_interfaces = [];
+		$hosts_macros = [];
+		$hosts_inventory = [];
+		$templates_hostids = [];
+
+		$hostids = DB::insert('hosts', $hosts);
+
+		foreach ($hosts as $index => &$host) {
+			$host['hostid'] = $hostids[$index];
+
+			foreach (zbx_toArray($host['groups']) as $group) {
+				$hosts_groups[] = [
+					'hostid' => $host['hostid'],
+					'groupid' => $group['groupid']
+				];
+			}
+
+			if (array_key_exists('tags', $host)) {
+				foreach (zbx_toArray($host['tags']) as $tag) {
+					$hosts_tags[] = ['hostid' => $host['hostid']] + $tag;
+				}
+			}
+
+			if (array_key_exists('interfaces', $host)) {
+				foreach (zbx_toArray($host['interfaces']) as $interface) {
+					$hosts_interfaces[] = ['hostid' => $host['hostid']] + $interface;
+				}
+			}
+
+			if (array_key_exists('macros', $host)) {
+				foreach (zbx_toArray($host['macros']) as $macro) {
+					$hosts_macros[] = ['hostid' => $host['hostid']] + $macro;
+				}
+			}
+
+			if (array_key_exists('templates', $host)) {
+				foreach (zbx_toArray($host['templates']) as $template) {
+					$templates_hostids[$template['templateid']][] = $host['hostid'];
+				}
+			}
+
+			$host_inventory = [];
+			if (array_key_exists('inventory', $host) && $host['inventory']) {
+				$host_inventory = $host['inventory'];
+				$host_inventory['inventory_mode'] = HOST_INVENTORY_MANUAL;
+			}
+
+			if (array_key_exists('inventory_mode', $host) && $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+				$host_inventory['inventory_mode'] = $host['inventory_mode'];
+			}
+
+			if (array_key_exists('inventory_mode', $host_inventory)) {
+				$hosts_inventory[] = ['hostid' => $host['hostid']] + $host_inventory;
+			}
+		}
+		unset($host);
+
+		DB::insertBatch('hosts_groups', $hosts_groups);
+
+		if ($hosts_tags) {
+			DB::insert('host_tag', $hosts_tags);
+		}
+
+		if ($hosts_interfaces) {
+			API::HostInterface()->create($hosts_interfaces);
+		}
+
+		if ($hosts_macros) {
+			API::UserMacro()->create($hosts_macros);
+		}
+
+		while ($templates_hostids) {
+			$templateid = key($templates_hostids);
+			$link_hostids = reset($templates_hostids);
+			$link_templateids = [$templateid];
+			unset($templates_hostids[$templateid]);
+
+			foreach ($templates_hostids as $templateid => $hostids) {
+				if ($link_hostids === $hostids) {
+					$link_templateids[] = $templateid;
+					unset($templates_hostids[$templateid]);
+				}
+			}
+
+			$this->link($link_templateids, $link_hostids);
+		}
+
+		if ($hosts_inventory) {
+			DB::insert('host_inventory', $hosts_inventory, false);
+		}
+
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hosts);
 
-		return ['hostids' => $hostids];
+		return ['hostids' => array_column($hosts, 'hostid')];
 	}
 
 	/**
@@ -1543,11 +1575,8 @@ class CHost extends CHostGeneral {
 			'operationid' => $delOperationids
 		]);
 
-		$hosts = API::Host()->get([
-			'output' => [
-				'hostid',
-				'name'
-			],
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
 			'hostids' => $hostIds,
 			'nopermissions' => true
 		]);
@@ -1562,13 +1591,14 @@ class CHost extends CHostGeneral {
 		DB::delete('hosts', ['hostid' => $hostIds]);
 
 		// TODO: remove info from API
-		foreach ($hosts as $host) {
-			info(_s('Deleted: Host "%1$s".', $host['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
+		foreach ($db_hosts as $db_host) {
+			info(_s('Deleted: Host "%1$s".', $db_host['name']));
 		}
 
 		// remove Monitoring > Latest data toggle profile values related to given hosts
 		DB::delete('profiles', ['idx' => 'web.latest.toggle_other', 'idx2' => $hostIds]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $db_hosts);
 
 		return ['hostids' => $hostIds];
 	}
