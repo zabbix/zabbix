@@ -537,9 +537,9 @@ static void	eval_function_return(zbx_uint32_t args_num, zbx_variant_t *value, zb
 {
 	int	i;
 
-	for (i = output->values_num - args_num; i < output->values_num; i++)
+	for (i = output->values_num - (int)args_num; i < output->values_num; i++)
 		zbx_variant_clear(&output->values[i]);
-	output->values_num -= args_num;
+	output->values_num -= (int)args_num;
 
 	zbx_vector_var_append_ptr(output, value);
 }
@@ -1243,11 +1243,11 @@ static int	eval_execute_function_bitand(const zbx_eval_context_t *ctx, const zbx
  *                                                                            *
  * Purpose: evaluate function by calling custom callback (if configured)      *
  *                                                                            *
- * parameters: ctx        - [in] the evaluation context                       *
- *             token      - [in] the function token                           *
- *             functio_cb - [in] the callback function                        *
- *             output     - [in/out] the output value stack                   *
- *             error      - [out] the error message in the case of failure    *
+ * Parameters: ctx         - [IN] the evaluation context                      *
+ *             token       - [IN] the function token                          *
+ *             function_cb - [IN] the callback function                       *
+ *             output      - [IN/OUT] the output value stack                  *
+ *             error       - [OUT] the error message in the case of failure   *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
@@ -1314,7 +1314,7 @@ static int	eval_execute_math_function_single_param(const zbx_eval_context_t *ctx
 
 	arg = &output->values[output->values_num - 1];
 
-	if ((log == func || log10 == func || sqrt == func) && 0 >= arg->data.dbl)
+	if (((log == func || log10 == func) && 0 >= arg->data.dbl) || (sqrt == func && 0 > arg->data.dbl))
 	{
 		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
 		return FAIL;
@@ -1422,19 +1422,18 @@ static double	eval_math_func_signum(double x)
 {
 	if (0 > x)
 		return -1;
+
 	if (0 == x)
 		return 0;
+
 	return 1;
 }
 
-static double	eval_math_func_rand()
+static double	eval_math_func_rand(void)
 {
-	double	rand_val;
-
 	srand((unsigned int)time(NULL));
-	rand_val = (double)rand();
 
-	return rand_val;
+	return (double)(rand());
 }
 
 /******************************************************************************
@@ -1453,8 +1452,7 @@ static double	eval_math_func_rand()
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		zbx_vector_var_t *output, char **error, double value)
+static int	eval_execute_math_return_value(zbx_vector_var_t *output, double value)
 {
 	zbx_variant_t	ret_value;
 
@@ -1565,11 +1563,11 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "atan2", ZBX_CONST_STRLEN("atan2")))
 		return eval_execute_math_function_double_param(ctx, token, output, error, atan2);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "pi", ZBX_CONST_STRLEN("pi")))
-		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_CONST_PI);
+		return eval_execute_math_return_value(output, ZBX_MATH_CONST_PI);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "e", ZBX_CONST_STRLEN("e")))
-		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_CONST_E);
+		return eval_execute_math_return_value(output, ZBX_MATH_CONST_E);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "rand", ZBX_CONST_STRLEN("rand")))
-		return eval_execute_math_return_value(ctx, token, output, error, eval_math_func_rand());
+		return eval_execute_math_return_value(output, eval_math_func_rand());
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);

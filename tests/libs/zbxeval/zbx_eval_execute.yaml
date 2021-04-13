@@ -926,6 +926,21 @@ out:
   result: SUCCEED
   value: 8
 ---
+test case: Expression 'sqrt(0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'sqrt(0)'
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'sqrt(-1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'sqrt(-1)'
+out:
+  result: FAIL
+---
 test case: Expression 'abs(3.5)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1006,6 +1021,14 @@ out:
   result: SUCCEED
   value: 0.69314718055994529
 ---
+test case: Expression 'log(0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'log(0)'
+out:
+  result: FAIL
+  value: 0
+---
 test case: Expression 'log10(5)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1013,6 +1036,14 @@ in:
 out:
   result: SUCCEED
   value: 0.69897000433601886
+---
+test case: Expression 'log10(0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'log10(0)'
+out:
+  result: FAIL
+  value: 0
 ---
 test case: Expression 'pi()'
 in:
@@ -1038,6 +1069,21 @@ out:
   result: SUCCEED
   value: 2.55
 ---
+test case: Expression 'round(2.5482,0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'round(2.5482,0)'
+out:
+  result: SUCCEED
+  value: 3
+---
+test case: Expression 'round(2.5482,-1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'round(2.5482,-1)'
+out:
+  result: FAIL
+---
 test case: Expression 'signum(-2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1062,14 +1108,6 @@ out:
   result: SUCCEED
   value: 0
 ---
-test case: Expression 'sqrt(3.5)'
-in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
-  expression: 'sqrt(3.5)'
-out:
-  result: SUCCEED
-  value: 1.8708286933869707
----
 test case: Expression 'truncate(2.5482,2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1077,6 +1115,21 @@ in:
 out:
   result: SUCCEED
   value: 2.54
+---
+test case: Expression 'truncate(2.5482,0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'truncate(2.5482,0)'
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Expression 'truncate(2.5482,-1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'truncate(2.5482,-1)'
+out:
+  result: FAIL
 ---
 test case: Expression 'acos(0.5)'
 in:
