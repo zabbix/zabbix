@@ -1347,6 +1347,7 @@ static int	calcitem_eval_common(const char *name, size_t len, int args_num, cons
 			*error = zbx_strdup(NULL, "Cannot evaluate function: quoted item query argument");
 			return FAIL;
 		}
+		zbx_eval_clear_query(&query);
 	}
 
 	*error = zbx_strdup(NULL, "Cannot evaluate function: invalid first argument");

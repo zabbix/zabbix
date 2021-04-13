@@ -75,8 +75,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 * Converts trigger expression to new syntax.
 	 *
 	 * @param array  $trigger_data
-	 * @param string $trigger_data['expression']           (optional)
-	 * @param string $trigger_data['recovery_expression']  (optional)
+	 * @param string $trigger_data['expression']
 	 * @param string $trigger_data['host']                 (optional)
 	 * @param string $trigger_data['item']                 (optional)
 	 *
@@ -86,23 +85,12 @@ class C52TriggerExpressionConverter extends CConverter {
 		$this->item = array_key_exists('item', $trigger_data) ? $trigger_data['item'] : '';
 		$this->host = (array_key_exists('host', $trigger_data) && $this->item) ? $trigger_data['host'] : '';
 
-		$extra_expressions = [];
-
-		if (array_key_exists('recovery_expression', $trigger_data) && $trigger_data['recovery_expression'] !== ''
-				&& ($this->parser->parse($trigger_data['recovery_expression'])) !== false) {
+		if (($this->parser->parse($trigger_data['expression'])) !== false) {
 			$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO);
 			$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
-			$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
+			$parts = $this->getExpressionParts(0, $this->parser->result->length - 1);
 			$this->wrap_subexpressions = ($parts['type'] === 'operator');
-			$this->convertExpressionParts($trigger_data['recovery_expression'], [$parts], $extra_expressions);
-		}
-
-		if (array_key_exists('expression', $trigger_data) && $trigger_data['expression'] !== ''
-				&& ($this->parser->parse($trigger_data['expression'])) !== false) {
-			$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO);
-			$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
-			$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
-			$this->wrap_subexpressions = ($parts['type'] === 'operator');
+			$extra_expressions = [];
 			$this->convertExpressionParts($trigger_data['expression'], [$parts], $extra_expressions);
 
 			$extra_expressions = array_filter($extra_expressions);
@@ -116,7 +104,7 @@ class C52TriggerExpressionConverter extends CConverter {
 			}
 		}
 
-		return array_intersect_key($trigger_data, array_flip(['recovery_expression', 'expression']));
+		return $trigger_data['expression'];
 	}
 
 	protected function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr) {
@@ -183,6 +171,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				$new_expression = sprintf('bitand(last(%1$s%2$s)%3$s)', $query, $timeshift, $mask);
 				break;
 
+			case 'change':
+				$new_expression = sprintf('change(%1$s)', $query);
+				break;
+
 			case 'delta':
 				$params = self::convertParameters($fn['functionParams'], $fn['functionName']);
 				$params = self::paramsToString($params);
@@ -190,11 +182,11 @@ class C52TriggerExpressionConverter extends CConverter {
 				break;
 
 			case 'diff':
-				$new_expression = sprintf('(last(%1$s,1)<>last(%1$s,2))', $query);
+				$new_expression = sprintf('(last(%1$s,#1)<>last(%1$s,#2))', $query);
 				break;
 
 			case 'prev':
-				$new_expression = sprintf('last(%1$s,2)', $query);
+				$new_expression = sprintf('last(%1$s,#2)', $query);
 				break;
 
 			case 'trenddelta':
@@ -310,7 +302,7 @@ class C52TriggerExpressionConverter extends CConverter {
 					$parameters[2] = 'bitand';
 				}
 				unset($parameters[3]);
-				array_push($parameters, $parameters[1]);
+				$parameters[] = $parameters[1];
 				unset($parameters[1]);
 				break;
 
@@ -356,9 +348,13 @@ class C52TriggerExpressionConverter extends CConverter {
 		];
 		$unquotable_parameters = in_array($fn_name, $functions_with_period_parameter) ? [0] : [];
 
-		// Time parameter don't need to be quoted for forecast() function.
-		if ($fn_name === 'forecast') {
+		if (in_array($fn_name, ['forecast', 'timeleft', 'percentile'])) {
+			// Time parameter don't need to be quoted for forecast() function.
 			$unquotable_parameters[] = 2;
+		}
+		elseif ($fn_name === 'band') {
+			// Mask parameter don't need to be quoted for bitand() function.
+			$unquotable_parameters[] = 1;
 		}
 
 		array_walk($parameters, function (&$param, $i) use ($unquotable_parameters) {
@@ -366,7 +362,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				return;
 			}
 
-			if ($param === '' || ($param[0] === '"' && substr($param, -1) === '"')) {
+			if ($param !== '' && $param[0] === '"' && substr($param, -1) === '"') {
 				return;
 			}
 
@@ -389,9 +385,10 @@ class C52TriggerExpressionConverter extends CConverter {
 	}
 
 	private static function convertTimeshift(string $param): string {
-		return (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
-			? 'now-'.$m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
+		$param = (preg_match('/^(?<num>\d+)(?<suffix>['.ZBX_TIME_SUFFIXES.']{0,1})$/', $param, $m) && $m['num'] > 0)
+			? $m['num'].($m['suffix'] !== '' ? $m['suffix'] : 's')
 			: $param;
+		return ($param !== '') ? 'now-'.$param : '';
 	}
 
 	private static function paramsToString(array $parameters): string {

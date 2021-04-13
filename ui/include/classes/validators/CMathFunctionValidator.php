@@ -125,15 +125,12 @@ class CMathFunctionValidator extends CValidator {
 	/**
 	 * Validate trigger math function.
 	 *
-	 * @param array                  $value
-	 * @param CFunctionParserResult  $value['fn']
+	 * @param CFunctionParserResult  $fn
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($fn) {
 		$this->setError('');
-
-		$fn = $value['fn'];
 
 		if (!in_array($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
@@ -153,7 +150,8 @@ class CMathFunctionValidator extends CValidator {
 
 		foreach ($fn->params_raw['parameters'] as $param) {
 			if ($param instanceof CQueryParserResult) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
+
 				return false;
 			}
 			elseif ($param instanceof CFunctionParserResult) {
@@ -170,11 +168,9 @@ class CMathFunctionValidator extends CValidator {
 
 				continue;
 			}
-			elseif (!$this->user_macro_parser->parse($param->match)
-					&& $this->number_parser->parse($param->match)
-					&& $this->checkString($param->match)
-					&& (!$this->lldmacros || $this->lld_macro_parser->parse($param->match))) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
+			elseif (!$this->checkValidConstant($param->getValue(true))) {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
+
 				return false;
 			}
 		}
@@ -224,7 +220,20 @@ class CMathFunctionValidator extends CValidator {
 		return true;
 	}
 
-	private function checkString(string $param): bool {
-		return preg_match('/^"([^"\\\\]|\\\\["\\\\])*"/', $param);
+	/**
+	 * Check if parameter is valid constant.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function checkValidConstant(string $param): bool {
+		if ($this->user_macro_parser->parse($param) == CParser::PARSE_SUCCESS
+				|| $this->number_parser->parse($param) == CParser::PARSE_SUCCESS
+				|| ($this->lldmacros && $this->lld_macro_parser->parse($param) != CParser::PARSE_SUCCESS)) {
+			return true;
+		}
+
+		return false;
 	}
 }
