@@ -47,6 +47,7 @@ $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');
 $this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('layout.mode.js');
+$this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.dashboard.print.js.php');
