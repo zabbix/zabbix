@@ -609,16 +609,6 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'At least one UI element must be checked.'
 				]
 			],
-			// Change nothing.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'link' => 'role_for_update',
-					'fields' => [
-					],
-					'message_header' => 'User role updated'
-				]
-			],
 			// Change name.
 			[
 				[
@@ -685,6 +675,14 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('link', $data['link'])->one()->click();
 		$this->CreateUpdate($data, 'update');
+	}
+
+	public function testFormUserRoles_SimpleUpdate() {
+		$hash_before = CDBHelper::getHash('SELECT * FROM role_rule where roleid='.zbx_dbstr(self::$roleid));
+		$this->page->login()->open('zabbix.php?action=userrole.list');
+		$this->query('link', 'user_changed_name')->one()->click();
+		$this->query('button:Update')->one()->click();
+		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role_rule where roleid='.zbx_dbstr(self::$roleid)));
 	}
 
 	public function testFormUserRoles_Clone() {
