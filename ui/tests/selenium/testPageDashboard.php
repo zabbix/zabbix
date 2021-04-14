@@ -166,7 +166,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$widget_content = CDashboardElement::find()->one()->getWidget('Favourite maps')->getContent();
 		$FavouriteScreens = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.
-				zbx_dbstr("web.favorite.sysmapids")));
+				zbx_dbstr('web.favorite.sysmapid')));
 
 		foreach ($FavouriteScreens as $FavouriteScreen) {
 			$widget_content->query('xpath://button[contains(@onclick, "(\'sysmapid\',\''.
@@ -179,7 +179,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->assertTrue($widget_content->query('xpath://table//td[text()="No maps added."]')->waitUntilVisible()
 				->one()->isPresent());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
-				zbx_dbstr("web.favorite.sysmapids")));
+				zbx_dbstr('web.favorite.sysmapids')));
 	}
 
 	public function testPageDashboard_KioskMode() {
