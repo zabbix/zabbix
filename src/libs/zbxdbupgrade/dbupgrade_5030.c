@@ -3250,6 +3250,15 @@ static int	DBpatch_5030085(void)
 	return ret;
 }
 
+static int	DBpatch_5030086(void)
+{
+#ifdef HAVE_MYSQL
+	return DBcreate_index("items", "items_8", "key_(1024)", 0);
+#else
+	return DBcreate_index("items", "items_8", "key_", 0);
+#endif
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -3342,5 +3351,6 @@ DBPATCH_ADD(5030082, 0, 1)
 DBPATCH_ADD(5030083, 0, 1)
 DBPATCH_ADD(5030084, 0, 1)
 DBPATCH_ADD(5030085, 0, 1)
+DBPATCH_ADD(5030086, 0, 1)
 
 DBPATCH_END()
