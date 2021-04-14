@@ -166,6 +166,9 @@ class testSID extends CWebTest {
 			// Dashboard widget refresh rate.
 			[['link' => 'zabbix.php?action=dashboard.widget.rfrate&widgetid=2002&rf_rate=120']],
 
+			// Dashboard widget sanitize.
+			[['link' => 'zabbix.php?action=dashboard.widgets.sanitize&fields=%7B%22reference%22%3A%22IACGE%22%7D&type=navtree']],
+
 			// Template dashboard update/create.
 			[['link' => 'zabbix.php?action=template.dashboard.update&templateid=10076&name=New+dashboard']],
 
