@@ -1084,6 +1084,13 @@ in:
 out:
   result: FAIL
 ---
+test case: Expression 'round(2.5482,1.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'round(2.5482,1.5)'
+out:
+  result: FAIL
+---
 test case: Expression 'signum(-2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1128,6 +1135,13 @@ test case: Expression 'truncate(2.5482,-1)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'truncate(2.5482,-1)'
+out:
+  result: FAIL
+---
+test case: Expression 'truncate(2.5482,1.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'truncate(2.5482,1.5)'
 out:
   result: FAIL
 ---
@@ -1186,6 +1200,13 @@ in:
 out:
   result: SUCCEED
   value: 0.64209261593433076
+---
+test case: Expression 'cot(0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'cot(0)'
+out:
+  result: FAIL
 ---
 test case: Expression 'degrees(1)'
 in:
@@ -1258,5 +1279,4 @@ in:
 out:
   result: SUCCEED
   value: -1.5
-
 ...

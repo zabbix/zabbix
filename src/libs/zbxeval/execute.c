@@ -539,6 +539,7 @@ static void	eval_function_return(zbx_uint32_t args_num, zbx_variant_t *value, zb
 
 	for (i = output->values_num - (int)args_num; i < output->values_num; i++)
 		zbx_variant_clear(&output->values[i]);
+
 	output->values_num -= (int)args_num;
 
 	zbx_vector_var_append_ptr(output, value);
@@ -1279,127 +1280,6 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: eval_execute_math_function_single_param                          *
- *                                                                            *
- * Purpose: evaluate mathematical function by calling passed function         *
- *          with 1 double argument                                            *
- *                                                                            *
- * parameters: ctx        - [in] the evaluation context                       *
- *             token      - [in] the function token                           *
- *             output     - [in/out] the output value stack                   *
- *             error      - [out] the error message in the case of failure    *
- *             func       - [in] the pointer to math function                 *
- *                                                                            *
- * Return value: SUCCEED - function evaluation succeeded                      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	eval_execute_math_function_single_param(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		zbx_vector_var_t *output, char **error, double (*func)(double))
-{
-	int		ret;
-	zbx_variant_t	*arg, value;
-
-	if (1 != token->opt)
-	{
-		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
-		return ret;
-
-	arg = &output->values[output->values_num - 1];
-
-	if (((log == func || log10 == func) && 0 >= arg->data.dbl) || (sqrt == func && 0 > arg->data.dbl))
-	{
-		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
-		return FAIL;
-	}
-
-	zbx_variant_set_dbl(&value, func(arg->data.dbl));
-
-	eval_function_return(token->opt, &value, output);
-
-	return SUCCEED;
-}
-
-static double	eval_math_func_round(double n, double decimal_points)
-{
-	double	multiplier;
-
-	multiplier = pow(10.0, decimal_points);
-
-	return round(n * multiplier ) / multiplier;
-}
-
-static double	eval_math_func_truncate(double n, double decimal_points)
-{
-	double	multiplier = 1;
-
-	if (0 < decimal_points)
-		multiplier = pow(10, decimal_points);
-	else if (0 == decimal_points)
-		multiplier = 1;
-
-	if (0 > n)
-		multiplier = -multiplier;
-
-	return floor(multiplier * n) / multiplier;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: eval_execute_math_function_double_param                          *
- *                                                                            *
- * Purpose: evaluate mathematical function by calling passed function         *
- *          with 2 double arguments                                           *
- *                                                                            *
- * parameters: ctx        - [in] the evaluation context                       *
- *             token      - [in] the function token                           *
- *             output     - [in/out] the output value stack                   *
- *             error      - [out] the error message in the case of failure    *
- *             func       - [in] the pointer to math function                 *
- *                                                                            *
- * Return value: SUCCEED - function evaluation succeeded                      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		zbx_vector_var_t *output, char **error, double (*func)(double, double))
-{
-	int		ret;
-	zbx_variant_t	*arg1, *arg2, value;
-
-	if (2 != token->opt)
-	{
-		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
-	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
-		return ret;
-
-	arg1 = &output->values[output->values_num - 2];
-	arg2 = &output->values[output->values_num - 1];
-
-	if ((eval_math_func_round == func || eval_math_func_truncate == func) && 0 > arg2->data.dbl)
-	{
-		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
-		return FAIL;
-	}
-
-	zbx_variant_set_dbl(&value, func(arg1->data.dbl, arg2->data.dbl));
-
-	eval_function_return(token->opt, &value, output);
-
-	return SUCCEED;
-}
-
 #define ZBX_MATH_CONST_PI	3.141592653589793238463
 #define ZBX_MATH_CONST_E	2.718281828459045
 
@@ -1438,15 +1318,136 @@ static double	eval_math_func_rand(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_execute_math_function_single_param                          *
+ *                                                                            *
+ * Purpose: evaluate mathematical function by calling passed function         *
+ *          with 1 double argument                                            *
+ *                                                                            *
+ * Parameters: ctx        - [IN] the evaluation context                       *
+ *             token      - [IN] the function token                           *
+ *             output     - [IN/OUT] the output value stack                   *
+ *             error      - [OUT] the error message in the case of failure    *
+ *             func       - [IN] the pointer to math function                 *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_math_function_single_param(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error, double (*func)(double))
+{
+	int		ret;
+	zbx_variant_t	*arg, value;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 1];
+
+	if (((log == func || log10 == func) && 0 >= arg->data.dbl) || (sqrt == func && 0 > arg->data.dbl) ||
+			(eval_math_func_cot == func && 0 == arg->data.dbl))
+	{
+		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
+		return FAIL;
+	}
+
+	zbx_variant_set_dbl(&value, func(arg->data.dbl));
+
+	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+}
+
+static double	eval_math_func_round(double n, double decimal_points)
+{
+	double	multiplier;
+
+	multiplier = pow(10.0, decimal_points);
+
+	return round(n * multiplier ) / multiplier;
+}
+
+static double	eval_math_func_truncate(double n, double decimal_points)
+{
+	double	multiplier = 1;
+
+	if (0 < decimal_points)
+		multiplier = pow(10, decimal_points);
+
+	if (0 > n)
+		multiplier = -multiplier;
+
+	return floor(multiplier * n) / multiplier;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_math_function_double_param                          *
+ *                                                                            *
+ * Purpose: evaluate mathematical function by calling passed function         *
+ *          with 2 double arguments                                           *
+ *                                                                            *
+ * Parameters: ctx        - [IN] the evaluation context                       *
+ *             token      - [IN] the function token                           *
+ *             output     - [IN/OUT] the output value stack                   *
+ *             error      - [OUT] the error message in the case of failure    *
+ *             func       - [IN] the pointer to math function                 *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error, double (*func)(double, double))
+{
+	int		ret;
+	zbx_variant_t	*arg1, *arg2, value;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg1 = &output->values[output->values_num - 2];
+	arg2 = &output->values[output->values_num - 1];
+
+	if ((eval_math_func_round == func || eval_math_func_truncate == func) && 0 > arg2->data.dbl ||
+			0.0 != fmod(arg2->data.dbl, 1))
+	{
+		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
+		return FAIL;
+	}
+
+	zbx_variant_set_dbl(&value, func(arg1->data.dbl, arg2->data.dbl));
+
+	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_execute_math_function_return_value                          *
  *                                                                            *
  * Purpose: evaluate mathematical function that returns constant value        *
  *                                                                            *
- * parameters: ctx        - [in] the evaluation context                       *
- *             token      - [in] the function token                           *
- *             output     - [in/out] the output value stack                   *
- *             error      - [out] the error message in the case of failure    *
- *             value      - [in] the constant value to return                 *
+ * Parameters: ctx        - [IN] the evaluation context                       *
+ *             token      - [IN] the function token                           *
+ *             output     - [IN/OUT] the output value stack                   *
+ *             error      - [OUT] the error message in the case of failure    *
+ *             func       - [IN] the pointer to math function                 *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1461,7 +1462,6 @@ static int	eval_execute_math_return_value(zbx_vector_var_t *output, double value
 
 	return SUCCEED;
 }
-
 
 /******************************************************************************
  *                                                                            *
