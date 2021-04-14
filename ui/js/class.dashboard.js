@@ -529,7 +529,7 @@ class CDashboard extends CBaseComponent {
 				const reference_substitution = new Map();
 
 				for (let i = 0; i < widgets.length; i++) {
-					let reference_fields = this._widget_defaults[widgets[i].type].foreign_reference_fields;
+					let reference_fields = [...this._widget_defaults[widgets[i].type].foreign_reference_fields];
 
 					if (this._widget_defaults[widgets[i].type].reference_field !== null) {
 						reference_fields.push(this._widget_defaults[widgets[i].type].reference_field);
