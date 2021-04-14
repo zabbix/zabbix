@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-05T15:45:31Z</date>
+   <date>2021-04-14T11:34:10Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -638,9 +638,8 @@ For domain mode: The name given to this domain</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>WildFly {#JMX_DATA_SOURCE}: Monitoring statistic is not enabled</name>
+                           <name>WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled</name>
                            <priority>INFO</priority>
-                           <description>Zabbix has not received data for items for the last 15 minutes</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -995,7 +994,7 @@ For domain mode: The name given to this domain</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>WildFly {#JMX_DATA_SOURCE}: Monitoring statistic is not enabled</name>
+                           <name>WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled</name>
                            <priority>INFO</priority>
                            <description>Zabbix has not received data for items for the last 15 minutes</description>
                         </trigger_prototype>

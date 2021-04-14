@@ -132,10 +132,10 @@ There are no template links in this template.
 |WildFly: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:jmx["java.lang:type=Runtime","Uptime"].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |WildFly: Failed to fetch info data (or no data for 15m) |<p>Zabbix has not received data for items for the last 15 minutes</p> |`{TEMPLATE_NAME:jmx["java.lang:type=Runtime","Uptime"].nodata(15m)}=1` |WARNING | |
 |WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE}) |<p>Deployment status has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",status].diff()}=1 and {TEMPLATE_NAME:jmx["{#JMXOBJ}",status].strlen()}>0` |WARNING |<p>Manual close: YES</p> |
-|WildFly {#JMX_DATA_SOURCE}: Monitoring statistic is not enabled |<p>Zabbix has not received data for items for the last 15 minutes</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",statisticsEnabled].last()}=0` |INFO | |
+|WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",statisticsEnabled].last()}=0` |INFO | |
 |WildFly {#JMX_DATA_SOURCE}: There are no active connections for 5m |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",ActiveCount].max(5m)}=0` |WARNING | |
 |WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m) |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",InUseCount].min(5m)}/{WildFly Server by JMX:jmx["{#JMXOBJ}",AvailableCount].last()}*100>{$WILDFLY.CONN.USAGE.WARN.MAX}` |HIGH | |
-|WildFly {#JMX_DATA_SOURCE}: Monitoring statistic is not enabled |<p>Zabbix has not received data for items for the last 15 minutes</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",statisticsEnabled].last()}=0` |INFO | |
+|WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled |<p>Zabbix has not received data for items for the last 15 minutes</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",statisticsEnabled].last()}=0` |INFO | |
 |WildFly {#JMX_DATA_SOURCE}: There are timeout  connections |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",TimedOut].last()}>0` |WARNING | |
 |WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m) |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",WaitCount].min(5m)}>{$WILDFLY.CONN.WAIT.MAX.WARN}` |WARNING | |
 |WildFly listener {#HTTP_LISTENER}: There are 500 responses by this listener. |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",errorCount].last()}>0` |WARNING | |
