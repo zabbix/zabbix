@@ -110,11 +110,14 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	unblock_signals();
 
-	if (SUCCEED == zbx_is_export_enabled())
-	{
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 		zbx_history_export_init("history-syncer", process_num);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+		zbx_trends_export_init("history-syncer", process_num);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_problems_export_init("history-syncer", process_num);
-	}
 
 	for (;;)
 	{

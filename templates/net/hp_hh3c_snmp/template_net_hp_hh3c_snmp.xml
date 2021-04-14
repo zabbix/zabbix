@@ -338,7 +338,7 @@ percent of memory are used.</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
-                           <name>{#MODULE_NAME}: High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                           <name>{#MODULE_NAME}: High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                            <priority>AVERAGE</priority>
                            <description>The system is running out of free memory.</description>
                         </trigger_prototype>

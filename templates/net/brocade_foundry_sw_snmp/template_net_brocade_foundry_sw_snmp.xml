@@ -79,7 +79,7 @@ For NI platforms, refer to snAgentBrdMemoryUtil100thPercent</description>
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
-                     <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                     <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                      <priority>AVERAGE</priority>
                      <description>The system is running out of free memory.</description>
                   </trigger>
@@ -321,7 +321,7 @@ The version of the running software in the form'major.minor.maintenance[letters]
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: FOUNDRY-SN-AGENT-MIB&#13;
-Temperature of the chassis. Each unit is 0.5 degrees Celcius.&#13;
+Temperature of the chassis. Each unit is 0.5 degrees Celsius.&#13;
 Only management module built with temperature sensor hardware is applicable.&#13;
 For those non-applicable management module, it returns no-such-name.</description>
                      <applications>

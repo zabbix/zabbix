@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-09-14T08:53:21Z</date>
+   <date>2021-03-09T06:46:39Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -3149,9 +3149,9 @@ WHERE drs.is_local = 0</params>
                <description>Discovery of the non-local (not local to the SQL Server instance) availability databases.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Get non-local DB states</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Get non-local DB states</name>
                      <type>ODBC</type>
-                     <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
+                     <key>db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -3174,9 +3174,9 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      </applications>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Log queue size</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Log queue size</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.non-local_db.log_send_queue_size["{#DBNAME}"]</key>
+                     <key>mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -3201,21 +3201,21 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last(#1)}&gt;{last(#2)} and {last(#2)}&gt;{last(#3)}</expression>
-                           <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Log queue size is growing</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Log queue size is growing</name>
                            <priority>HIGH</priority>
                            <description>The log records of the primary database do not send to the secondary databases.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Redo log queue size</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Redo log queue size</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.non-local_db.redo_queue_size["{#DBNAME}"]</key>
+                     <key>mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -3240,12 +3240,12 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last(#1)}&gt;{last(#2)} and {last(#2)}&gt;{last(#3)}</expression>
-                           <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Redo log queue size is growing</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Redo log queue size is growing</name>
                            <priority>HIGH</priority>
                            <description>The log records in the log files of the secondary replica have not yet been redone.</description>
                         </trigger_prototype>

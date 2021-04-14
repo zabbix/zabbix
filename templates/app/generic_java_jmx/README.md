@@ -26,7 +26,7 @@ No specific Zabbix configuration is required.
 |{$JMX.FILE.DESCRIPTORS.TIME} |<p>The time during which the file descriptors count may exceed the threshold.</p> |`3m` |
 |{$JMX.HEAP.MEM.USAGE.MAX} |<p>A threshold in percent for Heap memory utilization trigger.</p> |`85` |
 |{$JMX.HEAP.MEM.USAGE.TIME} |<p>The time during which the Heap memory utilization may exceed the threshold.</p> |`10m` |
-|{$JMX.MP.USAGE.MAX} |<p>A threshold in percent for memory pools utilization trigger. Use a context to change the treshold for a specific pool.</p> |`85` |
+|{$JMX.MP.USAGE.MAX} |<p>A threshold in percent for memory pools utilization trigger. Use a context to change the threshold for a specific pool.</p> |`85` |
 |{$JMX.MP.USAGE.TIME} |<p>The time during which the memory pools utilization may exceed the threshold.</p> |`10m` |
 |{$JMX.NONHEAP.MEM.USAGE.MAX} |<p>A threshold in percent for Non-heap memory utilization trigger.</p> |`85` |
 |{$JMX.NONHEAP.MEM.USAGE.TIME} |<p>The time during which the Non-heap memory utilization may exceed the threshold.</p> |`10m` |

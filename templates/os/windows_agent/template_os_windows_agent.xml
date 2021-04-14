@@ -629,7 +629,7 @@ than 5,000, there may well be a memory leak or you running out of memory.</descr
                      <description>The Memory Free System Page Table Entries is less than {$MEM.PAGE_TABLE_CRIT.MIN} for 5 minutes. If the number is less than 5,000, there may well be a memory leak.</description>
                      <dependencies>
                         <dependency>
-                           <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                           <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                            <expression>{Template Module Windows memory by Zabbix agent:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
                         </dependency>
                      </dependencies>
@@ -673,7 +673,7 @@ If the value is greater than 1,000, as a result of excessive paging, there may b
                      <description>The Memory Pages/sec in the last 5 minutes exceeds {$MEM.PAGE_SEC.CRIT.MAX}. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.</description>
                      <dependencies>
                         <dependency>
-                           <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                           <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                            <expression>{Template Module Windows memory by Zabbix agent:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
                         </dependency>
                      </dependencies>
@@ -799,7 +799,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
-                     <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                     <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                      <priority>AVERAGE</priority>
                      <description>The system is running out of free memory.</description>
                   </trigger>
@@ -1165,7 +1165,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()} and&#13;
 {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
@@ -1184,7 +1184,7 @@ or {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",error
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -1997,13 +1997,13 @@ Template tooling version used: 0.38</description>
       </trigger>
       <trigger>
          <expression>{Template Module Windows memory by Zabbix agent:system.swap.pfree.min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent:system.swap.size[,total].last()}&gt;0</expression>
-         <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
+         <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
          <description>This trigger is ignored, if there is no swap configured</description>
          <dependencies>
             <dependency>
-               <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+               <name>High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                <expression>{Template Module Windows memory by Zabbix agent:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
          </dependencies>

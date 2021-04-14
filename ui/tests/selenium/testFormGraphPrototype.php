@@ -754,7 +754,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=33800&hostid=40001');
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=133800&hostid=40001');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype updated');
@@ -1064,7 +1064,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	public function testFormGraphPrototype_SimpleCreate($data) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$itemName = $this->item;
-		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
+		$this->zbxTestLogin('graphs.php?parent_discoveryid=133800&form=Create+graph+prototype');
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestCheckHeader('Graph prototypes');

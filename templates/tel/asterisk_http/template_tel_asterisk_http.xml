@@ -1105,7 +1105,7 @@ In use</description>
                      <key>asterisk.queue.callers[{#QUEUE}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>The number incomming calls in queue.</description>
+                     <description>The number incoming  calls in queue.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Asterisk queue "{#QUEUE}"</name>

@@ -1,11 +1,101 @@
+Changes for 5.0.11rc1
+
+New features:
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+...G...... [ZBXNEXT-6428] added support of relative paths to the Include directive for Zabbix agent 2, plugins' parameters moved to separate config files (vadimipatov)
+
+Bug fixes:
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+.........T [ZBX-18667] fixed code spelling in templates (abakaldin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.10
+
+5.0.10rc1 was released as 5.0.10 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.10rc1
+
+New features:
+.......PS. [ZBXNEXT-6503] added protection of Zabbix Server from overloading by proxy data (dgoloscapov, wiper)
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
+.........T [ZBXNEXT-5869] added templates "MongoDB node by Zabbix Agent 2" and "MongoDB cluster by Zabbix Agent 2" (ychukina)
+.........T [ZBXNEXT-6507] added Template Power APC UPS by SNMP (mchudinov)
+...G...... [ZBXNEXT-6408] added mongoDB plugin (vadimipatov)
+.........T [ZBXNEXT-6462] added Cisco Catalyst 3750 templates (afayantsev)
+.........T [ZBXNEXT-6450] added template NetApp AFF A700 by HTTP (mchudinov)
+.........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
+.........T [ZBXNEXT-5924] added Template Module SMART by Zabbix agent 2 (mchudinov)
+.........T [ZBXNEXT-6489] added template for Huawei OceanStor 5300 V5 (tuskov)
+........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
+
+Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
+...G...... [ZBX-19103] fixed device sorting in Zabbix agent 2 smartctl plugin (esneiders)
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
+.........T [ZBX-18918] updated deprecated items in "RabbitMQ" template (abakaldin)
+.........T [ZBX-18634] changed macro names according to the Guidelines, fixed context macros in Temperature Discovery triggers, added preprocessing into Fan Discovery and Temperature Discovery (mchudinov)
+.........T [ZBX-18620] added {#REPLICA_NAME} macro in items of Non-local database discovery (mchudinov)
+...G...PS. [ZBX-19046] fixed agent build on solaris 10 (asestakovs)
+.........T [ZBX-17772] updated readme, described how to get Project ID (tuskov)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
+.........T [ZBX-18051] fixed typos extra space after "(" (abakaldin)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
+........S. [ZBX-17471,ZBX-18854] added TSDB 2.0, fixed TSDB housekeeping with 0 history period (arimdjonoks, kalimulin)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9
+
+5.0.9rc2 was released as 5.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9rc2
+
+Bug fixes:
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.9rc1
 
 New features:
+.........T [ZBXNEXT-6385] added template "Apache Ignite by JMX" (ychukina)
+...G...... [ZBXNEXT-6339] added smart plugin to support S.M.A.R.T monitoring in Zabbix Agent 2 (esneiders)
+...G...... [ZBXNEXT-6437] added native support for system.sw.packages plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6306] added native linux support for key vm.memory.size in Zabbix agent 2 (esneiders)
+.......PS. [ZBXNEXT-6443] added sha256() function to JavaScript preprocessing (viktors)
+.........T [ZBXNEXT-5809] added VictorOps media (tuskov)
 .......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
 .......PS. [ZBXNEXT-6441] added function to configure HTTP authentication for embedded scripts (wiper)
 .......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
 
 Bug fixes:
+A......... [ZBX-18966] fixed interface related errors when changing proxy type from passive to active (Ivo)
+.........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
+...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
+.........T [ZBX-18963] fixed preprocessing for archivelog items in Oracle Templates (ychukina)
+...G...... [ZBX-17543] fixed error in case if wmi.getall returned no items (dgoloscapov)
+..F....... [ZBX-18825] fixed last year period calculation in service availability report daily mode (miks)
+.........T [ZBX-18638] removed triggers of the "Temperature" items, added the "Temperature sensor condition" items with triggers, removed unnecessary macros (mchudinov)
+A......... [ZBX-18449] reworked trigger API validation (miks)
+..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
+..F....... [ZBX-18209] fixed RegEx delimiter not being escaped in macro resolver (talbergs)
+..F....... [ZBX-18237] fixed problem description icon in Monitoring->Problems in compact view mode being displayed above problem name (agriscenko)
+...G...... [ZBX-18945] fixed Zabbix agent 2 build Raspbian 10 (esneiders)
+...G...... [ZBX-18309] fixed reading log files with NULL character in log line (viktors)
+...G...... [ZBX-18872] fixed system.sw.os[name] for cases without quotation mark in /etc/os-release (akozlovs)
+.......PS. [ZBX-18885] fixed SNMP agent item not accepting values that are bigger than 2KB (vso)
+.........T [ZBX-18874] fixed incorrect links in templates and webhooks documentation (tuskov)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.8
@@ -1939,11 +2029,56 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.29rc1
+Changes for 4.0.31rc1
 
 New features:
 
 Bug fixes:
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.30
+
+4.0.30rc1 was released as 4.0.30 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.30rc1
+
+New features:
+A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
+
+Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
+..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
+..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
+A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
+A.F....... [ZBX-18998] rewrote API main object validation (rlataria, Sasha)
+A......... [ZBX-19111] improved performance of checking circular and double linkages of templates (Sasha)
+A......... [ZBX-19023] fixed inheritance of the permissions and tag filters for new host groups (Sasha)
+.....J.... [ZBX-10370] allowed Java Gateway to use ssl with remote registry (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29
+
+4.0.29rc1 was released as 4.0.29 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29rc1
+
+Bug fixes:
+A......... [ZBX-18966] fixed interface related errors when changing proxy type from passive to active (Ivo)
+...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
+..F....... [ZBX-18825] fixed last year period calculation in service availability report daily mode (miks)
+...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
+A......... [ZBX-18449] reworked trigger API validation (miks)
+..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
+...G...... [ZBX-18309] fixed reading log files with NULL character in log line (viktors)
+..F....... [ZBX-18931] fixed PHP runtime errors in CLineGraphDraw.php (Sasha)
+...G...... [ZBX-18872] fixed system.sw.os[name] for cases without quotation mark in /etc/os-release (akozlovs)
+.......PS. [ZBX-18885] fixed SNMP agent item not accepting values that are bigger than 2KB (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.28
@@ -5003,11 +5138,15 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.32
+
+3.0.32rc1 was released as 3.0.32 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.32rc1
 
-New features:
-
 Bug fixes:
+...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
 ..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 
 --------------------------------------------------------------------------------

@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/func.inc.php';
 
 class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 
@@ -32,13 +33,17 @@ class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 
 		$strings = [];
 
-		foreach (CDBHelper::getAll('SELECT name FROM valuemaps ORDER BY name', 100) as $valuemap) {
+		// Prepare the first 100 valuemaps from database, sorted by name.
+		$valuemaps = CDBHelper::getAll('SELECT name, valuemapid FROM valuemaps') ;
+		order_result($valuemaps, 'name');
+		$valuemaps = array_slice($valuemaps, 0, 100);
+		foreach ($valuemaps as $valuemap) {
 			$strings[] = $valuemap['name'];
-		}
+			$ids[] = $valuemap['valuemapid'];
+		};
 
-		foreach (CDBHelper::getAll('SELECT value,newvalue FROM mappings m'.
-				' INNER JOIN (SELECT valuemapid FROM valuemaps ORDER BY name LIMIT 100) v'.
-				' ON m.valuemapid=v.valuemapid') as $mapping) {
+		foreach (CDBHelper::getAll('SELECT value, newvalue FROM mappings'.
+				' WHERE valuemapid IN ('.implode(",", $ids).')') as $mapping) {
 			$strings[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
 		}
 

@@ -1440,7 +1440,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                             <name>DB {#DBNAME}: Get bloating tables</name>
                             <key>pgsql.db.bloating_tables[&quot;{$PG.URI}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.PASSWORD}&quot;,&quot;{#DBNAME}&quot;]</key>
                             <history>7d</history>
-                            <description>Number оf bloating tables</description>
+                            <description>Number of bloating tables</description>
                             <application_prototypes>
                                 <application_prototype>
                                     <name>PostgreSQL: DB {#DBNAME}</name>
