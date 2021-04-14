@@ -114,13 +114,13 @@ $widget = (new CWidget())
 							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
 							->setEnabled($data['dashboard']['can_edit_dashboards']
-								|| $data['dashboard']['allowed_view_reports']
+								|| $data['dashboard']['can_view_reports']
 							)
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
 								$data['dashboard']['editable'], $data['dashboard']['has_related_reports'],
-								$data['dashboard']['can_edit_dashboards'], $data['dashboard']['allowed_view_reports'],
-								$data['dashboard']['allowed_create_reports']
+								$data['dashboard']['can_edit_dashboards'], $data['dashboard']['can_view_reports'],
+								$data['dashboard']['can_create_reports']
 							))
 					)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))

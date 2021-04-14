@@ -87,8 +87,8 @@ class CControllerDashboardView extends CController {
 		}
 
 		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
-		$dashboard['allowed_view_reports'] = $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS);
-		$dashboard['allowed_create_reports'] = $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
+		$dashboard['can_view_reports'] = $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS);
+		$dashboard['can_create_reports'] = $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashboard.filter',

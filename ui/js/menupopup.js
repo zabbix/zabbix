@@ -449,10 +449,10 @@ function getMenuPopupMapElementImage(options) {
  * @param {string} options['dashboardid']
  * @param {bool}   options['editable']
  * @param {bool}   options['has_related_reports']
- * @param {bool}   options['allowed_edit']
- * @param {bool}   options['allowed_view_reports']
- * @param {bool}   options['allowed_create_reports']
- * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
+ * @param {bool}   options['can_edit_dashboards']
+ * @param {bool}   options['can_view_reports']
+ * @param {bool}   options['can_create_reports']
+ * @param {object} trigger_elmnt                   UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -463,7 +463,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 	};
 
 	// Dashboard actions.
-	if (options.allowed_edit) {
+	if (options.can_edit_dashboards) {
 		const url_create = new Curl('zabbix.php', false);
 		url_create.setArgument('action', 'dashboard.view');
 		url_create.setArgument('new', '1');
@@ -514,7 +514,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 	}
 
 	// Report actions.
-	if (options.allowed_view_reports) {
+	if (options.can_view_reports) {
 		const report_actions = [
 			{
 				label: t('View related reports'),
@@ -527,7 +527,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 			}
 		];
 
-		if (options.allowed_create_reports) {
+		if (options.can_create_reports) {
 			report_actions.unshift({
 				label: t('Create new report'),
 				clickCallback: function () {
@@ -539,7 +539,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 		}
 
 		sections.push({
-			label: options.allowed_edit ? null : t('Actions'),
+			label: options.can_edit_dashboards ? null : t('Actions'),
 			items: report_actions
 		})
 	}

@@ -27,23 +27,23 @@ class CMenuPopupHelper {
 	 * @param string|null $dashboardid
 	 * @param bool        $editable
 	 * @param bool        $has_related_reports
-	 * @param bool        $allowed_edit
-	 * @param bool        $allowed_view_reports
-	 * @param bool        $allowed_create_reports
+	 * @param bool        $can_edit_dashboards
+	 * @param bool        $can_view_reports
+	 * @param bool        $can_create_reports
 	 *
 	 * @return array
 	 */
 	public static function getDashboard(?string $dashboardid, bool $editable, bool $has_related_reports,
-			bool $allowed_edit, bool $allowed_view_reports, bool $allowed_create_reports): array {
+			bool $can_edit_dashboards, bool $can_view_reports, bool $can_create_reports): array {
 		return [
 			'type' => 'dashboard',
 			'data' => [
 				'dashboardid' => $dashboardid,
 				'editable' => $editable,
 				'has_related_reports' => $has_related_reports,
-				'allowed_edit' => $allowed_edit,
-				'allowed_view_reports' => $allowed_view_reports,
-				'allowed_create_reports' => $allowed_create_reports
+				'can_edit_dashboards' => $can_edit_dashboards,
+				'can_view_reports' => $can_view_reports,
+				'can_create_reports' => $can_create_reports
 			]
 		];
 	}
