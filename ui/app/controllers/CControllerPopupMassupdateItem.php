@@ -205,7 +205,7 @@ class CControllerPopupMassupdateItem extends CController {
 
 		if (array_key_exists('tags', $input)) {
 			$input['tags'] = array_filter($input['tags'], function ($tag) {
-				return ($tag['tag'] !== '' && $tag['value'] !== '');
+				return ($tag['tag'] !== '');
 			});
 		}
 
