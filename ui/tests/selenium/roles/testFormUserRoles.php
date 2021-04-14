@@ -586,11 +586,13 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	public function testFormUserRoles_Layout() {
+		$roles = ['User', 'Admin', 'Super admin'];
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=1');
 		$this->page->assertTitle('Configuration of user roles');
 		$this->page->assertHeader('User roles');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
+		$this->assertEquals($roles, $this->query('class:js-userrole-usertype')->one()->asZDropdown()->getOptions()->asText());
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
@@ -606,7 +608,7 @@ class testFormUserRoles extends CWebTest {
 		// New role check with screenshots.
 		$this->page->open('zabbix.php?action=userrole.edit');
 		$screenshot_area = $this->query('id:user_role_tab')->one();
-		foreach (['User', 'Admin', 'Super admin'] as $role) {
+		foreach ($roles as $role) {
 			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
 			$this->page->removeFocus();
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
