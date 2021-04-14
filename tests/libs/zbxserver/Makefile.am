@@ -144,10 +144,7 @@ valuemaps_SOURCES = \
 	valuemaps.c \
 	$(COMMON_SRC_FILES)
 
-valuemaps_LDADD = \
-	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
-
-valuemaps_LDADD += $(COMMON_LIB_FILES)
+valuemaps_LDADD = $(COMMON_LIB_FILES)
 
 valuemaps_LDADD += @SERVER_LIBS@
 

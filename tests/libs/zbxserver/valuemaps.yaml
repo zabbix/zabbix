@@ -6,11 +6,11 @@ in:
   - type: 0
     value: 0
     newvalue: "Value 0"
-  - type: 1
+  - type: 4
     value: "^1$"
     newvalue: "Regex 1"
   - type: 2
-    value: "<3"
+    value: "3"
     newvalue: "Value < 3"
 out:
   return: SUCCEED
@@ -23,11 +23,11 @@ in:
   - type: 0
     value: 0
     newvalue: "Value 0"
-  - type: 1
+  - type: 4
     value: "^1$"
     newvalue: "Regex 1"
   - type: 2
-    value: "<3"
+    value: "3"
     newvalue: "Value < 3"
 out:
   return: SUCCEED
@@ -40,11 +40,11 @@ in:
   - type: 0
     value: 0
     newvalue: "Value 0"
-  - type: 1
+  - type: 4
     value: "^1$"
     newvalue: "Regex 1"
   - type: 2
-    value: "<3"
+    value: "3"
     newvalue: "Value < 3"
 out:
   return: SUCCEED
@@ -57,14 +57,14 @@ in:
   - type: 0
     value: 0
     newvalue: "Value 0"
-  - type: 1
+  - type: 4
     value: "^1$"
     newvalue: "Regex 1"
   - type: 2
-    value: "<3"
+    value: "3"
     newvalue: "Value < 3"
-  - type: 2
-    value: 5:7
+  - type: 3
+    value: "5:7"
     newvalue: "Value 5-7"
 out:
   return: SUCCEED
@@ -77,17 +77,17 @@ in:
   - type: 0
     value: 0
     newvalue: "Value 0"
-  - type: 1
+  - type: 4
     value: "^1$"
     newvalue: "Regex 1"
   - type: 2
-    value: <3
+    value: 3
     newvalue: "Value < 3"
-  - type: 2
-    value: 5:7
+  - type: 3
+    value: "5:7"
     newvalue: "Value 5-7"
-  - type: 2
-    value: "> 10"
+  - type: 1
+    value: 10
     newvalue: "Value > 10"
 out:
   return: SUCCEED
@@ -100,20 +100,20 @@ in:
   - type: 0
     value: 0
     newvalue: "Value 0"
-  - type: 1
+  - type: 4
     value: "^1$"
     newvalue: "Regex 1"
   - type: 2
-    value: <3
+    value: 3
     newvalue: "Value < 3"
-  - type: 2
-    value: 5:7
+  - type: 3
+    value: "5:7"
     newvalue: "Value 5-7"
-  - type: 2
-    value: "> 10"
+  - type: 1
+    value: 10
     newvalue: "Value > 10"
-  - type: 2
-    value: "*"
+  - type: 5
+    value: ""
     newvalue: "Default"
 out:
   return: SUCCEED
@@ -126,17 +126,17 @@ in:
   - type: 0
     value: 0
     newvalue: "Value 0"
-  - type: 1
+  - type: 4
     value: "^1$"
     newvalue: "Regex 1"
   - type: 2
-    value: <3
+    value: 3
     newvalue: "Value < 3"
-  - type: 2
-    value: 5:7
+  - type: 3
+    value: "5:7"
     newvalue: "Value 5-7"
-  - type: 2
-    value: "> 10"
+  - type: 1
+    value: 10
     newvalue: "Value > 10"
 out:
   return: FAIL

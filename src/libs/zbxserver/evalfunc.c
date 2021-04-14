@@ -44,8 +44,11 @@ zbx_value_type_t;
 #define ZBX_VALUEMAP_STRING_LEN	64
 
 #define ZBX_VALUEMAP_TYPE_MATCH		0
-#define ZBX_VALUEMAP_TYPE_REGEXP	1
-#define ZBX_VALUEMAP_TYPE_RANGE		2
+#define ZBX_VALUEMAP_TYPE_GREATER	1
+#define ZBX_VALUEMAP_TYPE_LESS		2
+#define ZBX_VALUEMAP_TYPE_RANGE		3
+#define ZBX_VALUEMAP_TYPE_REGEX		4
+#define ZBX_VALUEMAP_TYPE_DEFAULT	5
 
 typedef struct
 {
@@ -3341,7 +3344,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
-		if (ZBX_VALUEMAP_TYPE_REGEXP != valuemap->type)
+		if (ZBX_VALUEMAP_TYPE_REGEX != valuemap->type)
 			continue;
 
 		zbx_vector_ptr_create(&regexps);
@@ -3377,28 +3380,20 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 			valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
-			if (ZBX_VALUEMAP_TYPE_RANGE != valuemap->type)
-				continue;
-
-			if (1 == sscanf(valuemap->value, "<%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "s", threshold_max))
+			if (ZBX_VALUEMAP_TYPE_LESS == valuemap->type &&
+					ZBX_INFINITY != (max = evaluate_string_to_double(valuemap->value)))
 			{
-				zbx_lrtrim(threshold_max, " ");
-				if (ZBX_INFINITY != (max = evaluate_string_to_double(threshold_max)) &&
-						input_value < max)
-				{
+				if (input_value < max)
 					goto map_value;
-				}
 			}
-			else if (1 == sscanf(valuemap->value, ">%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "s", threshold_min))
+			else if (ZBX_VALUEMAP_TYPE_GREATER == valuemap->type &&
+					ZBX_INFINITY != (min = evaluate_string_to_double(valuemap->value)))
 			{
-				zbx_lrtrim(threshold_min, " ");
-				if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
-						input_value > min)
-				{
+				if (input_value > min)
 					goto map_value;
-				}
 			}
-			else if (2 == sscanf(valuemap->value, "%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "[^:]:%"
+			else if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type &&
+					2 == sscanf(valuemap->value, "%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "[^:]:%"
 					ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "s", threshold_min, threshold_max))
 			{
 				zbx_lrtrim(threshold_max, " ");
@@ -3418,7 +3413,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 	{
 		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
-		if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type && 0 == strcmp(valuemap->value, "*"))
+		if (ZBX_VALUEMAP_TYPE_DEFAULT == valuemap->type)
 			goto map_value;
 	}
 

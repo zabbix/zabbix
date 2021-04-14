@@ -24,7 +24,6 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "valuecache.h"
 #include "zbxserver.h"
 #include "log.h"
 #include "../zbxalgo/vectorimpl.h"
