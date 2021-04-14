@@ -363,6 +363,16 @@ void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expressio
 	int			i;
 	size_t			pos = 0, expression_alloc = 0, expression_offset = 0;
 
+	/* Handle exceptions that are set when expression evaluation failed.     */
+	/* Exception stack consists of two tokens - error message and exception. */
+	if (2 == ctx->stack.values_num && ZBX_EVAL_TOKEN_EXCEPTION == ctx->stack.values[1].type)
+	{
+		zbx_strcpy_alloc(expression, &expression_alloc, &expression_offset, "throw(");
+		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, &ctx->stack.values[0]);
+		zbx_chrcpy_alloc(expression, &expression_alloc, &expression_offset, ')');
+		return;
+	}
+
 	zbx_vector_ptr_create(&tokens);
 
 	for (i = 0; i < ctx->stack.values_num; i++)
