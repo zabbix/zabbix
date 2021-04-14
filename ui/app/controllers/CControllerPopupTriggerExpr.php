@@ -549,17 +549,24 @@ class CControllerPopupTriggerExpr extends CController {
 						: PARAM_TYPE_TIME;
 
 					$param_values = [];
+					if (array_key_exists(0, $params)) {
+						if ($params[0] instanceof CPeriodParserResult) {
+							$param_values[] = $is_num ? substr($params[0]->sec_num, 1) : $params[0]->sec_num;
+							$param_values[] = $params[0]->time_shift;
+						}
+						elseif (!($params[0] instanceof CFunctionParserResult)) {
+							$param_values = array_merge($param_values, [$params[0]->getValue(), '']);
+						}
+
+						array_shift($params);
+					}
+
 					foreach ($params as $i => $param) {
 						if ($param instanceof CFunctionParserResult) {
 							continue;
 						}
-						elseif ($i == 0 && ($param instanceof CPeriodParserResult)) {
-							$param_values[] = $is_num ? substr($param->sec_num, 1) : $param->sec_num;
-							$param_values[] = $param->time_shift;
-						}
-						else {
-							$param_values[] = $param->getValue();
-						}
+
+						$param_values[] = $param->getValue();
 					}
 					$params = $param_values;
 
