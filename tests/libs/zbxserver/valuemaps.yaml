@@ -118,5 +118,28 @@ in:
 out:
   return: SUCCEED
   value: "Default (4)"
+---
+test case: no mapping
+in:
+  value: 4
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 1
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: <3
+    newvalue: "Value < 3"
+  - type: 2
+    value: 5:7
+    newvalue: "Value 5-7"
+  - type: 2
+    value: "> 10"
+    newvalue: "Value > 10"
+out:
+  return: FAIL
+  value: 4
 ...
 

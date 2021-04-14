@@ -83,17 +83,6 @@ void	zbx_mock_test_entry(void **state)
 	newvalue = (char *)zbx_mock_get_parameter_string("out.value");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	/*{
-		int i;
-		for (i = 0; i < valuemaps.values_num; i++)
-			{
-			valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
-			printf("AKDBG VALUE '%s'value '%s', newvalue '%s', type %d\n",value,  valuemap->value, valuemap->newvalue, valuemap->type);
-
-			}
-
-	}*/
-
 	ret = evaluate_value_by_map_test(value, sizeof(value), &valuemaps);
 
 	zbx_mock_assert_int_eq("valuemaps return value", expected_ret, ret);
