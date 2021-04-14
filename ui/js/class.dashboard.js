@@ -525,11 +525,39 @@ class CDashboard extends CBaseComponent {
 					widgets[i].fields = response.widgets[i].fields;
 				}
 
+				const used_references = this._getUsedReferences();
+				const reference_substitution = new Map();
+
+				for (let i = 0; i < widgets.length; i++) {
+					let reference_fields = this._widget_defaults[widgets[i].type].foreign_reference_fields;
+
+					if (this._widget_defaults[widgets[i].type].reference_field !== null) {
+						reference_fields.push(this._widget_defaults[widgets[i].type].reference_field);
+					}
+
+					for (const reference_field of reference_fields) {
+						const old_reference = widgets[i].fields[reference_field];
+
+						if (old_reference === undefined) {
+							continue;
+						}
+
+						if (!reference_substitution.has(old_reference)) {
+							const new_reference = this._createReference({used_references});
+
+							used_references.add(new_reference);
+							reference_substitution.set(old_reference, new_reference);
+						}
+
+						widgets[i].fields[reference_field] = reference_substitution.get(old_reference);
+					}
+				}
+
 				const dashboard_page = this.addDashboardPage({
 					dashboard_pageid: null,
 					name: new_dashboard_page_data.name,
 					display_period: new_dashboard_page_data.display_period,
-					widgets: widgets
+					widgets
 				});
 
 				this._selectDashboardPage(dashboard_page, {is_async: true});
@@ -569,6 +597,16 @@ class CDashboard extends CBaseComponent {
 			this._warnDashboardPageExhausted();
 
 			return;
+		}
+
+		const reference_field = this._widget_defaults[new_widget_data.type].reference_field;
+
+		if (reference_field !== null) {
+			new_widget_data.fields[reference_field] = this._createReference();
+		}
+
+		for (const reference_field of this._widget_defaults[new_widget_data.type].foreign_reference_fields) {
+			delete new_widget_data.fields[reference_field];
 		}
 
 		if (widget !== null) {
@@ -1177,6 +1215,10 @@ class CDashboard extends CBaseComponent {
 					return;
 				}
 
+				if (this._widget_defaults[type].reference_field !== null) {
+					fields[this._widget_defaults[type].reference_field] = this._createReference();
+				}
+
 				const widget_data = {
 					type,
 					name,
@@ -1539,6 +1581,46 @@ class CDashboard extends CBaseComponent {
 
 	_createUniqueId() {
 		return 'U' + (this._unique_id_index++).toString(36).toUpperCase().padStart(6, '0');
+	}
+
+	_createReference({used_references = null} = {}) {
+		if (used_references === null) {
+			used_references = this._getUsedReferences();
+		}
+
+		let reference;
+
+		do {
+			reference = '';
+
+			for (let i = 0; i < 5; i++) {
+				reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+			}
+		}
+		while (used_references.has(reference));
+
+		return reference;
+	}
+
+	_getUsedReferences() {
+		let used_references = new Set();
+
+		for (const dashboard_page of this._dashboard_pages.keys()) {
+			for (const widget of dashboard_page.getWidgets()) {
+				const type = widget.getType();
+				const fields = widget.getFields();
+
+				if (this._widget_defaults[type].reference_field !== null) {
+					used_references.add(fields[this._widget_defaults[type].reference_field]);
+				}
+
+				for (const reference_field of this._widget_defaults[type].foreign_reference_fields) {
+					used_references.add(fields[reference_field]);
+				}
+			}
+		}
+
+		return used_references;
 	}
 
 	// Internal events management methods.
