@@ -90,11 +90,17 @@ class CControllerScheduledReportList extends CController {
 		];
 
 		$expired = null;
+		$status = null;
 		if ($filter['status'] == ZBX_REPORT_STATUS_ENABLED) {
 			$expired = false;
+			$status = ZBX_REPORT_STATUS_ENABLED;
+		}
+		elseif ($filter['status'] == ZBX_REPORT_STATUS_DISABLED) {
+			$status = ZBX_REPORT_STATUS_DISABLED;
 		}
 		elseif ($filter['status'] == ZBX_REPORT_STATUS_EXPIRED) {
 			$expired = true;
+			$status = ZBX_REPORT_STATUS_ENABLED;
 		}
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
@@ -110,8 +116,7 @@ class CControllerScheduledReportList extends CController {
 			'sortfield' => $sort_field,
 			'filter' => [
 				'userid' => ($filter['show'] == ZBX_REPORT_FILTER_SHOW_MY) ? CWebUser::$data['userid'] : null,
-				'status' => ($filter['status'] == ZBX_REPORT_STATUS_ENABLED
-					|| $filter['status'] == ZBX_REPORT_STATUS_DISABLED) ? $filter['status'] : null
+				'status' => $status
 			],
 			'limit' => $limit
 		]);
