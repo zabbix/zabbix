@@ -825,7 +825,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		foreach (['Admin role', 'role_for_delete'] as $role) {
 			if ($role === 'Admin role') {
-				$role_hash_before = CDBHelper::getHash('SELECT * FROM role');
+				$hash_before = CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid');
 			}
 			$this->query('link', $role)->one()->click();
 			$this->query('button:Delete')->one()->click();
@@ -834,7 +834,7 @@ class testFormUserRoles extends CWebTest {
 			if ($role === 'Admin role') {
 				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'The role "Admin role" is assigned to'.
 						' at least one user and cannot be deleted.');
-				$this->assertEquals($role_hash_before, CDBHelper::getHash('SELECT * FROM role'));
+				$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid'));
 			}
 			else {
 				$this->assertMessage(TEST_GOOD, 'User role deleted');
@@ -885,7 +885,8 @@ class testFormUserRoles extends CWebTest {
 
 			if ($action === 'create') {
 				$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM role WHERE name='.zbx_dbstr($data['fields']['Name'])));
-				$this->query('link', $data['fields']['Name'])->one()->click();
+				$created_roleid = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr($data['fields']['Name']));
+				$this->page->open('zabbix.php?action=userrole.edit&roleid='.$created_roleid);
 			}
 			else {
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$roleid);
