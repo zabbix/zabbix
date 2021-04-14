@@ -911,6 +911,8 @@ static void	calc_cache_dcitems(zbx_calc_eval_t *eval)
 
 			zbx_vector_ptr_append(&eval->dcitem_refs, &eval->dcitems_hk[i]);
 		}
+
+		zbx_vector_ptr_sort(&eval->dcitem_refs, compare_dcitems_by_itemid);
 	}
 
 	for (i = 0; i < eval->queries.values_num; i++)
@@ -942,6 +944,8 @@ static void	calc_cache_dcitems(zbx_calc_eval_t *eval)
 
 	if (0 != (eval->dcitems_num = itemids.values_num))
 	{
+		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		eval->dcitems = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		eval->errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
