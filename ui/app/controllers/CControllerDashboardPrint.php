@@ -42,11 +42,7 @@ class CControllerDashboardPrint extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
-			return false;
-		}
-
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD);
 	}
 
 	protected function doAction() {
@@ -81,7 +77,7 @@ class CControllerDashboardPrint extends CController {
 	 *
 	 * @return array
 	 */
-	private function getDashboard() {
+	private function getDashboard(): array {
 		$dashboard = null;
 		$error = null;
 
