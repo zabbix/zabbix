@@ -730,9 +730,9 @@ class CControllerPopupTriggerExpr extends CController {
 
 					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
 						// Validate trigger function.
-						$trigger_function_validator = new CFunctionValidator();
-						if (!$trigger_function_validator->validate($result->getTokens()[0])) {
-							error($trigger_function_validator->getError());
+						$math_function_validator = new CMathFunctionValidator();
+						if (!$math_function_validator->validate($result->getTokens()[0])) {
+							error($math_function_validator->getError());
 						}
 					}
 					else {
@@ -836,22 +836,23 @@ class CControllerPopupTriggerExpr extends CController {
 						$math_function_validator = new CMathFunctionValidator();
 						$trigger_function_validator = new CFunctionValidator();
 						$fn = $result->getTokens()[0];
-						$error_msg = '';
+						$errors = [];
 
 						if (!$math_function_validator->validate($fn)) {
-							$error_msg = $math_function_validator->getError();
+							$errors[$math_function_validator->error_pos] = $math_function_validator->getError();
 
 							if (!$trigger_function_validator->validate($fn)
 									|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
-								$error_msg = $trigger_function_validator->getError();
+								$errors[$trigger_function_validator->error_pos]
+									= $trigger_function_validator->getError();
 							}
 							else {
-								$error_msg = '';
+								$errors = [];
 							}
 						}
 
-						if ($error_msg !== '') {
-							error($error_msg);
+						if ($errors) {
+							error($errors[max(array_keys($errors))]);
 						}
 					}
 					else {
