@@ -486,10 +486,6 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateQuery(string $param): bool {
-		if ($this->isMacro($param)) {
-			return true;
-		}
-
 		$parser = new CQueryParser();
 		return ($parser->parse($param) === CParser::PARSE_SUCCESS);
 	}
