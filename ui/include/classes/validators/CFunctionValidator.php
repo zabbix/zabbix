@@ -138,18 +138,6 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $value_types_all
 			],
-			'date' => [
-				'args' => [],
-				'value_types' => $value_types_all
-			],
-			'dayofmonth' => [
-				'args' => [],
-				'value_types' => $value_types_all
-			],
-			'dayofweek' => [
-				'args' => [],
-				'value_types' => $value_types_all
-			],
 			'find' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
@@ -231,10 +219,6 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $value_types_all
 			],
-			'now' => [
-				'args' => [],
-				'value_types' => $value_types_all
-			],
 			'percentile' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
@@ -249,10 +233,6 @@ class CFunctionValidator extends CValidator {
 					['type' => 'scale', 'mandat' => 0x01]
 				],
 				'value_types' => $value_types_num
-			],
-			'time' => [
-				'args' => [],
-				'value_types' => $value_types_all
 			],
 			'timeleft' => [
 				'args' => [

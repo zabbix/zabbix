@@ -36,7 +36,12 @@ class CMathFunctionValidator extends CValidator {
 		'max',
 		'min',
 		'length',
-		'sum'
+		'sum',
+		'date',
+		'dayofmonth',
+		'dayofweek',
+		'now',
+		'time'
 	];
 
 	/**
@@ -47,7 +52,12 @@ class CMathFunctionValidator extends CValidator {
 	private $number_of_parameters = [
 		'abs' => 1,
 		'bitand' => 2,
-		'length' => 1
+		'length' => 1,
+		'date' => 0,
+		'dayofmonth' => 0,
+		'dayofweek' => 0,
+		'now' => 0,
+		'time' => 0
 	];
 
 	/**
@@ -129,7 +139,9 @@ class CMathFunctionValidator extends CValidator {
 
 		$last_valid_pos = $fn->pos + $fn->params_raw['pos'] + 1;
 
-		if (count($fn->params_raw['parameters']) == 0) {
+		if ((!array_key_exists($fn->function, $this->number_of_parameters)
+					|| $this->number_of_parameters[$fn->function] > 0)
+				&& count($fn->params_raw['parameters']) == 0) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Mandatory parameter is missing.')
 			);
