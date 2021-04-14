@@ -1305,7 +1305,6 @@ class testMassUpdateItems extends CWebTest{
 						$form->query('id', $value['id'])->one()->asMultiselect()->setFillMode(CMultiselectElement::MODE_SELECT)
 							->fill($value['value']);
 					}
-
 					break;
 			}
 		}
