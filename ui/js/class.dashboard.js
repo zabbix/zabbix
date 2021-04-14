@@ -1603,7 +1603,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_getUsedReferences() {
-		let used_references = new Set();
+		const used_references = new Set();
 
 		for (const dashboard_page of this._dashboard_pages.keys()) {
 			for (const widget of dashboard_page.getWidgets()) {
