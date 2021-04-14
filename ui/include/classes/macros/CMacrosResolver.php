@@ -1044,7 +1044,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										))
 											->addClass(ZBX_STYLE_LINK_ALT)
 											->addClass($style)
-										: (new CSpan($function['host'].':'.$function['key_']))
+										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
 								else {
