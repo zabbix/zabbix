@@ -121,6 +121,9 @@ class testSID extends CWebTest {
 			// Template dashboard widget edit.
 			[['link' => 'zabbix.php?action=dashboard.widget.edit&templateid=10076']],
 
+			// Dashboard widget sanitize.
+			[['link' => 'zabbix.php?action=dashboard.widget.sanitize&fields=%7B%22reference%22%3A%22IACGE%22%7D&type=navtree']],
+
 			// Macros update.
 			[['link' => 'zabbix.php?action=macros.update&form_refresh=1&macros%5B16%5D%5Bmacro%5D=%7B%24FGDFGDF%7D&'.
 					'macros%5B16%5D%5Bvalue%5D=dfsdfsfs&macros%5B16%5D%5Btype%5D=0&macros%5B16%5D%5Bdescription%5D=&'.
