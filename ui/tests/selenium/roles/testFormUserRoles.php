@@ -302,6 +302,68 @@ class testFormUserRoles extends CWebTest {
 					'message_details' => 'At least one UI element must be checked.'
 				]
 			],
+			// Special symbols in the name.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '!@#$%^^&*()_+',
+						'User type' => 'User'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '!@#$%^^&*()_=',
+						'User type' => 'Admin'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '!@#$%^^&*()_?',
+						'User type' => 'Super admin'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// A lot of saces in the name.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'user          test          name',
+						'User type' => 'User'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'admin          test          name',
+						'User type' => 'Admin'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'super          admin          test          name',
+						'User type' => 'Super admin'
+					],
+					'message_header' => 'User role created'
+				]
+			],
 			// All UI elements checked out except one.
 			[
 				[
@@ -524,9 +586,11 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	public function testFormUserRoles_Layout() {
-		// Checking buttons for already created role.
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=1');
+		$this->page->assertTitle('Configuration of user roles');
+		$this->page->assertHeader('User roles');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
@@ -777,7 +841,11 @@ class testFormUserRoles extends CWebTest {
 		}
 	}
 
-	// Fill multiselect field.
+	/**
+	 * Fill multiselect field.
+	 *
+	 * @param array $methods	api methods from data provider
+	 */
 	private function fillMultiselect($methods) {
 		$api_field = $this->query('class:multiselect-control')->asMultiselect()->one();
 		$api_field->fill($methods);
