@@ -582,7 +582,7 @@ class testFormUserRoles extends CWebTest {
 	 */
 	public function testFormUserRoles_Create($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.edit');
-		$this->CreateUpdate($data, 'create');
+		$this->checkRoleAction($data, 'create');
 	}
 
 	public function testFormUserRoles_Layout() {
@@ -790,7 +790,7 @@ class testFormUserRoles extends CWebTest {
 	public function testFormUserRoles_Update($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('link', $data['link'])->one()->click();
-		$this->CreateUpdate($data, 'update');
+		$this->checkRoleAction($data, 'update');
 	}
 
 	public function testFormUserRoles_Clone() {
@@ -859,7 +859,7 @@ class testFormUserRoles extends CWebTest {
 	 * @param array $data		given data provider
 	 * @param string $action	create or update
 	 */
-	private function CreateUpdate($data, $action) {
+	private function checkRoleAction($data, $action) {
 		if ($action === 'create') {
 			if ($data['expected'] === TEST_BAD) {
 				$hash_before = CDBHelper::getHash('SELECT * FROM role');
