@@ -1765,4 +1765,42 @@ class testMassUpdateItems extends CWebTest{
 			}
 		}
 	}
+
+	/**
+	 * Cancel Mass updating of items or item prototypes.
+	 *
+	 * @param    boolean    $prototypes   true if item prototype, false if item
+	 */
+	public function executeMassUpdateCancel($prototypes = false) {
+		$items  = [
+			'1_Item_Preprocessing',
+			'2_Item_Preprocessing',
+			'1_Item_No_Preprocessing',
+			'2_Item_No_Preprocessing'
+		];
+
+		$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+
+		$link = ($prototypes)
+			? 'disc_prototypes.php?parent_discoveryid='.self::RULEID
+			: 'items.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID;
+		$this->page->login()->open($link);
+
+		// Get item table.
+		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+		foreach ($items as $item) {
+			$table->findRow('Name', $item)->select();
+		}
+
+		// Open mass update form and click Cancel.
+		$this->query('button:Mass update')->one()->click();
+		$this->query('button:Cancel')->one()->waitUntilClickable()->click();
+
+		// Check that UI returned to previous page and hash remained unchanged.
+		$this->page->waitUntilReady();
+		$header = ($prototypes) ? 'Item prototypes' : 'Items';
+		$this->page->assertHeader($header);
+
+		$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
+	}
 }

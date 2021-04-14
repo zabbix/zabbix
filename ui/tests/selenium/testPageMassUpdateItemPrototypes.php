@@ -444,8 +444,15 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 
 	/**
 	 * @on-before-once prepareItemPrototypePreprocessingData
-	 *
+	 */
+	public function testPageMassUpdateItemPrototypes_Cancel() {
+		$this->executeMassUpdateCancel(true);
+	}
+
+	/**
 	 * @dataProvider getCommonPreprocessingChangeData
+	 *
+	 * @depends testPageMassUpdateItemPrototypes_Cancel
 	 */
 	public function testPageMassUpdateItemPrototypes_ChangePreprocessing($data) {
 		$this->executeItemsPreprocessingMassUpdate($data, true);
