@@ -3,7 +3,8 @@ SERVER_tests = \
 	get_trigger_expression_constant \
 	evaluate_function \
 	substitute_lld_macros \
-	macro_fmttime
+	macro_fmttime \
+	valuemaps
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -139,6 +140,19 @@ evaluate_function_LDADD += @SERVER_LIBS@
 
 evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
 
+valuemaps_SOURCES = \
+	valuemaps.c \
+	$(COMMON_SRC_FILES)
+
+valuemaps_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+valuemaps_LDADD += $(COMMON_LIB_FILES)
+
+valuemaps_LDADD += @SERVER_LIBS@
+
+valuemaps_LDFLAGS = @SERVER_LDFLAGS@
+
 VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
 	-Wl,--wrap=zbx_mutex_destroy \
@@ -157,6 +171,11 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_timespec
 
 evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+valuemaps_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory

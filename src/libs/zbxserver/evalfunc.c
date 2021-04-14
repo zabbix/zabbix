@@ -3306,69 +3306,40 @@ static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
 
 /******************************************************************************
  *                                                                            *
- * Function: replace_value_by_map                                             *
+ * Function: evaluate_value_by_map                                            *
  *                                                                            *
  * Purpose: replace value by mapping value                                    *
  *                                                                            *
  * Parameters: value - value for replacing                                    *
  *             max_len - maximal length of output value                       *
- *             valuemapid - index of value map                                *
+ *             valuemaps - vector of vales mapped                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
  *                                                                            *
  ******************************************************************************/
-static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid)
+static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps)
 {
 	char				*value_tmp;
 	int				i, ret = FAIL;
 	double				input_value;
-	DB_RESULT			result;
-	DB_ROW				row;
 	zbx_valuemaps_t			*valuemap;
-	zbx_vector_valuemaps_ptr_t	valuemaps;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __func__, value, valuemapid);
-
-	if (0 == valuemapid)
-		goto clean;
-
-	zbx_vector_valuemaps_ptr_create(&valuemaps);
-
-	result = DBselect(
-			"select value,newvalue,type"
-			" from valuemap_mapping"
-			" where valuemapid=" ZBX_FS_UI64,
-			valuemapid);
-
-	while (NULL != (row = DBfetch(result)))
+	for (i = 0; i < valuemaps->values_num; i++)
 	{
-		del_zeros(row[1]);
-
-		valuemap = (zbx_valuemaps_t *)zbx_malloc(NULL, sizeof(zbx_valuemaps_t));
-		zbx_strlcpy_utf8(valuemap->value, row[0], ZBX_VALUEMAP_STRING_LEN);
-		zbx_strlcpy_utf8(valuemap->newvalue, row[1], ZBX_VALUEMAP_STRING_LEN);
-		valuemap->type = atoi(row[2]);
-		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
-	}
-
-	DBfree_result(result);
-
-	for (i = 0; i < valuemaps.values_num; i++)
-	{
-		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
 		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type && 0 == strcmp(valuemap->value, value))
 			goto map_value;
 	}
 
-	for (i = 0; i < valuemaps.values_num; i++)
+	for (i = 0; i < valuemaps->values_num; i++)
 	{
 		char			*pattern;
 		int			match;
 		zbx_vector_ptr_t	regexps;
 
-		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
 		if (ZBX_VALUEMAP_TYPE_REGEXP != valuemap->type)
 			continue;
@@ -3399,12 +3370,12 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	if (ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
 	{
-		for (i = 0; i < valuemaps.values_num; i++)
+		for (i = 0; i < valuemaps->values_num; i++)
 		{
 			char	threshold_min[ZBX_VALUEMAP_STRING_LEN], threshold_max[ZBX_VALUEMAP_STRING_LEN];
 			double	min, max;
 
-			valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+			valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
 			if (ZBX_VALUEMAP_TYPE_RANGE != valuemap->type)
 				continue;
@@ -3443,16 +3414,16 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 		}
 	}
 
-	for (i = 0; i < valuemaps.values_num; i++)
+	for (i = 0; i < valuemaps->values_num; i++)
 	{
-		valuemap = (zbx_valuemaps_t *)valuemaps.values[i];
+		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
 		if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type && 0 == strcmp(valuemap->value, "*"))
 			goto map_value;
 	}
 
 map_value:
-	if (0 <= i && i < valuemaps.values_num)
+	if (0 <= i && i < valuemaps->values_num)
 	{
 		value_tmp = zbx_dsprintf(NULL, "%s (%s)", valuemap->newvalue, value);
 		zbx_strlcpy_utf8(value, value_tmp, max_len);
@@ -3460,6 +3431,58 @@ map_value:
 
 		ret = SUCCEED;
 	}
+
+	return ret;
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: replace_value_by_map                                             *
+ *                                                                            *
+ * Purpose: replace value by mapping value                                    *
+ *                                                                            *
+ * Parameters: value - value for replacing                                    *
+ *             max_len - maximal length of output value                       *
+ *             valuemapid - index of value map                                *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, value contains new value   *
+ *               FAIL - evaluation failed, value contains old value           *
+ *                                                                            *
+ ******************************************************************************/
+static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid)
+{
+	int				ret;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_valuemaps_t			*valuemap;
+	zbx_vector_valuemaps_ptr_t	valuemaps;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __func__, value, valuemapid);
+
+	if (0 == valuemapid)
+		goto clean;
+
+	zbx_vector_valuemaps_ptr_create(&valuemaps);
+
+	result = DBselect(
+			"select value,newvalue,type"
+			" from valuemap_mapping"
+			" where valuemapid=" ZBX_FS_UI64,
+			valuemapid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		del_zeros(row[1]);
+
+		valuemap = (zbx_valuemaps_t *)zbx_malloc(NULL, sizeof(zbx_valuemaps_t));
+		zbx_strlcpy_utf8(valuemap->value, row[0], ZBX_VALUEMAP_STRING_LEN);
+		zbx_strlcpy_utf8(valuemap->newvalue, row[1], ZBX_VALUEMAP_STRING_LEN);
+		valuemap->type = atoi(row[2]);
+		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
+	}
+
+	DBfree_result(result);
+
+	ret = evaluate_value_by_map(value, max_len, &valuemaps);
 
 	zbx_vector_valuemaps_ptr_clear_ext(&valuemaps, zbx_valuemaps_free);
 	zbx_vector_valuemaps_ptr_destroy(&valuemaps);
@@ -3643,3 +3666,7 @@ int	evaluatable_for_notsupported(const char *fn)
 
 	return FAIL;
 }
+
+#ifdef HAVE_TESTS
+#	include "../../../tests/libs/zbxserver/valuemaps_test.c"
+#endif

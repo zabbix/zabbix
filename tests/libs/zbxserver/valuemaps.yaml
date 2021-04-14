@@ -1,0 +1,122 @@
+---
+test case: exact match
+in:
+  value: 0
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 1
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "<3"
+    newvalue: "Value < 3"
+out:
+  return: SUCCEED
+  value: "Value 0 (0)"
+---
+test case: regexp
+in:
+  value: 1
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 1
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "<3"
+    newvalue: "Value < 3"
+out:
+  return: SUCCEED
+  value: "Regex 1 (1)"
+---
+test case: range < 3
+in:
+  value: 2
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 1
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "<3"
+    newvalue: "Value < 3"
+out:
+  return: SUCCEED
+  value: "Value < 3 (2)"
+---
+test case: range 5-7
+in:
+  value: 6
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 1
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: "<3"
+    newvalue: "Value < 3"
+  - type: 2
+    value: 5:7
+    newvalue: "Value 5-7"
+out:
+  return: SUCCEED
+  value: "Value 5-7 (6)"
+---
+test case: range > 10
+in:
+  value: 15
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 1
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: <3
+    newvalue: "Value < 3"
+  - type: 2
+    value: 5:7
+    newvalue: "Value 5-7"
+  - type: 2
+    value: "> 10"
+    newvalue: "Value > 10"
+out:
+  return: SUCCEED
+  value: "Value > 10 (15)"
+---
+test case: default
+in:
+  value: 4
+  valuemaps:
+  - type: 0
+    value: 0
+    newvalue: "Value 0"
+  - type: 1
+    value: "^1$"
+    newvalue: "Regex 1"
+  - type: 2
+    value: <3
+    newvalue: "Value < 3"
+  - type: 2
+    value: 5:7
+    newvalue: "Value 5-7"
+  - type: 2
+    value: "> 10"
+    newvalue: "Value > 10"
+  - type: 2
+    value: "*"
+    newvalue: "Default"
+out:
+  return: SUCCEED
+  value: "Default (4)"
+...
+
