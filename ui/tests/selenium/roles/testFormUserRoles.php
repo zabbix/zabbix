@@ -825,7 +825,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		foreach (['Admin role', 'role_for_delete'] as $role) {
 			if ($role === 'Admin role') {
-				$hash_before = CDBHelper::getHash('SELECT * FROM role');
+				$role_hash_before = CDBHelper::getHash('SELECT * FROM role');
 			}
 			$this->query('link', $role)->one()->click();
 			$this->query('button:Delete')->one()->click();
@@ -834,7 +834,7 @@ class testFormUserRoles extends CWebTest {
 			if ($role === 'Admin role') {
 				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'The role "Admin role" is assigned to'.
 						' at least one user and cannot be deleted.');
-				$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role'));
+				$this->assertEquals($role_hash_before, CDBHelper::getHash('SELECT * FROM role'));
 			}
 			else {
 				$this->assertMessage(TEST_GOOD, 'User role deleted');
