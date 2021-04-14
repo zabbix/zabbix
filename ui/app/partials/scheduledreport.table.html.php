@@ -80,17 +80,21 @@ foreach ($data['reports'] as $report) {
 		$status_name = _('Disabled');
 		$status_class = ZBX_STYLE_RED;
 	}
-	elseif ($report['active_till'] > 0 && $report['active_till'] < $now) {
-		$status_name = _('Expired');
-		$status_class = ZBX_STYLE_GREY;
-
-		$info_icons[] = makeWarningIcon(_s('Expired on %1$s.',
-			(new DateTime('@'.$report['active_till']))->format(DATE_FORMAT))
-		);
-	}
 	else {
 		$status_name = _('Enabled');
 		$status_class = ZBX_STYLE_GREEN;
+
+		if ($report['active_till'] !== '') {
+			$active_till = (DateTime::createFromFormat(ZBX_DATE, $report['active_till'], new DateTimeZone('UTC')))
+				->setTime(23, 59, 59);
+
+			if ($active_till->getTimestamp() < $now) {
+				$status_name = _('Expired');
+				$status_class = ZBX_STYLE_GREY;
+
+				$info_icons[] = makeWarningIcon(_s('Expired on %1$s.', $active_till->format(DATE_FORMAT)));
+			}
+		}
 	}
 
 	$status = ($data['source'] === 'scheduledreport-form' && $data['allowed_edit'])

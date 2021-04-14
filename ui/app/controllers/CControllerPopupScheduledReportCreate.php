@@ -85,8 +85,8 @@ class CControllerPopupScheduledReportCreate extends CController {
 	protected function doAction() {
 		$report = [];
 
-		$this->getInputs($report, ['userid', 'name', 'dashboardid', 'period', 'cycle', 'active_since', 'active_till',
-			'subject', 'message', 'description', 'status'
+		$this->getInputs($report, ['userid', 'name', 'dashboardid', 'period', 'cycle', 'subject', 'message',
+			'description', 'status'
 		]);
 
 		if ($report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY) {
@@ -94,14 +94,14 @@ class CControllerPopupScheduledReportCreate extends CController {
 		}
 
 		$report['start_time'] = ($this->getInput('hours') * SEC_PER_HOUR) + ($this->getInput('minutes') * SEC_PER_MIN);
-		$report['active_since'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_since']) !== false)
-			? (new DateTime($report['active_since'], new DateTimeZone('UTC')))->getTimestamp()
-			: 0;
-		$report['active_till'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_till']) !== false)
-			? (new DateTime($report['active_till'], new DateTimeZone('UTC')))
-				->setTime(23,59,59)
-				->getTimestamp()
-			: 0;
+
+		if ($this->getInput('active_since') !== '') {
+			$report['active_since'] = $this->getInput('active_since');
+		}
+		if ($this->getInput('active_till') !== '') {
+			$report['active_till'] = $this->getInput('active_till');
+		}
+
 		$report['users'] = [];
 		$report['user_groups'] = [];
 

@@ -174,8 +174,8 @@ class CReport extends CApiService {
 			'cycle' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY]), 'default' => DB::getDefault('report', 'cycle')],
 			'weekdays' =>			['type' => API_INT32, 'default' => DB::getDefault('report', 'weekdays')],
 			'start_time' =>			['type' => API_INT32, 'in' => '0:86340'],
-			'active_since' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'default' => DB::getDefault('report', 'active_since')],
-			'active_till' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'default' => DB::getDefault('report', 'active_till')],
+			'active_since' =>		['type' => API_DATE, 'default' => ''],
+			'active_till' =>		['type' => API_DATE, 'default' => ''],
 			// The length of the "report.subject" and "media_type_message.subject" fields should match.
 			'subject' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'subject')],
 			'message' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('report_param', 'value')],
@@ -194,7 +194,7 @@ class CReport extends CApiService {
 		}
 
 		$rnum = 0;
-		foreach ($reports as $report) {
+		foreach ($reports as &$report) {
 			$rnum++;
 
 			if ($report['cycle'] == ZBX_REPORT_CYCLE_WEEKLY) {
@@ -210,39 +210,31 @@ class CReport extends CApiService {
 				));
 			}
 
+			$report['active_since'] = ($report['active_since'] !== '')
+				? $report['active_since'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_since'],
+					new DateTimeZone('UTC')
+				))
+					->setTime(0, 0)
+					->getTimestamp()
+				: 0;
+
+			$report['active_till'] = ($report['active_till'] !== '')
+				? $report['active_till'] = (DateTime::createFromFormat(ZBX_DATE, $report['active_till'],
+					new DateTimeZone('UTC')
+				))
+					->setTime(23, 59, 59)
+					->getTimestamp()
+				: 0;
+
 			if ($report['active_till'] > 0 && $report['active_since'] > $report['active_till']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('"%1$s" must be greater than "%2$s" or equal to %3$s.', 'active_till', 'active_since', 0)
+					_s('"%1$s" must be an empty string or greater than "%2$s".', 'active_till', 'active_since')
 				);
-			}
-
-			if ($report['active_since'] > 0) {
-				$day_start_timestamp = (new DateTime('@'.$report['active_since']))
-					->setTime(0,0)
-					->getTimestamp();
-
-				if ($report['active_since'] != $day_start_timestamp) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'active_since',
-						_('must be a timestamp representing the beginning of a particular day (00:00:00)')
-					));
-				}
-			}
-
-			if ($report['active_till'] > 0) {
-				$day_end_timestamp = (new DateTime('@'.$report['active_till']))
-					->setTime(23,59,59)
-					->getTimestamp();
-
-				if ($report['active_till'] != $day_end_timestamp) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'active_till', _('must be a timestamp representing the end of a particular day (23:59:59)')
-					));
-				}
 			}
 
 			$this->checkHasRecipients($report['users'], $report['user_groups']);
 		}
+		unset($report);
 
 		$this->checkDuplicates(array_column($reports, 'name'));
 		$this->checkDashboards(array_unique(array_column($reports, 'dashboardid')));
@@ -519,8 +511,8 @@ class CReport extends CApiService {
 			'cycle' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_REPORT_CYCLE_DAILY, ZBX_REPORT_CYCLE_WEEKLY, ZBX_REPORT_CYCLE_MONTHLY, ZBX_REPORT_CYCLE_YEARLY])],
 			'weekdays' =>			['type' => API_INT32],
 			'start_time' =>			['type' => API_INT32, 'in' => '0:86340'],
-			'active_since' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE],
-			'active_till' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE],
+			'active_since' =>		['type' => API_DATE],
+			'active_till' =>		['type' => API_DATE],
 			// The length of the "report.subject" and "media_type_message.subject" fields should match.
 			'subject' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'subject')],
 			'message' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('report_param', 'value')],
@@ -550,7 +542,7 @@ class CReport extends CApiService {
 		$dashboardids = [];
 
 		$rnum = 0;
-		foreach ($reports as $report) {
+		foreach ($reports as &$report) {
 			$rnum++;
 
 			if (!array_key_exists($report['reportid'], $db_reports)) {
@@ -587,41 +579,37 @@ class CReport extends CApiService {
 				}
 			}
 
-			$active_since = $db_report['active_since'];
-			if (array_key_exists('active_since', $report) && $report['active_since'] > 0) {
-				$day_start_timestamp = (new DateTime('@'.$report['active_since']))
-					->setTime(0,0)
-					->getTimestamp();
+			if (array_key_exists('active_since', $report) || array_key_exists('active_till', $report)) {
+				$active_since = $db_report['active_since'];
+				$active_till = $db_report['active_till'];
 
-				if ($report['active_since'] != $day_start_timestamp) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'active_since',
-						_('must be a timestamp representing the beginning of a particular day (00:00:00)')
-					));
+				if (array_key_exists('active_since', $report)) {
+					$active_since = ($report['active_since'] !== '')
+						? (DateTime::createFromFormat(ZBX_DATE, $report['active_since'],
+							new DateTimeZone('UTC')
+						))
+							->setTime(0, 0)
+							->getTimestamp()
+						: 0;
+					$report['active_since'] = $active_since;
 				}
 
-				$active_since = $report['active_since'];
-			}
-
-			$active_till = $db_report['active_till'];
-			if (array_key_exists('active_till', $report) && $report['active_till'] > 0) {
-				$day_end_timestamp = (new DateTime('@'.$report['active_till']))
-					->setTime(23,59,59)
-					->getTimestamp();
-
-				if ($report['active_till'] != $day_end_timestamp) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'active_till', _('must be a timestamp representing the end of a particular day (23:59:59)')
-					));
+				if (array_key_exists('active_till', $report)) {
+					$active_till = ($report['active_till'] !== '')
+						? (DateTime::createFromFormat(ZBX_DATE, $report['active_till'],
+							new DateTimeZone('UTC')
+						))
+							->setTime(23, 59, 59)
+							->getTimestamp()
+						: 0;
+					$report['active_till'] = $active_till;
 				}
 
-				$active_till = $report['active_till'];
-			}
-
-			if ($active_till > 0 && $active_since > $active_till) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('"%1$s" must be greater than "%2$s" or equal to %3$s.', 'active_till', 'active_since', 0)
-				);
+				if ($active_till > 0 && $active_since > $active_till) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('"%1$s" must be an empty string or greater than "%2$s".', 'active_till', 'active_since')
+					);
+				}
 			}
 
 			if (array_key_exists('users', $report) || array_key_exists('user_groups', $report)) {
@@ -633,6 +621,7 @@ class CReport extends CApiService {
 				$this->checkHasRecipients($users, $user_groups);
 			}
 		}
+		unset($report);
 
 		if ($names) {
 			$this->checkDuplicates($names);
@@ -915,6 +904,24 @@ class CReport extends CApiService {
 
 	protected function addRelatedObjects(array $options, array $result): array {
 		$reportids = array_keys($result);
+
+		// If requested, convert 'active_since' and 'active_till' from timestamp to date.
+		if ($this->outputIsRequested('active_since', $options['output'])
+				|| $this->outputIsRequested('active_till', $options['output'])) {
+			foreach ($result as &$report) {
+				if (array_key_exists('active_since', $report)) {
+					$report['active_since'] = ($report['active_since'] != 0)
+						? (new DateTime('@'.$report['active_since']))->format(ZBX_DATE)
+						: '';
+				}
+				if (array_key_exists('active_till', $report)) {
+					$report['active_till'] = ($report['active_till'] != 0)
+						? (new DateTime('@'.$report['active_till']))->format(ZBX_DATE)
+						: '';
+				}
+			}
+			unset($report);
+		}
 
 		// Adding email subject and message.
 		$fields_by_name = [];
