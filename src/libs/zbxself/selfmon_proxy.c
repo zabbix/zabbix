@@ -35,6 +35,5 @@
 int	get_component_process_type_forks(unsigned char proc_type)
 {
 	ZBX_UNUSED(proc_type);
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	return 0;
 }

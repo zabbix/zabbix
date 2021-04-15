@@ -45,6 +45,5 @@ int	get_component_process_type_forks(unsigned char proc_type)
 			return CONFIG_REPORTWRITER_FORKS;
 	}
 
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	return 0;
 }
