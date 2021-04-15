@@ -2120,7 +2120,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 		*out = zbx_strdup(NULL, "");
 }
 
-static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, zbx_vector_loc_t *params,
+static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const zbx_vector_loc_t *params,
 		char **replace)
 {
 	char	*parameter = NULL, *mask = NULL;
