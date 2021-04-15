@@ -843,6 +843,17 @@ class testFormUserRoles extends CWebTest {
 		}
 	}
 
+	public function testFormUserRoles_Cancellation() {
+		foreach(['zabbix.php?action=userrole.edit', 'zabbix.php?action=userrole.edit&roleid=2'] as $link) {
+			$hash_before = CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid');
+			$this->page->login()->open($link);
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			$form->fill(['Name' => 'cancellation_name_user']);
+			$this->query('button:Cancel')->one()->click();
+			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid'));
+		}
+	}
+
 	/**
 	 * Fill multiselect field.
 	 *
