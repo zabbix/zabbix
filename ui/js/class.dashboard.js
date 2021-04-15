@@ -604,6 +604,23 @@ class CDashboard extends CBaseComponent {
 			new_widget_data.fields[reference_field] = this._createReference();
 		}
 
+		let dashboard_page_references = [];
+
+		for (const widget of dashboard_page.getWidgets()) {
+			const reference_field = this._widget_defaults[widget.getType()].reference_field;
+
+			if (reference_field !== null) {
+				dashboard_page_references.push(widget.getFields()[reference_field]);
+			}
+		}
+
+		for (const reference_field of this._widget_defaults[new_widget_data.type].foreign_reference_fields) {
+			if (reference_field in new_widget_data.fields
+					&& !dashboard_page_references.includes(new_widget_data.fields[reference_field])) {
+				new_widget_data.fields[reference_field] = '';
+			}
+		}
+
 		if (widget !== null) {
 			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
