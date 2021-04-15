@@ -898,7 +898,7 @@ static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now, char
 		if (-1 == (nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays,
 				report->start_time, report->timezone)))
 		{
-			error = zbx_dsprintf(NULL, "Cannot calculate report start time: %s",
+			*error = zbx_dsprintf(NULL, "Cannot calculate report start time: %s",
 					zbx_strerror(errno));
 		}
 	}
