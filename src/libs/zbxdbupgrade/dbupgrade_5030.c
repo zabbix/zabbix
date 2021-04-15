@@ -3663,55 +3663,55 @@ static int	DBpatch_5030109(void)
 
 #define ZBX_FIELD_UUID			{"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0}
 
-static int	DBpatch_5030110(void)
+static int	DBpatch_5030143(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_5030111(void)
+static int	DBpatch_5030144(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_5030112(void)
+static int	DBpatch_5030145(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("triggers", &field);
 }
 
-static int	DBpatch_5030113(void)
+static int	DBpatch_5030146(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("dashboard", &field);
 }
 
-static int	DBpatch_5030114(void)
+static int	DBpatch_5030147(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("graphs", &field);
 }
 
-static int	DBpatch_5030115(void)
+static int	DBpatch_5030148(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("hstgrp", &field);
 }
 
-static int	DBpatch_5030116(void)
+static int	DBpatch_5030149(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("httptest", &field);
 }
-static int	DBpatch_5030117(void)
+static int	DBpatch_5030150(void)
 {
 	const ZBX_FIELD	field = ZBX_FIELD_UUID;
 
@@ -3736,7 +3736,7 @@ static char	*update_template_name(char *old)
 	return ptr;
 }
 
-static int	DBpatch_5030118(void)
+static int	DBpatch_5030151(void)
 {
 	int		ret = SUCCEED;
 	char		*name, *uuid, *sql = NULL;
@@ -3780,7 +3780,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030119(void)
+static int	DBpatch_5030152(void)
 {
 	int		ret = SUCCEED;
 	char		*name, *uuid, *sql = NULL, *seed = NULL;
@@ -3804,7 +3804,7 @@ static int	DBpatch_5030119(void)
 	{
 		name = zbx_strdup(NULL, row[2]);
 		name = update_template_name(name);
-		seed = zbx_dsprintf(seed, "%s%s", name, row[1]);
+		seed = zbx_dsprintf(seed, "%s/%s", name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
 				uuid, row[0]);
@@ -3827,7 +3827,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030120(void)
+static int	DBpatch_5030153(void)
 {
 	int		ret = SUCCEED;
 	char		*uuid, *sql = NULL, *seed = NULL;
@@ -3879,7 +3879,7 @@ static int	DBpatch_5030120(void)
 				while (NULL != (row2 = DBfetch(result2)))
 				{
 					zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset,
-							"%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
+							"/%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
 					pexpr = pexpr_f;
 				}
 
@@ -3917,7 +3917,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030121(void)
+static int	DBpatch_5030154(void)
 {
 	int		ret = SUCCEED;
 	char		*host_name, *uuid, *sql = NULL, *seed = NULL;
@@ -3959,7 +3959,7 @@ static int	DBpatch_5030121(void)
 			host_name = zbx_strdup(NULL, row2[0]);
 			host_name = update_template_name(host_name);
 
-			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", host_name);
+			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", host_name);
 			zbx_free(host_name);
 		}
 
@@ -3986,7 +3986,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030122(void)
+static int	DBpatch_5030155(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
@@ -4010,7 +4010,7 @@ static int	DBpatch_5030122(void)
 	{
 		template_name = zbx_strdup(NULL, row[2]);
 		template_name = update_template_name(template_name);
-		seed = zbx_dsprintf(seed, "%s%s", template_name, row[1]);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update dashboard set uuid='%s' where dashboardid=%s;\n", uuid, row[0]);
@@ -4033,7 +4033,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030123(void)
+static int	DBpatch_5030156(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
@@ -4057,7 +4057,7 @@ static int	DBpatch_5030123(void)
 	{
 		template_name = zbx_strdup(NULL, row[2]);
 		template_name = update_template_name(template_name);
-		seed = zbx_dsprintf(seed, "%s%s", template_name, row[1]);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update httptest set uuid='%s' where httptestid=%s;\n", uuid, row[0]);
@@ -4080,7 +4080,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030124(void)
+static int	DBpatch_5030157(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
@@ -4104,7 +4104,7 @@ static int	DBpatch_5030124(void)
 	{
 		template_name = zbx_strdup(NULL, row[2]);
 		template_name = update_template_name(template_name);
-		seed = zbx_dsprintf(seed, "%s%s", template_name, row[1]);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update valuemap set uuid='%s' where valuemapid=%s;\n", uuid, row[0]);
@@ -4127,7 +4127,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030125(void)
+static int	DBpatch_5030158(void)
 {
 	int		ret = SUCCEED;
 	char		*uuid, *sql = NULL;
@@ -4164,7 +4164,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030126(void)
+static int	DBpatch_5030159(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
@@ -4190,7 +4190,7 @@ static int	DBpatch_5030126(void)
 	{
 		template_name = zbx_strdup(NULL, row[2]);
 		template_name = update_template_name(template_name);
-		seed = zbx_dsprintf(seed, "%s%s%s", template_name, row[3], row[1]);
+		seed = zbx_dsprintf(seed, "%s/%s/%s", template_name, row[3], row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
 				uuid, row[0]);
@@ -4213,7 +4213,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030127(void)
+static int	DBpatch_5030160(void)
 {
 	int		ret = SUCCEED;
 	char		*uuid, *sql = NULL, *seed = NULL;
@@ -4284,7 +4284,7 @@ static int	DBpatch_5030127(void)
 				while (NULL != (row2 = DBfetch(result2)))
 				{
 					zbx_snprintf_alloc(&total_expr, &total_expr_alloc, &total_expr_offset,
-							"%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
+							"/%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
 					pexpr = pexpr_f;
 				}
 
@@ -4322,7 +4322,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030128(void)
+static int	DBpatch_5030161(void)
 {
 	int		ret = SUCCEED;
 	char		*templ_name, *uuid, *sql = NULL, *seed = NULL;
@@ -4349,7 +4349,7 @@ static int	DBpatch_5030128(void)
 	{
 		templ_name = zbx_strdup(NULL, row[2]);
 		templ_name = update_template_name(templ_name);
-		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s%s%s", templ_name, row[3], row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/%s/%s", templ_name, row[3], row[1]);
 
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set uuid='%s'"
@@ -4373,7 +4373,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5030129(void)
+static int	DBpatch_5030162(void)
 {
 	int		ret = SUCCEED;
 	char		*name_tmpl, *uuid, *seed = NULL, *sql = NULL;
@@ -4399,7 +4399,7 @@ static int	DBpatch_5030129(void)
 	{
 		name_tmpl = zbx_strdup(NULL, row[2]);
 		name_tmpl = update_template_name(name_tmpl);
-		seed = zbx_dsprintf(seed, "%s%s%s", name_tmpl, row[3], row[1]);
+		seed = zbx_dsprintf(seed, "%s/%s/%s", name_tmpl, row[3], row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",
 				uuid, row[0]);
@@ -4543,25 +4543,25 @@ DBPATCH_ADD(5030106, 0, 1)
 DBPATCH_ADD(5030107, 0, 1)
 DBPATCH_ADD(5030108, 0, 1)
 DBPATCH_ADD(5030109, 0, 1)
-DBPATCH_ADD(5030110, 0, 1)
-DBPATCH_ADD(5030111, 0, 1)
-DBPATCH_ADD(5030112, 0, 1)
-DBPATCH_ADD(5030113, 0, 1)
-DBPATCH_ADD(5030114, 0, 1)
-DBPATCH_ADD(5030115, 0, 1)
-DBPATCH_ADD(5030116, 0, 1)
-DBPATCH_ADD(5030117, 0, 1)
-DBPATCH_ADD(5030118, 0, 1)
-DBPATCH_ADD(5030119, 0, 1)
-DBPATCH_ADD(5030120, 0, 1)
-DBPATCH_ADD(5030121, 0, 1)
-DBPATCH_ADD(5030122, 0, 1)
-DBPATCH_ADD(5030123, 0, 1)
-DBPATCH_ADD(5030124, 0, 1)
-DBPATCH_ADD(5030125, 0, 1)
-DBPATCH_ADD(5030126, 0, 1)
-DBPATCH_ADD(5030127, 0, 1)
-DBPATCH_ADD(5030128, 0, 1)
-DBPATCH_ADD(5030129, 0, 1)
+DBPATCH_ADD(5030143, 0, 1)
+DBPATCH_ADD(5030144, 0, 1)
+DBPATCH_ADD(5030145, 0, 1)
+DBPATCH_ADD(5030146, 0, 1)
+DBPATCH_ADD(5030147, 0, 1)
+DBPATCH_ADD(5030148, 0, 1)
+DBPATCH_ADD(5030149, 0, 1)
+DBPATCH_ADD(5030150, 0, 1)
+DBPATCH_ADD(5030151, 0, 1)
+DBPATCH_ADD(5030152, 0, 1)
+DBPATCH_ADD(5030153, 0, 1)
+DBPATCH_ADD(5030154, 0, 1)
+DBPATCH_ADD(5030155, 0, 1)
+DBPATCH_ADD(5030156, 0, 1)
+DBPATCH_ADD(5030157, 0, 1)
+DBPATCH_ADD(5030158, 0, 1)
+DBPATCH_ADD(5030159, 0, 1)
+DBPATCH_ADD(5030160, 0, 1)
+DBPATCH_ADD(5030161, 0, 1)
+DBPATCH_ADD(5030162, 0, 1)
 
 DBPATCH_END()
