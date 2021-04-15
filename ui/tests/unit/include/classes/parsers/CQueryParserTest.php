@@ -65,10 +65,11 @@ class CQueryParserTest extends TestCase {
 	/**
 	 * @dataProvider dataProvider
 	 *
-	 * @param string    $source
-	 * @param array     $expected
+	 * @param string  $source
+	 * @param int     $source
+	 * @param array   $expected
 	 */
-	public function testQueryParse($source, $pos, array $expected) {
+	public function testQueryParse(string $source, int $pos, array $expected) {
 		$this->query_parser->parse($source, $pos);
 
 		if ($expected['rc'] == CParser::PARSE_FAIL) {
