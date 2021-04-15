@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @backup role
  * @on-before prepareRoleData
+ * @on-before prepareUserData
  */
 class testFormUserRoles extends CWebTest {
 
@@ -42,6 +43,13 @@ class testFormUserRoles extends CWebTest {
 	 * @var integer
 	 */
 	protected static $roleid;
+
+	/**
+	 * Id of role that created for future role change for Super admin.
+	 *
+	 * @var integer
+	 */
+	protected static $super_roleid;
 
 	/**
 	 * Function used to create roles.
@@ -67,6 +75,30 @@ class testFormUserRoles extends CWebTest {
 			[
 				'name' => 'role_for_delete',
 				'type' => 1
+			]
+		]);
+
+		$response_2 = CDataHelper::call('role.create', [
+			[
+				'name' => 'super_role',
+				'type' => 3
+			]
+		]);
+		$this->assertArrayHasKey('roleids', $response_2);
+		self::$super_roleid = $response_2['roleids'][0];
+	}
+
+	public function prepareUserData() {
+		CDataHelper::call('user.create', [
+			[
+				'alias' => 'super_role_check',
+				'passwd' => 'zabbix',
+				'roleid' => self::$super_roleid,
+				'usrgrps' => [
+					[
+					'usrgrpid' => '7'
+					]
+				]
 			]
 		]);
 	}
@@ -852,6 +884,19 @@ class testFormUserRoles extends CWebTest {
 			$this->query('button:Cancel')->one()->click();
 			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid'));
 		}
+	}
+
+	/**
+	 * Checking, that created super admin can't change it's own role.
+	 */
+	public function testFormUserRoles_SuperAdmin() {
+		$this->page->userLogin('super_role_check', 'zabbix');
+		$this->page->open('zabbix.php?action=userrole.list')->waitUntilReady();
+		$this->query('link:super_role')->one()->click();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$this->assertEquals('User cannot change the user type of own role.', $this->query('xpath://input[@id="type"]/following::span')->
+				one()->getText());
+		$this->assertEquals('true', $form->getField('User type')->getAttribute('readonly'));
 	}
 
 	/**
