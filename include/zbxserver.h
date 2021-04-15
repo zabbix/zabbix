@@ -25,6 +25,7 @@
 #include "dbcache.h"
 #include "zbxjson.h"
 #include "zbxvariant.h"
+#include "zbxeval.h"
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002
@@ -84,6 +85,42 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 
 void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
 
+#define ZBX_EXPRESSION_NORMAL		0
+#define ZBX_EXPRESSION_AGGREGATE	1
+
+typedef struct
+{
+	zbx_eval_context_t	*ctx;
+	zbx_vector_ptr_t	queries;
+	int			mode;
+	int			one_num;
+	int			many_num;
+	zbx_uint64_t		hostid;
+
+	/* cache to resolve one item queries */
+	zbx_host_key_t		*hostkeys;
+	DC_ITEM			*dcitems_hk;
+	int			*errcodes_hk;
+
+	/* cache to resolve many item queries */
+	zbx_vector_ptr_t	groups;
+	zbx_vector_ptr_t	itemtags;
+	zbx_vector_ptr_t	dcitem_refs;
+	DC_ITEM			*dcitems;
+	int			*errcodes;
+	int			dcitems_num;
+}
+zbx_expression_eval_t;
+
+void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
+void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
+void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const DC_ITEM *item);
+void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger);
+int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,
+		char **error);
+
+int	zbx_host_macro_index(const char *macro);
+
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
@@ -109,5 +146,8 @@ void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
+
+int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error);
 
 #endif

@@ -120,8 +120,11 @@
 						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_GROUP 			|\
 						ZBX_EVAL_PARSE_VAR_STR | ZBX_EVAL_PARSE_PROPERTY)
 
-#define	ZBX_EVAL_PARSE_EXPRESSION_MACRO		(ZBX_EVAL_PARSE_USERMACRO | ZBX_EVAL_PARSE_ITEM_QUERY |	\
-						ZBX_EVAL_PARSE_FUNCTION | ZBX_EVAL_PARSE_COMPOUND_CONST)
+#define	ZBX_EVAL_PARSE_EXPRESSION_MACRO		(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
+						ZBX_EVAL_PARSE_ITEM_QUERY | ZBX_EVAL_PARSE_FUNCTION	|\
+						ZBX_EVAL_PARSE_MATH | ZBX_EVAL_PARSE_COMPARE 		|\
+						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_VAR 		|\
+						ZBX_EVAL_PARSE_COMPOUND_CONST)
 /* expression composition rules */
 
 #define ZBX_EVAL_COMPOSE_LLD			__UINT64_C(0x01000000)
@@ -250,9 +253,9 @@ void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs)
 
 typedef struct
 {
-	char			*host;
-	char			*key;
-	char			*filter;
+	char	*host;
+	char	*key;
+	char	*filter;
 }
 zbx_item_query_t;
 

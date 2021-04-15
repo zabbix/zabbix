@@ -39,6 +39,8 @@ typedef struct
 zbx_libxml_error_t;
 #endif
 
+#include "expression.h"
+
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
 
@@ -47,22 +49,6 @@ zbx_libxml_error_t;
 #define ZBX_REQUEST_HOST_DNS			2
 #define ZBX_REQUEST_HOST_CONN			3
 #define ZBX_REQUEST_HOST_PORT			4
-
-/* DBget_item_value() */
-#define ZBX_REQUEST_HOST_ID			101
-#define ZBX_REQUEST_HOST_HOST			102
-#define ZBX_REQUEST_HOST_NAME			103
-#define ZBX_REQUEST_HOST_DESCRIPTION		104
-#define ZBX_REQUEST_ITEM_ID			105
-#define ZBX_REQUEST_ITEM_NAME			106
-#define ZBX_REQUEST_ITEM_NAME_ORIG		107
-#define ZBX_REQUEST_ITEM_KEY			108
-#define ZBX_REQUEST_ITEM_KEY_ORIG		109
-#define ZBX_REQUEST_ITEM_DESCRIPTION		110
-#define ZBX_REQUEST_ITEM_DESCRIPTION_ORIG	111
-#define ZBX_REQUEST_PROXY_NAME			112
-#define ZBX_REQUEST_PROXY_DESCRIPTION		113
-#define ZBX_REQUEST_ITEM_VALUETYPE		114
 
 /* DBget_history_log_value() */
 #define ZBX_REQUEST_ITEM_LOG_DATE		201
@@ -885,7 +871,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_value(const DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request)
+int	DBget_trigger_value(const DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request)
 {
 	zbx_uint64_t	itemid;
 	int		ret = FAIL;
@@ -2610,231 +2596,6 @@ out:
 	return ret;
 }
 
-
-typedef struct
-{
-	const DB_EVENT	*event;
-}
-zbx_expression_macro_data_t;
-
-/******************************************************************************
- *                                                                            *
- * Function: expression_macro_common_func_cb                                  *
- *                                                                            *
- * Purpose: evaluate common function                                          *
- *                                                                            *
- * Parameters: name     - [IN] the function name (not zero terminated)        *
- *             len      - [IN] the function name length                       *
- *             args_num - [IN] the number of function arguments               *
- *             args     - [IN] an array of the function arguments.            *
- *             data     - [IN] the caller data used for function evaluation   *
- *             ts       - [IN] the function execution time                    *
- *             value    - [OUT] the function return value                     *
- *             error    - [OUT] the error message if function failed          *
- *                                                                            *
- * Return value: SUCCEED - the function was executed successfully             *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: There are no custom common functions for expression macros, but  *
- *           it's used to check for /host/key query quoting errors instead.   *
- *                                                                            *
- ******************************************************************************/
-static int	expression_macro_common_func_cb(const char *name, size_t len, int args_num, const zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
-{
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(value);
-
-	if (SUCCEED != zbx_is_trigger_function(name, len))
-	{
-		*error = zbx_strdup(NULL, "Cannot evaluate formula: unsupported function");
-		return FAIL;
-	}
-
-	if (0 == args_num)
-	{
-		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid number of arguments");
-		return FAIL;
-	}
-
-	if (ZBX_VARIANT_STR == args[0].type)
-	{
-		zbx_item_query_t query;
-
-		if (0 == zbx_eval_parse_query(args[0].data.str, strlen(args[0].data.str), &query))
-		{
-			zbx_eval_clear_query(&query);
-			*error = zbx_strdup(NULL, "Cannot evaluate function: quoted item query argument");
-			return FAIL;
-		}
-		zbx_eval_clear_query(&query);
-	}
-
-	*error = zbx_strdup(NULL, "Cannot evaluate function: invalid first argument");
-	return FAIL;
-}
-
-static int	expression_macro_history_func_cb(const char *name, size_t len, int args_num, const zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
-{
-	zbx_expression_macro_data_t	*md = (zbx_expression_macro_data_t *)data;
-	zbx_item_query_t		query;
-	zbx_host_key_t			hkey;
-	DC_ITEM				item;
-	int				i, errcode, ret = FAIL;
-	char				func_name[MAX_STRING_LEN], *params = NULL, *errmsg = NULL, *host = NULL;
-	size_t				params_alloc = 0, params_offset = 0;
-	int				N_functionid = 0;
-
-	if (SUCCEED != zbx_is_trigger_function(name, len))
-	{
-		*error = zbx_strdup(NULL, "Cannot evaluate formula: unsupported function");
-		return FAIL;
-	}
-
-	if (0 == args_num)
-	{
-		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid number of arguments");
-		return FAIL;
-	}
-
-	if (ZBX_VARIANT_STR != args[0].type)
-	{
-		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid first argument");
-		return FAIL;
-	}
-
-	zbx_eval_parse_query(args[0].data.str, strlen(args[0].data.str), &query);
-
-	if (NULL != query.filter)
-	{
-		zbx_eval_clear_query(&query);
-		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid item query");
-		return FAIL;
-	}
-
-	if (query.host != NULL)
-	{
-		zbx_strloc_t	loc;
-
-		loc.l = 0;
-		loc.r = strlen(query.host) - 1;
-		macro_in_list(query.host, loc, simple_host_macros, &N_functionid);
-	}
-	else
-		N_functionid = 1;
-
-	if (0 != N_functionid)
-	{
-		if (SUCCEED != DBget_trigger_value(&md->event->trigger, &host, N_functionid,
-				ZBX_REQUEST_HOST_HOST))
-		{
-			*error = zbx_dsprintf(NULL, "cannot get host from trigger expression by index");
-			goto out;
-		}
-		hkey.host = host;
-	}
-	else
-		hkey.host = query.host;
-
-	hkey.key = query.key;
-
-	DCconfig_get_items_by_keys(&item, &hkey, &errcode, 1);
-
-	if (SUCCEED != errcode)
-	{
-		*error = zbx_dsprintf(NULL, "Cannot evaluate function because item \"/%s/%s\" does not exist",
-				hkey.host, hkey.key);
-		goto out;
-	}
-
-	/* do not evaluate if the item is disabled or belongs to a disabled host */
-
-	if (ITEM_STATUS_ACTIVE != item.status)
-	{
-		*error = zbx_dsprintf(NULL, "Cannot evaluate function with disabled item \"/%s/%s\"",
-				hkey.host, hkey.key);
-		goto out;
-	}
-
-	if (HOST_STATUS_MONITORED != item.host.status)
-	{
-		*error = zbx_dsprintf(NULL, "Cannot evaluate function with item \"/%s/%s\" belonging to a disabled host",
-				hkey.host, hkey.key);
-		goto out;
-	}
-
-	memcpy(func_name, name, len);
-	func_name[len] = '\0';
-
-	/* If the item is NOTSUPPORTED then evaluation is allowed for:   */
-	/*   - functions white-listed in evaluatable_for_notsupported(). */
-	/*     Their values can be evaluated to regular numbers even for */
-	/*     NOTSUPPORTED items. */
-	/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
-
-	if (ITEM_STATE_NOTSUPPORTED == item.state && FAIL == zbx_evaluatable_for_notsupported(func_name))
-	{
-		*error = zbx_dsprintf(NULL,"Cannot evaluate function with not supported item \"/%s/%s\"",
-				hkey.host, hkey.key);
-		goto out;
-	}
-
-	if (1 == args_num)
-	{
-		if (SUCCEED != (ret = evaluate_function2(value, &item, func_name, "", ts, &errmsg)))
-		{
-			*error = zbx_dsprintf(NULL, "Cannot evaluate calculated item formula: %s", errmsg);
-			zbx_free(errmsg);
-		}
-		goto out;
-	}
-
-	for (i = 1; i < args_num; i++)
-	{
-		if (0 != i)
-			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, ',');
-
-		switch (args[i].type)
-		{
-			case ZBX_VARIANT_DBL:
-				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_DBL64,
-						args[i].data.dbl);
-				break;
-			case ZBX_VARIANT_STR:
-				zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
-				break;
-			case ZBX_VARIANT_UI64:
-				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64,
-						args[i].data.ui64);
-				break;
-			case ZBX_VARIANT_NONE:
-				break;
-			default:
-				*error = zbx_dsprintf(NULL,"Cannot evaluate function \"%s\":"
-						" unsupported argument #%d type: %s",
-						func_name, i + 1, zbx_variant_type_desc(&args[i]));
-				goto out;
-		}
-	}
-
-	if (SUCCEED != (ret = evaluate_function2(value, &item, func_name, params, ts, &errmsg)))
-	{
-		*error = zbx_dsprintf(NULL, "Cannot evaluate calculated item formula: %s", errmsg);
-		zbx_free(errmsg);
-	}
-
-out:
-	zbx_free(params);
-	zbx_free(host);
-	zbx_eval_clear_query(&query);
-	DCconfig_clean_items(&item, &errcode, 1);
-
-	return ret;
-}
-
-
 /******************************************************************************
  *                                                                            *
  * Function: get_expression_macro_result                                      *
@@ -2853,7 +2614,7 @@ static int	get_expression_macro_result(const DB_EVENT *event, const DB_EVENT *r_
 	const zbx_vector_uint64_t	*hostids;
 	zbx_timespec_t			ts;
 	zbx_variant_t			value;
-	zbx_expression_macro_data_t	data;
+	zbx_expression_eval_t		eval;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, expression);
 
@@ -2877,18 +2638,16 @@ static int	get_expression_macro_result(const DB_EVENT *event, const DB_EVENT *r_
 	ts.sec = event->clock;
 	ts.ns = event->ns;
 
-	data.event = event;
+	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
+	zbx_expression_eval_resolve_trigger_hosts(&eval, &event->trigger);
 
-	if (SUCCEED != zbx_eval_execute_ext(&ctx, &ts, expression_macro_common_func_cb,
-			expression_macro_history_func_cb, (void *)&data, &value, error))
+	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, &ts, &value, error)))
 	{
-		goto out;
+		*replace_to = zbx_strdup(NULL, zbx_variant_value_desc(&value));
+		zbx_variant_clear(&value);
 	}
 
-	*replace_to = zbx_strdup(NULL, zbx_variant_value_desc(&value));
-	zbx_variant_clear(&value);
-
-	ret = SUCCEED;
+	zbx_expression_eval_clear(&eval);
 out:
 	zbx_eval_clear(&ctx);
 
@@ -4331,6 +4090,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 
 						if (SUCCEED != ret)
 						{
+							*errmsg = tolower(*errmsg);
 							zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot evaluate"
 									" expression macro: %s", __func__, errmsg);
 							zbx_strlcpy(error, errmsg, maxerrlen);
@@ -5929,13 +5689,101 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
 	zbx_free(context);
 }
 
-static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **filter,
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_query_filter_lld_macros                               *
+ *                                                                            *
+ * Purpose: substitute lld macros in calculated item query filter             *
+ *                                                                            *
+ * Parameters: filter          - [IN/OUT] the filter                          *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             error           - [OUT] the error message                      *
+ *                                                                            *
+ *  Return value: SUCCEED - the macros were expanded successfully.            *
+ *                FAIL    - otherwise.                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_query_filter_lld_macros(char **filter, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+{
+	char			*errmsg = NULL, err[128], *new_filter = NULL;
+	int			i, ret = FAIL;
+	zbx_eval_context_t	ctx;
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, *filter,
+			ZBX_EVAL_PARSE_QUERY_EXPRESSION | ZBX_EVAL_COMPOSE_QUOTE | ZBX_EVAL_PARSE_LLDMACRO, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot parse item query filter: %s", errmsg);
+		zbx_free(errmsg);
+		goto out;
+	}
+
+	for (i = 0; i < ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx.stack.values[i];
+		char			*value;
+
+		switch (token->type)
+		{
+			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
+			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+			case ZBX_EVAL_TOKEN_VAR_STR:
+				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+
+				if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err,
+						sizeof(err)))
+				{
+					*error = zbx_strdup(NULL, err);
+					zbx_free(value);
+
+					goto clean;
+				}
+				break;
+			default:
+				continue;
+		}
+
+		zbx_variant_set_str(&token->value, value);
+	}
+
+	zbx_eval_compose_expression(&ctx, &new_filter);
+	zbx_free(*filter);
+	*filter = new_filter;
+
+	ret = SUCCEED;
+clean:
+	zbx_eval_clear(&ctx);
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_item_query_macros                                     *
+ *                                                                            *
+ * Purpose: substitute lld macros in history function item query argument     *
+ *          /host/key?[filter]                                                *
+ *                                                                            *
+ * Parameters: ctx             - [IN] the calculated item formula             *
+ *             token           - [IN] the item query token                    *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             itemquery       - [OUT] the item query with expanded macros    *
+ *             error           - [OUT] the error message                      *
+ *                                                                            *
+ *  Return value: SUCCEED - the macros were expanded successfully.            *
+ *                FAIL    - otherwise.                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_item_query_lld_macros(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **itemquery,
 		char **error)
 {
 	zbx_item_query_t	query;
 	char			err[128];
-	int			ret;
+	int			ret = FAIL;
+	size_t			itemquery_alloc = 0, itemquery_offset = 0;
 
 	if (0 == zbx_eval_parse_query(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1, &query))
 	{
@@ -5943,14 +5791,26 @@ static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zb
 		return FAIL;
 	}
 
-	if (SUCCEED == (ret = substitute_key_macros(&query.key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
-			err, sizeof(err))))
+	if (SUCCEED != substitute_key_macros(&query.key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
+			err, sizeof(err)))
 	{
-		*filter = zbx_dsprintf(NULL, "/%s/%s", ZBX_NULL2EMPTY_STR(query.host), query.key);
-	}
-	else
 		*error = zbx_strdup(NULL, err);
+		goto out;
+	}
 
+	if (NULL != query.filter && SUCCEED != substitute_query_filter_lld_macros(&query.filter, jp_row,
+			lld_macro_paths, error))
+	{
+		goto out;
+	}
+
+	zbx_snprintf_alloc(itemquery, &itemquery_alloc, &itemquery_offset, "/%s/%s", ZBX_NULL2EMPTY_STR(query.host),
+			query.key);
+	if (NULL != query.filter)
+		zbx_snprintf_alloc(itemquery, &itemquery_alloc, &itemquery_offset, "?[%s]", query.filter);
+
+	ret = SUCCEED;
+out:
 	zbx_eval_clear_query(&query);
 
 	return ret;
@@ -5958,7 +5818,7 @@ static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zb
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_expression_macros                                     *
+ * Function: zbx_substitute_expression_macros                                 *
  *                                                                            *
  * Purpose: substitutes lld macros in an expression                           *
  *                                                                            *
@@ -5969,7 +5829,7 @@ static int	substitute_item_filter_macros(const zbx_eval_context_t *ctx, const zb
  *             max_error_len   - [IN] size of 'error' string                  *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_expression_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
+int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
 	char			*exp = NULL;
@@ -5984,13 +5844,13 @@ static int	substitute_expression_macros(char **data, zbx_uint64_t rules, const s
 	for (i = 0; i < ctx.stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx.stack.values[i];
-		char			*value, err[128];
+		char			*value = NULL, err[128];
 
 		switch(token->type)
 		{
 			case ZBX_EVAL_TOKEN_ARG_QUERY:
-				if (FAIL == substitute_item_filter_macros(&ctx, token, jp_row, lld_macro_paths, &value,
-						error))
+				if (FAIL == substitute_item_query_lld_macros(&ctx, token, jp_row, lld_macro_paths,
+						&value, error))
 				{
 					goto clean;
 				}
@@ -6057,7 +5917,7 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token, const
 	expression = zbx_substr(*data, token->data.expression_macro.expression.l,
 			token->data.expression_macro.expression.r);
 
-	if (FAIL == substitute_expression_macros(&expression, ZBX_EVAL_EXPRESSION_MACRO_LLD, jp_row,
+	if (FAIL == zbx_substitute_expression_lld_macros(&expression, ZBX_EVAL_EXPRESSION_MACRO_LLD, jp_row,
 			lld_macro_paths, &errmsg))
 	{
 		zbx_free(expression);
@@ -6879,4 +6739,27 @@ int	substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *d
 	ret = substitute_key_macros_impl(data, hostid, dc_item, jp_row, lld_macro_paths, macro_type, error, maxerrlen);
 	zbx_dc_set_macro_env(old_macro_env);
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_macro_index                                             *
+ *                                                                            *
+ * Purpose: extract index from valid indexed host macro                       *
+ *                                                                            *
+ * Return value: The index or -1 if it was not valid indexed host macro       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_host_macro_index(const char *macro)
+{
+	zbx_strloc_t	loc;
+	int		func_num;
+
+	loc.l = 0;
+	loc.r = strlen(macro) - 1;
+
+	if (NULL != macro_in_list(macro, loc, simple_host_macros, &func_num))
+		return func_num;
+
+	return -1;
 }
