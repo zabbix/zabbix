@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:45Z'
   groups:
     -
       name: Templates/Modules
@@ -11,20 +11,18 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: 'Telnet service'
       items:
         -
           name: 'Telnet service is running'
           type: SIMPLE
           key: 'net.tcp.service[telnet]'
           history: 1w
-          applications:
-            -
-              name: 'Telnet service'
           valuemap:
             name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: 'Telnet service'
           triggers:
             -
               expression: '{max(#3)}=0'

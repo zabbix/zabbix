@@ -58,6 +58,7 @@ $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tab-indicators.js');
+$this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');

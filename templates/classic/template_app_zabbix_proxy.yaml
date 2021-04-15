@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-11-11T11:03:47Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:47Z'
   groups:
     -
       name: Templates/Applications
@@ -11,9 +11,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: 'Zabbix proxy'
       items:
         -
           name: 'Zabbix preprocessing queue'
@@ -21,9 +18,10 @@ zabbix_export:
           key: 'zabbix[preprocessing_queue]'
           history: 1w
           description: 'Count of values enqueued in the preprocessing queue.'
-          applications:
+          tags:
             -
-              name: 'Zabbix proxy'
+              tag: Application
+              value: 'Zabbix proxy'
         -
           name: 'Utilization of availability manager internal processes, in %'
           type: INTERNAL
@@ -31,9 +29,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
+          tags:
             -
-              name: 'Zabbix proxy'
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -48,10 +47,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -66,10 +66,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -85,10 +86,11 @@ zabbix_export:
           value_type: FLOAT
           allowed_hosts: localhost
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -103,10 +105,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -121,9 +124,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
+          tags:
             -
-              name: 'Zabbix proxy'
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -138,10 +142,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -156,10 +161,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(30m)}>75'
@@ -174,10 +180,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -192,10 +199,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -210,10 +218,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -228,10 +237,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -246,10 +256,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -265,10 +276,11 @@ zabbix_export:
           value_type: FLOAT
           allowed_hosts: localhost
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -283,9 +295,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
+          tags:
             -
-              name: 'Zabbix proxy'
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -300,9 +313,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
+          tags:
             -
-              name: 'Zabbix proxy'
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -317,10 +331,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -335,10 +350,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -353,10 +369,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -371,10 +388,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -389,10 +407,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -407,10 +426,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{avg(10m)}>75'
@@ -424,10 +444,11 @@ zabbix_export:
           key: 'zabbix[queue,10m]'
           delay: 10m
           history: 1w
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{min(10m)}>100'
@@ -439,10 +460,11 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[queue]'
           history: 1w
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
         -
           name: 'Zabbix configuration cache, % used'
           type: INTERNAL
@@ -450,10 +472,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -467,10 +490,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -484,10 +508,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -501,10 +526,11 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
-            -
-              name: 'Zabbix proxy'
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
           triggers:
             -
               expression: '{max(10m)}>75'
@@ -517,105 +543,112 @@ zabbix_export:
           key: 'zabbix[wcache,values,float]'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix proxy'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
         -
           name: 'Number of processed log values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,log]'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix proxy'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
         -
           name: 'Number of processed not supported values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,not supported]'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix proxy'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
         -
           name: 'Number of processed character values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,str]'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix proxy'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
         -
           name: 'Number of processed text values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,text]'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix proxy'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
         -
           name: 'Number of processed numeric (unsigned) values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,uint]'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix proxy'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
         -
           name: 'Number of processed values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values]'
           history: 1w
           value_type: FLOAT
-          applications:
-            -
-              name: 'Zabbix proxy'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           request_method: POST
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
       dashboards:
         -
           name: 'Zabbix proxy health'

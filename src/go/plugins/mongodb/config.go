@@ -29,7 +29,7 @@ type PluginOptions struct {
 	// first connecting and on follow up operations in the session.
 	Timeout int `conf:"optional,range=1:30"`
 
-	// KeepAlive is amount of time a connection can remain idle before it is closed.
+	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.

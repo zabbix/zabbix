@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:38Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:58Z'
   groups:
     -
       name: Templates/Modules
@@ -18,9 +18,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Storage
       discovery_rules:
         -
           name: 'Block devices discovery'
@@ -53,14 +50,15 @@ zabbix_export:
               description: |
                 MIB: UCD-DISKIO-MIB
                 The number of read accesses from this device since boot.
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk utilization'
               type: SNMP_AGENT
@@ -72,9 +70,10 @@ zabbix_export:
               description: |
                 MIB: UCD-DISKIO-MIB
                 The 1 minute average load of disk (%)
-              application_prototypes:
+              tags:
                 -
-                  name: 'Disk {#DEVNAME}'
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk write rate'
               type: SNMP_AGENT
@@ -86,14 +85,15 @@ zabbix_export:
               description: |
                 MIB: UCD-DISKIO-MIB
                 The number of write accesses from this device since boot.
-              application_prototypes:
-                -
-                  name: 'Disk {#DEVNAME}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#DEVNAME}'
           graph_prototypes:
             -
               name: '{#DEVNAME}: Disk read/write rates'
@@ -131,9 +131,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: CPU
       items:
         -
           name: 'Interrupts per second'
@@ -142,14 +139,15 @@ zabbix_export:
           key: 'system.cpu.intr[ssRawInterrupts.0]'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'Load average (1m avg)'
           type: SNMP_AGENT
@@ -158,9 +156,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
         -
           name: 'Load average (5m avg)'
           type: SNMP_AGENT
@@ -169,9 +168,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
         -
           name: 'Load average (15m avg)'
           type: SNMP_AGENT
@@ -180,9 +180,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
         -
           name: 'Number of CPUs'
           type: SNMP_AGENT
@@ -192,9 +193,6 @@ zabbix_export:
           description: |
             MIB: HOST-RESOURCES-MIB
             Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: JAVASCRIPT
@@ -202,7 +200,10 @@ zabbix_export:
                 - |
                   //count the number of cores
                   return JSON.parse(value).length;
-                  
+          tags:
+            -
+              tag: Application
+              value: CPU
         -
           name: 'Context switches per second'
           type: SNMP_AGENT
@@ -210,14 +211,15 @@ zabbix_export:
           key: 'system.cpu.switches[ssRawContexts.0]'
           history: 7d
           value_type: FLOAT
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
+          tags:
+            -
+              tag: Application
+              value: CPU
       discovery_rules:
         -
           name: 'CPU discovery'
@@ -237,9 +239,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -251,7 +250,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU guest nice time'
               type: SNMP_AGENT
@@ -263,9 +265,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -277,7 +276,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU idle time'
               type: SNMP_AGENT
@@ -289,9 +291,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent doing nothing.
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -303,7 +302,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU interrupt time'
               type: SNMP_AGENT
@@ -315,9 +317,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 The amount of time the CPU has been servicing hardware interrupts.
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -329,7 +328,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU iowait time'
               type: SNMP_AGENT
@@ -341,9 +343,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 Amount of time the CPU has been waiting for I/O to complete.
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -355,7 +354,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU nice time'
               type: SNMP_AGENT
@@ -367,9 +369,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running users' processes that have been niced.
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -381,7 +380,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU softirq time'
               type: SNMP_AGENT
@@ -393,9 +395,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 The amount of time the CPU has been servicing software interrupts.
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -407,7 +406,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU steal time'
               type: SNMP_AGENT
@@ -419,9 +421,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 The amount of CPU 'stolen' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -433,7 +432,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU system time'
               type: SNMP_AGENT
@@ -445,9 +447,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running the kernel and its processes.
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -459,7 +458,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU user time'
               type: SNMP_AGENT
@@ -471,9 +473,6 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running users' processes that are not niced.
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -485,7 +484,10 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
-                      
+              tags:
+                -
+                  tag: Application
+                  value: CPU
             -
               name: 'CPU utilization'
               type: DEPENDENT
@@ -495,9 +497,6 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'CPU utilization in %'
-              applications:
-                -
-                  name: CPU
               preprocessing:
                 -
                   type: JAVASCRIPT
@@ -505,9 +504,12 @@ zabbix_export:
                     - |
                       //Calculate utilization
                       return (100 - value)
-                      
               master_item:
                 key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
+              tags:
+                -
+                  tag: Application
+                  value: CPU
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -595,7 +597,6 @@ zabbix_export:
                 - |
                   //count the number of CPU cores
                   return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])
-                  
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -616,9 +617,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Storage
       discovery_rules:
         -
           name: 'Mounted filesystem discovery'
@@ -660,14 +658,15 @@ zabbix_export:
               description: |
                 MIB: UCD-SNMP-MIB
                 If having problems collecting this item make sure access to UCD-SNMP-MIB is allowed.
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return (100-value);'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
@@ -698,9 +697,10 @@ zabbix_export:
               units: '%'
               params: '(last("vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]")/last("vfs.fs.total[hrStorageSize.{#SNMPINDEX}]"))*100'
               description: 'Space utilization in % for {#FSNAME}'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Filesystem {#FSNAME}'
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Total space'
               type: SNMP_AGENT
@@ -713,14 +713,15 @@ zabbix_export:
                 The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
                 This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
                 For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Used space'
               type: SNMP_AGENT
@@ -731,14 +732,15 @@ zabbix_export:
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
           trigger_prototypes:
             -
               expression: |
@@ -838,9 +840,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Memory
       items:
         -
           name: 'Free swap space'
@@ -852,14 +851,15 @@ zabbix_export:
           description: |
             MIB: UCD-SNMP-MIB
             The amount of swap space currently unused or available.
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Free swap space in %'
           type: CALCULATED
@@ -869,9 +869,10 @@ zabbix_export:
           units: '%'
           params: 'last("system.swap.free[memAvailSwap.0]")/last("system.swap.total[memTotalSwap.0]")*100'
           description: 'The free space of swap volume/file in percent.'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
           name: 'Total swap space'
           type: SNMP_AGENT
@@ -882,14 +883,15 @@ zabbix_export:
           description: |
             MIB: UCD-SNMP-MIB
             The total amount of swap space configured for this host.
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Available memory'
           type: CALCULATED
@@ -898,9 +900,10 @@ zabbix_export:
           units: B
           params: 'last("vm.memory.free[memAvailReal.0]")+last("vm.memory.buffers[memBuffer.0]")+last("vm.memory.cached[memCached.0]")'
           description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
           name: 'Memory (buffers)'
           type: SNMP_AGENT
@@ -911,14 +914,15 @@ zabbix_export:
           description: |
             MIB: UCD-SNMP-MIB
             Memory used by kernel buffers (Buffers in /proc/meminfo)
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Memory (cached)'
           type: SNMP_AGENT
@@ -929,14 +933,15 @@ zabbix_export:
           description: |
             MIB: UCD-SNMP-MIB
             Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Free memory'
           type: SNMP_AGENT
@@ -945,14 +950,15 @@ zabbix_export:
           history: 7d
           units: B
           description: 'MIB: UCD-SNMP-MIB'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Total memory'
           type: SNMP_AGENT
@@ -963,14 +969,15 @@ zabbix_export:
           description: |
             MIB: UCD-SNMP-MIB
             Total memory in Bytes
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Memory utilization'
           type: CALCULATED
@@ -980,9 +987,10 @@ zabbix_export:
           units: '%'
           params: '(last("vm.memory.total[memTotalReal.0]")-(last("vm.memory.free[memAvailReal.0]")+last("vm.memory.buffers[memBuffer.0]")+last("vm.memory.cached[memCached.0]")))/last("vm.memory.total[memTotalReal.0]")*100'
           description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'

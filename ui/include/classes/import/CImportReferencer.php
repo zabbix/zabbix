@@ -32,7 +32,6 @@ class CImportReferencer {
 	protected $groups = [];
 	protected $templates = [];
 	protected $hosts = [];
-	protected $applications = [];
 	protected $items = [];
 	protected $valueMaps = [];
 	protected $triggers = [];
@@ -48,7 +47,6 @@ class CImportReferencer {
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
-	protected $applicationsRefs;
 	protected $itemsRefs;
 	protected $valueMapsRefs;
 	protected $triggersRefs;
@@ -155,22 +153,6 @@ class CImportReferencer {
 		else {
 			return false;
 		}
-	}
-
-	/**
-	 * Get application id by host id and application name.
-	 *
-	 * @param string $hostid
-	 * @param string $name
-	 *
-	 * @return string|bool
-	 */
-	public function resolveApplication($hostid, $name) {
-		if ($this->applicationsRefs === null) {
-			$this->selectApplications();
-		}
-
-		return isset($this->applicationsRefs[$hostid][$name]) ? $this->applicationsRefs[$hostid][$name] : false;
 	}
 
 	/**
@@ -445,22 +427,6 @@ class CImportReferencer {
 	 */
 	public function addHostRef($host, $id) {
 		$this->hostsRefs[$host] = $id;
-	}
-
-	/**
-	 * Add application names that need association with a database application id.
-	 * Input array has format:
-	 * array('hostname1' => array('appname1', 'appname2'), 'hostname2' => array('appname1'), ...)
-	 *
-	 * @param array $applications
-	 */
-	public function addApplications(array $applications) {
-		foreach ($applications as $host => $apps) {
-			if (!isset($this->applications[$host])) {
-				$this->applications[$host] = [];
-			}
-			$this->applications[$host] = array_unique(array_merge($this->applications[$host], $apps));
-		}
 	}
 
 	/**
@@ -769,43 +735,6 @@ class CImportReferencer {
 
 			$this->hosts = [];
 		}
-	}
-
-	/**
-	 * Select application ids for previously added application names.
-	 */
-	protected function selectApplications() {
-		if (!empty($this->applications)) {
-			$this->applicationsRefs = [];
-			$sqlWhere = [];
-
-			foreach ($this->applications as $host => $applications) {
-				$hostId = $this->resolveHostOrTemplate($host);
-				if ($hostId) {
-					$sqlWhere[] = '(a.hostid='.zbx_dbstr($hostId).' AND '.
-						dbConditionString('a.name', $applications).')';
-				}
-			}
-
-			if ($sqlWhere) {
-				$dbApplications = DBselect(
-					'SELECT a.applicationid,a.hostid,a.name'.
-					' FROM applications a'.
-					' WHERE '.implode(' OR ', $sqlWhere).
-						' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL
-				);
-				while ($dbApplication = DBfetch($dbApplications)) {
-					$this->applicationsRefs[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
-				}
-			}
-		}
-	}
-
-	/**
-	 * Unset application refs to make referencer select them from db again.
-	 */
-	public function refreshApplications() {
-		$this->applicationsRefs = null;
 	}
 
 	/**

@@ -146,10 +146,6 @@ class CActionCondValidatorTest extends CValidatorTest {
 				'value' => 'abc'
 			]],
 			[[], [
-				'conditiontype' => CONDITION_TYPE_APPLICATION,
-				'value' => 'abc'
-			]],
-			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_NAME,
 				'value' => 'abc'
 			]],
@@ -391,13 +387,6 @@ class CActionCondValidatorTest extends CValidatorTest {
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DVALUE,
-					'value' => ''
-				],
-				'Incorrect value for field "value": cannot be empty.'
-			],
-			[[],
-				[
-					'conditiontype' => CONDITION_TYPE_APPLICATION,
 					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'

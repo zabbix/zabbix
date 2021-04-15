@@ -250,7 +250,6 @@ class CConfigurationExportBuilder {
 				'name' => $template['name'],
 				'description' => $template['description'],
 				'groups' => $this->formatGroups($template['groups']),
-				'applications' => $this->formatApplications($template['applications']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
@@ -292,7 +291,6 @@ class CConfigurationExportBuilder {
 				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
 				'groups' => $this->formatGroups($host['groups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
-				'applications' => $this->formatApplications($host['applications']),
 				'items' => $this->formatItems($host['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
@@ -642,7 +640,6 @@ class CConfigurationExportBuilder {
 		foreach ($httptests as $httptest) {
 			$result[] = [
 				'name' => $httptest['name'],
-				'application' => $httptest['application'],
 				'delay' => $httptest['delay'],
 				'attempts' => $httptest['retries'],
 				'agent' => $httptest['agent'],
@@ -658,7 +655,8 @@ class CConfigurationExportBuilder {
 				'ssl_cert_file' => $httptest['ssl_cert_file'],
 				'ssl_key_file' => $httptest['ssl_key_file'],
 				'ssl_key_password' => $httptest['ssl_key_password'],
-				'steps' => $this->formatHttpSteps($httptest['steps'])
+				'steps' => $this->formatHttpSteps($httptest['steps']),
+				'tags' => $this->formatTags($httptest['tags'])
 			];
 		}
 
@@ -1004,7 +1002,6 @@ class CConfigurationExportBuilder {
 				'privatekey' => $item['privatekey'],
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
-				'applications' => $this->formatApplications($item['applications']),
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt'],
 				'preprocessing' => self::formatPreprocessingSteps($item['preprocessing']),
@@ -1026,6 +1023,7 @@ class CConfigurationExportBuilder {
 				'ssl_cert_file' => $item['ssl_cert_file'],
 				'ssl_key_file' => $item['ssl_key_file'],
 				'ssl_key_password' => $item['ssl_key_password'],
+				'tags' => $this->formatTags($item['tags']),
 				'verify_peer' => $item['verify_peer'],
 				'verify_host' => $item['verify_host']
 			];
@@ -1033,7 +1031,6 @@ class CConfigurationExportBuilder {
 			$master_item = ($item['type'] == ITEM_TYPE_DEPENDENT) ? ['key' => $item['master_item']['key_']] : [];
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
 				$data['discover'] = $item['discover'];
 			}
 
@@ -1111,27 +1108,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format applications.
-	 *
-	 * @param array $applications
-	 *
-	 * @return array
-	 */
-	protected function formatApplications(array $applications) {
-		$result = [];
-
-		CArrayHelper::sort($applications, ['name']);
-
-		foreach ($applications as $application) {
-			$result[] = [
-				'name' => $application['name']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format macros.
 	 *
 	 * @param array $macros
@@ -1187,14 +1163,16 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatTags(array $tags) {
 		$result = [];
+		$fields = [
+			'tag' => true,
+			'value' => true,
+			'operator' => true
+		];
 
 		CArrayHelper::sort($tags, ['tag', 'value']);
 
 		foreach ($tags as $tag) {
-			$result[] = [
-				'tag' => $tag['tag'],
-				'value' => $tag['value']
-			];
+			$result[] = array_intersect_key($tag, $fields);
 		}
 
 		return $result;
@@ -1477,8 +1455,9 @@ class CConfigurationExportBuilder {
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
-				'application' => $element['application'],
-				'urls' => $this->formatMapElementUrls($element['urls'])
+				'urls' => $this->formatMapElementUrls($element['urls']),
+				'evaltype' => $element['evaltype'],
+				'tags' => $this->formatTags($element['tags'])
 			];
 		}
 

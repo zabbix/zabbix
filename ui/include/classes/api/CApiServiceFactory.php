@@ -28,7 +28,6 @@ class CApiServiceFactory extends CRegistryFactory {
 		'action' => CAction::class,
 		'alert' => CAlert::class,
 		'apiinfo' => CAPIInfo::class,
-		'application' => CApplication::class,
 		'auditlog' => CAuditLog::class,
 		'authentication' => CAuthentication::class,
 		'autoregistration' => CAutoregistration::class,

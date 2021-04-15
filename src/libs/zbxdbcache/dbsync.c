@@ -2990,6 +2990,110 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dbsync_compare_item_tag                                          *
+ *                                                                            *
+ * Purpose: compares item tags table row with cached configuration data       *
+ *                                                                            *
+ * Parameter: tag   - [IN] the cached item tag                                *
+ *            dbrow - [IN] the database row                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the row matches configuration data                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbsync_compare_item_tag(const zbx_dc_item_tag_t *tag, const DB_ROW dbrow)
+{
+	if (FAIL == dbsync_compare_uint64(dbrow[1], tag->itemid))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[2], tag->tag))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[3], tag->value))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbsync_compare_item_tags                                     *
+ *                                                                            *
+ * Purpose: compares item tags table with cached configuration data           *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
+{
+	DB_ROW			dbrow;
+	DB_RESULT		result;
+	zbx_hashset_t		ids;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		rowid;
+	zbx_dc_item_tag_t	*item_tag;
+
+	if (NULL == (result = DBselect(
+			"select distinct it.itemtagid,it.itemid,it.tag,it.value"
+			" from item_tag it,items i,hosts h"
+			" where i.itemid=it.itemid"
+				" and i.flags in (%d,%d)"
+				" and h.hostid=i.hostid"
+				" and h.status in (%d,%d)",
+				ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)))
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, 4, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		sync->dbresult = result;
+		return SUCCEED;
+	}
+
+	zbx_hashset_create(&ids, dbsync_env.cache->item_tags.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	while (NULL != (dbrow = DBfetch(result)))
+	{
+		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		ZBX_STR2UINT64(rowid, dbrow[0]);
+		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
+
+		if (NULL == (item_tag = (zbx_dc_item_tag_t *)zbx_hashset_search(&dbsync_env.cache->item_tags,
+				&rowid)))
+		{
+			tag = ZBX_DBSYNC_ROW_ADD;
+		}
+		else if (FAIL == dbsync_compare_item_tag(item_tag, dbrow))
+			tag = ZBX_DBSYNC_ROW_UPDATE;
+
+		if (ZBX_DBSYNC_ROW_NONE != tag)
+			dbsync_add_row(sync, rowid, tag, dbrow);
+	}
+
+	zbx_hashset_iter_reset(&dbsync_env.cache->item_tags, &iter);
+	while (NULL != (item_tag = (zbx_dc_item_tag_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == zbx_hashset_search(&ids, &item_tag->itemtagid))
+			dbsync_add_row(sync, item_tag->itemtagid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+	}
+
+	zbx_hashset_destroy(&ids);
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dbsync_compare_host_tag                                          *
  *                                                                            *
  * Purpose: compares host tags table row with cached configuration data       *

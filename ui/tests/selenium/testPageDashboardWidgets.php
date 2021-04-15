@@ -57,8 +57,8 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->checkLastSelectedWidgetType();
 
 		// Add widget with current default type "Action log".
-		$dashboard->addWidget()->asForm();
-		$this->query('xpath://div[@role="dialog"]//button[text()="Add"]')->waitUntilPresent()->one()->click();;
+		$dashboard->addWidget();
+		$this->query('xpath://div[@role="dialog"]//button[text()="Add"]')->waitUntilPresent()->one()->click();
 		// Check if widget was added.
 		$dashboard->getWidget('Action log');
 		$this->checkLastSelectedWidgetType();

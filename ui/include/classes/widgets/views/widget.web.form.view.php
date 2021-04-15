@@ -58,6 +58,14 @@ $field_hostids = CWidgetHelper::getHost($fields['hostids'],
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
 $scripts[] = $field_hostids->getPostJS();
 
+// Tags.
+$form_list->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']));
+
+// Tags filter list.
+$form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
+$scripts[] = $fields['tags']->getJavascript();
+$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
+
 // Show hosts in maintenance.
 $form_list->addRow(CWidgetHelper::getLabel($fields['maintenance']), CWidgetHelper::getCheckBox($fields['maintenance']));
 
@@ -65,5 +73,6 @@ $form->addItem($form_list);
 
 return [
 	'form' => $form,
-	'scripts' => $scripts
+	'scripts' => $scripts,
+	'jq_templates' => $jq_templates
 ];

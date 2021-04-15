@@ -25,7 +25,7 @@ class testPageLatestData extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=latest.view');
 		$this->zbxTestCheckTitle('Latest data');
 		$this->zbxTestCheckHeader('Latest data');
-		$this->zbxTestTextPresent(['Host groups', 'Hosts', 'Application', 'Name', 'Show items without data', 'Show details']);
+		$this->zbxTestTextPresent(['Host groups', 'Hosts', 'Name', 'Show items without data', 'Show details']);
 		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent(['Host', 'Name', 'Last check', 'Last value', 'Change']);
 	}
@@ -134,7 +134,7 @@ class testPageLatestData extends CLegacyWebTest {
 	 */
 	public function testPageLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
-		$this->page->login()->open('zabbix.php?action=latest.view&filter_hostids%5B%5D='.$data['host group'].'&filter_application=&filter_select=&filter_show_without_data=1&filter_set=1');
+		$this->page->login()->open('zabbix.php?action=latest.view&filter_hostids%5B%5D='.$data['host group'].'&filter_select=&filter_show_without_data=1&filter_set=1');
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Find rows from the data provider and click on the description icon if such should persist.

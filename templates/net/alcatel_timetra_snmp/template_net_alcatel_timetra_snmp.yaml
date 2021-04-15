@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:34Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -27,19 +27,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'CPU utilization'
@@ -52,9 +39,10 @@ zabbix_export:
           description: |
             MIB: TIMETRA-SYSTEM-MIB
             The value of sgiCpuUsage indicates the current CPU utilization for the system.
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -73,9 +61,6 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: SNMPv2-MIB'
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: REGEX
@@ -86,6 +71,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Operating system'
           type: SNMP_AGENT
@@ -97,9 +86,6 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: SNMPv2-MIB'
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: REGEX
@@ -110,6 +96,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -127,14 +117,15 @@ zabbix_export:
           description: |
             MIB: TIMETRA-SYSTEM-MIB
             The value of sgiKbMemoryAvailable indicates the amount of free memory, in kilobytes, in the overall system that is not allocated to memory pools, but is available in case a memory pool needs to grow.
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Total memory'
           type: CALCULATED
@@ -143,9 +134,10 @@ zabbix_export:
           units: B
           params: 'last("vm.memory.available[sgiKbMemoryAvailable.0]")+last("vm.memory.used[sgiKbMemoryUsed.0]")'
           description: 'Total memory in Bytes'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
           name: 'Used memory'
           type: SNMP_AGENT
@@ -156,14 +148,15 @@ zabbix_export:
           description: |
             MIB: TIMETRA-SYSTEM-MIB
             The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in kilobytes, currently in use on the system.
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Memory utilization'
           type: CALCULATED
@@ -173,9 +166,10 @@ zabbix_export:
           units: '%'
           params: 'last("vm.memory.used[sgiKbMemoryUsed.0]")/(last("vm.memory.available[sgiKbMemoryAvailable.0]")+last("vm.memory.used[sgiKbMemoryUsed.0]"))*100'
           description: 'Memory utilization in %'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
@@ -207,14 +201,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: TIMETRA-CHASSIS-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -246,11 +241,12 @@ zabbix_export:
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
                 Current status of the Fan tray.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -280,11 +276,12 @@ zabbix_export:
                 For any other type, this represents the overall status of the power supply.
                 If tmnxChassisPowerSupply1Status is'deviceStateOk', then all monitored statuses are 'deviceStateOk'.
                 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -307,11 +304,12 @@ zabbix_export:
                 For any other type, this field is unused and set to 'deviceNotEquipped'.
                 If tmnxChassisPowerSupply2Status is 'deviceStateOk', then all monitored statuses are 'deviceStateOk'.
                 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -343,9 +341,10 @@ zabbix_export:
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
                 The current temperature reading in degrees celsius from this hardware component's temperature sensor.  If this component does not contain a temperature sensor, then the value -1 is returned.
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
