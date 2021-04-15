@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-12T06:46:03Z'
+  date: '2021-04-15T08:50:14Z'
   media_types:
     -
       name: 'ManageEngine ServiceDesk'
@@ -110,15 +110,14 @@ zabbix_export:
             },
         
             createLink: function (id, url) {
-                if (MEngine.params.on_premise.toLowerCase() === 'true') {
-                    return url + (url.endsWith('/') ? '' : '/') + 'WorkOrder.do?woMode=viewWO&woID=' + id;
-                }
-                else {
-                    return url + (url.endsWith('/') ? '' : '/') + 'app/itdesk/ui/requests/' + id + '/details';
-                }
+                return url + (url.endsWith('/') ? '' : '/') +
+                    ((MEngine.params.on_premise.toLowerCase() === 'true')
+                        ? ('WorkOrder.do?woMode=viewWO&woID=' + id)
+                        : ('app/itdesk/ui/requests/' + id + '/details')
+                    );
             },
         
-            setToken: function () {
+            refreshAccessToken: function () {
                 [
                     'url_auth',
                     'on_demand_refresh_token',
@@ -134,9 +133,9 @@ zabbix_export:
                 var response,
                     request = new HttpRequest(),
                     url = MEngine.params.url_auth +
-                        'refresh_token=' + MEngine.params.on_demand_refresh_token +
-                        '&grant_type=refresh_token&client_id=' + MEngine.params.on_demand_client_id +
-                        '&client_secret=' + MEngine.params.on_demand_client_secret +
+                        'refresh_token=' + encodeURIComponent(MEngine.params.on_demand_refresh_token) +
+                        '&grant_type=refresh_token&client_id=' + encodeURIComponent(MEngine.params.on_demand_client_id) +
+                        '&client_secret=' + encodeURIComponent(MEngine.params.on_demand_client_secret) +
                         '&redirect_uri=https://www.zoho.com&scope=SDPOnDemand.requests.ALL';
         
                 if (MEngine.HTTPProxy) {
@@ -150,18 +149,26 @@ zabbix_export:
                 Zabbix.log(4, '[ ManageEngine Webhook ] Received response with status code ' +
                 request.getStatus() + '\n' + response);
         
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    throw 'Access token resresh failed with status code ' + request.getStatus() +
+                try {
+                    response = JSON.parse(response);
+                }
+                catch (error) {
+                    Zabbix.log(4, '[ ManageEngine Webhook ] Failed to parse response received from Zoho Accounts');
+                }
+        
+                if ((request.getStatus() < 200 || request.getStatus() >= 300) && !response.access_token) {
+                    throw 'Access token refresh failed with HTTP status code ' + request.getStatus() +
                         '. Check debug log for more information.';
                 }
                 else {
-                    MEngine.params.on_demand_auth_token = JSON.parse(response).access_token;
+                    MEngine.params.on_demand_auth_token = response.access_token;
                 }
             },
         
             request: function (method, query, data) {
                 var response,
                     url = MEngine.params.url + query,
+                    input,
                     request = new HttpRequest(),
                     message;
         
@@ -181,15 +188,16 @@ zabbix_export:
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.log(4, '[ ManageEngine Webhook ] Sending request: ' + url + '?input_data=' + encodeURIComponent(data));
+                input = 'input_data=' + encodeURIComponent(data);
+                Zabbix.log(4, '[ ManageEngine Webhook ] Sending request: ' + url + '?' + input);
         
                 switch (method) {
                     case 'post':
-                        response = request.post(url + '?input_data=' + encodeURIComponent(data));
+                        response = request.post(url, input);
                         break;
         
                     case 'put':
-                        response = request.put(url + '?input_data=' + encodeURIComponent(data));
+                        response = request.put(url, input);
                         break;
         
                     default:
@@ -204,8 +212,6 @@ zabbix_export:
                 }
                 catch (error) {
                     Zabbix.log(4, '[ ManageEngine Webhook ] Failed to parse response received from ManageEngine');
-                    throw 'Failed to parse response received from ManageEngine.\nRequest status code ' +
-                            request.getStatus() + '. Check debug log for more information.';
                 }
         
                 if ((request.getStatus() < 200 || request.getStatus() >= 300)
@@ -216,7 +222,9 @@ zabbix_export:
                 else if (typeof response.response_status === 'object' && response.response_status.status === 'failed') {
                     message = 'Request failed with status_code ';
         
-                    if (typeof response.response_status.messages === 'object' && response.response_status.messages[0].message) {
+                    if (typeof response.response_status.messages === 'object'
+                            && response.response_status.messages[0]
+                            && response.response_status.messages[0].message) {
                         message += response.response_status.messages[0].status_code +
                             '. Message: ' + response.response_status.messages[0].message;
                     }
@@ -236,51 +244,49 @@ zabbix_export:
                 var data = {},
                     result;
         
-                if (typeof fields === 'object' && Object.keys(fields).length) {
-                    if (isNote) {
-                        data.description = fields['field_string:description'];
-                        result = {request_note: data};
-                    }
-                    else {
-                        Object.keys(fields)
-                            .forEach(function(field) {
-                                if (fields[field].trim() === '') {
-                                    Zabbix.log(4, '[ ManageEngine Webhook ] Field "' + field +
-                                        '" can\'t be empty. The field ignored.');
-                                }
-                                else {
-                                    try {
-                                        var prefix = field.split(':')[0],
-                                            root;
+                if (isNote) {
+                    data.description = fields['field_string:description'];
+                    result = {request_note: data};
+                }
+                else {
+                    Object.keys(fields)
+                        .forEach(function(field) {
+                            if (fields[field].trim() === '') {
+                                Zabbix.log(4, '[ ManageEngine Webhook ] Field "' + field +
+                                    '" can\'t be empty. The field ignored.');
+                            }
+                            else {
+                                try {
+                                    var prefix = field.split(':')[0],
+                                        root;
         
-                                        if  (prefix.startsWith('udf_') && !data.udf_fields) {
-                                            data.udf_fields = {};
-                                            root = data.udf_fields;
-                                        }
-                                        else if (prefix.startsWith('udf_')) {
-                                            root = data.udf_fields;
-                                        }
-                                        else {
-                                            root = data;
-                                        }
-        
-                                        if (prefix.endsWith('string')) {
-                                            root[field.substring(field.indexOf(':') + 1)] = fields[field];
-                                        }
-                                        else {
-                                            root[field.substring(field.indexOf(':') + 1)] = {
-                                                name: fields[field]
-                                            };
-                                        }
+                                    if  (prefix.startsWith('udf_') && !data.udf_fields) {
+                                        data.udf_fields = {};
+                                        root = data.udf_fields;
                                     }
-                                    catch (error) {
-                                        Zabbix.log(4, '[ ManageEngine Webhook ] Can\'t parse field "' + field +
-                                            '". The field ignored.');
+                                    else if (prefix.startsWith('udf_')) {
+                                        root = data.udf_fields;
+                                    }
+                                    else {
+                                        root = data;
+                                    }
+        
+                                    if (prefix.endsWith('string')) {
+                                        root[field.substring(field.indexOf(':') + 1)] = fields[field];
+                                    }
+                                    else {
+                                        root[field.substring(field.indexOf(':') + 1)] = {
+                                            name: fields[field]
+                                        };
                                     }
                                 }
-                            });
-                        result = {request: data};
-                    }
+                                catch (error) {
+                                    Zabbix.log(4, '[ ManageEngine Webhook ] Can\'t parse field "' + field +
+                                        '". The field ignored.');
+                                }
+                            }
+                        });
+                    result = {request: data};
                 }
         
                 return result;
@@ -315,8 +321,7 @@ zabbix_export:
                         fields[key] = params[key];
                     }
         
-                    if (required_params.indexOf(key) !== -1
-                            && (typeof params[key] === 'undefined' || params[key].trim() === '')) {
+                    if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
                         throw 'Parameter "' + key + '" can\'t be empty.';
                     }
                 });
@@ -347,7 +352,6 @@ zabbix_export:
             fields['field_object:priority'] = params['priority_' + severities[params.event_nseverity].name]
             || 'Normal';
         
-        
             if (params.event_update_status === '1' && (typeof params.sd_request_id === 'undefined'
                     || params.sd_request_id.trim() === ''
                     || params.sd_request_id === '{EVENT.TAGS.__zbx_sd_request_id}')) {
@@ -358,9 +362,8 @@ zabbix_export:
             MEngine.setProxy(params.HTTPProxy);
         
             if (MEngine.params.on_premise.toLowerCase() !== 'true') {
-                MEngine.setToken();
+                MEngine.refreshAccessToken();
             }
-        
         
             // Create issue for non trigger-based events.
             if (params.event_source !== '0' && params.event_recovery_value !== '0') {
@@ -379,13 +382,14 @@ zabbix_export:
             }
             else {
                 MEngine.request('post', 'requests/' + params.sd_request_id + '/notes',
-                    MEngine.createPaylaod(fields, params.event_update_status === '1'));
+                    MEngine.createPaylaod(fields, params.event_update_status === '1')
+                );
             }
         
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.log(3, '[ MEngine Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ ManageEngine Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
