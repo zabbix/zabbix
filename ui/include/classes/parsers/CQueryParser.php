@@ -61,8 +61,7 @@ class CQueryParser extends CParser {
 	 *
 	 * @return int
 	 */
-	public function parse($source, $pos = 0): int {
-		$this->result = new CQueryParserResult();
+	public function parse(string $source, int $pos = 0): int {
 		$start_pos = $pos;
 
 		if (!isset($source[$pos]) || $source[$pos] !== '/') {
@@ -86,6 +85,8 @@ class CQueryParser extends CParser {
 		$pos += $this->item_key_parser->getLength();
 
 		$this->length = $pos - $start_pos;
+
+		$this->result = new CQueryParserResult();
 		$this->result->match = substr($source, $start_pos, $this->length);
 		$this->result->host = $this->host_name_parser->getMatch();
 		$this->result->item = $this->item_key_parser->getMatch();
@@ -93,23 +94,5 @@ class CQueryParser extends CParser {
 		$this->result->pos = $start_pos;
 
 		return isset($source[$pos]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
-	}
-
-	/**
-	 * Returns host.
-	 *
-	 * @return string
-	 */
-	public function getHost(): string {
-		return $this->host;
-	}
-
-	/**
-	 * Returns item.
-	 *
-	 * @return string
-	 */
-	public function getItem(): string {
-		return $this->item;
 	}
 }

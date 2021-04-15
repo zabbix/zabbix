@@ -3517,7 +3517,7 @@ class C10TriggerExpressionTest extends TestCase {
 	public function testTokens(string $expression, array $tokens, array $options = []) {
 		$parser = new C10TriggerExpression($options);
 		$result = $parser->parse($expression);
-		$this->assertTrue($result instanceof CTriggerExprParserResult);
+		$this->assertTrue($result instanceof C10TriggerExprParserResult);
 		$this->assertEquals($tokens, $result->getTokens());
 	}
 }

@@ -2058,13 +2058,12 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 					loc = &params->values[index];
 					if ('"' == parameter[loc->l])
 					{
-						loc = &params->values[index];
 						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
 								loc->r - loc->l + 1);
 					}
 					else if ('\0' != parameter[loc->l])
 					{
-						char raw[FUNCTION_PARAM_LEN * 4 + 1], quoted[sizeof(raw)];
+						char	raw[FUNCTION_PARAM_LEN * 4 + 1], quoted[sizeof(raw)];
 
 						zbx_strlcpy(raw, parameter + loc->l, loc->r - loc->l + 2);
 						zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");
@@ -2098,7 +2097,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 			case ZBX_DBPATCH_ARG_CONST_STR:
 				if (NULL != (ptr = va_arg(args, char *)))
 				{
-					char quoted[MAX_STRING_LEN];
+					char	quoted[MAX_STRING_LEN];
 
 					zbx_escape_string(quoted, sizeof(quoted), ptr, "\"\\");
 					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
