@@ -3951,7 +3951,6 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH);
 				break;
 			case ZBX_REPORT_CYCLE_WEEKLY:
-			case ZBX_REPORT_CYCLE_DAILY:
 				if (0 == weekdays)
 					return -1;
 				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
@@ -3959,6 +3958,9 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 				while (0 == (weekdays & (1 << (tm->tm_wday + 6) % 7)))
 					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
 
+				break;
+			case ZBX_REPORT_CYCLE_DAILY:
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
 				break;
 		}
 

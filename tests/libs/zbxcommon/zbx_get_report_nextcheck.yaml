@@ -4,7 +4,7 @@ in:
   timezone: :Europe/Riga
   now: 2021-03-04 14:00:00 +02:00
   cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  weekdays: []
   start_time: 12:00:00
 out:
   reports:
@@ -16,35 +16,6 @@ out:
     - 2021-03-10 12:00:00 +02:00
     - 2021-03-11 12:00:00 +02:00
     - 2021-03-12 12:00:00 +02:00
----
-test case: Workday reports for day
-in:
-  timezone: :Europe/Riga
-  now: 2021-03-04 14:00:00 +02:00
-  cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0, 1, 2, 3, 4]
-  start_time: 12:00:00
-out:
-  reports:
-    - 2021-03-05 12:00:00 +02:00
-    - 2021-03-08 12:00:00 +02:00
-    - 2021-03-09 12:00:00 +02:00
-    - 2021-03-10 12:00:00 +02:00
-    - 2021-03-11 12:00:00 +02:00
-    - 2021-03-12 12:00:00 +02:00
-    - 2021-03-15 12:00:00 +02:00
----
-test case: Monday reports for day
-in:
-  timezone: :Europe/Riga
-  now: 2021-03-04 10:00:00 +02:00
-  cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0]
-  start_time: 12:00:00
-out:
-  reports:
-    - 2021-03-08 12:00:00 +02:00
-    - 2021-03-15 12:00:00 +02:00
 ---
 test case: Weekly reports every day
 in:
@@ -124,7 +95,7 @@ in:
   timezone: :Europe/Riga
   now: 2021-03-04 08:00:00 +02:00
   cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  weekdays: []
   start_time: 12:00:00
 out:
   reports:
@@ -143,7 +114,7 @@ in:
   timezone: :Europe/Riga
   now: 2021-03-04 16:00:00 +02:00
   cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  weekdays: []
   start_time: 12:00:00
 out:
   reports:
@@ -161,7 +132,7 @@ in:
   timezone: :Europe/Riga
   now: 2021-03-12 10:00:00 +02:00
   cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  weekdays: []
   start_time: 11:00:00
 out:
   reports:
@@ -175,7 +146,7 @@ in:
   timezone: :Europe/Riga
   now: 2021-03-25 15:17:24 +02:00
   cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  weekdays: []
   start_time: 00:00:00
 out:
   reports:
@@ -188,7 +159,7 @@ in:
   timezone: :Europe/Riga
   now: 2021-03-12 10:00:00 +02:00
   cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  weekdays: []
   start_time: 10:00:00
 out:
   reports:
@@ -201,7 +172,7 @@ in:
   timezone: :Etc/UTC
   now: 2021-03-12 00:00:00 +0:00
   cycle: ZBX_REPORT_CYCLE_DAILY
-  weekdays: [0, 1, 2, 3, 4, 5, 6]
+  weekdays: []
   start_time: 10:00:00
 out:
   reports:
