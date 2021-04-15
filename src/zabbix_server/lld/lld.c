@@ -725,9 +725,10 @@ static int	regexp_strmatch_condition(const char *value, const char *pattern, uns
 }
 
 void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, const char **delay,
-		const char **history, const char **trends, unsigned char *status, unsigned char *discover)
+		const char **history, const char **trends, zbx_vector_db_tag_ptr_t *override_tags,
+		unsigned char *status, unsigned char *discover)
 {
-	int	i, j;
+	int	i, j, k;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -767,6 +768,9 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 
 			if (NULL != override_operation->trends)
 				*trends = override_operation->trends;
+
+			for (k = 0; k < override_operation->tags.values_num; k++)
+				zbx_vector_db_tag_ptr_append(override_tags, override_operation->tags.values[k]);
 
 			if (NULL != status)
 			{

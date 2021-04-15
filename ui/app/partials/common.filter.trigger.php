@@ -96,22 +96,6 @@ if (!$data['filter']['statusChange']) {
 }
 
 $column1
-	->addRow(_('Application'), [
-		(new CTextBox('application', $data['filter']['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_name', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic", jQuery.extend('.
-				json_encode([
-					'srctbl' => 'applications',
-					'srcfld1' => 'name',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'application',
-					'real_hosts' => '1',
-					'with_applications' => '1'
-				]).', getFirstMultiselectValue("filter_hostids_", "filter_groupids_")), null, this);'
-			)
-	])
 	->addRow(_('Name'),
 		(new CTextBox('txt_select', $data['filter']['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
@@ -167,6 +151,12 @@ $inventoryFilterTable->addRow(
 
 $column2 = (new CFormList())
 	->addRow(_('Host inventory'), $inventoryFilterTable)
+	->addRow(_('Tags'),
+		CTagFilterFieldHelper::getTagFilterField([
+			'evaltype' => $data['filter']['evaltype'],
+			'tags' => $data['filter']['tags']
+		])
+	)
 	->addRow(_('Show unacknowledged only'),
 		(new CCheckBox('ack_status'))
 			->setChecked($data['filter']['ackStatus'] == 1)

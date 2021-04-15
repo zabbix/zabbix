@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:51Z'
   groups:
     -
       name: Templates/Modules
@@ -18,9 +18,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: 'Network interfaces'
       discovery_rules:
         -
           name: 'EtherLike-MIB Discovery'
@@ -73,11 +70,12 @@ zabbix_export:
                 ifMauType.  This was felt to be sufficiently
                 valuable to justify the redundancy.
                 Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               valuemap:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
                   expression: '{last()}=2'

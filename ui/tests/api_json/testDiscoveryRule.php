@@ -3462,7 +3462,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": value must be one of opstatus, opdiscover, opperiod, ophistory, optrends.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": value must be one of opstatus, opdiscover, opperiod, ophistory, optrends, optag.'
 			],
 			// LLD rule override operation status
 			'Test /1/overrides/1/operations/1/opstatus/status is mandatory.' => [
@@ -4158,26 +4158,6 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag/1/tag": cannot be empty.'
-			],
-			'Test /1/overrides/1/operations/1/optag is is not supported for item prototype object.' => [
-				'discoveryrules' => [
-					$new_lld_overrides([
-						[
-							'name' => 'override',
-							'step' => 1,
-							'operations' => [
-								[
-									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
-									'optag' => [
-										['tag' => 'www']
-									]
-								]
-							]
-						]
-					])
-				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
 			],
 			'Test /1/overrides/1/operations/1/optag is is not supported for graph prototype object.' => [
 				'discoveryrules' => [

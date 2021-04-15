@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-11-23T08:46:30Z'
+  date: '2021-02-23T11:04:39Z'
   groups:
     -
       name: Templates/Applications
@@ -19,9 +19,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Tomcat
       items:
         -
           name: 'Tomcat: Version'
@@ -33,15 +30,16 @@ zabbix_export:
           username: '{$TOMCAT.USER}'
           password: '{$TOMCAT.PASSWORD}'
           description: 'The version of the Tomcat.'
-          applications:
-            -
-              name: Tomcat
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          tags:
+            -
+              tag: Application
+              value: Tomcat
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -76,15 +74,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: ProtocolHandler {#JMXVALUE}'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: ProtocolHandler {#JMXVALUE}'
               trigger_prototypes:
                 -
                   expression: '{str(off)} = 1'
@@ -123,15 +122,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Bytes received rate by processor {#JMXNAME}'
-              application_prototypes:
-                -
-                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
             -
               name: '{#JMXNAME}: Bytes sent per second'
               type: JMX
@@ -141,15 +141,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Bytes sent rate by processor {#JMXNAME}'
-              application_prototypes:
-                -
-                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
             -
               name: '{#JMXNAME}: Errors per second'
               type: JMX
@@ -158,15 +159,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Error rate of request processor {#JMXNAME}'
-              application_prototypes:
-                -
-                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
             -
               name: '{#JMXNAME}: Requests processing time'
               type: JMX
@@ -176,15 +178,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'The total time to process all incoming requests of request processor {#JMXNAME}'
-              application_prototypes:
-                -
-                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
             -
               name: '{#JMXNAME}: Requests per second'
               type: JMX
@@ -193,15 +196,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Rate of requests served by request processor {#JMXNAME}'
-              application_prototypes:
-                -
-                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
           graph_prototypes:
             -
               name: '{#JMXNAME}: Traffic'
@@ -249,10 +253,11 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Active sessions of the application.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
             -
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions allowed maximum'
               type: JMX
@@ -262,10 +267,11 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'The maximum number of active Sessions allowed, or -1 for no limit.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
             -
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions active maximum so far'
               type: JMX
@@ -274,10 +280,11 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Maximum number of active sessions so far.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
             -
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions rejected per second'
               type: JMX
@@ -286,15 +293,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Rate of sessions we rejected due to maxActive being reached.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
             -
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions created per second'
               type: JMX
@@ -303,15 +311,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Rate of sessions created by this application per second.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
           graph_prototypes:
             -
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions'
@@ -373,15 +382,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Amount of threads the thread pool has right now, both busy and free.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
             -
               name: '{#JMXNAME}: Threads busy'
               type: JMX
@@ -390,10 +400,11 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Number of the requests that are being currently handled.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
             -
               name: '{#JMXNAME}: Threads limit'
               type: JMX
@@ -402,15 +413,16 @@ zabbix_export:
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Limit of the threads count. When currentThreadsBusy counter reaches the maxThreads limit, no more requests could be handled, and the application chokes.'
-              application_prototypes:
-                -
-                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              tags:
+                -
+                  tag: Application
+                  value: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
           trigger_prototypes:
             -
               expression: '{Apache Tomcat JMX:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100'

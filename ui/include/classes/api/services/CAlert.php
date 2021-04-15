@@ -42,7 +42,6 @@ class CAlert extends CApiService {
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
 	 * @param array $options['alertids']
-	 * @param array $options['applicationids']
 	 * @param array $options['status']
 	 * @param bool  $options['editable']
 	 * @param array $options['extendoutput']

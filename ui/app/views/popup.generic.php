@@ -40,8 +40,7 @@ $header_form = ($data['popup_type'] === 'help_items') ? (new CForm())->cleanItem
 $header_form->setId('generic-popup-form');
 
 // Make 'empty' button.
-if (in_array($data['popup_type'], ['applications', 'application_prototypes', 'triggers'])
-		&& !array_key_exists('noempty', $options)) {
+if ($data['popup_type'] === 'triggers' && !array_key_exists('noempty', $options)) {
 	$value1 = (strpos($options['dstfld1'], 'id') !== false) ? 0 : '';
 	$value2 = (strpos($options['dstfld2'], 'id') !== false) ? 0 : '';
 	$value3 = (strpos($options['dstfld3'], 'id') !== false) ? 0 : '';
@@ -177,8 +176,6 @@ switch ($data['popup_type']) {
 	case 'proxies':
 	case 'host_templates':
 	case 'templates':
-	case 'applications':
-	case 'application_prototypes':
 	case 'drules':
 	case 'roles':
 	case 'api_methods':
@@ -626,9 +623,8 @@ if ($data['multiselect'] && $form !== null) {
 }
 
 // Types require results returned as array.
-$types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications',
-	'application_prototypes', 'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles',
-	'api_methods', 'valuemaps', 'dashboard'
+$types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'proxies', 'items',
+	'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods', 'valuemaps', 'dashboard'
 ];
 
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {

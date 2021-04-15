@@ -102,54 +102,10 @@ if (!$filter_tags) {
 	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
 
-$filter_tags_table = (new CTable())
-	->setId('filter-tags')
-	->addRow((new CCol(
-		(new CRadioButtonList('filter_evaltype', (int) $data['filter_evaltype']))
-			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-			->setModern(true)
-		))->setColSpan(4)
-	);
-
-$i = 0;
-foreach ($filter_tags as $tag) {
-	$filter_tags_table->addRow([
-		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
-			->setAttribute('placeholder', _('tag'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CSelect('filter_tags['.$i.'][operator]'))
-			->addOptions(CSelect::createOptionsFromArray([
-				TAG_OPERATOR_EXISTS => _('Exists'),
-				TAG_OPERATOR_EQUAL => _('Equals'),
-				TAG_OPERATOR_LIKE => _('Contains'),
-				TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
-				TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
-				TAG_OPERATOR_NOT_LIKE => _('Does not contain')
-			]))
-			->setValue($tag['operator'])
-			->setFocusableElementId('filter-tags-'.$i.'-operator-select')
-			->setId('filter_tags_'.$i.'_operator'),
-		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
-			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			->setId('filter_tags_'.$i.'_value'),
-		(new CCol(
-			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
-
-	$i++;
-}
-$filter_tags_table->addRow(
-	(new CCol(
-		(new CButton('filter_tags_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-	))->setColSpan(3)
-);
+$filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
+	'evaltype' => $data['filter_evaltype'],
+	'tags' => $filter_tags
+]);
 
 $filter_column2 = (new CFormList())
 	->addRow(_('Tags'), $filter_tags_table)

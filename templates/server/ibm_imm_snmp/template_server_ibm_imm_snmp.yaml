@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:53Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -39,17 +39,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Physical disks'
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'Hardware model name'
@@ -62,14 +51,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: IMM-MIB'
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -83,14 +73,15 @@ zabbix_export:
             MIB: IMM-MIB
             Machine serial number VPD information
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -109,11 +100,12 @@ zabbix_export:
           description: |
             MIB: IMM-MIB
             Indicates status of system health for the system in which the IMM resides. Value of 'nonRecoverable' indicates a severe error has occurred and the system may not be functioning. A value of 'critical' indicates that a error has occurred but the system is currently functioning properly. A value of 'nonCritical' indicates that a condition has occurred that may change the state of the system in the future but currently the system is working properly. A value of 'normal' indicates that the system is operating normally.
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'IMM-MIB::systemHealthStat'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1'
@@ -164,15 +156,16 @@ zabbix_export:
                 Fan speed expressed in percent(%) of maximum RPM.
                 An octet string expressed as 'ddd% of maximum' where:d is a decimal digit or blank space for a leading zero.
                 If the fan is determined not to be running or the fan speed cannot be determined, the string will indicate 'Offline'.
-              applications:
-                -
-                  name: Fans
               preprocessing:
                 -
                   type: REGEX
                   parameters:
                     - '(\d{1,3}) *%( of maximum)?'
                     - \1
+              tags:
+                -
+                  tag: Application
+                  value: Fans
             -
               name: '{#FAN_DESCR}: Fan status'
               type: SNMP_AGENT
@@ -185,9 +178,10 @@ zabbix_export:
               description: |
                 MIB: IMM-MIB
                 A description of the fan component status.
-              applications:
+              tags:
                 -
-                  name: Fans
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
@@ -214,9 +208,10 @@ zabbix_export:
               description: |
                 MIB: IMM-MIB
                 disk module FRU name.
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#SNMPINDEX}: Physical disk status'
               type: SNMP_AGENT
@@ -226,9 +221,10 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: IMM-MIB'
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_OK_STATUS},ne)}=1'
@@ -256,9 +252,10 @@ zabbix_export:
               description: |
                 MIB: IMM-MIB
                 A description of the power module status.
-              applications:
+              tags:
                 -
-                  name: 'Power supply'
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
@@ -291,9 +288,10 @@ zabbix_export:
               description: |
                 MIB: IMM-MIB
                 Temperature readings of testpoint: {#SNMPVALUE}
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
@@ -348,9 +346,10 @@ zabbix_export:
               description: |
                 MIB: IMM-MIB
                 Temperature readings of testpoint: Ambient
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
@@ -405,9 +404,10 @@ zabbix_export:
               description: |
                 MIB: IMM-MIB
                 Temperature readings of testpoint: CPU
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"CPU"}'

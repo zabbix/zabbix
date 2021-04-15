@@ -33,7 +33,6 @@ class CControllerProfileUpdate extends CController {
 		if ($ret) {
 			switch ($this->getInput('idx')) {
 				case 'web.actionconf.filter.active':
-				case 'web.applications.filter.active':
 				case 'web.auditacts.filter.active':
 				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
@@ -89,8 +88,6 @@ class CControllerProfileUpdate extends CController {
 
 				case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				case 'web.dashboard.widget.navtree.item.selected':
-				case 'web.latest.toggle':
-				case 'web.latest.toggle_other':
 					$ret = $this->hasInput('idx2');
 					break;
 
@@ -116,8 +113,6 @@ class CControllerProfileUpdate extends CController {
 
 		DBstart();
 		switch ($idx) {
-			case 'web.latest.toggle':
-			case 'web.latest.toggle_other':
 			case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));

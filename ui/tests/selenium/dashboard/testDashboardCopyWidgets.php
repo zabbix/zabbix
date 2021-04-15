@@ -35,8 +35,8 @@ class testDashboardCopyWidgets extends CWebTest {
 	 * Data provider for copying widgets.
 	 */
 	public static function getCopyWidgetsData() {
-		return CDBHelper::getDataProvider('SELECT * FROM widget w '.
-			'WHERE EXISTS ('.
+		return CDBHelper::getDataProvider('SELECT * FROM widget w'.
+			' WHERE EXISTS ('.
 				'SELECT NULL'.
 				' FROM dashboard_page dp'.
 				' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
@@ -151,8 +151,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		$dashboard->save();
 		$this->page->waitUntilReady();
 
-		$copied_widget_size = CDBHelper::getRow('SELECT w.width, w.height '.
-				'FROM widget w WHERE EXISTS ('.
+		$copied_widget_size = CDBHelper::getRow('SELECT w.width, w.height'.
+				' FROM widget w WHERE EXISTS ('.
 					'SELECT NULL'.
 					' FROM dashboard_page dp'.
 					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.

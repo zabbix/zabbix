@@ -358,8 +358,7 @@ jQuery(function($) {
 
 			$('#' + data.parentId).multiSelect('addData', items);
 		}
-		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
-				&& typeof window.addPopupValues !== 'undefined') {
+		else if (typeof window.addPopupValues !== 'undefined') {
 			// execute function if they exist
 			window.addPopupValues(data);
 		}
