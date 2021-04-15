@@ -989,6 +989,13 @@ out:
   result: SUCCEED
   value: 2.7182818284590451
 ---
+test case: Expression 'e(1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'e(1)'
+out:
+  result: FAIL
+---
 test case: Expression 'exp(2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1053,6 +1060,19 @@ out:
   result: SUCCEED
   value: 3.1415926535897931
 ---
+test case: Expression 'pi(1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'pi(1)'
+out:
+  result: FAIL
+---
+test case: Expression 'rand(1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'rand(1)'
+out:
+  result: FAIL
 test case: Expression 'power(2,3)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1177,6 +1197,13 @@ out:
   result: SUCCEED
   value: 0.982793723247329
 ---
+test case: Expression 'atan2(0,0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'atan2(0,0)'
+out:
+  result: FAIL
+---
 test case: Expression 'cos(1)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1279,4 +1306,11 @@ in:
 out:
   result: SUCCEED
   value: -1.5
+---
+test case: Expression 'rand(1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'rand(1)'
+out:
+  result: FAIL
 ...

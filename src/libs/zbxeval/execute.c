@@ -1282,6 +1282,7 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 
 #define ZBX_MATH_CONST_PI	3.141592653589793238463
 #define ZBX_MATH_CONST_E	2.718281828459045
+#define ZBX_MATH_RANDOM		0
 
 static double	eval_math_func_degrees(double radians)
 {
@@ -1307,13 +1308,6 @@ static double	eval_math_func_signum(double x)
 		return 0;
 
 	return 1;
-}
-
-static double	eval_math_func_rand(void)
-{
-	srand((unsigned int)time(NULL));
-
-	return (double)(rand());
 }
 
 /******************************************************************************
@@ -1424,7 +1418,8 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 	arg2 = &output->values[output->values_num - 1];
 
 	if ((eval_math_func_round == func || eval_math_func_truncate == func) && 0 > arg2->data.dbl ||
-			0.0 != fmod(arg2->data.dbl, 1))
+			0.0 != fmod(arg2->data.dbl, 1) || (atan2 == func && 0.0 == arg1->data.dbl &&
+			0.0 == arg2->data.dbl))
 	{
 		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
 		return FAIL;
@@ -1453,11 +1448,33 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_execute_math_return_value(zbx_vector_var_t *output, double value)
+static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error, double value)
 {
 	zbx_variant_t	ret_value;
 
-	zbx_variant_set_dbl(&ret_value, value);
+	if (0 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (ZBX_MATH_RANDOM == value)
+	{
+		struct timespec ts;
+
+		if (0 != clock_gettime(CLOCK_MONOTONIC, &ts))
+		{
+			srand((unsigned int)time(NULL));
+			zbx_variant_set_dbl(&ret_value, (double)(rand()));
+		}
+		else
+			zbx_variant_set_dbl(&ret_value, ts.tv_nsec ^ ts.tv_sec);
+	}
+	else
+		zbx_variant_set_dbl(&ret_value, value);
+
 	eval_function_return(0, &ret_value, output);
 
 	return SUCCEED;
@@ -1563,11 +1580,11 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "atan2", ZBX_CONST_STRLEN("atan2")))
 		return eval_execute_math_function_double_param(ctx, token, output, error, atan2);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "pi", ZBX_CONST_STRLEN("pi")))
-		return eval_execute_math_return_value(output, ZBX_MATH_CONST_PI);
+		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_CONST_PI);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "e", ZBX_CONST_STRLEN("e")))
-		return eval_execute_math_return_value(output, ZBX_MATH_CONST_E);
+		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_CONST_E);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "rand", ZBX_CONST_STRLEN("rand")))
-		return eval_execute_math_return_value(output, eval_math_func_rand());
+		return eval_execute_math_return_value(ctx, token, output, error, ZBX_MATH_RANDOM);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);
