@@ -141,5 +141,22 @@ in:
 out:
   return: FAIL
   value: 4
+---
+test case: order
+in:
+  value: 1
+  valuemaps:
+  - type: 2
+    value: 3
+    newvalue: "Value < 3"
+  - type: 0
+    value: 1
+    newvalue: "Value 1"
+  - type: 4
+    value: "^1$"
+    newvalue: "Regex 1"
+out:
+  return: SUCCEED
+  value: "Value < 3 (1)"
 ...
 

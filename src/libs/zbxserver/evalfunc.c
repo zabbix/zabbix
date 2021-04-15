@@ -3330,55 +3330,34 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 	for (i = 0; i < valuemaps->values_num; i++)
 	{
-		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
-
-		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type && 0 == strcmp(valuemap->value, value))
-			goto map_value;
-	}
-
-	for (i = 0; i < valuemaps->values_num; i++)
-	{
 		char			*pattern;
 		int			match;
 		zbx_vector_ptr_t	regexps;
 
 		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
-		if (ZBX_VALUEMAP_TYPE_REGEX != valuemap->type)
-			continue;
-
-		zbx_vector_ptr_create(&regexps);
-
-		pattern = valuemap->value;
-
-		if ('@' == *valuemap->value)
-		{
-			DCget_expressions_by_name(&regexps, valuemap->value + 1);
-
-			if (0 == regexps.values_num)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "global regular expression \"%s\" does not exist",
-						valuemap->value + 1);
-			}
-		}
-		match =  regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
-
-		zbx_regexp_clean_expressions(&regexps);
-		zbx_vector_ptr_destroy(&regexps);
-
-		if (ZBX_REGEXP_MATCH == match)
+		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type && 0 == strcmp(valuemap->value, value))
 			goto map_value;
 
-	}
+		if (ZBX_VALUEMAP_TYPE_REGEX == valuemap->type)
+		{
+			zbx_vector_ptr_create(&regexps);
 
-	if (ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
-	{
-		for (i = 0; i < valuemaps->values_num; i++)
+			pattern = valuemap->value;
+
+			match =  regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
+
+			zbx_regexp_clean_expressions(&regexps);
+			zbx_vector_ptr_destroy(&regexps);
+
+			if (ZBX_REGEXP_MATCH == match)
+				goto map_value;
+		}
+
+		if (ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
 		{
 			char	threshold_min[ZBX_VALUEMAP_STRING_LEN], threshold_max[ZBX_VALUEMAP_STRING_LEN];
 			double	min, max;
-
-			valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
 			if (ZBX_VALUEMAP_TYPE_LESS == valuemap->type &&
 					ZBX_INFINITY != (max = evaluate_string_to_double(valuemap->value)))
@@ -3461,7 +3440,8 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	result = DBselect(
 			"select value,newvalue,type"
 			" from valuemap_mapping"
-			" where valuemapid=" ZBX_FS_UI64,
+			" where valuemapid=" ZBX_FS_UI64
+			" order by valuemap_mappingid asc",
 			valuemapid);
 
 	while (NULL != (row = DBfetch(result)))
