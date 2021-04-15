@@ -3946,6 +3946,7 @@ clean:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
+ *             last_key     - [IN] the ID of last processed event             *
  *             events       - [OUT] a pointer to the output variable          *
  *             alloc_sz     - [OUT] allocated memory size for events          *
  *             error        - [OUT] the error message in the case of failure  *
@@ -3955,7 +3956,7 @@ clean:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
+		zbx_uint64_t last_key, zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
 	char		*event_session = NULL;
 	int		ret = FAIL, soap_count = 5; /* 10 - initial value of eventlog records number in one response */
@@ -3971,12 +3972,12 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		goto end_session;
 
 	if (NULL != service->data && 0 != service->data->events.values_num &&
-			((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
+			((const zbx_vmware_event_t *)service->data->events.values[0])->key > last_key)
 	{
 		eventlog_last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
 	}
 	else
-		eventlog_last_key = service->eventlog.last_key;
+		eventlog_last_key = last_key;
 
 	do
 	{
@@ -4012,7 +4013,7 @@ out:
 	zbx_free(event_session);
 	zbx_xml_free_doc(doc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __func__, zbx_result_string(ret), events->values_num);
 
 	return ret;
 }
@@ -4117,8 +4118,8 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 out:
 	zbx_xml_free_doc(doc);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s last_key:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+			(SUCCEED == ret ? xml_event.id : 0));
 	return ret;
 
 #	undef ZBX_POST_VMWARE_LASTEVENT
@@ -4743,8 +4744,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vector_ptr_t	events;
 	int			i, ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
-	unsigned char		skip_old = service->eventlog.skip_old;
-	zbx_uint64_t		events_sz = 0;
+	unsigned char		evt_pause = 0, evt_skip_old;
+	zbx_uint64_t		evt_last_key, events_sz = 0;
 	char			msg[MAX_STRING_LEN / 8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
@@ -4761,6 +4762,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	zbx_vector_str_create(&hvs);
 	zbx_vector_str_create(&dss);
+
+	zbx_vmware_lock();
+	evt_last_key = service->eventlog.last_key;
+	evt_skip_old = service->eventlog.skip_old;
+	zbx_vmware_unlock();
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -4787,6 +4793,12 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 			SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
 	{
 		goto clean;
+	}
+
+	if (NULL != service->data && 0 != service->data->events.values_num && 0 == evt_skip_old &&
+			((const zbx_vmware_event_t *)service->data->events.values[0])->key > evt_last_key)
+	{
+		evt_pause = 1;
 	}
 
 	if (SUCCEED != vmware_service_get_hv_ds_dc_list(service, easyhandle, &hvs, &dss, &data->datacenters,
@@ -4832,19 +4844,18 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_name_compare);
 
-	if (0 == service->eventlog.req_sz)
+	if (0 == service->eventlog.req_sz && 0 == evt_pause)
 	{
 		/* skip collection of event data if we don't know where	*/
 		/* we stopped last time or item can't accept values 	*/
-		if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != service->eventlog.last_key &&
-				0 == service->eventlog.skip_old &&
-				SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events,
-				&events_sz, &data->error))
+		if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != evt_last_key && 0 == evt_skip_old &&
+				SUCCEED != vmware_service_get_event_data(service, easyhandle, evt_last_key,
+				&data->events, &events_sz, &data->error))
 		{
 			goto clean;
 		}
 
-		if (0 != service->eventlog.skip_old)
+		if (0 != evt_skip_old)
 		{
 			char	*error = NULL;
 
@@ -4856,8 +4867,17 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 				zbx_free(error);
 			}
 			else
-				skip_old = 0;
+				evt_skip_old = 0;
 		}
+	}
+	else if (0 != service->eventlog.req_sz)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware events requires up to " ZBX_FS_UI64
+				" bytes of free VMwareCache memory. Reading events skipped", service->eventlog.req_sz);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Previous events have not been read. Reading new events skipped");
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
@@ -4933,7 +4953,7 @@ out:
 						vmware_mem->free_size, vmware_mem->free_size, vmware->strpool_sz,
 						vmware_mem->total_size);
 			}
-			else
+			else if (0 == evt_pause)
 			{
 				int	level;
 
@@ -4952,8 +4972,7 @@ out:
 		service->eventlog.req_sz = 0;
 	}
 
-	if (NULL != service->data && 0 != service->data->events.values_num &&
-			((const zbx_vmware_event_t *)service->data->events.values[0])->key > service->eventlog.last_key)
+	if (0 != evt_pause)
 	{
 		zbx_vector_ptr_append_array(&events, service->data->events.values, service->data->events.values_num);
 		zbx_vector_ptr_reserve(&data->events, data->events.values_num + service->data->events.values_num);
@@ -4962,7 +4981,7 @@ out:
 
 	vmware_data_shared_free(service->data);
 	service->data = vmware_data_shared_dup(data);
-	service->eventlog.skip_old = skip_old;
+	service->eventlog.skip_old = evt_skip_old;
 
 	if (0 != events.values_num)
 		zbx_vector_ptr_append_array(&service->data->events, events.values, events.values_num);
@@ -4971,9 +4990,18 @@ out:
 
 	vmware_service_update_perf_entities(service);
 
-	zbx_snprintf(msg, sizeof(msg), "VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
-			ZBX_FS_UI64 " / " ZBX_FS_UI64, vmware_mem->free_size, vmware->strpool_sz,
-			vmware_mem->total_size);
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, vmware_mem);
+
+	zbx_snprintf(msg, sizeof(msg), "Events:%d DC:%d DS:%d CL:%d HV:%d VM:%d"
+			" VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
+			ZBX_FS_UI64, NULL != service->data ? service->data->events.values_num : 0 ,
+			NULL != service->data ? service->data->datacenters.values_num : 0 ,
+			NULL != service->data ? service->data->datastores.values_num : 0 ,
+			NULL != service->data ? service->data->clusters.values_num : 0 ,
+			NULL != service->data ? service->data->hvs.num_data : 0 ,
+			NULL != service->data ? service->data->vms_index.num_data : 0 ,
+			vmware_mem->free_size, vmware->strpool_sz, vmware_mem->total_size);
 
 	zbx_vmware_unlock();
 
