@@ -61,7 +61,7 @@ class CQueryParser extends CParser {
 	 *
 	 * @return int
 	 */
-	public function parse(string $source, int $pos = 0): int {
+	public function parse($source, $pos = 0): int {
 		$start_pos = $pos;
 
 		if (!isset($source[$pos]) || $source[$pos] !== '/') {
