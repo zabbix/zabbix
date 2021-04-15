@@ -882,16 +882,29 @@ static void	rm_update_report(zbx_rm_t *manager, zbx_rm_report_t *report, int sta
  *             now    - [IN] the current time                                 *
  *                                                                            *
  ******************************************************************************/
-static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now)
+static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now, char **error)
 {
 	int	nextcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%s %s", __func__, zbx_date2str(now, NULL), zbx_time2str(now, NULL));
 
-	nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays, report->start_time, report->timezone);
+	if (ZBX_REPORT_CYCLE_WEEKLY == report->cycle && 0 == report->weekdays)
+	{
+		*error = zbx_strdup(NULL, "Cannot calculate report start time: weekdays must be set for weekly cycle");
+		nextcheck = -1;
+	}
+	else
+	{
+		if (-1 == (nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays,
+				report->start_time, report->timezone)))
+		{
+			error = zbx_dsprintf(NULL, "Cannot calculate report start time: %s",
+					zbx_strerror(errno));
+		}
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() nextcheck:%s %s", __func__, zbx_date2str(nextcheck, NULL),
-			zbx_time2str(nextcheck, NULL));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() nextcheck:%s %s, error:%s", __func__, zbx_date2str(nextcheck, NULL),
+			zbx_time2str(nextcheck, NULL), ZBX_NULL2EMPTY_STR(*error));
 
 	return nextcheck;
 }
@@ -1090,6 +1103,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 	zbx_rm_report_t		*report, report_local;
 	zbx_config_t		cfg;
 	const char		*tz;
+	char			*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1181,7 +1195,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		if (0 == reschedule)
 			continue;
 
-		if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now)))
+		if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now, &error)))
 		{
 			if (nextcheck != report->nextcheck)
 			{
@@ -1203,11 +1217,9 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		}
 		else
 		{
-			char	info[MAX_STRING_LEN];
-
-			zbx_snprintf(info, sizeof(info), "Cannot calculate report start time: %s", zbx_strerror(errno));
-			rm_update_report(manager, report, ZBX_REPORT_STATE_ERROR, info);
+			rm_update_report(manager, report, ZBX_REPORT_STATE_ERROR, error);
 			rm_dequeue_report(manager, report);
+			zbx_free(error);
 		}
 	}
 	DBfree_result(result);
@@ -2096,7 +2108,7 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 		if (SUCCEED == (ret = rm_report_create_jobs(manager, report, now, &error)))
 		{
-			if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now)))
+			if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now, &error)))
 			{
 				if (SUCCEED == rm_is_report_active(report, now))
 				{
@@ -2109,11 +2121,7 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 				}
 			}
 			else
-			{
-				error = zbx_dsprintf(NULL, "Cannot calculate report start time: %s",
-						zbx_strerror(errno));
 				ret = FAIL;
-			}
 		}
 
 		if (FAIL == ret)
