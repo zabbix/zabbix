@@ -528,26 +528,26 @@ class CDashboard extends CBaseComponent {
 				const used_references = this._getUsedReferences();
 				const reference_substitution = new Map();
 
-				for (let i = 0; i < widgets.length; i++) {
-					const reference_field = this._widget_defaults[widgets[i].type].reference_field;
+				for (const widget of widgets) {
+					const reference_field = this._widget_defaults[widget.type].reference_field;
 
 					if (reference_field !== null) {
-						const old_reference = widgets[i].fields[reference_field];
+						const old_reference = widget.fields[reference_field];
 						const new_reference = this._createReference({used_references});
 
-						widgets[i].fields[reference_field] = new_reference;
+						widget.fields[reference_field] = new_reference;
 
 						used_references.add(new_reference);
 						reference_substitution.set(old_reference, new_reference);
 					}
 				}
 
-				for (let i = 0; i < widgets.length; i++) {
-					for (const reference_field of this._widget_defaults[widgets[i].type].foreign_reference_fields) {
-						const old_reference = widgets[i].fields[reference_field];
+				for (const widget of widgets) {
+					for (const reference_field of this._widget_defaults[widget.type].foreign_reference_fields) {
+						const old_reference = widget.fields[reference_field];
 
 						if (reference_substitution.has(old_reference)) {
-							widgets[i].fields[reference_field] = reference_substitution.get(old_reference);
+							widget.fields[reference_field] = reference_substitution.get(old_reference);
 						}
 					}
 				}
