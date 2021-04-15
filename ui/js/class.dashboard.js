@@ -598,6 +598,10 @@ class CDashboard extends CBaseComponent {
 			return;
 		}
 
+		if (widget !== null) {
+			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
+		}
+
 		const reference_field = this._widget_defaults[new_widget_data.type].reference_field;
 
 		if (reference_field !== null) {
@@ -619,10 +623,6 @@ class CDashboard extends CBaseComponent {
 					&& !dashboard_page_references.includes(new_widget_data.fields[reference_field])) {
 				new_widget_data.fields[reference_field] = '';
 			}
-		}
-
-		if (widget !== null) {
-			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
 
 		const paste_placeholder_widget = dashboard_page.addPastePlaceholderWidget({
