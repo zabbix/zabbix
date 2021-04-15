@@ -568,6 +568,12 @@ class CControllerPopupTriggerExpr extends CController {
 
 						$param_values[] = $param->getValue();
 					}
+
+					if ($function === 'bitand') {
+						// Only 'mask' parameter can be extracted. Push it behind period parameters.
+						$param_values = ['', '', $param_values[0]];
+					}
+
 					$params = $param_values;
 
 					/*
