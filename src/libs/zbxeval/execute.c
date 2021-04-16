@@ -1430,7 +1430,7 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 
 	if (atan2 == func && 0.0 == arg1->data.dbl && 0.0 == arg2->data.dbl)
 	{
-		*error = zbx_dsprintf(*error, "both function arguments \"%s,%s\" for function at \"%s\"",
+		*error = zbx_dsprintf(*error, "invalid both function arguments \"%s,%s\" for function at \"%s\"",
 				zbx_variant_value_desc(arg1), zbx_variant_value_desc(arg2),
 				ctx->expression + token->loc.l);
 
