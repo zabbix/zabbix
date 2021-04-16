@@ -2786,7 +2786,7 @@ static int	expression_macro_history_func_cb(const char *name, size_t len, int ar
 	{
 		if (SUCCEED != (ret = evaluate_function2(value, &item, func_name, "", ts, &errmsg)))
 		{
-			*error = zbx_dsprintf(NULL, "Cannot evaluate calculated item formula: %s", errmsg);
+			*error = zbx_dsprintf(NULL, "Cannot evaluate expression macro: %s", errmsg);
 			zbx_free(errmsg);
 		}
 		goto out;
@@ -2822,7 +2822,7 @@ static int	expression_macro_history_func_cb(const char *name, size_t len, int ar
 
 	if (SUCCEED != (ret = evaluate_function2(value, &item, func_name, params, ts, &errmsg)))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot evaluate calculated item formula: %s", errmsg);
+		*error = zbx_dsprintf(NULL, "Cannot evaluate expression macro: %s", errmsg);
 		zbx_free(errmsg);
 	}
 
