@@ -99,7 +99,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	zbx_vector_ptr_create(&expressions);
 
-	if (FAIL == trapper_parse_expressions_evaluate(jp,  &expressions, error))
+	if (FAIL == trapper_parse_expressions_evaluate(jp, &expressions, error))
 		goto out;
 
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
@@ -122,7 +122,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 		}
 		else
 		{
-			zbx_uint64_t res = (ZBX_INFINITY == expr_result ||
+			zbx_uint64_t	res = (ZBX_INFINITY == expr_result ||
 					SUCCEED == zbx_double_compare(expr_result, 0.0)) ? 0 : 1;
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_VALUE, res);
 

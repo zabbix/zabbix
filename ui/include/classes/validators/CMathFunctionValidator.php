@@ -36,7 +36,12 @@ class CMathFunctionValidator extends CValidator {
 		'max',
 		'min',
 		'length',
-		'sum'
+		'sum',
+		'date',
+		'dayofmonth',
+		'dayofweek',
+		'now',
+		'time'
 	];
 
 	/**
@@ -47,7 +52,12 @@ class CMathFunctionValidator extends CValidator {
 	private $number_of_parameters = [
 		'abs' => 1,
 		'bitand' => 2,
-		'length' => 1
+		'length' => 1,
+		'date' => 0,
+		'dayofmonth' => 0,
+		'dayofweek' => 0,
+		'now' => 0,
+		'time' => 0
 	];
 
 	/**
@@ -70,6 +80,13 @@ class CMathFunctionValidator extends CValidator {
 	 * @var CUserMacroParser
 	 */
 	protected $user_macro_parser;
+
+	/**
+	 * Position at which error was detected.
+	 *
+	 * @var int
+	 */
+	public $error_pos;
 
 	/**
 	 * Parser for LLD macros.
@@ -133,6 +150,7 @@ class CMathFunctionValidator extends CValidator {
 	 */
 	public function validate($fn) {
 		$this->setError('');
+		$this->error_pos = 0;
 
 		if (!in_array($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
@@ -140,11 +158,15 @@ class CMathFunctionValidator extends CValidator {
 			return false;
 		}
 
+		$last_valid_pos = $fn->pos + $fn->params_raw['pos'] + 1;
+
 		if (count($fn->params_raw['parameters']) == 0
 				|| (array_key_exists($fn->function, $this->number_of_parameters)
 						&& count($fn->params_raw['parameters']) != $this->number_of_parameters[$fn->function])) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid number of parameters.'));
+			$this->error_pos = $last_valid_pos;
+
 			return false;
 		}
 
@@ -153,6 +175,7 @@ class CMathFunctionValidator extends CValidator {
 		foreach ($fn->params_raw['parameters'] as $param) {
 			if ($param instanceof CQueryParserResult && !$this->calculated) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
+				$this->error_pos = $last_valid_pos;
 
 				return false;
 			}
@@ -167,14 +190,18 @@ class CMathFunctionValidator extends CValidator {
 						return false;
 					}
 				}
+				$last_valid_pos = $param->pos;
 
 				continue;
 			}
 			elseif (!$this->checkValidConstant($param->getValue(true))) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
+				$this->error_pos = $last_valid_pos;
 
 				return false;
 			}
+
+			$last_valid_pos = $param->pos + $param->length;
 		}
 
 		return true;

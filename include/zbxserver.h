@@ -119,8 +119,6 @@ void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, cons
 int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error);
 
-int	zbx_host_macro_index(const char *macro);
-
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)

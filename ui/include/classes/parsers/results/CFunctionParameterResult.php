@@ -59,7 +59,16 @@ class CFunctionParameterResult extends CParserResult {
 			return $value;
 		}
 		elseif (!$keep_unquoted && $this->type == CFunctionParser::PARAM_QUOTED) {
-			$value = (substr($value, 0, 1) === '"' && substr($value, -1) === '"') ? substr($value, 1, -1) : $value;
+			$unquoted = '';
+			for ($p = 1; isset($value[$p]); $p++) {
+				if ($value[$p] === '\\' && $value[$p + 1] === '"') {
+					continue;
+				}
+
+				$unquoted .= $value[$p];
+			}
+
+			$value = substr($unquoted, 0, -1);
 		}
 
 		return $value;
