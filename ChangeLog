@@ -1,10 +1,13 @@
 Changes for 5.0.11rc1
 
 New features:
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
 .........T [ZBX-18667] fixed code spelling in templates (abakaldin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
