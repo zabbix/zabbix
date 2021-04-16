@@ -2272,7 +2272,7 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 
 				if (0 == strcmp(op, "band"))
 					op = zbx_strdup(op, "bitand");
-				else if ('\0' == *op)
+				else if ('\0' == *op && '"' != function->parameter[params.values[2].l])
 					zbx_free(op);
 			}
 		}
