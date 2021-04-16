@@ -2036,9 +2036,12 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 
 					loc = &params->values[index];
 					str = zbx_substr_unquote(parameter, loc->l, loc->r);
-					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
-					if (0 != isdigit(str[strlen(str) - 1]))
-						zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
+					if ('\0' != *str)
+					{
+						zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
+						if (0 != isdigit(str[strlen(str) - 1]))
+							zbx_chrcpy_alloc(out, &out_alloc, &out_offset, 's');
+					}
 					zbx_free(str);
 				}
 				break;
@@ -2118,7 +2121,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 			(*out)[--out_offset] = '\0';
 	}
 	else
-		*out = zbx_strdup(NULL, "");
+		*out = zbx_strdup(*out, "");
 }
 
 static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const zbx_vector_loc_t *params,
