@@ -20,13 +20,17 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup role
+ * @backup module
  * @on-before prepareRoleData
  * @on-before prepareUserData
  */
 class testFormUserRoles extends CWebTest {
+
+	use TableTrait;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -897,6 +901,35 @@ class testFormUserRoles extends CWebTest {
 		$this->assertEquals('User cannot change the user type of own role.', $this->query('xpath://input[@id="type"]/following::span')->
 				one()->getText());
 		$this->assertEquals('true', $form->getField('User type')->getAttribute('readonly'));
+	}
+
+	/**
+	 *  Checking layout after enabling modules.
+	 */
+	public function testFormUserRoles_Modules() {
+		foreach ([true, false] as $status) {
+			$modules = ['4th Module', '5th Module'];
+			$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			if ($status === true) {
+				$this->assertTrue($form->query('xpath://label[text()="No enabled modules found."]')->one()->isDisplayed());
+				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
+				$this->query('button:Scan directory')->one()->click();
+				$table = $this->query('class:list-table')->asTable()->one();
+				foreach ($modules as $module) {
+					$table->findRows(['Name' => $module])->select();
+				}
+				$this->query('button:Enable')->one()->click();
+				$this->page->acceptAlert();
+				$this->page->waitUntilReady();
+			}
+			else {
+				$this->assertFalse($form->query('xpath://label[text()="No enabled modules found."]')->one($status)->isDisplayed());
+				foreach ($modules as $module) {
+					$form->getField($module)->isValid();
+				}
+			}
+		}
 	}
 
 	/**
