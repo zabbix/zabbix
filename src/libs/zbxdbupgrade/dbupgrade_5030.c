@@ -2306,9 +2306,11 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	}
 	else if (0 == strcmp(function->name, "last"))
 	{
-		int	secnum;
+		int	secnum = 0;
 
-		secnum = ('#' == function->parameter[params.values[0].l] ? 0 : -1);
+		if (0 < params.values_num && '#' != function->parameter[params.values[0].l])
+			secnum = -1;
+
 		dbpatch_convert_params(&parameter, function->parameter, &params,
 				ZBX_DBPATCH_ARG_HIST, secnum, 1,
 				ZBX_DBPATCH_ARG_NONE);
