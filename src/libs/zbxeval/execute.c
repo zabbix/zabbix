@@ -603,7 +603,7 @@ static const char	*eval_type_desc(unsigned char type)
 		case ZBX_VARIANT_STR:
 			return "a string";
 		default:
-			zbx_get_variant_type_desc(type);
+			return zbx_get_variant_type_desc(type);
 	}
 }
 

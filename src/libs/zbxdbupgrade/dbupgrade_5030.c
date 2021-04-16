@@ -1993,7 +1993,7 @@ static void	dbpatch_convert_params(char **out, const char *parameter, const zbx_
 		switch (type)
 		{
 			case ZBX_DBPATCH_ARG_HIST:
-				if (params->values_num > (index = va_arg(args, int)))
+				if (-1 != (index = va_arg(args, int)) && index < params->values_num)
 				{
 					loc = &params->values[index];
 					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
@@ -2306,8 +2306,11 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	}
 	else if (0 == strcmp(function->name, "last"))
 	{
+		int	secnum;
+
+		secnum = ('#' == function->parameter[params.values[0].l] ? 0 : -1);
 		dbpatch_convert_params(&parameter, function->parameter, &params,
-				ZBX_DBPATCH_ARG_HIST, 0, 1,
+				ZBX_DBPATCH_ARG_HIST, secnum, 1,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
