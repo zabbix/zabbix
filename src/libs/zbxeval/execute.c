@@ -1348,7 +1348,9 @@ static int	eval_execute_math_function_single_param(const zbx_eval_context_t *ctx
 	if (((log == func || log10 == func) && 0 >= arg->data.dbl) || (sqrt == func && 0 > arg->data.dbl) ||
 			(eval_math_func_cot == func && 0 == arg->data.dbl))
 	{
-		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
+		*error = zbx_dsprintf(*error, "invalid argument \"%s\"for function at \"%s\"",
+				zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
+
 		return FAIL;
 	}
 
@@ -1417,11 +1419,21 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 	arg1 = &output->values[output->values_num - 2];
 	arg2 = &output->values[output->values_num - 1];
 
-	if ((eval_math_func_round == func || eval_math_func_truncate == func) && 0 > arg2->data.dbl ||
-			0.0 != fmod(arg2->data.dbl, 1) || (atan2 == func && 0.0 == arg1->data.dbl &&
-			0.0 == arg2->data.dbl))
+	if (((eval_math_func_round == func || eval_math_func_truncate == func) && 0 > arg2->data.dbl) ||
+			0.0 != fmod(arg2->data.dbl, 1))
 	{
-		*error = zbx_strdup(*error, "Mathematical error, wrong value was passed");
+		*error = zbx_dsprintf(*error, "invalid second argument \"%s\" for function at \"%s\"",
+				zbx_variant_value_desc(arg2), ctx->expression + token->loc.l);
+
+		return FAIL;
+	}
+
+	if (atan2 == func && 0.0 == arg1->data.dbl && 0.0 == arg2->data.dbl)
+	{
+		*error = zbx_dsprintf(*error, "both function arguments \"%s,%s\" for function at \"%s\"",
+				zbx_variant_value_desc(arg1), zbx_variant_value_desc(arg2),
+				ctx->expression + token->loc.l);
+
 		return FAIL;
 	}
 
