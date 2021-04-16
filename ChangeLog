@@ -1,10 +1,15 @@
 Changes for 5.2.7rc1
 
 New features:
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
+.........T [ZBXNEXT-6504] added Templates "TiDB by HTTP",  "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
 .........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
 ..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
 ........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
