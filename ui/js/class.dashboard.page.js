@@ -403,10 +403,11 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	replaceWidget(widget, widget_data) {
-		this.deleteWidget(widget, {is_batch_mode: true});
-		this.addWidget(widget_data);
-
 		this._is_unsaved = true;
+
+		this.deleteWidget(widget, {is_batch_mode: true});
+
+		return this.addWidget(widget_data);
 	}
 
 	_createWidget(js_class, {type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {

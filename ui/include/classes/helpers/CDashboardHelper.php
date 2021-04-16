@@ -329,7 +329,7 @@ class CDashboardHelper {
 	public static function hasTimeSelector(array $pages): bool {
 		foreach ($pages as $page) {
 			foreach ($page['widgets'] as $widget) {
-				if (CWidgetConfig::usesTimeSelector($widget)) {
+				if (CWidgetConfig::usesTimeSelector($widget['type'], $widget['fields'])) {
 					return true;
 				}
 			}
