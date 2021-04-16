@@ -349,7 +349,7 @@ class testJSONRPC extends CAPITest {
 					'error' => [
 						'code' => -32602,
 						'message' => 'Invalid params.',
-						'data' => 'Not authorised.'
+						'data' => 'Not authorized.'
 					],
 					'id' => 5
 				]
@@ -362,7 +362,7 @@ class testJSONRPC extends CAPITest {
 					'error' => [
 						'code' => -32602,
 						'message' => 'Invalid params.',
-						'data' => 'Not authorised.'
+						'data' => 'Not authorized.'
 					],
 					'id' => 5
 				]

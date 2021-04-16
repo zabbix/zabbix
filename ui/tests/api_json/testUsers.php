@@ -1926,7 +1926,7 @@ class testUsers extends CAPITest {
 		$this->assertTrue(array_key_exists('error', $res));
 
 		['error' => ['data' => $error]] = $res;
-		$this->assertEquals($error, 'Not authorised.');
+		$this->assertEquals($error, 'Not authorized.');
 	}
 
 	public function testUsers_AuthTokenDisabled() {
@@ -1952,7 +1952,7 @@ class testUsers extends CAPITest {
 		$this->assertTrue(array_key_exists('error', $res));
 
 		['error' => ['data' => $error]] = $res;
-		$this->assertEquals($error, 'Not authorised.');
+		$this->assertEquals($error, 'Not authorized.');
 	}
 
 	public function testUsers_AuthTokenExpired() {
@@ -2124,7 +2124,7 @@ class testUsers extends CAPITest {
 		]);
 
 		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
-		$this->assertEquals($res['error']['data'], 'Not authorised.');
+		$this->assertEquals($res['error']['data'], 'Not authorized.');
 	}
 
 	public function testUsers_LoginBlocked() {
