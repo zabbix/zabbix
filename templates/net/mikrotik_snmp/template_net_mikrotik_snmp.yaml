@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:09:29Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:32Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -33,19 +33,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: Storage
-        -
-          name: Temperature
-        -
-          name: Wireless
       items:
         -
           name: 'Firmware version'
@@ -59,14 +46,15 @@ zabbix_export:
           description: |
             MIB: MIKROTIK-MIB
             Current firmware version.
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -85,14 +73,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -106,14 +95,15 @@ zabbix_export:
             MIB: MIKROTIK-MIB
             RouterBOARD serial number.
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -134,14 +124,15 @@ zabbix_export:
             MIB: MIKROTIK-MIB
             Software version.
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -167,14 +158,15 @@ zabbix_export:
             memory allocated to a buffer pool might be modified or
             the amount of disk space allocated to virtual memory
             might be modified.
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Used memory'
           type: SNMP_AGENT
@@ -185,14 +177,15 @@ zabbix_export:
           description: |
             MIB: HOST-RESOURCES-MIB
             The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
         -
           name: 'Memory utilization'
           type: CALCULATED
@@ -202,13 +195,14 @@ zabbix_export:
           units: '%'
           params: 'last("vm.memory.used[hrStorageUsed.Memory]")/last("vm.memory.total[hrStorageSize.Memory]")*100'
           description: 'Memory utilization in %'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       discovery_rules:
@@ -231,9 +225,10 @@ zabbix_export:
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The average, over the last minute, of the percentage of time that this processor was not idle. Implementations may approximate this one minute smoothing period if necessary.
-              applications:
+              tags:
                 -
-                  name: CPU
+                  tag: Application
+                  value: CPU
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -275,14 +270,15 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).
                 Might be missing in entry models (RB750, RB450G..).
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"CPU"}'
@@ -337,14 +333,15 @@ zabbix_export:
                 Might be missing in entry models (RB750, RB450G..).
                 
                 Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"Device"}'
@@ -404,9 +401,10 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrLTEModemSignalRSRP Reference Signal Received Power.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
                   expression: '{max(5m)} < {$LTEMODEM.RSRP.MIN.WARN}'
@@ -423,9 +421,10 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrLTEModemSignalRSRQ Reference Signal Received Quality.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
                   expression: '{max(5m)} < {$LTEMODEM.RSRQ.MIN.WARN}'
@@ -442,9 +441,10 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrLTEModemSignalRSSI Received Signal Strength Indicator.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
                   expression: '{max(5m)} < {$LTEMODEM.RSSI.MIN.WARN}'
@@ -461,9 +461,10 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrLTEModemSignalSINR Signal to Interference & Noise Ratio.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
                   expression: '{max(5m)} < {$LTEMODEM.SINR.MIN.WARN}'
@@ -524,9 +525,10 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApAuthClientCount Number of authentication clients.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): AP band'
               type: SNMP_AGENT
@@ -538,14 +540,15 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApBand
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): SSID'
               type: SNMP_AGENT
@@ -557,14 +560,15 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApSsid Service Set Identifier.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): AP noise floor'
               type: SNMP_AGENT
@@ -575,14 +579,15 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApNoiseFloor
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
               type: SNMP_AGENT
@@ -592,9 +597,10 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
         -
           name: 'CAPsMAN AP channel discovery'
           type: SNMP_AGENT
@@ -623,9 +629,10 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMAuthClientCount Number of authentication clients.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): AP channel'
               type: SNMP_AGENT
@@ -637,14 +644,15 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMChannel
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
               type: SNMP_AGENT
@@ -654,9 +662,10 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
             -
               name: 'Interface {#IFNAME}({#IFALIAS}): AP state'
               type: SNMP_AGENT
@@ -668,14 +677,15 @@ zabbix_export:
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMState Wireless interface state.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS})'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
                   expression: '{last()}<>"running-ap"'
@@ -710,9 +720,10 @@ zabbix_export:
               units: '%'
               params: '(last("vfs.fs.used[hrStorageSize.{#SNMPINDEX}]")/last("vfs.fs.total[hrStorageSize.{#SNMPINDEX}]"))*100'
               description: 'Space utilization in % for Disk-{#SNMPINDEX}'
-              applications:
+              tags:
                 -
-                  name: Storage
+                  tag: Application
+                  value: Storage
             -
               name: 'Disk-{#SNMPINDEX}: Total space'
               type: SNMP_AGENT
@@ -731,14 +742,15 @@ zabbix_export:
                 memory allocated to a buffer pool might be modified or
                 the amount of disk space allocated to virtual memory
                 might be modified.
-              applications:
-                -
-                  name: Storage
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: Storage
             -
               name: 'Disk-{#SNMPINDEX}: Used space'
               type: SNMP_AGENT
@@ -749,14 +761,15 @@ zabbix_export:
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-              applications:
-                -
-                  name: Storage
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: Storage
           trigger_prototypes:
             -
               expression: |

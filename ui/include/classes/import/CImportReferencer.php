@@ -32,14 +32,12 @@ class CImportReferencer {
 	protected $groups = [];
 	protected $templates = [];
 	protected $hosts = [];
-	protected $applications = [];
 	protected $items = [];
 	protected $valueMaps = [];
 	protected $triggers = [];
 	protected $graphs = [];
 	protected $iconMaps = [];
 	protected $maps = [];
-	protected $screens = [];
 	protected $templateDashboards = [];
 	protected $macros = [];
 	protected $proxies = [];
@@ -49,14 +47,12 @@ class CImportReferencer {
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
-	protected $applicationsRefs;
 	protected $itemsRefs;
 	protected $valueMapsRefs;
 	protected $triggersRefs;
 	protected $graphsRefs;
 	protected $iconMapsRefs;
 	protected $mapsRefs;
-	protected $screensRefs;
 	protected $templateDashboardsRefs;
 	protected $macrosRefs;
 	protected $proxiesRefs;
@@ -160,22 +156,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get application id by host id and application name.
-	 *
-	 * @param string $hostid
-	 * @param string $name
-	 *
-	 * @return string|bool
-	 */
-	public function resolveApplication($hostid, $name) {
-		if ($this->applicationsRefs === null) {
-			$this->selectApplications();
-		}
-
-		return isset($this->applicationsRefs[$hostid][$name]) ? $this->applicationsRefs[$hostid][$name] : false;
-	}
-
-	/**
 	 * Get item id by host id and item key_.
 	 *
 	 * @param string $hostid
@@ -272,21 +252,6 @@ class CImportReferencer {
 		}
 
 		return isset($this->mapsRefs[$name]) ? $this->mapsRefs[$name] : false;
-	}
-
-	/**
-	 * Get screen id by name.
-	 *
-	 * @param string $name
-	 *
-	 * @return string|bool
-	 */
-	public function resolveScreen($name) {
-		if ($this->screensRefs === null) {
-			$this->selectScreens();
-		}
-
-		return isset($this->screensRefs[$name]) ? $this->screensRefs[$name] : false;
 	}
 
 	/**
@@ -465,22 +430,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add application names that need association with a database application id.
-	 * Input array has format:
-	 * array('hostname1' => array('appname1', 'appname2'), 'hostname2' => array('appname1'), ...)
-	 *
-	 * @param array $applications
-	 */
-	public function addApplications(array $applications) {
-		foreach ($applications as $host => $apps) {
-			if (!isset($this->applications[$host])) {
-				$this->applications[$host] = [];
-			}
-			$this->applications[$host] = array_unique(array_merge($this->applications[$host], $apps));
-		}
-	}
-
-	/**
 	 * Add item keys that need association with a database item id.
 	 * Input array has format:
 	 * array('hostname1' => array('itemkey1', 'itemkey2'), 'hostname2' => array('itemkey1'), ...)
@@ -606,18 +555,9 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add screens names that need association with a database screen id.
+	 * Add templated dashboard names that need association with a database dashboard id.
 	 *
-	 * @param array $screens
-	 */
-	public function addScreens(array $screens) {
-		$this->screens = array_unique(array_merge($this->screens, $screens));
-	}
-
-	/**
-	 * Add templated screen names that need association with a database screen id.
-	 *
-	 * @param array $screens
+	 * @param array $dashboards
 	 */
 	public function addTemplateDashboards(array $dashboards) {
 		$this->templateDashboards = array_unique(array_merge($this->templateDashboards, $dashboards));
@@ -795,43 +735,6 @@ class CImportReferencer {
 
 			$this->hosts = [];
 		}
-	}
-
-	/**
-	 * Select application ids for previously added application names.
-	 */
-	protected function selectApplications() {
-		if (!empty($this->applications)) {
-			$this->applicationsRefs = [];
-			$sqlWhere = [];
-
-			foreach ($this->applications as $host => $applications) {
-				$hostId = $this->resolveHostOrTemplate($host);
-				if ($hostId) {
-					$sqlWhere[] = '(a.hostid='.zbx_dbstr($hostId).' AND '.
-						dbConditionString('a.name', $applications).')';
-				}
-			}
-
-			if ($sqlWhere) {
-				$dbApplications = DBselect(
-					'SELECT a.applicationid,a.hostid,a.name'.
-					' FROM applications a'.
-					' WHERE '.implode(' OR ', $sqlWhere).
-						' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL
-				);
-				while ($dbApplication = DBfetch($dbApplications)) {
-					$this->applicationsRefs[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
-				}
-			}
-		}
-	}
-
-	/**
-	 * Unset application refs to make referencer select them from db again.
-	 */
-	public function refreshApplications() {
-		$this->applicationsRefs = null;
 	}
 
 	/**
@@ -1014,25 +917,6 @@ class CImportReferencer {
 			}
 
 			$this->maps = [];
-		}
-	}
-
-	/**
-	 * Select screen ids for previously added screen names.
-	 */
-	protected function selectScreens() {
-		if (!empty($this->screens)) {
-			$this->screensRefs = [];
-
-			$db_screens = API::Screen()->get([
-				'filter' => ['name' => $this->screens],
-				'output' => ['screenid', 'name']
-			]);
-			foreach ($db_screens as $db_screen) {
-				$this->screensRefs[$db_screen['name']] = $db_screen['screenid'];
-			}
-
-			$this->screens = [];
 		}
 	}
 

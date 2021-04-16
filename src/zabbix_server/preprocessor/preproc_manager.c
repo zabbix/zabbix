@@ -31,7 +31,7 @@
 
 #include "preprocessing.h"
 #include "preproc_manager.h"
-#include "linked_list.h"
+#include "zbxalgo.h"
 #include "preproc_history.h"
 
 extern unsigned char	process_type, program_type;
@@ -894,7 +894,7 @@ static AGENT_RESULT	*create_result_with_meta(const AGENT_RESULT *result_old)
 
 	init_result(result);
 
-	if (0 == ISSET_META(result_old))
+	if (NULL == result_old || 0 == ISSET_META(result_old))
 		return result;
 
 	result->type = AR_META;

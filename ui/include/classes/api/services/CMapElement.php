@@ -414,6 +414,8 @@ abstract class CMapElement extends CApiService {
 
 		DB::insert('sysmap_element_url', $insertUrls);
 
+		$this->createSelementsTags($selements, $selementids);
+
 		return ['selementids' => $selementids];
 	}
 
@@ -524,6 +526,8 @@ abstract class CMapElement extends CApiService {
 			$urlsToDelete = array_merge($urlsToDelete, zbx_objectValues($diffUrls['second'], 'sysmapelementurlid'));
 		}
 		unset($selement);
+
+		$this->updateElementsTags($selements);
 
 		$db_triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'priority'],
@@ -795,6 +799,99 @@ abstract class CMapElement extends CApiService {
 			if (!check_db_fields($linktriggerDbFields, $linkTrigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
+		}
+	}
+
+	/**
+	 * Create map element tags.
+	 *
+	 * @param array  $selements
+	 * @param int    $selements[]['elementtype']
+	 * @param array  $selements[]['tags']
+	 * @param string $selements[]['tags'][]['tag']
+	 * @param string $selements[]['tags'][]['value']
+	 * @param string $selements[]['tags'][]['operator']
+	 * @param array  $selementids
+	 */
+	protected function createSelementsTags(array $selements, array $selementids): void {
+		$new_tags = [];
+		foreach ($selements as $index => $selement) {
+			if (!array_key_exists('tags', $selement)
+					|| ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST
+						&& $selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP)) {
+				continue;
+			}
+
+			foreach ($selement['tags'] as $tag_add) {
+				$new_tags[] = ['selementid' => $selementids[$index]] + $tag_add;
+			}
+		}
+
+		if ($new_tags) {
+			DB::insert('sysmaps_element_tag', $new_tags);
+		}
+	}
+
+	/**
+	 * Update map element tags.
+	 *
+	 * @param array  $selements
+	 * @param string $selements[]['selementid']
+	 * @param int    $selements[]['elementtype']
+	 * @param array  $selements[]['tags']
+	 * @param string $selements[]['tags'][]['tag']
+	 * @param string $selements[]['tags'][]['value']
+	 * @param string $selements[]['tags'][]['operator']
+	 */
+	protected function updateElementsTags(array $selements): void {
+		// Select tags from database.
+		$db_tags = DBselect(
+			'SELECT selementtagid, selementid, tag, value, operator'.
+			' FROM sysmaps_element_tag'.
+			' WHERE '.dbConditionInt('selementid', array_column($selements, 'selementid'))
+		);
+
+		array_walk($selements, function (&$selement) {
+			$selement['db_tags'] = [];
+		});
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$selements[$db_tag['selementid']]['db_tags'][] = $db_tag;
+		}
+
+		// Find which tags must be added/deleted.
+		$new_tags = [];
+		$del_tagids = [];
+		foreach ($selements as $selement) {
+			if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST
+					&& $selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+				$del_tagids = array_merge($del_tagids, array_column($selement['db_tags'], 'selementtagid'));
+				continue;
+			}
+
+			foreach ($selement['db_tags'] as $del_tag_key => $tag_delete) {
+				foreach ($selement['tags'] as $new_tag_key => $tag_add) {
+					if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']
+							&& $tag_delete['operator'] === $tag_add['operator']) {
+						unset($selement['db_tags'][$del_tag_key], $selement['tags'][$new_tag_key]);
+						continue 2;
+					}
+				}
+			}
+
+			$del_tagids = array_merge($del_tagids, array_column($selement['db_tags'], 'selementtagid'));
+
+			foreach ($selement['tags'] as $tag_add) {
+				$tag_add['selementid'] = $selement['selementid'];
+				$new_tags[] = $tag_add;
+			}
+		}
+
+		if ($del_tagids) {
+			DB::delete('sysmaps_element_tag', ['selementtagid' => $del_tagids]);
+		}
+		if ($new_tags) {
+			DB::insert('sysmaps_element_tag', $new_tags);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-19T10:58:50Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:32Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -34,13 +34,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Inventory
-        -
-          name: Memory
       items:
         -
           name: 'Firmware version'
@@ -54,14 +47,15 @@ zabbix_export:
           description: |
             MIB: TPLINK-SYSINFO-MIB
             The software version of the product.
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -83,14 +77,15 @@ zabbix_export:
             MIB: TPLINK-SYSINFO-MIB
             The hardware version of the product.
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -104,14 +99,15 @@ zabbix_export:
             MIB: TPLINK-SYSINFO-MIB
             The Serial number of the product.
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -131,14 +127,15 @@ zabbix_export:
           description: |
             MIB: TPLINK-SYSINFO-MIB
             The hardware version of the product.
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
       discovery_rules:
         -
           name: 'CPU Discovery'
@@ -160,9 +157,10 @@ zabbix_export:
                 MIB: TPLINK-SYSMONITOR-MIB
                 Displays the CPU utilization in 1 minute.
                 Reference: http://www.tp-link.com/faq-1330.html
-              applications:
+              tags:
                 -
-                  name: CPU
+                  tag: Application
+                  value: CPU
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -202,13 +200,14 @@ zabbix_export:
                 MIB: TPLINK-SYSMONITOR-MIB
                 Displays the memory utilization.
                 Reference: http://www.tp-link.com/faq-1330.html
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-                  name: '#{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:

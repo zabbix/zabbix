@@ -1019,14 +1019,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('logtimefmt');
 		}
 
-		$this->zbxTestTextPresent('New application');
-		$this->zbxTestAssertVisibleId('new_application');
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'size', 20);
-
-		$this->zbxTestTextPresent('Applications');
-		$this->zbxTestAssertVisibleId('applications_');
-		$this->zbxTestDropdownAssertSelected('applications[]', '-None-');
+		$this->zbxTestTextNotPresent(['Applications','New application']);
 
 		$this->zbxTestTextPresent('Description');
 		$this->zbxTestAssertVisibleId('description');
@@ -1104,7 +1097,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid=133800');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype updated');
@@ -2079,7 +2072,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&context=host&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&context=host&parent_discoveryid=133800');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:32Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -25,19 +25,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       discovery_rules:
         -
           name: 'FAN Discovery'
@@ -57,11 +44,12 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 The status of the fan tray {#SNMPVALUE}.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -97,9 +85,10 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 CPU utilization in percentage for last 1 minute.
-              applications:
+              tags:
                 -
-                  name: CPU
+                  tag: Application
+                  value: CPU
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -118,13 +107,14 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 Total memory usage in percentage.
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-                  name: '#{#SNMPINDEX}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '#{#SNMPINDEX}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
@@ -169,11 +159,12 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 The status of the power supply {#SNMPVALUE}
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -209,9 +200,10 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 The temperature of the unit.
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
@@ -253,14 +245,15 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 The plugged-in model ID for this unit.
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '#{#SNMPVALUE}: Hardware serial number'
               type: SNMP_AGENT
@@ -273,14 +266,15 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 The unit's serial number.
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -300,14 +294,15 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 The unit manufacturer's product revision
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '#{#SNMPVALUE}: Operating system'
               type: SNMP_AGENT
@@ -320,14 +315,15 @@ zabbix_export:
               description: |
                 MIB: F10-S-SERIES-CHASSIS-MIB
                 Current code version of this unit.
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'

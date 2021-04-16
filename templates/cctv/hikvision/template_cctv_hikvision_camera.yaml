@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-02T13:28:33Z'
+  date: '2021-02-23T11:04:44Z'
   groups:
     -
       name: 'Templates/Video surveillance'
@@ -12,17 +12,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Video surveillance'
-      applications:
-        -
-          name: CPU
-        -
-          name: 'Hikvision camera'
-        -
-          name: Memory
-        -
-          name: Status
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Hikvision camera: Boot loader released date'
@@ -32,9 +21,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -47,6 +33,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Boot loader version'
           type: DEPENDENT
@@ -56,9 +46,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_E
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -71,6 +58,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: CPU utilization'
           type: DEPENDENT
@@ -80,9 +71,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'CPU utilization in %'
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: JSONPATH
@@ -95,6 +83,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: hikvision_cam.get_status
+          tags:
+            -
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -110,9 +102,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -121,6 +110,10 @@ zabbix_export:
               error_handler: DISCARD_VALUE
           master_item:
             key: hikvision_cam.get_status
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Device description'
           type: DEPENDENT
@@ -130,9 +123,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: NOTES
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -145,6 +135,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Device ID'
           type: DEPENDENT
@@ -153,9 +147,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -168,6 +159,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Device location'
           type: DEPENDENT
@@ -177,9 +172,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: LOCATION
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -192,6 +184,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Device name'
           type: DEPENDENT
@@ -201,9 +197,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: NAME
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -216,6 +209,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Device type'
           type: DEPENDENT
@@ -225,9 +222,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: TYPE
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -240,6 +234,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Encoder released date'
           type: DEPENDENT
@@ -249,9 +247,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_D
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -264,6 +259,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Encoder version'
           type: DEPENDENT
@@ -273,9 +272,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_C
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -288,6 +284,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Firmware released date'
           type: DEPENDENT
@@ -297,9 +297,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_B
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -312,6 +309,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Firmware version'
           type: DEPENDENT
@@ -321,9 +322,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_A
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -336,6 +334,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -354,9 +356,6 @@ zabbix_export:
           username: '{$USER}'
           password: '{$PASSWORD}'
           description: 'Used to get the device information'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -372,15 +371,16 @@ zabbix_export:
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
           url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/System/deviceInfo'
           status_codes: '200,401'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Hikvision camera: Get device info: Login status'
           type: DEPENDENT
           key: hikvision_cam.get_info.login_status
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'Login status'
           preprocessing:
@@ -403,6 +403,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: Status
         -
           name: 'Hikvision camera: Get system status'
           type: HTTP_AGENT
@@ -414,9 +418,6 @@ zabbix_export:
           username: '{$USER}'
           password: '{$PASSWORD}'
           description: 'It is used to get the status information of the device'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -432,15 +433,16 @@ zabbix_export:
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
           url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/System/status'
           status_codes: '200,401'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Hikvision camera: Get system status: Login status'
           type: DEPENDENT
           key: hikvision_cam.get_status.login_status
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'Login status'
           preprocessing:
@@ -463,6 +465,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: hikvision_cam.get_streaming
+          tags:
+            -
+              tag: Application
+              value: Status
         -
           name: 'Hikvision camera: Get streaming channels'
           type: HTTP_AGENT
@@ -474,9 +480,6 @@ zabbix_export:
           username: '{$USER}'
           password: '{$PASSWORD}'
           description: 'Used to get the properties of streaming channels for the device'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -492,15 +495,16 @@ zabbix_export:
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
           url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/Streaming/channels'
           status_codes: '200,401'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Hikvision camera: Get streaming channels: Login status'
           type: DEPENDENT
           key: hikvision_cam.get_streaming.login_status
           delay: '0'
           history: 7d
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'Login status'
           preprocessing:
@@ -523,6 +527,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: hikvision_cam.get_streaming
+          tags:
+            -
+              tag: Application
+              value: Status
         -
           name: 'Hikvision camera: Hardware version'
           type: DEPENDENT
@@ -531,9 +539,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -546,6 +551,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: MACaddress'
           type: DEPENDENT
@@ -555,9 +564,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: MACADDRESS_A
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -570,6 +576,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Memory utilization'
           type: DEPENDENT
@@ -579,9 +589,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Memory utilization in %'
-          applications:
-            -
-              name: Memory
           preprocessing:
             -
               type: JSONPATH
@@ -594,10 +601,14 @@ zabbix_export:
                 - 1h
           master_item:
             key: hikvision_cam.get_status
+          tags:
+            -
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-              name: 'Hikvision camera: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'Hikvision camera: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
         -
@@ -609,9 +620,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: MODEL
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -624,6 +632,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Serial number'
           type: DEPENDENT
@@ -633,9 +645,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -648,6 +657,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -663,9 +676,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -678,6 +688,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Supported video loss'
           type: DEPENDENT
@@ -686,9 +700,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -701,6 +712,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: System contact'
           type: DEPENDENT
@@ -710,9 +725,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: CONTACT
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -725,6 +737,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Telecontrol ID'
           type: DEPENDENT
@@ -733,9 +749,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: 'Hikvision camera'
           preprocessing:
             -
               type: JSONPATH
@@ -748,6 +761,10 @@ zabbix_export:
                 - 24h
           master_item:
             key: hikvision_cam.get_info
+          tags:
+            -
+              tag: Application
+              value: 'Hikvision camera'
         -
           name: 'Hikvision camera: Uptime'
           type: DEPENDENT
@@ -757,9 +774,6 @@ zabbix_export:
           trends: '0'
           units: uptime
           description: 'System uptime in ''N days, hh:mm:ss'' format.'
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: JSONPATH
@@ -768,6 +782,10 @@ zabbix_export:
               error_handler: DISCARD_VALUE
           master_item:
             key: hikvision_cam.get_status
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{last()}<10m'
@@ -791,9 +809,6 @@ zabbix_export:
               key: 'hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}]'
               delay: '0'
               history: 7d
-              applications:
-                -
-                  name: 'Zabbix raw items'
               valuemap:
                 name: 'Login status'
               preprocessing:
@@ -816,6 +831,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
               trigger_prototypes:
                 -
                   expression: '{last()}=1'
@@ -854,9 +873,6 @@ zabbix_export:
               username: '{$USER}'
               password: '{$PASSWORD}'
               description: 'High precision positioning which is accurate to a bit after the decimal point'
-              applications:
-                -
-                  name: 'Zabbix raw items'
               preprocessing:
                 -
                   type: CHECK_NOT_SUPPORTED
@@ -872,6 +888,10 @@ zabbix_export:
                   error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
               url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/PTZCtrl/channels/{#PTZ_CHANNEL_ID}/status'
               status_codes: '200,401'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
             -
               name: 'Channel "{#PTZ_CHANNEL_ID}": Absolute zoom'
               type: DEPENDENT
@@ -880,9 +900,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!x'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -900,6 +917,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
             -
               name: 'Channel "{#PTZ_CHANNEL_ID}": Azimuth'
               type: DEPENDENT
@@ -908,9 +929,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!°'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -928,6 +946,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
             -
               name: 'Channel "{#PTZ_CHANNEL_ID}": Elevation'
               type: DEPENDENT
@@ -936,9 +958,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!°'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -956,6 +975,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
           trigger_prototypes:
             -
               expression: |
@@ -1010,9 +1033,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!kbit/s'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1030,6 +1050,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Fixed quality'
               type: DEPENDENT
@@ -1037,9 +1061,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '%'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1057,15 +1078,16 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": GovLength'
               type: DEPENDENT
               key: 'hikvision_cam.gov_length[{#CHANNEL_ID}]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1083,6 +1105,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": H264Profile'
               type: DEPENDENT
@@ -1091,9 +1117,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1111,15 +1134,16 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Key frame interval'
               type: DEPENDENT
               key: 'hikvision_cam.key_frame_interval[{#CHANNEL_ID}]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1142,6 +1166,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Frame rate (max)'
               type: DEPENDENT
@@ -1149,9 +1177,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!fps'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1174,15 +1199,16 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Smoothing'
               type: DEPENDENT
               key: 'hikvision_cam.smoothing[{#CHANNEL_ID}]'
               delay: '0'
               history: 7d
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1200,6 +1226,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Snapshot image type'
               type: DEPENDENT
@@ -1208,9 +1238,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1228,6 +1255,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": VBR lower'
               type: DEPENDENT
@@ -1235,9 +1266,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!kbit/s'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1255,6 +1283,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": VBR upper'
               type: DEPENDENT
@@ -1262,9 +1294,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!kbit/s'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1278,6 +1307,10 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Video codec type'
               type: DEPENDENT
@@ -1286,9 +1319,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1306,6 +1336,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Video quality control type'
               type: DEPENDENT
@@ -1314,9 +1348,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1334,6 +1365,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Resolution height'
               type: DEPENDENT
@@ -1341,9 +1376,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!px'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1361,6 +1393,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Resolution width'
               type: DEPENDENT
@@ -1368,9 +1404,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!px'
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1388,6 +1421,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
             -
               name: 'Channel "{#CHANNEL_ID}": Video scan type'
               type: DEPENDENT
@@ -1396,9 +1433,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              application_prototypes:
-                -
-                  name: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1416,6 +1450,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: hikvision_cam.get_streaming
+              tags:
+                -
+                  tag: Application
+                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
           trigger_prototypes:
             -
               expression: |

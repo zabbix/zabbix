@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:33Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -26,19 +26,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: Temperature
@@ -51,9 +38,10 @@ zabbix_export:
           description: |
             MIB: QTECH-MIB
             Temperature readings of testpoint: __RESOURCE__
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
           triggers:
             -
               expression: '{avg(5m)}>{$TEMP_CRIT:""}'
@@ -94,9 +82,10 @@ zabbix_export:
           description: |
             MIB: QTECH-MIB
             CPU utilization in %
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -114,14 +103,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -141,14 +131,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -160,14 +151,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -185,14 +177,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Operating system'
           type: SNMP_AGENT
@@ -204,14 +197,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: QTECH-MIB'
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -229,9 +223,10 @@ zabbix_export:
           description: |
             MIB: QTECH-MIB
             Total memory in Bytes
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
           name: 'Used memory'
           type: SNMP_AGENT
@@ -242,9 +237,10 @@ zabbix_export:
           description: |
             MIB: QTECH-MIB
             Used memory in Bytes
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
         -
           name: 'Memory utilization'
           type: CALCULATED
@@ -254,13 +250,14 @@ zabbix_export:
           units: '%'
           params: 'last("vm.memory.used[switchMemoryBusy.0]")/last("vm.memory.total[switchMemorySize.0]")*100'
           description: 'Memory utilization in %'
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       discovery_rules:
@@ -280,11 +277,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: QTECH-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'QTECH-MIB::sysFanStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -308,11 +306,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: QTECH-MIB'
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'QTECH-MIB::sysPowerStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'

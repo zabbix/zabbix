@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:17Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:49Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -11,13 +11,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: Fans
-        -
-          name: Temperature
-        -
-          name: Voltage
       items:
         -
           name: 'BB +1.8V SM'
@@ -27,9 +20,10 @@ zabbix_export:
           value_type: FLOAT
           units: V
           ipmi_sensor: 'BB +1.8V SM'
-          applications:
+          tags:
             -
-              name: Voltage
+              tag: Application
+              value: Voltage
           triggers:
             -
               expression: '{last()}<1.597 or {last()}>2.019'
@@ -58,9 +52,10 @@ zabbix_export:
           value_type: FLOAT
           units: V
           ipmi_sensor: 'BB +3.3V'
-          applications:
+          tags:
             -
-              name: Voltage
+              tag: Application
+              value: Voltage
           triggers:
             -
               expression: '{last()}<2.876 or {last()}>3.729'
@@ -89,9 +84,10 @@ zabbix_export:
           value_type: FLOAT
           units: V
           ipmi_sensor: 'BB +3.3V STBY'
-          applications:
+          tags:
             -
-              name: Voltage
+              tag: Application
+              value: Voltage
           triggers:
             -
               expression: '{last()}<2.876 or {last()}>3.729'
@@ -113,9 +109,10 @@ zabbix_export:
           value_type: FLOAT
           units: V
           ipmi_sensor: 'BB +5.0V'
-          applications:
+          tags:
             -
-              name: Voltage
+              tag: Application
+              value: Voltage
           triggers:
             -
               expression: '{last()}<4.362 or {last()}>5.663'
@@ -144,9 +141,10 @@ zabbix_export:
           value_type: FLOAT
           units: C
           ipmi_sensor: 'BB Ambient Temp'
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
           triggers:
             -
               expression: '{last()}<5 or {last()}>66'
@@ -166,9 +164,10 @@ zabbix_export:
           key: power
           history: 1w
           ipmi_sensor: power
-          applications:
+          tags:
             -
-              name: Voltage
+              tag: Application
+              value: Voltage
           triggers:
             -
               expression: '{last()}=0'
@@ -182,9 +181,10 @@ zabbix_export:
           value_type: FLOAT
           units: V
           ipmi_sensor: 'Processor Vcc'
-          applications:
+          tags:
             -
-              name: Voltage
+              tag: Application
+              value: Voltage
         -
           name: 'System Fan 3'
           type: IPMI
@@ -193,9 +193,10 @@ zabbix_export:
           value_type: FLOAT
           units: RPM
           ipmi_sensor: 'System Fan 3'
-          applications:
+          tags:
             -
-              name: Fans
+              tag: Application
+              value: Fans
   graphs:
     -
       name: 'Fan speed and ambient temperature'

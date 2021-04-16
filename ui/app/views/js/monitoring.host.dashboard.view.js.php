@@ -25,35 +25,76 @@
 ?>
 
 <script>
-	function initializeHostDashboard(host, data, widget_defaults, web_layout_mode) {
-		// Prevent page reloading on time selector events.
-		timeControl.refreshPage = false;
+	function initializeView(host, dashboard, widget_defaults, time_period, web_layout_mode) {
 
-		$('.<?= ZBX_STYLE_DASHBRD_GRID_CONTAINER ?>')
-			.dashboardGrid({
-				dashboard: {
-					templateid: data.templateid,
-					dashboardid: data.dashboardid,
-					dynamic_hostid: host.hostid
+		const init = () => {
+			timeControl.refreshPage = false;
+
+			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
+				containers: {
+					grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
+					navigation: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION ?>'),
+					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
 				},
-				options: {
-					'widget-height': 70,
-					'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
-					'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
-					'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-					'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-					'editable': false,
-					'edit_mode': false,
-					'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
+				buttons: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>
+					? {
+						previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE?>'),
+						next_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE ?>'),
+						slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW ?>')
+					}
+					: {
+						previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE ?>'),
+						next_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NEXT_PAGE ?>'),
+						slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW ?>')
+					},
+				data: {
+					dashboardid: dashboard.dashboardid,
+					name: dashboard.name,
+					userid: null,
+					templateid: dashboard.templateid,
+					display_period: dashboard.display_period,
+					auto_start: dashboard.auto_start
+				},
+				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
+				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
+				cell_height: 70,
+				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
+				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
+				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
+				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
+				widget_defaults: widget_defaults,
+				is_editable: false,
+				is_edit_mode: false,
+				can_edit_dashboards: false,
+				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
+				time_period: time_period,
+				dynamic_hostid: host.hostid,
+			});
+
+			for (const page of dashboard.pages) {
+				for (const widget of page.widgets) {
+					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.configuration = (typeof widget.configuration === 'object') ? widget.configuration : {};
 				}
-			})
-			.dashboardGrid('setWidgetDefaults', widget_defaults)
-			.dashboardGrid('addWidgets', data.widgets);
 
-		jqBlink.blink();
+				ZABBIX.Dashboard.addDashboardPage(page);
+			}
+
+			ZABBIX.Dashboard.activate();
+
+			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
+				document.getElementById('dashboardid').addEventListener('change', events.dashboardChange);
+			}
+
+			jqBlink.blink();
+		};
+
+		const events = {
+			dashboardChange: (e) => {
+				e.target.closest('form').submit();
+			}
+		};
+
+		init();
 	}
-
-	$(() => {
-		$('#dashboardid').on('change', (e) => $(e.target).closest('form').submit());
-	});
 </script>

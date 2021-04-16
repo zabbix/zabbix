@@ -199,7 +199,6 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$host_triggers_table->query('link', $inherited_trigger)->one()->click();
 		// Check trigger name.
 		$triggers_form->invalidate();
-//		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		$name = $triggers_form->getField('Name')->getValue();
 		$this->assertEquals($name, $inherited_trigger);
 		// Check tags.

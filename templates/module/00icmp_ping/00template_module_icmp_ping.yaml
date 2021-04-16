@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:51Z'
   groups:
     -
       name: Templates/Modules
@@ -15,20 +15,18 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Status
       items:
         -
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 1w
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{max(#3)}=0'
@@ -42,9 +40,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          applications:
+          tags:
             -
-              name: Status
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{min(5m)}>{$ICMP_LOSS_WARN} and {min(5m)}<100'
@@ -62,9 +61,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: s
-          applications:
+          tags:
             -
-              name: Status
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{avg(5m)}>{$ICMP_RESPONSE_TIME_WARN}'

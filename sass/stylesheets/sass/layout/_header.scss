@@ -30,6 +30,31 @@ header {
 		}
 	}
 
+	.header-kioskmode-controls {
+		position: fixed;
+		top: 5px;
+		right: 45px;
+		z-index: 1010;
+		display: flex;
+		transition: opacity 1s ease-out;
+
+		&.hidden {
+			opacity: 0;
+		}
+
+		& > li > ul {
+			margin-right: 10px;
+		}
+
+		ul {
+			display: flex;
+
+			li {
+				margin-right: 10px;
+			}
+		}
+	}
+
 	.header-z-select {
 		max-width: 600px;
 	}
@@ -78,6 +103,14 @@ header {
 			vertical-align: top;
 			position: relative;
 			padding: 0 0 0 10px;
+
+			.btn-split {
+				margin-right: 0;
+
+				li {
+					padding-left: 0;
+				}
+			}
 		}
 
 		ul li:first-child {

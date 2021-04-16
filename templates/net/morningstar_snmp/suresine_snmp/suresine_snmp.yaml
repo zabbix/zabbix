@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:30Z'
   groups:
     -
       name: Templates/Modules
@@ -16,17 +16,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Battery
-        -
-          name: Load
-        -
-          name: Status
-        -
-          name: Temperature
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Battery: Battery Voltage discovery'
@@ -38,9 +27,6 @@ zabbix_export:
           value_type: FLOAT
           units: V
           description: 'MIB: SURESINE'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: MULTIPLIER
@@ -51,6 +37,10 @@ zabbix_export:
               parameters:
                 - '^(\d+)(\.\d{1,2})?'
                 - \1\2
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Load: A/C Current'
           type: SNMP_AGENT
@@ -65,9 +55,6 @@ zabbix_export:
             Units:A
             Range:[0.0, 17]
             Modbus address:0x0005
-          applications:
-            -
-              name: Load
           preprocessing:
             -
               type: MULTIPLIER
@@ -78,6 +65,10 @@ zabbix_export:
               parameters:
                 - '^(\d+)(\.\d{1,2})?'
                 - \1\2
+          tags:
+            -
+              tag: Application
+              value: Load
         -
           name: 'Load: State'
           type: SNMP_AGENT
@@ -99,9 +90,6 @@ zabbix_export:
             6: NormalOff
             7: UnknownState
             8: Standby
-          applications:
-            -
-              name: Load
           valuemap:
             name: 'SureSine load state'
           preprocessing:
@@ -109,6 +97,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: Load
           triggers:
             -
               expression: '{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}'
@@ -136,9 +128,6 @@ zabbix_export:
             MIB: SURESINE
             Description:Faults
             Modbus address:0x0007
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -165,6 +154,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"heatsinkTempSensorOpen","like")}=2'
@@ -198,9 +191,6 @@ zabbix_export:
             MIB: SURESINE
             Description:Faults
             Modbus address:0x0007
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -231,6 +221,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"customSettingsEdit","like")}=2'
@@ -280,14 +274,15 @@ zabbix_export:
           history: 7d
           units: uptime
           description: 'Device uptime in seconds'
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{last()}<10m'
@@ -316,9 +311,10 @@ zabbix_export:
             Units:C
             Range:[-128, 127]
             Modbus address:0x0006
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
       discovery_rules:
         -
           name: 'Battery voltage discovery'
@@ -342,9 +338,6 @@ zabbix_export:
                 Units:V
                 Range:[0.0, 17.0]
                 Modbus address:0x0004
-              applications:
-                -
-                  name: Battery
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -355,6 +348,10 @@ zabbix_export:
                   parameters:
                     - '^(\d+)(\.\d{1,2})?'
                     - \1\2
+              tags:
+                -
+                  tag: Application
+                  value: Battery
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{#VOLTAGE.MAX.CRIT}'

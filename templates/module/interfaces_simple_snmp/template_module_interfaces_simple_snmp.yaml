@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-03-02T19:42:23Z'
   groups:
     -
       name: Templates/Modules
@@ -22,9 +22,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: 'Network interfaces'
       discovery_rules:
         -
           name: 'Network interfaces discovery'
@@ -96,14 +93,15 @@ zabbix_export:
                 One possible reason for discarding such a packet could be to free up buffer space.
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
             -
               name: 'Interface {#IFDESCR}: Inbound packets with errors'
               type: SNMP_AGENT
@@ -114,14 +112,15 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
             -
               name: 'Interface {#IFDESCR}: Bits received'
               type: SNMP_AGENT
@@ -133,9 +132,6 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -145,6 +141,10 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
             -
               name: 'Interface {#IFDESCR}: Outbound packets discarded'
               type: SNMP_AGENT
@@ -159,14 +159,15 @@ zabbix_export:
                 One possible reason for discarding such a packet could be to free up buffer space.
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
             -
               name: 'Interface {#IFDESCR}: Outbound packets with errors'
               type: SNMP_AGENT
@@ -177,14 +178,15 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
             -
               name: 'Interface {#IFDESCR}: Bits sent'
               type: SNMP_AGENT
@@ -196,9 +198,6 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFDESCR}'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -208,6 +207,10 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
             -
               name: 'Interface {#IFDESCR}: Speed'
               type: SNMP_AGENT
@@ -225,9 +228,10 @@ zabbix_export:
                 If the bandwidth of the interface is greater than the maximum value reportable by this object then
                 this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interace's speed.
                 For a sub-layer which has no concept of bandwidth, this object should be zero.
-              application_prototypes:
+              tags:
                 -
-                  name: 'Interface {#IFDESCR}'
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
             -
               name: 'Interface {#IFDESCR}: Operational status'
               type: SNMP_AGENT
@@ -244,11 +248,12 @@ zabbix_export:
                 - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
                 - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
                 - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFDESCR}'
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
               trigger_prototypes:
                 -
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)'
@@ -278,9 +283,6 @@ zabbix_export:
                 The type of interface.
                 Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
                 through updating the syntax of the IANAifType textual convention.
-              application_prototypes:
-                -
-                  name: 'Interface {#IFDESCR}'
               valuemap:
                 name: 'IF-MIB::ifType'
               preprocessing:
@@ -288,6 +290,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFDESCR}'
           trigger_prototypes:
             -
               expression: |
@@ -325,7 +331,7 @@ zabbix_export:
               recovery_expression: |
                 {Interfaces Simple SNMP:net.if.in[ifInOctets.{#SNMPINDEX}].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Interfaces Simple SNMP:net.if.speed[ifSpeed.{#SNMPINDEX}].last()} and
                 {Interfaces Simple SNMP:net.if.out[ifOutOctets.{#SNMPINDEX}].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Interfaces Simple SNMP:net.if.speed[ifSpeed.{#SNMPINDEX}].last()}
-              name: 'Interface {#IFDESCR}: High bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -343,7 +349,7 @@ zabbix_export:
               recovery_expression: |
                 {Interfaces Simple SNMP:net.if.in.errors[ifInErrors.{#SNMPINDEX}].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and {Interfaces Simple SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFDESCR}: High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -449,7 +455,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -458,11 +464,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid

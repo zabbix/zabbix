@@ -39,7 +39,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:system.cpu.util[snAgGblCpuUtil1MinAvg.0].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
-|High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[snAgGblDynMemUtil.0].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[snAgGblDynMemUtil.0].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 
 ## Feedback
 
@@ -109,7 +109,7 @@ No specific Zabbix configuration is required.
 |Inventory |Firmware version |<p>MIB: FOUNDRY-SN-AGENT-MIB</p><p>The version of the running software in the form'major.minor.maintenance[letters]'</p> |SNMP |system.hw.firmware<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Power_supply |PSU {#PSU_INDEX}: Power supply status |<p>MIB: FOUNDRY-SN-AGENT-MIB</p> |SNMP |sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}] |
 |Temperature |{#SENSOR_DESCR}: Temperature |<p>MIB: FOUNDRY-SN-AGENT-MIB</p><p>Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.</p> |SNMP |sensor.temp.value[snAgentTempValue.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.5`</p> |
-|Temperature |Chassis #{#SNMPINDEX}: Temperature |<p>MIB: FOUNDRY-SN-AGENT-MIB</p><p>Temperature of the chassis. Each unit is 0.5 degrees Celcius.</p><p>Only management module built with temperature sensor hardware is applicable.</p><p>For those non-applicable management module, it returns no-such-name.</p> |SNMP |sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.5`</p> |
+|Temperature |Chassis #{#SNMPINDEX}: Temperature |<p>MIB: FOUNDRY-SN-AGENT-MIB</p><p>Temperature of the chassis. Each unit is 0.5 degrees Celsius.</p><p>Only management module built with temperature sensor hardware is applicable.</p><p>For those non-applicable management module, it returns no-such-name.</p> |SNMP |sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.5`</p> |
 
 ## Triggers
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:26Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -30,19 +30,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'CPU utilization'
@@ -56,9 +43,10 @@ zabbix_export:
             MIB: STATISTICS-MIB
             The CPU utilization in percent(%).
             Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c02597344&sp4ts.oid=51079
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -82,14 +70,15 @@ zabbix_export:
             A    the function set available in your router
             08   the common release number
             01   updates to the current common release
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -109,14 +98,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: SEMI-MIB'
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -148,14 +138,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '{#ENT_NAME}: Hardware version(revision)'
               type: SNMP_AGENT
@@ -166,14 +157,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
         -
           name: 'FAN Discovery'
           type: SNMP_AGENT
@@ -204,11 +196,12 @@ zabbix_export:
               description: |
                 MIB: HP-ICF-CHASSIS
                 Actual status indicated by the sensor: {#ENT_DESCR}
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1'
@@ -244,9 +237,10 @@ zabbix_export:
               description: |
                 MIB: NETSWITCH-MIB
                 The number of available (unallocated) bytes.
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
             -
               name: '#{#SNMPVALUE}: Total memory'
               type: SNMP_AGENT
@@ -257,9 +251,10 @@ zabbix_export:
               description: |
                 MIB: NETSWITCH-MIB
                 The number of currently installed bytes.
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
             -
               name: '#{#SNMPVALUE}: Used memory'
               type: SNMP_AGENT
@@ -270,9 +265,10 @@ zabbix_export:
               description: |
                 MIB: NETSWITCH-MIB
                 The number of currently allocated bytes.
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
             -
               name: '#{#SNMPVALUE}: Memory utilization'
               type: CALCULATED
@@ -282,13 +278,14 @@ zabbix_export:
               units: '%'
               params: 'last("vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}]")/last("vm.memory.total[hpLocalMemTotalBytes.{#SNMPINDEX}]")*100'
               description: 'Memory utilization in %'
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-                  name: '#{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
@@ -350,11 +347,12 @@ zabbix_export:
               description: |
                 MIB: HP-ICF-CHASSIS
                 Actual status indicated by the sensor: {#ENT_DESCR}
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1'
@@ -404,9 +402,10 @@ zabbix_export:
                 The most recent measurement obtained by the agent for this sensor.
                 To correctly interpret the value of this object, the associated entPhySensorType,
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
@@ -466,11 +465,12 @@ zabbix_export:
               description: |
                 MIB: HP-ICF-CHASSIS
                 Actual status indicated by the sensor: {#ENT_DESCR}
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

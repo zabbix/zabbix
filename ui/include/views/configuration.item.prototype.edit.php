@@ -764,34 +764,6 @@ $form_list
 		(new CTextBox('trapper_hosts', $data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_trapper_hosts'
 	)
-	->addRow(new CLabel(_('New application'), 'new_application'),
-		(new CSpan(
-			(new CTextBox('new_application', $data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-	);
-
-$application_list_box = new CListBox('applications[]', $data['applications'], 6);
-$application_list_box->addItem(0, '-'._('None').'-');
-foreach ($data['db_applications'] as $application) {
-	$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
-}
-$form_list
-	->addRow(_('Applications'), $application_list_box)
-	// Append application prototypes to form list.
-	->addRow(new CLabel(_('New application prototype'), 'new_application_prototype'),
-		(new CSpan(
-			(new CTextBox('new_application_prototype', $data['new_application_prototype']))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-	);
-
-$application_prototype_listbox = new CListBox('application_prototypes[]', $data['application_prototypes'], 6);
-$application_prototype_listbox->addItem(0, '-'._('None').'-');
-foreach ($data['db_application_prototypes'] as $application_prototype) {
-	$application_prototype_listbox->addItem($application_prototype['name'], $application_prototype['name']);
-}
-$form_list
-	->addRow(_('Application prototypes'), $application_prototype_listbox)
 	// Append description to form list.
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
@@ -811,6 +783,15 @@ $form_list
 // Append tabs to form.
 $tab = (new CTabView())
 	->addTab('itemTab', $data['caption'], $form_list)
+	->addTab('tags-tab', _('Tags'),
+		new CPartial('configuration.tags.tab', [
+			'source' => 'item',
+			'tags' => $data['tags'],
+			'show_inherited_tags' => $data['show_inherited_tags'],
+			'readonly' => false
+		]),
+		TAB_INDICATOR_TAGS
+	)
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),

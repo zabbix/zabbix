@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:27Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -26,17 +26,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: Temperature
       discovery_rules:
         -
           name: 'FAN Discovery'
@@ -54,11 +43,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: HUAWEI-ENTITY-EXTENT-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -89,14 +79,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
         -
           name: 'MPU Discovery'
           type: SNMP_AGENT
@@ -122,9 +113,10 @@ zabbix_export:
               description: |
                 MIB: HUAWEI-ENTITY-EXTENT-MIB
                 The temperature for the {#SNMPVALUE}.
-              applications:
+              tags:
                 -
-                  name: Temperature
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
@@ -166,9 +158,10 @@ zabbix_export:
                 MIB: HUAWEI-ENTITY-EXTENT-MIB
                 The CPU usage for this entity. Generally, the CPU usage will calculate the overall CPU usage on the entity, and itis not sensible with the number of CPU on the entity.
                 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
-              applications:
+              tags:
                 -
-                  name: CPU
+                  tag: Application
+                  value: CPU
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -186,14 +179,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -211,14 +205,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
             -
               name: '{#ENT_NAME}: Operating system'
               type: SNMP_AGENT
@@ -229,14 +224,15 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -256,13 +252,14 @@ zabbix_export:
                 MIB: HUAWEI-ENTITY-EXTENT-MIB
                 The memory usage for the entity. This object indicates what percent of memory are used.
                 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-                  name: '{#ENT_NAME}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#ENT_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:

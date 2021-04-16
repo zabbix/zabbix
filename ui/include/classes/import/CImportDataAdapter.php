@@ -105,37 +105,6 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get applications from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getApplications() {
-		$applications = [];
-
-		if (array_key_exists('hosts', $this->data)) {
-			foreach ($this->data['hosts'] as $host) {
-				if (array_key_exists('applications', $host)) {
-					foreach ($host['applications'] as $application) {
-						$applications[$host['host']][$application['name']] = $application;
-					}
-				}
-			}
-		}
-
-		if (array_key_exists('templates', $this->data)) {
-			foreach ($this->data['templates'] as $template) {
-				if (array_key_exists('applications', $template)) {
-					foreach ($template['applications'] as $application) {
-						$applications[$template['template']][$application['name']] = $application;
-					}
-				}
-			}
-		}
-
-		return $applications;
-	}
-
-	/**
 	 * Get items from the imported data.
 	 *
 	 * @return array
@@ -374,23 +343,6 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get screens from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getScreens() {
-		$screens = [];
-
-		if (array_key_exists('screens', $this->data)) {
-			foreach ($this->data['screens'] as $screen) {
-				$screens[] = CArrayHelper::renameKeys($screen, ['screen_items' => 'screenitems']);
-			}
-		}
-
-		return $screens;
-	}
-
-	/**
 	 * Get template dashboards from the imported data.
 	 *
 	 * @return array
@@ -402,14 +354,17 @@ class CImportDataAdapter {
 			foreach ($this->data['templates'] as $template) {
 				if (array_key_exists('dashboards', $template)) {
 					foreach ($template['dashboards'] as $dashboard) {
-						// Rename hide_header to view_mode in widgets.
-						if (array_key_exists('widgets', $dashboard)) {
-							$dashboard['widgets'] = array_map(function (array $widget): array {
-								$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
+						foreach ($dashboard['pages'] as &$dashboard_page) {
+							// Rename hide_header to view_mode in widgets.
+							if (array_key_exists('widgets', $dashboard_page)) {
+								$dashboard_page['widgets'] = array_map(function (array $widget): array {
+									$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
 
-								return $widget;
-							}, $dashboard['widgets']);
+									return $widget;
+								}, $dashboard_page['widgets']);
+							}
 						}
+						unset($dashboard_page);
 
 						$dashboards[$template['template']][$dashboard['name']] = $dashboard;
 					}
@@ -592,6 +547,12 @@ class CImportDataAdapter {
 							}
 							if (array_key_exists('trends', $operation) && $operation['trends'] !== '') {
 								$operation['optrends']['trends'] = $operation['trends'];
+							}
+							if (array_key_exists('tags', $operation) && $operation['tags']) {
+								$operation['optag'] = [];
+								foreach ($operation['tags'] as $tag) {
+									$operation['optag'][] = $tag;
+								}
 							}
 							break;
 

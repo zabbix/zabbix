@@ -641,7 +641,7 @@ class CMap extends CMapElement {
 		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
 
 		// Continue to check 2 more mandatory fields and other optional fields.
-		foreach ($maps as $map) {
+		foreach ($maps as $map_index => $map) {
 			// Check mandatory fields "width" and "height".
 			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -989,6 +989,10 @@ class CMap extends CMapElement {
 						_('No permissions to referred object or it does not exist!')
 					);
 				}
+
+				foreach (array_values($map['selements']) as $selement_index => $selement) {
+					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
+				}
 			}
 
 			// Map selement links.
@@ -1104,7 +1108,7 @@ class CMap extends CMapElement {
 		$expandproblem_types = [SYSMAP_PROBLEMS_NUMBER, SYSMAP_SINGLE_PROBLEM, SYSMAP_PROBLEMS_NUMBER_CRITICAL];
 		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
 
-		foreach ($maps as $map) {
+		foreach ($maps as $map_index => $map) {
 			// Check if owner can be set.
 			if (array_key_exists('userid', $map)) {
 				if ($map['userid'] === '' || $map['userid'] === null || $map['userid'] === false) {
@@ -1455,6 +1459,12 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
+			if (array_key_exists('selements', $map)) {
+				foreach (array_values($map['selements']) as $selement_index => $selement) {
+					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
+				}
+			}
+
 			// Map selement links.
 			if (array_key_exists('links', $map) && $map['links']) {
 				$selementids = zbx_objectValues($map['selements'], 'selementid');
@@ -1487,6 +1497,38 @@ class CMap extends CMapElement {
 		unset($map);
 
 		$this->validateCircularReference($maps);
+	}
+
+	/**
+	 * Validate Map element tag properties.
+	 *
+	 * @param array  $selement['evaltype']
+	 * @param array  $selement['tags']
+	 * @param string $selement['tags'][]['tag']
+	 * @param string $selement['tags'][]['value']
+	 * @param int    $selement['tags'][]['operator']
+	 * @param string $path
+	 *
+	 * @throws APIException if input is invalid.
+	 */
+	protected function validateSelementTags(array $selement, string $path): void {
+		if (!array_key_exists('tags', $selement)) {
+			return;
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'evaltype'	=>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => DB::getDefault('sysmaps_elements', 'evaltype')],
+			'tags'		=>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'		=>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmaps_element_tag', 'tag')],
+				'value'		=>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_element_tag', 'value'), 'default' => DB::getDefault('sysmaps_element_tag', 'value')],
+				'operator'	=>		['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('sysmaps_element_tag', 'operator')]
+			]]
+		]];
+
+		$data = array_intersect_key($selement, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $data, $path, $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -2268,10 +2310,6 @@ class CMap extends CMapElement {
 			'elementid' => $sysmapids,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
 		]);
-		DB::delete('screens_items', [
-			'resourceid' => $sysmapids,
-			'resourcetype' => SCREEN_RESOURCE_MAP
-		]);
 		DB::delete('profiles', [
 			'idx' => 'web.maps.sysmapid',
 			'value_id' => $sysmapids
@@ -2389,6 +2427,26 @@ class CMap extends CMapElement {
 				if (!is_null($options['expandUrls'])) {
 					$resolve_opt = ['resolve_element_urls' => true];
 					$selements = CMacrosResolverHelper::resolveMacrosInMapElements($selements, $resolve_opt);
+				}
+			}
+
+			if ($this->outputIsRequested('tags', $options['selectSelements']) && $selements) {
+				$db_tags = DBselect(
+					'SELECT selementid, tag, value, operator'.
+					' FROM sysmaps_element_tag'.
+					' WHERE '.dbConditionInt('selementid', array_keys($selements))
+				);
+
+				array_walk($selements, function (&$selement) {
+					$selement['tags'] = [];
+				});
+
+				while ($db_tag = DBfetch($db_tags)) {
+					$selements[$db_tag['selementid']]['tags'][] = [
+						'tag' => $db_tag['tag'],
+						'value' => $db_tag['value'],
+						'operator' => $db_tag['operator']
+					];
 				}
 			}
 

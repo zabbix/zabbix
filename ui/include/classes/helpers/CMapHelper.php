@@ -24,9 +24,10 @@ class CMapHelper {
 	/**
 	 * Get map data with resolved element / link states.
 	 *
-	 * @param array $sysmapids					Map IDs.
-	 * @param array $options					Options used to retrieve actions.
-	 * @param int   $options['severity_min']	Minimum severity.
+	 * @param array  $sysmapids					Map IDs.
+	 * @param array  $options					Options used to retrieve actions.
+	 * @param int    $options['severity_min']	Minimum severity.
+	 * @param int    $options['unique_id']
 	 *
 	 * @return array
 	 */
@@ -47,7 +48,7 @@ class CMapHelper {
 			],
 			'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
 				'label_location', 'x', 'y', 'iconid_disabled', 'iconid_maintenance', 'elementsubtype', 'areatype',
-				'width', 'height', 'viewtype', 'use_iconmap', 'application', 'urls', 'permission'
+				'width', 'height', 'viewtype', 'use_iconmap', 'urls', 'permission', 'evaltype', 'tags'
 			],
 			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
 				'permission'
@@ -112,7 +113,8 @@ class CMapHelper {
 				'width' => $map['width'],
 				'height' => $map['height']
 			],
-			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'],
+			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min']
+				.(array_key_exists('unique_id', $options) ? '&unique_id='.$options['unique_id'] : ''),
 			'background' => $map['backgroundid'],
 			'label_location' => $map['label_location'],
 			'elements' => array_values($map['selements']),
@@ -201,11 +203,12 @@ class CMapHelper {
 	/**
 	 * Resolve map element (selements and links) state.
 	 *
-	 * @param array $sysmap                   Map data.
-	 * @param array $areas                    Areas representing array containing host group element IDs and dimension
-	 *                                        properties of area.
-	 * @param array $options                  Options used to retrieve actions.
-	 * @param int   $options['severity_min']  Minimum severity.
+	 * @param array  $sysmap                   Map data.
+	 * @param array  $areas                    Areas representing array containing host group element IDs and dimension
+	 *                                         properties of area.
+	 * @param array  $options                  Options used to retrieve actions.
+	 * @param int    $options['severity_min']  Minimum severity.
+	 * @param int    $options['unique_id']
 	 */
 	protected static function resolveMapState(array &$sysmap, array $areas, array $options) {
 		$map_info = getSelementsInfo($sysmap, ['severity_min' => $options['severity_min']]);

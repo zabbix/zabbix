@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:28Z'
   groups:
     -
       name: Templates/Modules
@@ -16,19 +16,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Array
-        -
-          name: Battery
-        -
-          name: Counter
-        -
-          name: Status
-        -
-          name: Temperature
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Array: Array Current'
@@ -45,9 +32,10 @@ zabbix_export:
             Units:A
             Range:[-10, 80]
             Modbus address:0x001d
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Array: Sweep Pmax'
           type: SNMP_AGENT
@@ -63,9 +51,10 @@ zabbix_export:
             Units:W
             Range:[-10, 5000]
             Modbus address:0x003c
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Array: Sweep Vmp'
           type: SNMP_AGENT
@@ -81,9 +70,10 @@ zabbix_export:
             Units:V
             Range:[-10, 650.0]
             Modbus address:0x003d
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Array: Sweep Voc'
           type: SNMP_AGENT
@@ -99,9 +89,10 @@ zabbix_export:
             Units:V
             Range:[-10, 650.0]
             Modbus address:0x003e
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Array: Voltage'
           type: SNMP_AGENT
@@ -117,9 +108,10 @@ zabbix_export:
             Units:V
             Range:[-10, 650]
             Modbus address:0x001b
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Battery: Battery Voltage discovery'
           type: SNMP_AGENT
@@ -136,9 +128,10 @@ zabbix_export:
             Units:V
             Range:[-10, 80]
             Modbus address:0x0018
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Battery: Charge Current'
           type: SNMP_AGENT
@@ -154,9 +147,10 @@ zabbix_export:
             Units:A
             Range:[-10, 80]
             Modbus address:0x001c
-          applications:
+          tags:
             -
-              name: Battery
+              tag: Application
+              value: Battery
         -
           name: 'Battery: Output Power'
           type: SNMP_AGENT
@@ -172,9 +166,10 @@ zabbix_export:
             Units:W
             Range:[-10, 4000]
             Modbus address:0x003a
-          applications:
+          tags:
             -
-              name: Battery
+              tag: Application
+              value: Battery
         -
           name: 'Battery: Charge State'
           type: SNMP_AGENT
@@ -198,9 +193,6 @@ zabbix_export:
             8: Equalize
             9: Slave
             10: Fixed
-          applications:
-            -
-              name: Battery
           valuemap:
             name: 'TriStar MPPT 600V charge state'
           preprocessing:
@@ -208,6 +200,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: Battery
           triggers:
             -
               expression: '{last()}={$CHARGE.STATE.CRIT}'
@@ -233,14 +229,15 @@ zabbix_export:
           units: Ah
           description: |
             MIB: TRISTAR-MPPT
-            Description:Ah Charge Resetable
+            Description:Ah Charge Resettable
             Scaling Factor:1.0
             Units:Ah
             Range:[0.0, 5000]
             Modbus addresses:H=0x0034 L=0x0035
-          applications:
+          tags:
             -
-              name: Counter
+              tag: Application
+              value: Counter
         -
           name: 'Counter: Charge KW-hours'
           type: SNMP_AGENT
@@ -251,14 +248,15 @@ zabbix_export:
           units: '!kWh'
           description: |
             MIB: TRISTAR-MPPT
-            Description:kWh Charge Resetable
+            Description:kWh Charge Resettable
             Scaling Factor:1.0
             Units:kWh
             Range:[0.0, 65535.0]
             Modbus address:0x0038
-          applications:
+          tags:
             -
-              name: Counter
+              tag: Application
+              value: Counter
         -
           name: 'Status: Alarms'
           type: SNMP_AGENT
@@ -271,9 +269,6 @@ zabbix_export:
             MIB: TRISTAR-MPPT
             Description:Alarms
             Modbus addresses:H=0x002e L=0x002f
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -328,6 +323,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"alarm21Internal","like")}=2'
@@ -486,9 +485,6 @@ zabbix_export:
             MIB: TRISTAR-MPPT
             Description:Faults
             Modbus addresses:H=0x002c L=0x002d
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -540,6 +536,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"arrayHvd","like")}=2'
@@ -689,14 +689,15 @@ zabbix_export:
           history: 7d
           units: uptime
           description: 'Device uptime in seconds'
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{last()}<10m'
@@ -725,14 +726,15 @@ zabbix_export:
             Units:V
             Range:[-10, 650.0]
             Modbus address:0x0033
-          applications:
-            -
-              name: Battery
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: Battery
         -
           name: 'Temperature: Battery'
           type: SNMP_AGENT
@@ -748,9 +750,10 @@ zabbix_export:
             Units:C
             Range:[-40, 80]
             Modbus address:0x0025
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
           triggers:
             -
               expression: '{min(5m)}>{$BATTERY.TEMP.MAX.CRIT}'
@@ -795,9 +798,10 @@ zabbix_export:
             Units:C
             Range:[-40, 80]
             Modbus address:0x0023
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
       discovery_rules:
         -
           name: 'Battery voltage discovery'
@@ -821,9 +825,10 @@ zabbix_export:
                 Units:V
                 Range:[-10, 80]
                 Modbus address:0x0018
-              applications:
+              tags:
                 -
-                  name: Battery
+                  tag: Application
+                  value: Battery
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{#VOLTAGE.MAX.CRIT}'

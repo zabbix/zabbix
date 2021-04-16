@@ -29,7 +29,6 @@ define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
-	->cleanItems()
 	->setId('massupdate-form')
 	->setName('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -385,72 +384,6 @@ $item_form_list->addRow(
 		(new CTextBox('trapper_hosts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append applications to form list.
-if ($data['single_host_selected']) {
-	$item_form_list->addRow(
-		(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
-			->setLabel(_('Applications')),
-		(new CDiv([
-			(new CRadioButtonList('massupdate_app_action', ZBX_ACTION_ADD))
-				->addValue(_('Add'), ZBX_ACTION_ADD)
-				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
-				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
-				->setModern(true)
-				->addStyle('margin-bottom: 5px;'),
-			(new CMultiSelect([
-				'name' => 'applications[]',
-				'object_name' => 'applications',
-				'add_new' => true,
-				'data' => [],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'applications',
-						'srcfld1' => 'applicationid',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'applications_',
-						'hostid' => $data['hostid'],
-						'noempty' => true
-					]
-				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		]))->setId('applications_div')
-	);
-}
-
-if ($data['prototype']) {
-	$item_form_list
-		->addRow(
-			(new CVisibilityBox('visible[applicationPrototypes]', 'application_prototypes_div', _('Original')))
-				->setLabel(_('Application prototypes')),
-			(new CDiv([
-				(new CRadioButtonList('massupdate_app_prot_action', ZBX_ACTION_ADD))
-					->addValue(_('Add'), ZBX_ACTION_ADD)
-					->addValue(_('Replace'), ZBX_ACTION_REPLACE)
-					->addValue(_('Remove'), ZBX_ACTION_REMOVE)
-					->setModern(true)
-					->addStyle('margin-bottom: 5px;'),
-				(new CMultiSelect([
-					'name' => 'application_prototypes[]',
-					'object_name' => 'application_prototypes',
-					'add_new' => true,
-					'data' => [],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'application_prototypes',
-							'srcfld1' => 'application_prototypeid',
-							'dstfrm' => $form->getName(),
-							'dstfld1' => 'application_prototypes_',
-							'hostid' => $data['hostid'],
-							'parent_discoveryid' => $data['parent_discoveryid'],
-							'noempty' => true
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			]))
-				->setId('application_prototypes_div')
-		);
-}
-
 // Append master item select to form list.
 if ($data['single_host_selected']) {
 	if (!$data['prototype']) {
@@ -536,8 +469,28 @@ $item_form_list->addRow(
 		->setMaxlength(DB::getFieldLength('items', 'description'))
 );
 
+/*
+ * Tags tab
+ */
+$tags_form_list = (new CFormList('tags-form-list'))
+	->addRow(
+		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CDiv([
+			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
+				->addValue(_('Add'), ZBX_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+				->setModern(true)
+				->addStyle('margin-bottom: 10px;'),
+			renderTagTable([['tag' => '', 'value' => '']])
+				->setHeader([_('Name'), _('Value'), _('Action')])
+				->setId('tags-table')
+		]))->setId('tags-div')
+	);
+
 $tabs = (new CTabView())
 	->addTab('item_tab', $data['prototype'] ? _('Item prototype') : _('Item'), $item_form_list)
+	->addTab('tags_tab', _('Tags'), $tags_form_list)
 	->addTab('preprocessing_tab', _('Preprocessing'), $preprocessing_form_list)
 	->setSelected(0);
 

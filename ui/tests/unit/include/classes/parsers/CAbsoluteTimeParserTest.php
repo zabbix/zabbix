@@ -19,12 +19,14 @@
 **/
 
 
-class CAbsoluteTimeParserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CAbsoluteTimeParserTest extends TestCase {
 
 	/**
 	 * An array of absolute times and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProvider() {
 		return [
 			[
 				'2018-04-15 12:0', 0,
@@ -238,7 +240,7 @@ class CAbsoluteTimeParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
 	 * @param int    $pos

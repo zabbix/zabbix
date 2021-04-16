@@ -32,7 +32,6 @@ abstract class CControllerProblem extends CController {
 		'show' => TRIGGERS_OPTION_RECENT_PROBLEM,
 		'groupids' => [],
 		'hostids' => [],
-		'application' => '',
 		'triggerids' => [],
 		'name' => '',
 		'severities' => [],
@@ -72,9 +71,7 @@ abstract class CControllerProblem extends CController {
 		$range_time_parser->parse($filter['to']);
 		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
-		$data = CScreenProblem::getData($filter, [
-			'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
-		]);
+		$data = CScreenProblem::getData($filter);
 
 		return count($data['problems']);
 	}

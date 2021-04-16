@@ -26,7 +26,7 @@ $page['title'] = _('Configuration of hosts');
 $page['file'] = 'hosts.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
-	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js'
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -37,7 +37,6 @@ $fields = [
 	'groups' =>					[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'hostids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
 	'clone_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,
 									'isset({form}) && ({form} == "clone" || {form} == "full_clone")'
@@ -552,11 +551,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		// full clone
 		if (getRequest('form', '') === 'full_clone' && getRequest('clone_hostid', 0) != 0) {
 			$srcHostId = getRequest('clone_hostid');
-
-			// copy applications
-			if (!copyApplications($srcHostId, $hostId)) {
-				throw new Exception();
-			}
 
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
@@ -1150,7 +1144,6 @@ else {
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectApplications' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'selectHostDiscovery' => ['ts_delete'],

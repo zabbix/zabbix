@@ -395,8 +395,8 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file',
 			'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'parameters'
 		],
-		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+		'selectTags' => ['tag', 'value'],
 		'itemids' => $src_itemids,
 		'preservekeys' => true
 	]);
@@ -545,10 +545,6 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			}
 
 			$item['hostid'] = $dstHost['hostid'];
-			$item['applications'] = get_same_applications_for_host(
-				zbx_objectValues($item['applications'], 'applicationid'),
-				$dstHost['hostid']
-			);
 
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 				if (array_key_exists($item['master_itemid'], $items)) {
@@ -602,7 +598,7 @@ function copyItems($srcHostId, $dstHostId) {
 			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 			'allow_traps', 'parameters'
 		],
-		'selectApplications' => ['applicationid'],
+		'selectTags' => ['tag', 'value'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 		'selectValueMap' => ['name'],
 		'hostids' => $srcHostId,
@@ -709,7 +705,6 @@ function copyItems($srcHostId, $dstHostId) {
 		unset($srcItem['itemid']);
 		unset($srcItem['templateid']);
 		$srcItem['hostid'] = $dstHostId;
-		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
 
 		if (!$srcItem['preprocessing']) {
 			unset($srcItem['preprocessing']);
@@ -738,35 +733,6 @@ function copyItems($srcHostId, $dstHostId) {
 	}
 
 	return true;
-}
-
-/**
- * Copy applications to a different host.
- *
- * @param string $source_hostid
- * @param string $destination_hostid
- *
- * @return bool
- */
-function copyApplications($source_hostid, $destination_hostid) {
-	$applications_to_create = API::Application()->get([
-		'output' => ['name'],
-		'hostids' => [$source_hostid],
-		'inherited' => false,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-	]);
-
-	if (!$applications_to_create) {
-		return true;
-	}
-
-	foreach ($applications_to_create as &$application) {
-		$application['hostid'] = $destination_hostid;
-		unset($application['applicationid'], $application['templateid']);
-	}
-	unset($application);
-
-	return (bool) API::Application()->create($applications_to_create);
 }
 
 function get_item_by_itemid($itemid) {
@@ -1137,33 +1103,19 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
 /**
  * @param array  $groupids
  * @param array  $hostids
- * @param string $application
+ * @param array  $tags
+ * @param int    $evaltype
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
-	if ($application !== '') {
-		$db_applications = API::Application()->get([
-			'output' => ['hostid'],
-			'hostids' => $hostids,
-			'groupids' => $groupids,
-			'search' => ['name' => $application],
-			'preservekeys' => true
-		]);
-
-		$applicationids = array_keys($db_applications);
-		$hostids = array_keys(array_flip(array_column($db_applications, 'hostid')));
-	}
-	else {
-		$applicationids = null;
-	}
+function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?array $tags,
+		int $evaltype = TAG_EVAL_TYPE_AND_OR): array {
 
 	if ($hostids === null) {
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1;
 		$db_hosts = API::Host()->get([
 			'output' => [],
 			'groupids' => $groupids,
-			'applicationids' => $applicationids,
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
@@ -1172,29 +1124,18 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		$hostids = array_keys($db_hosts);
 	}
 
-	if ($application !== '') {
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
-			'selectHosts' => ['name'],
-			'selectValueMap' => ['mappings'],
-			'applicationids' => $applicationids,
-			'monitored' => true,
-			'webitems' => true,
-			'preservekeys' => true
-		]);
-	}
-	else {
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
-			'selectHosts' => ['name'],
-			'selectValueMap' => ['mappings'],
-			'hostids' => $hostids,
-			'groupids' => $groupids,
-			'monitored' => true,
-			'webitems' => true,
-			'preservekeys' => true
-		]);
-	}
+	$db_items = API::Item()->get([
+		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'selectHosts' => ['name'],
+		'selectValueMap' => ['mappings'],
+		'hostids' => $hostids,
+		'groupids' => $groupids,
+		'evaltype' => $evaltype,
+		'tags' => $tags,
+		'monitored' => true,
+		'webitems' => true,
+		'preservekeys' => true
+	]);
 
 	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 
@@ -1207,16 +1148,20 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 }
 
 /**
- * @param array   $groupids
- * @param array   $hostids
- * @param array   $filter
- * @param string  $filter['application']
- * @param int     $filter['show_suppressed']
+ * @param array  $groupids
+ * @param array  $hostids
+ * @param array  $filter
+ * @param array  $filter['tags']
+ * @param int    $filter['evaltype']
+ * @param int    $filter['show_suppressed']
  *
  * @return array
  */
 function getDataOverview(?array $groupids, ?array $hostids, array $filter): array {
-	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $filter['application']);
+	$tags = (array_key_exists('tags', $filter) && $filter['tags']) ? $filter['tags'] : null;
+	$evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
+
+	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $tags, $evaltype);
 
 	$data = [];
 	$item_counter = [];
@@ -1442,56 +1387,6 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 		->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 	return $col;
-}
-
-/**
- * Get same application IDs on destination host and return array with keys as source application IDs
- * and values as destination application IDs.
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- * @param array  $applicationIds
- * @param string $hostId
- *
- * @return array
- */
-function get_same_applications_for_host(array $applicationIds, $hostId) {
-	$applications = [];
-
-	$dbApplications = DBselect(
-		'SELECT a1.applicationid AS dstappid,a2.applicationid AS srcappid'.
-		' FROM applications a1,applications a2'.
-		' WHERE a1.name=a2.name'.
-			' AND a1.hostid='.zbx_dbstr($hostId).
-			' AND '.dbConditionInt('a2.applicationid', $applicationIds)
-	);
-
-	while ($dbApplication = DBfetch($dbApplications)) {
-		$applications[$dbApplication['srcappid']] = $dbApplication['dstappid'];
-	}
-
-	return $applications;
-}
-
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-function get_applications_by_itemid($itemids, $field = 'applicationid') {
-	zbx_value2array($itemids);
-	$result = [];
-	$db_applications = DBselect(
-		'SELECT DISTINCT app.'.$field.' AS result'.
-		' FROM applications app,items_applications ia'.
-		' WHERE app.applicationid=ia.applicationid'.
-			' AND '.dbConditionInt('ia.itemid', $itemids)
-	);
-	while ($db_application = DBfetch($db_applications)) {
-		array_push($result, $db_application['result']);
-	}
-
-	return $result;
 }
 
 /**

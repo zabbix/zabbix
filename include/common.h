@@ -360,7 +360,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_DVALUE			12
 #define CONDITION_TYPE_HOST_TEMPLATE		13
 #define CONDITION_TYPE_EVENT_ACKNOWLEDGED	14
-#define CONDITION_TYPE_APPLICATION		15
+/* #define CONDITION_TYPE_APPLICATION		15	deprecated */
 #define CONDITION_TYPE_SUPPRESSED		16
 #define CONDITION_TYPE_DRULE			18
 #define CONDITION_TYPE_DCHECK			19
@@ -403,24 +403,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 /* #define EVENT_TYPE_LLDRULE_NORMAL		3	 deprecated */
 #define EVENT_TYPE_TRIGGER_UNKNOWN		4
 /* #define EVENT_TYPE_TRIGGER_NORMAL		5	 deprecated */
-
-#define SCREEN_RESOURCE_GRAPH			0
-#define SCREEN_RESOURCE_SIMPLE_GRAPH		1
-#define SCREEN_RESOURCE_MAP			2
-#define SCREEN_RESOURCE_PLAIN_TEXT		3
-#define SCREEN_RESOURCE_HOST_INFO		4
-#define SCREEN_RESOURCE_TRIGGER_INFO		5
-#define SCREEN_RESOURCE_SERVER_INFO		6
-#define SCREEN_RESOURCE_CLOCK			7
-#define SCREEN_RESOURCE_SCREEN			8
-#define SCREEN_RESOURCE_TRIGGER_OVERVIEW	9
-#define SCREEN_RESOURCE_DATA_OVERVIEW		10
-#define SCREEN_RESOURCE_URL			11
-#define SCREEN_RESOURCE_ACTIONS			12
-#define SCREEN_RESOURCE_EVENTS			13
-#define SCREEN_RESOURCE_HOSTGROUP_TRIGGERS	14
-#define SCREEN_RESOURCE_SYSTEM_STATUS		15
-#define SCREEN_RESOURCE_HOST_TRIGGERS		16
 
 typedef enum
 {
@@ -855,8 +837,11 @@ zbx_script_t;
 #define ZBX_SCRIPT_TYPE_IPMI		1
 #define ZBX_SCRIPT_TYPE_SSH		2
 #define ZBX_SCRIPT_TYPE_TELNET		3
-#define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4
 #define ZBX_SCRIPT_TYPE_WEBHOOK		5
+
+#define ZBX_SCRIPT_SCOPE_ACTION	1
+#define ZBX_SCRIPT_SCOPE_HOST	2
+#define ZBX_SCRIPT_SCOPE_EVENT	4
 
 #define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
@@ -919,7 +904,8 @@ while (0)
 														\
 do														\
 {														\
-	zbx_error("ERROR [file:%s,line:%d] Something impossible has just happened.", __FILE__, __LINE__);	\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
+			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
 	zbx_backtrace();											\
 }														\
 while (0)

@@ -63,13 +63,6 @@ class CUrlFactory {
 		'maintenance.php' => [
 			'remove' => ['maintenanceid']
 		],
-		'screenconf.php' => [
-			'remove' => ['screenid'],
-			'add' => ['templateid']
-		],
-		'slideconf.php' => [
-			'remove' => ['slideshowid']
-		],
 		'sysmaps.php' => [
 			'remove' => ['sysmapid']
 		],

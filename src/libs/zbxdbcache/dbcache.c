@@ -39,6 +39,8 @@
 #include "daemon.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
+#include "zbxalgo.h"
+#include "../zbxalgo/vectorimpl.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -86,6 +88,9 @@ extern int		CONFIG_DOUBLE_PRECISION;
 #define ZBX_DC_FLAGS_NOT_FOR_MODULES	(ZBX_DC_FLAGS_NOT_FOR_HISTORY | ZBX_DC_FLAG_LLD)
 #define ZBX_DC_FLAGS_NOT_FOR_EXPORT	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF)
 
+#define ZBX_HC_PROXYQUEUE_STATE_NORMAL 0
+#define ZBX_HC_PROXYQUEUE_STATE_WAIT 1
+
 typedef struct
 {
 	char		table_name[ZBX_TABLENAME_LEN_MAX];
@@ -103,6 +108,14 @@ static ZBX_DC_IDS	*ids = NULL;
 
 typedef struct
 {
+	zbx_list_t	list;
+	zbx_hashset_t	index;
+	int		state;
+}
+zbx_hc_proxyqueue_t;
+
+typedef struct
+{
 	zbx_hashset_t		trends;
 	ZBX_DC_STATS		stats;
 
@@ -116,6 +129,8 @@ typedef struct
 	int			history_progress_ts;
 
 	unsigned char		db_trigger_queue_lock;
+
+	zbx_hc_proxyqueue_t     proxyqueue;
 }
 ZBX_DC_CACHE;
 
@@ -173,6 +188,9 @@ static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 static int	hc_queue_get_size(void);
 static int	hc_get_history_compression_age(void);
+
+ZBX_PTR_VECTOR_DECL(item_tag, zbx_tag_t)
+ZBX_PTR_VECTOR_IMPL(item_tag, zbx_tag_t)
 
 /******************************************************************************
  *                                                                            *
@@ -1029,7 +1047,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	char			*name;
 	DC_ITEM			*item;
-	zbx_vector_ptr_t	applications;
+	zbx_vector_item_tag_t	item_tags;
 }
 zbx_item_info_t;
 
@@ -1037,9 +1055,9 @@ zbx_item_info_t;
  *                                                                            *
  * Function: db_get_items_info_by_itemid                                      *
  *                                                                            *
- * Purpose: get items name and applications                                   *
+ * Purpose: get items name and item tags                                      *
  *                                                                            *
- * Parameters: items_info - [IN/OUT] output item name and applications        *
+ * Parameters: items_info - [IN/OUT] output item name and item tags           *
  *             itemids    - [IN] the item identifiers                         *
  *                                                                            *
  ******************************************************************************/
@@ -1073,12 +1091,9 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,a.name"
-			" from applications a,items_applications i"
-			" where a.applicationid=i.applicationid"
-				" and");
+			"select itemid,tag,value from item_tag where");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids->values, itemids->values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
 	result = DBselect("%s", sql);
 
@@ -1086,6 +1101,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 	{
 		zbx_uint64_t	itemid;
 		zbx_item_info_t	*item_info;
+		zbx_tag_t	item_tag;
 
 		ZBX_DBROW2UINT64(itemid, row[0]);
 
@@ -1095,24 +1111,41 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 			continue;
 		}
 
-		zbx_vector_ptr_append(&item_info->applications, zbx_strdup(NULL, row[1]));
+		item_tag.tag = zbx_strdup(NULL, row[1]);
+		item_tag.value = zbx_strdup(NULL, row[2]);
+		zbx_vector_item_tag_append(&item_info->item_tags, item_tag);
 	}
 	DBfree_result(result);
 }
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_tag_free                                                    *
+ *                                                                            *
+ * Purpose: frees resources allocated to store item tag                       *
+ *                                                                            *
+ * Parameters: item_tag - [IN] item tag                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	item_tag_free(zbx_tag_t item_tag)
+{
+	zbx_free(item_tag.tag);
+	zbx_free(item_tag.value);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_info_clean                                              *
  *                                                                            *
- * Purpose: frees resources allocated to store item applications and name     *
+ * Purpose: frees resources allocated to store item tags and name             *
  *                                                                            *
  * Parameters: item_info - [IN] item information                              *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 {
-	zbx_vector_ptr_clear_ext(&item_info->applications, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&item_info->applications);
+	zbx_vector_item_tag_clear_ext(&item_info->item_tags, item_tag_free);
+	zbx_vector_item_tag_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
 }
 
@@ -1125,7 +1158,7 @@ static void	zbx_item_info_clean(zbx_item_info_t *item_info)
  * Parameters: trends     - [IN] trends from cache                            *
  *             trends_num - [IN] number of trends                             *
  *             hosts_info - [IN] hosts groups names                           *
- *             items_info - [IN] item names and applications                  *
+ *             items_info - [IN] item names and tags                          *
  *                                                                            *
  ******************************************************************************/
 static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hashset_t *hosts_info,
@@ -1170,10 +1203,17 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 		zbx_json_close(&json);
 
-		zbx_json_addarray(&json, ZBX_PROTO_TAG_APPLICATIONS);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
 
-		for (j = 0; j < item_info->applications.values_num; j++)
-			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
+		for (j = 0; j < item_info->item_tags.values_num; j++)
+		{
+			zbx_tag_t	item_tag = item_info->item_tags.values[j];
+
+			zbx_json_addobject(&json, NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag.tag, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, item_tag.value, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json);
+		}
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
@@ -1218,7 +1258,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
  * Parameters: history     - [IN/OUT] array of history data                   *
  *             history_num - [IN] number of history structures                *
  *             hosts_info  - [IN] hosts groups names                          *
- *             items_info  - [IN] item names and applications                 *
+ *             items_info  - [IN] item names and tags                         *
  *                                                                            *
  ******************************************************************************/
 static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx_hashset_t *hosts_info,
@@ -1268,10 +1308,17 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 
 		zbx_json_close(&json);
 
-		zbx_json_addarray(&json, ZBX_PROTO_TAG_APPLICATIONS);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
 
-		for (j = 0; j < item_info->applications.values_num; j++)
-			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
+		for (j = 0; j < item_info->item_tags.values_num; j++)
+		{
+			zbx_tag_t	item_tag = item_info->item_tags.values[j];
+
+			zbx_json_addobject(&json, NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_TAG, item_tag.tag, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, item_tag.value, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json);
+		}
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
@@ -1375,7 +1422,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 		item_info.itemid = item->itemid;
 		item_info.name = NULL;
 		item_info.item = item;
-		zbx_vector_ptr_create(&item_info.applications);
+		zbx_vector_item_tag_create(&item_info.item_tags);
 		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 	}
 
@@ -1403,7 +1450,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 			item_info.itemid = item->itemid;
 			item_info.name = NULL;
 			item_info.item = item;
-			zbx_vector_ptr_create(&item_info.applications);
+			zbx_vector_item_tag_create(&item_info.item_tags);
 			zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 		}
 	}
@@ -1520,7 +1567,7 @@ static void	DCsync_trends(void)
 
 	UNLOCK_TRENDS;
 
-	if (SUCCEED == zbx_is_export_enabled() && 0 != trends_num)
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS) && 0 != trends_num)
 		DCexport_all_trends(trends, trends_num);
 
 	DBbegin();
@@ -3172,16 +3219,33 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 						history_string, history_text, history_log);
 			}
 
-			if (SUCCEED == zbx_is_export_enabled())
+			if (0 != history_num)
 			{
-				if (0 != history_num)
+				const ZBX_DC_HISTORY	*phistory = NULL;
+				const ZBX_DC_TREND	*ptrends = NULL;
+				int			history_num_loc = 0, trends_num_loc = 0;
+
+				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 				{
-					DCexport_history_and_trends(history, history_num, &itemids, items, errcodes,
-							trends, trends_num);
+					phistory = history;
+					history_num_loc = history_num;
 				}
 
-				zbx_export_events();
+				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+				{
+					ptrends = trends;
+					trends_num_loc = trends_num;
+				}
+
+				if (NULL != phistory || NULL != ptrends)
+				{
+					DCexport_history_and_trends(phistory, history_num_loc, &itemids, items,
+							errcodes, ptrends, trends_num_loc);
+				}
 			}
+
+			if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+				zbx_export_events();
 		}
 
 		if (0 != history_num || 0 != timers_num)
@@ -4407,6 +4471,14 @@ int	init_database_cache(char **error)
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
+		zbx_hashset_create_ext(&(cache->proxyqueue.index), ZBX_HC_SYNC_MAX,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			__hc_index_mem_malloc_func, __hc_index_mem_realloc_func, __hc_index_mem_free_func);
+
+		zbx_list_create_ext(&(cache->proxyqueue.list), __hc_index_mem_malloc_func, __hc_index_mem_free_func);
+
+		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
+
 		if (SUCCEED != (ret = init_trend_cache(error)))
 			goto out;
 	}
@@ -4664,3 +4736,162 @@ void	zbx_db_trigger_queue_unlock(void)
 	cache->db_trigger_queue_lock = 0;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_proxyqueue_peek                                           *
+ *                                                                            *
+ * Purpose: return first proxy in a queue, function assumes that a queue is   *
+ *          not empty                                                         *
+ *                                                                            *
+ * Return value: proxyid at the top a queue                                   *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	zbx_hc_proxyqueue_peek(void)
+{
+	zbx_uint64_t	*p_val;
+
+	if (NULL == cache->proxyqueue.list.head)
+		return 0;
+
+	p_val = (zbx_uint64_t *)(cache->proxyqueue.list.head->data);
+
+	return *p_val;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_proxyqueue_enqueue                                        *
+ *                                                                            *
+ * Purpose: add new proxyid to a queue                                        *
+ *                                                                            *
+ * Parameters: proxyid   - [IN] the proxy id                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid)
+{
+	if (NULL == zbx_hashset_search(&cache->proxyqueue.index, &proxyid))
+	{
+		zbx_uint64_t *ptr;
+
+		ptr = zbx_hashset_insert(&cache->proxyqueue.index, &proxyid, sizeof(proxyid));
+		zbx_list_append(&cache->proxyqueue.list, ptr, NULL);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_proxyqueue_dequeue                                        *
+ *                                                                            *
+ * Purpose: try to dequeue proxyid from a proxy queue                         *
+ *                                                                            *
+ * Parameters: chk_proxyid  - [IN] the proxyid                                *
+ *                                                                            *
+ * Return value: SUCCEED - retrieval successful                               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid)
+{
+	zbx_uint64_t	top_val;
+	void		*rem_val = 0;
+
+	top_val = zbx_hc_proxyqueue_peek();
+
+	if (proxyid != top_val)
+		return FAIL;
+
+	if (FAIL == zbx_list_pop(&cache->proxyqueue.list, &rem_val))
+		return FAIL;
+
+	zbx_hashset_remove_direct(&cache->proxyqueue.index, rem_val);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_proxyqueue_clear                                          *
+ *                                                                            *
+ * Purpose: remove all proxies from proxy priority queue                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_hc_proxyqueue_clear(void)
+{
+	zbx_list_destroy(&cache->proxyqueue.list);
+	zbx_hashset_clear(&cache->proxyqueue.index);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_check_proxy                                               *
+ *                                                                            *
+ * Purpose: check status of a history cache usage, enqueue/dequeue proxy      *
+ *          from priority list and accordingly enable or disable wait mode    *
+ *                                                                            *
+ * Parameters: proxyid   - [IN] the proxyid                                   *
+ *                                                                            *
+ * Return value: SUCCEED - proxy can be processed now                         *
+ *               FAIL    - proxy cannot be processed now, it got enqueued     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
+{
+	double	hc_pused;
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64, __func__, proxyid);
+
+	LOCK_CACHE;
+
+	hc_pused = 100 * (double)(hc_mem->total_size - hc_mem->free_size) / hc_mem->total_size;
+
+	if (20 >= hc_pused)
+	{
+		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
+
+		zbx_hc_proxyqueue_clear();
+
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (ZBX_HC_PROXYQUEUE_STATE_WAIT == cache->proxyqueue.state)
+	{
+		zbx_hc_proxyqueue_enqueue(proxyid);
+
+		if (60 < hc_pused)
+		{
+			ret = FAIL;
+			goto out;
+		}
+
+		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
+	}
+	else
+	{
+		if (80 <= hc_pused)
+		{
+			cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_WAIT;
+			zbx_hc_proxyqueue_enqueue(proxyid);
+
+			ret = FAIL;
+			goto out;
+		}
+	}
+
+	if (0 == zbx_hc_proxyqueue_peek())
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	ret = zbx_hc_proxyqueue_dequeue(proxyid);
+
+out:
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}

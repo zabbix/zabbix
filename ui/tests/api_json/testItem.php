@@ -95,6 +95,27 @@ class testItem extends CAPITest {
 			[
 				'request_data' => [
 					'hostid' => '50009',
+					'name' => 'Item with some tags',
+					'key_' => 'trapper_item_1',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_TRAPPER,
+					'delay' => '0',
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => 'value 1'
+						],
+						[
+							'tag' => 'tag',
+							'value' => 'value 2'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'hostid' => '50009',
 					'name' => 'Test mqtt with wrong key and 0 delay',
 					'key_' => 'mqt.get[5]',
 					'interfaceid' => '50022',
@@ -144,6 +165,17 @@ class testItem extends CAPITest {
 
 				foreach (['hostid', 'name', 'key_', 'type', 'delay'] as $field) {
 					$this->assertSame($db_item[$field], strval($request_data[$field]));
+				}
+
+				if (array_key_exists('tags', $request_data)) {
+					$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM item_tag WHERE itemid='.zbx_dbstr($id)));
+					uasort($request_data['tags'], function ($a, $b) {
+						return strnatcasecmp($a['value'], $b['value']);
+					});
+					uasort($db_tags, function ($a, $b) {
+						return strnatcasecmp($a['value'], $b['value']);
+					});
+					$this->assertTrue(array_values($db_tags) === array_values($request_data['tags']));
 				}
 			}
 		}

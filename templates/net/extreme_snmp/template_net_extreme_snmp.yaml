@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:26Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -27,19 +27,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: CPU
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: Memory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'Device: Temperature status'
@@ -52,11 +39,12 @@ zabbix_export:
           description: |
             MIB: EXTREME-SYSTEM-MIB
             Temperature status of testpoint: Device
-          applications:
-            -
-              name: Temperature
           valuemap:
             name: 'EXTREME-SYSTEM-MIB::extremeOverTemperatureAlarm'
+          tags:
+            -
+              tag: Application
+              value: Temperature
         -
           name: 'Device: Temperature'
           type: SNMP_AGENT
@@ -69,9 +57,10 @@ zabbix_export:
             MIB: EXTREME-SYSTEM-MIB
             Temperature readings of testpoint: Device
             Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
           triggers:
             -
               expression: '{avg(5m)}>{$TEMP_WARN:""}'
@@ -107,9 +96,10 @@ zabbix_export:
           description: |
             MIB: EXTREME-SOFTWARE-MONITOR-MIB
             Total CPU utlization (percentage) as of last sampling.
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -127,14 +117,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -154,14 +145,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -173,14 +165,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -198,14 +191,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Operating system'
           type: SNMP_AGENT
@@ -221,14 +215,15 @@ zabbix_export:
             This string will have a zero length if the revision is unknown, invalid or not present.
             This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -253,9 +248,10 @@ zabbix_export:
               description: |
                 MIB: EXTREME-SYSTEM-MIB
                 The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}
-              applications:
+              tags:
                 -
-                  name: Fans
+                  tag: Application
+                  value: Fans
             -
               name: 'Fan {#SNMPVALUE}: Fan status'
               type: SNMP_AGENT
@@ -267,11 +263,12 @@ zabbix_export:
               description: |
                 MIB: EXTREME-SYSTEM-MIB
                 Operational status of a cooling fan.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'EXTREME-SYSTEM-MIB::extremeFanOperational'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -296,14 +293,15 @@ zabbix_export:
               description: |
                 MIB: EXTREME-SOFTWARE-MONITOR-MIB
                 Total amount of free memory in Kbytes in the system.
-              applications:
-                -
-                  name: Memory
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
             -
               name: '#{#SNMPVALUE}: Total memory'
               type: SNMP_AGENT
@@ -314,14 +312,15 @@ zabbix_export:
               description: |
                 MIB: EXTREME-SOFTWARE-MONITOR-MIB
                 Total amount of DRAM in Kbytes in the system.
-              applications:
-                -
-                  name: Memory
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
             -
               name: '#{#SNMPVALUE}: Memory utilization'
               type: CALCULATED
@@ -331,13 +330,14 @@ zabbix_export:
               units: '%'
               params: '(last("vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]") - last("vm.memory.available[extremeMemoryMonitorSystemFree.{#SNMPINDEX}]")) / last("vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]") * 100'
               description: 'Memory utilization in %'
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
-                  name: '#{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
           graph_prototypes:
@@ -388,11 +388,12 @@ zabbix_export:
               description: |
                 MIB: EXTREME-SYSTEM-MIB
                 Status of the power supply {#SNMPVALUE}
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'EXTREME-SYSTEM-MIB::extremePowerSupplyStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
