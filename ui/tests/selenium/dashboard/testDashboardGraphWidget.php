@@ -192,12 +192,12 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Data set": cannot be empty.'
 				]
 			],
-			// Base colour field validation.
+			// Base color field validation.
 			[
 				[
 					'Data set' => [
 						[
-							'Base colour' => ''
+							'Base color' => ''
 						]
 					],
 					'error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
@@ -207,20 +207,20 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Data set' => [
 						[
-							'Base colour' => '00000!'
+							'Base color' => '00000!'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
 				[
 					'Data set' => [
 						[
-							'Base colour' => '00000'
+							'Base color' => '00000'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -363,10 +363,10 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Zabbix*',
 							'item' => 'Agent ping',
-							'Base colour' => '00000'
+							'Base color' => '00000'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -922,13 +922,13 @@ class testDashboardGraphWidget extends CWebTest {
 
 	public static function getOverridesValidationData() {
 		return [
-			// Base colour field validation.
+			// Base color field validation.
 			[
 				[
 					'Overrides' => [
 						[
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
@@ -941,11 +941,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'color' => '00000!',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -954,11 +954,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'color' => '00000',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -1108,7 +1108,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'options' => [
-								'Base colour'
+								'Base color'
 							]
 						]
 					],
@@ -1452,7 +1452,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-							'Base colour' => '009688',
+							'Base color' => '009688',
 							'Draw' => 'Staircase',
 							'Width' => '10',
 							'Transparency' => '10',
@@ -1466,7 +1466,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-							'Base colour' => '000000',
+							'Base color' => '000000',
 							'Y-axis' => 'Right',
 							'Draw' => 'Points',
 							'Point size' => '1',
@@ -1515,7 +1515,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1532,7 +1532,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '1'],
 								['Draw', 'Points'],
 								['Transparency', '2'],
@@ -1740,7 +1740,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'One host',
 							'item' => 'One item',
 							'Y-axis' => 'Left',
-							'Base colour' => '009688',
+							'Base color' => '009688',
 							'Draw' => 'Staircase',
 							'Width' => '10',
 							'Transparency' => '10',
@@ -1751,7 +1751,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-							'Base colour' => '000000',
+							'Base color' => '000000',
 							'Y-axis' => 'Right',
 							'Draw' => 'Bar',
 							'Transparency' => '10',
@@ -1807,7 +1807,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1824,7 +1824,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-								'Base colour',
+								'Base color',
 								['Width', '1'],
 								['Draw', 'Bar'],
 								['Transparency', '2'],

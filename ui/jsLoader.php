@@ -278,7 +278,7 @@ $tranStrings = [
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
-		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
+		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).')
 	],
 	'class.notifications.js' => [
 		'S_PROBLEM_ON' => _('Problem on'),

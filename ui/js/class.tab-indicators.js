@@ -266,7 +266,7 @@ class TabIndicatorItem {
 	 * @return {boolean|number} Boolean for mark indicator and number for count indicator
 	 */
 	getValue() {
-		throw 'Fatal error: can not call abstract method.';
+		throw 'Fatal error: cannot call abstract method.';
 	}
 
 	/**
@@ -275,7 +275,7 @@ class TabIndicatorItem {
 	 * @param {HTMLElement} element
 	 */
 	initObserver(element) {
-		throw 'Fatal error: can not call abstract method.';
+		throw 'Fatal error: cannot call abstract method.';
 	}
 
 	/**
