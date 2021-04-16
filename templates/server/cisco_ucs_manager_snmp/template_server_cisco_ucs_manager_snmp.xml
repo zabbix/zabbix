@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-14T12:14:53Z</date>
+   <date>2021-04-16T06:28:29Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -276,6 +276,12 @@ portion of the system was last re-initialized.</description>
                <valuemap>
                   <name>zabbix.host.available</name>
                </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
                <triggers>
                   <trigger>
                      <expression>{max({$SNMP.TIMEOUT})}=0</expression>
@@ -313,6 +319,12 @@ portion of the system was last re-initialized.</description>
                      <valuemap>
                         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}</expression>
@@ -362,6 +374,12 @@ portion of the system was last re-initialized.</description>
                            <name>Disk arrays</name>
                         </application>
                      </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
                   </item_prototype>
                   <item_prototype>
                      <name>{#DISKARRAY_LOCATION}: Disk array controller status</name>
@@ -381,6 +399,12 @@ Cisco UCS storage:RaidBattery:operability managed object property.</description>
                      <valuemap>
                         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}={$DISK.ARRAY.STATUS.CRIT:"inoperable"}</expression>
@@ -450,6 +474,12 @@ Cisco UCS equipment:Fan:operState managed object property</description>
                      <valuemap>
                         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}={$FAN.STATUS.CRIT:"inoperable"}</expression>
@@ -562,8 +592,9 @@ Cisco UCS equipment:Fan:operState managed object property</description>
                      <key>cisco.ucs.if.descr[ifDescr.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <history>7d</history>
-                     <trends>0d</trends>
+                     <trends>0</trends>
                      <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
                      <description>MIB: IF-MIB&#13;
 A textual string containing information about the&#13;
 interface.  This string should include the name of the&#13;
@@ -903,6 +934,12 @@ The current operational state of the interface.&#13;
                      <valuemap>
                         <name>IF-MIB::ifOperStatus</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)</expression>
@@ -1074,6 +1111,15 @@ Cisco UCS storage:LocalDisk:deviceType managed object property. Actually returns
                            <name>Physical disks</name>
                         </application>
                      </applications>
+                     <valuemap>
+                        <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageTechnology</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
                   </item_prototype>
                   <item_prototype>
                      <name>{#DISK_LOCATION}: Physical disk model name</name>
@@ -1092,13 +1138,19 @@ Cisco UCS storage:LocalDisk:model managed object property.</description>
                            <name>Physical disks</name>
                         </application>
                      </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
                   </item_prototype>
                   <item_prototype>
                      <name>{#DISK_LOCATION}: Physical disk serial number</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.9.9.719.1.45.4.1.12.{#SNMPINDEX}</snmp_oid>
                      <key>cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]</key>
-                     <delay>1d</delay>
+                     <delay>1h</delay>
                      <trends>0</trends>
                      <status>ENABLED</status>
                      <value_type>CHAR</value_type>
@@ -1109,6 +1161,12 @@ Cisco UCS storage:LocalDisk:serial managed object property. Actually returns par
                            <name>Physical disks</name>
                         </application>
                      </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1 and {strlen()}&gt;0</expression>
@@ -1141,6 +1199,10 @@ Cisco UCS storage:LocalDisk:size managed object property. In MB.</description>
                            <type>MULTIPLIER</type>
                            <params>1048576</params>
                         </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
                      </preprocessing>
                   </item_prototype>
                   <item_prototype>
@@ -1161,6 +1223,12 @@ Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                      <valuemap>
                         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}={$DISK.STATUS.FAIL:"failed"}</expression>
@@ -1213,6 +1281,12 @@ Cisco UCS equipment:Psu:operState managed object property</description>
                      <valuemap>
                         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}={$PSU.STATUS.CRIT:"inoperable"}</expression>
@@ -1262,6 +1336,12 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                            <name>Temperature</name>
                         </application>
                      </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"CPU"}</expression>
@@ -1316,6 +1396,12 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                            <name>Temperature</name>
                         </application>
                      </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"Ambient"}</expression>
@@ -1375,6 +1461,12 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                            <name>Temperature</name>
                         </application>
                      </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"Ambient"}</expression>
@@ -1434,6 +1526,12 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                            <name>Temperature</name>
                         </application>
                      </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"Ambient"}</expression>
@@ -1493,6 +1591,12 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                            <name>Temperature</name>
                         </application>
                      </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"Ambient"}</expression>
@@ -1622,6 +1726,12 @@ Cisco UCS compute:RackUnit:operState managed object property</description>
                      <valuemap>
                         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}={$HEALTH.STATUS.CRIT:"computeFailed"} or {last()}={$HEALTH.STATUS.CRIT:"configFailure"} or {last()}={$HEALTH.STATUS.CRIT:"unconfigFailure"} or {last()}={$HEALTH.STATUS.CRIT:"inoperable"}</expression>
@@ -1674,6 +1784,12 @@ Cisco UCS storage:LocalLun:type managed object property</description>
                      <valuemap>
                         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
+                     </preprocessing>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VDISK_LOCATION}: Disk size</name>
@@ -1700,6 +1816,10 @@ Cisco UCS storage:LocalLun:size managed object property in MB.</description>
                            <type>MULTIPLIER</type>
                            <params>1048576</params>
                         </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
+                        </step>
                      </preprocessing>
                   </item_prototype>
                   <item_prototype>
@@ -1720,6 +1840,12 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
                      <valuemap>
                         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence</name>
                      </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&lt;&gt;{$VDISK.STATUS.OK:"equipped"}</expression>
@@ -2437,6 +2563,27 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
             <mapping>
                <value>105</value>
                <newvalue>equippedDiscUnknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageTechnology</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unspecified</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>hdd</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ssd</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>nvme</newvalue>
             </mapping>
          </mappings>
       </value_map>
