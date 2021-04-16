@@ -33,17 +33,34 @@ class C52ImportConverter extends CConverter {
 	 */
 	public function convert($data): array {
 		$data['zabbix_export']['version'] = '5.4';
+		$templates_names = [];
+
+		if (array_key_exists('value_maps', $data['zabbix_export'])) {
+			/**
+			 * Value maps conversion should be done before Template conversion,
+			 * value map uuid will be generated during Template conversion it requires template name.
+			 */
+			$data['zabbix_export'] = self::convertValueMaps($data['zabbix_export']);
+		}
 
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
 
 		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$templates_names = array_column($data['zabbix_export']['templates'], 'name');
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
 
-		if (array_key_exists('value_maps', $data['zabbix_export'])) {
-			$data['zabbix_export'] = self::convertValueMaps($data['zabbix_export']);
+		if (array_key_exists('graphs', $data['zabbix_export']) && $templates_names) {
+			$data['zabbix_export']['graphs'] = self::convertGraphs($data['zabbix_export']['graphs'], $templates_names);
+		}
+
+		if (array_key_exists('groups', $data['zabbix_export']) && $templates_names) {
+			foreach ($data['zabbix_export']['groups'] as &$group) {
+				$group['uuid'] = generateUuidV4($group['name']);
+			}
+			unset($group);
 		}
 
 		return $data;
@@ -90,16 +107,60 @@ class C52ImportConverter extends CConverter {
 	 */
 	private static function convertTemplates(array $templates): array {
 		$result = [];
+		$old_name_match = '/Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
 
 		foreach ($templates as $template) {
+			$tmpl_name = $template['name'];
+
+			if (preg_match($old_name_match, $tmpl_name, $match)) {
+				$tmpl_name = $match['mapped_name'];
+			}
+
 			if (array_key_exists('discovery_rules', $template)) {
-				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
+				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules'], $tmpl_name);
 			}
 
 			if (array_key_exists('dashboards', $template)) {
-				$template['dashboards'] = self::convertTemplateDashboards($template['dashboards']);
+				$template['dashboards'] = self::convertTemplateDashboards($template['dashboards'], $tmpl_name);
 			}
 
+			if (array_key_exists('items', $template)) {
+				foreach ($template['items'] as &$item) {
+					$item['uuid'] = generateUuidV4($tmpl_name.'/'.$item['key']);
+
+					if (!array_key_exists('triggers', $item)) {
+						continue;
+					}
+
+					foreach ($item['triggers'] as &$trigger) {
+						$seed = $trigger['name'].'/'.$trigger['expression'];
+
+						if (array_key_exists('recovery_expression', $trigger)) {
+							$seed .= '/'.$trigger['recovery_expression'];
+						}
+
+						$trigger['uuid'] = generateUuidV4($seed);
+					}
+					unset($trigger);
+				}
+				unset($item);
+			}
+
+			if (array_key_exists('httptests', $template)) {
+				foreach ($template['httptests'] as &$httptest) {
+					$httptest['uuid'] = generateUuidV4($tmpl_name.'/'.$httptest['name']);
+				}
+				unset($httptest);
+			}
+
+			if (array_key_exists('valuemaps', $template)) {
+				foreach ($template['valuemaps'] as &$valuemap) {
+					$valuemap['uuid'] = generateUuidV4($tmpl_name.'/'.$valuemap['name']);
+				}
+				unset($valuemap);
+			}
+
+			$template['uuid'] = generateUuidV4($tmpl_name);
 			$result[] = $template;
 		}
 
@@ -111,11 +172,12 @@ class C52ImportConverter extends CConverter {
 	 *
 	 * @static
 	 *
-	 * @param array $dashboards
+	 * @param array  $dashboards
+	 * @param string $template_name
 	 *
 	 * @return array
 	 */
-	private static function convertTemplateDashboards(array $dashboards): array {
+	private static function convertTemplateDashboards(array $dashboards, string $template_name): array {
 		$result = [];
 
 		foreach ($dashboards as $dashboard) {
@@ -127,7 +189,8 @@ class C52ImportConverter extends CConverter {
 
 			$dashboard = [
 				'name' => $dashboard['name'],
-				'pages' => [$dashboard_page]
+				'pages' => [$dashboard_page],
+				'uuid' => generateUuidV4($template_name.'/'.$dashboard['name'])
 			];
 
 			$result[] = $dashboard;
@@ -178,16 +241,59 @@ class C52ImportConverter extends CConverter {
 	 *
 	 * @static
 	 *
-	 * @param array $discovery_rules
+	 * @param array  $discovery_rules
+	 * @param string $template_name
 	 *
 	 * @return array
 	 */
-	private static function convertDiscoveryRules(array $discovery_rules): array {
+	private static function convertDiscoveryRules(array $discovery_rules, string $template_name = ''): array {
 		$result = [];
 
 		foreach ($discovery_rules as $discovery_rule) {
 			if (array_key_exists('host_prototypes', $discovery_rule)) {
 				$discovery_rule['host_prototypes'] = self::convertHostPrototypes($discovery_rule['host_prototypes']);
+			}
+
+			if ($template_name !== '') {
+				if (array_key_exists('host_prototypes', $discovery_rule)) {
+					foreach ($discovery_rule['host_prototypes'] as &$host_prototype) {
+						$seed = $template_name.'/'.$discovery_rule['key'].'/'.$host_prototype['name'];
+						$host_prototype['uuid'] = generateUuidV4($seed);
+					}
+					unset($host_prototype);
+				}
+
+				if (array_key_exists('item_prototypes', $discovery_rule)) {
+					foreach ($discovery_rule['item_prototypes'] as &$item_prototype) {
+						if (array_key_exists('trigger_prototypes', $item_prototype)) {
+							foreach ($item_prototype['trigger_prototypes'] as &$trigger_prototype) {
+								$seed = $discovery_rule['key'].'/'.$trigger_prototype['name'].'/'
+									.$trigger_prototype['expression'];
+
+								if (array_key_exists('recovery_expression', $trigger_prototype)) {
+									$seed .= '/'.$trigger_prototype['recovery_expression'];
+								}
+
+								$trigger_prototype['uuid'] = generateUuidV4($seed);
+							}
+							unset($trigger_prototype);
+						}
+
+						$seed = $template_name.'/'.$discovery_rule['key'].'/'.$item_prototype['key'];
+						$item_prototype['uuid'] = generateUuidV4($seed);
+					}
+					unset($item_prototype);
+				}
+
+				if (array_key_exists('graph_prototypes', $discovery_rule)) {
+					foreach ($discovery_rule['graph_prototypes'] as &$graph_prototype) {
+						$seed = $template_name.'/'.$discovery_rule['key'].'/'.$graph_prototype['name'];
+						$graph_prototype['uuid'] = generateUuidV4($seed);
+					}
+					unset($graph_prototype);
+				}
+
+				$discovery_rule['uuid'] = generateUuidV4($template_name.'/'.$discovery_rule['key']);
 			}
 
 			$result[] = $discovery_rule;
@@ -270,5 +376,40 @@ class C52ImportConverter extends CConverter {
 		unset($host);
 
 		return $hosts;
+	}
+
+	/**
+	 * Convert graphs.
+	 *
+	 * @static
+	 *
+	 * @param array $graphs
+	 * @param array $import_templates_names
+	 *
+	 * @return array
+	 */
+	private static function convertGraphs(array $graphs, array $import_templates_names): array {
+		$result = [];
+		$old_name_match = '/Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
+
+		foreach ($graphs as $graph) {
+			$templates_names = array_intersect(array_column($graph['graph_items'], 'host'), $import_templates_names);
+
+			if ($templates_names) {
+				$seed = [$graph['name']];
+
+				foreach ($templates_names as $template_name) {
+					$seed[] = preg_match($old_name_match, $template_name, $match)
+						? $match['mapped_name']
+						: $template_name;
+				}
+
+				$graph['uuid'] = generateUuidV4(implode('/', $seed));
+			}
+
+			$result[] = $graph;
+		}
+
+		return $result;
 	}
 }
