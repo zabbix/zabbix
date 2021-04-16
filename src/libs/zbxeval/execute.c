@@ -986,7 +986,6 @@ static int	eval_execute_function_length(const zbx_eval_context_t *ctx, const zbx
 
 	arg = &output->values[output->values_num - 1];
 
-
 	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
 		return FAIL;
 

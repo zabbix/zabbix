@@ -1701,6 +1701,9 @@ typedef struct
 	/* hosts when replacing with history function with common function */
 	zbx_uint64_t	hostid;
 
+	/* function location - expression|recovery expression */
+	unsigned char	location;
+
 	char		*name;
 	char		*parameter;
 
@@ -1900,26 +1903,25 @@ static void	dbpatch_update_func_strlen(zbx_dbpatch_function_t *function, const c
 	*replace = zbx_dsprintf(NULL, "length({" ZBX_FS_UI64 "})", function->functionid);
 }
 
-static void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int extended,
-		zbx_dbpatch_trigger_t *trigger)
+static void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int extended, char **expression)
 {
 	char	*str  = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
 
-	dbpatch_update_function(function, "last", "$", ZBX_DBPATCH_FUNCTION_UPDATE);
+	if (ZBX_DBPATCH_FUNCTION_DELETE == function->flags)
+		dbpatch_update_function(function, "last", "$", ZBX_DBPATCH_FUNCTION_UPDATE);
 
 	if (0 == extended)
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '(');
-	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, trigger->expression);
+	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, *expression);
 	if (0 == extended)
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, ')');
 
 	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " or ({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})",
 			function->functionid, function->functionid);
 
-	zbx_free(trigger->expression);
-	trigger->expression = str;
-	trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION;
+	zbx_free(*expression);
+	*expression = str;
 }
 
 /******************************************************************************
@@ -2358,6 +2360,69 @@ static int	dbpatch_is_time_function(const char *name, size_t len)
 	return FAIL;
 }
 
+#define ZBX_DBPATCH_EXPRESSION			0x01
+#define ZBX_DBPATCH_RECOVERY_EXPRESSION		0x02
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_find_function                                            *
+ *                                                                            *
+ * Purpose: check if the expression contains specified functionid             *
+ *                                                                            *
+ ******************************************************************************/
+static	int	dbpatch_find_function(const char *expression, zbx_uint64_t functionid)
+{
+	int		pos = 0;
+	zbx_token_t	token;
+	zbx_uint64_t	id;
+
+	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_OBJECTID:
+				if (SUCCEED == is_uint64_n(expression + token.data.objectid.name.l,
+						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id) &&
+						functionid == id)
+				{
+					return SUCCEED;
+				}
+				pos = token.loc.r;
+				break;
+			case ZBX_TOKEN_MACRO:
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_LLD_MACRO:
+				pos = token.loc.r;
+				break;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbpatch_get_function_location                                    *
+ *                                                                            *
+ * Purpose: return function location mask (expression | recovery expression)  *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned char	dbpatch_get_function_location(const zbx_dbpatch_trigger_t *trigger, zbx_uint64_t functionid)
+{
+	unsigned char	mask = 0;
+
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION != trigger->recovery_mode)
+		return ZBX_DBPATCH_EXPRESSION;
+
+	if (SUCCEED == dbpatch_find_function(trigger->expression, functionid))
+		mask |= ZBX_DBPATCH_EXPRESSION;
+
+	if (SUCCEED == dbpatch_find_function(trigger->recovery_expression, functionid))
+		mask |= ZBX_DBPATCH_RECOVERY_EXPRESSION;
+
+	return mask;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: dbpatch_convert_trigger                                          *
@@ -2376,7 +2441,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	zbx_uint64_t			functionid, itemid, hostid;
 	zbx_vector_loc_t		params;
 	zbx_vector_ptr_t		common_functions, trigger_functions;
-	zbx_vector_uint64_t		hostids;
+	zbx_vector_uint64_t		hostids, r_hostids;
 	zbx_dbpatch_function_t		*func;
 
 	index = functions->values_num;
@@ -2385,6 +2450,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	zbx_vector_ptr_create(&common_functions);
 	zbx_vector_ptr_create(&trigger_functions);
 	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&r_hostids);
 
 	result = DBselect("select f.functionid,f.itemid,f.name,f.parameter,h.hostid"
 			" from functions f"
@@ -2398,7 +2464,8 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char	*replace = NULL;
+		char		*replace = NULL;
+		unsigned char	location;
 
 		ZBX_STR2UINT64(functionid, row[0]);
 		ZBX_STR2UINT64(itemid, row[1]);
@@ -2408,17 +2475,24 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 		{
 			char	func_name[FUNCTION_NAME_LEN * 4 + 1];
 
-			zbx_snprintf(func_name, sizeof(func_name), "%s()", row[2]);
-			dbpatch_update_trigger(trigger, functionid, func_name);
-
 			func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
 			func->hostid = hostid;
+			func->location = dbpatch_get_function_location(trigger, functionid);
 			zbx_vector_ptr_append(&common_functions, func);
+
+			zbx_snprintf(func_name, sizeof(func_name), "%s()", row[2]);
+			dbpatch_update_trigger(trigger, functionid, func_name);
 
 			continue;
 		}
 
-		zbx_vector_uint64_append(&hostids, hostid);
+		location = dbpatch_get_function_location(trigger, functionid);
+
+		if (0 != (location & ZBX_DBPATCH_EXPRESSION))
+			zbx_vector_uint64_append(&hostids, hostid);
+
+		if (0 != (location & ZBX_DBPATCH_RECOVERY_EXPRESSION))
+			zbx_vector_uint64_append(&r_hostids, hostid);
 
 		func = dbpatch_new_function(functionid, itemid, row[2], row[3], 0);
 		zbx_vector_ptr_append(functions, func);
@@ -2451,30 +2525,45 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	/* the trigger is still linked to the same hosts                              */
 	if (0 != common_functions.values_num)
 	{
-		int	extended = 0;
+		int	extended = 0, r_extended = 0;
 
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+		zbx_vector_uint64_sort(&r_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&r_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		for (i = 0; i < common_functions.values_num; i++)
 		{
 			func = (zbx_dbpatch_function_t *)common_functions.values[i];
+			func->flags = ZBX_DBPATCH_FUNCTION_DELETE;
 
-			if (FAIL == zbx_vector_uint64_bsearch(&hostids, func->hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			if (0 != (func->location & ZBX_DBPATCH_EXPRESSION) &&
+					(FAIL == zbx_vector_uint64_search(&hostids, func->hostid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				dbpatch_update_hist2common(func, extended, trigger);
+				dbpatch_update_hist2common(func, extended, &trigger->expression);
 				extended = 1;
 				zbx_vector_uint64_append(&hostids, func->hostid);
-				zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+				trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION;
 			}
-			else
-				func->flags = ZBX_DBPATCH_FUNCTION_DELETE;
+
+			if (0 != (func->location & ZBX_DBPATCH_RECOVERY_EXPRESSION) &&
+					(FAIL == zbx_vector_uint64_search(&r_hostids, func->hostid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				dbpatch_update_hist2common(func, r_extended, &trigger->recovery_expression);
+				r_extended = 1;
+				zbx_vector_uint64_append(&r_hostids, func->hostid);
+				trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION;
+			}
 
 			zbx_vector_ptr_append(functions, func);
 		}
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_uint64_destroy(&r_hostids);
 	zbx_vector_ptr_destroy(&trigger_functions);
 	zbx_vector_ptr_destroy(&common_functions);
 	zbx_vector_loc_destroy(&params);
@@ -2753,6 +2842,7 @@ static void	dbpatch_convert_simple_macro(const char *expression, const zbx_token
 	func->itemid = 0;
 	func->flags = 0;
 	func->name = name;
+
 	if (data->func_param.l + 1 == data->func_param.r)
 		func->parameter = zbx_strdup(NULL, "");
 	else
