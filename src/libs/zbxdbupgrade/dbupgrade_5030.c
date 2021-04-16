@@ -2753,7 +2753,10 @@ static void	dbpatch_convert_simple_macro(const char *expression, const zbx_token
 	func->itemid = 0;
 	func->flags = 0;
 	func->name = name;
-	func->parameter = zbx_substr(expression, data->func_param.l + 1, data->func_param.r -1);
+	if (data->func_param.l + 1 == data->func_param.r)
+		func->parameter = zbx_strdup(NULL, "");
+	else
+		func->parameter = zbx_substr(expression, data->func_param.l + 1, data->func_param.r - 1);
 
 	host = zbx_substr(expression, data->host.l, data->host.r);
 	key = zbx_substr(expression, data->key.l, data->key.r);
