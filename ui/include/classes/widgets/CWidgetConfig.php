@@ -32,7 +32,7 @@ class CWidgetConfig {
 	public const CONTEXT_TEMPLATE_DASHBOARD = 'template_dashboard';
 
 	/**
-	 * Return list of all widget types with names.
+	 * Get default names for all widget types.
 	 *
 	 * @static
 	 *
@@ -74,7 +74,14 @@ class CWidgetConfig {
 		return $types;
 	}
 
-	public static function getTypeJSClasses() {
+	/**
+	 * Get JavaScript classes for all widget types.
+	 *
+	 * @static
+	 *
+	 * @return array
+	 */
+	public static function getJSClasses(): array {
 		return [
 			WIDGET_ACTION_LOG			=> 'CWidget',
 			WIDGET_CLOCK				=> 'CWidgetClock',
@@ -100,13 +107,48 @@ class CWidgetConfig {
 	}
 
 	/**
+	 * Get reference field name for widgets of the given type.
+	 *
+	 * @static
+	 *
+	 * @return string|null
+	 */
+	public static function getReferenceField(string $type): ?string {
+		switch ($type) {
+			case WIDGET_MAP:
+			case WIDGET_NAV_TREE:
+				return 'reference';
+
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Get foreign reference field names for widgets of the given type.
+	 *
+	 * @static
+	 *
+	 * @return array
+	 */
+	public static function getForeignReferenceFields(string $type): array {
+		switch ($type) {
+			case WIDGET_MAP:
+				return ['filter_widget_reference'];
+
+			default:
+				return [];
+		}
+	}
+
+	/**
 	 * Get default widget dimensions.
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	private static function getDefaultDimensions() {
+	private static function getDefaultDimensions(): array {
 		return [
 			WIDGET_ACTION_LOG			=> ['width' => 12,	'height' => 5],
 			WIDGET_CLOCK				=> ['width' => 4,	'height' => 3],
@@ -132,7 +174,7 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Return default values for widgets.
+	 * Get default values for widgets.
 	 *
 	 * @static
 	 *
@@ -144,14 +186,16 @@ class CWidgetConfig {
 		$ret = [];
 
 		$dimensions = self::getDefaultDimensions();
-		$type_js_clases = self::getTypeJSClasses();
+		$js_clases = self::getJSClasses();
 
 		foreach (self::getKnownWidgetTypes($context) as $type => $name) {
 			$ret[$type] = [
 				'name' => $name,
 				'size' => $dimensions[$type],
-				'js_class' => $type_js_clases[$type],
+				'js_class' => $js_clases[$type],
 				'iterator' => self::isIterator($type),
+				'reference_field' => self::getReferenceField($type),
+				'foreign_reference_fields' => self::getForeignReferenceFields($type),
 				'dialogue_stick_to_top' => self::getDialogueStickToTop($type)
 			];
 		}
@@ -190,7 +234,7 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Return default refresh rate for widget type.
+	 * Get default refresh rate for widget type.
 	 *
 	 * @static
 	 *
@@ -198,7 +242,7 @@ class CWidgetConfig {
 	 *
 	 * @return int  default refresh rate, 0 for no refresh
 	 */
-	public static function getDefaultRfRate($type) {
+	public static function getDefaultRfRate(string $type): int {
 		switch ($type) {
 			case WIDGET_ACTION_LOG:
 			case WIDGET_DATA_OVER:
@@ -246,24 +290,23 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Detect if widget uses time selector.
+	 * Check if time selector is necessary for widget having specified type and fields.
 	 *
 	 * @static
 	 *
-	 * @param array $widget
-	 * @param array $widget[type]
-	 * @param array $widget[fields]
+	 * @param string $type    Widget type - 'WIDGET_*' constant.
+	 * @param array  $fields
 	 *
 	 * @return bool
 	 */
-	public static function usesTimeSelector(array $widget) {
-		switch ($widget['type']) {
+	public static function usesTimeSelector(string $type, array $fields): bool {
+		switch ($type) {
 			case WIDGET_GRAPH:
 			case WIDGET_GRAPH_PROTOTYPE:
 				return true;
 
 			case WIDGET_SVG_GRAPH:
-				return !CWidgetFormSvgGraph::hasOverrideTime($widget['fields']);
+				return !CWidgetFormSvgGraph::hasOverrideTime($fields);
 
 			default:
 				return false;
@@ -279,7 +322,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	public static function isIterator($type) {
+	public static function isIterator(string $type): bool {
 		switch ($type) {
 			case WIDGET_GRAPH_PROTOTYPE:
 				return true;
@@ -290,13 +333,13 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Detect if widget dialogue should be sticked to top instead of being centered vertically.
+	 * Check if widget dialogue should be sticked to top instead of being centered vertically.
 	 *
 	 * @param string $type  Widget type - 'WIDGET_*' constant.
 	 *
 	 * @return bool
 	 */
-	public static function getDialogueStickToTop($type) {
+	public static function getDialogueStickToTop(string $type): bool {
 		switch ($type) {
 			case WIDGET_SVG_GRAPH:
 				return true;
@@ -307,7 +350,7 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Detect if widget has padding or not
+	 * Check if widget has padding or not.
 	 *
 	 * @static
 	 *
@@ -317,7 +360,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	private static function hasPadding($type, $fields, $view_mode) {
+	private static function hasPadding(string $type, array $fields, int $view_mode): bool {
 		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
 			switch ($type) {
 				case WIDGET_CLOCK:
@@ -357,14 +400,14 @@ class CWidgetConfig {
 	 *
 	 * @return array
 	 */
-	public static function getConfiguration($type, $fields, $view_mode) {
+	public static function getConfiguration(string $type, array $fields, int $view_mode): array {
 		return [
 			'padding' => self::hasPadding($type, $fields, $view_mode)
 		];
 	}
 
 	/**
-	 * Return Form object for widget with provided data.
+	 * Get Form object for widget with provided data.
 	 *
 	 * @static
 	 *
@@ -374,7 +417,7 @@ class CWidgetConfig {
 	 *
 	 * @return CWidgetForm
 	 */
-	public static function getForm($type, $data, $templateid) {
+	public static function getForm(string $type, string $data, ?string $templateid): CWidgetForm {
 		switch ($type) {
 			case WIDGET_ACTION_LOG:
 				return new CWidgetFormActionLog($data, $templateid);
