@@ -195,7 +195,13 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 				'type' => 15,
 				'value_type' => 0,
 				'delay' => '50s',
-				'params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)'
+				'params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)',
+				'tags'=> [
+					[
+						'tag'=> 'Item_tag_name',
+						'value'=> 'Item_tag_value'
+					]
+				]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -204,7 +210,17 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 				'type' => 15,
 				'value_type' => 0,
 				'delay' => '30s',
-				'params' => 'sum("Zabbix Server:zabbix[wcache,values]",900)'
+				'params' => 'sum("Zabbix Server:zabbix[wcache,values]",900)',
+				'tags'=> [
+					[
+						'tag'=> 'Item_tag_name_1',
+						'value'=> 'Item_tag_value_1'
+					],
+					[
+						'tag'=> 'Item_tag_name_2',
+						'value'=> 'Item_tag_value_2'
+					]
+				]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -276,18 +292,24 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 	/**
 	 * Add items with preprocessing for mass updating.
 	 */
-	public function prepareItemPreprocessingData() {
+	public function prepareItemTagsPreprocessingData() {
 		CDataHelper::setSessionId(null);
 
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => self::HOSTID,
-				'name' => '1_Item_Preprocessing',
+				'name' => '1_Item_Tags_Preprocessing',
 				'key_' => '1agent.preproc',
 				'type' => 0,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '1m',
+				'tags'=> [
+					[
+						'tag'=> 'old_tag_1',
+						'value'=> 'old_value_1'
+					]
+				],
 				'preprocessing' => [
 					[
 						'type' => '4',
@@ -305,12 +327,22 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
-				'name' => '2_Item_Preprocessing',
+				'name' => '2_Item_Tags_Preprocessing',
 				'key_' => '2agent.preproc',
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'old_tag_2',
+						'value'=> 'old_value_2'
+					],
+					[
+						'tag'=> 'old_tag_3',
+						'value'=> 'old_value_3'
+					]
+				],
 				'preprocessing' => [
 					[
 						'type' => '5',
@@ -328,7 +360,7 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
-				'name' => '1_Item_No_Preprocessing',
+				'name' => '1_Item_No_Tags_Preprocessing',
 				'key_' => '1agent.no.preproc',
 				'type' => 0,
 				'value_type' => 0,
@@ -337,21 +369,113 @@ class testPageMassUpdateItems extends testMassUpdateItems{
 			],
 			[
 				'hostid' => self::HOSTID,
-				'name' => '2_Item_No_Preprocessing',
+				'name' => '2_Item_No_Tags_Preprocessing',
 				'key_' => '2agent.no.preproc',
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '2m'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '1_Item_Tags_replace',
+				'key_' => '1agent.tags.replace',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'Replace_tag_1',
+						'value'=> 'replace_value_1'
+					],
+					[
+						'tag'=> 'Replace_tag_2',
+						'value'=> 'Replace_value_2'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '2_Item_Tags_replace',
+				'key_' => '2agent.tags.replace',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'Replace_tag_3',
+						'value'=> 'Replace_value_3'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '1_Item_Tags_remove',
+				'key_' => '1agent.tags.remove',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'remove_tag_1',
+						'value'=> 'remove_value_1'
+					],
+					[
+						'tag'=> 'remove_tag_2',
+						'value'=> 'remove_value_2'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '2_Item_Tags_remove',
+				'key_' => '2agent.tags.remove',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'remove_tag_2',
+						'value'=> 'remove_value_2'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'name' => '3_Item_Tags_remove',
+				'key_' => '3agent.tags.remove',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'remove_tag_3',
+						'value'=> 'remove_value_3'
+					]
+				]
 			]
 		]);
 	}
 
 	/**
-	 * @on-before-once prepareItemPreprocessingData
+	 * @on-before-once prepareItemTagsPreprocessingData
 	 */
 	public function testPageMassUpdateItems_Cancel() {
 		$this->executeMassUpdateCancel();
+	}
+
+	/**
+	 * @dataProvider getCommonTagsChangeData
+	 *
+	 * @depends testPageMassUpdateItems_Cancel
+	 */
+	public function testPageMassUpdateItems_ChangeTags($data) {
+		$this->executeItemsTagsMassUpdate($data);
 	}
 
 	/**

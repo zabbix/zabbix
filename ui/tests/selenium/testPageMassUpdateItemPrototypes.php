@@ -210,7 +210,13 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'type' => 15,
 				'value_type' => 0,
 				'delay' => '50s',
-				'params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)'
+				'params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)',
+				'tags'=> [
+					[
+						'tag'=> 'Item_tag_name',
+						'value'=> 'Item_tag_value'
+					]
+				]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -220,7 +226,17 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'type' => 15,
 				'value_type' => 0,
 				'delay' => '30s',
-				'params' => 'sum("Zabbix Server:zabbix[wcache,values]",900)'
+				'params' => 'sum("Zabbix Server:zabbix[wcache,values]",900)',
+				'tags'=> [
+					[
+						'tag'=> 'Item_tag_name_1',
+						'value'=> 'Item_tag_value_1'
+					],
+					[
+						'tag'=> 'Item_tag_name_2',
+						'value'=> 'Item_tag_value_2'
+					]
+				]
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -279,31 +295,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 						'Discover' => ['id' => 'discover', 'value' => 'Yes']
 					]
 				]
-			],
-//			[
-//				[
-//					'names'=> [
-//						'3_SNMP_trap',
-//						'3_SNMP_trap'
-//					],
-//					'change' => [
-//						'Type' => ['id' => 'type', 'value' => 'SNMP trap'],
-//						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'names'=> [
-//						'9_SNMP_Agent',
-//						'10_SNMP_Agent'
-//					],
-//					'change' => [
-//						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
-//						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
-//					]
-//				]
-//			]
+			]
 		];
 	}
 
@@ -320,19 +312,25 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 	/**
 	 * Add items with preprocessing for mass updating.
 	 */
-	public function prepareItemPrototypePreprocessingData() {
+	public function prepareItemPrototypeTagsPreprocessingData() {
 		CDataHelper::setSessionId(null);
 
 		CDataHelper::call('itemprototype.create', [
 			[
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
-				'name' => '1_Item_Preprocessing',
+				'name' => '1_Item_Tags_Preprocessing',
 				'key_' => '1agent.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '1m',
+				'tags'=> [
+					[
+						'tag'=> 'old_tag_1',
+						'value'=> 'old_value_1'
+					]
+				],
 				'preprocessing' => [
 					[
 						'type' => '4',
@@ -351,13 +349,22 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 			[
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
-				'name' => '2_Item_Preprocessing',
+				'name' => '2_Item_Tags_Preprocessing',
 				'key_' => '2agent.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '2m',
-				'applications' => [5000, 5001],
+				'tags'=> [
+					[
+						'tag'=> 'old_tag_2',
+						'value'=> 'old_value_2'
+					],
+					[
+						'tag'=> 'old_tag_3',
+						'value'=> 'old_value_3'
+					]
+				],
 				'preprocessing' => [
 					[
 						'type' => '5',
@@ -376,7 +383,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 			[
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
-				'name' => '1_Item_No_Preprocessing',
+				'name' => '1_Item_No_Tags_Preprocessing',
 				'key_' => '1agent.no.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 0,
@@ -386,21 +393,118 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 			[
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
-				'name' => '2_Item_No_Preprocessing',
+				'name' => '2_Item_No_Tags_Preprocessing',
 				'key_' => '2agent.no.preproc[{#KEY}]',
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid'=> self::AGENT_INTERFACE_ID,
 				'delay' => '2m'
+			],
+			[
+				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
+				'name' => '1_Item_Tags_replace',
+				'key_' => '1agent.tags.replace[{#KEY}]',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'Replace_tag_1',
+						'value'=> 'replace_value_1'
+					],
+					[
+						'tag'=> 'Replace_tag_2',
+						'value'=> 'Replace_value_2'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
+				'name' => '2_Item_Tags_replace',
+				'key_' => '2agent.tags.replace[{#KEY}]',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'Replace_tag_3',
+						'value'=> 'Replace_value_3'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
+				'name' => '1_Item_Tags_remove',
+				'key_' => '1agent.tags.remove[{#KEY}]',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'remove_tag_1',
+						'value'=> 'remove_value_1'
+					],
+					[
+						'tag'=> 'remove_tag_2',
+						'value'=> 'remove_value_2'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
+				'name' => '2_Item_Tags_remove',
+				'key_' => '2agent.tags.remove[{#KEY}]',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'remove_tag_2',
+						'value'=> 'remove_value_2'
+					]
+				]
+			],
+			[
+				'hostid' => self::HOSTID,
+				'ruleid' => self::RULEID,
+				'name' => '3_Item_Tags_remove',
+				'key_' => '3agent.tags.remove[{#KEY}]',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid'=> self::AGENT_INTERFACE_ID,
+				'delay' => '2m',
+				'tags'=> [
+					[
+						'tag'=> 'remove_tag_3',
+						'value'=> 'remove_value_3'
+					]
+				]
 			]
 		]);
 	}
 
 	/**
-	 * @on-before-once prepareItemPrototypePreprocessingData
+	 * @on-before-once prepareItemPrototypeTagsPreprocessingData
 	 */
 	public function testPageMassUpdateItemPrototypes_Cancel() {
 		$this->executeMassUpdateCancel(true);
+	}
+
+	/**
+	 * @dataProvider getCommonTagsChangeData
+	 *
+	 * @depends testPageMassUpdateItemPrototypes_Cancel
+	 */
+	public function testPageMassUpdateItemPrototypes_ChangeTags($data) {
+		$this->executeItemsTagsMassUpdate($data, true);
 	}
 
 	/**

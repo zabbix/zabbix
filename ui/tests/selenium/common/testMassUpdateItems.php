@@ -1123,6 +1123,23 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Database monitor'],
 						'User name' => ['id' => 'username', 'value' => 'db_monitor_name'],
 						'Password' => ['id' => 'password', 'value' => 'db_monitor_password']
+					],
+					'expected_preprocessing' => [
+						'13_DB_Monitor' => [
+							[
+								'type' => 'Regular expression',
+								'parameter_1' => 'regular expression pattern',
+								'parameter_2' => 'output template',
+								'error_handler' => 'Set value to',
+								'error_handler_params' => 'Error custom value'
+							]
+						],
+						'14_DB_Monitor' => [
+									[
+								'type' => 'Custom multiplier',
+								'parameter_1' => '2'
+							]
+						]
 					]
 				]
 			],
@@ -1160,6 +1177,24 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
 						'Master item'=> ['id' => 'master_item', 'value' => '7_IPMI'],
+					],
+					'expected_tags' => [
+						'15_Calculated' => [
+							[
+								'tag'=> 'Item_tag_name',
+								'value'=> 'Item_tag_value'
+							]
+						],
+						'16_Calculated' =>[
+							[
+								'tag'=> 'Item_tag_name_1',
+								'value'=> 'Item_tag_value_1'
+							],
+							[
+								'tag'=> 'Item_tag_name_2',
+								'value'=> 'Item_tag_value_2'
+							]
+						]
 					]
 				]
 			]
@@ -1361,27 +1396,15 @@ class testMassUpdateItems extends CWebTest{
 				}
 
 				// Check that preprocessing is not changed after other fields are mass updated.
-				if ($name === '13_DB_Monitor') {
+				if (CTestArrayHelper::get($data, 'expected_preprocessing')) {
 					$form->selectTab('Preprocessing');
-					$this->assertPreprocessingSteps([
-						[
-							'type' => 'Regular expression',
-							'parameter_1' => 'regular expression pattern',
-							'parameter_2' => 'output template',
-							'error_handler' => 'Set value to',
-							'error_handler_params' => 'Error custom value'
-						]
-					]);
+					$this->assertPreprocessingSteps($data['expected_preprocessing'][$name]);
 				}
 
-				if ($name === '14_DB_Monitor') {
-					$form->selectTab('Preprocessing');
-					$this->assertPreprocessingSteps([
-						[
-							'type' => 'Custom multiplier',
-							'parameter_1' => '2'
-						]
-					]);
+				// Check that tags are not changed after other fields are mass updated.
+				if (CTestArrayHelper::get($data, 'expected_tags')) {
+					$form->selectTab('Tags');
+					$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($data['expected_tags'][$name]);
 				}
 
 				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
@@ -1470,8 +1493,8 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names'=> [
-						'1_Item_Preprocessing',
-						'1_Item_No_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'1_Item_No_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						['type' => 'Custom multiplier', 'parameter_1' => 'abc']
@@ -1483,8 +1506,8 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names'=> [
-						'1_Item_Preprocessing',
-						'1_Item_No_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'1_Item_No_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						['type' => 'Simple change'],
@@ -1497,8 +1520,8 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names'=> [
-						'1_Item_Preprocessing',
-						'1_Item_No_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'1_Item_No_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
@@ -1510,8 +1533,8 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names'=> [
-						'1_Item_Preprocessing',
-						'1_Item_No_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'1_Item_No_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						['type' => 'Check for error using regular expression', 'parameter_1' => 'test']
@@ -1523,8 +1546,8 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names'=> [
-						'1_Item_Preprocessing',
-						'1_Item_No_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'1_Item_No_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						['type' => 'Discard unchanged'],
@@ -1537,8 +1560,8 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names'=> [
-						'1_Item_Preprocessing',
-						'1_Item_No_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'1_Item_No_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						['type' => 'Regular expression']
@@ -1550,8 +1573,8 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names'=> [
-						'2_Item_Preprocessing',
-						'2_Item_No_Preprocessing'
+						'2_Item_Tags_Preprocessing',
+						'2_Item_No_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						[
@@ -1567,8 +1590,8 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'names'=> [
-						'1_Item_Preprocessing',
-						'2_Item_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'2_Item_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => []
 				]
@@ -1576,8 +1599,8 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'names'=> [
-						'1_Item_Preprocessing',
-						'1_Item_No_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'1_Item_No_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						[
@@ -1610,8 +1633,8 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'names'=> [
-						'1_Item_Preprocessing',
-						'2_Item_Preprocessing'
+						'1_Item_Tags_Preprocessing',
+						'2_Item_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
 						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
@@ -1677,6 +1700,463 @@ class testMassUpdateItems extends CWebTest{
 		}
 	}
 
+	public function getCommonTagsChangeData() {
+		return [
+			/*
+			// Empty tag name.
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item_Tags_Preprocessing',
+						'1_Item_No_Tags_Preprocessing'
+					],
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'value' => 'value1'
+						]
+					],
+					'details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+				]
+			],
+			// Equal tags.
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'2_Item_Tags_Preprocessing',
+						'2_Item_No_Tags_Preprocessing'
+					],
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => 'tag',
+							'value' => 'value'
+						],
+						[
+							'tag' => 'tag',
+							'value' => 'value'
+						]
+					],
+					'details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
+				]
+			],
+			*/
+			[
+				[
+					'names'=> [
+						'1_Item_Tags_Preprocessing',
+						'2_Item_Tags_Preprocessing'
+					],
+					'Tags' => [
+						'action' => 'Add',
+						'tags' => []
+					],
+					'expected_tags' => [
+						'1_Item_Tags_Preprocessing' => [
+							[
+								'tag'=> 'old_tag_1',
+								'value'=> 'old_value_1'
+							]
+						],
+						'2_Item_Tags_Preprocessing' => [
+							[
+								'tag'=> 'old_tag_2',
+								'value'=> 'old_value_2'
+							],
+							[
+								'tag'=> 'old_tag_3',
+								'value'=> 'old_value_3'
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item_Tags_Preprocessing',
+						'2_Item_Tags_Preprocessing'
+					],
+					'Tags' => [
+						'action' => 'Add',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag'=> 'added_tag_1',
+								'value'=> 'added_value_1'
+							]
+						]
+					],
+					'expected_tags' => [
+						'1_Item_Tags_Preprocessing' => [
+							[
+								'tag'=> 'added_tag_1',
+								'value'=> 'added_value_1'
+							],
+							[
+								'tag'=> 'old_tag_1',
+								'value'=> 'old_value_1'
+							]
+						],
+						'2_Item_Tags_Preprocessing' => [
+							[
+								'tag'=> 'added_tag_1',
+								'value'=> 'added_value_1'
+							],
+							[
+								'tag'=> 'old_tag_2',
+								'value'=> 'old_value_2'
+							],
+							[
+								'tag'=> 'old_tag_3',
+								'value'=> 'old_value_3'
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item_Tags_replace',
+						'2_Item_Tags_replace'
+					],
+					'Tags' => [
+						'action' => 'Replace',
+						'tags' => []
+					],
+					'expected_tags' => [
+						'1_Item_Tags_replace' => [
+							[
+								'tag'=> '',
+								'value'=> ''
+							]
+						],
+						'2_Item_Tags_replace' => [
+							[
+								'tag'=> '',
+								'value'=> ''
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item_Tags_replace',
+						'2_Item_Tags_replace'
+					],
+					'Tags' => [
+						'action' => 'Replace',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag'=> 'replaced_tag',
+								'value'=> 'replaced_value'
+							]
+						]
+					],
+					'expected_tags' => [
+						'1_Item_Tags_replace' => [
+							[
+								'tag'=> 'replaced_tag',
+								'value'=> 'replaced_value'
+							]
+						],
+						'2_Item_Tags_replace' => [
+							[
+								'tag'=> 'replaced_tag',
+								'value'=> 'replaced_value'
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item_Tags_remove',
+						'2_Item_Tags_remove'
+					],
+					'Tags' => [
+						'action' => 'Remove',
+						'tags' => [
+							[
+								'tag'=> '',
+								'value'=> ''
+							]
+						]
+					],
+					'expected_tags' => [
+						'1_Item_Tags_remove' => [
+							[
+								'tag'=> 'remove_tag_1',
+								'value'=> 'remove_value_1'
+							],
+							[
+								'tag'=> 'remove_tag_2',
+								'value'=> 'remove_value_2'
+							]
+						],
+						'2_Item_Tags_remove' => [
+							[
+								'tag'=> 'remove_tag_2',
+								'value'=> 'remove_value_2'
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'names'=> [
+						'1_Item_Tags_remove',
+						'2_Item_Tags_remove',
+						'3_Item_Tags_remove'
+					],
+					'Tags' => [
+						'action' => 'Remove',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag'=> 'remove_tag_2',
+								'value'=> 'remove_value_2'
+							]
+						]
+					],
+					'expected_tags' => [
+						'1_Item_Tags_remove' => [
+							[
+								'tag'=> 'remove_tag_1',
+								'value'=> 'remove_value_1'
+							]
+						],
+						'2_Item_Tags_remove' => [
+							[
+								'tag'=> '',
+								'value'=> ''
+							]
+						],
+						'3_Item_Tags_remove' => [
+							[
+								'tag'=> 'remove_tag_3',
+								'value'=> 'remove_value_3'
+							]
+						]
+					]
+				]
+			],
+			// Different symbols in tag names and values.
+			[
+				[
+					'names'=> [
+						'1_Item_No_Tags_Preprocessing',
+						'2_Item_No_Tags_Preprocessing'
+					],
+					'Tags' => [
+						'action' => 'Add',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => '!@#$%^&*()_+<>,.\/',
+								'value' => '!@#$%^&*()_+<>,.\/'
+							],
+							[
+								'tag' => 'tag1',
+								'value' => 'value1'
+							],
+//							[
+//								'tag' => 'tag2'
+//							],
+							[
+								'tag' => '{$MACRO:A}',
+								'value' => '{$MACRO:A}'
+							],
+							[
+								'tag' => '{$MACRO}',
+								'value' => '{$MACRO}'
+							],
+							[
+								'tag' => 'Таг',
+								'value' => 'Значение'
+							]
+						]
+					]
+				]
+			],
+			// Two tags with equal tag names.
+			[
+				[
+					'names'=> [
+						'1_Item_No_Tags_Preprocessing',
+						'2_Item_No_Tags_Preprocessing'
+					],
+					'Tags' => [
+						'action' => 'Replace',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => 'tag3',
+								'value' => '3'
+							],
+							[
+								'tag' => 'tag3',
+								'value' => '4'
+							]
+						]
+					]
+				]
+			],
+			// Two tags with equal tag values.
+			[
+				[
+					'names'=> [
+						'1_Item_No_Tags_Preprocessing',
+						'2_Item_No_Tags_Preprocessing'
+					],
+					'Tags' => [
+						'action' => 'Replace',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => 'tag4',
+								'value' => '5'
+							],
+							[
+								'tag' => 'tag5',
+								'value' => '5'
+							]
+						]
+					]
+				]
+			],
+			// Tag with trailing spaces.
+//			[
+//				[
+//					'names'=> [
+//						'1_Item_No_Tags_Preprocessing',
+//						'2_Item_No_Tags_Preprocessing'
+//					],
+//					'Tags' => [
+//						'action' => 'Replace',
+//						'tags' => [
+//							[
+//								'action' => USER_ACTION_UPDATE,
+//								'index' => 0,
+//								'tag' => '    trimmed tag    ',
+//								'value' => '   trimmed value    '
+//							]
+//						]
+//					],
+//					'trim' => true
+//				]
+//			],
+			// Tag with long name and value.
+			[
+				[
+					'names'=> [
+						'1_Item_No_Tags_Preprocessing',
+						'2_Item_No_Tags_Preprocessing'
+					],
+					'Tags' => [
+						'action' => 'Replace',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => 'Long tag name. Long tag name. Long tag name. Long tag name. Long tag name.'.
+										' Long tag name. Long tag name. Long tag name.',
+								'value' => 'Long tag value. Long tag value. Long tag value. Long tag value. Long tag value.'.
+										' Long tag value. Long tag value. Long tag value. Long tag value.'
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Mass update of items or item prototypes tags.
+	 *
+	 * @param    array      $data	      data provider
+	 * @param    boolean    $prototypes   true if item prototype, false if item
+	 */
+	public function executeItemsTagsMassUpdate($data, $prototypes = false) {
+		$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
+
+		$dialog = $this->openMassUpdateForm($prototypes, $data['names']);
+		$form = $dialog->asForm();
+		$form->selectTab('Tags');
+		$form->getLabel('Tags')->click();
+
+		$form->query('id:mass_update_tags')->asSegmentedRadio()->one()->fill($data['Tags']['action']);
+
+		if ($data['Tags']['tags'] !== []) {
+			$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['Tags']['tags']);
+		}
+
+		$dialog->query('button:Update')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$error = ($prototypes) ? 'Cannot update item prototypes' : 'Cannot update items';
+			$this->assertMessage(TEST_BAD, $error, $data['details']);
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, (($prototypes) ? 'Item prototypes updated' : 'Items updated'));
+
+			// Check changed fields in saved item form.
+			foreach ($data['names'] as $name) {
+				$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
+				$table->query('link', $name)->one()->waitUntilClickable()->click();
+				$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+				$form->selectTab('Tags');
+
+				$expected = $data['Tags']['tags'];
+				if (!array_key_exists('expected_tags', $data)) {
+					// Remove action and index fields for asserting expected result.
+					foreach ($expected as &$tag) {
+						unset($tag['action'], $tag['index']);
+
+						if (CTestArrayHelper::get($data, 'trim', false) === false) {
+							continue;
+						}
+
+						// Remove trailing spaces from tag and value for asserting expected result.
+						foreach ($expected as $i => &$options) {
+							foreach (['tag', 'value'] as $parameter) {
+								if (array_key_exists($parameter, $options)) {
+									$options[$parameter] = trim($options[$parameter]);
+								}
+							}
+						}
+						unset($options);
+					}
+					unset($tag);
+				}
+
+				$expected_tags = (array_key_exists('expected_tags', $data)) ? $data['expected_tags'][$name] : $expected;
+				$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
+
+				$form->query('button:Cancel')->one()->waitUntilClickable()->click();
+				$this->page->waitUntilReady();
+			}
+		}
+	}
+
 	/**
 	 * Cancel Mass updating of items or item prototypes.
 	 *
@@ -1686,10 +2166,10 @@ class testMassUpdateItems extends CWebTest{
 		$old_hash = CDBHelper::getHash('SELECT * FROM items ORDER BY itemid');
 
 		$items  = [
-			'1_Item_Preprocessing',
-			'2_Item_Preprocessing',
-			'1_Item_No_Preprocessing',
-			'2_Item_No_Preprocessing'
+			'1_Item_Tags_Preprocessing',
+			'2_Item_Tags_Preprocessing',
+			'1_Item_No_Tags_Preprocessing',
+			'2_Item_No_Tags_Preprocessing'
 		];
 		$dialog = $this->openMassUpdateForm($prototypes, $items);
 		$dialog->query('button:Cancel')->one()->waitUntilClickable()->click();
