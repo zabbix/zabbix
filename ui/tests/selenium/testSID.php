@@ -743,7 +743,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'other' => true,
-					'link' => 'zabbix.php?action=valuemap.edit'
+					'link' => 'zabbix.php?action=workingtime.edit'
 				]
 			],
 
