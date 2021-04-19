@@ -1434,4 +1434,18 @@ in:
   expression: 'rand(1)'
 out:
   result: FAIL
+---
+test case: Expression 'power(10,400)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'power(10,400)'
+out:
+  result: FAIL
+---
+test case: Expression 'power(10,300)*power(10,300)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'power(10,300)*power(10,300)'
+out:
+  result: FAIL
 ...

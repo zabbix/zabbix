@@ -296,14 +296,6 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 
 	/* check logical operators */
 
-	if ((FP_ZERO != fpclassify(left->data.dbl) && FP_NORMAL != fpclassify(left->data.dbl)) ||
-			(FP_ZERO != fpclassify(right->data.dbl) && FP_NORMAL != fpclassify(right->data.dbl)))
-	{
-		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
-				ctx->expression + ctx->stack.values[ctx->stack.values_num - 3].loc.l);
-		return FAIL;
-	}
-
 	switch (token->type)
 	{
 		case ZBX_EVAL_TOKEN_OP_AND:
@@ -361,6 +353,14 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 			value = left->data.dbl / right->data.dbl;
 			break;
 	}
+
+	if (FP_ZERO != fpclassify(value) && FP_NORMAL != fpclassify(value))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
 finish:
 	zbx_variant_clear(left);
 	zbx_variant_clear(right);
