@@ -95,13 +95,6 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
 		return FAIL;
 	}
 
-	if (FP_ZERO != fpclassify(right->data.dbl) && FP_NORMAL != fpclassify(right->data.dbl))
-	{
-		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
-
 	switch (token->type)
 	{
 		case ZBX_EVAL_TOKEN_OP_MINUS:
@@ -115,6 +108,13 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
 			*error = zbx_dsprintf(*error, "unknown unary operator at \"%s\"",
 					ctx->expression + token->loc.l);
 			return FAIL;
+	}
+
+	if (FP_ZERO != fpclassify(value) && FP_NORMAL != fpclassify(value))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
 	}
 
 	zbx_variant_clear(right);
