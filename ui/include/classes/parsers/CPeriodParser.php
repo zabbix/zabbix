@@ -25,6 +25,18 @@
 class CPeriodParser extends CParser {
 
 	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'lldmacros' => true    Enable low-level discovery macros usage in trigger expression.
+	 *
+	 * @var array
+	 */
+	protected $options = [
+		'lldmacros' => true
+	];
+
+	/**
 	 * User macro parser.
 	 *
 	 * @var CUserMacroParser
@@ -39,6 +51,13 @@ class CPeriodParser extends CParser {
 	private $lld_macro_parser;
 
 	/**
+	 * LLD macro function parser.
+	 *
+	 * @var CLLDMacroFunctionParser
+	 */
+	private $lld_macro_function_parser;
+
+	/**
 	 * Parsed data.
 	 *
 	 * @var CPeriodParserResult
@@ -47,10 +66,16 @@ class CPeriodParser extends CParser {
 
 	/**
 	 * @param array $options
+	 * @param bool  $options['lldmacros']
 	 */
-	public function __construct() {
+	public function __construct(array $options) {
+		$this->options = $options + $this->options;
+
 		$this->user_macro_parser = new CUserMacroParser();
-		$this->lld_macro_parser = new CLLDMacroParser();
+		if ($this->options['lldmacros']) {
+			$this->lld_macro_parser = new CLLDMacroParser();
+			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
+		}
 	}
 
 	/**
@@ -86,7 +111,15 @@ class CPeriodParser extends CParser {
 				$parts[$num] .= $this->user_macro_parser->match;
 				$contains_macros[$num] = true;
 			}
-			elseif ($this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
+			elseif ($this->options['lldmacros']
+					&& $this->lld_macro_function_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
+				$pos += $this->lld_macro_function_parser->length;
+				$parts[$num] .= $this->lld_macro_function_parser->match;
+				$contains_macros[$num] = true;
+				//$pos += $this->lld_macro_function_parser->getLength() - 1;
+			}
+			elseif ($this->options['lldmacros']
+					&& $this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
 				$pos += $this->lld_macro_parser->length;
 				$parts[$num] .= $this->lld_macro_parser->match;
 				$contains_macros[$num] = true;

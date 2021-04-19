@@ -24,6 +24,10 @@ require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
+//$x = new C52TriggerExpressionConverter();
+//sdii($x->convert(['expression' => '{t:ip.count(5m,,,"{{#M}.regsub(\"^([0-9]+)\", \"\1\")}")}=0']));
+//exit;
+
 $page['title'] = _('ZABBIX');
 $page['file'] = 'index.php';
 
