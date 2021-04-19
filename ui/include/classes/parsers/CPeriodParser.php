@@ -28,34 +28,15 @@ class CPeriodParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'lldmacros' => true    Enable low-level discovery macros usage in trigger expression.
+	 *   'usermacros' => false   Enable user macros usage in the periods.
+	 *   'lldmacros' => false    Enable low-level discovery macros usage in the periods.
 	 *
 	 * @var array
 	 */
 	protected $options = [
-		'lldmacros' => true
+		'usermacros' => false,
+		'lldmacros' => false
 	];
-
-	/**
-	 * User macro parser.
-	 *
-	 * @var CUserMacroParser
-	 */
-	private $user_macro_parser;
-
-	/**
-	 * LLD macro parser.
-	 *
-	 * @var CLLDMacroParser
-	 */
-	private $lld_macro_parser;
-
-	/**
-	 * LLD macro function parser.
-	 *
-	 * @var CLLDMacroFunctionParser
-	 */
-	private $lld_macro_function_parser;
 
 	/**
 	 * Parsed data.
@@ -71,11 +52,15 @@ class CPeriodParser extends CParser {
 	public function __construct(array $options) {
 		$this->options = $options + $this->options;
 
-		$this->user_macro_parser = new CUserMacroParser();
-		if ($this->options['lldmacros']) {
-			$this->lld_macro_parser = new CLLDMacroParser();
-			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
-		}
+		$this->simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros'],
+			'with_year' => true
+		]);
+		$this->relative_time_parser = new CRelativeTimeParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros']
+		]);
 	}
 
 	/**
@@ -87,83 +72,40 @@ class CPeriodParser extends CParser {
 	 * @return int
 	 */
 	public function parse($source, $pos = 0): int {
-		$start_pos = $pos;
-		$break_chars = [',', ')'];
-		$parts = [
-			0 => ''
-		];
-		$contains_macros = [
-			0 => ''
-		];
-		$num = 0;
+		$p = $pos;
+		$sec_num = '';
+		$time_shift = '';
 
-		while (isset($source[$pos])) {
-			if (in_array($source[$pos], $break_chars)) {
-				break;
-			}
-			elseif ($source[$pos] === ':') {
-				$parts[++$num] = '';
-				$contains_macros[$num] = '';
-				$pos++;
-			}
-			elseif ($this->user_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
-				$pos += $this->user_macro_parser->length;
-				$parts[$num] .= $this->user_macro_parser->match;
-				$contains_macros[$num] = $this->user_macro_parser->match;
-			}
-			elseif ($this->options['lldmacros']
-					&& $this->lld_macro_function_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
-				$pos += $this->lld_macro_function_parser->length;
-				$parts[$num] .= $this->lld_macro_function_parser->match;
-				$contains_macros[$num] = $this->lld_macro_function_parser->match;
-			}
-			elseif ($this->options['lldmacros']
-					&& $this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
-				$pos += $this->lld_macro_parser->length;
-				$parts[$num] .= $this->lld_macro_parser->match;
-				$contains_macros[$num] = $this->lld_macro_parser->match;
-			}
-			else {
-				$parts[$num] .= $source[$pos];
-				$pos++;
+		if (preg_match('/^#[0-9]+/', substr($source, $p), $matches)) {
+			$sec_num = $matches[0];
+			$p += strlen($matches[0]);
+		}
+		elseif ($this->simple_interval_parser->parse($source, $p) !== self::PARSE_FAIL) {
+			$sec_num = $this->simple_interval_parser->match;
+			$p += $this->simple_interval_parser->length;
+		}
+		else {
+			return self::PARSE_FAIL;
+		}
+
+		if (isset($source[$p]) && $source[$p] === ':') {
+			if ($this->relative_time_parser->parse($source, $p + 1) !== self::PARSE_FAIL) {
+				$time_shift = $this->relative_time_parser->match;
+				$p += $this->relative_time_parser->length + 1;
 			}
 		}
 
-		// Valid period consists of 1 or 2 non-empty parts.
-		if (count($parts) > 2 || $parts[0] === '' || (array_key_exists(1, $parts) && $parts[1] === '')) {
-			return CParser::PARSE_FAIL;
-		}
-
-		// First part can contain only raw value or single macro but not mixed raw value and macro.
-		if ($contains_macros[0] && $contains_macros[0] !== $parts[0]) {
-			return CParser::PARSE_FAIL;
-		}
-
-		// Second part can contain macro only at the end. E.g., now-{$TWO_WEEKS}
-		if (array_key_exists(1, $contains_macros) && $contains_macros[1] !== ''
-				&& substr($parts[1], strlen($contains_macros[1]) * -1) !== $contains_macros[1]) {
-			return CParser::PARSE_FAIL;
-		}
-
-		// Check format. Otherwise, almost anything can be period.
-		$is_valid_num = (substr($parts[0], 0, 1) === '#' && ctype_digit(substr($parts[0], 1)));
-		$is_valid_sec = preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.ZBX_TIME_SUFFIXES_WITH_YEAR.'])$/', $parts[0]);
-		if (!$is_valid_num && !$is_valid_sec && !$contains_macros[0]) {
-			return CParser::PARSE_FAIL;
-		}
+		$this->length = $p - $pos;
 
 		$this->result = new CPeriodParserResult();
-		$this->length = $pos - $start_pos;
-		$this->result->match = substr($source, $start_pos, $this->length);
-		$this->result->sec_num = $parts[0];
-		$this->result->time_shift = (array_key_exists(1, $parts) && $parts[1] !== '') ? $parts[1] : null;
-		$this->result->sec_num_contains_macros = ($contains_macros[0] !== '');
-		$this->result->time_shift_contains_macros = array_key_exists(1, $contains_macros)
-			? (bool) ($contains_macros[1] !== '')
-			: false;
+		$this->result->match = substr($source, $pos, $this->length);
+		$this->result->sec_num = $sec_num;
+		$this->result->time_shift = $time_shift;
+		$this->result->sec_num_contains_macros = (strpos($sec_num, '{') !== false);
+		$this->result->time_shift_contains_macros = (strpos($time_shift, '{') !== false);
 		$this->result->length = $this->length;
-		$this->result->pos = $start_pos;
+		$this->result->pos = $pos;
 
-		return isset($source[$pos]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 }

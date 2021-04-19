@@ -155,7 +155,7 @@ class CFunctionParser extends CParser {
 		$num = 0;
 
 		$query_parser = new CQueryParser($this->options);
-		$period_parser = new CPeriodParser(['lldmacros' => $this->options['lldmacros']]);
+		$period_parser = new CPeriodParser(['usermacros' => true, 'lldmacros' => $this->options['lldmacros']]);
 		$user_macro_parser = new CUserMacroParser();
 		if ($this->options['lldmacros']) {
 			$lld_macro_parser = new CLLDMacroParser();
