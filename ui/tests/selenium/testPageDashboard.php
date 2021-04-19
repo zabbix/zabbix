@@ -71,8 +71,8 @@ class testPageDashboard extends CLegacyWebTest {
 				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No maps added.');
 				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[5]//tr[@class='nothing-to-show']/td", 'No data found.');
 			}
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favourite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Favourite maps');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite graphs');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Favorite maps');
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[5]//h4", 'Problems');
 			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Problems by severity']");
 			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Local']");
@@ -164,7 +164,7 @@ class testPageDashboard extends CLegacyWebTest {
 
 	public function testPageDashboard_RemoveFavouriteMaps() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
-		$widget_content = CDashboardElement::find()->one()->getWidget('Favourite maps')->getContent();
+		$widget_content = CDashboardElement::find()->one()->getWidget('Favorite maps')->getContent();
 		$favourite_maps = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.
 				zbx_dbstr('web.favorite.sysmapids')));
 

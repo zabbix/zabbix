@@ -105,7 +105,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						'Base DN' => 'dc=example,dc=com',
 						'Search attribute' => 'uid',
 						'Bind DN' => 'cn=read-only-admin,dc=example,dc=com',
-						'Case sensitive login' => true,
+						'Case-sensitive login' => true,
 						'Bind password' => 'password',
 						'Login' => 'galieleo',
 						'User password' => 'password'
