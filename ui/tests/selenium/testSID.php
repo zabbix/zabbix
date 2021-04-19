@@ -648,4 +648,369 @@ class testSID extends CWebTest {
 			}
 		}
 	}
+
+	public static function getElementRemoveData() {
+		return [
+			// Map creation.
+			[['link' => 'sysmaps.php?form=Create+map']],
+
+			// Map update.
+			[['link' => 'sysmaps.php?form=update&sysmapid=3']],
+
+			// Host groups creation.
+			[['link' => 'hostgroups.php?form=create']],
+
+			// Host groups update.
+			[['link' => 'hostgroups.php?form=update&groupid=50012']],
+
+			// Template creation.
+			[['link' => 'templates.php?form=create']],
+
+			// Template update.
+			[['link' => 'templates.php?form=update&templateid=10169']],
+
+			// Hosts creation.
+			[['link' => 'hosts.php?form=create']],
+
+			// Hosts update.
+			[['link' => 'hosts.php?form=update&hostid=10084']],
+
+			// Application update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=application.edit&applicationid=99010&hostid=50011'
+				]
+			],
+
+			// Application creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=application.edit&hostid=50011'
+				]
+			],
+
+			// Item update.
+			[['link' => 'items.php?form=update&hostid=50011&itemid=99086&context=host']],
+
+			// Item creation.
+			[['link' => 'items.php?form=create&hostid=50011&context=host']],
+
+			// Trigger update.
+			[['link' => 'triggers.php?form=update&triggerid=100034&context=host']],
+
+			// Trigger creation.
+			[['link' => 'triggers.php?hostid=50011&form=create&context=host']],
+
+			// Graph update.
+			[['link' => 'graphs.php?form=update&graphid=700026&context=host&filter_hostids%5B0%5D=99202']],
+
+			// Graph creation.
+			[['link' => 'graphs.php?hostid=99202&form=create&context=host']],
+
+			// Discovery rule update.
+			[['link' => 'host_discovery.php?form=update&itemid=99107&context=host']],
+
+			// Discovery rule creation.
+			[['link' => 'host_discovery.php?form=create&hostid=99202&context=host']],
+
+			// Web update.
+			[['link' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host']],
+
+			// Web creation.
+			[['link' => 'httpconf.php?form=create&hostid=50001&context=host']],
+
+			// Maintenance creation.
+			[['link' => 'maintenance.php?form=create']],
+
+			// Maintenance update.
+			[['link' => 'maintenance.php?form=update&maintenanceid=3']],
+
+			// Action creation.
+			[['link' => 'actionconf.php?eventsource=0&form=Create+action']],
+
+			// Action update.
+			[['link' => 'actionconf.php?form=update&actionid=3']],
+
+			// Event correlation creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=correlation.edit'
+				]
+			],
+
+			// Event correlation update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit'
+				]
+			],
+
+			// Discovery creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=discovery.edit'
+				]
+			],
+
+			// Discovery update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=discovery.edit&druleid=5'
+				]
+			],
+
+			// GUI update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=gui.edit'
+				]
+			],
+
+			// Autoregistration update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=autoreg.edit'
+				]
+			],
+
+			// Housekeeping update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=housekeeping.edit'
+				]
+			],
+
+			// Image update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=image.edit&imageid=1'
+				]
+			],
+
+			// Image creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=image.edit&imagetype=1'
+				]
+			],
+
+			// Icon map update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
+				]
+			],
+
+			// Icon map creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=iconmap.edit'
+				]
+			],
+
+			// Regular expression update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=regex.edit&regexid=20'
+				]
+			],
+
+			// Regular expression added.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=regex.edit'
+				]
+			],
+
+			// Macros update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=macros.edit'
+				]
+			],
+
+			// Trigger displaying update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=trigdisplay.edit'
+				]
+			],
+
+			// API token creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=token.edit'
+				]
+			],
+
+			// Other update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=miscconfig.edit'
+				]
+			],
+
+			// Proxy update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=proxy.edit&proxyid=20000'
+				]
+			],
+
+			// Proxy creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=proxy.edit'
+				]
+			],
+
+			// Authentication update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=authentication.edit'
+				]
+			],
+
+			// User group update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7'
+				]
+			],
+
+			// User group creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=usergroup.edit'
+				]
+			],
+
+			// User update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=user.edit&userid=1'
+				]
+			],
+
+			// User creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=user.edit'
+				]
+			],
+
+			// Media update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1'
+				]
+			],
+
+			// Media creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=mediatype.edit'
+				]
+			],
+
+			// Script update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=script.edit&scriptid=1'
+				]
+			],
+
+			// Script creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=script.edit'
+				]
+			],
+
+			// User profile update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=userprofile.edit'
+				]
+			],
+
+			// User role update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=userrole.edit&roleid=2'
+				]
+			],
+
+			// User role creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=userrole.edit'
+				]
+			],
+			// User API token creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=user.token.edit'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getElementRemoveData
+	 */
+	public function testSID_ElementRemove($data) {
+		$this->page->login()->open($data['link'])->waitUntilReady();
+		$this->query('xpath://input[@id="sid"]')->one()->delete();
+		if($this->query('button:Update')->exists()) {
+			$this->query('button:Update')->one()->click();
+		}
+		else {
+			$this->query('xpath://button[text()="Add" and @type="submit"]')->one()->click();
+		}
+
+		if (array_key_exists('other', $data)) {
+			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+		}
+		else {
+			$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
+					' performed due to unauthorized request.');
+		}
+	}
 }
