@@ -251,7 +251,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 			if (SUCCEED != eval_parse_macro(ctx, offset, &tok))
 				break;
 
-			if (0 == type)
+			if (pos == offset)
 			{
 				switch (tok.type)
 				{
@@ -290,12 +290,13 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 					goto out;
 			}
 		}
-		else if (SUCCEED == eval_parse_number(ctx, offset, &offset) ||
-				SUCCEED == eval_is_compound_number_char(ctx->expression[offset], offset - pos))
+		else if (SUCCEED == eval_parse_number(ctx, offset, &offset))
 		{
 			type = ZBX_EVAL_TOKEN_VAR_NUM;
 			offset++;
 		}
+		else if (SUCCEED == eval_is_compound_number_char(ctx->expression[offset], offset - pos))
+			offset++;
 		else
 			break;
 	}
