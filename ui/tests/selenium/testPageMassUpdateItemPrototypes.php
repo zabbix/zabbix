@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
  *
  * @backup items, interface
  *
+ * TODO: This annotation should be removed after ZBX-19257 is fixed.
  * @ignore-browser-errors
  */
 class testPageMassUpdateItemPrototypes extends testMassUpdateItems {

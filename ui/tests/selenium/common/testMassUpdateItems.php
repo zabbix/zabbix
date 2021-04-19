@@ -511,29 +511,31 @@ class testMassUpdateItems extends CWebTest{
 				]
 			],
 			// TODO: Uncomment these lines after ZBX-19255 is fixed.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'names'=> [
-//						'1_Item',
-//						'2_Item'
-//					],
-//					'change' => [
-//						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
-//						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-//						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
-//						'Headers' => [
-//							[
-//								'action' => USER_ACTION_UPDATE,
-//								'index' => 0,
-//								'name' => 'header name 1',
-//								'value' => ''
-//							]
-//						]
-//					],
-//					'details' => 'Invalid parameter "headers": nonempty key and value pair expected.'
-//				]
-//			],
+			/*
+			[
+				[
+					'expected' => TEST_BAD,
+					'names'=> [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
+						'URL'=> ['id' => 'url', 'value' => 'https//:zabbix.com'],
+						'Headers' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'name' => 'header name 1',
+								'value' => ''
+							]
+						]
+					],
+					'details' => 'Invalid parameter "headers": nonempty key and value pair expected.'
+				]
+			],
+			 */
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1702,6 +1704,7 @@ class testMassUpdateItems extends CWebTest{
 
 	public function getCommonTagsChangeData() {
 		return [
+			// TODO: Uncomment this case when ZBXNEXT-2976(76) is merged.
 			/*
 			// Empty tag name.
 			[
@@ -1721,7 +1724,10 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
+			 */
+			// TODO: Uncomment this case when ZBX-19263 is fixed.
 			// Equal tags.
+			/*
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1974,6 +1980,7 @@ class testMassUpdateItems extends CWebTest{
 								'tag' => 'tag1',
 								'value' => 'value1'
 							],
+							// TODO: Uncomment this line when ZBXNEXT-2976(76) is merged.
 //							[
 //								'tag' => 'tag2'
 //							],
@@ -2041,27 +2048,30 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
+			// TODO: Uncomment this case when ZBX-19262 is fixed.
 			// Tag with trailing spaces.
-//			[
-//				[
-//					'names'=> [
-//						'1_Item_No_Tags_Preprocessing',
-//						'2_Item_No_Tags_Preprocessing'
-//					],
-//					'Tags' => [
-//						'action' => 'Replace',
-//						'tags' => [
-//							[
-//								'action' => USER_ACTION_UPDATE,
-//								'index' => 0,
-//								'tag' => '    trimmed tag    ',
-//								'value' => '   trimmed value    '
-//							]
-//						]
-//					],
-//					'trim' => true
-//				]
-//			],
+			/*
+			[
+				[
+					'names'=> [
+						'1_Item_No_Tags_Preprocessing',
+						'2_Item_No_Tags_Preprocessing'
+					],
+					'Tags' => [
+						'action' => 'Replace',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => '    trimmed tag    ',
+								'value' => '   trimmed value    '
+							]
+						]
+					],
+					'trim' => true
+				]
+			],
+			 */
 			// Tag with long name and value.
 			[
 				[
