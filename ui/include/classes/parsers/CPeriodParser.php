@@ -93,7 +93,7 @@ class CPeriodParser extends CParser {
 			0 => ''
 		];
 		$contains_macros = [
-			0 => false
+			0 => ''
 		];
 		$num = 0;
 
@@ -103,25 +103,25 @@ class CPeriodParser extends CParser {
 			}
 			elseif ($source[$pos] === ':') {
 				$parts[++$num] = '';
-				$contains_macros[$num] = false;
+				$contains_macros[$num] = '';
 				$pos++;
 			}
 			elseif ($this->user_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
 				$pos += $this->user_macro_parser->length;
 				$parts[$num] .= $this->user_macro_parser->match;
-				$contains_macros[$num] = true;
+				$contains_macros[$num] = $this->user_macro_parser->match;
 			}
 			elseif ($this->options['lldmacros']
 					&& $this->lld_macro_function_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
 				$pos += $this->lld_macro_function_parser->length;
 				$parts[$num] .= $this->lld_macro_function_parser->match;
-				$contains_macros[$num] = true;
+				$contains_macros[$num] = $this->lld_macro_function_parser->match;
 			}
 			elseif ($this->options['lldmacros']
 					&& $this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
 				$pos += $this->lld_macro_parser->length;
 				$parts[$num] .= $this->lld_macro_parser->match;
-				$contains_macros[$num] = true;
+				$contains_macros[$num] = $this->lld_macro_parser->match;
 			}
 			else {
 				$parts[$num] .= $source[$pos];
@@ -134,7 +134,18 @@ class CPeriodParser extends CParser {
 			return CParser::PARSE_FAIL;
 		}
 
-		// Check format. Otherwaise, almost anything can be period.
+		// First part can contain only raw value or single macro but not mixed raw value and macro.
+		if ($contains_macros[0] && $contains_macros[0] !== $parts[0]) {
+			return CParser::PARSE_FAIL;
+		}
+
+		// Second part can contain macro only at the end. E.g., now-{$TWO_WEEKS}
+		if (array_key_exists(1, $contains_macros) && $contains_macros[1] !== ''
+				&& substr($parts[1], strlen($contains_macros[1]) * -1) !== $contains_macros[1]) {
+			return CParser::PARSE_FAIL;
+		}
+
+		// Check format. Otherwise, almost anything can be period.
 		$is_valid_num = (substr($parts[0], 0, 1) === '#' && ctype_digit(substr($parts[0], 1)));
 		$is_valid_sec = preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.ZBX_TIME_SUFFIXES_WITH_YEAR.'])$/', $parts[0]);
 		if (!$is_valid_num && !$is_valid_sec && !$contains_macros[0]) {
@@ -146,8 +157,10 @@ class CPeriodParser extends CParser {
 		$this->result->match = substr($source, $start_pos, $this->length);
 		$this->result->sec_num = $parts[0];
 		$this->result->time_shift = (array_key_exists(1, $parts) && $parts[1] !== '') ? $parts[1] : null;
-		$this->result->sec_num_contains_macros = $contains_macros[0];
-		$this->result->time_shift_contains_macros = array_key_exists(1, $contains_macros) ? $contains_macros[1] : false;
+		$this->result->sec_num_contains_macros = ($contains_macros[0] !== '');
+		$this->result->time_shift_contains_macros = array_key_exists(1, $contains_macros)
+			? (bool) ($contains_macros[1] !== '')
+			: false;
 		$this->result->length = $this->length;
 		$this->result->pos = $start_pos;
 
