@@ -955,7 +955,7 @@ class testSID extends CWebTest {
 	public function testSID_ElementRemove($data) {
 		$this->page->login()->open($data['link'])->waitUntilReady();
 		$this->query('xpath://input[@id="sid"]')->one()->delete();
-		if($this->query('button:Update')->exists() === true) {
+		if($this->query('button:Update')->exists()) {
 			$this->query('button:Update')->one()->click();
 		}
 		else {
