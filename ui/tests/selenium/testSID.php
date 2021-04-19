@@ -20,8 +20,31 @@
 
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
+/**
+ * @backup token
+ * @on-before prepareTokenData
+ */
 class testSID extends CWebTest {
+
+	/**
+	 * Token ID used for update.
+	 *
+	 * @var string
+	 */
+	protected static $token_id;
+
+	public function prepareTokenData() {
+		$response = CDataHelper::call('token.create', [
+			[
+				'name' => 'api_update',
+				'userid' => '1'
+				]
+			]);
+		$this->assertArrayHasKey('tokenids', $response);
+		self::$token_id = $response['tokenids'][0];
+	}
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -861,6 +884,14 @@ class testSID extends CWebTest {
 				]
 			],
 
+			// API token update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=token.edit&tokenid='
+				]
+			],
+
 			// Other update.
 			[
 				[
@@ -980,11 +1011,20 @@ class testSID extends CWebTest {
 					'link' => 'zabbix.php?action=userrole.edit'
 				]
 			],
+
 			// User API token creation.
 			[
 				[
 					'other' => true,
 					'link' => 'zabbix.php?action=user.token.edit'
+				]
+			],
+
+			// User API token update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=user.token.edit&tokenid='
 				]
 			]
 		];
@@ -994,8 +1034,14 @@ class testSID extends CWebTest {
 	 * @dataProvider getElementRemoveData
 	 */
 	public function testSID_ElementRemove($data) {
-		$this->page->login()->open($data['link'])->waitUntilReady();
+		if(!str_contains($data['link'], 'tokenid')) {
+			$this->page->login()->open($data['link'])->waitUntilReady();
+		}
+		else {
+			$this->page->login()->open($data['link'].self::$token_id)->waitUntilReady();
+		}
 		$this->query('xpath://input[@id="sid"]')->one()->delete();
+
 		if($this->query('button:Update')->exists()) {
 			$this->query('button:Update')->one()->click();
 		}
@@ -1003,7 +1049,7 @@ class testSID extends CWebTest {
 			$this->query('xpath://button[text()="Add" and @type="submit"]')->one()->click();
 		}
 
-		if (array_key_exists('other', $data)) {
+		if(array_key_exists('other', $data)) {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
 			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
 			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
