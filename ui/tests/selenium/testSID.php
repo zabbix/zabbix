@@ -34,7 +34,7 @@ class testSID extends CWebTest {
 
 	public static function getLinksData() {
 		return [
-			// Icon mapping delete
+			// Icon mapping delete.
 			[['link' => 'zabbix.php?action=iconmap.delete&iconmapid=101']],
 
 			// Icon mapping update.
@@ -556,6 +556,304 @@ class testSID extends CWebTest {
 				$this->query('button:Go to dashboard')->one()->waitUntilClickable()->click();
 				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
+		}
+	}
+
+	public static function getElementRemoveData() {
+		return [
+			// Screen creation.
+			[['link' => 'screenconf.php?form=Create+screen']],
+
+			// Screen update.
+			[['link' => 'screenconf.php?form=update&screenid=200021']],
+
+			// Map creation.
+			[['link' => 'sysmaps.php?form=Create+map']],
+
+			// Map update.
+			[['link' => 'sysmaps.php?form=update&sysmapid=3']],
+
+			// Host groups creation.
+			[['link' => 'hostgroups.php?form=create']],
+
+			// Host groups update.
+			[['link' => 'hostgroups.php?form=update&groupid=50012']],
+
+			// Template creation.
+			[['link' => 'templates.php?form=create']],
+
+			// Template update.
+			[['link' => 'templates.php?form=update&templateid=10169']],
+
+			// Hosts creation.
+			[['link' => 'hosts.php?form=create']],
+
+			// Hosts update.
+			[['link' => 'hosts.php?form=update&hostid=10084']],
+
+			// Maintenance creation.
+			[['link' => 'maintenance.php?form=create']],
+
+			// Maintenance update.
+			[['link' => 'maintenance.php?form=update&maintenanceid=3']],
+
+			// Action creation.
+			[['link' => 'actionconf.php?eventsource=0&form=Create+action']],
+
+			// Action update.
+			[['link' => 'actionconf.php?form=update&actionid=3']],
+
+			// Event correlation creation.
+			[['link' => 'correlation.php?form=Create+correlation']],
+
+			// Event correlation update.
+			[['link' => 'correlation.php?form=update&correlationid=99003']],
+
+			// Discovery creation.
+			[['link' => 'discoveryconf.php?form=Create+discovery+rule']],
+
+			// Discovery update.
+			[['link' => 'discoveryconf.php?form=update&druleid=2']],
+
+			// GUI update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=gui.edit'
+				]
+			],
+
+			// Autoregistration update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=autoreg.edit'
+				]
+			],
+
+			// Image update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=image.edit&imageid=1'
+				]
+			],
+
+			// Image creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=image.edit&imagetype=1'
+				]
+			],
+
+			// Icon map update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
+				]
+			],
+
+			// Icon map creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=iconmap.edit'
+				]
+			],
+
+			// Regular expression update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=regex.edit&regexid=20'
+				]
+			],
+
+			// Regular expression added.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=regex.edit'
+				]
+			],
+
+			// Macros update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=macros.edit'
+				]
+			],
+
+			// Value map update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=valuemap.edit&valuemapid=83'
+				]
+			],
+
+			// Value map creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=valuemap.edit'
+				]
+			],
+
+			// Working time update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=valuemap.edit'
+				]
+			],
+
+			// Trigger severities update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=trigseverity.edit'
+				]
+			],
+
+			// Trigger displaying update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=trigdisplay.edit'
+				]
+			],
+
+			// Other update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=miscconfig.edit'
+				]
+			],
+
+			// Proxy update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=proxy.edit&proxyid=20000'
+				]
+			],
+
+			// Proxy creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=proxy.edit'
+				]
+			],
+
+			// Authentication update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=authentication.edit'
+				]
+			],
+
+			// User group update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7'
+				]
+			],
+
+			// User group creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=usergroup.edit'
+				]
+			],
+
+			// User update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=user.edit&userid=1'
+				]
+			],
+
+			// User creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=user.edit'
+				]
+			],
+
+			// Media update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1'
+				]
+			],
+
+			// Media creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=mediatype.edit'
+				]
+			],
+
+			// Script update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=script.edit&scriptid=1'
+				]
+			],
+
+			// Script creation.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=script.edit'
+				]
+			],
+
+			// User profile update.
+			[
+				[
+					'other' => true,
+					'link' => 'zabbix.php?action=userprofile.edit'
+				]
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider getElementRemoveData
+	 */
+	public function testSID_ElementRemove($data) {
+		$this->page->login()->open($data['link'])->waitUntilReady();
+		$this->query('xpath://input[@id="sid"]')->one()->delete();
+		if($this->query('button:Update')->exists() === true) {
+			$this->query('button:Update')->one()->click();
+		}
+		else {
+			$this->query('xpath://button[text()="Add" and @type="submit"]')->one()->click();
+		}
+
+		if (array_key_exists('other', $data)) {
+			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+			$this->query('button:Go to dashboard')->one()->waitUntilClickable()->click();
+			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+		}
+		else {
+			$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
+					' performed due to unauthorized request.');
 		}
 	}
 }
