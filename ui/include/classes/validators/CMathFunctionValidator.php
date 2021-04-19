@@ -160,9 +160,17 @@ class CMathFunctionValidator extends CValidator {
 
 		$last_valid_pos = $fn->pos + $fn->params_raw['pos'] + 1;
 
-		if ((count($fn->params_raw['parameters']) == 0 && !array_key_exists($fn->function, $this->number_of_parameters))
-				|| (array_key_exists($fn->function, $this->number_of_parameters)
-					&& count($fn->params_raw['parameters']) != $this->number_of_parameters[$fn->function])) {
+		if (!array_key_exists($fn->function, $this->number_of_parameters)
+				&& count($fn->params_raw['parameters']) == 0) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+				_('Mandatory parameter is missing.')
+			);
+			$this->error_pos = $last_valid_pos;
+
+			return false;
+		}
+		elseif (array_key_exists($fn->function, $this->number_of_parameters)
+				&& count($fn->params_raw['parameters']) != $this->number_of_parameters[$fn->function]) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid number of parameters.'));
 			$this->error_pos = $last_valid_pos;
