@@ -591,6 +591,42 @@ class testSID extends CWebTest {
 			// Hosts update.
 			[['link' => 'hosts.php?form=update&hostid=10084']],
 
+			// Application update.
+			[['link' => 'applications.php?form=update&applicationid=99010&hostid=50011']],
+
+			// Application creation.
+			[['link' => 'applications.php?form=create&hostid=50011']],
+
+			// Item update.
+			[['link' => 'items.php?form=update&hostid=50011&itemid=99086']],
+
+			// Item creation.
+			[['link' => 'items.php?form=create&hostid=50011']],
+
+			// Trigger update.
+			[['link' => 'triggers.php?form=update&triggerid=100034']],
+
+			// Trigger creation.
+			[['link' => 'triggers.php?hostid=50011&form=create']],
+
+			// Graph update.
+			[['link' => 'graphs.php?form=update&graphid=700026&filter_hostids%5B0%5D=99202']],
+
+			// Graph creation.
+			[['link' => 'graphs.php?hostid=50011&form=create']],
+
+			// Discovery rule update.
+			[['link' => 'host_discovery.php?form=update&itemid=99107']],
+
+			// Discovery rule creation.
+			[['link' => 'host_discovery.php?form=create&hostid=99202']],
+
+			// Web update.
+			[['link' => 'httpconf.php?form=update&hostid=50001&httptestid=102']],
+
+			// Web creation.
+			[['link' => 'httpconf.php?form=create&hostid=50001']],
+
 			// Maintenance creation.
 			[['link' => 'maintenance.php?form=create']],
 
