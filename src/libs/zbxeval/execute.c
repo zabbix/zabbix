@@ -1499,7 +1499,7 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
  *             token      - [IN] the function token                           *
  *             output     - [IN/OUT] the output value stack                   *
  *             error      - [OUT] the error message in the case of failure    *
- *             func       - [IN] the pointer to math function                 *
+ *             value      - [IN] the value to be returned                     *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *                                                                            *
