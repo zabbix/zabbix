@@ -155,6 +155,7 @@ class CTriggerExprParserResult extends CParserResult {
 	 * @return array
 	 */
 	public function getUserMacros(): array {
+		$user_macro_parser = new CUserMacroParser();
 		$params_stack = $this->tokens;
 		$return = [];
 
@@ -165,6 +166,10 @@ class CTriggerExprParserResult extends CParserResult {
 			}
 			elseif ($param instanceof CTriggerExprTokenResult
 					&& $param->type == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO) {
+				$return[] = $param;
+			}
+			elseif ($param instanceof CFunctionParameterResult
+					&& $user_macro_parser->parse($param->getValue()) == CParser::PARSE_SUCCESS) {
 				$return[] = $param;
 			}
 		}

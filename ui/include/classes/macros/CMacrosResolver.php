@@ -1223,6 +1223,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$options
 				));
 			}
+			elseif ($param instanceof CFunctionParameterResult && array_key_exists($param->match, $usermacro_values)) {
+				array_unshift($expression, $usermacro_values[$param->match]);
+			}
 			else {
 				array_unshift($expression, $param->match);
 			}
