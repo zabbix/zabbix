@@ -116,7 +116,6 @@ class CPeriodParser extends CParser {
 				$pos += $this->lld_macro_function_parser->length;
 				$parts[$num] .= $this->lld_macro_function_parser->match;
 				$contains_macros[$num] = true;
-				//$pos += $this->lld_macro_function_parser->getLength() - 1;
 			}
 			elseif ($this->options['lldmacros']
 					&& $this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
