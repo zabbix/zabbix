@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-16 19:55+0300\n"
-"PO-Revision-Date: 2021-04-05 09:41+0300\n"
+"PO-Revision-Date: 2021-04-19 06:10+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1617608468.000000\n"
+"X-POOTLE-MTIME: 1618805430.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -358,7 +358,7 @@ msgstr "<שם מדד>{<שם תווית>=\"<ערך התווית>\", ...} == <ער
 
 #: app/views/administration.script.edit.php:110
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<תת־תפריט/תת־תפריט/…>"
 
 #: include/classes/widgets/CWidgetHelper.php:770
 msgid "ADD OVERRIDE"
@@ -1722,7 +1722,7 @@ msgstr "לא ניתן להוסיף יחס"
 #: jsLoader.php:147
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "לא ניתן להוסיף עמוד ללוח מחוונים: נוספו כבר %1$d עמודי לוחות מחוונים שזו הכמות המרבית."
 
 #: include/classes/api/services/CTrigger.php:952
 #: include/classes/api/services/CTriggerPrototype.php:773
@@ -2963,7 +2963,7 @@ msgstr "לא ניתן לעדכן את הסקריפט"
 #: include/classes/api/services/CScript.php:628
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
-msgstr ""
+msgstr "לא ניתן לעדכן את היקף הסקריפט. הסקריפט „%1$s” משמש את הפעולה „%2$s”."
 
 #: services.php:147
 msgid "Cannot update service"
@@ -3991,7 +3991,7 @@ msgstr "יצירת משימה"
 
 #: include/classes/helpers/CRoleHelper.php:479
 msgid "Create and edit dashboards"
-msgstr ""
+msgstr "יצירת ועריכת לוחות מחוונים"
 
 #: include/classes/helpers/CRoleHelper.php:484
 msgid "Create and edit maintenance"
@@ -4347,7 +4347,7 @@ msgstr[1] "נמחקו לוחות מחוונים"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
-msgstr ""
+msgstr "מאפייני עמוד לוח מחוונים"
 
 #: app/views/dashboard.properties.edit.php:88
 msgid "Dashboard properties"
@@ -4618,7 +4618,7 @@ msgstr "משך מהלך פעולה כבררת מחדל"
 
 #: app/views/dashboard.properties.edit.php:79
 msgid "Default page display period"
-msgstr ""
+msgstr "משך כבררת מחדל להצגת עמוד"
 
 #: app/views/administration.gui.edit.php:83
 #: include/classes/setup/CSetupWizard.php:475
@@ -6362,11 +6362,11 @@ msgstr "פענוח הכתובת נכשל."
 
 #: jsLoader.php:151
 msgid "Failed to paste dashboard page."
-msgstr ""
+msgstr "הדבקת עמוד לוח המחוונים נכשלה."
 
 #: jsLoader.php:152
 msgid "Failed to paste widget."
-msgstr ""
+msgstr "הדבקת הווידג׳ט נכשלה."
 
 #: app/controllers/CControllerDashboardUpdate.php:137
 #: app/controllers/CControllerTemplateDashboardUpdate.php:131
@@ -6375,11 +6375,11 @@ msgstr "עדכון לוח המחוונים נכשל"
 
 #: jsLoader.php:153
 msgid "Failed to update dashboard page properties."
-msgstr ""
+msgstr "עדכון מאפייני עמוד לוח המחוונים נכשל."
 
 #: jsLoader.php:154
 msgid "Failed to update dashboard properties."
-msgstr ""
+msgstr "עדכון מאפייני לוח המחוונים נכשל."
 
 #: include/classes/api/services/CTemplate.php:594
 msgid "Failed to update template."
@@ -6387,7 +6387,7 @@ msgstr "עדכון התבנית נכשל."
 
 #: jsLoader.php:155
 msgid "Failed to update widget properties."
-msgstr ""
+msgstr "עדכון מאפייני הווידג׳ט נכשל."
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -9217,11 +9217,11 @@ msgstr "מאקרואים שהתקבלו בירושה ואבות טיפוס של 
 
 #: app/partials/configuration.tags.tab.php:138
 msgid "Inherited and item tags"
-msgstr ""
+msgstr "תגיות פריט וכאלו שהתקבלו בירושה"
 
 #: app/partials/configuration.tags.tab.php:133
 msgid "Inherited and scenario tags"
-msgstr ""
+msgstr "תגיות תרחיש וכאלו שהתקבלו בירושה"
 
 #: include/views/configuration.template.edit.php:211
 msgid "Inherited and template macros"
@@ -9894,7 +9894,7 @@ msgstr "אבות הטיפוס של הפריט עודכנו"
 
 #: app/partials/configuration.tags.tab.php:138
 msgid "Item tags"
-msgstr ""
+msgstr "תגיות פריט"
 
 #: jsLoader.php:373
 msgid "Item type does not use interface"
@@ -10045,7 +10045,7 @@ msgstr "אמורה להיות מחרוזת JSON"
 #: include/classes/core/CJsonRpc.php:146
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "יצירת שגיאת JSON-RPC נכשלה. אין כזאת שגיאה „%1$s”."
 
 #: include/items.inc.php:1828
 #: include/views/configuration.host.discovery.edit.php:780
@@ -10819,13 +10819,13 @@ msgstr "ידני"
 #: app/views/administration.script.list.php:52
 #: app/views/administration.script.list.php:129
 msgid "Manual event action"
-msgstr ""
+msgstr "פעולת אירוע ידנית"
 
 #: app/views/administration.script.edit.php:102
 #: app/views/administration.script.list.php:51
 #: app/views/administration.script.list.php:125
 msgid "Manual host action"
-msgstr ""
+msgstr "פעולת מארח ידנית"
 
 #: include/actions.inc.php:1988
 msgid "Manually closed"
@@ -11161,7 +11161,7 @@ msgstr "שם רשומה בתפריט"
 
 #: app/views/administration.script.edit.php:107
 msgid "Menu path"
-msgstr ""
+msgstr "נתיב בתפריט"
 
 #: app/partials/popup.operations.php:160
 #: app/views/monitoring.widget.actionlog.view.php:37
@@ -12992,7 +12992,7 @@ msgstr "פלט"
 #: include/classes/api/services/CDashboardGeneral.php:276
 #, c-format
 msgid "Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\"."
-msgstr ""
+msgstr "וידג׳טים חופפים בנקודה X:%3$d,‏ Y:%4$d בעמוד מס׳ %2$d של לוח המחוונים „%1$s”."
 
 #: include/views/configuration.item.edit.php:749
 #: include/views/configuration.item.edit.php:785
@@ -13262,7 +13262,7 @@ msgstr "עמוד %1$d"
 
 #: app/views/dashboard.page.properties.edit.php:55
 msgid "Page display period"
-msgstr ""
+msgstr "משך הצגת עמוד"
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -14699,17 +14699,17 @@ msgstr "כללים"
 #: include/actions.inc.php:616 include/actions.inc.php:785
 #, c-format
 msgid "Run script \"%1$s\" on current host"
-msgstr ""
+msgstr "להריץ את הסקריפט „%1$s” על המארח הנוכחי"
 
 #: include/actions.inc.php:647 include/actions.inc.php:816
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
-msgstr ""
+msgstr "להריץ את הסקריפט „%1$s” על קבוצות מארחים"
 
 #: include/actions.inc.php:629 include/actions.inc.php:798
 #, c-format
 msgid "Run script \"%1$s\" on hosts"
-msgstr ""
+msgstr "להריץ את הסקריפט „%1$s” על מארחים"
 
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:599
@@ -14981,7 +14981,7 @@ msgstr "תרחיש"
 
 #: app/partials/configuration.tags.tab.php:133
 msgid "Scenario tags"
-msgstr ""
+msgstr "תגיות תרחיש"
 
 #: include/views/configuration.maintenance.edit.php:45
 msgid "Schedule"
@@ -18751,7 +18751,7 @@ msgstr "בעת פעילות"
 #: include/classes/api/services/CDashboardGeneral.php:289
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
-msgstr ""
+msgstr "הווידג׳ט בנקודה X:%3$d,‏ Y:%4$d בעמוד מס׳ %2$d של לוח המחוונים „%1$s” חורג מגבולות העמוד. "
 
 #: jsLoader.php:188
 msgid "Widget is too small for the specified number of columns and rows."
@@ -19120,7 +19120,7 @@ msgstr "אין לך הרשאה ליצור משתמשים."
 
 #: jsLoader.php:167
 msgid "You do not have permissions to edit dashboard"
-msgstr "אין לך הרשאות לערוך לוח מחוונים"
+msgstr "אין לך הרשאות לערוך לוחות מחוונים"
 
 #: include/func.inc.php:1514
 msgid "You have no permissions to access this page."
@@ -19307,7 +19307,7 @@ msgstr "אמור להיות זמן יחסי"
 
 #: include/classes/validators/CApiInputValidator.php:2116
 msgid "a string, number or null value is expected"
-msgstr ""
+msgstr "אמור להיות מחרוזת, מספר או ריק"
 
 #: include/classes/validators/CNewValidator.php:273
 msgid "a time is expected"
@@ -19416,7 +19416,7 @@ msgstr "אמור להיות מערך או מחרוזת תווים"
 
 #: include/classes/validators/CApiInputValidator.php:2096
 msgid "an array or object is expected"
-msgstr ""
+msgstr "אמור להיות מערך"
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:382
@@ -19749,7 +19749,7 @@ msgstr "diff()‎ - השינוי בין הערכים האחרון והעוקב (
 
 #: include/classes/validators/CApiInputValidator.php:1404
 msgid "directory cannot be empty"
-msgstr ""
+msgstr "התיקייה לא יכולה להיות ריקה"
 
 #: include/events.inc.php:60
 msgid "discovered host"

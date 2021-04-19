@@ -685,6 +685,7 @@ New features:
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
 .......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
 .........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
 ..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
