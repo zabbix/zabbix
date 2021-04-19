@@ -2889,6 +2889,7 @@ static int	dbpatch_convert_expression_macro(const char *expression, const zbx_st
 	zbx_token_t	token;
 	char		*out = NULL;
 	size_t		out_alloc = 0, out_offset = 0, pos = loc->l + 2, last_pos = loc->l;
+
 	for (; SUCCEED == zbx_token_find(expression, (int)pos, &token, ZBX_TOKEN_SEARCH_BASIC) && token.loc.r < loc->r;
 			pos++)
 	{
