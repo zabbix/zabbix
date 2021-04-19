@@ -147,7 +147,7 @@ class CFunctionParser extends CParser {
 		if (!isset($source[$pos]) || $source[$pos] !== '(') {
 			return false;
 		}
-		elseif ($source[$pos + 1] === ')') {
+		elseif (isset($source[$pos + 1]) && $source[$pos + 1] === ')') {
 			$parameters = [];
 			$pos += 2;
 
