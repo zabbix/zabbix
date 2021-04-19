@@ -305,7 +305,6 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 				}
 				zbx_variant_clear(&functionid);
 			}
-			check_value = 1;
 			break;
 		case ZBX_EVAL_TOKEN_VAR_STR:
 			quoted = 1;

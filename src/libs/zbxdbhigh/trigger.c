@@ -679,3 +679,126 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
 	if (NULL != trigger->cache)
 		trigger_cache_free((zbx_trigger_cache_t *)trigger->cache);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_trigger_get_expression                                        *
+ *                                                                            *
+ * Purpose: get original trigger expression/recovery expression with expanded *
+ *          functions                                                         *
+ *                                                                            *
+ * Parameters: trigger    - [IN] the trigger                                  *
+ *             expression - [OUT] the trigger expression                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expression)
+{
+	int			i;
+	zbx_eval_context_t	local_ctx;
+
+	zbx_eval_copy(&local_ctx, ctx, ctx->expression);
+
+	for (i = 0; i < local_ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
+		zbx_uint64_t		functionid;
+		DC_FUNCTION		function;
+		DC_ITEM			item;
+		int			err_func, err_item;
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+		{
+			/* reset cached token values to get the original expression */
+			zbx_variant_clear(&token->value);
+			continue;
+		}
+
+		switch (token->value.type)
+		{
+			case ZBX_VARIANT_UI64:
+				functionid = token->value.data.ui64;
+				break;
+			case ZBX_VARIANT_NONE:
+				if (SUCCEED != is_uint64_n(local_ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					continue;
+				}
+				break;
+			default:
+				continue;
+		}
+
+		DCconfig_get_functions_by_functionids(&function, &functionid, &err_func, 1);
+
+		if (SUCCEED != err_func)
+			continue;
+
+		DCconfig_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
+
+		if (SUCCEED == err_item)
+		{
+			char	*func = NULL;
+			size_t	func_alloc = 0, func_offset = 0;
+
+			zbx_snprintf_alloc(&func, &func_alloc, &func_offset, "%s(/%s/%s",
+					function.function, item.host.host, item.key_orig);
+
+			if ('\0' != *function.parameter)
+				zbx_snprintf_alloc(&func, &func_alloc, &func_offset, ",%s", function.parameter);
+
+			zbx_chrcpy_alloc(&func, &func_alloc, &func_offset,')');
+
+			zbx_variant_clear(&token->value);
+			zbx_variant_set_str(&token->value, func);
+			DCconfig_clean_items(&item, &err_item, 1);
+		}
+
+		DCconfig_clean_functions(&function, &err_func, 1);
+	}
+
+	zbx_eval_compose_expression(&local_ctx, expression);
+
+	zbx_eval_clear(&local_ctx);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_get_expression                                    *
+ *                                                                            *
+ * Purpose: get original trigger expression with expanded functions           *
+ *                                                                            *
+ * Parameters: trigger    - [IN] the trigger                                  *
+ *             expression - [OUT] the trigger expression                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression)
+{
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+		*expression = zbx_strdup(NULL, trigger->expression);
+	else
+		db_trigger_get_expression(&cache->eval_ctx, expression);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_get_recovery_expression                           *
+ *                                                                            *
+ * Purpose: get original trigger recovert expression with expanded functions  *
+ *                                                                            *
+ * Parameters: trigger    - [IN] the trigger                                  *
+ *             expression - [OUT] the trigger expression                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **expression)
+{
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R)))
+		*expression = zbx_strdup(NULL, trigger->recovery_expression);
+	else
+		db_trigger_get_expression(&cache->eval_ctx_r, expression);
+}

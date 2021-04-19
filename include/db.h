@@ -783,7 +783,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 void	zbx_db_free_event(DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
-
+void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
 typedef struct

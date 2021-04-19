@@ -68,99 +68,6 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
 		char *error, size_t maxerrlen);
 
-static void	DCexpand_trigger_expression(char **expression)
-{
-	char		*tmp = NULL;
-	size_t		tmp_alloc = 256, tmp_offset = 0, l, r;
-	DC_FUNCTION	function;
-	DC_ITEM		item;
-	zbx_uint64_t	functionid;
-	int		errcode[2];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, *expression);
-
-	tmp = (char *)zbx_malloc(tmp, tmp_alloc);
-
-	for (l = 0; '\0' != (*expression)[l]; l++)
-	{
-		if ('{' != (*expression)[l])
-		{
-			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, (*expression)[l]);
-			continue;
-		}
-
-		/* skip user macros */
-		if ('$' == (*expression)[l + 1])
-		{
-			int	macro_r, context_l, context_r;
-
-			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r, NULL))
-			{
-				zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, *expression + l, macro_r + 1);
-				l += macro_r;
-				continue;
-			}
-
-			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '{');
-			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '$');
-			l++;
-			continue;
-		}
-
-		for (r = l + 1; 0 != isdigit((*expression)[r]); r++)
-			;
-
-		if ('}' != (*expression)[r])
-		{
-			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, (*expression)[l]);
-			continue;
-		}
-
-		(*expression)[r] = '\0';
-
-		if (SUCCEED == is_uint64(&(*expression)[l + 1], &functionid))
-		{
-			DCconfig_get_functions_by_functionids(&function, &functionid, &errcode[0], 1);
-
-			if (SUCCEED == errcode[0])
-			{
-				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1);
-
-				if (SUCCEED == errcode[1])
-				{
-					zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '{');
-					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, item.host.host);
-					zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ':');
-					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, item.key_orig);
-					zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '.');
-					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, function.function);
-					zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '(');
-					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, function.parameter);
-					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ")}");
-				}
-
-				DCconfig_clean_items(&item, &errcode[1], 1);
-			}
-
-			DCconfig_clean_functions(&function, &errcode[0], 1);
-
-			if (SUCCEED != errcode[0] || SUCCEED != errcode[1])
-				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "*ERROR*");
-
-			l = r;
-		}
-		else
-			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, (*expression)[l]);
-
-		(*expression)[r] = '}';
-	}
-
-	zbx_free(*expression);
-	*expression = tmp;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __func__, *expression);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: get_trigger_severity_name                                        *
@@ -3195,16 +3102,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
 				{
-					replace_to = zbx_strdup(replace_to, c_event->trigger.expression);
-					DCexpand_trigger_expression(&replace_to);
+					zbx_db_trigger_get_expression(&c_event->trigger, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY))
 				{
 					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
 					{
-						replace_to = zbx_strdup(replace_to,
-								c_event->trigger.recovery_expression);
-						DCexpand_trigger_expression(&replace_to);
+						zbx_db_trigger_get_recovery_expression(&c_event->trigger, &replace_to);
 					}
 					else
 						replace_to = zbx_strdup(replace_to, "");
@@ -3444,16 +3348,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
 				{
-					replace_to = zbx_strdup(replace_to, c_event->trigger.expression);
-					DCexpand_trigger_expression(&replace_to);
+					zbx_db_trigger_get_expression(&c_event->trigger, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY))
 				{
 					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
 					{
-						replace_to = zbx_strdup(replace_to,
-								c_event->trigger.recovery_expression);
-						DCexpand_trigger_expression(&replace_to);
+						zbx_db_trigger_get_recovery_expression(&c_event->trigger, &replace_to);
 					}
 					else
 						replace_to = zbx_strdup(replace_to, "");
