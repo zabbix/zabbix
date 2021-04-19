@@ -836,7 +836,6 @@ class testFormUserRoles extends CWebTest {
 		$role_name = $values['Name'];
 		$this->query('button:Clone')->one()->click();
 		$this->page->waitUntilReady();
-
 		$form->invalidate();
 		$form->fill(['Name' => 'Cloned_'.$role_name]);
 		$form->submit();
@@ -984,5 +983,9 @@ class testFormUserRoles extends CWebTest {
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 			$form->checkValue($data['fields']);
 		}
+	}
+
+	private function checkValues() {
+
 	}
 }
