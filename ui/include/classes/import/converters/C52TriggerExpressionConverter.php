@@ -256,7 +256,6 @@ class C52TriggerExpressionConverter extends CConverter {
 			case 'min':
 			case 'sum':
 			// (<sec|#num>,<time_shift>)
-			case 'last':
 			case 'strlen':
 			// (sec|#num,<time_shift>,percentage)
 			case 'percentile':
@@ -266,6 +265,23 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
 				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
+				if ($parameters[1] !== '') {
+					$parameters[0] .= ':'.$parameters[1];
+				}
+				unset($parameters[1], $unquotable_parameters[1]);
+				break;
+
+			// (<#num>,<time_shift>)
+			case 'last':
+				$parameters += ['', ''];
+				if (ctype_digit($parameters[0])) {
+					$parameters[0] = '#'.$parameters[0];
+				}
+				elseif (substr($parameters[0], 0, 1) !== '#') {
+					$parameters[0] = '#1';
+				}
+
+				$parameters[1] = self::convertTimeshift($parameters[1]);
 				if ($parameters[1] !== '') {
 					$parameters[0] .= ':'.$parameters[1];
 				}
