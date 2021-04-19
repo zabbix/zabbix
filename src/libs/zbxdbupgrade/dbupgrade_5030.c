@@ -4649,6 +4649,8 @@ static int	DBpatch_5030153(void)
 
 		for (i = 0; i < 2; i++)
 		{
+			int	expr_start = 1;
+
 			trigger_expr = zbx_strdup(NULL, row[i + 2]);
 			pexpr = pexpr_f = (const char *)trigger_expr;
 
@@ -4664,10 +4666,16 @@ static int	DBpatch_5030153(void)
 						" where f.functionid=" ZBX_FS_UI64,
 						functionid);
 
+				if (NULL != result && 1 == expr_start)
+				{
+					zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset, "/");
+					expr_start = 0;
+				}
+
 				while (NULL != (row2 = DBfetch(result2)))
 				{
 					zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset,
-							"/%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
+							"%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
 					pexpr = pexpr_f;
 				}
 
@@ -5054,6 +5062,8 @@ static int	DBpatch_5030160(void)
 
 		for (i = 0; i < 2; i++)
 		{
+			int	expr_start = 1;
+
 			trigger_expr = zbx_strdup(NULL, row[i + 2]);
 			pexpr = pexpr_f = (const char *)trigger_expr;
 
@@ -5069,10 +5079,16 @@ static int	DBpatch_5030160(void)
 						" where f.functionid=" ZBX_FS_UI64,
 						functionid);
 
+				if (NULL != result && 1 == expr_start)
+				{
+					zbx_snprintf_alloc(&total_expr, &total_expr_alloc, &total_expr_offset, "/");
+					expr_start = 0;
+				}
+
 				while (NULL != (row2 = DBfetch(result2)))
 				{
 					zbx_snprintf_alloc(&total_expr, &total_expr_alloc, &total_expr_offset,
-							"/%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
+							"%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
 					pexpr = pexpr_f;
 				}
 
@@ -5085,7 +5101,7 @@ static int	DBpatch_5030160(void)
 			zbx_free(trigger_expr);
 		}
 
-		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", row[1]);
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", total_expr);
 
 		uuid = zbx_gen_uuid4(seed);
