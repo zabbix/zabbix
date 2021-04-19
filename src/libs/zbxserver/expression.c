@@ -5869,7 +5869,6 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
 				max_error_len))
 		{
 			offset = tok.loc.r - offset;
-			zabbix_log(LOG_LEVEL_DEBUG, "OFFSET: %d", offset);
 		}
 	}
 
