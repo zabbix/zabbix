@@ -265,8 +265,8 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
+				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[1] !== '') {
-					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[1];
 				}
 				unset($parameters[1], $unquotable_parameters[1]);
@@ -277,8 +277,8 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[1] = self::convertTimeshift($parameters[1]);
+				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[1] !== '') {
-					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[1];
 				}
 				unset($parameters[1], $unquotable_parameters[1]);
@@ -290,8 +290,8 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[2] = self::convertTimeshift($parameters[2]);
+				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[2] !== '') {
-					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[2];
 				}
 				unset($parameters[2], $unquotable_parameters[2]);
@@ -302,8 +302,8 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', '', '', ''];
 				$parameters[0] = self::convertParamSec($parameters[0]);
 				$parameters[3] = self::convertTimeshift($parameters[3]);
+				$parameters[0] = ($parameters[0] === '' || (string) $parameters[0] === '0') ? '#1' : $parameters[0];
 				if ($parameters[3] !== '') {
-					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[3];
 				}
 				if ($parameters[2] === 'band') {
@@ -346,7 +346,6 @@ class C52TriggerExpressionConverter extends CConverter {
 				$parameters += ['', ''];
 				$parameters[0] = self::convertParamPeriod($parameters[0]);
 				if ($parameters[1] !== '') {
-					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[1];
 				}
 				unset($parameters[1], $unquotable_parameters[1]);
