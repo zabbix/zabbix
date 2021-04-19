@@ -146,6 +146,10 @@ func run() error {
 
 	http.HandleFunc("/report", h.report)
 
+	if err := validateTLSFiles(); err != nil {
+		return err
+	}
+
 	switch options.TLSAccept {
 	case "cert":
 		server, err := createTLSServer()
@@ -156,9 +160,9 @@ func run() error {
 		return server.ListenAndServeTLS(options.TLSCertFile, options.TLSKeyFile)
 	case "", "unencrypted":
 		return http.ListenAndServe(":"+options.ListenPort, nil)
-	default:
-		return errors.New("invalid TLSAccept configuration parameter")
 	}
+
+	return nil
 }
 
 func fatalExit(message string, err error) {
@@ -174,6 +178,35 @@ func fatalExit(message string, err error) {
 
 	fmt.Fprintf(os.Stderr, "zabbix_web_service [%d]: ERROR: %s\n", os.Getpid(), message)
 	os.Exit(1)
+}
+
+func validateTLSFiles() error {
+	switch options.TLSAccept {
+	case "cert":
+		if options.TLSCAFile == "" {
+			return errors.New("missing TLSCAFile configuration parameter")
+		}
+		if options.TLSCertFile == "" {
+			return errors.New("missing TLSCertFile configuration parameter")
+		}
+		if options.TLSKeyFile == "" {
+			return errors.New("missing TLSKeyFile configuration parameter")
+		}
+	case "", "unencrypted":
+		if options.TLSCAFile != "" {
+			return errors.New("TLSCAFile configuration parameter set without certificates being used")
+		}
+		if options.TLSCertFile != "" {
+			return errors.New("TLSCertFile configuration parameter set without certificates being used")
+		}
+		if options.TLSKeyFile != "" {
+			return errors.New("TLSKeyFile configuration parameter set without certificates being used")
+		}
+	default:
+		return errors.New("invalid TLSAccept configuration parameter")
+	}
+
+	return nil
 }
 
 func createTLSServer() (*http.Server, error) {

@@ -25,7 +25,7 @@ type serviceOptions struct {
 	ListenPort  string `conf:"optional,range=1024:32767,default=10053"`
 	AllowedIP   string `conf:"optional"`
 	LogType     string `conf:"optional,default=file"`
-	LogFile     string `conf:"optional,default=/tmp/zabbix_agent2.log"`
+	LogFile     string `conf:"optional,default=/tmp/zabbix_web_service.log"`
 	LogFileSize int    `conf:"optional,range=0:1024,default=1"`
 	Timeout     int    `conf:"optional,range=1:30,default=3"`
 	DebugLevel  int    `conf:"range=0:5,default=3"`
