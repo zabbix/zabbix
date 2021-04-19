@@ -194,11 +194,6 @@ class CFunctionParser extends CParser {
 							break;
 
 						case ')':
-							$_parameters[$num] = new CFunctionParameterResult([
-								'type' => self::PARAM_UNQUOTED,
-								'match' => '',
-								'pos' => $p
-							]);
 							$state = self::STATE_END_OF_PARAMS;
 							break;
 
