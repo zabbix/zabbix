@@ -30,7 +30,6 @@
 #include "poller.h"
 
 #include "checks_agent.h"
-#include "checks_aggregate.h"
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"

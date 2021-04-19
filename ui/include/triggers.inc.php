@@ -592,7 +592,7 @@ function triggerExpressionReplaceHost(string $expression, string $src_host, stri
 	$trigger_expression_parser = new CTriggerExpression();
 	if (($result = $trigger_expression_parser->parse($expression)) !== false) {
 		$queries = $result->getTokensOfTypes([CTriggerExprParserResult::TOKEN_TYPE_QUERY]);
-		for ($i = count($queries)-1; $i >= 0; $i--) {
+		for ($i = count($queries) - 1; $i >= 0; $i--) {
 			if ($queries[$i]->host === $src_host) {
 				$expression = substr_replace($expression, '/'.$dst_host.'/'.$queries[$i]->item, $queries[$i]->pos,
 					$queries[$i]->length

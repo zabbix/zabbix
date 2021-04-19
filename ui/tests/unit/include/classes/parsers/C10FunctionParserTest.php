@@ -26,7 +26,7 @@ class C10FunctionParserTest extends TestCase {
 	/**
 	 * An array of trigger functions and parsed results.
 	 */
-	public static function testProvider() {
+	public static function dataProviderParse() {
 		return [
 			// valid keys
 			[
@@ -518,7 +518,7 @@ class C10FunctionParserTest extends TestCase {
 	}
 
 	/**
-	 * @dataProvider testProvider
+	 * @dataProvider dataProviderParse
 	 *
 	 * @param string $source
 	 * @param int    $pos

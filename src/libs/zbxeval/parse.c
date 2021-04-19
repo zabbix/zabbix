@@ -646,17 +646,41 @@ static int	eval_parse_query_filter(const char **ptr)
  ******************************************************************************/
 size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, const char **pfilter)
 {
+#define MVAR_HOST_HOST	"{HOST.HOST"
+
 	const char	*host = str + 1, *key, *filter, *end;
 
 	key = host;
 
-	if ('*' != *host)
+	if ('*' == *key)
+	{
+		key++;
+	}
+	else if ('{' == *key)
+	{
+		if (0 == strncmp(key, MVAR_HOST_HOST, ZBX_CONST_STRLEN(MVAR_HOST_HOST)))
+		{
+			int	offset = 0;
+
+			if ('}' == key[ZBX_CONST_STRLEN(MVAR_HOST_HOST)])
+			{
+				offset = 1;
+			}
+			else if (0 != isdigit((unsigned char)key[ZBX_CONST_STRLEN(MVAR_HOST_HOST)]) &&
+				'}' == key[ZBX_CONST_STRLEN(MVAR_HOST_HOST) + 1])
+			{
+				offset = 2;
+			}
+
+			if (0 != offset)
+				key += ZBX_CONST_STRLEN(MVAR_HOST_HOST) + offset;
+		}
+	}
+	else if ('/' != *key)
 	{
 		while (SUCCEED == is_hostname_char(*key))
 			key++;
 	}
-	else
-		key++;
 
 	if ('/' != *key)
 		return 0;
@@ -686,6 +710,8 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	}
 
 	return end - str;
+
+#undef MVAR_HOST_HOST
 }
 
 /******************************************************************************

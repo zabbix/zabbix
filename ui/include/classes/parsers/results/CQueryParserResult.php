@@ -24,6 +24,9 @@
  */
 class CQueryParserResult extends CFunctionParameterResult {
 
+	// Wildcard character to define host or item key.
+	const HOST_ITEMKEY_WILDCARD = '*';
+
 	/**
 	 * Host name
 	 *

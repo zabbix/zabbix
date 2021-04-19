@@ -117,22 +117,4 @@ class CQueryParser extends CParser {
 
 		return isset($source[$pos]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
-
-	/**
-	 * Returns host.
-	 *
-	 * @return string
-	 */
-	public function getHost(): string {
-		return $this->host;
-	}
-
-	/**
-	 * Returns item.
-	 *
-	 * @return string
-	 */
-	public function getItem(): string {
-		return $this->item;
-	}
 }

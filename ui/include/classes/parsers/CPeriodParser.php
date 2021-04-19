@@ -25,6 +25,18 @@
 class CPeriodParser extends CParser {
 
 	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'lldmacros' => true    Enable low-level discovery macros usage in trigger expression.
+	 *
+	 * @var array
+	 */
+	protected $options = [
+		'lldmacros' => true
+	];
+
+	/**
 	 * User macro parser.
 	 *
 	 * @var CUserMacroParser
@@ -39,6 +51,13 @@ class CPeriodParser extends CParser {
 	private $lld_macro_parser;
 
 	/**
+	 * LLD macro function parser.
+	 *
+	 * @var CLLDMacroFunctionParser
+	 */
+	private $lld_macro_function_parser;
+
+	/**
 	 * Parsed data.
 	 *
 	 * @var CPeriodParserResult
@@ -47,10 +66,16 @@ class CPeriodParser extends CParser {
 
 	/**
 	 * @param array $options
+	 * @param bool  $options['lldmacros']
 	 */
-	public function __construct() {
+	public function __construct(array $options) {
+		$this->options = $options + $this->options;
+
 		$this->user_macro_parser = new CUserMacroParser();
-		$this->lld_macro_parser = new CLLDMacroParser();
+		if ($this->options['lldmacros']) {
+			$this->lld_macro_parser = new CLLDMacroParser();
+			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
+		}
 	}
 
 	/**
@@ -86,7 +111,14 @@ class CPeriodParser extends CParser {
 				$parts[$num] .= $this->user_macro_parser->match;
 				$contains_macros[$num] = true;
 			}
-			elseif ($this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
+			elseif ($this->options['lldmacros']
+					&& $this->lld_macro_function_parser->parse($source, $pos) != CParser::PARSE_FAIL) {
+				$pos += $this->lld_macro_function_parser->length;
+				$parts[$num] .= $this->lld_macro_function_parser->match;
+				$contains_macros[$num] = true;
+			}
+			elseif ($this->options['lldmacros']
+					&& $this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
 				$pos += $this->lld_macro_parser->length;
 				$parts[$num] .= $this->lld_macro_parser->match;
 				$contains_macros[$num] = true;
@@ -97,14 +129,15 @@ class CPeriodParser extends CParser {
 			}
 		}
 
-		if (count($parts) > 2) {
+		// Valid period consists of 1 or 2 non-empty parts.
+		if (count($parts) > 2 || $parts[0] === '' || (array_key_exists(1, $parts) && $parts[1] === '')) {
 			return CParser::PARSE_FAIL;
 		}
 
 		// Check format. Otherwaise, almost anything can be period.
 		$is_valid_num = (substr($parts[0], 0, 1) === '#' && ctype_digit(substr($parts[0], 1)));
 		$is_valid_sec = preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.ZBX_TIME_SUFFIXES_WITH_YEAR.'])$/', $parts[0]);
-		if (!$is_valid_num && !$is_valid_sec) {
+		if (!$is_valid_num && !$is_valid_sec && !$contains_macros[0]) {
 			return CParser::PARSE_FAIL;
 		}
 

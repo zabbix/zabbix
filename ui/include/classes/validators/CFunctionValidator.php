@@ -46,6 +46,13 @@ class CFunctionValidator extends CValidator {
 	private $allowed;
 
 	/**
+	 * Position at which error was detected.
+	 *
+	 * @var int
+	 */
+	public $error_pos;
+
+	/**
 	 * If set to true, LLD macros can be used inside functions and are properly validated using LLD macro parser.
 	 *
 	 * @var bool
@@ -57,7 +64,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @var bool
 	 */
-	private $calculated = false;
+	protected $calculated = false;
 
 	public function __construct(array $options = []) {
 		/*
@@ -69,10 +76,6 @@ class CFunctionValidator extends CValidator {
 		if (array_key_exists('lldmacros', $options)) {
 			$this->lldmacros = $options['lldmacros'];
 			unset($options['lldmacros']);
-		}
-		if (array_key_exists('calculated', $options)) {
-			$this->calculated = (bool) $options['calculated'];
-			unset($options['calculated']);
 		}
 		parent::__construct($options);
 
@@ -140,18 +143,6 @@ class CFunctionValidator extends CValidator {
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01]
 				],
-				'value_types' => $value_types_all
-			],
-			'date' => [
-				'args' => [],
-				'value_types' => $value_types_all
-			],
-			'dayofmonth' => [
-				'args' => [],
-				'value_types' => $value_types_all
-			],
-			'dayofweek' => [
-				'args' => [],
 				'value_types' => $value_types_all
 			],
 			'find' => [
@@ -235,10 +226,6 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $value_types_all
 			],
-			'now' => [
-				'args' => [],
-				'value_types' => $value_types_all
-			],
 			'percentile' => [
 				'args' => [
 					['type' => 'query', 'mandat' => 0x01],
@@ -253,10 +240,6 @@ class CFunctionValidator extends CValidator {
 					['type' => 'scale', 'mandat' => 0x01]
 				],
 				'value_types' => $value_types_num
-			],
-			'time' => [
-				'args' => [],
-				'value_types' => $value_types_all
 			],
 			'timeleft' => [
 				'args' => [
@@ -308,27 +291,20 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate trigger function like last(0), time(), etc.
 	 *
-	 * @param array                  $value
-	 * @param CFunctionParserResult  $value['fn']
-	 * @param int                    $value['value_type']  Used only to enable some parameters unquoted.
+	 * @param CFunctionParserResult  $fn
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($fn) {
 		$this->setError('');
-
-		$value_type = array_key_exists('value_type', $value) ? $value['value_type'] : ITEM_VALUE_TYPE_STR;
-		$fn = $value['fn'];
+		$this->error_pos = 0;
 
 		if (!array_key_exists($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-				_('Unknown function.'));
-			return false;
-		}
+				_('Unknown function.')
+			);
+			$this->error_pos = $fn->pos;
 
-		if (count($this->allowed[$fn->function]['args']) < count($fn->params_raw['parameters'])) {
-			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-				_('Invalid number of parameters.'));
 			return false;
 		}
 
@@ -340,32 +316,70 @@ class CFunctionValidator extends CValidator {
 			_('Invalid fifth parameter.')
 		];
 
+		$next_param_num = 0;
+		$last_valid_pos = $fn->pos + $fn->params_raw['pos'] + 1;
+
 		foreach ($this->allowed[$fn->function]['args'] as $num => $arg) {
+			$next_param_num = $num + 1;
+
 			// Mandatory check.
 			if ($arg['mandat'] && !array_key_exists($num, $fn->params_raw['parameters'])) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
-					_('Mandatory parameter is missing.'));
+					_('Mandatory parameter is missing.')
+				);
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
 			elseif (!array_key_exists($num, $fn->params_raw['parameters'])) {
 				continue;
 			}
+			elseif (($fn->params_raw['parameters'][$num] instanceof CFunctionParameterResult) == false) {
+				continue;
+			}
 
-			if (!$this->checkQuotes($arg['type'], $value_type, $fn->params_raw['parameters'][$num])) {
+			if (!$this->checkQuotes($arg['type'], $fn->params_raw['parameters'][$num])) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 					$param_labels[$num]
 				);
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
 
-			$parameter_value = $fn->params_raw['parameters'][$num]->getValue();
+			if ($arg['mandat'] == 0x00 && $fn->params_raw['parameters'][$num]->getValue() === '') {
+				$last_valid_pos++;
 
-			if ($arg['mandat'] != 0x00 && !$this->validateParameter($fn->params_raw['parameters'][$num], $arg)) {
+				continue;
+			}
+
+			if ($arg['mandat'] != 0x00 && $fn->params_raw['parameters'][$num]->getValue() === '') {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+					$param_labels[$num]
+				);
+				$this->error_pos = $last_valid_pos;
+
+				return false;
+			}
+
+			if (!$this->validateParameter($fn->params_raw['parameters'][$num], $arg)) {
 				$this->setError(
 					_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.$param_labels[$num]
 				);
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
+
+			$last_valid_pos = $fn->params_raw['parameters'][$num]->pos + $fn->params_raw['parameters'][$num]->length;
+		}
+
+		if (array_key_exists($next_param_num, $fn->params_raw['parameters'])) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
+				_('Invalid number of parameters.'));
+			$this->error_pos = $fn->params_raw['parameters'][$next_param_num]->pos;
+
+			return false;
 		}
 
 		return true;
@@ -374,16 +388,15 @@ class CFunctionValidator extends CValidator {
 	/**
 	 * Validate value type.
 	 *
-	 * @param array                 $value
-	 * @param CFunctionParserResult $value['fn']
-	 * @param int                   $value['value_type']  To check if function support particular type of values.
+	 * @param int                   $value_type  To check if function support particular type of values.
+	 * @param CFunctionParserResult $fn
 	 *
 	 * @return bool
 	 */
-	public function validateValueType(array $value): bool {
-		if (!array_key_exists($value['value_type'], $this->allowed[$value['fn']->function]['value_types'])) {
+	public function validateValueType(int $value_type, CFunctionParserResult $fn): bool {
+		if (!array_key_exists($value_type, $this->allowed[$fn->function]['value_types'])) {
 			$this->setError(_s('Incorrect item value type "%1$s" provided for trigger function "%2$s".',
-				itemValueTypeString($value['value_type']), $value['fn']->match));
+				itemValueTypeString($value_type), $fn->match));
 			return false;
 		}
 
@@ -394,12 +407,11 @@ class CFunctionValidator extends CValidator {
 	 * Check if parameter is properly quoted.
 	 *
 	 * @param string         $type
-	 * @param int            $value_type
 	 * @param CParserResult  $param
 	 *
 	 * @return bool
 	 */
-	private function checkQuotes(string $type, int $value_type, CParserResult $parameter): bool {
+	private function checkQuotes(string $type, CParserResult $parameter): bool {
 		if ($parameter->getValue() === '') {
 			return true;
 		}
@@ -411,21 +423,9 @@ class CFunctionValidator extends CValidator {
 			case 'period':
 			case 'sec_neg':
 			case 'sec_zero':
-				return !self::isQuoted($parameter->getValue(true));
-
-			// Mandatory quoted based on value type.
-			case 'pattern':
-				$support_unquoted = (ctype_digit((string) $parameter->getValue())
-						&& in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]));
-				if (!$support_unquoted && !self::isQuoted($parameter->getValue(true))) {
-					return false;
-				}
-				break;
-
-			// Optionally quoted.
-			case 'percent':
 			case 'num_suffix':
-				return true;
+			case 'percent':
+				return !self::isQuoted($parameter->getValue(true));
 
 			// Mandatory quoted.
 			default:
@@ -541,6 +541,7 @@ class CFunctionValidator extends CValidator {
 	 * Valid period shift can contain time range value with precision and multiple of an hour.
 	 *
 	 * @param mixed $param
+	 * @param int   $mandat
 	 *
 	 * @return bool
 	 */
@@ -557,7 +558,7 @@ class CFunctionValidator extends CValidator {
 			$period_shift = $param->time_shift;
 		}
 
-		if (($mandat & 0x01) && !$param->sec_num_contains_macros) {
+		if ((($mandat & 0x01) || $mandat !== '') && !$param->sec_num_contains_macros) {
 			$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
 			if ($simple_interval_parser->parse($period) != CParser::PARSE_SUCCESS) {
 				return false;
@@ -569,11 +570,11 @@ class CFunctionValidator extends CValidator {
 			}
 		}
 
-		if (!($mandat & 0x02) && $period_shift === null) {
+		if ((!($mandat & 0x02) && $period_shift === null) || $param->time_shift_contains_macros) {
 			return true;
 		}
-		elseif (($mandat & 0x02) && !$this->validateTrendPeriods($period, $period_shift)) {
-			return $this->isMacro($period_shift);
+		elseif (!$this->validateTrendPeriods($period, $period_shift)) {
+			return false;
 		}
 
 		return true;
@@ -736,11 +737,6 @@ class CFunctionValidator extends CValidator {
 		$period = strpos($precisions, substr($period_value, -1));
 
 		if ($period !== false) {
-			if (substr($period_shift_value, 0, 4) !== 'now/') {
-				return false;
-			}
-			$period_shift_value = substr($period_shift_value, 4);
-
 			$relative_time_parser = new CRelativeTimeParser();
 			if ($relative_time_parser->parse($period_shift_value) !== CParser::PARSE_SUCCESS) {
 				return false;

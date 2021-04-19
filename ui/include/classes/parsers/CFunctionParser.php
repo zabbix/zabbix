@@ -39,11 +39,15 @@ class CFunctionParser extends CParser {
 	 *
 	 * Supported options:
 	 *   'collapsed_expression' => false  Short trigger expression.
+	 *   'nested_functions' => true       Support nested functions as parameters.
+	 *   'lldmacros' => true              Enable low-level discovery macros usage in trigger expression.
 	 *
 	 * @var array
 	 */
 	protected $options = [
-		'collapsed_expression' => false
+		'collapsed_expression' => false,
+		'nested_functions' => true,
+		'lldmacros' => true
 	];
 
 	/**
@@ -63,6 +67,9 @@ class CFunctionParser extends CParser {
 	/**
 	 * @param array $options
 	 * @param bool  $options['collapsed_expression']
+	 * @param bool  $options['nested_functions']
+	 * @param bool  $options['lldmacros']
+	 * @param int   $depth
 	 */
 	public function __construct(array $options = [], int $depth = 1) {
 		$this->options = $options + $this->options;
@@ -154,8 +161,17 @@ class CFunctionParser extends CParser {
 		$num = 0;
 
 		$query_parser = new CQueryParser($this->options);
-		$period_parser = new CPeriodParser();
+		$period_parser = new CPeriodParser(['lldmacros' => $this->options['lldmacros']]);
+		$user_macro_parser = new CUserMacroParser();
+		if ($this->options['lldmacros']) {
+			$lld_macro_parser = new CLLDMacroParser();
+			$lld_macro_function_parser = new CLLDMacroFunctionParser();
+		}
 		$function_parser = new self($this->options, $this->depth + 1);
+		$number_parser = new CNumberParser([
+			'with_minus' => true,
+			'with_suffix' => true
+		]);
 
 		if ($this->options['collapsed_expression']) {
 			$functionid_parser = new CFunctionIdParser();
@@ -173,7 +189,7 @@ class CFunctionParser extends CParser {
 							$_parameters[$num++] = new CFunctionParameterResult([
 								'type' => self::PARAM_UNQUOTED,
 								'match' => '',
-								'pos' => $p - $pos
+								'pos' => $p
 							]);
 							break;
 
@@ -181,7 +197,7 @@ class CFunctionParser extends CParser {
 							$_parameters[$num] = new CFunctionParameterResult([
 								'type' => self::PARAM_UNQUOTED,
 								'match' => '',
-								'pos' => $p - $pos
+								'pos' => $p
 							]);
 							$state = self::STATE_END_OF_PARAMS;
 							break;
@@ -190,18 +206,20 @@ class CFunctionParser extends CParser {
 							$_parameters[$num] = new CFunctionParameterResult([
 								'type' => self::PARAM_QUOTED,
 								'match' => $source[$p],
-								'pos' => $p - $pos
+								'pos' => $p,
+								'length' => 1
 							]);
 							$state = self::STATE_QUOTED;
 							break;
 
 						default:
-							if ($query_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+							if ($num == 0 && $query_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $query_parser->getLength() - 1;
 								$_parameters[$num] = $query_parser->result;
 								$state = self::STATE_END;
 							}
-							elseif ($function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+							elseif ($this->options['nested_functions']
+									&& $function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $function_parser->getLength() - 1;
 								$_parameters[$num] = $function_parser->result;
 								$state = self::STATE_END;
@@ -212,9 +230,56 @@ class CFunctionParser extends CParser {
 								$_parameters[$num] = $functionid_parser->result;
 								$state = self::STATE_END;
 							}
-							elseif ($period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+							elseif ($num == 1 && $period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $period_parser->getLength() - 1;
 								$_parameters[$num] = $period_parser->result;
+								$state = self::STATE_END;
+							}
+							elseif ($user_macro_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$_parameters[$num] = new CFunctionParameterResult([
+									'type' => self::PARAM_UNQUOTED,
+									'match' => $user_macro_parser->getMatch(),
+									'pos' => $p,
+									'length' => $user_macro_parser->getLength()
+								]);
+
+								$p += $user_macro_parser->getLength() - 1;
+								$state = self::STATE_END;
+							}
+							elseif ($number_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$_parameters[$num] = new CFunctionParameterResult([
+									'type' => self::PARAM_UNQUOTED,
+									'match' => $number_parser->getMatch(),
+									'pos' => $p,
+									'length' => $number_parser->getLength()
+								]);
+
+								$p += $number_parser->getLength() - 1;
+								$state = self::STATE_END;
+							}
+							elseif ($this->options['lldmacros']
+									&& $lld_macro_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$_parameters[$num] = new CFunctionParameterResult([
+									'type' => self::PARAM_UNQUOTED,
+									'match' => $lld_macro_parser->getMatch(),
+									'pos' => $p,
+									'length' => $lld_macro_parser->getLength()
+								]);
+
+								$p += $lld_macro_parser->getLength() - 1;
+								$state = self::STATE_END;
+							}
+							elseif ($this->options['lldmacros']
+									&& $this->options['nested_functions']
+									&& $lld_macro_function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$_parameters[$num] = new CFunctionParameterResult([
+									'type' => self::PARAM_UNQUOTED,
+									'match' => $lld_macro_function_parser->getMatch(),
+									'pos' => $p,
+									'length' => $lld_macro_function_parser->getLength()
+								]);
+
+								$p += $lld_macro_function_parser->getLength() - 1;
 								$state = self::STATE_END;
 							}
 							else {
@@ -230,21 +295,16 @@ class CFunctionParser extends CParser {
 									$this->errorPos($source, $pos);
 									break 3;
 								}
-
-								if (!array_key_exists($num, $_parameters)) {
-									$_parameters[$num] = new CFunctionParameterResult([
-										'type' => self::PARAM_UNQUOTED,
-										'match' => $source[$p],
-										'pos' => $p - $pos,
-										'length' => 1
-									]);
+								elseif (!array_key_exists($num, $_parameters) || $_parameters[$num]->match === '') {
+									// Unquoted string parameters are not supported.
+									$this->errorPos($source, $p);
+									break 3;
 								}
 								else {
 									$_parameters[$num]->match .= $source[$p];
 									$_parameters[$num]->length++;
+									$state = self::STATE_UNQUOTED;
 								}
-
-								$state = self::STATE_UNQUOTED;
 							}
 					}
 					break;

@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.4.0rc1');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030084);
+define('ZABBIX_DB_VERSION',		5030086);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -486,7 +486,7 @@ define('ITEM_TYPE_SNMPV2C',			4); // Deprecated. Now only used in XML converters
 define('ITEM_TYPE_INTERNAL',		5);
 define('ITEM_TYPE_SNMPV3',			6); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_SNMP instead.
 define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
-define('ITEM_TYPE_AGGREGATE',		8);
+define('ITEM_TYPE_AGGREGATE',		8); // Deprecated. Now only used in XML converters. Use ITEM_TYPE_CALCULATED instead.
 define('ITEM_TYPE_HTTPTEST',		9);
 define('ITEM_TYPE_EXTERNAL',		10);
 define('ITEM_TYPE_DB_MONITOR',		11);

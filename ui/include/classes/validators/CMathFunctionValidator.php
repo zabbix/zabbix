@@ -36,7 +36,12 @@ class CMathFunctionValidator extends CValidator {
 		'max',
 		'min',
 		'length',
-		'sum'
+		'sum',
+		'date',
+		'dayofmonth',
+		'dayofweek',
+		'now',
+		'time'
 	];
 
 	/**
@@ -47,7 +52,12 @@ class CMathFunctionValidator extends CValidator {
 	private $number_of_parameters = [
 		'abs' => 1,
 		'bitand' => 2,
-		'length' => 1
+		'length' => 1,
+		'date' => 0,
+		'dayofmonth' => 0,
+		'dayofweek' => 0,
+		'now' => 0,
+		'time' => 0
 	];
 
 	/**
@@ -72,6 +82,13 @@ class CMathFunctionValidator extends CValidator {
 	protected $user_macro_parser;
 
 	/**
+	 * Position at which error was detected.
+	 *
+	 * @var int
+	 */
+	public $error_pos;
+
+	/**
 	 * Parser for LLD macros.
 	 *
 	 * @var CLLDMacroParser
@@ -79,9 +96,11 @@ class CMathFunctionValidator extends CValidator {
 	protected $lld_macro_parser;
 
 	/**
-	 * If set to true, foreach functions will be allowed and validated as first parameter.
+	 * Validate as part of calculated item formula: allow CQueryParserResult as first argument.
+	 *
+	 * @var bool
 	 */
-	protected $foreach_function = false;
+	protected $calculated = false;
 
 	/**
 	 * Array of function supports foreach function as first parameter.
@@ -125,15 +144,13 @@ class CMathFunctionValidator extends CValidator {
 	/**
 	 * Validate trigger math function.
 	 *
-	 * @param array                  $value
-	 * @param CFunctionParserResult  $value['fn']
+	 * @param CFunctionParserResult  $fn
 	 *
 	 * @return bool
 	 */
-	public function validate($value) {
+	public function validate($fn) {
 		$this->setError('');
-
-		$fn = $value['fn'];
+		$this->error_pos = 0;
 
 		if (!in_array($fn->function, $this->allowed)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
@@ -141,19 +158,25 @@ class CMathFunctionValidator extends CValidator {
 			return false;
 		}
 
+		$last_valid_pos = $fn->pos + $fn->params_raw['pos'] + 1;
+
 		if (count($fn->params_raw['parameters']) == 0
-				|| (in_array($fn->function, $this->number_of_parameters)
+				|| (array_key_exists($fn->function, $this->number_of_parameters)
 						&& count($fn->params_raw['parameters']) != $this->number_of_parameters[$fn->function])) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid number of parameters.'));
+			$this->error_pos = $last_valid_pos;
+
 			return false;
 		}
 
-		$validate_foreach = ($this->foreach_function && in_array($fn->function, $this->parameter_foreach_functions));
+		$validate_foreach = ($this->calculated && in_array($fn->function, $this->parameter_foreach_functions));
 
 		foreach ($fn->params_raw['parameters'] as $param) {
-			if ($param instanceof CQueryParserResult) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
+			if ($param instanceof CQueryParserResult && !$this->calculated) {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
 			elseif ($param instanceof CFunctionParserResult) {
@@ -167,16 +190,18 @@ class CMathFunctionValidator extends CValidator {
 						return false;
 					}
 				}
+				$last_valid_pos = $param->pos;
 
 				continue;
 			}
-			elseif (!$this->user_macro_parser->parse($param->match)
-					&& $this->number_parser->parse($param->match)
-					&& $this->checkString($param->match)
-					&& (!$this->lldmacros || $this->lld_macro_parser->parse($param->match))) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
+			elseif (!$this->checkValidConstant($param->getValue(true))) {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match));
+				$this->error_pos = $last_valid_pos;
+
 				return false;
 			}
+
+			$last_valid_pos = $param->pos + $param->length;
 		}
 
 		return true;
@@ -199,7 +224,11 @@ class CMathFunctionValidator extends CValidator {
 			return false;
 		}
 
-		if ((array_shift($params) instanceof CQueryParserResult) === false) {
+		$query = array_shift($params);
+
+		if (($query instanceof CQueryParserResult) === false
+				|| ($query->host === CQueryParserResult::HOST_ITEMKEY_WILDCARD
+				&& $query->item[0] === CQueryParserResult::HOST_ITEMKEY_WILDCARD)) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid first parameter.')
 			);
@@ -224,7 +253,20 @@ class CMathFunctionValidator extends CValidator {
 		return true;
 	}
 
-	private function checkString(string $param): bool {
-		return preg_match('/^"([^"\\\\]|\\\\["\\\\])*"/', $param);
+	/**
+	 * Check if parameter is valid constant.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function checkValidConstant(string $param): bool {
+		if ($this->user_macro_parser->parse($param) == CParser::PARSE_SUCCESS
+				|| $this->number_parser->parse($param) == CParser::PARSE_SUCCESS
+				|| ($this->lldmacros && $this->lld_macro_parser->parse($param) != CParser::PARSE_SUCCESS)) {
+			return true;
+		}
+
+		return false;
 	}
 }
