@@ -96,6 +96,13 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
 		return FAIL;
 	}
 
+	if (FP_ZERO != fpclassify(right->data.dbl) && FP_NORMAL != fpclassify(right->data.dbl))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
 	switch (token->type)
 	{
 		case ZBX_EVAL_TOKEN_OP_MINUS:
@@ -289,6 +296,14 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 	}
 
 	/* check logical operators */
+
+	if ((FP_ZERO != fpclassify(left->data.dbl) && FP_NORMAL != fpclassify(left->data.dbl)) ||
+			(FP_ZERO != fpclassify(right->data.dbl) && FP_NORMAL != fpclassify(right->data.dbl)))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + ctx->stack.values[ctx->stack.values_num - 3].loc.l);
+		return FAIL;
+	}
 
 	switch (token->type)
 	{
@@ -1281,7 +1296,7 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 }
 
 #define ZBX_MATH_CONST_PI	3.141592653589793238463
-#define ZBX_MATH_CONST_E	2.718281828459045
+#define ZBX_MATH_CONST_E	2.7182818284590452354
 #define ZBX_MATH_RANDOM		0
 
 static double	eval_math_func_degrees(double radians)
@@ -1331,6 +1346,7 @@ static int	eval_execute_math_function_single_param(const zbx_eval_context_t *ctx
 		zbx_vector_var_t *output, char **error, double (*func)(double))
 {
 	int		ret;
+	double		result;
 	zbx_variant_t	*arg, value;
 
 	if (1 != token->opt)
@@ -1348,13 +1364,22 @@ static int	eval_execute_math_function_single_param(const zbx_eval_context_t *ctx
 	if (((log == func || log10 == func) && 0 >= arg->data.dbl) || (sqrt == func && 0 > arg->data.dbl) ||
 			(eval_math_func_cot == func && 0 == arg->data.dbl))
 	{
-		*error = zbx_dsprintf(*error, "invalid argument \"%s\"for function at \"%s\"",
-				zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "invalid argument for function at \"%s\"",
+				ctx->expression + token->loc.l);
 
 		return FAIL;
 	}
 
-	zbx_variant_set_dbl(&value, func(arg->data.dbl));
+	result = func(arg->data.dbl);
+
+	if (FP_ZERO != fpclassify(result) && FP_NORMAL != fpclassify(result))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_dbl(&value, result);
 
 	eval_function_return(token->opt, &value, output);
 
@@ -1404,6 +1429,7 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 		zbx_vector_var_t *output, char **error, double (*func)(double, double))
 {
 	int		ret;
+	double		result;
 	zbx_variant_t	*arg1, *arg2, value;
 
 	if (2 != token->opt)
@@ -1419,25 +1445,33 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 	arg1 = &output->values[output->values_num - 2];
 	arg2 = &output->values[output->values_num - 1];
 
-	if (((eval_math_func_round == func || eval_math_func_truncate == func) && 0 > arg2->data.dbl) ||
-			0.0 != fmod(arg2->data.dbl, 1))
+	if ((eval_math_func_round == func || eval_math_func_truncate == func) && (0 > arg2->data.dbl ||
+			0.0 != fmod(arg2->data.dbl, 1)) || (fmod == func && 0.0 == arg2->data.dbl))
 	{
-		*error = zbx_dsprintf(*error, "invalid second argument \"%s\" for function at \"%s\"",
-				zbx_variant_value_desc(arg2), ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "invalid second argument for function at \"%s\"",
+				ctx->expression + token->loc.l);
 
 		return FAIL;
 	}
 
 	if (atan2 == func && 0.0 == arg1->data.dbl && 0.0 == arg2->data.dbl)
 	{
-		*error = zbx_dsprintf(*error, "invalid both function arguments \"%s,%s\" for function at \"%s\"",
-				zbx_variant_value_desc(arg1), zbx_variant_value_desc(arg2),
+		*error = zbx_dsprintf(*error, "undefined result for arguments (0,0) for function 'atan2' at \"%s\"",
 				ctx->expression + token->loc.l);
 
 		return FAIL;
 	}
 
-	zbx_variant_set_dbl(&value, func(arg1->data.dbl, arg2->data.dbl));
+	result = func(arg1->data.dbl, arg2->data.dbl);
+
+	if (FP_ZERO != fpclassify(result) && FP_NORMAL != fpclassify(result))
+	{
+		*error = zbx_dsprintf(*error, "calculation resulted in NaN or Infinity at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_dbl(&value, result);
 
 	eval_function_return(token->opt, &value, output);
 
@@ -1457,7 +1491,6 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
  *             func       - [IN] the pointer to math function                 *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
- *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
@@ -1476,7 +1509,7 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 	{
 		struct timespec ts;
 
-		if (0 != clock_gettime(CLOCK_MONOTONIC, &ts))
+		if (SUCCEED != clock_gettime(CLOCK_MONOTONIC, &ts))
 		{
 			srand((unsigned int)time(NULL));
 			zbx_variant_set_dbl(&ret_value, (double)(rand()));

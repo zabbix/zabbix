@@ -926,6 +926,14 @@ out:
   result: SUCCEED
   value: 8
 ---
+test case: Expression 'sqrt(2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'sqrt(2.5)'
+out:
+  result: SUCCEED
+  value: 1.5811388300841898
+---
 test case: Expression 'sqrt(0)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -949,6 +957,14 @@ out:
   result: SUCCEED
   value: 3.5
 ---
+test case: Expression 'abs(-3.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'abs(-3.5)'
+out:
+  result: SUCCEED
+  value: 3.5
+---
 test case: Expression 'cbrt(64)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -965,6 +981,14 @@ out:
   result: SUCCEED
   value: 3.9790572078963922
 ---
+test case: Expression 'cbrt(2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'cbrt(2.5)'
+out:
+  result: SUCCEED
+  value: 1.3572088082974532
+---
 test case: Expression 'ceil(2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -980,6 +1004,14 @@ in:
 out:
   result: SUCCEED
   value: 3
+---
+test case: Expression 'ceil(-2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'ceil(-2.5)'
+out:
+  result: SUCCEED
+  value: -2
 ---
 test case: Expression 'e()'
 in:
@@ -1004,6 +1036,14 @@ out:
   result: SUCCEED
   value: 7.38905609893065
 ---
+test case: Expression 'exp(2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'exp(2.5)'
+out:
+  result: SUCCEED
+  value: 12.182493960703473
+---
 test case: Expression 'expm1(2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1011,6 +1051,14 @@ in:
 out:
   result: SUCCEED
   value: 6.38905609893065
+---
+test case: Expression 'expm1(2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'expm1(2.5)'
+out:
+  result: SUCCEED
+  value: 11.182493960703473
 ---
 test case: Expression 'floor(2.6)'
 in:
@@ -1020,6 +1068,22 @@ out:
   result: SUCCEED
   value: 2
 ---
+test case: Expression 'floor(2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'floor(2)'
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Expression 'floor(-2.8)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'floor(-2.8)'
+out:
+  result: SUCCEED
+  value: -3
+---
 test case: Expression 'log(2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1027,6 +1091,14 @@ in:
 out:
   result: SUCCEED
   value: 0.69314718055994529
+---
+test case: Expression 'log(2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'log(2.5)'
+out:
+  result: SUCCEED
+  value: 0.91629073187415511
 ---
 test case: Expression 'log(0)'
 in:
@@ -1052,6 +1124,14 @@ out:
   result: FAIL
   value: 0
 ---
+test case: Expression 'log10(2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'log10(2.5)'
+out:
+  result: SUCCEED
+  value: 0.3979400086720376
+---
 test case: Expression 'pi()'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1067,12 +1147,6 @@ in:
 out:
   result: FAIL
 ---
-test case: Expression 'rand(1)'
-in:
-  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
-  expression: 'rand(1)'
-out:
-  result: FAIL
 test case: Expression 'power(2,3)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
@@ -1080,6 +1154,22 @@ in:
 out:
   result: SUCCEED
   value: 8
+---
+test case: Expression 'power(2,2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'power(2,2.5)'
+out:
+  result: SUCCEED
+  value: 5.6568542494923806
+---
+test case: Expression 'power(2.5,2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'power(2.5,2.5)'
+out:
+  result: SUCCEED
+  value: 9.8821176880261863
 ---
 test case: Expression 'round(2.5482,2)'
 in:
@@ -1123,6 +1213,14 @@ test case: Expression 'signum(2)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
   expression: 'signum(2)'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'signum(2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'signum(2.5)'
 out:
   result: SUCCEED
   value: 1
@@ -1196,6 +1294,14 @@ in:
 out:
   result: SUCCEED
   value: 0.982793723247329
+---
+test case: Expression 'atan2(3,2.5)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'atan2(3,2.5)'
+out:
+  result: SUCCEED
+  value: 0.87605805059819342
 ---
 test case: Expression 'atan2(0,0)'
 in:
@@ -1306,6 +1412,21 @@ in:
 out:
   result: SUCCEED
   value: -1.5
+---
+test case: Expression 'mod(-5.5,0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'mod(-5.5,0)'
+out:
+  result: FAIL
+---
+test case: Expression 'mod(123,6.253)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'mod(123,6.253)'
+out:
+  result: SUCCEED
+  value: 4.1929999999999978
 ---
 test case: Expression 'rand(1)'
 in:
