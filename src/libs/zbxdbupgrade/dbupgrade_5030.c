@@ -3025,6 +3025,19 @@ static int	DBpatch_5030083(void)
 	return ret;
 }
 
+static int	dbpatch_validate_key_macro(const char *key)
+{
+	char	*params, *macro;
+
+	if (NULL == (macro = strchr(key, '{')))
+		return SUCCEED;
+
+	if (NULL != (params = strchr(key, '[')) && params < macro)
+		return SUCCEED;
+
+	return FAIL;
+}
+
 static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *formula, zbx_vector_ptr_t *functions)
 {
 	zbx_dbpatch_function_t	*func;
@@ -3058,6 +3071,13 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 				zbx_vector_ptr_clear_ext(functions, (zbx_clean_func_t)dbpatch_function_free);
 				zbx_free(exp);
 				return NULL;
+			}
+
+			if (SUCCEED != dbpatch_validate_key_macro(key))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid key parameter \"%s\" in calculated item \""
+						ZBX_FS_UI64 "\" formula: using macro within item key is not supported"
+								" anymore", key, itemid);
 			}
 
 			func = (zbx_dbpatch_function_t *)zbx_malloc(NULL, sizeof(zbx_dbpatch_function_t));
@@ -3214,8 +3234,8 @@ static int	DBpatch_5030084(void)
 	return ret;
 }
 
-static int	dbpatch_aggregate2formula(const AGENT_REQUEST *request, char **str, size_t *str_alloc,
-		size_t *str_offset, char **error)
+static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *request, char **str,
+		size_t *str_alloc, size_t *str_offset, char **error)
 {
 	char	*esc;
 
@@ -3245,6 +3265,13 @@ static int	dbpatch_aggregate2formula(const AGENT_REQUEST *request, char **str, s
 	{
 		*error = zbx_dsprintf(NULL, "unknown group function \"%s\"", request->key);
 		return FAIL;
+	}
+
+	if (SUCCEED != dbpatch_validate_key_macro(request->params[1]))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid key parameter \"%s\" when converting aggregate check \"%s\""
+				" to calculated item: using macro within item key is not supported anymore",
+				request->params[1], itemid);
 	}
 
 	zbx_rtrim(request->params[1], " ");
@@ -3319,7 +3346,8 @@ static int	DBpatch_5030085(void)
 		init_request(&request);
 		parse_item_key(row[1], &request);
 
-		ret_formula = dbpatch_aggregate2formula(&request, &params, &params_alloc, &params_offset, &error);
+		ret_formula = dbpatch_aggregate2formula(row[0], &request, &params, &params_alloc, &params_offset,
+				&error);
 		free_request(&request);
 
 		if (FAIL == ret_formula)
