@@ -48,7 +48,7 @@ class CFunctionParameterResult extends CParserResult {
 	/**
 	 * Get value of parsed parameter.
 	 *
-	 * @param bool $keep_unquoted  Keep parameters of type CFunctionParser::PARAM_QUOTED unqioted.
+	 * @param bool $keep_unquoted  Keep parameters of type CFunctionParser::PARAM_QUOTED unquoted.
 	 *
 	 * @return string
 	 */
@@ -59,16 +59,7 @@ class CFunctionParameterResult extends CParserResult {
 			return $value;
 		}
 		elseif (!$keep_unquoted && $this->type == CFunctionParser::PARAM_QUOTED) {
-			$unquoted = '';
-			for ($p = 1; isset($value[$p]); $p++) {
-				if ($value[$p] === '\\' && $value[$p + 1] === '"') {
-					continue;
-				}
-
-				$unquoted .= $value[$p];
-			}
-
-			$value = substr($unquoted, 0, -1);
+			return CFunctionParser::unquoteParam($value);
 		}
 
 		return $value;
