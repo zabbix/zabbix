@@ -29,7 +29,6 @@ $form = (new CForm('GET', 'history.php'))
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 
 $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-$table = (new CTableInfo());
 
 // Latest data header.
 $col_check_all = new CColHeader(
