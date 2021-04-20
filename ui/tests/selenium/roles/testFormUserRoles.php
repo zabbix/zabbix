@@ -985,6 +985,10 @@ class testFormUserRoles extends CWebTest {
 			if (array_key_exists('api_methods', $data)) {
 				$this->assertApi($data['api_methods']);
 			}
+
+			if ($action === 'update') {
+				$this->assertActions($data['fields']);
+			}
 		}
 	}
 
@@ -1010,7 +1014,27 @@ class testFormUserRoles extends CWebTest {
 	private function assertApi($api) {
 		$api_list = $this->getApi();
 		foreach ($api as $request) {
-			$this->assertTrue(in_Array($request, $api_list));
+			$this->assertTrue(in_array($request, $api_list));
+		}
+	}
+
+	/**
+	 * Checking that changes was accepted
+	 *
+	 * @param array $actions	given data provider
+	 */
+	private function assertActions($actions) {
+		$existing_actions = ['Create and edit dashboards and screens', 'Create and edit maps', 'Create and edit maintenance',
+				'Add problem comments', 'Change severity', 'Acknowledge problems', 'Close problems', 'Execute scripts'];
+		foreach($existing_actions as $action) {
+			if ((array_key_exists($action, $actions))) {
+				if($this->query('xpath://label[text()="'.$action.'"]/preceding-sibling::input[@checked]')->exists()) {
+					$action_status = [$action => true];
+				} else {
+					$action_status = [$action => false];
+				}
+				in_array($action_status, $actions);
+			}
 		}
 	}
 }
