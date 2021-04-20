@@ -83,7 +83,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	 * @return string
 	 */
 	public function convert($trigger_data) {
-		$this->item = array_key_exists('item', $trigger_data) ? $trigger_data['item'] : '';
+		$this->item = (array_key_exists('item', $trigger_data) && $trigger_data['item']) ? $trigger_data['item'] : '';
 		$this->host = (array_key_exists('host', $trigger_data) && $this->item) ? $trigger_data['host'] : '';
 
 		if (($this->parser->parse($trigger_data['expression'])) !== false) {
