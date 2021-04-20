@@ -182,7 +182,7 @@ class CReport extends CApiService {
 			'users' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'default' => [], 'fields' => [
 				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'access_userid' =>		['type' => API_ID],
-				'exclude' =>			['type' => API_INT32, 'in' => ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE]
+				'exclude' =>			['type' => API_INT32, 'in' => ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE, 'default' => DB::getDefault('report_user', 'exclude')]
 			]],
 			'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['usrgrpid']], 'default' => [], 'fields' => [
 				'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
