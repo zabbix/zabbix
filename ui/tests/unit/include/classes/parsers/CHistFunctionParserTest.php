@@ -55,6 +55,32 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key']
 			],
 			[
+				'{$A} = 5 or last(/host/key)', 12, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'last(/host/key)',
+					'function' => 'last',
+					'parameters' => '/host/key',
+					'params_raw' => [
+						'type' => CHistFunctionParser::PARAM_ARRAY,
+						'raw' => '(/host/key)',
+						'pos' => 4,
+						'parameters' => [
+							0 => new CQueryParserResult([
+								'host' => 'host',
+								'item' => 'key',
+								'type' => 11,
+								'source' => null,
+								'match' => '/host/key',
+								'pos' => 17,
+								'length' => 9
+							])
+						]
+					]
+				],
+				['/host/key']
+			],
+			[
 				'last(  /host/key  )', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -546,6 +572,28 @@ class CHistFunctionParserTest extends TestCase {
 					]
 				],
 				['/host/key', '#25', 'abc' , '"def"', '1', '1.125', '-1e12', '{$M}', '{$M: context}', '{#M}', '{{#M}.regsub()}', '', '', '']
+			],
+			[
+				'last(', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => '',
+					'params_raw' => []
+				],
+				[]
+			],
+			[
+				'last', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => '',
+					'params_raw' => []
+				],
+				[]
 			],
 			[
 				'last()', 0, [],
