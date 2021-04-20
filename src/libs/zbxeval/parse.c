@@ -565,9 +565,6 @@ static int	eval_parse_function_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
 {
 	const char	*ptr = ctx->expression + pos;
 
-	if (0 != isdigit(*ptr))
-		return FAIL;
-
 	while (0 != isalpha((unsigned char)*ptr) || '_' == *ptr || 0 != isdigit((unsigned char)*ptr))
 		ptr++;
 
