@@ -71,7 +71,8 @@ class CImportDataAdapter {
 				$template = CArrayHelper::renameKeys($template, ['template' => 'host']);
 
 				$templates[] = CArrayHelper::getByKeys($template, [
-					'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags', 'valuemaps'
+					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
+					'valuemaps'
 				]);
 			}
 		}

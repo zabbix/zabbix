@@ -39,7 +39,7 @@ class CTemplateDashboardImporter extends CImporter {
 		$dashboards_update = [];
 
 		foreach ($template_dashboards as $template_name => $dashboards) {
-			$templateid = $this->referencer->resolveTemplate($template_name);
+			$templateid = $this->referencer->findTemplateidByHost($template_name);
 
 			if (!$this->importedObjectContainer->isTemplateProcessed($templateid)) {
 				continue;
@@ -97,7 +97,7 @@ class CTemplateDashboardImporter extends CImporter {
 
 		if ($template_dashboards) {
 			foreach ($template_dashboards as $template_name => $dashboards) {
-				$templateid = $this->referencer->resolveTemplate($template_name);
+				$templateid = $this->referencer->findTemplateidByHost($template_name);
 
 				if ($templateid) {
 					foreach ($dashboards as $name => $dashboard) {
@@ -146,7 +146,7 @@ class CTemplateDashboardImporter extends CImporter {
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
 							$host_name = $field['value']['host'];
 
-							$field['value'] = $this->referencer->resolveHost($host_name);
+							$field['value'] = $this->referencer->findHostidByHost($host_name);
 
 							if (!$field['value']) {
 								throw new Exception(_s('Cannot find host "%1$s" used in dashboard "%2$s".',
@@ -160,7 +160,7 @@ class CTemplateDashboardImporter extends CImporter {
 							$host_name = $field['value']['host'];
 							$item_key = $field['value']['key'];
 
-							$hostid = $this->referencer->resolveHostOrTemplate($host_name);
+							$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
 							$field['value'] = $this->referencer->resolveItem($hostid, $item_key);
 
 							if (!$field['value']) {
@@ -175,7 +175,7 @@ class CTemplateDashboardImporter extends CImporter {
 							$host_name = $field['value']['host'];
 							$graph_name = $field['value']['name'];
 
-							$hostid = $this->referencer->resolveHostOrTemplate($host_name);
+							$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
 							$field['value'] = $this->referencer->resolveGraph($hostid, $graph_name);
 
 							if (!$field['value']) {

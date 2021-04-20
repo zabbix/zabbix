@@ -130,7 +130,8 @@ class CMapImporter extends CImporter {
 			foreach ($map['selements'] as &$selement) {
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$selement['elements'][0]['sysmapid'] = $this->referencer->resolveMap($selement['elements'][0]['name']);
+						$selement['elements'][0]['sysmapid']
+							= $this->referencer->resolveMap($selement['elements'][0]['name']);
 						if (!$selement['elements'][0]['sysmapid']) {
 							throw new Exception(_s('Cannot find map "%1$s" used in map "%2$s".',
 								$selement['elements'][0]['name'], $map['name']));
@@ -140,7 +141,8 @@ class CMapImporter extends CImporter {
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$selement['elements'][0]['groupid'] = $this->referencer->resolveGroup($selement['elements'][0]['name']);
+						$selement['elements'][0]['groupid']
+							= $this->referencer->findGroupidByName($selement['elements'][0]['name']);
 						if (!$selement['elements'][0]['groupid']) {
 							throw new Exception(_s('Cannot find group "%1$s" used in map "%2$s".',
 								$selement['elements'][0]['name'], $map['name']));
@@ -150,7 +152,8 @@ class CMapImporter extends CImporter {
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						$selement['elements'][0]['hostid'] = $this->referencer->resolveHost($selement['elements'][0]['host']);
+						$selement['elements'][0]['hostid']
+							= $this->referencer->findHostidByHost($selement['elements'][0]['host']);
 						if (!$selement['elements'][0]['hostid']) {
 							throw new Exception(_s('Cannot find host "%1$s" used in map "%2$s".',
 								$selement['elements'][0]['host'], $map['name']));

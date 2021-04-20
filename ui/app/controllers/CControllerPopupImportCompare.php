@@ -69,7 +69,7 @@ class CControllerPopupImportCompare extends CController {
 		// TODO VM: (?) Do I merge this somehow with CControllerPopupImport? I would prefer not to, as they are similar, but stil different.
 
 		$rules = [
-			'groups' => ['createMissing' => false],
+			'groups' => ['updateExisting' => false, 'createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -176,6 +176,7 @@ class CControllerPopupImportCompare extends CController {
 			'discovery_rules' => _('Discovery rules'),
 			'dashboards' => _('Dashboards'),
 			'httptests' => _('Web scenarios'),
+			'valuemaps' => _('Value mappings'),
 			'item_prototypes' => _('Item prototypes'),
 			'trigger_prototypes' => _('Trigger prototypes'),
 			'graph_prototypes' => _('Graph prototypes'),

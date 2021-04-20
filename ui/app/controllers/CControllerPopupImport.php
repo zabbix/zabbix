@@ -68,7 +68,7 @@ class CControllerPopupImport extends CController {
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
 			case 'host':
-				$rules['groups'] = ['createMissing' => true];
+				$rules['groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
@@ -83,7 +83,7 @@ class CControllerPopupImport extends CController {
 				break;
 
 			case 'template':
-				$rules['groups'] = ['createMissing' => true];
+				$rules['groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,

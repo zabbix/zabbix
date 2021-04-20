@@ -109,7 +109,8 @@ class CConfiguration extends CApiService {
 					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
 				'groups' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
 				'hosts' =>				['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],

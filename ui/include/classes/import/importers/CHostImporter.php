@@ -48,7 +48,7 @@ class CHostImporter extends CImporter {
 			 */
 			if (!empty($host['templates'])) {
 				foreach ($host['templates'] as $template) {
-					$templateId = $this->referencer->resolveTemplate($template['name']);
+					$templateId = $this->referencer->findTemplateidByHost($template['name']);
 					if (!$templateId) {
 						throw new Exception(_s('Template "%1$s" for host "%2$s" does not exist.', $template['name'], $host['host']));
 					}
@@ -281,7 +281,7 @@ class CHostImporter extends CImporter {
 	 */
 	protected function resolveHostReferences(array $host) {
 		foreach ($host['groups'] as $gnum => $group) {
-			$groupId = $this->referencer->resolveGroup($group['name']);
+			$groupId = $this->referencer->findGroupidByName($group['name']);
 			if (!$groupId) {
 				throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));
 			}
@@ -302,12 +302,12 @@ class CHostImporter extends CImporter {
 			$host['proxy_hostid'] = $proxyId;
 		}
 
-		if ($hostId = $this->referencer->resolveHost($host['host'])) {
+		if ($hostId = $this->referencer->findHostidByHost($host['host'])) {
 			$host['hostid'] = $hostId;
 
 			if (array_key_exists('macros', $host)) {
 				foreach ($host['macros'] as &$macro) {
-					if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
+					if ($hostMacroId = $this->referencer->findMacroid($hostId, $macro['macro'])) {
 						$macro['hostmacroid'] = $hostMacroId;
 					}
 				}

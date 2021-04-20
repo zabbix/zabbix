@@ -363,6 +363,8 @@ class CHostGroup extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+		// TODO VM: (?) should we return uuid by API_OUTPUT_EXTEND? If not, how it can be removed from output?
+
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -546,7 +548,9 @@ class CHostGroup extends CApiService {
 		$this->validateCreate($groups);
 
 		foreach ($groups as &$group) {
-			$group['uuid'] = generateUuidV4();
+			if (!array_key_exists('uuid', $group)) {
+				$group['uuid'] = generateUuidV4();
+			}
 		}
 		unset($group);
 
@@ -731,7 +735,8 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['name']], 'fields' => [
+			'uuid' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hstgrp', 'uuid')],
 			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {

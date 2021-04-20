@@ -611,7 +611,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($triggers as $index => $trigger) {
 			// TODO VM: (?) getting only first host could be enough (as it is not possible to have trigger on host and template simultaneously). But this is safer.
-			// TODO VM: (?) we already have these expressions parsed in checkValues functon. But it will be hard to get host names out from there.
 			$expression_data->parse($trigger['expression']);
 			$expression_hosts = $expression_data->getHosts();
 

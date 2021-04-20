@@ -45,9 +45,10 @@ class CImportReferencer {
 	protected $hostPrototypes = [];
 	protected $httptests = [];
 	protected $httpsteps = [];
-	protected $groupsRefs;
-	protected $templatesRefs;
-	protected $hostsRefs;
+
+	protected $db_groups;
+	protected $db_templates;
+	protected $db_hosts;
 	protected $applicationsRefs;
 	protected $itemsRefs;
 	protected $valueMapsRefs;
@@ -56,7 +57,7 @@ class CImportReferencer {
 	protected $iconMapsRefs;
 	protected $mapsRefs;
 	protected $templateDashboardsRefs;
-	protected $macrosRefs;
+	protected $db_macros;
 	protected $proxiesRefs;
 	protected $hostPrototypesRefs;
 	protected $httptestsRefs;
@@ -71,19 +72,60 @@ class CImportReferencer {
 		}
 	}
 
-	/**
-	 * Get group id by name.
-	 *
-	 * @param string $name
-	 *
-	 * @return string|bool
-	 */
-	public function resolveGroup($name) {
-		if ($this->groupsRefs === null) {
+	public function findGroupidByUuid(string $uuid): ?string {
+		if ($this->db_groups === null) {
 			$this->selectGroups();
 		}
 
-		return isset($this->groupsRefs[$name]) ? $this->groupsRefs[$name] : false;
+		foreach ($this->db_groups as $groupid => $group) {
+			if ($group['uuid'] === $uuid) {
+				return $groupid;
+			}
+		}
+
+		return null;
+	}
+
+	public function findGroupidByName(string $name): ?string {
+		if ($this->db_groups === null) {
+			$this->selectGroups();
+		}
+
+		foreach ($this->db_groups as $groupid => $group) {
+			if ($group['name'] === $name) {
+				return $groupid;
+			}
+		}
+
+		return null;
+	}
+
+	public function findTemplateidByUuid(string $uuid): ?string {
+		if ($this->db_templates === null) {
+			$this->selectTemplates();
+		}
+
+		foreach ($this->db_templates as $templateid => $template) {
+			if ($template['uuid'] === $uuid) {
+				return $templateid;
+			}
+		}
+
+		return null;
+	}
+
+	public function findTemplateidByHost(string $host): ?string {
+		if ($this->db_templates === null) {
+			$this->selectTemplates();
+		}
+
+		foreach ($this->db_templates as $templateid => $template) {
+			if ($template['host'] === $host) {
+				return $templateid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -93,12 +135,35 @@ class CImportReferencer {
 	 *
 	 * @return string|bool
 	 */
-	public function resolveHost($host) {
-		if ($this->hostsRefs === null) {
+	public function findHostidByHost(string $name): ?string {
+		if ($this->db_hosts === null) {
 			$this->selectHosts();
 		}
 
-		return isset($this->hostsRefs[$host]) ? $this->hostsRefs[$host] : false;
+		foreach ($this->db_hosts as $hostid => $host) {
+			if ($host['host'] === $name) {
+				return $hostid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get host or template id by host.
+	 *
+	 * @param string $host
+	 *
+	 * @return string|null
+	 */
+	public function findTemplateidOrHostidByHost(string $host): ?string {
+		$templateid = $this->findTemplateidByHost($host);
+
+		if ($templateid !== null) {
+			return $templateid;
+		}
+
+		return $this->findHostidByHost($host);
 	}
 
 	/**
@@ -114,47 +179,6 @@ class CImportReferencer {
 				&& array_key_exists($name, $this->interfacesCache[$hostid]))
 			? $this->interfacesCache[$hostid][$name]
 			: false;
-	}
-
-	/**
-	 * Get template id by template name.
-	 *
-	 * @param string $host
-	 *
-	 * @return string|bool
-	 */
-	public function resolveTemplate($name) {
-		if ($this->templatesRefs === null) {
-			$this->selectTemplates();
-		}
-
-		return isset($this->templatesRefs[$name]) ? $this->templatesRefs[$name] : false;
-	}
-
-	/**
-	 * Get host or template id by host.
-	 *
-	 * @param string $host
-	 *
-	 * @return string|bool
-	 */
-	public function resolveHostOrTemplate($host) {
-		if ($this->templatesRefs === null) {
-			$this->selectTemplates();
-		}
-		if ($this->hostsRefs === null) {
-			$this->selectHosts();
-		}
-
-		if (isset($this->templatesRefs[$host])) {
-			return $this->templatesRefs[$host];
-		}
-		elseif (isset($this->hostsRefs[$host])) {
-			return $this->hostsRefs[$host];
-		}
-		else {
-			return false;
-		}
 	}
 
 	/**
@@ -296,14 +320,20 @@ class CImportReferencer {
 	 * @param string $hostid
 	 * @param string $name
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveMacro($hostid, $name) {
-		if ($this->macrosRefs === null) {
+	public function findMacroid(string $hostid, string $name): ?string {
+		if ($this->db_macros === null) {
 			$this->selectMacros();
 		}
 
-		return isset($this->macrosRefs[$hostid][$name]) ? $this->macrosRefs[$hostid][$name] : false;
+		foreach ($this->db_macros as $hostmacroid => $macro) {
+			if ($macro['hostid'] === $hostid && $macro['macro'] === $name) {
+				return $hostmacroid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -396,17 +426,22 @@ class CImportReferencer {
 	 * @param array $groups
 	 */
 	public function addGroups(array $groups) {
-		$this->groups = array_unique(array_merge($this->groups, $groups));
+// TODO VM: can this lead to error?
+//		$this->groups = array_unique(array_merge($this->groups, $groups));
+		$this->groups = $groups;
 	}
 
 	/**
 	 * Add group name association with group id.
 	 *
-	 * @param string $name
 	 * @param string $id
+	 * @param array  $group
 	 */
-	public function addGroupRef($name, $id) {
-		$this->groupsRefs[$name] = $id;
+	public function setDbGroup(string $id, array $group): void {
+		$this->db_groups[$id] = [
+			'uuid' => $group['uuid'],
+			'name' => $group['name']
+		];
 	}
 
 	/**
@@ -415,17 +450,21 @@ class CImportReferencer {
 	 * @param array $templates
 	 */
 	public function addTemplates(array $templates) {
-		$this->templates = array_unique(array_merge($this->templates, $templates));
+//		$this->templates = array_unique(array_merge($this->templates, $templates));
+		$this->templates = $templates;
 	}
 
 	/**
 	 * Add template name association with template id.
 	 *
-	 * @param string $name
 	 * @param string $id
+	 * @param array  $template
 	 */
-	public function addTemplateRef($name, $id) {
-		$this->templatesRefs[$name] = $id;
+	public function setDbTemplate(string $id, array $template): void {
+		$this->db_templates[$id] = [
+			'uuid' => $template['uuid'],
+			'host' => $template['host']
+		];
 	}
 
 	/**
@@ -434,7 +473,8 @@ class CImportReferencer {
 	 * @param array $hosts
 	 */
 	public function addHosts(array $hosts) {
-		$this->hosts = array_unique(array_merge($this->hosts, $hosts));
+//		$this->hosts = array_unique(array_merge($this->hosts, $hosts));
+		$this->hosts = $hosts;
 	}
 
 	/**
@@ -444,7 +484,7 @@ class CImportReferencer {
 	 * @param string $id
 	 */
 	public function addHostRef($host, $id) {
-		$this->hostsRefs[$host] = $id;
+		$this->db_hosts[$host] = $id;
 	}
 
 	/**
@@ -471,12 +511,14 @@ class CImportReferencer {
 	 * @param array $items
 	 */
 	public function addItems(array $items) {
-		foreach ($items as $host => $keys) {
-			if (!isset($this->items[$host])) {
-				$this->items[$host] = [];
-			}
-			$this->items[$host] = array_unique(array_merge($this->items[$host], $keys));
-		}
+//		foreach ($items as $host => $keys) {
+//			if (!isset($this->items[$host])) {
+//				$this->items[$host] = [];
+//			}
+//			$this->items[$host] = array_unique(array_merge($this->items[$host], $keys));
+//		}
+
+		$this->items = $items;
 	}
 
 	/**
@@ -496,12 +538,14 @@ class CImportReferencer {
 	 * @param array $valueMaps
 	 */
 	public function addValueMaps(array $valueMaps) {
-		foreach ($valueMaps as $host => $valuemap_names) {
-			if (!array_key_exists($host, $this->valueMaps)) {
-				$this->valueMaps[$host] = [];
-			}
-			$this->valueMaps[$host] = array_unique(array_merge($this->valueMaps[$host], $valuemap_names));
-		}
+//		foreach ($valueMaps as $host => $valuemap_names) {
+//			if (!array_key_exists($host, $this->valueMaps)) {
+//				$this->valueMaps[$host] = [];
+//			}
+//			$this->valueMaps[$host] = array_unique(array_merge($this->valueMaps[$host], $valuemap_names));
+//		}
+
+		$this->valueMaps = $valueMaps;
 	}
 
 	/**
@@ -513,23 +557,25 @@ class CImportReferencer {
 	 * @param bool  $triggers[<description>][<expression>][<recovery_expression>]
 	 */
 	public function addTriggers(array $triggers) {
-		foreach ($triggers as $description => $expressions) {
-			if (!array_key_exists($description, $this->triggers)) {
-				$this->triggers[$description] = [];
-			}
+//		foreach ($triggers as $description => $expressions) {
+//			if (!array_key_exists($description, $this->triggers)) {
+//				$this->triggers[$description] = [];
+//			}
 
-			foreach ($expressions as $expression => $recovery_expressions) {
-				if (!array_key_exists($expression, $this->triggers[$description])) {
-					$this->triggers[$description][$expression] = [];
-				}
+//			foreach ($expressions as $expression => $recovery_expressions) {
+//				if (!array_key_exists($expression, $this->triggers[$description])) {
+//					$this->triggers[$description][$expression] = [];
+//				}
 
-				foreach ($recovery_expressions as $recovery_expression => $foo) {
-					if (!array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
-						$this->triggers[$description][$expression][$recovery_expression] = true;
-					}
-				}
-			}
-		}
+//				foreach ($recovery_expressions as $recovery_expression => $foo) {
+//					if (!array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
+//						$this->triggers[$description][$expression][$recovery_expression] = true;
+//					}
+//				}
+//			}
+//		}
+
+		$this->triggers = $triggers;
 	}
 
 	/**
@@ -540,12 +586,14 @@ class CImportReferencer {
 	 * @param array $graphs
 	 */
 	public function addGraphs(array $graphs) {
-		foreach ($graphs as $host => $hostGraphs) {
-			if (!isset($this->graphs[$host])) {
-				$this->graphs[$host] = [];
-			}
-			$this->graphs[$host] = array_unique(array_merge($this->graphs[$host], $hostGraphs));
-		}
+//		foreach ($graphs as $host => $hostGraphs) {
+//			if (!isset($this->graphs[$host])) {
+//				$this->graphs[$host] = [];
+//			}
+//			$this->graphs[$host] = array_unique(array_merge($this->graphs[$host], $hostGraphs));
+//		}
+
+		$this->graphs = $graphs;
 	}
 
 	/**
@@ -566,7 +614,8 @@ class CImportReferencer {
 	 * @param array $iconMaps
 	 */
 	public function addIconMaps(array $iconMaps) {
-		$this->iconMaps = array_unique(array_merge($this->iconMaps, $iconMaps));
+//		$this->iconMaps = array_unique(array_merge($this->iconMaps, $iconMaps));
+		$this->iconMaps = $iconMaps;
 	}
 
 	/**
@@ -575,7 +624,8 @@ class CImportReferencer {
 	 * @param array $maps
 	 */
 	public function addMaps(array $maps) {
-		$this->maps = array_unique(array_merge($this->maps, $maps));
+//		$this->maps = array_unique(array_merge($this->maps, $maps));
+		$this->maps = $maps;
 	}
 
 	/**
@@ -594,7 +644,8 @@ class CImportReferencer {
 	 * @param array $dashboards
 	 */
 	public function addTemplateDashboards(array $dashboards) {
-		$this->templateDashboards = array_unique(array_merge($this->templateDashboards, $dashboards));
+//		$this->templateDashboards = array_unique(array_merge($this->templateDashboards, $dashboards));
+		$this->templateDashboards = $dashboards;
 	}
 
 	/**
@@ -613,12 +664,14 @@ class CImportReferencer {
 	 * @param array $macros
 	 */
 	public function addMacros(array $macros) {
-		foreach ($macros as $host => $ms) {
-			if (!isset($this->macros[$host])) {
-				$this->macros[$host] = [];
-			}
-			$this->macros[$host] = array_unique(array_merge($this->macros[$host], $ms));
-		}
+//		foreach ($macros as $host => $ms) {
+//			if (!isset($this->macros[$host])) {
+//				$this->macros[$host] = [];
+//			}
+//			$this->macros[$host] = array_unique(array_merge($this->macros[$host], $ms));
+//		}
+
+		$this->macros = $macros;
 	}
 
 	/**
@@ -629,7 +682,7 @@ class CImportReferencer {
 	 * @param string $macroId
 	 */
 	public function addMacroRef($hostId, $macro, $macroId) {
-		$this->macrosRefs[$hostId][$macro] = $macroId;
+		$this->db_macros[$hostId][$macro] = $macroId;
 	}
 
 	/**
@@ -638,7 +691,8 @@ class CImportReferencer {
 	 * @param array $proxies
 	 */
 	public function addProxies(array $proxies) {
-		$this->proxies = array_unique(array_merge($this->proxies, $proxies));
+//		$this->proxies = array_unique(array_merge($this->proxies, $proxies));
+		$this->proxies = $proxies;
 	}
 
 	/**
@@ -657,19 +711,21 @@ class CImportReferencer {
 	 * @param array $hostPrototypes
 	 */
 	public function addHostPrototypes(array $hostPrototypes) {
-		foreach ($hostPrototypes as $host => $discoveryRule) {
-			if (!isset($this->hostPrototypes[$host])) {
-				$this->hostPrototypes[$host] = [];
-			}
-			foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
-				if (!isset($this->hostPrototypes[$host][$discoveryRuleKey])) {
-					$this->hostPrototypes[$host][$discoveryRuleKey] = [];
-				}
-				$this->hostPrototypes[$host][$discoveryRuleKey] = array_unique(
-					array_merge($this->hostPrototypes[$host][$discoveryRuleKey], $hostPrototypes)
-				);
-			}
-		}
+//		foreach ($hostPrototypes as $host => $discoveryRule) {
+//			if (!isset($this->hostPrototypes[$host])) {
+//				$this->hostPrototypes[$host] = [];
+//			}
+//			foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
+//				if (!isset($this->hostPrototypes[$host][$discoveryRuleKey])) {
+//					$this->hostPrototypes[$host][$discoveryRuleKey] = [];
+//				}
+//				$this->hostPrototypes[$host][$discoveryRuleKey] = array_unique(
+//					array_merge($this->hostPrototypes[$host][$discoveryRuleKey], $hostPrototypes)
+//				);
+//			}
+//		}
+
+		$this->hostPrototypes = $hostPrototypes;
 	}
 
 	/**
@@ -679,13 +735,15 @@ class CImportReferencer {
 	 * @param string $httptests[<host>][]	web scenario name
 	 */
 	public function addHttpTests(array $httptests) {
-		foreach ($httptests as $host => $names) {
-			if (!array_key_exists($host, $this->httptests)) {
-				$this->httptests[$host] = [];
-			}
+//		foreach ($httptests as $host => $names) {
+//			if (!array_key_exists($host, $this->httptests)) {
+//				$this->httptests[$host] = [];
+//			}
 
-			$this->httptests[$host] = array_unique(array_merge($this->httptests[$host], $names));
-		}
+//			$this->httptests[$host] = array_unique(array_merge($this->httptests[$host], $names));
+//		}
+
+		$this->httptests = $httptests;
 	}
 
 	/**
@@ -695,36 +753,38 @@ class CImportReferencer {
 	 * @param string $httpsteps[<host>][<httptest_name>][]	web scenario step name
 	 */
 	public function addHttpSteps(array $httpsteps) {
-		foreach ($httpsteps as $host => $httptests) {
-			if (!array_key_exists($host, $this->httpsteps)) {
-				$this->httpsteps[$host] = [];
-			}
+//		foreach ($httpsteps as $host => $httptests) {
+//			if (!array_key_exists($host, $this->httpsteps)) {
+//				$this->httpsteps[$host] = [];
+//			}
 
-			foreach ($httptests as $httptest_name => $httpstep_names) {
-				if (!array_key_exists($httptest_name, $this->httpsteps[$host])) {
-					$this->httpsteps[$host][$httptest_name] = [];
-				}
+//			foreach ($httptests as $httptest_name => $httpstep_names) {
+//				if (!array_key_exists($httptest_name, $this->httpsteps[$host])) {
+//					$this->httpsteps[$host][$httptest_name] = [];
+//				}
 
-				$this->httpsteps[$host][$httptest_name] =
-					array_unique(array_merge($this->httpsteps[$host][$httptest_name], $httpstep_names));
-			}
-		}
+//				$this->httpsteps[$host][$httptest_name] =
+//					array_unique(array_merge($this->httpsteps[$host][$httptest_name], $httpstep_names));
+//			}
+//		}
+
+		$this->httpsteps = $httpsteps;
 	}
 
 	/**
 	 * Select group ids for previously added group names.
 	 */
 	protected function selectGroups() {
-		if (!empty($this->groups)) {
-			$this->groupsRefs = [];
-			$dbGroups = API::HostGroup()->get([
-				'filter' => ['name' => $this->groups],
-				'output' => ['groupid', 'name'],
+		if ($this->groups) {
+			$this->db_groups = API::HostGroup()->get([
+				'output' => ['name', 'uuid'],
+				'search' => [
+					'uuid' => array_column($this->groups, 'uuid'),
+					'name' => array_keys($this->groups)
+				],
+				'searchByAny' => true,
 				'preservekeys' => true
 			]);
-			foreach ($dbGroups as $group) {
-				$this->groupsRefs[$group['name']] = $group['groupid'];
-			}
 
 			$this->groups = [];
 		}
@@ -734,17 +794,17 @@ class CImportReferencer {
 	 * Select template ids for previously added template names.
 	 */
 	protected function selectTemplates() {
-		if (!empty($this->templates)) {
-			$this->templatesRefs = [];
-			$dbTemplates = API::Template()->get([
-				'output' => ['host', 'templateid'],
-				'preservekeys' => true,
+		if ($this->templates) {
+			$this->db_templates = API::Template()->get([
+				'output' => ['host', 'uuid'],
+				'search' => [
+					'uuid' => array_column($this->templates, 'uuid'),
+					'host' => array_keys($this->templates)
+				],
+				'searchByAny' => true,
 				'editable' => true,
-				'filter' => ['host' => $this->templates]
+				'preservekeys' => true
 			]);
-			foreach ($dbTemplates as $template) {
-				$this->templatesRefs[$template['host']] = $template['templateid'];
-			}
 
 			$this->templates = [];
 		}
@@ -754,18 +814,14 @@ class CImportReferencer {
 	 * Select host ids for previously added host names.
 	 */
 	protected function selectHosts() {
-		if (!empty($this->hosts)) {
-			$this->hostsRefs = [];
-			// fetch only normal hosts, discovered hosts must not be imported
-			$dbHosts = API::Host()->get([
-				'output' => ['hostid', 'host'],
-				'filter' => ['host' => $this->hosts],
-				'preservekeys' => true,
-				'templated_hosts' => true
+		if ($this->hosts) {
+			// Fetch only normal hosts, discovered hosts must not be imported.
+			$this->db_hosts = API::Host()->get([
+				'output' => ['host'],
+				'search' => ['host' => $this->hosts],
+				'templated_hosts' => true,
+				'preservekeys' => true
 			]);
-			foreach ($dbHosts as $host) {
-				$this->hostsRefs[$host['host']] = $host['hostid'];
-			}
 
 			$this->hosts = [];
 		}
@@ -780,7 +836,7 @@ class CImportReferencer {
 			$sqlWhere = [];
 
 			foreach ($this->applications as $host => $applications) {
-				$hostId = $this->resolveHostOrTemplate($host);
+				$hostId = $this->findTemplateidOrHostidByHost($host);
 				if ($hostId) {
 					$sqlWhere[] = '(a.hostid='.zbx_dbstr($hostId).' AND '.
 						dbConditionString('a.name', $applications).')';
@@ -817,7 +873,7 @@ class CImportReferencer {
 
 			$sqlWhere = [];
 			foreach ($this->items as $host => $keys) {
-				$hostId = $this->resolveHostOrTemplate($host);
+				$hostId = $this->findTemplateidOrHostidByHost($host);
 				if ($hostId) {
 					$sqlWhere[] = '(i.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('i.key_', $keys).')';
 				}
@@ -848,7 +904,7 @@ class CImportReferencer {
 			$sql_where = [];
 
 			foreach ($this->valueMaps as $host => $valuemap_names) {
-				$hostid = $this->resolveHostOrTemplate($host);
+				$hostid = $this->findTemplateidOrHostidByHost($host);
 				if ($hostid) {
 					$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
 						dbConditionString('vm.name', $valuemap_names).')';
@@ -904,6 +960,46 @@ class CImportReferencer {
 					$this->triggersRefs[$description][$expression][$recovery_expression] = $dbTrigger['triggerid'];
 				}
 			}
+		}
+	}
+
+	/**
+	 * Select trigger ids for previously added trigger names/expressions.
+	 */
+	protected function selectTriggersByUuid() {
+		if ($this->triggersUuid) {
+			$this->triggersUuidRefs = [];
+
+			$dbTriggers = API::Trigger()->get([
+				'output' => ['triggerid', 'uuid'],
+				'filter' => [
+					'uuid' => array_keys($this->triggersUuid),
+					'flags' => [
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_CREATED
+					]
+				],
+				'selectHosts' => ['status']
+			]);
+
+			foreach ($dbTriggers as $dbTrigger) {
+				$uuid = $dbTrigger['uuid'];
+
+				$is_templated = true;
+				foreach($dbTrigger['hosts'] as $host) {
+					if ($host['status'] !== HOST_STATUS_TEMPLATE) {
+						$is_templated = false;
+					}
+				}
+
+				if (array_key_exists($uuid, $this->triggersUuid) && $is_templated) {
+					$this->triggersUuidRefs[$uuid] = $dbTrigger['triggerid'];
+				}
+			}
+
+			// TODO VM: How to check, if nonexisting trigger is from a tempalte? Probably it can only be done by parsing the trigger expressions.
+			// TODO VM: if such check is done, they (triggers) need to be added to $this->triggersUuidRefs with 'false' to avoid seracing them by name.
 		}
 	}
 
@@ -1014,20 +1110,25 @@ class CImportReferencer {
 	 * Select macro ids for previously added macro names.
 	 */
 	protected function selectMacros() {
-		if (!empty($this->macros)) {
-			$this->macrosRefs = [];
-			$sqlWhere = [];
+		if ($this->macros) {
+			$this->db_macros = [];
+			$sql_where = [];
 			foreach ($this->macros as $host => $macros) {
-				$hostId = $this->resolveHostOrTemplate($host);
-				if ($hostId) {
-					$sqlWhere[] = '(hm.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('hm.macro', $macros).')';
+				$hostid = $this->findTemplateidOrHostidByHost($host);
+				if ($hostid) {
+					$sql_where[] = '(hm.hostid='.zbx_dbstr($hostid).' AND '
+						.dbConditionString('hm.macro', array_keys($macros)).')';
 				}
 			}
 
-			if ($sqlWhere) {
-				$dbMacros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm WHERE '.implode(' OR ', $sqlWhere));
-				while ($dbMacro = DBfetch($dbMacros)) {
-					$this->macrosRefs[$dbMacro['hostid']][$dbMacro['macro']] = $dbMacro['hostmacroid'];
+			if ($sql_where) {
+				$db_macros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm'
+					.' WHERE '.implode(' OR ', $sql_where));
+				while ($db_macro = DBfetch($db_macros)) {
+					$this->db_macros[$db_macro['hostmacroid']] = [
+						'hostid' => $db_macro['hostid'],
+						'macro' => $db_macro['macro']
+					];
 				}
 			}
 
@@ -1062,7 +1163,7 @@ class CImportReferencer {
 			$this->hostPrototypesRefs = [];
 			$sqlWhere = [];
 			foreach ($this->hostPrototypes as $host => $discoveryRule) {
-				$hostId = $this->resolveHostOrTemplate($host);
+				$hostId = $this->findTemplateidOrHostidByHost($host);
 
 				foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
 					$discoveryRuleId = $this->resolveItem($hostId, $discoveryRuleKey);
@@ -1097,7 +1198,7 @@ class CImportReferencer {
 			$sql_where = [];
 
 			foreach ($this->httptests as $host => $names) {
-				$hostid = $this->resolveHostOrTemplate($host);
+				$hostid = $this->findTemplateidOrHostidByHost($host);
 
 				if ($hostid !== false) {
 					$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid).' AND '.dbConditionString('ht.name', $names).')';
@@ -1134,7 +1235,7 @@ class CImportReferencer {
 			$sql_where = [];
 
 			foreach ($this->httpsteps as $host => $httptests) {
-				$hostid = $this->resolveHostOrTemplate($host);
+				$hostid = $this->findTemplateidOrHostidByHost($host);
 
 				if ($hostid !== false) {
 					foreach ($httptests as $httptest_name => $httpstep_names) {
