@@ -1007,7 +1007,8 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			if (0 != isalpha((unsigned char)ctx->expression[pos]))
 			{
 				/* logical operation must be separated by whitespace or '(', ')', ',' characters */
-				if ((0 != skip || 0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR) ||
+				if (0 != (ctx->rules & ZBX_EVAL_PARSE_LOGIC) &&
+						(0 != skip || 0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR) ||
 						ZBX_EVAL_TOKEN_GROUP_CLOSE == ctx->last_token_type))
 				{
 					if (SUCCEED == eval_parse_logic_token(ctx, pos, token))
