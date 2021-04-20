@@ -231,8 +231,6 @@ class CReport extends CApiService {
 					_s('"%1$s" must be an empty string or greater than "%2$s".', 'active_till', 'active_since')
 				);
 			}
-
-			$this->checkHasRecipients($report['users'], $report['user_groups']);
 		}
 		unset($report);
 
@@ -240,30 +238,6 @@ class CReport extends CApiService {
 		$this->checkDashboards(array_unique(array_column($reports, 'dashboardid')));
 		$this->checkUsers($reports);
 		$this->checkUserGroups($reports);
-	}
-
-	/**
-	 * Check if there is at least one recipient or recipient group.
-	 *
-	 * @param array $users
-	 * @param array $usrgrps
-	 *
-	 * @throws APIException if there are no recipients to send the report to.
-	 */
-	protected function checkHasRecipients(array $users, array $usrgrps): void {
-		if ($usrgrps) {
-			return;
-		}
-
-		if (!$users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one user or user group must be specified.'));
-		}
-
-		if (!array_key_exists(ZBX_REPORT_EXCLUDE_USER_FALSE, array_column($users, 'exclude', 'exclude'))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_('If no user groups are specified, at least one user must be included in the mailing list.')
-			);
-		}
 	}
 
 	/**
@@ -313,13 +287,23 @@ class CReport extends CApiService {
 	 *
 	 * @param array  $reports
 	 * @param string $reports[]['userid']                          (optional)
+	 * @param string $reports[]['dashboardid']                     (optional)
 	 * @param array  $reports[]['users']                           (optional)
 	 * @param string $reports[]['users'][]['userid']
 	 * @param string $reports[]['users'][]['access_userid']        (optional)
+	 * @param string $reports[]['users'][]['exclude']
 	 * @param array  $reports[]['user_groups']                     (optional)
 	 * @param string $reports[]['user_groups'][]['access_userid']  (optional)
 	 * @param array  $db_reports                                   (optional)
+	 * @param string $db_reports[]['reportid']
 	 * @param string $db_reports[]['userid']
+	 * @param string $db_reports[]['dashboardid']
+	 * @param array  $db_reports[]['users']
+	 * @param string $db_reports[]['users'][]['userid']
+	 * @param string $db_reports[]['users'][]['access_userid']
+	 * @param string $db_reports[]['users'][]['exclude']
+	 * @param array  $db_reports[]['user_groups']
+	 * @param string $db_reports[]['user_groups'][]['access_userid']
 	 *
 	 * @throws APIException if user is not valid.
 	 */
@@ -327,7 +311,23 @@ class CReport extends CApiService {
 		$userids = [];
 
 		foreach ($reports as $report) {
-			$db_report = $db_reports ? $db_reports[$report['reportid']] : [];
+			$db_report = [];
+			$dashboardid_has_changed = false;
+			$users = array_key_exists('users', $report) ? $report['users'] : [];
+			$user_groups = array_key_exists('user_groups', $report) ? $report['user_groups'] : [];
+
+			if ($db_reports) {
+				$db_report = $db_reports[$report['reportid']];
+				$dashboardid_has_changed = (array_key_exists('dashboardid', $report)
+					&& $report['dashboardid'] != $db_report['dashboardid']
+				);
+				if (!array_key_exists('users', $report)) {
+					$users =  $db_report['users'];
+				}
+				if (!array_key_exists('user_groups', $report)) {
+					$user_groups = $db_report['user_groups'];
+				}
+			}
 
 			if (array_key_exists('userid', $report) && (!$db_report || $report['userid'] != $db_report['userid'])) {
 				if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
@@ -340,6 +340,18 @@ class CReport extends CApiService {
 				$userids[$report['userid']] = true;
 			}
 
+			if (!$user_groups) {
+				if (!$users) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one user or user group must be specified.'));
+				}
+
+				if (!array_key_exists(ZBX_REPORT_EXCLUDE_USER_FALSE, array_column($users, 'exclude', 'exclude'))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('If no user groups are specified, at least one user must be included in the mailing list.')
+					);
+				}
+			}
+
 			if (array_key_exists('users', $report) && $report['users']) {
 				$db_userids = [];
 				$db_access_userids = [];
@@ -349,12 +361,13 @@ class CReport extends CApiService {
 				}
 
 				foreach ($report['users'] as $user) {
-					if (!array_key_exists($user['userid'], $db_userids)) {
+					if ($dashboardid_has_changed || !array_key_exists($user['userid'], $db_userids)) {
 						$userids[$user['userid']] = true;
 					}
 
 					if (array_key_exists('access_userid', $user) && $user['access_userid'] != 0
-							&& !array_key_exists($user['access_userid'], $db_access_userids)) {
+							&& ($dashboardid_has_changed
+								|| !array_key_exists($user['access_userid'], $db_access_userids))) {
 						$userids[$user['access_userid']] = true;
 					}
 				}
@@ -367,7 +380,8 @@ class CReport extends CApiService {
 
 				foreach ($report['user_groups'] as $usrgrp) {
 					if (array_key_exists('access_userid', $usrgrp) && $usrgrp['access_userid'] != 0
-							&& !array_key_exists($usrgrp['access_userid'], $db_access_userids)) {
+							&& ($dashboardid_has_changed
+								|| !array_key_exists($usrgrp['access_userid'], $db_access_userids))) {
 						$userids[$usrgrp['access_userid']] = true;
 					}
 				}
@@ -399,10 +413,12 @@ class CReport extends CApiService {
 	 * Check for valid user groups.
 	 *
 	 * @param array  $reports
-	 * @param string $reports[]['reportid']
+	 * @param string $reports[]['dashboarid']                    (optional)
 	 * @param array  $reports[]['user_groups']                   (optional)
 	 * @param string $reports[]['user_groups'][]['usrgrpid']
 	 * @param array  $db_reports                                 (optional)
+	 * @param string $db_reports[]['reportid']
+	 * @param string $db_reports[]['dashboarid']
 	 * @param array  $db_reports[]['user_groups']
 	 * @param string $db_reports[]['user_groups'][]['usrgrpid']
 	 *
@@ -413,12 +429,19 @@ class CReport extends CApiService {
 
 		foreach ($reports as $report) {
 			if (array_key_exists('user_groups', $report) && $report['user_groups']) {
-				$db_usrgrpids = $db_reports
-					? array_flip(array_column($db_reports[$report['reportid']]['user_groups'], 'usrgrpid'))
-					: [];
+				$db_usrgrpids = [];
+				$dashboardid_has_changed = false;
+
+				if ($db_reports) {
+					$db_report = $db_reports[$report['reportid']];
+					$db_usrgrpids = array_flip(array_column($db_report['user_groups'], 'usrgrpid'));
+					$dashboardid_has_changed = (array_key_exists('dashboarid', $report)
+						&& $report['dashboarid'] != $db_report['dashboarid']
+					);
+				}
 
 				foreach ($report['user_groups'] as $usrgrp) {
-					if (!array_key_exists($usrgrp['usrgrpid'], $db_usrgrpids)) {
+					if ($dashboardid_has_changed || !array_key_exists($usrgrp['usrgrpid'], $db_usrgrpids)) {
 						$usrgrpids[$usrgrp['usrgrpid']] = true;
 					}
 				}
@@ -519,7 +542,7 @@ class CReport extends CApiService {
 			'users' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'access_userid' =>		['type' => API_ID],
-				'exclude' =>			['type' => API_INT32, 'in' => ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE]
+				'exclude' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => ZBX_REPORT_EXCLUDE_USER_FALSE.','.ZBX_REPORT_EXCLUDE_USER_TRUE]
 			]],
 			'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -558,6 +581,18 @@ class CReport extends CApiService {
 			}
 
 			if (array_key_exists('dashboardid', $report) && $report['dashboardid'] != $db_report['dashboardid']) {
+				if (!array_key_exists('users', $report)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.$rnum,
+						_s('the parameter "%1$s" is missing', 'users')
+					));
+				}
+
+				if (!array_key_exists('user_groups', $report)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.$rnum,
+						_s('the parameter "%1$s" is missing', 'user_groups')
+					));
+				}
+
 				$dashboardids[$report['dashboardid']] = true;
 			}
 
@@ -610,15 +645,6 @@ class CReport extends CApiService {
 						_s('"%1$s" must be an empty string or greater than "%2$s".', 'active_till', 'active_since')
 					);
 				}
-			}
-
-			if (array_key_exists('users', $report) || array_key_exists('user_groups', $report)) {
-				$users = array_key_exists('users', $report) ? $report['users'] : $db_report['users'];
-				$user_groups = array_key_exists('user_groups', $report)
-					? $report['user_groups']
-					: $db_report['user_groups'];
-
-				$this->checkHasRecipients($users, $user_groups);
 			}
 		}
 		unset($report);
