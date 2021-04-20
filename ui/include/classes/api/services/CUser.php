@@ -1270,7 +1270,7 @@ class CUser extends CApiService {
 
 		// Check if deleted users used in scheduled reports.
 		$db_reports = DBselect(
-			'SELECT r.name,r.userid,ru.userid AS recipientid, ru.access_userid AS user_creatorid,'.
+			'SELECT r.name,r.userid,ru.userid AS recipientid,ru.access_userid AS user_creatorid,'.
 					'rug.access_userid AS usrgrp_creatorid'.
 			' FROM report r'.
 				' LEFT JOIN report_user ru ON r.reportid=ru.reportid'.
