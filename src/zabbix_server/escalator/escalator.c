@@ -1918,28 +1918,25 @@ static const char	*check_escalation_result_string(int result)
 	}
 }
 
-static int	is_webhook_action(zbx_uint64_t eventid)
+static	int	postpone_escalation(const DB_ESCALATION *escalation)
 {
-	int		ret = FAIL;
+	int		count = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select type from media_type where mediatypeid=(select mediatypeid "
-			"from alerts where eventid=" ZBX_FS_UI64 ")", eventid);
+	result = DBselect("select count(eventid) from alerts where eventid=" ZBX_FS_UI64
+			" and actionid=" ZBX_FS_UI64 " and status in (0,3);", escalation->eventid,
+			escalation->actionid);
 
 	if (NULL != (row = DBfetch(result)))
-	{
-		int	mt_type;
-
-		mt_type = atoi(row[0]);
-
-		if (MEDIA_TYPE_WEBHOOK == mt_type)
-			ret = SUCCEED;
-	}
+		count = atoi(row[0]);
 
 	DBfree_result(result);
 
-	return ret;
+	if (0 == count)
+		return ZBX_ESCALATION_PROCESS;
+
+	return ZBX_ESCALATION_SKIP;
 }
 
 /******************************************************************************
@@ -1983,25 +1980,9 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		maintenance = (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed ? HOST_MAINTENANCE_STATUS_ON :
 				HOST_MAINTENANCE_STATUS_OFF);
 
-		if (0 != escalation->r_eventid && 2 == escalation->status && SUCCEED == is_webhook_action(event->eventid))
+		if (0 != escalation->r_eventid)
 		{
-			int		count = 0;
-			DB_RESULT	result;
-			DB_ROW		row;
-
-			result = DBselect("select count(eventid) from alerts where eventid=" ZBX_FS_UI64
-					" and status in (0,3);", escalation->eventid);
-
-			if (NULL != (row = DBfetch(result)))
-				count = atoi(row[0]);
-
-			DBfree_result(result);
-
-			if (0 == count)
-				ret = ZBX_ESCALATION_PROCESS;
-			else
-				ret = ZBX_ESCALATION_SKIP;
-
+			ret = postpone_escalation(escalation);
 			goto out;
 		}
 	}
@@ -2009,6 +1990,12 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	{
 		if (EVENT_OBJECT_ITEM == event->object || EVENT_OBJECT_LLDRULE == event->object)
 		{
+			if (0 != escalation->r_eventid)
+			{
+				ret = postpone_escalation(escalation);
+				goto out;
+			}
+
 			/* item disabled or deleted? */
 			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1);
 
