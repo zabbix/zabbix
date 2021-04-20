@@ -1716,7 +1716,7 @@ class CItemKeyTest extends TestCase {
 				],
 				[],
 				$with_filter
-			],
+			]
 		];
 	}
 
