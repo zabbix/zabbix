@@ -63,10 +63,6 @@ class CHistFunctionParser extends CParser {
 
 	/**
 	 * @param array $options
-	 * @param bool  $options['collapsed_expression']
-	 * @param bool  $options['nested_functions']
-	 * @param bool  $options['lldmacros']
-	 * @param int   $depth
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
