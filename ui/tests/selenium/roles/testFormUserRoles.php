@@ -988,15 +988,6 @@ class testFormUserRoles extends CWebTest {
 		}
 	}
 
-//	public function testFormUserRoles_checkvalues() {
-//		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=2');
-//		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-////		$fields = $form->getFields()->asValues();
-//////		var_dump($fields);
-////		$actions = $form->query('xpath://input[contains(@id, "actions.")]/following::label')->all();
-////		$this->assertApi(['application.create']);
-//	}
-
 	/**
 	 * Get array list of API requests.
 	 *
