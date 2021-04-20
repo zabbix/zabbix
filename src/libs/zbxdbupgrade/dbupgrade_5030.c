@@ -2371,7 +2371,7 @@ static int	dbpatch_is_time_function(const char *name, size_t len)
  * Purpose: check if the expression contains specified functionid             *
  *                                                                            *
  ******************************************************************************/
-static	int	dbpatch_find_function(const char *expression, zbx_uint64_t functionid)
+static int	dbpatch_find_function(const char *expression, zbx_uint64_t functionid)
 {
 	int		pos = 0;
 	zbx_token_t	token;
