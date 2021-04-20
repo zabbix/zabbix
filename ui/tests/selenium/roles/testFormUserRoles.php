@@ -997,7 +997,11 @@ class testFormUserRoles extends CWebTest {
 ////		$this->assertApi(['application.create']);
 //	}
 
-
+	/**
+	 * Get array list of API requests.
+	 *
+	 * @return array
+	 */
 	private function getApi(){
 		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->all()->count();
 		$result=[];
@@ -1007,6 +1011,11 @@ class testFormUserRoles extends CWebTest {
 		return $result;
 	}
 
+	/**
+	 * Checking that api request exists on page.
+	 *
+	 * @param array $api	given data provider
+	 */
 	private function assertApi($api) {
 		$api_list = $this->getApi();
 		foreach ($api as $request) {
