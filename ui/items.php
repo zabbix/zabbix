@@ -1471,6 +1471,17 @@ else {
 	$data['items'] = API::Item()->get($options);
 	$data['parent_templates'] = [];
 
+	// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain tags already deleted).
+	if ($subfilter_tags) {
+		$item_tags = [];
+		foreach ($data['items'] as $item) {
+			foreach ($item['tags'] as $tag) {
+				$item_tags[json_encode([$tag['tag'], $tag['value']])] = true;
+			}
+		}
+		$subfilter_tags = array_intersect_key($subfilter_tags, $item_tags);
+	}
+
 	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
 	if ($data['items']) {
 		// resolve name macros
@@ -1478,7 +1489,6 @@ else {
 
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
-		$item_tags = [];
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 
@@ -1549,16 +1559,8 @@ else {
 							return json_encode([$tag['tag'], $tag['value']]);
 						}, $item['tags']))))
 			];
-
-			foreach ($item['tags'] as $tag) {
-				$item_tags[json_encode([$tag['tag'], $tag['value']])] = true;
-			}
 		}
 		unset($item);
-
-		// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain deleted tags).
-		$subfilter_tags = array_intersect_key($subfilter_tags, $item_tags);
-		unset($item_tags);
 
 		// disable subfilters if list is empty
 		foreach ($data['items'] as $item) {
