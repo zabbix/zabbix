@@ -12727,44 +12727,6 @@ void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zb
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_nested_hostgroupids_by_names                          *
- *                                                                            *
- * Purpose: gets nested group ids for the specified host groups               *
- *                                                                            *
- * Parameter: groups          - [IN] the parent group names                   *
- *            groups_num      - [IN] the number of parent groups              *
- *            nested_groupids - [OUT] the nested + parent group ids           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_get_nested_hostgroupids_by_names(const char **groups, int groups_num,
-		zbx_vector_uint64_t *nested_groupids)
-{
-	int	i, index;
-
-	WRLOCK_CACHE;
-
-	for (i = 0; i < groups_num; i++)
-	{
-		zbx_dc_hostgroup_t	group_local, *group;
-
-		group_local.name = groups[i];
-
-		if (FAIL != (index = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local,
-				dc_compare_hgroups)))
-		{
-			group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
-			dc_get_nested_hostgroupids(group->groupid, nested_groupids);
-		}
-	}
-
-	UNLOCK_CACHE;
-
-	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dc_get_hostids_by_group_name                                 *
  *                                                                            *
  * Purpose: gets hostids belonging to the group and its nested groups         *
