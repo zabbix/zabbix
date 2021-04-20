@@ -64,7 +64,7 @@ in:
     value: "3"
     newvalue: "Value < 3"
   - type: 3
-    value: "5:7"
+    value: "5-7"
     newvalue: "Value 5-7"
 out:
   return: SUCCEED
@@ -84,7 +84,7 @@ in:
     value: 3
     newvalue: "Value < 3"
   - type: 3
-    value: "5:7"
+    value: "5-7"
     newvalue: "Value 5-7"
   - type: 1
     value: 10
@@ -107,7 +107,7 @@ in:
     value: 3
     newvalue: "Value < 3"
   - type: 3
-    value: "5:7"
+    value: "5-7"
     newvalue: "Value 5-7"
   - type: 1
     value: 10
@@ -133,7 +133,7 @@ in:
     value: 3
     newvalue: "Value < 3"
   - type: 3
-    value: "5:7"
+    value: "5-7"
     newvalue: "Value 5-7"
   - type: 1
     value: 10
@@ -158,5 +158,16 @@ in:
 out:
   return: SUCCEED
   value: "Value < 3 (1)"
+---
+test case: complex range
+in:
+  value: 4
+  valuemaps:
+  - type: 3
+    value: "-10--5,-3-5,32,44,4- 6, 10.5 -12.5, 133.1, 8"
+    newvalue: "Range"
+out:
+  return: SUCCEED
+  value: "Range (4)"
 ...
 

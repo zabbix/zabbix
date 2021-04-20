@@ -3356,7 +3356,6 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 		if (ZBX_INFINITY != (input_value = evaluate_string_to_double(value)))
 		{
-			char	threshold_min[ZBX_VALUEMAP_STRING_LEN], threshold_max[ZBX_VALUEMAP_STRING_LEN];
 			double	min, max;
 
 			if (ZBX_VALUEMAP_TYPE_LESS == valuemap->type &&
@@ -3371,21 +3370,57 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 				if (input_value > min)
 					goto map_value;
 			}
-			else if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type &&
-					2 == sscanf(valuemap->value, "%" ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "[^:]:%"
-					ZBX_STR(ZBX_VALUEMAP_STRING_LEN) "s", threshold_min, threshold_max))
+			else if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type)
 			{
-				zbx_lrtrim(threshold_max, " ");
-				zbx_lrtrim(threshold_min, " ");
-				if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
-						input_value >= min &&
-						ZBX_INFINITY != (max = evaluate_string_to_double(threshold_max)) &&
-						input_value <= max)
+				int				num, j;
+				char				*input_ptr, *range_str;
+
+				input_ptr = valuemap->value;
+
+				zbx_trim_str_list(input_ptr, ',');
+				num = num_param(input_ptr);
+
+				for (j = 0; j < num; j++)
 				{
-					goto map_value;
+					int	sign = 0, found = 0;
+					char	*ptr, *threshold_min, *threshold_max = NULL;
+
+					range_str = get_param_dyn(input_ptr, j + 1, NULL);
+					ptr = range_str;
+					if (1 < strlen(ptr) && '-' == ptr[0])
+					{
+						ptr++;
+						sign = 1;
+					}
+
+					zbx_strsplit(ptr, '-', &threshold_min, &threshold_max);
+					zbx_lrtrim(threshold_min, " ");
+					zbx_lrtrim(threshold_max, " ");
+					zbx_free(range_str);
+
+					if (ZBX_INFINITY != (min = evaluate_string_to_double(threshold_min)) &&
+							(NULL == threshold_max || ZBX_INFINITY !=
+							(max = evaluate_string_to_double(threshold_max))))
+					{
+						if (1 == sign)
+							min = - min;
+						if (NULL == threshold_max)
+							max = min;
+
+						if (input_value >= min && input_value <= max)
+							found = 1;
+					}
+
+					zbx_free(threshold_min);
+					zbx_free(threshold_max);
+
+					if (0 != found)
+						goto map_value;
 				}
 			}
 		}
+
+
 	}
 
 	for (i = 0; i < valuemaps->values_num; i++)
