@@ -1478,6 +1478,7 @@ else {
 
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
+		$item_tags = [];
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 
@@ -1548,8 +1549,16 @@ else {
 							return json_encode([$tag['tag'], $tag['value']]);
 						}, $item['tags']))))
 			];
+
+			foreach ($item['tags'] as $tag) {
+				$item_tags[json_encode([$tag['tag'], $tag['value']])] = true;
+			}
 		}
 		unset($item);
+
+		// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain deleted tags).
+		$subfilter_tags = array_intersect_key($subfilter_tags, $item_tags);
+		unset($item_tags);
 
 		// disable subfilters if list is empty
 		foreach ($data['items'] as $item) {
