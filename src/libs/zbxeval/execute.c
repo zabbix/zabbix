@@ -1456,8 +1456,8 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 	arg1 = &output->values[output->values_num - 2];
 	arg2 = &output->values[output->values_num - 1];
 
-	if ((eval_math_func_round == func || eval_math_func_truncate == func) && ((0 > arg2->data.dbl ||
-			0.0 != fmod(arg2->data.dbl, 1)) || (fmod == func && 0.0 == arg2->data.dbl)))
+	if ((eval_math_func_round == func || eval_math_func_truncate == func) && (0 > arg2->data.dbl ||
+			0.0 != fmod(arg2->data.dbl, 1)) || (fmod == func && 0.0 == arg2->data.dbl))
 	{
 		*error = zbx_dsprintf(*error, "invalid second argument for function at \"%s\"",
 				ctx->expression + token->loc.l);
@@ -1522,11 +1522,14 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 
 		if (SUCCEED != clock_gettime(CLOCK_MONOTONIC, &ts))
 		{
-			srand((unsigned int)time(NULL));
-			zbx_variant_set_dbl(&ret_value, (double)(rand()));
+			*error = zbx_strdup(*error, "failed to generate seed for random number generator");
+			return FAIL;
 		}
 		else
-			zbx_variant_set_dbl(&ret_value, ts.tv_nsec ^ ts.tv_sec);
+		{
+			srandom((unsigned int)(ts.tv_nsec ^ ts.tv_sec));
+			zbx_variant_set_dbl(&ret_value, random());
+		}
 	}
 	else
 		zbx_variant_set_dbl(&ret_value, value);
