@@ -39,14 +39,12 @@ class CFunctionParser extends CParser {
 	 *
 	 * Supported options:
 	 *   'collapsed_expression' => false  Short trigger expression.
-	 *   'nested_functions' => true       Support nested functions as parameters.
 	 *   'lldmacros' => true              Enable low-level discovery macros usage in trigger expression.
 	 *
 	 * @var array
 	 */
 	protected $options = [
 		'collapsed_expression' => false,
-		'nested_functions' => true,
 		'lldmacros' => true
 	];
 
@@ -67,7 +65,6 @@ class CFunctionParser extends CParser {
 	/**
 	 * @param array $options
 	 * @param bool  $options['collapsed_expression']
-	 * @param bool  $options['nested_functions']
 	 * @param bool  $options['lldmacros']
 	 * @param int   $depth
 	 */
@@ -207,8 +204,7 @@ class CFunctionParser extends CParser {
 								$_parameters[$num] = $query_parser->result;
 								$state = self::STATE_END;
 							}
-							elseif ($this->options['nested_functions']
-									&& $function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+							elseif ($function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $function_parser->getLength() - 1;
 								$_parameters[$num] = $function_parser->result;
 								$state = self::STATE_END;
@@ -259,7 +255,6 @@ class CFunctionParser extends CParser {
 								$state = self::STATE_END;
 							}
 							elseif ($this->options['lldmacros']
-									&& $this->options['nested_functions']
 									&& $lld_macro_function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$_parameters[$num] = new CFunctionParameterResult([
 									'type' => self::PARAM_UNQUOTED,

@@ -43,7 +43,7 @@ class CLLDMacroFunctionParser extends CParser {
 	 */
 	public function __construct() {
 		$this->lld_macro_parser = new CLLDMacroParser();
-		$this->function_parser = new CFunctionParser(['nested_functions' => false]);
+		$this->function_parser = new C10FunctionParser();
 	}
 
 	/**
