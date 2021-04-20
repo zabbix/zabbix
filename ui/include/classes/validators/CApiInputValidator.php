@@ -2153,7 +2153,7 @@ class CApiInputValidator {
 
 		if (!validateDateInterval($year, $month, $day)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('a date between 1970-01-01 and 2038-01-18 is expected')
+				_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
 			);
 			return false;
 		}
