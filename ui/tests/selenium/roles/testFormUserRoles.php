@@ -982,10 +982,35 @@ class testFormUserRoles extends CWebTest {
 
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 			$form->checkValue($data['fields']);
+			if (array_key_exists('api_methods', $data)) {
+				$this->assertApi($data['api_methods']);
+			}
 		}
 	}
 
-	private function checkValues() {
+//	public function testFormUserRoles_checkvalues() {
+//		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=2');
+//		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+////		$fields = $form->getFields()->asValues();
+//////		var_dump($fields);
+////		$actions = $form->query('xpath://input[contains(@id, "actions.")]/following::label')->all();
+////		$this->assertApi(['application.create']);
+//	}
 
+
+	private function getApi(){
+		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->all()->count();
+		$result=[];
+		for ($i = 1;$i <= $counted; ++$i) {
+			$result[] = $this->query('xpath:(//ul[@class="multiselect-list"]/li)['.$i.']')->asMultiselect()->one()->getText();
+		}
+		return $result;
+	}
+
+	private function assertApi($api) {
+		$api_list = $this->getApi();
+		foreach ($api as $request) {
+			$this->assertTrue(in_Array($request, $api_list));
+		}
 	}
 }
