@@ -322,7 +322,7 @@ class CReport extends CApiService {
 					&& $report['dashboardid'] != $db_report['dashboardid']
 				);
 				if (!array_key_exists('users', $report)) {
-					$users =  $db_report['users'];
+					$users = $db_report['users'];
 				}
 				if (!array_key_exists('user_groups', $report)) {
 					$user_groups = $db_report['user_groups'];
