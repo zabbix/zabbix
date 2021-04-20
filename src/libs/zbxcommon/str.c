@@ -2095,6 +2095,17 @@ size_t	zbx_strlen_utf8(const char *text)
 	return n;
 }
 
+char	*zbx_strshift_utf8(char *text, int num)
+{
+	while ('\0' != *text && 0 < num)
+	{
+		if (0x80 != (0xc0 & *text++))
+			num--;
+	}
+
+	return text;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_utf8_char_len                                                *

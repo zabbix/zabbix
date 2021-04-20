@@ -26,6 +26,26 @@
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1
 
+/* bit function types */
+typedef enum
+{
+	FUNCTION_OPTYPE_BIT_AND = 0,
+	FUNCTION_OPTYPE_BIT_OR,
+	FUNCTION_OPTYPE_BIT_XOR,
+	FUNCTION_OPTYPE_BIT_LSHIFT,
+	FUNCTION_OPTYPE_BIT_RSHIFT
+}
+zbx_function_bit_optype_t;
+
+/* trim function types */
+typedef enum
+{
+	FUNCTION_OPTYPE_TRIM_ALL = 0,
+	FUNCTION_OPTYPE_TRIM_LEFT,
+	FUNCTION_OPTYPE_TRIM_RIGHT,
+}
+zbx_function_trim_optype_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: variant_convert_suffixed_num                                     *
@@ -1196,12 +1216,14 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_bitand                                     *
+ * Function: eval_execute_function_bitwise                                    *
  *                                                                            *
- * Purpose: evaluate bitand() function                                        *
+ * Purpose: evaluate bitand(), bitor(), bitxor(), bitlshift(),                *
+ *          bitrshift() functions                                             *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
  *             token  - [IN] the function token                               *
+ *             type   - [IN] the function type                                *
  *             output - [IN/OUT] the output value stack                       *
  *             error  - [OUT] the error message in the case of failure        *
  *                                                                            *
@@ -1209,8 +1231,8 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_execute_function_bitand(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		zbx_vector_var_t *output, char **error)
+static int	eval_execute_function_bitwise(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_function_bit_optype_t type, zbx_vector_var_t *output, char **error)
 {
 	zbx_variant_t	value, *left, *right;
 	int		ret;
@@ -1242,8 +1264,958 @@ static int	eval_execute_function_bitand(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	zbx_variant_set_ui64(&value, left->data.ui64 & right->data.ui64);
+	switch (type)
+	{
+		case FUNCTION_OPTYPE_BIT_AND:
+			zbx_variant_set_ui64(&value, left->data.ui64 & right->data.ui64);
+			break;
+		case FUNCTION_OPTYPE_BIT_OR:
+			zbx_variant_set_ui64(&value, left->data.ui64 | right->data.ui64);
+			break;
+		case FUNCTION_OPTYPE_BIT_XOR:
+			zbx_variant_set_ui64(&value, left->data.ui64 ^ right->data.ui64);
+			break;
+		case FUNCTION_OPTYPE_BIT_LSHIFT:
+			zbx_variant_set_ui64(&value, left->data.ui64 << right->data.ui64);
+			break;
+		case FUNCTION_OPTYPE_BIT_RSHIFT:
+			zbx_variant_set_ui64(&value, left->data.ui64 >> right->data.ui64);
+	}
+
 	eval_function_return(2, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_bitnot                                     *
+ *                                                                            *
+ * Purpose: evaluate bitnot() function                                        *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_bitnot(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	zbx_variant_t	value, *arg;
+	int		ret;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_ui64(&value, ~arg->data.ui64);
+	eval_function_return(1, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_left                                       *
+ *                                                                            *
+ * Purpose: evaluate left() function                                          *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_left(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, *len, value;
+	size_t		sz;
+	char		*strval;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 2];
+	len = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(len), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	sz = zbx_strlen_utf8_nchars(arg->data.str, (size_t)len->data.ui64) + 1;
+	strval = zbx_malloc(NULL, sz);
+	zbx_strlcpy_utf8(strval, arg->data.str, sz);
+
+	zbx_variant_set_str(&value, strval);
+	eval_function_return(2, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_right                                      *
+ *                                                                            *
+ * Purpose: evaluate right() function                                         *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_right(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, *len, value;
+	size_t		sz;
+	char		*strval, *p;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 2];
+	len = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(len), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	p = zbx_strshift_utf8(arg->data.str, zbx_strlen_utf8(arg->data.str) - len->data.ui64);
+	sz = zbx_strlen_utf8_nchars(p, len->data.ui64) + 1;
+	strval = zbx_malloc(NULL, sz);
+	zbx_strlcpy_utf8(strval, p, sz);
+
+	zbx_variant_set_str(&value, strval);
+	eval_function_return(2, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_mid                                        *
+ *                                                                            *
+ * Purpose: evaluate mid() function                                           *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, *start, *len, value;
+	size_t		sz;
+	char		*strval, *p;
+
+	if (3 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 3];
+	start = &output->values[output->values_num - 2];
+	len = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(start, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(start), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(len), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	p = zbx_strshift_utf8(arg->data.str, (int)start->data.ui64 - 1);
+	sz = zbx_strlen_utf8_nchars(p, len->data.ui64) + 1;
+	strval = zbx_malloc(NULL, sz);
+	zbx_strlcpy_utf8(strval, p, sz);
+
+	zbx_variant_set_str(&value, strval);
+	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_trim                                       *
+ *                                                                            *
+ * Purpose: evaluate trim(), rtrim(), ltrim() functions                       *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             type   - [IN] the function type                                *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_trim(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_function_trim_optype_t type, zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*sym, *arg, value, sym_val;
+
+	if (1 > token->opt || 2 < token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	if (2 == token->opt)
+	{
+		arg = &output->values[output->values_num - 2];
+		sym = &output->values[output->values_num - 1];
+
+		if (SUCCEED != zbx_variant_convert(sym, ZBX_VARIANT_STR))
+		{
+			*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
+					ctx->expression + token->loc.l);
+			return FAIL;
+		}
+	}
+	else
+	{
+		arg = &output->values[output->values_num - 1];
+		zbx_variant_set_str(&sym_val, zbx_strdup(NULL, ZBX_WHITESPACE));
+		sym = &sym_val;
+	}
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	switch (type)
+	{
+		case FUNCTION_OPTYPE_TRIM_ALL:
+			zbx_lrtrim(arg->data.str, sym->data.str);
+			break;
+		case FUNCTION_OPTYPE_TRIM_RIGHT:
+			zbx_rtrim(arg->data.str, sym->data.str);
+			break;
+		case FUNCTION_OPTYPE_TRIM_LEFT:
+			zbx_ltrim(arg->data.str, sym->data.str);
+	}
+
+	if (2 != token->opt)
+		zbx_variant_clear(&sym_val);
+
+	zbx_variant_set_str(&value, zbx_strdup(NULL, arg->data.str));
+	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_concat                                     *
+ *                                                                            *
+ * Purpose: evaluate concat() function                                        *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*str1, *str2, value;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	str1 = &output->values[output->values_num - 2];
+	str2 = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(str1, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(str2, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_str(&value, zbx_strdcat(str1->data.str, str2->data.str));
+	eval_function_return(2, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_insert                                     *
+ *                                                                            *
+ * Purpose: evaluate insert() function                                        *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, *start, *len, *replacement, value;
+	char		*strval;
+	size_t		str_alloc, str_len;
+
+	if (4 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 4];
+	start = &output->values[output->values_num - 3];
+	len = &output->values[output->values_num - 2];
+	replacement = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(start, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(start), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(len, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(len), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(replacement, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function fourth argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	strval = zbx_strdup(NULL, arg->data.str);
+
+	str_alloc = str_len = strlen(strval) + 1;
+	zbx_replace_mem_dyn(&strval, &str_alloc, &str_len, start->data.ui64 - 1, len->data.ui64, replacement->data.str,
+			strlen(replacement->data.str));
+
+	zbx_variant_set_str(&value, strval);
+	eval_function_return(4, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_replace                                    *
+ *                                                                            *
+ * Purpose: evaluate replace() function                                       *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, *pattern, *replacement, value;
+	char		*strval, *p;
+
+	if (3 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 3];
+	pattern = &output->values[output->values_num - 2];
+	replacement = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(pattern, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function second argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(replacement, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function third argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	strval = zbx_strdup(NULL, arg->data.str);
+
+	if (NULL != (p = strstr(strval, pattern->data.str)))
+	{
+		size_t	str_alloc, str_len;
+
+		str_alloc = str_len = strlen(strval) + 1;
+		zbx_replace_mem_dyn(&strval, &str_alloc, &str_len, p - strval, strlen(pattern->data.str),
+				replacement->data.str, strlen(replacement->data.str));
+	}
+
+	zbx_variant_set_str(&value, strval);
+	eval_function_return(3, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_repeat                                     *
+ *                                                                            *
+ * Purpose: evaluate repeat() function                                        *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*str, *num, value;
+	char		*strval = NULL;
+	zbx_uint64_t	i;
+
+	if (2 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	str = &output->values[output->values_num - 2];
+	num = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(str, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_variant_convert(num, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(num), ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	for (i = num->data.ui64; i > 0; i--)
+		strval = zbx_strdcat(strval, str->data.str);
+
+	if (NULL == strval)
+		strval = zbx_strdup(NULL, "");
+
+	zbx_variant_set_str(&value, strval);
+	eval_function_return(2, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_bytelength                                 *
+ *                                                                            *
+ * Purpose: evaluate bytelength() function                                    *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_bytelength(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, value;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 1];
+
+	if (SUCCEED == zbx_variant_convert(arg, ZBX_VARIANT_UI64))
+	{
+		zbx_uint64_t	byte = __UINT64_C(0xFF00000000000000);
+		int		i;
+
+		for (i = 8; i > 0; i--)
+		{
+			if (byte & arg->data.ui64)
+				break;
+
+			byte = byte >> 8;
+		}
+
+		zbx_variant_set_dbl(&value, i);
+	}
+	else if (SUCCEED == zbx_variant_convert(arg, ZBX_VARIANT_DBL))
+	{
+		zbx_variant_set_dbl(&value, sizeof(arg->data.dbl));
+	}
+	else if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
+		return FAIL;
+	}
+	else
+		zbx_variant_set_dbl(&value, strlen(arg->data.str));
+
+	eval_function_return(1, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_bitlength                                  *
+ *                                                                            *
+ * Purpose: evaluate bitlength() function                                     *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_bitlength(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, value;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 1];
+
+	if (SUCCEED == zbx_variant_convert(arg, ZBX_VARIANT_UI64))
+	{
+		int	i, bits;
+
+		bits = sizeof(uint64_t) * 8;
+
+		for (i = bits - 1; i >= 0; i--)
+		{
+			if (__UINT64_C(1) << i & arg->data.ui64)
+				break;
+		}
+
+		zbx_variant_set_dbl(&value, ++i);
+	}
+	else if (SUCCEED == zbx_variant_convert(arg, ZBX_VARIANT_DBL))
+	{
+		zbx_variant_set_dbl(&value, sizeof(arg->data.dbl) * 8);
+	}
+	else if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
+		return FAIL;
+	}
+	else
+		zbx_variant_set_dbl(&value, strlen(arg->data.str) * 8);
+
+	eval_function_return(1, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_char                                       *
+ *                                                                            *
+ * Purpose: evaluate char() function                                          *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_char(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, value;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_UI64))
+	{
+		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_str(&value, zbx_dsprintf(NULL, "%c", (char)arg->data.ui64));
+	eval_function_return(1, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_ascii                                      *
+ *                                                                            *
+ * Purpose: evaluate ascii() function                                         *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_ascii(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret;
+	zbx_variant_t	*arg, value;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	arg = &output->values[output->values_num - 1];
+
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_ui64(&value, *arg->data.str);
+	eval_function_return(1, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_between                                    *
+ *                                                                            *
+ * Purpose: evaluate between() function                                       *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_between(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		i, ret;
+	double		between;
+	zbx_variant_t	value;
+
+	if (3 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
+		return ret;
+
+	i = output->values_num - token->opt;
+	between = output->values[i++].data.dbl;
+
+	if (output->values[i++].data.dbl <= between && between <= output->values[i].data.dbl)
+		zbx_variant_set_dbl(&value, 1);
+	else
+		zbx_variant_set_dbl(&value, 0);
+
+	eval_function_return(3, &value, output);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_execute_function_in                                         *
+ *                                                                            *
+ * Purpose: evaluate in() function                                            *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_in(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	zbx_variant_t	value;
+	int		i, ret;
+
+	if (2 > token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	zbx_variant_set_dbl(&value, 0);
+
+	if (UNKNOWN != (ret = eval_prepare_math_function_args(ctx, token, output, error)))
+	{
+		zbx_variant_t	*cmpr, *arg;
+
+		if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+			return ret;
+
+		cmpr = &output->values[0];
+
+		if (SUCCEED != zbx_variant_convert(cmpr, ZBX_VARIANT_STR))
+		{
+			*error = zbx_dsprintf(*error, "invalid function first argument at \"%s\"",
+					ctx->expression + token->loc.l);
+			return FAIL;
+		}
+
+		for (i = 1; i < output->values_num; i++)
+		{
+			arg = &output->values[i];
+
+			if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
+			{
+				*error = zbx_dsprintf(*error, "invalid function argument \"%s\" at \"%s\"",
+						zbx_variant_value_desc(arg), ctx->expression + token->loc.l);
+				return FAIL;
+			}
+
+			if (0 == strcmp(cmpr->data.str, arg->data.str))
+			{
+				zbx_variant_set_dbl(&value, 1);
+				break;
+			}
+		}
+	}
+	else
+	{
+		double	in;
+
+		i = output->values_num - token->opt;
+		in = output->values[i++].data.dbl;
+
+		for (; i < output->values_num; i++)
+		{
+			if (in == output->values[i].data.dbl)
+			{
+				zbx_variant_set_dbl(&value, 1);
+				break;
+			}
+		}
+	}
+
+	eval_function_return(token->opt, &value, output);
 
 	return SUCCEED;
 }
@@ -1338,7 +2310,49 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "dayofmonth", ZBX_CONST_STRLEN("dayofmonth")))
 		return eval_execute_function_dayofmonth(ctx, token, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitand", ZBX_CONST_STRLEN("bitand")))
-		return eval_execute_function_bitand(ctx, token, output, error);
+		return eval_execute_function_bitwise(ctx, token, FUNCTION_OPTYPE_BIT_AND, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitor", ZBX_CONST_STRLEN("bitor")))
+		return eval_execute_function_bitwise(ctx, token, FUNCTION_OPTYPE_BIT_OR, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitxor", ZBX_CONST_STRLEN("bitxor")))
+		return eval_execute_function_bitwise(ctx, token, FUNCTION_OPTYPE_BIT_XOR, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitlshift", ZBX_CONST_STRLEN("bitlshift")))
+		return eval_execute_function_bitwise(ctx, token, FUNCTION_OPTYPE_BIT_LSHIFT, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitrshift", ZBX_CONST_STRLEN("bitrshift")))
+		return eval_execute_function_bitwise(ctx, token, FUNCTION_OPTYPE_BIT_RSHIFT, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitnot", ZBX_CONST_STRLEN("bitnot")))
+		return eval_execute_function_bitnot(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "between", ZBX_CONST_STRLEN("between")))
+		return eval_execute_function_between(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "in", ZBX_CONST_STRLEN("in")))
+		return eval_execute_function_in(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "ascii", ZBX_CONST_STRLEN("ascii")))
+		return eval_execute_function_ascii(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "char", ZBX_CONST_STRLEN("char")))
+		return eval_execute_function_char(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "left", ZBX_CONST_STRLEN("left")))
+		return eval_execute_function_left(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "right", ZBX_CONST_STRLEN("right")))
+		return eval_execute_function_right(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "mid", ZBX_CONST_STRLEN("mid")))
+		return eval_execute_function_mid(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bitlength", ZBX_CONST_STRLEN("bitlength")))
+		return eval_execute_function_bitlength(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "bytelength", ZBX_CONST_STRLEN("bytelength")))
+		return eval_execute_function_bytelength(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "concat", ZBX_CONST_STRLEN("concat")))
+		return eval_execute_function_concat(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "insert", ZBX_CONST_STRLEN("insert")))
+		return eval_execute_function_insert(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "replace", ZBX_CONST_STRLEN("replace")))
+		return eval_execute_function_replace(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "repeat", ZBX_CONST_STRLEN("repeat")))
+		return eval_execute_function_repeat(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "ltrim", ZBX_CONST_STRLEN("ltrim")))
+		return eval_execute_function_trim(ctx, token, FUNCTION_OPTYPE_TRIM_LEFT, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "rtrim", ZBX_CONST_STRLEN("rtrim")))
+		return eval_execute_function_trim(ctx, token, FUNCTION_OPTYPE_TRIM_RIGHT, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "trim", ZBX_CONST_STRLEN("trim")))
+		return eval_execute_function_trim(ctx, token, FUNCTION_OPTYPE_TRIM_ALL, output, error);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);

@@ -1303,6 +1303,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
+char	*zbx_strshift_utf8(char *text, int num);
 size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
 size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen);
