@@ -181,7 +181,7 @@ class CItemKey extends CParser {
 			}
 		}
 
-		if ($this->options['with_filter'] && $data[$p] === '?') {
+		if ($this->options['with_filter'] && isset($data[$p]) && $data[$p] === '?') {
 			$p++;
 
 			if (!isset($data[$p]) || $data[$p] !== '[') {
