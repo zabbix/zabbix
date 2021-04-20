@@ -414,13 +414,13 @@ class CHistFunctionParserTest extends TestCase {
 							]),
 							1 => new CPeriodParserResult([
 								'sec_num' => '{{#PERIOD}.regsub("^([0-9]+)", \1)}',
-								'time_shift' => 'now/{#MONTH}/{#MONTH}-{#ONE_HOUR}',
+								'time_shift' => 'now/{#MONTH}-{#ONE_HOUR}',
 								'sec_num_contains_macros' => true,
 								'time_shift_contains_macros' => true,
 								'source' => null,
 								'match' => '{{#PERIOD}.regsub("^([0-9]+)", \1)}:now/{#MONTH}-{#ONE_HOUR}',
 								'pos' => 16,
-								'length' => 25
+								'length' => 60
 							])
 						]
 					]
