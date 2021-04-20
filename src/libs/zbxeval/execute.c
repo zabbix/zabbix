@@ -1456,8 +1456,8 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 	arg1 = &output->values[output->values_num - 2];
 	arg2 = &output->values[output->values_num - 1];
 
-	if ((eval_math_func_round == func || eval_math_func_truncate == func) && (0 > arg2->data.dbl ||
-			0.0 != fmod(arg2->data.dbl, 1)) || (fmod == func && 0.0 == arg2->data.dbl))
+	if (((eval_math_func_round == func || eval_math_func_truncate == func) && (0 > arg2->data.dbl ||
+			0.0 != fmod(arg2->data.dbl, 1))) || (fmod == func && 0.0 == arg2->data.dbl))
 	{
 		*error = zbx_dsprintf(*error, "invalid second argument for function at \"%s\"",
 				ctx->expression + token->loc.l);
