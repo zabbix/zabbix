@@ -145,7 +145,7 @@ class CControllerScheduledReportEdit extends CController {
 			$data['status'] = $this->report['status'];
 			$data['subscriptions'] = [];
 
-			$userids = [$data['userid']];
+			$userids = [$data['userid'] => true];
 			$usrgrpids = [];
 
 			foreach ($this->report['users'] as $user) {
