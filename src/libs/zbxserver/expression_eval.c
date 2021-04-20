@@ -746,7 +746,7 @@ static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expressi
 			if (SUCCEED != zbx_variant_convert(&filter_value, ZBX_VARIANT_DBL))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "unexpected item query filter evaluation result:"
-						" value:\"%s\" of flags \"%s\"", zbx_variant_value_desc(&filter_value),
+						" value:\"%s\" of type \"%s\"", zbx_variant_value_desc(&filter_value),
 						zbx_variant_type_desc(&filter_value));
 
 				zbx_variant_clear(&filter_value);

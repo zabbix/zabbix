@@ -69,7 +69,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 				break;
 			default:
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "unsupported calculated value result \"%s\""
-						" of flags \"%s\"", zbx_variant_value_desc(&value),
+						" of type \"%s\"", zbx_variant_value_desc(&value),
 						zbx_variant_type_desc(&value)));
 				zbx_variant_clear(&value);
 				break;

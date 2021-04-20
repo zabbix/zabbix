@@ -382,7 +382,7 @@ const char	*zbx_get_variant_type_desc(unsigned char type)
 		case ZBX_VARIANT_ERR:
 			return "error";
 		case ZBX_VARIANT_DBL_VECTOR:
-			return "floating vector";
+			return "double vector";
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
