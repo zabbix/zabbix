@@ -127,9 +127,6 @@ class testFormItem extends CLegacyWebTest {
 				['type' => 'Zabbix trapper', 'host' => 'Simple form test host']
 			],
 			[
-				['type' => 'Zabbix aggregate', 'host' => 'Simple form test host']
-			],
-			[
 				['type' => 'External check', 'host' => 'Simple form test host']
 			],
 			[
@@ -271,9 +268,6 @@ class testFormItem extends CLegacyWebTest {
 				['type' => 'Zabbix trapper', 'template' => 'Inheritance test template']
 			],
 			[
-				['type' => 'Zabbix aggregate', 'template' => 'Inheritance test template']
-			],
-			[
 				['type' => 'External check', 'template' => 'Inheritance test template']
 			],
 			[
@@ -395,7 +389,6 @@ class testFormItem extends CLegacyWebTest {
 				'SNMP trap',
 				'Zabbix internal',
 				'Zabbix trapper',
-				'Zabbix aggregate',
 				'External check',
 				'Database monitor',
 				'IPMI agent',
@@ -614,7 +607,6 @@ class testFormItem extends CLegacyWebTest {
 			case 'Simple check':
 			case 'SNMP agent':
 			case 'Zabbix internal':
-			case 'Zabbix aggregate':
 			case 'External check':
 			case 'Database monitor':
 			case 'IPMI agent':
@@ -649,7 +641,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Numeric (unsigned)']");
 			$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Numeric (float)']");
 
-			if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
+			if ($type == 'Calculated') {
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Character']", 'disabled');
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Log']", 'disabled');
 				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Text']", 'disabled');
@@ -1675,28 +1667,6 @@ class testFormItem extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'type' => 'Zabbix aggregate',
-					'name' => 'Zabbix aggregate',
-					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'type' => 'Zabbix aggregate',
-					'name' => 'Zabbix aggregate',
-					'key' => 'item-zabbix-aggregate',
-					'error_msg' => 'Cannot add item',
-					'errors' => [
-						'Key "item-zabbix-aggregate" does not match'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'item-external-check',
@@ -2133,9 +2103,8 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath("//z-select[@id='value_type']//li[text()='$value_type']");
 
 			// "Check now" button availability
-			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMP agent',
-					'Zabbix internal', 'Zabbix aggregate', 'External check', 'Database monitor', 'IPMI agent',
-					'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated'])) {
+			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMP agent', 'Zabbix internal', 'External check',
+					'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated'])) {
 				$this->zbxTestClick('check_now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
 			}
