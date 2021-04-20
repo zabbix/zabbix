@@ -1060,6 +1060,14 @@ out:
   result: SUCCEED
   value: 11.182493960703473
 ---
+test case: Expression 'expm1(expm1(2))'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'expm1(expm1(2))'
+out:
+  result: SUCCEED
+  value: 594.29441538075378
+---
 test case: Expression 'floor(2.6)'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]

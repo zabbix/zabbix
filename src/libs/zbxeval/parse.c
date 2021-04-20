@@ -1028,14 +1028,6 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 					return SUCCEED;
 				}
 			}
-			else if (0 != isdigit((unsigned char)ctx->expression[pos]))
-			{
-				if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION_NAME) &&
-						SUCCEED == eval_parse_function_token(ctx, pos, token))
-				{
-					return SUCCEED;
-				}
-			}
 			break;
 	}
 
