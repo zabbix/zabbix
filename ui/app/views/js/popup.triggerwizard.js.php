@@ -90,6 +90,7 @@
 	// Button Add click handler.
 	$add_button.on('click', function () {
 		var expression = [],
+			expression_raw = [],
 			$inputs = $('[name^="keys["]'),
 			$keywords = $inputs.filter('[name$="[value]"]'),
 			items = $('#itemid').data('multiSelect').values.selected,
@@ -111,6 +112,7 @@
 			var operator = '"' + el.value + '"';
 
 			expression.push('find(' + query + ',,' + operator + ',' + pattern + ')');
+			expression_raw.push('find($,,' + operator + ',' + pattern + ')');
 			parts.push({operator: operator, pattern: pattern});
 			$(el).closest('tr').remove();
 		});
@@ -119,6 +121,7 @@
 			operator = $iregexp_checkbox.is(':checked') ? '"iregexp"' : '"regexp"';
 			pattern = '"' + $expr_input.val().replace(/"/g, '\\"') + '"';
 			expression.push('find(' + query + ',,' + operator + ',' + pattern + ')');
+			expression_raw.push('find($,,' + operator + ',' + pattern + ')');
 			parts.push({operator: operator, pattern: pattern});
 			$expr_input.val('');
 		}
@@ -132,6 +135,7 @@
 			var logical_operator = $and_button.is(':enabled') ? ' and ' : ' or ',
 				row = $(trigger_row_tmpl.evaluate({
 						expression: expression.join(logical_operator),
+						expression_raw: expression_raw.join(logical_operator),
 						type_label: label,
 						type: value
 					}))
@@ -190,15 +194,19 @@
 		$expr_table.find('tbody > tr').each((i, tr) => {
 			var details = $(tr).data('row-details'),
 				expressions = [],
-				expr_str = '';
+				expressions_raw = [],
+				expr_str = '',
+				expr_raw = '';
 
 			details.parts.forEach(part => {
 				expressions.push('find(' + query + ',,' + part.operator + ',' + part.pattern + ')');
+				expressions_raw.push('find($,,' + part.operator + ',' + part.pattern + ')');
 			});
 			expr_str = expressions.join(details.logical_operator);
+			expr_raw = expressions_raw.join(details.logical_operator);
 
 			$(tr).find('div[data-expr]').html(expr_str);
-			$(tr).find('[name="expressions[][value]"]').val(expr_str);
+			$(tr).find('[name="expressions[][value]"]').val(expr_raw);
 		});
 	});
 

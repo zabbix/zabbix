@@ -61,7 +61,7 @@
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 		new CDiv('#{type_label}'),
 		(new CCol([
-			(new CVar('expressions[][value]', '#{expression}')),
+			(new CVar('expressions[][value]', '#{expression_raw}')),
 			(new CVar('expressions[][type]', '#{type}')),
 			(new CButton(null, _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
 		]))->addClass(ZBX_STYLE_NOWRAP)

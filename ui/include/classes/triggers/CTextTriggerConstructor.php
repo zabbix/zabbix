@@ -47,6 +47,8 @@ class CTextTriggerConstructor {
 	 * Most of this function was left unchanged to preserve the current behavior of the constructor.
 	 * Feel free to rewrite and correct it if necessary.
 	 *
+	 * @param string    $host                       host name
+	 * @param string    $item_key                    item key
 	 * @param array     $expressions                array of expression parts
 	 * @param string    $expressions[]['value']     expression string
 	 * @param int       $expressions[]['type']      whether the string should match the expression; supported values:
@@ -54,8 +56,9 @@ class CTextTriggerConstructor {
 	 *
 	 * @return bool|string
 	 */
-	public function getExpressionFromParts(array $expressions) {
+	public function getExpressionFromParts(string $host, string $item_key, array $expressions) {
 		$result = '';
+		$query = '/'.$host.'/'.$item_key;
 
 		if (empty($expressions)) {
 			error(_('Expression cannot be empty'));
@@ -63,7 +66,12 @@ class CTextTriggerConstructor {
 		}
 
 		// regexp used to split an expressions into tokens
-		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*) (and|or) (not )?(-)? ?[(]*((find)(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
+		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*) (and|or) (not )?(-)? ?[(]*(find(\\('.
+			'(?:[\s]{0,}\\$)'. // query placeholder
+			'(?:[\s]{0,},[\s]{0,}(?:[^\\)])*)?'. // unquoted period
+			'(?:[\s]{0,},[\s]{0,}"[^"].*")?'. // quoted operator
+			'(?:[\s]{0,},[\s]{0,}"[^"].*")'. // quoted pattern
+		'\\)))(['.ZBX_PREG_PRINT.']*)$';
 		$expr_array = [];
 		$cexpor = 0;
 		$startpos = -1;
@@ -105,16 +113,13 @@ class CTextTriggerConstructor {
 			// split an expression into separate tokens
 			// start from the first part of the expression, then move to the next one
 			while (preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)) {
-				$arr[6] = strtolower($arr[6]);
-				if ($arr[6] !== 'find') {
-					error(_('Incorrect function is used').'. ['.$expression['value'].']');
-					return false;
-				}
+				$query_pos = strpos($arr[5], TRIGGER_QUERY_PLACEHOLDER);
+				$arr[5] = substr_replace($arr[5], $query, $query_pos, 1);
 
 				$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
 				$expr_array[$sub_expr_count]['not'] = trim($arr[3]);
 				$expr_array[$sub_expr_count]['minus'] = trim($arr[4]);
-				$expr_array[$sub_expr_count]['regexp'] = $arr[6].$arr[7];
+				$expr_array[$sub_expr_count]['regexp'] = $arr[5];
 
 				$sub_expr_count++;
 				$expr = $arr[1];
@@ -185,13 +190,22 @@ class CTextTriggerConstructor {
 		$splitTokens = $this->splitTokensByFirstLevel($parseResult->getTokens());
 		foreach($splitTokens as $key => $tokens) {
 			$expr = [];
+			$expr_raw = [];
 			$parts = [];
 			$logical_operator = '';
 
 			// replace whole function macros with their functions
 			foreach ($tokens as $token) {
+				$match = $token->match;
+
 				if ($token->type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION) {
 					$params = $token->params_raw['parameters'];
+
+					if (array_key_exists(0, $params) && ($params[0] instanceof CQueryParserResult)) {
+						$query_pos = strpos($match, $params[0]->match);
+						$match = substr_replace($match, TRIGGER_QUERY_PLACEHOLDER, $query_pos, $params[0]->length);
+					}
+
 					$parts[] = [
 						'operator' => array_key_exists(2, $params) ? $params[2]->match : '',
 						'pattern' => array_key_exists(3, $params) ? $params[3]->match : ''
@@ -206,20 +220,26 @@ class CTextTriggerConstructor {
 				$is_operator = ($token->type == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
 					&& in_array($token->match, ['and', 'or', 'not']));
 				$expr[] = $is_operator ? ' '.$token->match.' ' : $token->match;
+				$expr_raw[] = $is_operator ? ' '.$token->match.' ' : $match;
 			}
 
 			$expr = implode($expr);
+			$expr_raw = implode($expr_raw);
 
 			// trim surrounding parentheses
 			$expr = preg_replace('/^\((.*)\)$/u', '$1', $expr);
+			$expr_raw = preg_replace('/^\((.*)\)$/u', '$1', $expr_raw);
 
 			// trim parentheses around item function macros
 			$value = preg_replace('/\((.*)\)(=|<>)0/U', '$1', $expr);
+			$value_raw = preg_replace('/\((.*)\)(=|<>)0/U', '$1', $expr_raw);
 
 			// trim surrounding parentheses
 			$value = preg_replace('/^\((.*)\)$/u', '$1', $value);
+			$value_raw = preg_replace('/^\((.*)\)$/u', '$1', $value_raw);
 
 			$expressions[$key]['value'] = trim($value);
+			$expressions[$key]['value_raw'] = trim($value_raw);
 			$expressions[$key]['type'] = (strpos($expr, '<>0', mb_strlen($expr) - 4) === false)
 				? self::EXPRESSION_TYPE_NO_MATCH
 				: self::EXPRESSION_TYPE_MATCH;
