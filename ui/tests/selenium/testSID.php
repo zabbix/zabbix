@@ -362,7 +362,7 @@ class testSID extends CWebTest {
 			// Event correlation delete.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'correlation.php?delete=1&form=update&correlationid=99005'
 				]
 			],
@@ -370,7 +370,7 @@ class testSID extends CWebTest {
 			// Event correlation enable.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'correlation.php?action=correlation.massenable&g_correlationid[]=99004'
 				]
 			],
@@ -378,7 +378,7 @@ class testSID extends CWebTest {
 			// Event correlation disable.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'correlation.php?action=correlation.massdisable&g_correlationid[]=99004'
 				]
 			],
@@ -386,7 +386,7 @@ class testSID extends CWebTest {
 			// Event correlation creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'correlation.php?form_refresh=3&form=Create+correlation&name=11111&evaltype=0&formula=&'.
 							'conditions%5B0%5D%5Btype%5D=0&conditions%5B0%5D%5Boperator%5D=0&conditions%5B0%5D%5Btag%5D'.
 							'=ttt&conditions%5B0%5D%5Bformulaid%5D=A&description=&status=0&operations%5B%5D%5Btype%5D=0&add=Add'
@@ -396,7 +396,7 @@ class testSID extends CWebTest {
 			// Event correlation update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'correlation.php?form_refresh=1&form=update&correlationid=99004&name=11111&evaltype=0'.
 						'&formula=&conditions%5B0%5D%5Btype%5D=0&conditions%5B0%5D%5Btag%5D=ttt&conditions%5B0%5D%5B'.
 						'formulaid%5D=A&conditions%5B0%5D%5Boperator%5D=0&description=sssss&status=0&operations'.
@@ -407,7 +407,7 @@ class testSID extends CWebTest {
 			// Discovery creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'discoveryconf.php?form_refresh=1&form=Create+discovery+rule&name=aaa&proxy_hostid=0&'.
 						'iprange=192.168.0.1-254&delay=1h&dchecks%5Bnew1%5D%5Btype%5D=3&dchecks%5Bnew1%5D%5Bports%5D'.
 						'=21&dchecks%5Bnew1%5D%5Bsnmpv3_securitylevel%5D=0&dchecks%5Bnew1%5D%5Bname%5D=FTP&'.
@@ -419,7 +419,7 @@ class testSID extends CWebTest {
 			// Discovery delete.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'discoveryconf.php?form_refresh=1&g_druleid%5B7%5D=7&action=drule.massdelete'
 				]
 			],
@@ -427,7 +427,7 @@ class testSID extends CWebTest {
 			// Discovery disable.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'discoveryconf.php?action=drule.massdisable&g_druleid[]=4'
 				]
 			],
@@ -435,7 +435,7 @@ class testSID extends CWebTest {
 			// Discovery enable.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'discoveryconf.php?action=drule.massenable&g_druleid[]=6'
 				]
 			],
@@ -443,7 +443,7 @@ class testSID extends CWebTest {
 			// Discovery update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'discoveryconf.php?form_refresh=1&form=update&druleid=2&name=Local+network&proxy_hostid=0&'.
 						'iprange=192.168.0.1-254&delay=2h&dchecks%5B2%5D%5Btype%5D=9&dchecks%5B2%5D%5Bdcheckid%5D=2&'.
 						'dchecks%5B2%5D%5Bports%5D=10050&dchecks%5B2%5D%5Buniq%5D=0&dchecks%5B2%5D%5Bhost_source%5D=1&'.
@@ -465,7 +465,7 @@ class testSID extends CWebTest {
 			// Host creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'hosts.php?form_refresh=1&form=create&flags=0&tls_connect=1&tls_accept=1&host=1111&visiblename=&'.
 					'groups%5B%5D%5Bnew%5D=111&interfaces%5B1%5D%5Bitems%5D=&interfaces%5B1%5D%5Blocked%5D=&'.
 					'interfaces%5B1%5D%5BisNew%5D=true&interfaces%5B1%5D%5Binterfaceid%5D=1&interfaces%5B1%5D%5Btype%5D=1&'.
@@ -481,7 +481,7 @@ class testSID extends CWebTest {
 			// Host update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'hosts.php?form_refresh=1&form=update&flags=0&tls_connect=1&tls_accept=1&psk_edit_mode=1&'.
 					'hostid=99452&host=11111111&visiblename=&groups%5B%5D=50020&interfaces%5B55079%5D%5Bitems%5D=false&'.
 					'interfaces%5B55079%5D%5BisNew%5D=&interfaces%5B55079%5D%5Binterfaceid%5D=55079&interfaces'.
@@ -497,7 +497,7 @@ class testSID extends CWebTest {
 			// Host delete.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'hosts.php?delete=1&form=update&hostid=99452'
 				]
 			],
@@ -505,7 +505,7 @@ class testSID extends CWebTest {
 			// Host disable.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'hosts.php?action=host.massdisable&hosts[0]=50011'
 				]
 			],
@@ -513,7 +513,7 @@ class testSID extends CWebTest {
 			// Host enable.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'hosts.php?action=host.massenable&hosts[0]=50011'
 				]
 			],
@@ -617,7 +617,7 @@ class testSID extends CWebTest {
 	public function testSID_Links($data) {
 		foreach ([$data['link'], $data['link'].'&sid=test111116666666'] as $link) {
 			$this->page->login()->open($link)->waitUntilReady();
-			if (array_key_exists('other', $data)) {
+			if (array_key_exists('incorrect_request', $data)) {
 				$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
 						' performed due to unauthorized request.');
 			}
@@ -664,7 +664,7 @@ class testSID extends CWebTest {
 			// Application update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=application.edit&applicationid=99010&hostid=50011'
 				]
 			],
@@ -672,7 +672,7 @@ class testSID extends CWebTest {
 			// Application creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=application.edit&hostid=50011'
 				]
 			],
@@ -734,7 +734,7 @@ class testSID extends CWebTest {
 			// GUI update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=gui.edit'
 				]
 			],
@@ -742,7 +742,7 @@ class testSID extends CWebTest {
 			// Autoregistration update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=autoreg.edit'
 				]
 			],
@@ -750,7 +750,7 @@ class testSID extends CWebTest {
 			// Image update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=image.edit&imageid=1'
 				]
 			],
@@ -758,7 +758,7 @@ class testSID extends CWebTest {
 			// Image creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=image.edit&imagetype=1'
 				]
 			],
@@ -766,7 +766,7 @@ class testSID extends CWebTest {
 			// Icon map update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
 			],
@@ -774,7 +774,7 @@ class testSID extends CWebTest {
 			// Icon map creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=iconmap.edit'
 				]
 			],
@@ -782,7 +782,7 @@ class testSID extends CWebTest {
 			// Regular expression update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=regex.edit&regexid=20'
 				]
 			],
@@ -790,7 +790,7 @@ class testSID extends CWebTest {
 			// Regular expression added.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=regex.edit'
 				]
 			],
@@ -798,7 +798,7 @@ class testSID extends CWebTest {
 			// Macros update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=macros.edit'
 				]
 			],
@@ -806,7 +806,7 @@ class testSID extends CWebTest {
 			// Value map update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=valuemap.edit&valuemapid=83'
 				]
 			],
@@ -814,7 +814,7 @@ class testSID extends CWebTest {
 			// Value map creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=valuemap.edit'
 				]
 			],
@@ -822,7 +822,7 @@ class testSID extends CWebTest {
 			// Trigger displaying update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=trigdisplay.edit'
 				]
 			],
@@ -830,7 +830,7 @@ class testSID extends CWebTest {
 			// Other update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=miscconfig.edit'
 				]
 			],
@@ -838,7 +838,7 @@ class testSID extends CWebTest {
 			// Proxy update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=proxy.edit&proxyid=20000'
 				]
 			],
@@ -846,7 +846,7 @@ class testSID extends CWebTest {
 			// Proxy creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=proxy.edit'
 				]
 			],
@@ -854,7 +854,7 @@ class testSID extends CWebTest {
 			// Authentication update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=authentication.edit'
 				]
 			],
@@ -862,7 +862,7 @@ class testSID extends CWebTest {
 			// User group update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7'
 				]
 			],
@@ -870,7 +870,7 @@ class testSID extends CWebTest {
 			// User group creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=usergroup.edit'
 				]
 			],
@@ -878,7 +878,7 @@ class testSID extends CWebTest {
 			// User update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=user.edit&userid=1'
 				]
 			],
@@ -886,7 +886,7 @@ class testSID extends CWebTest {
 			// User creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=user.edit'
 				]
 			],
@@ -894,7 +894,7 @@ class testSID extends CWebTest {
 			// Media update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1'
 				]
 			],
@@ -902,7 +902,7 @@ class testSID extends CWebTest {
 			// Media creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=mediatype.edit'
 				]
 			],
@@ -910,7 +910,7 @@ class testSID extends CWebTest {
 			// Script update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=script.edit&scriptid=1'
 				]
 			],
@@ -918,7 +918,7 @@ class testSID extends CWebTest {
 			// Script creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=script.edit'
 				]
 			],
@@ -926,7 +926,7 @@ class testSID extends CWebTest {
 			// User profile update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=userprofile.edit'
 				]
 			],
@@ -934,7 +934,7 @@ class testSID extends CWebTest {
 			// User role update.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=userrole.edit&roleid=2'
 				]
 			],
@@ -942,7 +942,7 @@ class testSID extends CWebTest {
 			// User role creation.
 			[
 				[
-					'other' => true,
+					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=userrole.edit'
 				]
 			]
@@ -955,16 +955,14 @@ class testSID extends CWebTest {
 	public function testSID_ElementRemove($data) {
 		$this->page->login()->open($data['link'])->waitUntilReady();
 		$this->query('xpath://input[@id="sid"]')->one()->delete();
-		if($this->query('button:Update')->exists()) {
-			$this->query('button:Update')->one()->click();
-		}
-		else {
-			$this->query('xpath://button[text()="Add" and @type="submit"]')->one()->click();
-		}
+		$button = ($this->query('button:Update')->exists()) ? $this->query('button:Update')->one() : $this->query('xpath:'.
+				'//button[text()="Add" and @type="submit"]')->one();
+		$button->click();
 
-		if (array_key_exists('other', $data)) {
+		if (array_key_exists('incorrect_request', $data)) {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
 			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
 			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
 		else {
