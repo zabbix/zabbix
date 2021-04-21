@@ -105,7 +105,6 @@ class CHistFunctionParser extends CParser {
 		$p += strlen($matches[0]);
 		$p2 = $p - 1;
 
-
 		$params_raw = [
 			'type' => self::PARAM_ARRAY,
 			'raw' => '',
