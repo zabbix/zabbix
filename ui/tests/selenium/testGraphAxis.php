@@ -167,6 +167,7 @@ class testGraphAxis extends CWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 		$this->query('class:flickerfreescreen')->waitUntilVisible();
+		sleep(1);
 		$this->assertScreenshot($this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()
 				->one(), $data['name']);
 	}
