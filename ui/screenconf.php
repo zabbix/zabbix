@@ -160,10 +160,8 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		if (getRequest('form') === 'full_clone') {
 			$output = ['resourcetype', 'resourceid', 'width', 'height', 'x', 'y', 'colspan', 'rowspan', 'elements',
-				'valign', 'haligh', 'style', 'url', 'max_columns'
+				'valign', 'haligh', 'style', 'url', 'max_columns', 'dynamic', 'sort_triggers'
 			];
-
-			array_push($output, 'dynamic', 'sort_triggers', 'application');
 
 			$screen['screenitems'] = API::ScreenItem()->get([
 				'output' => $output,

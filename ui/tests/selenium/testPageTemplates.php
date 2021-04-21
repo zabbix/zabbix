@@ -43,8 +43,9 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->templateName);
 
 		$table = $this->query('class:list-table')->asTable()->one();
-		$headers = ['', 'Name', 'Hosts', 'Applications', 'Items', 'Triggers', 'Graphs',
-				'Dashboards', 'Discovery', 'Web', 'Linked templates', 'Linked to templates', 'Tags'];
+		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web',
+				'Linked templates', 'Linked to templates', 'Tags'
+		];
 		$this->assertSame($headers, $table->getHeadersText());
 
 		foreach (['Export', 'Mass update', 'Delete', 'Delete and clear'] as $button) {

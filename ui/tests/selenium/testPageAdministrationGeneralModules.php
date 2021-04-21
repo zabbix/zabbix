@@ -75,7 +75,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Name' => 'шестой модуль',
 				'Version' => 'бета 2',
 				'Author' => 'Работник Заббикса',
-				'Description' => 'Удалить "Reports" и "Maps" из меню верхнего уровня.',
+				'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
 				'Status' => 'Disabled'
 			]
 		];
@@ -172,7 +172,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Name' => 'шестой модуль',
 					'Version' => 'бета 2',
 					'Author' => 'Работник Заббикса',
-					'Description' => 'Удалить "Reports" и "Maps" из меню верхнего уровня.',
+					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
 					'Directory' => 'module_number_6',
 					'Namespace' => 'Example_F',
 					'Homepage' => '-',

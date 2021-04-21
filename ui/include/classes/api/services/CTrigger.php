@@ -45,7 +45,6 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
 	 * @param array $options['triggerids']
-	 * @param array $options['applicationids']
 	 * @param array $options['status']
 	 * @param bool  $options['editable']
 	 * @param array $options['count']
@@ -73,7 +72,6 @@ class CTrigger extends CTriggerGeneral {
 			'hostids'						=> null,
 			'triggerids'					=> null,
 			'itemids'						=> null,
-			'applicationids'				=> null,
 			'functions'						=> null,
 			'inherited'						=> null,
 			'dependent'						=> null,
@@ -213,17 +211,6 @@ class CTrigger extends CTriggerGeneral {
 			if ($options['groupCount']) {
 				$sqlParts['group']['f'] = 'f.itemid';
 			}
-		}
-
-		// applicationids
-		if ($options['applicationids'] !== null) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where']['a'] = dbConditionInt('ia.applicationid', $options['applicationids']);
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fia'] = 'f.itemid=ia.itemid';
 		}
 
 		// functions

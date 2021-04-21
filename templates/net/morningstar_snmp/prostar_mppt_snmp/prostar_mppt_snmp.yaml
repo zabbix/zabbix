@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:28Z'
   groups:
     -
       name: Templates/Modules
@@ -16,21 +16,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Array
-        -
-          name: Battery
-        -
-          name: Counter
-        -
-          name: Load
-        -
-          name: Status
-        -
-          name: Temperature
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Array: Sweep Pmax'
@@ -48,9 +33,10 @@ zabbix_export:
              Units:W
              Range:[0.0, 500]
              Modbus address:0x003E
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Array: Sweep Vmp'
           type: SNMP_AGENT
@@ -67,9 +53,10 @@ zabbix_export:
               Units:V
               Range:[0.0, 5000.0]
               Modbus address:0x003D
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Array: Sweep Voc'
           type: SNMP_AGENT
@@ -86,9 +73,10 @@ zabbix_export:
              Units:V
              Range:[0.0, 80.0]
              Modbus address:0x003F
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Array: Voltage'
           type: SNMP_AGENT
@@ -105,9 +93,10 @@ zabbix_export:
               Units:V
               Range:[0, 80]
               Modbus address:0x0013
-          applications:
+          tags:
             -
-              name: Array
+              tag: Application
+              value: Array
         -
           name: 'Battery: Battery Voltage discovery'
           type: SNMP_AGENT
@@ -118,9 +107,10 @@ zabbix_export:
           value_type: FLOAT
           units: V
           description: 'MIB: PROSTAR-MPPT'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'Battery: Charge Current'
           type: SNMP_AGENT
@@ -137,9 +127,10 @@ zabbix_export:
               Units:A
               Range:[0, 40]
               Modbus address:0x0010
-          applications:
+          tags:
             -
-              name: Battery
+              tag: Application
+              value: Battery
         -
           name: 'Battery: Charge State'
           type: SNMP_AGENT
@@ -164,9 +155,6 @@ zabbix_export:
               8: Equalize
               9: Slave
               10: Fixed
-          applications:
-            -
-              name: Battery
           valuemap:
             name: 'ProStar MPPT charge state'
           preprocessing:
@@ -174,6 +162,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: Battery
           triggers:
             -
               expression: '{last()}={$CHARGE.STATE.CRIT}'
@@ -205,14 +197,15 @@ zabbix_export:
              Units:Ah
              Range:[0.0, 4294967294]
              Modbus addresses:H=0x0026 L=0x0027
-          applications:
-            -
-              name: Counter
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.1'
+          tags:
+            -
+              tag: Application
+              value: Counter
         -
           name: 'Counter: Charge KW-hours'
           type: SNMP_AGENT
@@ -229,9 +222,10 @@ zabbix_export:
             Units:kWh
             Range:[0.0, 65535]
             Modbus address:0x002A
-          applications:
+          tags:
             -
-              name: Counter
+              tag: Application
+              value: Counter
         -
           name: 'Counter: Load Amp-hours'
           type: SNMP_AGENT
@@ -247,14 +241,15 @@ zabbix_export:
             Units:Ah
             Range:[0.0, 4294967294]
             Modbus addresses:H=0x0032 L=0x0033
-          applications:
-            -
-              name: Counter
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.1'
+          tags:
+            -
+              tag: Application
+              value: Counter
         -
           name: 'Load: Current'
           type: SNMP_AGENT
@@ -271,9 +266,10 @@ zabbix_export:
              Units:A
              Range:[0, 60]
              Modbus address:0x0016
-          applications:
+          tags:
             -
-              name: Load
+              tag: Application
+              value: Load
         -
           name: 'Load: State'
           type: SNMP_AGENT
@@ -296,9 +292,6 @@ zabbix_export:
             6: NormalOff
             7: Override
             8: NotUsed
-          applications:
-            -
-              name: Load
           valuemap:
             name: 'ProStar MPPT load state'
           preprocessing:
@@ -306,6 +299,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: Load
           triggers:
             -
               expression: '{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}'
@@ -337,9 +334,10 @@ zabbix_export:
              Units:V
              Range:[0, 80]
              Modbus address:0x0014
-          applications:
+          tags:
             -
-              name: Load
+              tag: Application
+              value: Load
         -
           name: 'Status: Alarms'
           type: SNMP_AGENT
@@ -352,9 +350,6 @@ zabbix_export:
             MIB: PROSTAR-MPPT
             Description:Alarms
             Modbus addresses:H=0x0038 L=0x0039
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -404,6 +399,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"arrayCurrentOffset","like")}=2'
@@ -542,9 +541,6 @@ zabbix_export:
             MIB: PROSTAR-MPPT
             Description:Array Faults
             Modbus address:0x0022
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -579,6 +575,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"arrayHvd","like")}=2'
@@ -652,9 +652,6 @@ zabbix_export:
             MIB: PROSTAR-MPPT
             Description:Array Faults
             Modbus address:0x0022
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -685,6 +682,10 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#3,"customSettingsEdit","like")}=2'
@@ -734,14 +735,15 @@ zabbix_export:
           history: 7d
           units: uptime
           description: 'Device uptime in seconds'
-          applications:
-            -
-              name: Status
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{last()}<10m'
@@ -771,14 +773,15 @@ zabbix_export:
              Units:V
              Range:[0.0, 80.0]
              Modbus address:0x0024
-          applications:
-            -
-              name: Battery
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          tags:
+            -
+              tag: Application
+              value: Battery
         -
           name: 'Temperature: Ambient'
           type: SNMP_AGENT
@@ -795,9 +798,10 @@ zabbix_export:
              Units:deg C
              Range:[-128, 127]
              Modbus address:0x001C
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
         -
           name: 'Temperature: Battery'
           type: SNMP_AGENT
@@ -814,9 +818,10 @@ zabbix_export:
               Units:deg C
               Range:[-128, 127]
               Modbus address:0x001B
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
           triggers:
             -
               expression: '{min(5m)}>{$BATTERY.TEMP.MAX.CRIT}'
@@ -862,9 +867,10 @@ zabbix_export:
              Units:deg C
              Range:[-128, 127]
              Modbus address:0x001A
-          applications:
+          tags:
             -
-              name: Temperature
+              tag: Application
+              value: Temperature
       discovery_rules:
         -
           name: 'Battery voltage discovery'
@@ -889,9 +895,10 @@ zabbix_export:
                 Units:V
                 Range:[0.0, 80.0]
                 Modbus address:0x0012
-              applications:
+              tags:
                 -
-                  name: Battery
+                  tag: Application
+                  value: Battery
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{#VOLTAGE.MAX.CRIT}'

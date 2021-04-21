@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:42Z'
   groups:
     -
       name: Templates/Applications
@@ -19,11 +19,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Applications
-      applications:
-        -
-          name: Nginx
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Nginx: Service response time'
@@ -31,9 +26,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          applications:
+          tags:
             -
-              name: Nginx
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}'
@@ -51,9 +47,6 @@ zabbix_export:
           name: 'Nginx: Service status'
           key: 'net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"]'
           history: 7d
-          applications:
-            -
-              name: Nginx
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -61,6 +54,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{last()}=0'
@@ -79,9 +76,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of accepted client connections.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -94,6 +88,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections active'
           type: DEPENDENT
@@ -101,9 +99,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of active client connections including Waiting connections.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -112,6 +107,10 @@ zabbix_export:
                 - \1
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections dropped per second'
           type: DEPENDENT
@@ -120,9 +119,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of dropped client connections.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: JAVASCRIPT
@@ -138,6 +134,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}'
@@ -160,9 +160,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -175,6 +172,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections reading'
           type: DEPENDENT
@@ -182,9 +183,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of connections where nginx is reading the request header.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -193,6 +191,10 @@ zabbix_export:
                 - \1
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections waiting'
           type: DEPENDENT
@@ -200,9 +202,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of idle client connections waiting for a request.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -211,6 +210,10 @@ zabbix_export:
                 - \3
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Connections writing'
           type: DEPENDENT
@@ -218,9 +221,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The current number of connections where nginx is writing the response back to the client.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -229,6 +229,10 @@ zabbix_export:
                 - \2
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Requests total'
           type: DEPENDENT
@@ -236,9 +240,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The total number of client requests.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -247,6 +248,10 @@ zabbix_export:
                 - \3
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Requests per second'
           type: DEPENDENT
@@ -255,9 +260,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of client requests.'
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -270,6 +272,10 @@ zabbix_export:
                 - ''
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Version'
           type: DEPENDENT
@@ -278,9 +284,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          applications:
-            -
-              name: Nginx
           preprocessing:
             -
               type: REGEX
@@ -293,6 +296,10 @@ zabbix_export:
                 - 1d
           master_item:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
+          tags:
+            -
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -307,35 +314,39 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Process CPU utilization percentage.'
-          applications:
+          tags:
             -
-              name: Nginx
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Memory usage (rss)'
           key: 'proc.mem[nginx,,,,rss]'
           history: 7d
           units: B
           description: 'Resident set size memory used by process in bytes.'
-          applications:
+          tags:
             -
-              name: Nginx
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Memory usage (vsize)'
           key: 'proc.mem[nginx,,,,vsize]'
           history: 7d
           units: B
           description: 'Virtual memory size used by process in bytes.'
-          applications:
+          tags:
             -
-              name: Nginx
+              tag: Application
+              value: Nginx
         -
           name: 'Nginx: Number of processes running'
           key: 'proc.num[nginx]'
           history: 7d
           description: 'Number of the Nginx processes running.'
-          applications:
+          tags:
             -
-              name: Nginx
+              tag: Application
+              value: Nginx
           triggers:
             -
               expression: '{last()}=0'
@@ -357,9 +368,10 @@ zabbix_export:
             Writing - the current number of connections where nginx is writing the response back to the client.
             Waiting - the current number of idle client connections waiting for a request.
             https://nginx.org/en/docs/http/ngx_http_stub_status_module.html
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
           triggers:
             -
               expression: |

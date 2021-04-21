@@ -72,7 +72,6 @@ class CControllerPopupImport extends CController {
 				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['applications'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => false
@@ -90,7 +89,6 @@ class CControllerPopupImport extends CController {
 					'deleteMissing' => false
 				];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['applications'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => false

@@ -60,7 +60,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'hostids'						=> null,
 			'triggerids'					=> null,
 			'itemids'						=> null,
-			'applicationids'				=> null,
 			'discoveryids'					=> null,
 			'functions'						=> null,
 			'inherited'						=> null,
@@ -184,19 +183,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			if ($options['groupCount']) {
 				$sqlParts['group']['f'] = 'f.itemid';
 			}
-		}
-
-		// applicationids
-		if ($options['applicationids'] !== null) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where']['a'] = dbConditionInt('a.applicationid', $options['applicationids']);
-			$sqlParts['where']['ia'] = 'i.hostid=a.hostid';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// discoveryids

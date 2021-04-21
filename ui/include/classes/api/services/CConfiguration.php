@@ -94,10 +94,6 @@ class CConfiguration extends CApiService {
 			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
 			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'applications' =>		['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
-				]],
 				'discoveryRules' =>		['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],

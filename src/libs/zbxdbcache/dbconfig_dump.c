@@ -576,6 +576,28 @@ typedef struct
 }
 zbx_trace_item_t;
 
+static void	DCdump_item_tags(const ZBX_DC_ITEM *item)
+{
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zbx_vector_ptr_create(&index);
+
+	zbx_vector_ptr_append_array(&index, item->tags.values, item->tags.values_num);
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  tags:");
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		zbx_dc_item_tag_t	*tag = (zbx_dc_item_tag_t *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "      tagid:" ZBX_FS_UI64 " tag:'%s' value:'%s'",
+				tag->itemtagid, tag->tag, tag->value);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+}
+
 static void	DCdump_items(void)
 {
 	ZBX_DC_ITEM		*item;
@@ -636,6 +658,9 @@ static void	DCdump_items(void)
 			if (NULL != (ptr = zbx_hashset_search(trace_items[j].hashset, &item->itemid)))
 				trace_items[j].dump_func(ptr);
 		}
+
+		if (0 != item->tags.values_num)
+			DCdump_item_tags(item);
 
 		if (NULL != item->triggers)
 		{

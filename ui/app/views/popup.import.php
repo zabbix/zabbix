@@ -33,7 +33,6 @@ $titles = [
 	'valueMaps' => _('Value mappings'),
 	'templateDashboards' => _('Template dashboards'),
 	'templateLinkage' => _('Template linkage'),
-	'applications' => _('Applications'),
 	'items' => _('Items'),
 	'discoveryRules' => _('Discovery rules'),
 	'triggers' => _('Triggers'),

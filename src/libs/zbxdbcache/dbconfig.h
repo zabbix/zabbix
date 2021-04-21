@@ -104,6 +104,8 @@ typedef struct
 	unsigned char		update_triggers;
 	zbx_uint64_t		templateid;
 	zbx_uint64_t		parent_itemid; /* from joined item_discovery table */
+
+	zbx_vector_ptr_t	tags;
 }
 ZBX_DC_ITEM;
 
@@ -592,6 +594,15 @@ zbx_dc_trigger_tag_t;
 
 typedef struct
 {
+	zbx_uint64_t	itemtagid;
+	zbx_uint64_t	itemid;
+	const char	*tag;
+	const char	*value;
+}
+zbx_dc_item_tag_t;
+
+typedef struct
+{
 	zbx_uint64_t	hosttagid;
 	zbx_uint64_t	hostid;
 	const char	*tag;
@@ -825,8 +836,9 @@ typedef struct
 	zbx_hashset_t		actions;
 	zbx_hashset_t		action_conditions;
 	zbx_hashset_t		trigger_tags;
+	zbx_hashset_t		item_tags;
 	zbx_hashset_t		host_tags;
-	zbx_hashset_t		host_tags_index;		/* host tag index by hostid */
+	zbx_hashset_t		host_tags_index;	/* host tag index by hostid */
 	zbx_hashset_t		correlations;
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
