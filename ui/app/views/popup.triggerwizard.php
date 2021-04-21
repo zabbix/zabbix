@@ -51,6 +51,7 @@ $expressions = [];
 foreach ($data['expressions'] as $expr) {
 	$expressions[] = [
 		'expression' => $expr['value'],
+		'expression_raw' => $expr['value_raw'],
 		'type_label' => $expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH ? _('Include') : _('Exclude'),
 		'type' => $expr['type'],
 		'details' => $expr['details']

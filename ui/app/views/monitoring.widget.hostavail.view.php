@@ -107,7 +107,7 @@ else {
 }
 
 $output = [
-	'header' => $data['name'],
+	'name' => $data['name'],
 	'body' => $table->toString()
 ];
 

@@ -64,10 +64,11 @@ function sysmapElementLabel($label = null) {
 /**
  * Get actions (data for popup menu) for map elements.
  *
- * @param array $sysmap
- * @param array $sysmap['selements']
- * @param array $options                    Options used to retrieve actions.
- * @param int   $options['severity_min']    Minimal severity used.
+ * @param array  $sysmap
+ * @param array  $sysmap['selements']
+ * @param array  $options                   Options used to retrieve actions.
+ * @param int    $options['severity_min']   Minimal severity used.
+ * @param int    $options['unique_id']
  *
  * @return array
  */
@@ -80,6 +81,10 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 	foreach ($sysmap['selements'] as $selementid => $elem) {
 		if ($elem['permission'] < PERM_READ) {
 			continue;
+		}
+
+		if (array_key_exists('unique_id', $options)) {
+			$elem['unique_id'] = $options['unique_id'];
 		}
 
 		$hostid = ($elem['elementtype_orig'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
@@ -470,7 +475,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				while (!empty($sysmapIds)) {
 					$subSysmaps = API::Map()->get([
 						'output' => ['sysmapid'],
-						'selectSelements' => ['elementtype', 'elements', 'application'],
+						'selectSelements' => ['elementtype', 'elements', 'operator', 'tags'],
 						'sysmapids' => $sysmapIds,
 						'preservekeys' => true
 					]);
@@ -676,13 +681,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				}
 			}
 		}
-
-		$subSysmapHostApplicationFilters = getSelementHostApplicationFilters($selements, $selementIdToSubSysmaps,
-			$hostsFromHostGroups
-		);
-		$selements = filterSysmapTriggers($selements, $subSysmapHostApplicationFilters, $triggers,
-			$subSysmapTriggerIdToSelementIds
-		);
 	}
 
 	// Get problems by triggerids.
@@ -697,6 +695,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 	$problems = API::Problem()->get([
 		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'clock', 'r_clock', 'severity'],
+		'selectTags' => ['tag', 'value'],
 		'objectids' => array_keys($triggerids),
 		'acknowledged' => ($sysmap['show_unack'] == EXTACK_OPTION_UNACK) ? false : null,
 		'severities' => range($options['severity_min'], TRIGGER_SEVERITY_COUNT - 1),
@@ -704,13 +703,24 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		'recent' => true
 	]);
 
-	foreach ($selements as $snum => $selement) {
-		foreach ($problems as $problem) {
-			if (array_key_exists($problem['objectid'], $selement['triggers'])) {
-				$selements[$snum]['triggers'][$problem['objectid']]['problems'][] = $problem;
-			}
+	foreach ($selements as &$selement) {
+		// Find problems originated from $selement triggers.
+		$filtered_problems = array_filter($problems, function ($problem) use ($selement) {
+			return array_key_exists($problem['objectid'], $selement['triggers']);
+		});
+
+		// Check if $filtered_problems tags matches $selement filter tags.
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
+				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+			$filtered_problems = getProblemsMatchingTags($filtered_problems, $selement['tags'], $selement['evaltype']);
+		}
+
+		// Apply filtgered problems to elements they belong to.
+		foreach ($filtered_problems as $problem) {
+			$selement['triggers'][$problem['objectid']]['problems'][] = $problem;
 		}
 	}
+	unset($selement);
 
 	$info = [];
 	foreach ($selements as $selementId => $selement) {
@@ -946,220 +956,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	}
 
 	return $info;
-}
-
-/**
- * Takes sysmap selements array, applies filtering by application to triggers and returns sysmap selements array.
- *
- * @param array $selements                          selements of current sysmap
- * @param array $selementHostApplicationFilters     a list of application filters applied to each host under each element
- *                                                  @see getSelementHostApplicationFilters()
- * @param array $triggersFromMonitoredHosts         triggers that are relevant to filtering
- * @param array $subSysmapTriggerIdToSelementIds    a map of triggers in sysmaps to selement IDs
- *
- * @return array
- */
-function filterSysmapTriggers(array $selements, array $selementHostApplicationFilters,
-		array $triggersFromMonitoredHosts, array $subSysmapTriggerIdToSelementIds) {
-	// pick only host, host group or map selements
-	$filterableSelements = [];
-	foreach ($selements as $selementId => $selement) {
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
-				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
-				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-			$filterableSelements[$selementId] = $selement;
-		}
-	}
-	// calculate list of triggers that might get removed from $selement['triggers']
-	$triggersToFilter = [];
-	foreach ($filterableSelements as $selementId => $selement) {
-		foreach ($selement['triggers'] as $trigger) {
-			if (!isset($triggersFromMonitoredHosts[$trigger['triggerid']])) {
-				continue;
-			}
-			$trigger = $triggersFromMonitoredHosts[$trigger['triggerid']];
-			foreach ($trigger['hosts'] as $host) {
-				$hostId = $host['hostid'];
-				if (isset($selementHostApplicationFilters[$selementId][$hostId])) {
-					$triggersToFilter[$trigger['triggerid']] = $trigger;
-				}
-			}
-		}
-	}
-
-	// if there are no triggers to filter
-	if (!$triggersToFilter) {
-		return $selements;
-	}
-
-	// produce mapping of trigger to application names it is related to and produce mapping of host to triggers
-	$itemIds = [];
-	foreach ($triggersToFilter as $trigger) {
-		foreach ($trigger['items'] as $item) {
-			$itemIds[$item['itemid']] = $item['itemid'];
-		}
-	}
-	$items = API::Item()->get([
-		'output' => ['itemid'],
-		'selectApplications' => ['name'],
-		'itemids' => $itemIds,
-		'webitems' => true,
-		'preservekeys' => true
-	]);
-
-	$triggerApplications = [];
-	$hostIdToTriggers = [];
-	foreach ($triggersToFilter as $trigger) {
-		$triggerId = $trigger['triggerid'];
-
-		foreach ($trigger['items'] as $item) {
-			foreach ($items[$item['itemid']]['applications'] as $application) {
-				$triggerApplications[$triggerId][$application['name']] = true;
-			}
-		}
-
-		foreach ($trigger['hosts'] as $host) {
-			$hostIdToTriggers[$host['hostid']][$triggerId] = $trigger;
-		}
-	}
-
-	foreach ($filterableSelements as $selementId => &$selement) {
-		// walk through each host of a submap and apply its filters to all its triggers
-		foreach ($selement['hosts'] as $hostId) {
-			// skip hosts that don't have any filters or triggers to filter
-			if (!isset($hostIdToTriggers[$hostId]) || !isset($selementHostApplicationFilters[$selementId][$hostId])) {
-				continue;
-			}
-
-			// remove the triggers that don't have applications or don't match the filter
-			$filteredApplicationNames = $selementHostApplicationFilters[$selementId][$hostId];
-			foreach ($hostIdToTriggers[$hostId] as $trigger) {
-				$triggerId = $trigger['triggerid'];
-
-				// skip if this trigger is standalone trigger and those are not filtered
-				if (isset($subSysmapTriggerIdToSelementIds[$triggerId])
-						&& isset($subSysmapTriggerIdToSelementIds[$triggerId][$selementId])) {
-					continue;
-				}
-
-				$applicationNamesForTrigger = isset($triggerApplications[$triggerId])
-					? array_keys($triggerApplications[$triggerId])
-					: [];
-
-				if (!array_intersect($applicationNamesForTrigger, $filteredApplicationNames)) {
-					unset($selement['triggers'][$triggerId]);
-				}
-			}
-		}
-	}
-	unset($selement);
-
-	// put back updated selements
-	foreach ($filterableSelements as $selementId => $selement) {
-		$selements[$selementId] = $selement;
-	}
-
-	return $selements;
-}
-
-/**
- * Returns a list of application filters applied to each host under each element.
- *
- * @param array $selements                  selements of current sysmap
- * @param array $selementIdToSubSysmaps     all sub-sysmaps used in current sysmap, indexed by selementId
- * @param array $hostsFromHostGroups        collection of hosts that get included via host groups
- *
- * @return array    a two-dimensional array with selement IDs as the primary key, host IDs as the secondary key
- *                  application names as values
- */
-function getSelementHostApplicationFilters(array $selements, array $selementIdToSubSysmaps,
-		array $hostsFromHostGroups) {
-	$hostIdsForHostGroupId = [];
-	foreach ($hostsFromHostGroups as $host) {
-		$hostId = $host['hostid'];
-		foreach ($host['groups'] as $group) {
-			$hostIdsForHostGroupId[$group['groupid']][$hostId] = $hostId;
-		}
-	}
-
-	$selementHostApplicationFilters = [];
-	foreach ($selements as $selementId => $selement) {
-		switch ($selement['elementtype']) {
-			case SYSMAP_ELEMENT_TYPE_HOST:
-			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				// skip host and host group elements with an empty filter
-				if ($selement['application'] === '') {
-					continue 2;
-				}
-
-				foreach ($selement['hosts'] as $hostId) {
-					$selementHostApplicationFilters[$selementId][$hostId][] = $selement['application'];
-				}
-
-				break;
-
-			case SYSMAP_ELEMENT_TYPE_MAP:
-				if (array_key_exists($selementId, $selementIdToSubSysmaps)) {
-					foreach ($selementIdToSubSysmaps[$selementId] as $subSysmap) {
-						// add all filters set for host elements
-						foreach ($subSysmap['selements'] as $subSysmapSelement) {
-							if ($subSysmapSelement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST
-									|| $subSysmapSelement['application'] === '') {
-
-								continue;
-							}
-
-							$hostId = $subSysmapSelement['elements'][0]['hostid'];
-							$selementHostApplicationFilters[$selementId][$hostId][] = $subSysmapSelement['application'];
-						}
-
-						// Find all selements with host groups and sort them into two arrays:
-						// - with application filter
-						// - without application filter
-						$hostGroupSelementsWithApplication = [];
-						$hostGroupSelementsWithoutApplication = [];
-						foreach ($subSysmap['selements'] as $subSysmapSelement) {
-							if ($subSysmapSelement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-								if ($subSysmapSelement['application'] !== '') {
-									$hostGroupSelementsWithApplication[] = $subSysmapSelement;
-								}
-								else {
-									$hostGroupSelementsWithoutApplication[] = $subSysmapSelement;
-								}
-							}
-						}
-
-						// Combine application filters for hosts from host group selements with
-						// application filters set.
-						foreach ($hostGroupSelementsWithApplication as $hostGroupSelement) {
-							$hostGroupId = $hostGroupSelement['elements'][0]['groupid'];
-
-							if (isset($hostIdsForHostGroupId[$hostGroupId])) {
-								foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
-									$selementHostApplicationFilters[$selementId][$hostId][]
-										= $hostGroupSelement['application'];
-								}
-							}
-						}
-
-						// Unset all application filters for hosts in host group selements without any filters.
-						// This might reset application filters set by previous foreach.
-						foreach ($hostGroupSelementsWithoutApplication AS $hostGroupSelement) {
-							$hostGroupId = $hostGroupSelement['elements'][0]['groupid'];
-
-							if (isset($hostIdsForHostGroupId[$hostGroupId])) {
-								foreach ($hostIdsForHostGroupId[$hostGroupId] as $hostId) {
-									unset($selementHostApplicationFilters[$selementId][$hostId]);
-								}
-							}
-						}
-					}
-				}
-				break;
-		}
-	}
-
-	return $selementHostApplicationFilters;
 }
 
 function separateMapElements($sysmap) {
@@ -1567,4 +1363,122 @@ function getSelementLabelColor($is_problem, $is_ack) {
 	}
 
 	return $schema['fields'][$param]['default'];
+}
+
+/**
+ * Filter problems by given tags.
+ *
+ * @param array  $problems
+ * @param array  $problems[]['tags']
+ * @param string $problems[]['tags'][]['tag']
+ * @param string $problems[]['tags'][]['value']
+ * @param array  $filter_tags
+ * @param string $filter_tags[]['tag']
+ * @param string $filter_tags[]['value']
+ * @param int    $filter_tags[]['operator']
+ * @param int    $evaltype
+ *
+ * @return array
+ */
+function getProblemsMatchingTags(array $problems, array $filter_tags, int $evaltype): array {
+	if (!$problems) {
+		return [];
+	}
+
+	$tags = [];
+	foreach ($filter_tags as $tag) {
+		$tags[$tag['tag']][] = $tag;
+	}
+
+	$filtered_problems = [];
+	foreach ($problems as $problem) {
+		$matching_tags = array_fill_keys(array_keys($tags), 0);
+		array_walk($matching_tags, function (&$match, $key) use ($tags, $problem) {
+			foreach ($tags[$key] as $tag) {
+				if (checkIfProblemTagsMatches($tag, $problem['tags'])) {
+					$match = 1;
+					break;
+				}
+			}
+		});
+
+		$matching_tags = array_flip($matching_tags);
+		if ($evaltype == TAG_EVAL_TYPE_OR && array_key_exists(1, $matching_tags)) {
+			$filtered_problems[] = $problem;
+		}
+		elseif ($evaltype == TAG_EVAL_TYPE_AND_OR && !array_key_exists(0, $matching_tags)) {
+			$filtered_problems[] = $problem;
+		}
+	}
+
+	return $filtered_problems;
+}
+
+/**
+ * Check if $filter_tag matches one of tags in $tags array.
+ *
+ * @param array  $filter_tag
+ * @param string $filter_tag['tag']
+ * @param string $filter_tag['value']
+ * @param int    $filter_tag['operator']
+ * @param array  $tags
+ * @param string $tags[]['tag']
+ * @param string $tags[]['value']
+ *
+ * @return bool
+ */
+function checkIfProblemTagsMatches(array $filter_tag, array $tags): bool {
+	if (in_array($filter_tag['operator'], [TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_NOT_EXISTS])
+			&& !$tags) {
+		return true;
+	}
+
+	if ($filter_tag['operator'] == TAG_OPERATOR_NOT_LIKE && $filter_tag['value'] === '') {
+		$filter_tag['operator'] = TAG_OPERATOR_NOT_EXISTS;
+	}
+	elseif ($filter_tag['operator'] == TAG_OPERATOR_LIKE && $filter_tag['value'] === '') {
+		$filter_tag['operator'] = TAG_OPERATOR_EXISTS;
+	}
+
+	switch ($filter_tag['operator']) {
+		case TAG_OPERATOR_LIKE:
+			foreach ($tags as $tag) {
+				if ($filter_tag['tag'] === $tag['tag'] && mb_stripos($tag['value'], $filter_tag['value']) !== false) {
+					return true;
+				}
+			}
+			break;
+
+		case TAG_OPERATOR_EQUAL:
+			foreach ($tags as $tag) {
+				if ($filter_tag['tag'] === $tag['tag'] && $filter_tag['value'] === $tag['value']) {
+					return true;
+				}
+			}
+			break;
+
+		case TAG_OPERATOR_NOT_LIKE:
+			$tags_count = count($tags);
+			$tags = array_filter($tags, function ($tag) use ($filter_tag) {
+				return !($filter_tag['tag'] === $tag['tag']
+					&& mb_stripos($tag['value'], $filter_tag['value']) !== false
+				);
+			});
+			return (count($tags) == $tags_count);
+
+		case TAG_OPERATOR_NOT_EQUAL:
+			$tags_count = count($tags);
+			$tags = array_filter($tags, function ($tag) use ($filter_tag) {
+				return !($filter_tag['tag'] === $tag['tag'] && $filter_tag['value'] === $tag['value']);
+			});
+			return (count($tags) == $tags_count);
+
+		case TAG_OPERATOR_EXISTS:
+			return array_key_exists($filter_tag['tag'], zbx_toHash($tags, 'tag'));
+
+		case TAG_OPERATOR_NOT_EXISTS:
+			return !array_key_exists($filter_tag['tag'], zbx_toHash($tags, 'tag'));
+	}
+
+	return false;
 }

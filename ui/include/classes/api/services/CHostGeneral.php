@@ -188,8 +188,6 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		foreach ($templates_hostids as $templateid => $hostids) {
-			Manager::Application()->link($templateid, $hostids);
-
 			// Fist link web items, so that later regular items can use web item as their master item.
 			Manager::HttpTest()->link($templateid, $hostids);
 		}
@@ -457,7 +455,7 @@ abstract class CHostGeneral extends CHostBase {
 			$item_prototypeids = array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 
 			if ($clear) {
-				// This will include deletion of linked application prototypes.
+				// Deletes item prototypes and related entities.
 				CItemPrototypeManager::delete($item_prototypeids);
 			}
 			else {
@@ -468,30 +466,6 @@ abstract class CHostGeneral extends CHostBase {
 
 				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $item) {
 					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
-				}
-
-				/*
-				 * Convert templated application prototypes to normal application prototypes
-				 * who are linked to these item prototypes.
-				 */
-				$application_prototypes = DBfetchArray(DBselect(
-					'SELECT ap.application_prototypeid'.
-					' FROM application_prototype ap'.
-					' WHERE EXISTS ('.
-						'SELECT NULL'.
-						' FROM item_application_prototype iap'.
-						' WHERE '.dbConditionInt('iap.itemid', $item_prototypeids).
-							' AND iap.application_prototypeid=ap.application_prototypeid'.
-					')'
-				));
-
-				if ($application_prototypes) {
-					$application_prototypeids = zbx_objectValues($application_prototypes, 'application_prototypeid');
-
-					DB::update('application_prototype', [
-						'values' => ['templateid' => 0],
-						'where' => ['application_prototypeid' => $application_prototypeids]
-					]);
 				}
 			}
 		}
@@ -564,99 +538,6 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 		}
-
-		/* APPLICATIONS {{{ */
-		$sql = 'SELECT at.application_templateid,at.applicationid,h.name,h.host,h.hostid'.
-			' FROM applications a1,application_template at,applications a2,hosts h'.
-			' WHERE a1.applicationid=at.applicationid'.
-				' AND at.templateid=a2.applicationid'.
-				' AND '.dbConditionInt('a2.hostid', $templateids).
-				' AND a1.hostid=h.hostid';
-		if ($targetids) {
-			$sql .= ' AND '.dbConditionInt('a1.hostid', $targetids);
-		}
-		$query = DBselect($sql);
-		$applicationTemplates = [];
-		while ($applicationTemplate = DBfetch($query)) {
-			$applicationTemplates[] = [
-				'applicationid' => $applicationTemplate['applicationid'],
-				'application_templateid' => $applicationTemplate['application_templateid'],
-				'name' => $applicationTemplate['name'],
-				'hostid' => $applicationTemplate['hostid'],
-				'host' => $applicationTemplate['host']
-			];
-		}
-
-		if ($applicationTemplates) {
-			// unlink applications from templates
-			DB::delete('application_template', [
-				'application_templateid' => zbx_objectValues($applicationTemplates, 'application_templateid')
-			]);
-
-			if ($clear) {
-				// Delete inherited applications that are no longer linked to any templates and items.
-				$applicationids = zbx_objectValues($applicationTemplates, 'applicationid');
-
-				$applications = DBfetchArray(DBselect(
-					'SELECT a.applicationid'.
-					' FROM applications a'.
-						' LEFT JOIN application_template at ON a.applicationid=at.applicationid'.
-					' WHERE '.dbConditionInt('a.applicationid', $applicationids).
-						' AND at.applicationid IS NULL'.
-						' AND a.applicationid NOT IN ('.
-							'SELECT ia.applicationid'.
-							' FROM items_applications ia'.
-							' WHERE '.dbConditionInt('ia.applicationid', $applicationids).
-						')'
-				));
-				if ($applications) {
-					$result = API::Application()->delete(zbx_objectValues($applications, 'applicationid'), true);
-					if (!$result) {
-						self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications.'));
-					}
-				}
-			}
-			else {
-				foreach ($applicationTemplates as $application) {
-					info(_s('Unlinked: Application "%1$s" on "%2$s".', $application['name'], $application['host']));
-				}
-			}
-		}
-
-		/*
-		 * Process discovered applications when parent is a host, not template.
-		 * If a discovered application has no longer linked items, remove them.
-		 */
-		if ($targetids) {
-			$discovered_applications = API::Application()->get([
-				'output' => ['applicationid'],
-				'hostids' => $targetids,
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-				'preservekeys' => true
-			]);
-
-			if ($discovered_applications) {
-				$discovered_applications = API::Application()->get([
-					'output' => ['applicationid'],
-					'selectItems' => ['itemid'],
-					'applicationids' => array_keys($discovered_applications),
-					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-				]);
-
-				$applications_to_delete = [];
-
-				foreach ($discovered_applications as $discovered_application) {
-					if (!$discovered_application['items']) {
-						$applications_to_delete[$discovered_application['applicationid']] = true;
-					}
-				}
-
-				if ($applications_to_delete) {
-					API::Application()->delete(array_keys($applications_to_delete), true);
-				}
-			}
-		}
-		/* }}} APPLICATIONS */
 
 		parent::unlink($templateids, $targetids);
 	}
@@ -885,45 +766,6 @@ abstract class CHostGeneral extends CHostBase {
 				foreach ($result as $hostid => $host) {
 					$result[$hostid]['httpTests'] = array_key_exists($hostid, $httpTests)
 						? $httpTests[$hostid]['rowscount']
-						: '0';
-				}
-			}
-		}
-
-		// adding applications
-		if ($options['selectApplications'] !== null) {
-			if ($options['selectApplications'] != API_OUTPUT_COUNT) {
-				$applications = API::Application()->get([
-					'output' => $this->outputExtend($options['selectApplications'], ['hostid', 'applicationid']),
-					'hostids' => $hostids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($applications, 'name');
-				}
-
-				$relationMap = $this->createRelationMap($applications, 'hostid', 'applicationid');
-
-				$applications = $this->unsetExtraFields($applications, ['hostid', 'applicationid'],
-					$options['selectApplications']
-				);
-				$result = $relationMap->mapMany($result, $applications, 'applications', $options['limitSelects']);
-			}
-			else {
-				$applications = API::Application()->get([
-					'output' => $options['selectApplications'],
-					'hostids' => $hostids,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-
-				$applications = zbx_toHash($applications, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['applications'] = array_key_exists($hostid, $applications)
-						? $applications[$hostid]['rowscount']
 						: '0';
 				}
 			}

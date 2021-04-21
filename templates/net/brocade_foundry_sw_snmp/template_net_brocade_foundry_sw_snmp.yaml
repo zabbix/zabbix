@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:30Z'
   groups:
     -
       name: Templates/Modules
@@ -27,15 +27,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'Firmware version'
@@ -49,14 +40,15 @@ zabbix_export:
           description: |
             MIB: FOUNDRY-SN-AGENT-MIB
             The version of the running software in the form'major.minor.maintenance[letters]'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -76,14 +68,15 @@ zabbix_export:
           value_type: CHAR
           description: 'MIB: FOUNDRY-SN-AGENT-MIB'
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -109,11 +102,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: FOUNDRY-SN-AGENT-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -148,11 +142,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: FOUNDRY-SN-AGENT-MIB'
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -188,17 +183,18 @@ zabbix_export:
               units: °C
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
-                Temperature of the chassis. Each unit is 0.5 degrees Celcius.
+                Temperature of the chassis. Each unit is 0.5 degrees Celsius.
                 Only management module built with temperature sensor hardware is applicable.
                 For those non-applicable management module, it returns no-such-name.
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.5'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:"Chassis"}'
@@ -247,14 +243,15 @@ zabbix_export:
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
                 Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.5'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'
@@ -344,11 +341,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: CPU
-        -
-          name: Memory
       items:
         -
           name: 'CPU utilization'
@@ -361,9 +353,10 @@ zabbix_export:
           description: |
             MIB: FOUNDRY-SN-AGENT-MIB
             The statistics collection of 1 minute CPU utilization.
-          applications:
+          tags:
             -
-              name: CPU
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -384,9 +377,10 @@ zabbix_export:
             The system dynamic memory utilization, in unit of percentage.
             Deprecated: Refer to snAgSystemDRAMUtil.
             For NI platforms, refer to snAgentBrdMemoryUtil100thPercent
-          applications:
+          tags:
             -
-              name: Memory
+              tag: Application
+              value: Memory
           triggers:
             -
               expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
@@ -427,15 +421,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Network devices'
-      applications:
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
       items:
         -
           name: 'Firmware version'
@@ -449,14 +434,15 @@ zabbix_export:
           description: |
             MIB: FOUNDRY-SN-AGENT-MIB
             The version of the running software in the form 'major.minor.maintenance[letters]'
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -486,14 +472,15 @@ zabbix_export:
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
                 The serial number of the chassis for each unit. If the serial number is unknown or unavailable then the value should be a zero length string.
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -518,11 +505,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: FOUNDRY-SN-AGENT-MIB'
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -557,11 +545,12 @@ zabbix_export:
               history: 2w
               trends: 0d
               description: 'MIB: FOUNDRY-SN-AGENT-MIB'
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -599,14 +588,15 @@ zabbix_export:
               description: |
                 MIB: FOUNDRY-SN-STACKING-MIB
                 A description of the configured/active system type for each unit.
-              applications:
-                -
-                  name: Inventory
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
         -
           name: 'Temperature Discovery'
           type: SNMP_AGENT
@@ -626,14 +616,15 @@ zabbix_export:
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
                 Temperature of the sensor represented by this row. Each unit is 0.5 degrees Celsius.
-              applications:
-                -
-                  name: Temperature
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.5'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}>{$TEMP_CRIT:""}'

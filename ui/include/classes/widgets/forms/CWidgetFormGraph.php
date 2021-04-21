@@ -33,7 +33,7 @@ class CWidgetFormGraph extends CWidgetForm {
 			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph')
 		]))
 			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
-			->setAction('updateWidgetConfigDialogue()')
+			->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
 			->setModern(true);
 
 		if (array_key_exists('source_type', $this->data)) {

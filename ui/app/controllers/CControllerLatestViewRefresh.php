@@ -35,10 +35,11 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 			// filter inputs
 			'filter_groupids' =>			'array_id',
 			'filter_hostids' =>				'array_id',
-			'filter_application' =>			'string',
 			'filter_select' =>				'string',
 			'filter_show_without_data' =>	'in 1',
 			'filter_show_details' =>		'in 1',
+			'filter_evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_tags' =>				'array',
 
 			// table sorting inputs
 			'sort' =>						'in host,name,lastclock',
@@ -70,11 +71,21 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 		$filter = [
 			'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,
 			'hostids' => $this->hasInput('filter_hostids') ? $this->getInput('filter_hostids') : null,
-			'application' => $this->getInput('filter_application', ''),
 			'select' => $this->getInput('filter_select', ''),
 			'show_without_data' => $this->getInput('filter_show_without_data', 0),
-			'show_details' => $this->getInput('filter_show_details', 0)
+			'show_details' => $this->getInput('filter_show_details', 0),
+			'evaltype' => CProfile::get('web.latest.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+			'tags' => []
 		];
+
+		// Tags filters.
+		foreach (CProfile::getArray('web.latest.filter.tags.tag', []) as $i => $tag) {
+			$filter['tags'][] = [
+				'tag' => $tag,
+				'value' => CProfile::get('web.latest.filter.tags.value', null, $i),
+				'operator' => CProfile::get('web.latest.filter.tags.operator', null, $i)
+			];
+		}
 
 		$sort_field = $this->getInput('sort', 'name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
@@ -84,10 +95,9 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 		// data sort and pager
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
-		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['rows'], ZBX_SORT_UP, $view_curl);
+		$paging = CPagerHelper::paginate($this->getInput('page', 1), $prepared_data['items'], ZBX_SORT_UP, $view_curl);
 
-		$this->extendData($prepared_data, $filter['show_without_data']);
-		$this->addCollapsedDataFromProfile($prepared_data);
+		$this->extendData($prepared_data);
 
 		// display
 		$data = [
@@ -101,7 +111,8 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-			]
+			],
+			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

@@ -91,8 +91,6 @@ class CXmlExportWriter extends CExportWriter {
 	 */
 	private function mapName($name) {
 		$map = [
-			'application_prototypes' => 'application_prototype',
-			'applications' => 'application',
 			'conditions' => 'condition',
 			'dashboards' => 'dashboard',
 			'dependencies' => 'dependency',
@@ -124,13 +122,12 @@ class CXmlExportWriter extends CExportWriter {
 			'message_templates' => 'message_template',
 			'operations' => 'operation',
 			'overrides' => 'override',
+			'pages' => 'page',
 			'parameters' => 'parameter',
 			'parameters' => 'parameter',
 			'posts' => 'post_field',
 			'preprocessing' => 'step',
 			'query_fields' => 'query_field',
-			'screen_items' => 'screen_item',
-			'screens' => 'screen',
 			'selements' => 'selement',
 			'shapes' => 'shape',
 			'steps' => 'step',

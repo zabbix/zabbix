@@ -1005,14 +1005,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('logtimefmt');
 		}
 
-		$this->zbxTestTextPresent('New application');
-		$this->zbxTestAssertVisibleId('new_application');
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'size', 20);
-
-		$this->zbxTestTextPresent('Applications');
-		$this->zbxTestAssertVisibleId('applications_');
-		$this->zbxTestDropdownAssertSelected('applications[]', '-None-');
+		$this->zbxTestTextNotPresent(['Applications','New application']);
 
 		$this->zbxTestTextPresent('Description');
 		$this->zbxTestAssertVisibleId('description');

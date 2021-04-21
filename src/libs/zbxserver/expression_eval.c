@@ -1839,6 +1839,8 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 	ret = zbx_eval_execute_ext(eval->ctx, ts, expression_eval_common, expression_eval_history, (void *)eval, value,
 			error);
 
+	zbx_vc_flush_stats();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:%s error:%s", __func__, zbx_result_string(ret),
 			zbx_variant_value_desc(value), ZBX_NULL2EMPTY_STR(*error));
 

@@ -36,12 +36,10 @@ class CImportDataAdapterTest extends TestCase {
 		$this->assertEquals($adapter->getGroups(), []);
 		$this->assertEquals($adapter->getHosts(), []);
 		$this->assertEquals($adapter->getTemplates(), []);
-		$this->assertEquals($adapter->getApplications(), []);
 		$this->assertEquals($adapter->getItems(), []);
 		$this->assertEquals($adapter->getTriggers(), []);
 		$this->assertEquals($adapter->getGraphs(), []);
 		$this->assertEquals($adapter->getDiscoveryRules(), []);
-		$this->assertEquals($adapter->getScreens(), []);
 		$this->assertEquals($adapter->getImages(), []);
 		$this->assertEquals($adapter->getMaps(), []);
 		$this->assertEquals($adapter->getMediaTypes(), []);
@@ -325,23 +323,6 @@ class CImportDataAdapterTest extends TestCase {
 		]);
 	}
 
-	public function testGetApplications() {
-		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
-
-		$this->assertEquals($adapter->getApplications(), [
-			'export-host' => [
-				'app' => [
-					'name' => 'app'
-				]
-			],
-			'export-template' => [
-				'app' => [
-					'name' => 'app'
-				]
-			]
-		]);
-	}
-
 	public function testGetItems() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
@@ -366,7 +347,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'interface_ref' => 'if1',
@@ -415,7 +396,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'interface_ref' => 'if3',
@@ -464,9 +445,10 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [
+					'tags' => [
 						[
-							'name' => 'app'
+							'tag' => 'Application',
+							'value' => 'app'
 						]
 					],
 					'valuemap' => [],
@@ -519,7 +501,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'jmx_endpoint' => '',
@@ -567,7 +549,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
@@ -615,9 +597,10 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [
+					'tags' => [
 						[
-							'name' => 'app'
+							'tag' => 'Application',
+							'value' => 'app'
 						]
 					],
 					'valuemap' => [],
@@ -976,7 +959,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'interface_ref' => 'if1',
@@ -1003,7 +986,6 @@ class CImportDataAdapterTest extends TestCase {
 							'headers' => [],
 							'key_' => 'lld-item',
 							'trapper_hosts' => '',
-							'application_prototypes' => [],
 							'preprocessing' => []
 						],
 						[
@@ -1026,7 +1008,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'interface_ref' => 'if3',
@@ -1053,7 +1035,6 @@ class CImportDataAdapterTest extends TestCase {
 							'headers' => [],
 							'key_' => 'lld-item-jmx',
 							'trapper_hosts' => '',
-							'application_prototypes' => [],
 							'preprocessing' => []
 						],
 						[
@@ -1076,10 +1057,10 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'application_prototypes' => [],
-							'applications' => [
+							'tags' => [
 								[
-									'name' => 'app'
+									'tag' => 'Application',
+									'value' => 'app'
 								]
 							],
 							'valuemap' => [],
@@ -1375,8 +1356,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'application_prototypes' => [],
-							'applications' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'jmx_endpoint' => '',
@@ -1424,8 +1404,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'application_prototypes' => [],
-							'applications' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
@@ -1473,10 +1452,10 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'application_prototypes' => [],
-							'applications' => [
+							'tags' => [
 								[
-									'name' => 'app'
+									'tag' => 'Application',
+									'value' => 'app'
 								]
 							],
 							'valuemap' => [],
@@ -1755,7 +1734,8 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_maintenance' => [
 							'name' => ''
 						],
-						'application' => '',
+						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'tags' => [],
 						'urls' => [
 							[
 								'name' => 'url',
@@ -1795,7 +1775,8 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_maintenance' => [
 							'name' => ''
 						],
-						'application' => '',
+						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'tags' => [],
 						'urls' => [],
 						'elements' => [
 							[
@@ -1828,7 +1809,8 @@ class CImportDataAdapterTest extends TestCase {
 						'icon_maintenance' => [
 							'name' => ''
 						],
-						'application' => '',
+						'evaltype' => TAG_EVAL_TYPE_AND_OR,
+						'tags' => [],
 						'urls' => [],
 						'elements' => [
 							[
@@ -1884,48 +1866,6 @@ class CImportDataAdapterTest extends TestCase {
 					'zindex' => '0'
 				]],
 				'lines' => []
-			]
-		]);
-	}
-
-	public function testGetScreens() {
-		$adapter = $this->getAdapter($this->getScreenXml());
-
-		$this->assertEquals($adapter->getScreens(), [
-			[
-				'name' => 'empty-screen',
-				'hsize' => '1',
-				'vsize' => '1',
-				'screenitems' => []
-			],
-			[
-				'name' => 'screen',
-				'hsize' => '1',
-				'vsize' => '1',
-				'screenitems' => [
-					[
-						'resourcetype' => '0',
-						'width' => '500',
-						'height' => '100',
-						'x' => '0',
-						'y' => '0',
-						'colspan' => '1',
-						'rowspan' => '1',
-						'elements' => '0',
-						'valign' => '0',
-						'halign' => '0',
-						'style' => '0',
-						'url' => '',
-						'dynamic' => '0',
-						'sort_triggers' => '0',
-						'resource' => [
-							'name' => 'simple',
-							'host' => 'export-host'
-						],
-						'max_columns' => '1',
-						'application' => ''
-					]
-				]
 			]
 		]);
 	}
@@ -2101,12 +2041,14 @@ class CImportDataAdapterTest extends TestCase {
 						'params' => '',
 						'trapper_hosts' => '',
 						'snmp_oid' => '',
-						'applications' => [
+						'tags' => [
 							[
-								'name' => 'Filesystem'
+								'tag' => 'Application',
+								'value' => 'Filesystem'
 							],
 							[
-								'name' => 'Availability'
+								'tag' => 'Application',
+								'value' => 'Availability'
 							]
 						],
 						'name' => 'Free disk space on / in %',
@@ -2160,9 +2102,10 @@ class CImportDataAdapterTest extends TestCase {
 						'params' => '',
 						'trapper_hosts' => '',
 						'snmp_oid' => '',
-						'applications' => [
+						'tags' => [
 							[
-								'name' => 'Simple checks'
+								'tag' => 'Application',
+								'value' => 'Simple checks'
 							]
 						],
 						'name' => 'FTP check',
@@ -2214,9 +2157,10 @@ class CImportDataAdapterTest extends TestCase {
 						'params' => '',
 						'trapper_hosts' => '',
 						'snmp_oid' => '',
-						'applications' => [
+						'tags' => [
 							[
-								'name' => 'Simple checks'
+								'tag' => 'Application',
+								'value' => 'Simple checks'
 							]
 						],
 						'name' => 'FTP check with macro',
@@ -2249,23 +2193,6 @@ class CImportDataAdapterTest extends TestCase {
 						'valuemap' => [
 							'name' => '0'
 						]
-					]
-				]
-			]
-		);
-
-		$this->assertEquals($adapter->getApplications(), [
-				'Template_Linux' => [
-					'Filesystem' => [
-						'name' => 'Filesystem'
-					],
-					'Availability' => [
-						'name' => 'Availability'
-					]
-				],
-				'Template_Simple' => [
-					'Simple checks' => [
-						'name' => 'Simple checks'
 					]
 				]
 			]
@@ -2512,39 +2439,6 @@ class CImportDataAdapterTest extends TestCase {
 			]
 		);
 
-		$this->assertEquals($adapter->getScreens(), [
-				[
-					'name' => 'test',
-					'hsize' => 'test',
-					'vsize' => 'test',
-					'screenitems' => [
-						[
-							'resourcetype' => '1',
-							'width' => 'test',
-							'height' => 'test',
-							'x' => 'test',
-							'y' => 'test',
-							'colspan' => '1',
-							'rowspan' => '1',
-							'elements' => 'test',
-							'valign' => 'test',
-							'halign' => 'test',
-							'style' => 'test',
-							'dynamic' => 'test',
-							'url' => 'test',
-							'resource' => [
-								'host' => 'Template_Simple',
-								'key' => 'ftp,21'
-							],
-							'sort_triggers' => '',
-							'application' => '',
-							'max_columns' => ''
-						]
-					]
-				]
-			]
-		);
-
 		$this->assertEquals($adapter->getTemplates(), [
 				[
 					'groups' => [
@@ -2585,9 +2479,10 @@ class CImportDataAdapterTest extends TestCase {
 						'trends' => '365d',
 						'status' => '0',
 						'authtype' => '0',
-						'applications' => [
+						'tags' => [
 							[
-								'name' => 'Simple checks'
+								'tag' => 'Application',
+								'value' => 'Simple checks'
 							]
 						],
 						'name' => 'FTP check',
@@ -2639,9 +2534,10 @@ class CImportDataAdapterTest extends TestCase {
 						'trends' => '365d',
 						'status' => '0',
 						'authtype' => '0',
-						'applications' => [
+						'tags' => [
 							[
-								'name' => 'Simple checks'
+								'tag' => 'Application',
+								'value' => 'Simple checks'
 							]
 						],
 						'name' => 'FTP check with macro',
@@ -2928,7 +2824,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -2976,7 +2872,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3024,7 +2920,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3072,7 +2968,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3120,7 +3016,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3168,7 +3064,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3227,8 +3123,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => [],
-							'application_prototypes' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'preprocessing' => [],
@@ -3327,8 +3222,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => [],
-							'application_prototypes' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'preprocessing' => [],
@@ -3427,8 +3321,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => [],
-							'application_prototypes' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'preprocessing' => [],
@@ -3715,7 +3608,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3764,7 +3657,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3813,7 +3706,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3862,7 +3755,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3911,7 +3804,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -3960,7 +3853,7 @@ class CImportDataAdapterTest extends TestCase {
 					'privatekey' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => [],
+					'tags' => [],
 					'valuemap' => [],
 					'logtimefmt' => '',
 					'preprocessing' => [],
@@ -4021,8 +3914,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => [],
-							'application_prototypes' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'preprocessing' => [],
@@ -4123,8 +4015,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => [],
-							'application_prototypes' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'preprocessing' => [],
@@ -4225,8 +4116,7 @@ class CImportDataAdapterTest extends TestCase {
 							'privatekey' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => [],
-							'application_prototypes' => [],
+							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
 							'preprocessing' => [],
@@ -4362,10 +4252,6 @@ class CImportDataAdapterTest extends TestCase {
 
 	protected function getMapXml() {
 		return $this->getFile('map.xml');
-	}
-
-	protected function getScreenXml() {
-		return $this->getFile('screen.xml');
 	}
 
 	protected function getMediaTypeXml() {
