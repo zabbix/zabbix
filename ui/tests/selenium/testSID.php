@@ -865,7 +865,7 @@ class testSID extends CWebTest {
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=userprofile.edit'
 				]
-			],
+			]
 		];
 	}
 
