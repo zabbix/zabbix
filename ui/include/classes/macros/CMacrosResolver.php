@@ -863,6 +863,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param bool   $options['resolve_functionids']  Resolve finctionid macros. Default: true.
 	 * @param array  $options['sources']			  An array of the field names. Default: ['expression'].
 	 * @param string $options['context']              Additional parameter in URL to identify main section.
+	 *                                                Default: 'host'.
 	 *
 	 * @return string|array
 	 */
@@ -872,7 +873,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'resolve_usermacros' => false,
 			'resolve_macros' => false,
 			'resolve_functionids' => true,
-			'sources' => ['expression']
+			'sources' => ['expression'],
+			'context' => 'host'
 		];
 
 		$functionids = [];
@@ -1038,41 +1040,37 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 												->setArgument('form', 'update')
 												->setArgument('itemid', $function['itemid'])
 												->setArgument('parent_discoveryid', $function['parent_itemid'])
-												->setArgument('context', array_key_exists('context', $options)
-													? $options['context']
-													: 'host'
-												)
+												->setArgument('context', $options['context'])
 										))
 											->addClass(ZBX_STYLE_LINK_ALT)
 											->addClass($style)
-										: (new CSpan($function['host'].':'.$function['key_']))
+										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
 								else {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-									? (new CLink('/'.$function['host'].'/'.$function['key_'],
-										(new CUrl('items.php'))
-											->setArgument('form', 'update')
-											->setArgument('itemid', $function['itemid'])
-											->setArgument('context', array_key_exists('context', $options)
-												? $options['context']
-												: 'host'
-											)
-									))
-										->addClass(ZBX_STYLE_LINK_ALT)
-										->setAttribute('data-itemid', $function['itemid'])
-										->addClass($style)
-									: (new CSpan('/'.$function['host'].'/'.$function['key_']))
-										->addClass($style);
+										? (new CLink('/'.$function['host'].'/'.$function['key_'],
+											(new CUrl('items.php'))
+												->setArgument('form', 'update')
+												->setArgument('itemid', $function['itemid'])
+												->setArgument('context', $options['context'])
+										))
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->setAttribute('data-itemid', $function['itemid'])
+											->addClass($style)
+										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
+											->addClass($style);
 								}
 
 								$value = [bold($function['function'].'(')];
-								if ($function['parameter'] === TRIGGER_QUERY_PLACEHOLDER) {
+								if (($pos = strpos($function['parameter'], TRIGGER_QUERY_PLACEHOLDER)) !== false) {
+									if ($pos != 0) {
+										$value[] = substr($function['parameter'], 0, $pos);
+									}
 									$value[] = $link;
-								}
-								elseif (substr($function['parameter'], 0, 1) === TRIGGER_QUERY_PLACEHOLDER) {
-									$value[] = $link;
-									$value[] = substr($function['parameter'], 1);
+									if (strlen($function['parameter']) > $pos + 1) {
+										$value[] = substr($function['parameter'], $pos + 1);
+									}
 								}
 								else {
 									$value[] = $function['parameter'];
@@ -1167,14 +1165,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$pos_left = 0;
 
 		foreach ($expression_data->getTokens() as $token) {
-			if ($token instanceof CParserResult) {
-				$token_pos = $token->pos;
-				$token_length = $token->length;
-			}
-			else {
-				$token_pos = $token->pos;
-				$token_length = $token->length;
-			}
+			$token_pos = $token->pos;
+			$token_length = $token->length;
 
 			if ($pos_left != $token_pos) {
 				$expression[] = substr($source, $pos_left, $token_pos - $pos_left);
@@ -1211,19 +1203,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 	private static function makeTriggerFunctionExpression(CFunctionParserResult $fn, array &$macro_values,
 			array &$usermacro_values, array $options) {
+		$parameters_str = $fn->parameters;
 		$left = $fn->params_raw['pos'] + $fn->pos + 1;
 		$expression = [];
 
-		$parameters_str = $fn->parameters;
 		for ($i = count($fn->params_raw['parameters']) - 1; $i >= 0; $i--) {
 			$param = $fn->params_raw['parameters'][$i];
 
-			if ($param instanceof CParserResult) {
-				$string_after = substr($parameters_str, $param->pos - $left + $param->length);
-				$parameters_str = substr($parameters_str, 0, $param->pos - $left);
-				array_unshift($expression, $string_after);
-			}
+			// Add substring located between parsed parameters (like comma and space).
+			array_unshift($expression, substr($parameters_str, $param->pos - $left + $param->length));
+			$parameters_str = substr($parameters_str, 0, $param->pos - $left);
 
+			// Add parameter.
 			if ($param instanceof CFunctionIdParserResult) {
 				array_unshift($expression, $macro_values[$param->match]);
 			}
@@ -1232,15 +1223,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$options
 				));
 			}
+			elseif ($param instanceof CFunctionParameterResult && array_key_exists($param->match, $usermacro_values)) {
+				array_unshift($expression, $usermacro_values[$param->match]);
+			}
+			else {
+				array_unshift($expression, $param->match);
+			}
 		}
 
-		if ($parameters_str) {
-			array_unshift($expression, $parameters_str);
-		}
+		array_unshift($expression, $parameters_str);
 		$expression = array_filter($expression);
 
 		array_unshift($expression, $options['html'] ? bold($fn->function.'(') : $fn->function.'(');
-		array_push($expression, $options['html'] ? bold(')') : ')');
+		$expression[] = $options['html'] ? bold(')') : ')';
 
 		return $options['html'] ? $expression : implode('', $expression);
 	}

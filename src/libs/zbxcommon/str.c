@@ -3739,6 +3739,7 @@ static int	token_parse_expression_macro(const char *expression, const char *macr
 			{
 				switch (tmp.type)
 				{
+					case ZBX_TOKEN_MACRO:
 					case ZBX_TOKEN_LLD_MACRO:
 					case ZBX_TOKEN_LLD_FUNC_MACRO:
 					case ZBX_TOKEN_USER_MACRO:

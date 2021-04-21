@@ -251,7 +251,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 			if (SUCCEED != eval_parse_macro(ctx, offset, &tok))
 				break;
 
-			if (0 == type)
+			if (pos == offset)
 			{
 				switch (tok.type)
 				{
@@ -290,12 +290,13 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 					goto out;
 			}
 		}
-		else if (SUCCEED == eval_parse_number(ctx, offset, &offset) ||
-				SUCCEED == eval_is_compound_number_char(ctx->expression[offset], offset - pos))
+		else if (SUCCEED == eval_parse_number(ctx, offset, &offset))
 		{
 			type = ZBX_EVAL_TOKEN_VAR_NUM;
 			offset++;
 		}
+		else if (SUCCEED == eval_is_compound_number_char(ctx->expression[offset], offset - pos))
+			offset++;
 		else
 			break;
 	}
@@ -643,17 +644,41 @@ static int	eval_parse_query_filter(const char **ptr)
  ******************************************************************************/
 size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, const char **pfilter)
 {
+#define MVAR_HOST_HOST	"{HOST.HOST"
+
 	const char	*host = str + 1, *key, *filter, *end;
 
 	key = host;
 
-	if ('*' != *host)
+	if ('*' == *key)
+	{
+		key++;
+	}
+	else if ('{' == *key)
+	{
+		if (0 == strncmp(key, MVAR_HOST_HOST, ZBX_CONST_STRLEN(MVAR_HOST_HOST)))
+		{
+			int	offset = 0;
+
+			if ('}' == key[ZBX_CONST_STRLEN(MVAR_HOST_HOST)])
+			{
+				offset = 1;
+			}
+			else if (0 != isdigit((unsigned char)key[ZBX_CONST_STRLEN(MVAR_HOST_HOST)]) &&
+				'}' == key[ZBX_CONST_STRLEN(MVAR_HOST_HOST) + 1])
+			{
+				offset = 2;
+			}
+
+			if (0 != offset)
+				key += ZBX_CONST_STRLEN(MVAR_HOST_HOST) + offset;
+		}
+	}
+	else if ('/' != *key)
 	{
 		while (SUCCEED == is_hostname_char(*key))
 			key++;
 	}
-	else
-		key++;
 
 	if ('/' != *key)
 		return 0;
@@ -683,6 +708,8 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	}
 
 	return end - str;
+
+#undef MVAR_HOST_HOST
 }
 
 /******************************************************************************
@@ -980,7 +1007,8 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			if (0 != isalpha((unsigned char)ctx->expression[pos]))
 			{
 				/* logical operation must be separated by whitespace or '(', ')', ',' characters */
-				if ((0 != skip || 0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR) ||
+				if (0 != (ctx->rules & ZBX_EVAL_PARSE_LOGIC) &&
+						(0 != skip || 0 != (ctx->last_token_type & ZBX_EVAL_CLASS_SEPARATOR) ||
 						ZBX_EVAL_TOKEN_GROUP_CLOSE == ctx->last_token_type))
 				{
 					if (SUCCEED == eval_parse_logic_token(ctx, pos, token))

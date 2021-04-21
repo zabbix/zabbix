@@ -132,6 +132,11 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			],
 			'o' => [
 				'C' => 'O',
 				'T' => T_ZBX_STR,
@@ -140,11 +145,6 @@ class CControllerPopupTriggerExpr extends CController {
 			'v' => [
 				'C' => 'V',
 				'T' => T_ZBX_STR,
-				'A' => false
-			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
 				'A' => false
 			]
 		];
@@ -156,6 +156,11 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => false
 			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			],
 			'o' => [
 				'C' => 'O',
 				'T' => T_ZBX_STR,
@@ -164,11 +169,6 @@ class CControllerPopupTriggerExpr extends CController {
 			'v' => [
 				'C' => 'V',
 				'T' => T_ZBX_STR,
-				'A' => false
-			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
 				'A' => false
 			]
 		];
@@ -199,15 +199,15 @@ class CControllerPopupTriggerExpr extends CController {
 				'M' => $this->metrics,
 				'A' => true
 			],
-			'mask' => [
-				'C' => _('Mask'),
-				'T' => T_ZBX_STR,
-				'A' => true
-			],
 			'shift' => [
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT,
 				'A' => false
+			],
+			'mask' => [
+				'C' => _('Mask'),
+				'T' => T_ZBX_STR,
+				'A' => true
 			]
 		];
 
@@ -549,18 +549,31 @@ class CControllerPopupTriggerExpr extends CController {
 						: PARAM_TYPE_TIME;
 
 					$param_values = [];
+					if (array_key_exists(0, $params)) {
+						if ($params[0] instanceof CPeriodParserResult) {
+							$param_values[] = $is_num ? substr($params[0]->sec_num, 1) : $params[0]->sec_num;
+							$param_values[] = $params[0]->time_shift;
+						}
+						elseif (!($params[0] instanceof CFunctionParserResult)) {
+							$param_values = array_merge($param_values, [$params[0]->getValue(), '']);
+						}
+
+						array_shift($params);
+					}
+
 					foreach ($params as $i => $param) {
 						if ($param instanceof CFunctionParserResult) {
-							$param_values[] = $param->getFunctionTriggerQuery()->getValue();
+							continue;
 						}
-						elseif ($i == 0 && ($param instanceof CPeriodParserResult)) {
-							$param_values[] = $is_num ? substr($param->sec_num, 1) : $param->sec_num;
-							$param_values[] = $param->time_shift;
-						}
-						else {
-							$param_values[] = $param->getValue();
-						}
+
+						$param_values[] = $param->getValue();
 					}
+
+					if ($function === 'bitand') {
+						// Only 'mask' parameter can be extracted. Push it behind period parameters.
+						$param_values = ['', '', $param_values[0]];
+					}
+
 					$params = $param_values;
 
 					/*
@@ -593,14 +606,11 @@ class CControllerPopupTriggerExpr extends CController {
 							if (array_key_exists($fn_name, $this->functions)
 									&& in_array($operator_token->match, $this->functions[$fn_name]['operators'])) {
 								$operator = $operator_token->match;
-								$value = (($value_token instanceof CTriggerExprParserResult)
-										&& array_key_exists('string', $value_token->data))
-									? $value_token->data['string']
-									: $value_token->match;
 							}
-							else {
-								break;
-							}
+							$value = (($value_token instanceof CTriggerExprParserResult)
+									&& array_key_exists('string', $value_token->data))
+								? $value_token->data['string']
+								: $value_token->match;
 
 							if (!in_array($fn_name, getStandaloneFunctions())
 									&& ($query = $function_token->getFunctionTriggerQuery()) !== null) {
@@ -726,13 +736,9 @@ class CControllerPopupTriggerExpr extends CController {
 
 					if (($result = $trigger_expression->parse($data['expression'])) !== false) {
 						// Validate trigger function.
-						$trigger_function_validator = new CFunctionValidator();
-
-						$fn_data = [
-							'fn' => $result->getTokens()[0]
-						];
-						if (!$trigger_function_validator->validate($fn_data)) {
-							error($trigger_function_validator->getError());
+						$math_function_validator = new CMathFunctionValidator();
+						if (!$math_function_validator->validate($result->getTokens()[0])) {
+							error($math_function_validator->getError());
 						}
 					}
 					else {
@@ -835,26 +841,24 @@ class CControllerPopupTriggerExpr extends CController {
 						// Validate trigger function.
 						$math_function_validator = new CMathFunctionValidator();
 						$trigger_function_validator = new CFunctionValidator();
-						$fn_data = [
-							'fn' => $result->getTokens()[0],
-							'value_type' => $data['itemValueType']
-						];
-						$error_msg = '';
+						$fn = $result->getTokens()[0];
+						$errors = [];
 
-						if (!$math_function_validator->validate($fn_data)) {
-							$error_msg = $math_function_validator->getError();
+						if (!$math_function_validator->validate($fn)) {
+							$errors[$math_function_validator->error_pos] = $math_function_validator->getError();
 
-							if (!$trigger_function_validator->validate($fn_data)
-									|| !$trigger_function_validator->validateValueType($fn_data)) {
-								$error_msg = $trigger_function_validator->getError();
+							if (!$trigger_function_validator->validate($fn)
+									|| !$trigger_function_validator->validateValueType($data['itemValueType'], $fn)) {
+								$errors[$trigger_function_validator->error_pos]
+									= $trigger_function_validator->getError();
 							}
 							else {
-								$error_msg = '';
+								$errors = [];
 							}
 						}
 
-						if ($error_msg !== '') {
-							error($error_msg);
+						if ($errors) {
+							error($errors[max(array_keys($errors))]);
 						}
 					}
 					else {

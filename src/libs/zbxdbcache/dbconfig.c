@@ -10925,6 +10925,42 @@ int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *h
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_dc_expand_user_macros_len                                    *
+ *                                                                            *
+ * Purpose: expand user macros in the specified text                          *
+ *                                                                            *
+ * Parameters: text         - [IN] the text value to expand                   *
+ *             len          - [IN] the text length                            *
+ *             hostids      - [IN] an array of related hostids                *
+ *             hostids_num  - [IN] the number of hostids                      *
+ *             value        - [IN] the expanded macro with expanded user      *
+ *                                 macros. Unknown or invalid macros will be  *
+ *                                 left unresolved.                           *
+ *             error        - [IN] the error message, optional. If specified  *
+ *                                 the function will return failure on first  *
+ *                                 unknown user macro                         *
+ *                                                                            *
+ * Return value: SUCCEED - the macros were expanded successfully              *
+ *               FAIL    - error parameter was given and at least one of      *
+ *                         macros was not expanded                            *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
+		char **value, char **error)
+{
+	int	ret;
+
+	RDLOCK_CACHE;
+	ret = dc_expand_user_macros_len(text, text_len, hostids, hostids_num, value, error);
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_expand_user_macros                                            *
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
@@ -12682,44 +12718,6 @@ void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zb
 
 	for (i = 0; i < groupids_num; i++)
 		dc_get_nested_hostgroupids(groupids[i], nested_groupids);
-
-	UNLOCK_CACHE;
-
-	zbx_vector_uint64_sort(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(nested_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_nested_hostgroupids_by_names                          *
- *                                                                            *
- * Purpose: gets nested group ids for the specified host groups               *
- *                                                                            *
- * Parameter: groups          - [IN] the parent group names                   *
- *            groups_num      - [IN] the number of parent groups              *
- *            nested_groupids - [OUT] the nested + parent group ids           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_get_nested_hostgroupids_by_names(const char **groups, int groups_num,
-		zbx_vector_uint64_t *nested_groupids)
-{
-	int	i, index;
-
-	WRLOCK_CACHE;
-
-	for (i = 0; i < groups_num; i++)
-	{
-		zbx_dc_hostgroup_t	group_local, *group;
-
-		group_local.name = groups[i];
-
-		if (FAIL != (index = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local,
-				dc_compare_hgroups)))
-		{
-			group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
-			dc_get_nested_hostgroupids(group->groupid, nested_groupids);
-		}
-	}
 
 	UNLOCK_CACHE;
 

@@ -155,6 +155,7 @@ class CTriggerExprParserResult extends CParserResult {
 	 * @return array
 	 */
 	public function getUserMacros(): array {
+		$user_macro_parser = new CUserMacroParser();
 		$params_stack = $this->tokens;
 		$return = [];
 
@@ -165,6 +166,10 @@ class CTriggerExprParserResult extends CParserResult {
 			}
 			elseif ($param instanceof CTriggerExprTokenResult
 					&& $param->type == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO) {
+				$return[] = $param;
+			}
+			elseif ($param instanceof CFunctionParameterResult
+					&& $user_macro_parser->parse($param->getValue()) == CParser::PARSE_SUCCESS) {
 				$return[] = $param;
 			}
 		}
@@ -201,57 +206,5 @@ class CTriggerExprParserResult extends CParserResult {
 		}
 
 		return array_keys(array_flip($hosts));
-	}
-
-	/**
-	 * Return array containing items found in parsed trigger expression grouped by host.
-	 *
-	 * Example:
-	 * [
-	 *   'host1' => [
-	 *     'item1' => 'item1',
-	 *     'item2' => 'item2'
-	 *   ]
-	 * ],
-	 * [
-	 *   'host2' => [
-	 *     'item3' => 'item3',
-	 *   ]
-	 * ]
-	 *
-	 * @return array
-	 */
-	public function getItemsGroupedByHosts():array {
-		$params_stack = $this->tokens;
-		$hosts = [];
-
-		while ($params_stack) {
-			$param = array_shift($params_stack);
-			if ($param instanceof CFunctionParserResult) {
-				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
-
-				foreach ($param->getItemsGroupedByHosts() as $host => $items) {
-					if (!array_key_exists($host, $hosts)) {
-						$hosts[$host] = [
-							'hostid' => null,
-							'host' => $host,
-							'status' => null,
-							'keys' => []
-						];
-					}
-
-					foreach ($items as $item) {
-						$hosts[$host]['keys'][$item] = [
-							'itemid' => null,
-							'key' => $item,
-							'value_type' => null,
-							'flags' => null
-						];
-					}
-				}
-			}
-		}
-
-		return $hosts;
 	}
 }

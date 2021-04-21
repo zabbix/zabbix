@@ -614,7 +614,7 @@ static void	zbx_vector_history_record_log_uniq(zbx_vector_history_record_t *vect
 #define OP_LIKE		6
 #define OP_REGEXP	7
 #define OP_IREGEXP	8
-#define OP_BAND		9
+#define OP_BITAND		9
 
 static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t pattern, zbx_uint64_t mask)
 {
@@ -644,7 +644,7 @@ static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t 
 			if (value <= pattern)
 				(*count)++;
 			break;
-		case OP_BAND:
+		case OP_BITAND:
 			if ((value & mask) == pattern)
 				(*count)++;
 	}
@@ -816,7 +816,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 	else if (0 == strcmp(operator, "iregexp"))
 		op = OP_IREGEXP;
 	else if (0 == strcmp(operator, "band"))
-		op = OP_BAND;
+		op = OP_BITAND;
 
 	if (OP_UNKNOWN == op)
 	{
@@ -841,14 +841,14 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 			goto out;
 		}
 
-		if (OP_BAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		if (OP_BITAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
 			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting float values",
 					operator);
 			goto out;
 		}
 
-		if (OP_BAND == op && NULL != (pattern2 = strchr(pattern, '/')))
+		if (OP_BITAND == op && NULL != (pattern2 = strchr(pattern, '/')))
 		{
 			*pattern2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
 			pattern2++;	/* start of the 2nd part of the 2nd parameter (mask) */
@@ -858,7 +858,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, DC_ITEM *item, const char *param
 		{
 			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			{
-				if (OP_BAND != op)
+				if (OP_BITAND != op)
 				{
 					if (SUCCEED != str2uint64(pattern, ZBX_UNIT_SYMBOLS, &pattern_ui64))
 					{
@@ -1060,7 +1060,7 @@ out:
 #undef OP_LIKE
 #undef OP_REGEXP
 #undef OP_IREGEXP
-#undef OP_BAND
+#undef OP_BITAND
 
 /******************************************************************************
  *                                                                            *

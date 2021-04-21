@@ -36,9 +36,17 @@ class C52ImportConverter extends CConverter {
 	 */
 	protected $aggregate_item_key_converter;
 
+	/**
+	 * Converter used to convert calculated item formula from 5.2 to 5.4 syntax.
+	 *
+	 * @var C52CalculatedItemConverter
+	 */
+	protected $calculated_item_converter;
+
 	public function __construct() {
 		$this->trigger_expression_converter = new C52TriggerExpressionConverter();
 		$this->aggregate_item_key_converter = new C52AggregateItemKeyConverter();
+		$this->calculated_item_converter = new C52CalculatedItemConverter();
 	}
 
 	/**
@@ -81,7 +89,6 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private function convertHosts(array $hosts): array {
-		$parser = new C52CalculatedItemConverter();
 		$tls_fields = array_flip(['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
 			'tls_psk'
 		]);
@@ -99,7 +106,7 @@ class C52ImportConverter extends CConverter {
 					}
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item = $parser->convert($item);
+						$item = $this->calculated_item_converter->convert($item);
 					}
 					else if ($item['type'] === CXmlConstantName::AGGREGATE) {
 						$item['type'] = CXmlConstantName::CALCULATED;
@@ -130,8 +137,6 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private function convertTemplates(array $templates): array {
-		$parser = new C52CalculatedItemConverter();
-
 		foreach ($templates as &$template) {
 			if (array_key_exists('items', $template)) {
 				foreach ($template['items'] as &$item) {
@@ -143,7 +148,7 @@ class C52ImportConverter extends CConverter {
 					}
 
 					if ($item['type'] === CXmlConstantName::CALCULATED) {
-						$item = $parser->convert($item);
+						$item = $this->calculated_item_converter->convert($item);
 					}
 					else if ($item['type'] === CXmlConstantName::AGGREGATE) {
 						$item['type'] = CXmlConstantName::CALCULATED;
@@ -351,19 +356,25 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private function convertTrigger(array $trigger, ?string $host = null, ?string $item = null): array {
-		$converted_expressions = $this->trigger_expression_converter->convert(array_filter([
+		$trigger['expression'] = $this->trigger_expression_converter->convert([
 			'expression' => $trigger['expression'],
-			'recovery_expression' => array_key_exists('recovery_expression', $trigger)
-				? $trigger['recovery_expression']
-				: null,
 			'host' => $host,
 			'item' => $item
-		]));
+		]);
 
-		foreach (['expression', 'recovery_expression'] as $source) {
-			if (array_key_exists($source, $converted_expressions)) {
-				$trigger[$source] = $converted_expressions[$source];
+		if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== '') {
+			$trigger['recovery_expression'] = $this->trigger_expression_converter->convert([
+				'expression' => $trigger['recovery_expression'],
+				'host' => $host,
+				'item' => $item
+			]);
+		}
+
+		if (array_key_exists('dependencies', $trigger)) {
+			foreach ($trigger['dependencies'] as &$dep_trigger) {
+				$dep_trigger = $this->convertTrigger($dep_trigger);
 			}
+			unset($dep_trigger);
 		}
 
 		return $trigger;

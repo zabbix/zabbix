@@ -389,12 +389,12 @@ class CMacrosResolverGeneral {
 
 							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
 								switch ($param_raw->type) {
-									case CFunctionParser::PARAM_UNQUOTED:
+									case C10FunctionParser::PARAM_UNQUOTED:
 										$function_parameters[] = $param_raw->match;
 										break;
 
-									case CFunctionParser::PARAM_QUOTED:
-										$function_parameters[] = CFunctionParser::unquoteParam($param_raw->match);
+									case C10FunctionParser::PARAM_QUOTED:
+										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw->match);
 										break;
 								}
 							}

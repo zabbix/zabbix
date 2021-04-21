@@ -68,8 +68,8 @@ class CPeriodParserResult extends CFunctionParameterResult {
 			'type' => CTriggerExprParserResult::TOKEN_TYPE_PERIOD,
 			'sec_num' => '',
 			'time_shift' => '',
-			'sec_num_contains_macros' => '',
-			'time_shift_contains_macros' => '',
+			'sec_num_contains_macros' => false,
+			'time_shift_contains_macros' => false,
 			'match' => '',
 			'pos' => 0,
 			'length' => 0

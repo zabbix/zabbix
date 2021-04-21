@@ -75,7 +75,6 @@
 #define ZBX_EVAL_TOKEN_PROP_TAG		(29 | ZBX_EVAL_CLASS_PROPERTY)
 #define ZBX_EVAL_TOKEN_PROP_GROUP	(30 | ZBX_EVAL_CLASS_PROPERTY)
 #define ZBX_EVAL_TOKEN_EXCEPTION	(31 | ZBX_EVAL_CLASS_FUNCTION)
-#define ZBX_EVAL_TOKEN_JOKER		(32)
 
 /* token parsing rules */
 
@@ -121,6 +120,11 @@
 						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_GROUP 			|\
 						ZBX_EVAL_PARSE_VAR_STR | ZBX_EVAL_PARSE_PROPERTY)
 
+#define	ZBX_EVAL_PARSE_EXPRESSION_MACRO		(ZBX_EVAL_PARSE_MACRO | ZBX_EVAL_PARSE_USERMACRO 	|\
+						ZBX_EVAL_PARSE_ITEM_QUERY | ZBX_EVAL_PARSE_FUNCTION	|\
+						ZBX_EVAL_PARSE_MATH | ZBX_EVAL_PARSE_COMPARE 		|\
+						ZBX_EVAL_PARSE_LOGIC | ZBX_EVAL_PARSE_VAR 		|\
+						ZBX_EVAL_PARSE_COMPOUND_CONST)
 /* expression composition rules */
 
 #define ZBX_EVAL_COMPOSE_LLD			__UINT64_C(0x01000000)
@@ -146,6 +150,9 @@
 					ZBX_EVAL_PARSE_LLDMACRO | \
 					ZBX_EVAL_COMPOSE_LLD)
 
+#define ZBX_EVAL_EXPRESSION_MACRO_LLD	(ZBX_EVAL_PARSE_EXPRESSION_MACRO | \
+					ZBX_EVAL_PARSE_LLDMACRO | \
+					ZBX_EVAL_COMPOSE_LLD)
 
 #define ZBX_EVAL_QUERY_EXPRESSION_LLD	(ZBX_EVAL_PARSE_QUERY_EXPRESSION | \
 					ZBX_EVAL_PARSE_LLDMACRO | \
@@ -246,9 +253,9 @@ void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs)
 
 typedef struct
 {
-	char			*host;
-	char			*key;
-	char			*filter;
+	char	*host;
+	char	*key;
+	char	*filter;
 }
 zbx_item_query_t;
 

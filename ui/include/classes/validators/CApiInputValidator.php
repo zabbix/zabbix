@@ -322,10 +322,33 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		$parser = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
+		$result = $parser->parse($data);
+
+		if (!$result) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $parser->error);
+
 			return false;
+		}
+
+		$validator = new CFunctionValidator(['calculated' => true]);
+		$math_validator = new CMathFunctionValidator(['calculated' => true]);
+		$skip_valid = $data;
+
+		foreach ($result->getFunctions() as $func) {
+			if ($math_validator->validate($func)) {
+				/**
+				 * Replace validated math functions with space to not validate functions in parameters
+				 * as standalone functions. Example:
+				 * Do not validate "last_foreach" as standalone function in expression "sum(last_foreach(...))".
+				 */
+				$skip_valid = substr_replace($skip_valid, str_repeat(' ', $func->length), $func->pos, $func->length);
+			}
+			elseif (trim(substr($skip_valid, $func->pos, $func->length)) !== '' && !$validator->validate($func)) {
+				$error = $validator->getError();
+
+				return false;
+			}
 		}
 
 		return true;
@@ -2031,7 +2054,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (!$expression_data->expressions) {
+		if (!$expression_data->result->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_QUERY)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('trigger expression must contain at least one /host/key reference')
 			);

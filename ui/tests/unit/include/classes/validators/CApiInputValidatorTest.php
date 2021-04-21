@@ -45,21 +45,81 @@ class CApiInputValidatorTest extends TestCase {
 		return [
 			[
 				['type' => API_CALC_FORMULA],
-				'last(agent.ping) = 1 or "text" = {$MACRO}',
+				'last(//agent.ping) = 1 or "text" = {$MACRO}',
 				'/1/formula',
-				'last(agent.ping) = 1 or "text" = {$MACRO}'
+				'last(//agent.ping) = 1 or "text" = {$MACRO}'
+			],
+			[
+				['type' => API_CALC_FORMULA, 'flags' => API_ALLOW_LLD_MACRO],
+				'last(//agent.ping) = 1 or "text" = {#LLD}',
+				'/1/formula',
+				'last(//agent.ping) = 1 or "text" = {#LLD}'
 			],
 			[
 				['type' => API_CALC_FORMULA],
-				'last(agent.ping) = 1 or "text" = {#LLD}',
+				'10+sum(/*/counter?[tag="test:1" and group="test-hosts"],1m)',
+				'/1/formula',
+				'10+sum(/*/counter?[tag="test:1" and group="test-hosts"],1m)'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'10+sum(/host/*?[tag="test:1" and group="test-hosts"],1m)',
+				'/1/formula',
+				'10+sum(/host/*?[tag="test:1" and group="test-hosts"],1m)'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, 33))))))))))))))))))))))))))))))))',
+				'/1/formula',
+				'max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, 33))))))))))))))))))))))))))))))))'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
+				'/1/formula',
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/*[/,total]?[group="Any host and item is prohibited"]))',
+				'/1/formula',
+				'Incorrect trigger function "sum(last_foreach(/*/*[/,total]?[group="Any host and item is prohibited"]))" provided in expression. Mandatory parameter is missing.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'sum(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])) + last_foreach(/host/key)',
+				'/1/formula',
+				'Incorrect trigger function "last_foreach(/host/key)" provided in expression. Unknown function.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last(last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"]))',
+				'/1/formula',
+				'Incorrect trigger function "last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])" provided in expression. Unknown function.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])',
+				'/1/formula',
+				'Incorrect trigger function "last_foreach(/*/vfs.fs.size[/,total]?[group="MySQL Servers"])" provided in expression. Unknown function.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last(//agent.ping) = 1 or "text" = {$MACRO}',
+				'/1/formula',
+				'Incorrect trigger function "last(agent.ping)" provided in expression. Invalid first parameter.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last(//agent.ping) = 1 or "text" = {#LLD}',
 				'/1/formula',
 				'Invalid parameter "/1/formula": incorrect calculated item formula starting from " {#LLD}".'
 			],
 			[
-				['type' => API_CALC_FORMULA, 'flags' => API_ALLOW_LLD_MACRO],
-				'last(agent.ping) = 1 or "text" = {#LLD}',
+				['type' => API_CALC_FORMULA],
+				'max(1, max(2, max(3, max(4, max(5, max(6, max(7, max(8, max(9, max(10, max(11, max(12, max(13, max(14, max(15, max(16, max(17, max(18, max(19, max(20, max(21, max(22, max(23, max(24, max(25, max(26, max(27, max(28, max(29, max(30, max(31, max(32, max(33, 1)))))))))))))))))))))))))))))))))',
 				'/1/formula',
-				'last(agent.ping) = 1 or "text" = {#LLD}'
+				'Invalid parameter "/1/formula": incorrect calculated item formula starting from "max(33, 1)))))))))))))))))))))))))))))))))".'
 			],
 			[
 				['type' => API_CALC_FORMULA],
@@ -3523,15 +3583,15 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION, 'length' => 10],
-				'{host:item.last()} = 0',
+				'last(/host/item) = 0',
 				'/1/expression',
 				'Invalid parameter "/1/expression": value is too long.'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last() = 0',
+				'last(/host/item = 0',
 				'/1/expression',
-				'Invalid parameter "/1/expression": incorrect trigger expression starting from "{host:item.last() = 0".'
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from "last(/host/item = 0".'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
@@ -3541,27 +3601,27 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = {#LLD_MACRO}',
+				'last(/host/item) = {#LLD_MACRO}',
 				'/1/expression',
 				'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#LLD_MACRO}".'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
-				'{host:item.last()} = {#LLD_MACRO}',
+				'last(/host/item) = {#LLD_MACRO}',
 				'/1/expression',
-				'{host:item.last()} = {#LLD_MACRO}'
+				'last(/host/item) = {#LLD_MACRO}'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = 0',
+				'last(/host/item) = 0',
 				'/1/expression',
-				'{host:item.last()} = 0'
+				'last(/host/item) = 0'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
-				'{host:item.last()} = {$USER_MACRO}',
+				'last(/host/item) = {$USER_MACRO}',
 				'/1/expression',
-				'{host:item.last()} = {$USER_MACRO}'
+				'last(/host/item) = {$USER_MACRO}'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
@@ -3607,15 +3667,15 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_EVENT_NAME],
-				'event name {?{host:item.last()} = 0}',
+				'event name {?last(/host/item) = 0}',
 				'/1/event_name',
-				'event name {?{host:item.last()} = 0}'
+				'event name {?last(/host/item) = 0}'
 			],
 			[
 				['type' => API_EVENT_NAME],
-				'event name {?{host:item.last()} = {$USER_MACRO}}',
+				'event name {?last(/host/item) = {$USER_MACRO}}',
 				'/1/event_name',
-				'event name {?{host:item.last()} = {$USER_MACRO}}'
+				'event name {?last(/host/item) = {$USER_MACRO}}'
 			],
 			[
 				['type' => API_EVENT_NAME],

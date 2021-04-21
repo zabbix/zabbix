@@ -246,7 +246,7 @@ class CHostNameParserTest extends TestCase {
 					'match' => '',
 					'macros' => []
 				]
-			],
+			]
 		];
 	}
 

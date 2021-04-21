@@ -222,7 +222,8 @@ class CTriggerExpression {
 		}
 		$this->function_parser = new CFunctionParser([
 			'calculated' => $this->options['calculated'],
-			'collapsed_expression' => $this->options['collapsed_expression']
+			'collapsed_expression' => $this->options['collapsed_expression'],
+			'lldmacros' => $this->options['lldmacros']
 		]);
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
@@ -675,7 +676,6 @@ class CTriggerExpression {
 	private function parseFunction(): bool {
 		$start_pos = $this->pos;
 
-		// TODO miks: parser must support functionids as parameters based on value of $this->options['collapsed_expression'].
 		if ($this->function_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			$error = $this->function_parser->getErrorDetails();
 

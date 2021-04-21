@@ -90,9 +90,8 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
 
 	if (SUCCEED != zbx_variant_convert(right, ZBX_VARIANT_DBL))
 	{
-		*error = zbx_dsprintf(*error, "invalid value \"%s\" of type \"%s\" for unary"
-				" operator at \"%s\"", zbx_variant_value_desc(right),
-				zbx_variant_type_desc(right), ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "unary operator operand \"%s\" is not a numeric value at \"%s\"",
+				zbx_variant_value_desc(right), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -276,15 +275,15 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 
 	if (SUCCEED != zbx_variant_convert(left, ZBX_VARIANT_DBL))
 	{
-		*error = zbx_dsprintf(*error, "invalid left operand value \"%s\" of type \"%s\"",
-				zbx_variant_value_desc(left), zbx_variant_type_desc(left));
+		*error = zbx_dsprintf(*error, "left operand \"%s\" is not a numeric value for operator at \"%s\"",
+				zbx_variant_value_desc(left), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
 	if (SUCCEED != zbx_variant_convert(right, ZBX_VARIANT_DBL))
 	{
-		*error = zbx_dsprintf(*error, "invalid right operand value \"%s\" of type \"%s\"",
-				zbx_variant_value_desc(right), zbx_variant_type_desc(right));
+		*error = zbx_dsprintf(*error, "right operand \"%s\" is not a numeric value for operator at \"%s\"",
+				zbx_variant_value_desc(right), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -593,6 +592,21 @@ static int	eval_validate_function_args(const zbx_eval_context_t *ctx, const zbx_
 	return UNKNOWN;
 }
 
+static const char	*eval_type_desc(unsigned char type)
+{
+	switch (type)
+	{
+		case ZBX_VARIANT_DBL:
+			return "a numeric";
+		case ZBX_VARIANT_UI64:
+			return "an unsigned integer";
+		case ZBX_VARIANT_STR:
+			return "a string";
+		default:
+			return zbx_get_variant_type_desc(type);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: eval_convert_function_arg                                        *
@@ -624,8 +638,8 @@ static int	eval_convert_function_arg(const zbx_eval_context_t *ctx, const zbx_ev
 	if (SUCCEED == zbx_variant_convert(arg, type))
 		return SUCCEED;
 
-	*error = zbx_dsprintf(*error, "invalid arg \"%s\" of type \"%s\" for function at \"%s\"",
-			zbx_variant_value_desc(arg), zbx_variant_type_desc(arg), ctx->expression + token->loc.l);
+	*error = zbx_dsprintf(*error, "function argument \"%s\" is not %s value at \"%s\"",
+			zbx_variant_value_desc(arg),  eval_type_desc(type), ctx->expression + token->loc.l);
 
 	return FAIL;
 }
@@ -972,11 +986,8 @@ static int	eval_execute_function_length(const zbx_eval_context_t *ctx, const zbx
 
 	arg = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
-	{
-		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
+	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
 		return FAIL;
-	}
 
 	zbx_variant_set_dbl(&value, zbx_strlen_utf8(arg->data.str));
 	eval_function_return(1, &value, output);
@@ -1219,15 +1230,15 @@ static int	eval_execute_function_bitand(const zbx_eval_context_t *ctx, const zbx
 
 	if (SUCCEED != zbx_variant_convert(left, ZBX_VARIANT_UI64))
 	{
-		*error = zbx_dsprintf(*error, "invalid left operand value \"%s\" of type \"%s\"",
-				zbx_variant_value_desc(left), zbx_variant_type_desc(left));
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(left), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
 	if (SUCCEED != zbx_variant_convert(right, ZBX_VARIANT_UI64))
 	{
-		*error = zbx_dsprintf(*error, "invalid right operand value \"%s\" of type \"%s\"",
-				zbx_variant_value_desc(right), zbx_variant_type_desc(right));
+		*error = zbx_dsprintf(*error, "function argument \"%s\" is not an unsigned integer value at \"%s\"",
+				zbx_variant_value_desc(right), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -1412,6 +1423,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 {
 	zbx_vector_var_t	output;
 	int			i, ret = FAIL;
+	char			*errmsg = NULL;
 
 	zbx_vector_var_create(&output);
 
@@ -1421,12 +1433,12 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 
 		if (0 != (token->type & ZBX_EVAL_CLASS_OPERATOR1))
 		{
-			if (SUCCEED != eval_execute_op_unary(ctx, token, &output, error))
+			if (SUCCEED != eval_execute_op_unary(ctx, token, &output, &errmsg))
 				goto out;
 		}
 		else if (0 != (token->type & ZBX_EVAL_CLASS_OPERATOR2))
 		{
-			if (SUCCEED != eval_execute_op_binary(ctx, token, &output, error))
+			if (SUCCEED != eval_execute_op_binary(ctx, token, &output, &errmsg))
 				goto out;
 		}
 		else
@@ -1439,40 +1451,40 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 				case ZBX_EVAL_TOKEN_VAR_STR:
 				case ZBX_EVAL_TOKEN_VAR_MACRO:
 				case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-					if (SUCCEED != eval_execute_push_value(ctx, token, &output, error))
+					if (SUCCEED != eval_execute_push_value(ctx, token, &output, &errmsg))
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_ARG_QUERY:
 				case ZBX_EVAL_TOKEN_ARG_PERIOD:
-					if (SUCCEED != eval_execute_push_value(ctx, token, &output, error))
+					if (SUCCEED != eval_execute_push_value(ctx, token, &output, &errmsg))
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_ARG_NULL:
 					eval_execute_push_null(&output);
 					break;
 				case ZBX_EVAL_TOKEN_FUNCTION:
-					if (SUCCEED != eval_execute_common_function(ctx, token, &output, error))
+					if (SUCCEED != eval_execute_common_function(ctx, token, &output, &errmsg))
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_HIST_FUNCTION:
-					if (SUCCEED != eval_execute_history_function(ctx, token, &output, error))
+					if (SUCCEED != eval_execute_history_function(ctx, token, &output, &errmsg))
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_FUNCTIONID:
 					if (ZBX_VARIANT_NONE == token->value.type)
 					{
-						*error = zbx_strdup(*error, "trigger history functions must be"
+						errmsg = zbx_strdup(errmsg, "trigger history functions must be"
 								" pre-calculated");
 						goto out;
 					}
-					if (SUCCEED != eval_execute_push_value(ctx, token, &output, error))
+					if (SUCCEED != eval_execute_push_value(ctx, token, &output, &errmsg))
 						goto out;
 					break;
 				case ZBX_EVAL_TOKEN_EXCEPTION:
-					eval_throw_exception(&output, error);
+					eval_throw_exception(&output, &errmsg);
 					goto out;
 				default:
-					*error = zbx_dsprintf(*error, "unknown token at \"%s\"",
+					errmsg = zbx_dsprintf(errmsg, "unknown token at \"%s\"",
 							ctx->expression + token->loc.l);
 					goto out;
 			}
@@ -1481,13 +1493,13 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 
 	if (1 != output.values_num)
 	{
-		*error = zbx_strdup(*error, "output stack after expression execution must contain one value");
+		errmsg = zbx_strdup(errmsg, "output stack after expression execution must contain one value");
 		goto out;
 	}
 
 	if (ZBX_VARIANT_ERR == output.values[0].type)
 	{
-		*error = zbx_strdup(*error, output.values[0].data.err);
+		errmsg = zbx_strdup(errmsg, output.values[0].data.err);
 		goto out;
 	}
 
@@ -1496,6 +1508,17 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 
 	ret = SUCCEED;
 out:
+	if (SUCCEED != ret)
+	{
+		if (0 != islower(*errmsg))
+		{
+			*error = zbx_dsprintf(NULL, "Cannot evaluate expression: %s", errmsg);
+			zbx_free(errmsg);
+		}
+		else
+			*error = errmsg;
+	}
+
 	for (i = 0; i < output.values_num; i++)
 		zbx_variant_clear(&output.values[i]);
 

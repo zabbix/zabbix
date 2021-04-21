@@ -293,6 +293,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				$item_test_data['parameters'] = $this->transformParametersFields($item_test_data['parameters']);
 			}
 
+			if ($item_test_data['type'] == ITEM_TYPE_CALCULATED) {
+				$item_test_data['hostid'] = $this->getInput('hostid');
+			}
+
 			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
 

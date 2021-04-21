@@ -47,8 +47,6 @@ class CTextTriggerConstructor {
 	 * Most of this function was left unchanged to preserve the current behavior of the constructor.
 	 * Feel free to rewrite and correct it if necessary.
 	 *
-	 * @param string    $host                       host name
-	 * @param string    $item_key                   item key
 	 * @param array     $expressions                array of expression parts
 	 * @param string    $expressions[]['value']     expression string
 	 * @param int       $expressions[]['type']      whether the string should match the expression; supported values:
@@ -56,7 +54,7 @@ class CTextTriggerConstructor {
 	 *
 	 * @return bool|string
 	 */
-	public function getExpressionFromParts(string $host, string $item_key, array $expressions) {
+	public function getExpressionFromParts(array $expressions) {
 		$result = '';
 
 		if (empty($expressions)) {
@@ -253,7 +251,7 @@ class CTextTriggerConstructor {
 				case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
 					// look for an "or" or "and" operator on the top parentheses level
 					// if such an expression is found, save all of the tokens before it as a separate expression
-					if ($level == 0 && ($token->value === 'or' || $token->value === 'and')) {
+					if ($level == 0 && ($token->match === 'or' || $token->match === 'and')) {
 						$expressions[] = $currentExpression;
 						$currentExpression = [];
 

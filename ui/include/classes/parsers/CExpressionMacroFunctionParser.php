@@ -30,7 +30,7 @@ class CExpressionMacroFunctionParser extends CParser {
 	protected $expression_macro_parser;
 
 	/**
-	 * @var CFunctionParser
+	 * @var C10FunctionParser
 	 */
 	protected $function_parser;
 
@@ -39,7 +39,7 @@ class CExpressionMacroFunctionParser extends CParser {
 	 */
 	public function __construct() {
 		$this->expression_macro_parser = new CExpressionMacroParser();
-		$this->function_parser = new CFunctionParser();
+		$this->function_parser = new C10FunctionParser();
 	}
 
 	/**

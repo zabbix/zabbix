@@ -25,18 +25,18 @@
 class CPeriodParser extends CParser {
 
 	/**
-	 * User macro parser.
+	 * An options array.
 	 *
-	 * @var CUserMacroParser
-	 */
-	private $user_macro_parser;
-
-	/**
-	 * LLD macro parser.
+	 * Supported options:
+	 *   'usermacros' => false   Enable user macros usage in the periods.
+	 *   'lldmacros' => false    Enable low-level discovery macros usage in the periods.
 	 *
-	 * @var CLLDMacroParser
+	 * @var array
 	 */
-	private $lld_macro_parser;
+	protected $options = [
+		'usermacros' => false,
+		'lldmacros' => false
+	];
 
 	/**
 	 * Parsed data.
@@ -47,10 +47,20 @@ class CPeriodParser extends CParser {
 
 	/**
 	 * @param array $options
+	 * @param bool  $options['lldmacros']
 	 */
-	public function __construct() {
-		$this->user_macro_parser = new CUserMacroParser();
-		$this->lld_macro_parser = new CLLDMacroParser();
+	public function __construct(array $options) {
+		$this->options = $options + $this->options;
+
+		$this->simple_interval_parser = new CSimpleIntervalParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros'],
+			'with_year' => true
+		]);
+		$this->relative_time_parser = new CRelativeTimeParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros']
+		]);
 	}
 
 	/**
@@ -62,62 +72,40 @@ class CPeriodParser extends CParser {
 	 * @return int
 	 */
 	public function parse($source, $pos = 0): int {
-		$start_pos = $pos;
-		$break_chars = [',', ')'];
-		$parts = [
-			0 => ''
-		];
-		$contains_macros = [
-			0 => false
-		];
-		$num = 0;
+		$p = $pos;
+		$sec_num = '';
+		$time_shift = '';
 
-		while (isset($source[$pos])) {
-			if (in_array($source[$pos], $break_chars)) {
-				break;
-			}
-			elseif ($source[$pos] === ':') {
-				$parts[++$num] = '';
-				$contains_macros[$num] = false;
-				$pos++;
-			}
-			elseif ($this->user_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
-				$pos += $this->user_macro_parser->length;
-				$parts[$num] .= $this->user_macro_parser->match;
-				$contains_macros[$num] = true;
-			}
-			elseif ($this->lld_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
-				$pos += $this->lld_macro_parser->length;
-				$parts[$num] .= $this->lld_macro_parser->match;
-				$contains_macros[$num] = true;
-			}
-			else {
-				$parts[$num] .= $source[$pos];
-				$pos++;
+		if (preg_match('/^#[0-9]+/', substr($source, $p), $matches)) {
+			$sec_num = $matches[0];
+			$p += strlen($matches[0]);
+		}
+		elseif ($this->simple_interval_parser->parse($source, $p) !== self::PARSE_FAIL) {
+			$sec_num = $this->simple_interval_parser->match;
+			$p += $this->simple_interval_parser->length;
+		}
+		else {
+			return self::PARSE_FAIL;
+		}
+
+		if (isset($source[$p]) && $source[$p] === ':') {
+			if ($this->relative_time_parser->parse($source, $p + 1) !== self::PARSE_FAIL) {
+				$time_shift = $this->relative_time_parser->match;
+				$p += $this->relative_time_parser->length + 1;
 			}
 		}
 
-		if (count($parts) > 2) {
-			return CParser::PARSE_FAIL;
-		}
-
-		// Check format. Otherwaise, almost anything can be period.
-		$is_valid_num = (substr($parts[0], 0, 1) === '#' && ctype_digit(substr($parts[0], 1)));
-		$is_valid_sec = preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.ZBX_TIME_SUFFIXES_WITH_YEAR.'])$/', $parts[0]);
-		if (!$is_valid_num && !$is_valid_sec) {
-			return CParser::PARSE_FAIL;
-		}
+		$this->length = $p - $pos;
 
 		$this->result = new CPeriodParserResult();
-		$this->length = $pos - $start_pos;
-		$this->result->match = substr($source, $start_pos, $this->length);
-		$this->result->sec_num = $parts[0];
-		$this->result->time_shift = (array_key_exists(1, $parts) && $parts[1] !== '') ? $parts[1] : null;
-		$this->result->sec_num_contains_macros = $contains_macros[0];
-		$this->result->time_shift_contains_macros = array_key_exists(1, $contains_macros) ? $contains_macros[1] : false;
+		$this->result->match = substr($source, $pos, $this->length);
+		$this->result->sec_num = $sec_num;
+		$this->result->time_shift = $time_shift;
+		$this->result->sec_num_contains_macros = (strpos($sec_num, '{') !== false);
+		$this->result->time_shift_contains_macros = (strpos($time_shift, '{') !== false);
 		$this->result->length = $this->length;
-		$this->result->pos = $start_pos;
+		$this->result->pos = $pos;
 
-		return isset($source[$pos]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 }

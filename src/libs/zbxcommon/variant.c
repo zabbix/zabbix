@@ -324,7 +324,7 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 
 const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 {
-	static ZBX_THREAD_LOCAL char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
+	static ZBX_THREAD_LOCAL char	buffer[64];
 	zbx_uint32_t			size, i, len;
 
 	switch (value->type)
@@ -357,7 +357,7 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 		case ZBX_VARIANT_ERR:
 			return value->data.err;
 		case ZBX_VARIANT_DBL_VECTOR:
-			zbx_snprintf(buffer, sizeof(buffer), "[0:%d]", value->data.dbl_vector->values_num);
+			zbx_snprintf(buffer, sizeof(buffer), "double vector[0:%d]", value->data.dbl_vector->values_num);
 			return buffer;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -382,7 +382,7 @@ const char	*zbx_get_variant_type_desc(unsigned char type)
 		case ZBX_VARIANT_ERR:
 			return "error";
 		case ZBX_VARIANT_DBL_VECTOR:
-			return "floating vector";
+			return "double vector";
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;

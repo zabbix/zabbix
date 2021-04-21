@@ -127,7 +127,7 @@ class CItemKey extends CParser {
 		$this->parameters = [];
 		$this->errorClear();
 
-		if ($this->options['allow_wildcard'] && $data[$offset] === '*') {
+		if ($this->options['allow_wildcard'] && $data[$offset] === CQueryParserResult::HOST_ITEMKEY_WILDCARD) {
 			$p = $offset + 1;
 		}
 		else {
@@ -181,7 +181,7 @@ class CItemKey extends CParser {
 			}
 		}
 
-		if ($this->options['with_filter'] && $data[$p] === '?') {
+		if ($this->options['with_filter'] && isset($data[$p]) && $data[$p] === '?') {
 			$p++;
 
 			if (!isset($data[$p]) || $data[$p] !== '[') {

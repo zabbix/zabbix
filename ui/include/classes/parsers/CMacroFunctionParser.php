@@ -34,7 +34,7 @@ class CMacroFunctionParser extends CParser {
 	/**
 	 * Parser for trigger functions.
 	 *
-	 * @var CFunctionParser
+	 * @var C10FunctionParser
 	 */
 	private $function_parser;
 
@@ -45,7 +45,7 @@ class CMacroFunctionParser extends CParser {
 	 */
 	public function __construct(array $options) {
 		$this->macro_parser = new CMacroParser($options);
-		$this->function_parser = new CFunctionParser();
+		$this->function_parser = new C10FunctionParser();
 	}
 
 	/**
