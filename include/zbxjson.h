@@ -82,7 +82,6 @@
 #define ZBX_PROTO_TAG_NAME			"name"
 #define ZBX_PROTO_TAG_HOSTS			"hosts"
 #define ZBX_PROTO_TAG_GROUPS			"groups"
-#define ZBX_PROTO_TAG_APPLICATIONS		"applications"
 #define ZBX_PROTO_TAG_TAGS			"tags"
 #define ZBX_PROTO_TAG_TAG			"tag"
 #define ZBX_PROTO_TAG_PROBLEM_EVENTID		"p_eventid"
@@ -166,6 +165,7 @@
 #define ZBX_PROTO_TAG_EXPRESSIONS		"expressions"
 #define ZBX_PROTO_TAG_EXPRESSION		"expression"
 #define ZBX_PROTO_TAG_CLIENTIP			"clientip"
+#define ZBX_PROTO_TAG_ITEM_TAGS			"item_tags"
 #define ZBX_PROTO_TAG_PROXY_UPLOAD		"upload"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"

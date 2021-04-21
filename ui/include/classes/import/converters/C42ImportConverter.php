@@ -32,10 +32,6 @@ class C42ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = $this->convertTlsAccept($data['zabbix_export']['hosts']);
 		}
 
-		if (array_key_exists('screens', $data['zabbix_export'])) {
-			$data['zabbix_export']['screens'] = $this->convertScreens($data['zabbix_export']['screens']);
-		}
-
 		$data['zabbix_export'] = $this->convertFormat($data['zabbix_export']);
 
 		return $data;
@@ -90,41 +86,6 @@ class C42ImportConverter extends CConverter {
 		unset($host);
 
 		return $hosts;
-	}
-
-	/**
-	 * Convert screens.
-	 *
-	 * @param array $screens
-	 *
-	 * @return array
-	 */
-	protected function convertScreens(array $screens) {
-		foreach ($screens as &$screen) {
-			if (array_key_exists('screen_items', $screen)) {
-				$screen['screen_items'] = $this->convertScreenItems($screen['screen_items']);
-			}
-		}
-		unset($screen);
-
-		return $screens;
-	}
-
-	/**
-	 * Convert screen items.
-	 *
-	 * @param array $screen_items
-	 *
-	 * @return array
-	 */
-	protected function convertScreenItems(array $screen_items) {
-		foreach ($screen_items as $index => $screen_item) {
-			if ($screen_item['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
-				unset($screen_items[$index]);
-			}
-		}
-
-		return $screen_items;
 	}
 
 	/**

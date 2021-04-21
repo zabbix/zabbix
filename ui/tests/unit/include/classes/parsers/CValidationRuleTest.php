@@ -200,9 +200,9 @@ class CValidationRuleTest extends TestCase {
 					'id' => true
 				]
 			],
-			['in graphid,itemid,screenid,slideshowid,sysmapid|fatal|required', '',
+			['in graphid,itemid,sysmapid|fatal|required', '',
 				[
-					'in' => ['graphid', 'itemid', 'screenid', 'slideshowid', 'sysmapid'],
+					'in' => ['graphid', 'itemid', 'sysmapid'],
 					'fatal' => true,
 					'required' => true
 				]

@@ -38,7 +38,6 @@ class CHost extends CHostGeneral {
 	 * @param array         $options['triggerids']                         Select hosts by trigger IDs.
 	 * @param array         $options['maintenanceids']                     Select hosts by maintenance IDs.
 	 * @param array         $options['graphids']                           Select hosts by graph IDs.
-	 * @param array         $options['applicationids']                     Select hosts by application IDs.
 	 * @param array         $options['dserviceids']                        Select hosts by discovery service IDs.
 	 * @param array         $options['httptestids']                        Select hosts by web scenario IDs.
 	 * @param bool          $options['monitored_hosts']                    Return only monitored hosts.
@@ -55,7 +54,6 @@ class CHost extends CHostGeneral {
 	 * @param bool          $options['with_monitored_httptests']           Select hosts only with monitored http tests.
 	 * @param bool          $options['with_graphs']                        Select hosts only with graphs.
 	 * @param bool          $options['with_graph_prototypes']              Select hosts only with graph prototypes.
-	 * @param bool          $options['with_applications']                  Select hosts with applications.
 	 * @param bool          $options['withProblemsSuppressed']             Select hosts that have suppressed problems. (null - all, true - only suppressed, false - unsuppressed)
 	 * @param bool          $options['editable']                           Select hosts only with read-write permission. Ignored for Super admins.
 	 * @param bool          $options['nopermissions']                      Select hosts by ignoring all permissions. Only available inside API calls.
@@ -69,7 +67,6 @@ class CHost extends CHostGeneral {
 	 * @param string|array  $options['selectDiscoveries']                  Return a "discoveries" property with host low-level discovery rules.
 	 * @param string|array  $options['selectTriggers']                     Return a "triggers" property with host triggers.
 	 * @param string|array  $options['selectGraphs']                       Return a "graphs" property with host graphs.
-	 * @param string|array  $options['selectApplications']                 Return an "applications" property with host applications.
 	 * @param string|array  $options['selectMacros']                       Return a "macros" property with host macros.
 	 * @param string|array  $options['selectDashboards']                   Return a "dashboards" property with host dashboards.
 	 * @param string|array  $options['selectInterfaces']                   Return an "interfaces" property with host interfaces.
@@ -111,7 +108,6 @@ class CHost extends CHostGeneral {
 			'triggerids'						=> null,
 			'maintenanceids'					=> null,
 			'graphids'							=> null,
-			'applicationids'					=> null,
 			'dserviceids'						=> null,
 			'httptestids'						=> null,
 			'monitored_hosts'					=> null,
@@ -128,7 +124,6 @@ class CHost extends CHostGeneral {
 			'with_monitored_httptests'			=> null,
 			'with_graphs'						=> null,
 			'with_graph_prototypes'				=> null,
-			'with_applications'					=> null,
 			'withProblemsSuppressed'			=> null,
 			'editable'							=> false,
 			'nopermissions'						=> null,
@@ -152,7 +147,6 @@ class CHost extends CHostGeneral {
 			'selectDiscoveries'					=> null,
 			'selectTriggers'					=> null,
 			'selectGraphs'						=> null,
-			'selectApplications'				=> null,
 			'selectMacros'						=> null,
 			'selectDashboards'					=> null,
 			'selectInterfaces'					=> null,
@@ -280,15 +274,6 @@ class CHost extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-		}
-
-		// applicationids
-		if (!is_null($options['applicationids'])) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where'][] = dbConditionInt('a.applicationid', $options['applicationids']);
-			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 		}
 
 		// dserviceids
@@ -442,12 +427,6 @@ class CHost extends CHostGeneral {
 					' AND gi.graphid=g.graphid'.
 					' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
 				')';
-		}
-
-		// with applications
-		if (!is_null($options['with_applications'])) {
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where'][] = 'a.hostid=h.hostid';
 		}
 
 		// search
@@ -1460,13 +1439,6 @@ class CHost extends CHostGeneral {
 			API::HttpTest()->delete($delHttptests, true);
 		}
 
-
-		// delete screen items
-		DB::delete('screens_items', [
-			'resourceid' => $hostIds,
-			'resourcetype' => SCREEN_RESOURCE_HOST_TRIGGERS
-		]);
-
 		// delete host from maps
 		if (!empty($hostIds)) {
 			DB::delete('sysmaps_elements', [
@@ -1550,9 +1522,6 @@ class CHost extends CHostGeneral {
 		// delete host inventory
 		DB::delete('host_inventory', ['hostid' => $hostIds]);
 
-		// delete host applications
-		DB::delete('applications', ['hostid' => $hostIds]);
-
 		// delete host
 		DB::delete('hosts', ['hostid' => $hostIds]);
 
@@ -1560,9 +1529,6 @@ class CHost extends CHostGeneral {
 		foreach ($db_hosts as $db_host) {
 			info(_s('Deleted: Host "%1$s".', $db_host['name']));
 		}
-
-		// remove Monitoring > Latest data toggle profile values related to given hosts
-		DB::delete('profiles', ['idx' => 'web.latest.toggle_other', 'idx2' => $hostIds]);
 
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $db_hosts);
 

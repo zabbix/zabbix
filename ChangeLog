@@ -1,8 +1,27 @@
 Changes for 5.4.0rc1
 
 New features:
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
+A.F.....S. [ZBXNEXT-2976] dropped support of applications; added support of tags for item related configuration entities (asestakovs, miks)
+.........T [ZBXNEXT-6504] added Templates "TiDB by HTTP", "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
+A.F.....S. [ZBXNEXT-6288,ZBXNEXT-6289] removed screens and slideshows (akozlovs, talbergs)
+A.F.....S. [ZBXNEXT-6309] added support for multi-page dashboards (arimdjonoks, ashubin, averza)
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+..F....... [ZBX-19240] fixed JavaScript errors upon copying map or map navigation tree widgets (averza)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
+..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
+.........T [ZBX-19220] fixed broken link to Hikvision camera manufacturer page (abakaldin)
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+..F....... [ZBX-19199] fixed console errors when updating problem widgets when other popups are active (averza)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.0beta2
@@ -19,6 +38,8 @@ A.F.I..PS. [ZBXNEXT-6368] moved action operation scripts to global scripts, adde
 .........T [ZBXNEXT-6522] added Brevis.one media (tuskov)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
@@ -159,6 +180,32 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 --------------------------------------------------------------------------------
+Changes for 5.2.7rc1
+
+New features:
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
+.........T [ZBXNEXT-6504] added Templates "TiDB by HTTP",  "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+
+Bug fixes:
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
+..F....... [ZBX-18372] fixed additional word before parameters in fatal error message text (rlataria)
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-18667] fixed code spelling in templates (abakaldin)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.6
+
+5.2.6rc1 was released as 5.2.6 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.2.6rc1
 
 New features:
@@ -177,6 +224,8 @@ A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and t
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
@@ -628,6 +677,30 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.11rc1
+
+New features:
+........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
+.........T [ZBXNEXT-6508] added template for APC UPS Symmetra RX (mchudinov)
+.........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
+
+Bug fixes:
+.........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
+.......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
+.........T [ZBX-18673] fixed JS in Slack media and updated documentation (tuskov)
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+.........T [ZBX-18667] fixed code spelling in templates (abakaldin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+.........T [ZBX-17454] changed the unit of data item "pgsql.ping.time" in PostgreSQL template (abakaldin)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+.........T [ZBX-18809] changed formula for latency in Elasticsearch template (abakaldin)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.10
+
+5.0.10rc1 was released as 5.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.10rc1
 
 New features:
@@ -644,6 +717,8 @@ A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and t
 ........S. [ZBXNEXT-6442] added ExportType server parameter for better configurability of real-time export (akozlovs)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)
@@ -2636,12 +2711,29 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.31rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-19210] fixed css file versioning for custom themes (ashubin)
+........S. [ZBX-18912] fixed escalation message is using template message instead of custom message in actions (asestakovs)
+..F....... [ZBX-19195] fixed endless loop in graph widget processing if widget size is too small (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.30
+
+4.0.30rc1 was released as 4.0.30 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.30rc1
 
 New features:
 A......... [ZBXNEXT-6528,ZBXNEXT-6565] improved performance of host.create and template.create methods; improved performance of templates linking process; optimized DB::insert() method to send bulk SQL inserts (Sasha, vmaksimovs)
 
 Bug fixes:
+.....J.... [ZBX-19149] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions: 1.2.3, 1.2.3 and 1.7.30 (arimdjonoks)
+..F....... [ZBX-19150] added csrf check (rlataria)
 ..F....... [ZBX-12867] reworked problem event popup of problems widget to load data only on mouse hover and click (agriscenko, Sasha)
 ..F....... [ZBX-17000] changed translation of 'last' for week of month in japanese (vmurzins)
 A......... [ZBX-19117] fixed host deletion, template deletion and maintenance update was not shown in audit log report when it was made via API request (vmaksimovs)

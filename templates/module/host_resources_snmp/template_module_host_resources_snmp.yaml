@@ -18,9 +18,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: CPU
       items:
         -
           name: 'CPU utilization'
@@ -34,14 +31,15 @@ zabbix_export:
             MIB: HOST-RESOURCES-MIB
             The average, over the last minute, of the percentage of time that processors was not idle.
             Implementations may approximate this one minute smoothing period if necessary.
-          applications:
-            -
-              name: CPU
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$..[''{#CPU.UTIL}''].avg()'
+          tags:
+            -
+              tag: Application
+              value: CPU
           triggers:
             -
               expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -64,9 +62,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Memory
       discovery_rules:
         -
           name: 'Memory discovery'
@@ -109,14 +104,15 @@ zabbix_export:
                 The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
                 This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
                 For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.
-              applications:
-                -
-                  name: Memory
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
             -
               name: '{#MEMNAME}: Used memory'
               type: SNMP_AGENT
@@ -127,14 +123,15 @@ zabbix_export:
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-              applications:
-                -
-                  name: Memory
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
             -
               name: '{#MEMNAME}: Memory utilization'
               type: CALCULATED
@@ -144,9 +141,10 @@ zabbix_export:
               units: '%'
               params: 'last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100'
               description: 'Memory utilization in %'
-              applications:
+              tags:
                 -
-                  name: Memory
+                  tag: Application
+                  value: Memory
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
@@ -269,9 +267,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Modules
-      applications:
-        -
-          name: Storage
       discovery_rules:
         -
           name: 'Storage discovery'
@@ -311,9 +306,10 @@ zabbix_export:
               units: '%'
               params: '(last("vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]")/last("vfs.fs.total[hrStorageSize.{#SNMPINDEX}]"))*100'
               description: 'Space utilization in % for {#FSNAME}'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Filesystem {#FSNAME}'
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Total space'
               type: SNMP_AGENT
@@ -326,14 +322,15 @@ zabbix_export:
                 The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
                 This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
                 For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
             -
               name: '{#FSNAME}: Used space'
               type: SNMP_AGENT
@@ -344,14 +341,15 @@ zabbix_export:
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-              application_prototypes:
-                -
-                  name: 'Filesystem {#FSNAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
           trigger_prototypes:
             -
               expression: |

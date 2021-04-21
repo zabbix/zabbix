@@ -201,15 +201,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 */
-	public function buildScreens(array $screens) {
-		$this->data['screens'] = $this->formatScreens($screens);
-	}
-
-	/**
 	 * Format media types.
 	 *
 	 * @param array $schema       Tag schema from validation class.
@@ -259,7 +250,6 @@ class CConfigurationExportBuilder {
 				'name' => $template['name'],
 				'description' => $template['description'],
 				'groups' => $this->formatGroups($template['groups']),
-				'applications' => $this->formatApplications($template['applications']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
@@ -301,7 +291,6 @@ class CConfigurationExportBuilder {
 				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
 				'groups' => $this->formatGroups($host['groups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
-				'applications' => $this->formatApplications($host['applications']),
 				'items' => $this->formatItems($host['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
@@ -651,7 +640,6 @@ class CConfigurationExportBuilder {
 		foreach ($httptests as $httptest) {
 			$result[] = [
 				'name' => $httptest['name'],
-				'application' => $httptest['application'],
 				'delay' => $httptest['delay'],
 				'attempts' => $httptest['retries'],
 				'agent' => $httptest['agent'],
@@ -667,7 +655,8 @@ class CConfigurationExportBuilder {
 				'ssl_cert_file' => $httptest['ssl_cert_file'],
 				'ssl_key_file' => $httptest['ssl_key_file'],
 				'ssl_key_password' => $httptest['ssl_key_password'],
-				'steps' => $this->formatHttpSteps($httptest['steps'])
+				'steps' => $this->formatHttpSteps($httptest['steps']),
+				'tags' => $this->formatTags($httptest['tags'])
 			];
 		}
 
@@ -1012,7 +1001,6 @@ class CConfigurationExportBuilder {
 				'privatekey' => $item['privatekey'],
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
-				'applications' => $this->formatApplications($item['applications']),
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt'],
 				'preprocessing' => self::formatPreprocessingSteps($item['preprocessing']),
@@ -1034,6 +1022,7 @@ class CConfigurationExportBuilder {
 				'ssl_cert_file' => $item['ssl_cert_file'],
 				'ssl_key_file' => $item['ssl_key_file'],
 				'ssl_key_password' => $item['ssl_key_password'],
+				'tags' => $this->formatTags($item['tags']),
 				'verify_peer' => $item['verify_peer'],
 				'verify_host' => $item['verify_host']
 			];
@@ -1041,7 +1030,6 @@ class CConfigurationExportBuilder {
 			$master_item = ($item['type'] == ITEM_TYPE_DEPENDENT) ? ['key' => $item['master_item']['key_']] : [];
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
 				$data['discover'] = $item['discover'];
 			}
 
@@ -1095,27 +1083,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format applications.
-	 *
-	 * @param array $applications
-	 *
-	 * @return array
-	 */
-	protected function formatApplications(array $applications) {
-		$result = [];
-
-		CArrayHelper::sort($applications, ['name']);
-
-		foreach ($applications as $application) {
-			$result[] = [
-				'name' => $application['name']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format macros.
 	 *
 	 * @param array $macros
@@ -1133,30 +1100,6 @@ class CConfigurationExportBuilder {
 				'type' => $macro['type'],
 				'value' => array_key_exists('value', $macro) ? $macro['value'] : '',
 				'description' => $macro['description']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 *
-	 * @return array
-	 */
-	protected function formatScreens(array $screens) {
-		$result = [];
-
-		CArrayHelper::sort($screens, ['name']);
-
-		foreach ($screens as $screen) {
-			$result[] = [
-				'name' => $screen['name'],
-				'hsize' => $screen['hsize'],
-				'vsize' => $screen['vsize'],
-				'screen_items' => $this->formatScreenItems($screen['screenitems'])
 			];
 		}
 
@@ -1195,51 +1138,16 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatTags(array $tags) {
 		$result = [];
+		$fields = [
+			'tag' => true,
+			'value' => true,
+			'operator' => true
+		];
 
 		CArrayHelper::sort($tags, ['tag', 'value']);
 
 		foreach ($tags as $tag) {
-			$result[] = [
-				'tag' => $tag['tag'],
-				'value' => $tag['value']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format screen items.
-	 *
-	 * @param array $screenItems
-	 *
-	 * @return array
-	 */
-	protected function formatScreenItems(array $screenItems) {
-		$result = [];
-
-		CArrayHelper::sort($screenItems, ['y', 'x']);
-
-		foreach ($screenItems as $screenItem) {
-			$result[] = [
-				'resourcetype' => $screenItem['resourcetype'],
-				'width' => $screenItem['width'],
-				'height' => $screenItem['height'],
-				'x' => $screenItem['x'],
-				'y' => $screenItem['y'],
-				'colspan' => $screenItem['colspan'],
-				'rowspan' => $screenItem['rowspan'],
-				'elements' => $screenItem['elements'],
-				'valign' => $screenItem['valign'],
-				'halign' => $screenItem['halign'],
-				'style' => $screenItem['style'],
-				'url' => $screenItem['url'],
-				'dynamic' => $screenItem['dynamic'],
-				'sort_triggers' => $screenItem['sort_triggers'],
-				'resource' => $screenItem['resourceid'],
-				'max_columns' => $screenItem['max_columns'],
-				'application' => $screenItem['application']
-			];
+			$result[] = array_intersect_key($tag, $fields);
 		}
 
 		return $result;
@@ -1260,7 +1168,30 @@ class CConfigurationExportBuilder {
 		foreach ($dashboards as $dashboard) {
 			$result[] = [
 				'name' => $dashboard['name'],
-				'widgets' => $this->formatWidgets($dashboard['widgets'])
+				'display_period' => $dashboard['display_period'],
+				'auto_start' => $dashboard['auto_start'],
+				'pages' => $this->formatDashboardPages($dashboard['pages'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format dashboard pages.
+	 *
+	 * @param array $dashboard_pages
+	 *
+	 * @return array
+	 */
+	protected function formatDashboardPages(array $dashboard_pages) {
+		$result = [];
+
+		foreach ($dashboard_pages as $dashboard_page) {
+			$result[] = [
+				'name' => $dashboard_page['name'],
+				'display_period' => $dashboard_page['display_period'],
+				'widgets' => $this->formatWidgets($dashboard_page['widgets'])
 			];
 		}
 
@@ -1499,8 +1430,9 @@ class CConfigurationExportBuilder {
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
-				'application' => $element['application'],
-				'urls' => $this->formatMapElementUrls($element['urls'])
+				'urls' => $this->formatMapElementUrls($element['urls']),
+				'evaltype' => $element['evaltype'],
+				'tags' => $this->formatTags($element['tags'])
 			];
 		}
 

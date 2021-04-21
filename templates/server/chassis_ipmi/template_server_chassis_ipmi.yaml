@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:40Z'
+  version: '5.4'
+  date: '2021-02-23T11:04:52Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -24,11 +24,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: General
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'Get IPMI sensors'
@@ -38,9 +33,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'The master item that receives all sensors with values for LLD and dependent elements from BMC.'
-          applications:
+          tags:
             -
-              name: 'Zabbix raw items'
+              tag: Application
+              value: 'Zabbix raw items'
       discovery_rules:
         -
           name: 'Discrete sensors discovery'
@@ -75,9 +71,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'It is a state of the discrete IPMI sensor.'
-              application_prototypes:
-                -
-                  name: 'IPMI {#SENSOR_TYPE}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -89,6 +82,10 @@ zabbix_export:
                     - 1d
               master_item:
                 key: ipmi.get
+              tags:
+                -
+                  tag: Application
+                  value: 'IPMI {#SENSOR_TYPE}'
               trigger_prototypes:
                 -
                   expression: '{diff()}=1'
@@ -142,9 +139,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'It is a state of the threshold IPMI sensor.'
-              application_prototypes:
-                -
-                  name: 'IPMI {#SENSOR_TYPE}'
               preprocessing:
                 -
                   type: JSONPATH
@@ -156,6 +150,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: ipmi.get
+              tags:
+                -
+                  tag: Application
+                  value: 'IPMI {#SENSOR_TYPE}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{#SENSOR_HI_CRIT}'

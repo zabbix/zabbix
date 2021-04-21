@@ -40,9 +40,8 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 		[$items, $hosts, $has_hidden_data] = getDataOverview($groupids, $hostids, $fields);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'name' => $this->getInput('name', $this->getDefaultName()),
 			'groupids' => getSubGroups($fields['groupids']),
-			'application' => $fields['application'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'style' => $fields['style'],
 			'items' => $items,

@@ -805,21 +805,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('logtimefmt');
 		}
 
-		$this->zbxTestTextPresent('New application');
-		$this->zbxTestAssertVisibleId('new_application');
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'size', 20);
-
-		$this->zbxTestTextPresent('Applications');
-		$this->zbxTestAssertVisibleId('applications_');
-		$this->zbxTestDropdownAssertSelected('applications[]', '-None-');
-
-		$options = ['-None-'];
-		$result = DBselect('SELECT name FROM applications WHERE hostid='.$hostid);
-		while ($row = DBfetch($result)) {
-			$options[] = $row['name'];
-		}
-		$this->zbxTestDropdownHasOptions('applications_', $options);
+		$this->zbxTestTextNotPresent(['Applications', 'New application']);
 
 		if ($value_type != 'Log') {
 			$this->zbxTestTextPresent('Populates host inventory field');

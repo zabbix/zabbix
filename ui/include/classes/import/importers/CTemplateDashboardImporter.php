@@ -46,7 +46,12 @@ class CTemplateDashboardImporter extends CImporter {
 			}
 
 			foreach ($dashboards as $name => $dashboard) {
-				$dashboard['widgets'] = $this->resolveDashboardWidgetReferences($dashboard['widgets'], $name);
+				foreach ($dashboard['pages'] as &$dashboard_page) {
+					$dashboard_page['widgets'] = $this->resolveDashboardWidgetReferences($dashboard_page['widgets'],
+						$name
+					);
+				}
+				unset($dashboard_page);
 
 				$dashboardid = $this->referencer->resolveTemplateDashboards($templateid, $name);
 				if ($dashboardid) {

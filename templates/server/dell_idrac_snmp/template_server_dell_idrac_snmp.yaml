@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-02-23T11:04:53Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -21,21 +21,6 @@ zabbix_export:
       groups:
         -
           name: 'Templates/Server hardware'
-      applications:
-        -
-          name: 'Disk arrays'
-        -
-          name: Fans
-        -
-          name: Inventory
-        -
-          name: 'Physical disks'
-        -
-          name: 'Power supply'
-        -
-          name: Temperature
-        -
-          name: 'Virtual disks'
       items:
         -
           name: 'Firmware version'
@@ -49,14 +34,15 @@ zabbix_export:
           description: |
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the firmware version of a remote access card.
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -78,14 +64,15 @@ zabbix_export:
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the model name of the system.
           inventory_link: MODEL
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -99,14 +86,15 @@ zabbix_export:
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the service tag of the system.
           inventory_link: SERIALNO_A
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -125,11 +113,12 @@ zabbix_export:
           description: |
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.
-          applications:
-            -
-              name: Status
           valuemap:
             name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+          tags:
+            -
+              tag: Application
+              value: Status
           triggers:
             -
               expression: '{count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1'
@@ -173,14 +162,15 @@ zabbix_export:
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the name of the operating system that the hostis running.
           inventory_link: OS
-          applications:
-            -
-              name: Inventory
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -215,11 +205,12 @@ zabbix_export:
                 5: The battery is missing or not detected.
                 6: The battery is undergoing the re-charge phase.
                 7: The battery voltage or charge level is below the threshold.
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::batteryState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1'
@@ -278,9 +269,10 @@ zabbix_export:
                 value returned for this attribute is the speed in RPM or the OFF/ON value
                 of the cooling device.  When the value for coolingDeviceSubType is
                 coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.
-              applications:
+              tags:
                 -
-                  name: Fans
+                  tag: Application
+                  value: Fans
             -
               name: '{#FAN_DESCR}: Fan status'
               type: SNMP_AGENT
@@ -292,11 +284,12 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0012.0001.0005 This attribute defines the probe status of the cooling device.
-              applications:
-                -
-                  name: Fans
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS:"criticalUpper"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"nonRecoverableUpper"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"criticalLower"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"nonRecoverableLower"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1'
@@ -333,9 +326,10 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The controller's name as represented in Storage Management.
-              applications:
+              tags:
                 -
-                  name: 'Disk arrays'
+                  tag: Application
+                  value: 'Disk arrays'
             -
               name: '{#CNTLR_NAME}: Disk array controller status'
               type: SNMP_AGENT
@@ -353,11 +347,12 @@ zabbix_export:
                 4: Non-critical
                 5: Critical
                 6: Non-recoverable
-              applications:
-                -
-                  name: 'Disk arrays'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CRIT_STATUS:"critical"},eq)}=1'
@@ -410,11 +405,12 @@ zabbix_export:
                 1: The media type could not be determined.
                 2: Hard Disk Drive (HDD).
                 3: Solid State Drive (SSD).
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_NAME}: Physical disk model name'
               type: SNMP_AGENT
@@ -427,9 +423,10 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The model number of the physical disk.
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_NAME}: Physical disk part number'
               type: SNMP_AGENT
@@ -442,9 +439,10 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The part number of the disk.
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_NAME}: Physical disk serial number'
               type: SNMP_AGENT
@@ -456,9 +454,10 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The physical disk's unique identification number from the manufacturer.
-              applications:
+              tags:
                 -
-                  name: 'Physical disks'
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -478,14 +477,15 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The size of the physical disk in megabytes.
-              applications:
-                -
-                  name: 'Physical disks'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
             -
               name: '{#DISK_NAME}: Physical disk S.M.A.R.T. status'
               type: SNMP_AGENT
@@ -496,11 +496,12 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 Indicates whether the physical disk has received a predictive failure alert.
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::BooleanType'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_SMART_FAIL_STATUS},eq)}=1'
@@ -529,11 +530,12 @@ zabbix_export:
                 4: Non-critical
                 5: Critical
                 6: Non-recoverable
-              applications:
-                -
-                  name: 'Physical disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1'
@@ -570,11 +572,12 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0600.0012.0001.0005 This attribute defines the status of the power supply.
-              applications:
-                -
-                  name: 'Power supply'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {count(#1,{$PSU_CRIT_STATUS:"nonRecoverable"},eq)}=1'
@@ -617,11 +620,12 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
               name: '{#SENSOR_LOCALE}: Temperature'
               type: SNMP_AGENT
@@ -633,9 +637,6 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0006 This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete.  When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete,the value returned for this attribute is the temperature that the probeis reading in tenths of degrees Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               preprocessing:
@@ -643,6 +644,10 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
@@ -711,11 +716,12 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
             -
               name: '{#SENSOR_LOCALE}: Temperature'
               type: SNMP_AGENT
@@ -727,9 +733,6 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0006 This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete.  When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete,the value returned for this attribute is the temperature that the probeis reading in tenths of degrees Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.
-              applications:
-                -
-                  name: Temperature
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               preprocessing:
@@ -737,6 +740,10 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
               trigger_prototypes:
                 -
                   expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"CPU"}'
@@ -809,11 +816,12 @@ zabbix_export:
                 8: RAID-60
                 9: Concatenated RAID 1
                 10: Concatenated RAID 5
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Read policy'
               type: SNMP_AGENT
@@ -828,9 +836,10 @@ zabbix_export:
                 1: No Read Ahead.
                 2: Read Ahead.
                 3: Adaptive Read Ahead.
-              applications:
+              tags:
                 -
-                  name: 'Virtual disks'
+                  tag: Application
+                  value: 'Virtual disks'
             -
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Disk size'
               type: SNMP_AGENT
@@ -843,14 +852,15 @@ zabbix_export:
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The size of the virtual disk in megabytes.
-              applications:
-                -
-                  name: 'Virtual disks'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Current state'
               type: SNMP_AGENT
@@ -867,11 +877,12 @@ zabbix_export:
                 3: A Consistency Check (CC) is being performed on the virtual disk.
                 4: The virtual disk is being initialized.
                 5: BackGround Initialization (BGI) is being performed on the virtual disk.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
             -
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Status'
               type: SNMP_AGENT
@@ -886,13 +897,14 @@ zabbix_export:
                 1: The current state could not be determined.
                 2: The virtual disk is operating normally or optimally.
                 3: The virtual disk has encountered a failure. The data on disk is lost or is about to be lost.
-                4: The virtual disk encounterd a failure with one or all of the constituent redundant physical disks.
+                4: The virtual disk encountered a failure with one or all of the constituent redundant physical disks.
                 The data on the virtual disk might no longer be fault tolerant.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$VDISK_CRIT_STATUS:"failed"},eq)}=1'
@@ -924,11 +936,12 @@ zabbix_export:
                 1: Write Through.
                 2: Write Back.
                 3: Force Write Back.
-              applications:
-                -
-                  name: 'Virtual disks'
               valuemap:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
       macros:
         -
           macro: '{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}'

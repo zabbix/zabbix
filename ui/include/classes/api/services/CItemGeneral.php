@@ -150,7 +150,6 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
 		}
@@ -169,7 +168,6 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
 
@@ -249,8 +247,10 @@ abstract class CItemGeneral extends CApiService {
 			'lldmacros' => (get_class($this) === 'CItemPrototype')
 		]);
 
+		$index = 0;
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
+			$index++;
 
 			$fullItem = $items[$inum];
 
@@ -558,38 +558,44 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
 			}
 
-			if (isset($item['applications']) && $item['applications']) {
-				/*
-				 * 'flags' is available for update and item prototypes.
-				 * Don't allow discovered or any other application types for item prototypes in 'applications' option.
-				 */
-				if (array_key_exists('flags', $fullItem) && $fullItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					foreach ($host['applications'] as $num => $application) {
-						if ($application['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
-							unset($host['applications'][$num]);
-						}
-					}
-				}
-
-				// check that the given applications belong to the item's host
-				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
-				foreach ($item['applications'] as $appId) {
-					if (!in_array($appId, $dbApplicationIds)) {
-						$error = _s('Application with ID "%1$s" is not available on "%2$s".', $appId, $host['name']);
-						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-					}
-				}
-			}
-
 			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
 
 			$this->validateItemPreprocessing($fullItem);
+			$this->validateTags($item, '/'.$index);
 		}
 		unset($item);
 
 		$this->validateValueMaps($items);
 
 		$this->checkExistingItems($items);
+	}
+
+	/**
+	 * Validates tags.
+	 *
+	 * @param array  $item
+	 * @param array  $item['tags']
+	 * @param string $item['tags'][]['tag']
+	 * @param string $item['tags'][]['value']
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateTags(array $item, string $path = '/') {
+		if (!array_key_exists('tags', $item)) {
+			return;
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'tags'		=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
+				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
+			]]
+		]];
+
+		$item_tags = ['tags' => $item['tags']];
+		if (!CApiInputValidator::validate($api_input_rules, $item_tags, $path, $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -786,10 +792,6 @@ abstract class CItemGeneral extends CApiService {
 	 * @param string     $tpl_items[<itemid>]['hostid']
 	 * @param string     $tpl_items[<itemid>]['key_']
 	 * @param int        $tpl_items[<itemid>]['type']
-	 * @param array      $tpl_items[<itemid>]['applicationPrototypes']            (optional) Suitable for item
-	 *                                                                            prototypes.
-	 * @param string     $tpl_items[<itemid>]['applicationPrototypes'][]['name']
-	 * @param array      $tpl_items[<itemid>]['applications']                     (optional) Array of applicationids.
 	 * @param array      $tpl_items[<itemid>]['preprocessing']                    (optional)
 	 * @param int        $tpl_items[<itemid>]['preprocessing'][]['type']
 	 * @param string     $tpl_items[<itemid>]['preprocessing'][]['params']
@@ -877,32 +879,6 @@ abstract class CItemGeneral extends CApiService {
 				unset($db_item['hostid']);
 
 				$chd_items_key[$hostid][$db_item['key_']] = $db_item;
-			}
-		}
-
-		// Preparing list of application prototypes.
-		if ($this instanceof CItemPrototype) {
-			$tpl_app_prototypes = [];
-			$item_prototypeids = [];
-
-			foreach ($tpl_items as $tpl_item) {
-				if (array_key_exists('applicationPrototypes', $tpl_item) && $tpl_item['applicationPrototypes']) {
-					$item_prototypeids[] = $tpl_item['itemid'];
-				}
-			}
-
-			if ($item_prototypeids) {
-				$db_tpl_app_prototypes = DBselect(
-					'SELECT iap.itemid,iap.application_prototypeid,ap.name'.
-					' FROM item_application_prototype iap,application_prototype ap'.
-					' WHERE iap.application_prototypeid=ap.application_prototypeid'.
-						' AND '.dbConditionInt('iap.itemid', $item_prototypeids)
-				);
-
-				while ($db_tpl_app_prototype = DBfetch($db_tpl_app_prototypes)) {
-					$tpl_app_prototypes[$db_tpl_app_prototype['itemid']][$db_tpl_app_prototype['name']] =
-						$db_tpl_app_prototype['application_prototypeid'];
-				}
 			}
 		}
 
@@ -1050,14 +1026,6 @@ abstract class CItemGeneral extends CApiService {
 					}
 				}
 
-				if ($this instanceof CItemPrototype && array_key_exists('applicationPrototypes', $new_item)) {
-					foreach ($new_item['applicationPrototypes'] as &$application_prototype) {
-						$application_prototype['templateid'] =
-							$tpl_app_prototypes[$tpl_item['itemid']][$application_prototype['name']];
-					}
-					unset($application_prototype);
-				}
-
 				$new_items[] = $new_item;
 			}
 		}
@@ -1078,46 +1046,6 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _params($this->getErrorMsg(self::ERROR_EXISTS),
 					[$db_item['key_'], $chd_hosts[$db_item['hostid']]['host']]
 				));
-			}
-		}
-
-		// Setting item applications.
-		if ($this instanceof CItem || $this instanceof CItemPrototype) {
-			$tpl_applicationids = [];
-			foreach ($tpl_items as $tpl_item) {
-				if (array_key_exists('applications', $tpl_item)) {
-					foreach ($tpl_item['applications'] as $applicationid) {
-						$tpl_applicationids[$applicationid] = true;
-					}
-				}
-			}
-
-			if ($tpl_applicationids) {
-				$db_applications = DBselect('SELECT a.hostid,at.templateid,a.applicationid'.
-					' FROM application_template at,applications a'.
-					' WHERE at.applicationid=a.applicationid'.
-						' AND '.dbConditionInt('at.templateid', array_keys($tpl_applicationids)).
-						' AND '.dbConditionInt('a.hostid', array_keys($chd_hosts))
-				);
-
-				$app_links = [];
-				while ($db_application = DBfetch($db_applications)) {
-					$app_links[$db_application['hostid']][$db_application['templateid']] =
-						$db_application['applicationid'];
-				}
-
-				foreach ($new_items as &$new_item) {
-					if (array_key_exists('applications', $new_item)) {
-						$applicationids = [];
-						foreach ($new_item['applications'] as $applicationid) {
-							if (array_key_exists($applicationid, $app_links[$new_item['hostid']])) {
-								$applicationids[] =  $app_links[$new_item['hostid']][$applicationid];
-							}
-						}
-						$new_item['applications'] = $applicationids;
-					}
-				}
-				unset($new_item);
 			}
 		}
 
@@ -1742,8 +1670,9 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Insert item pre-processing data into DB.
 	 *
-	 * @param array $items                     An array of items.
-	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
+	 * @param array  $items                     An array of items.
+	 * @param string $items[]['itemid']
+	 * @param array  $items[]['preprocessing']  An array of item pre-processing data.
 	 */
 	protected function createItemPreprocessing(array $items) {
 		$item_preproc = [];
@@ -1755,7 +1684,7 @@ abstract class CItemGeneral extends CApiService {
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
-						'step' => $preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++,
+						'step' => ($preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++,
 						'type' => $preprocessing['type'],
 						'params' => $preprocessing['params'],
 						'error_handler' => $preprocessing['error_handler'],
@@ -1790,7 +1719,7 @@ abstract class CItemGeneral extends CApiService {
 				$step = 1;
 
 				foreach ($item['preprocessing'] as $item_preproc) {
-					$curr_step = $item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++;
+					$curr_step = ($item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++;
 					$item_preprocs[$item['itemid']][$curr_step] = [
 						'type' => $item_preproc['type'],
 						'params' => $item_preproc['params'],
@@ -2720,6 +2649,91 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Update item tags.
+	 *
+	 * @param array  $items
+	 * @param string $items[]['itemid']
+	 * @param array  $items[]['tags']
+	 * @param string $items[]['tags'][]['tag']
+	 * @param string $items[]['tags'][]['value']
+	 */
+	protected function updateItemTags(array $items): void {
+		$items = array_filter($items, function ($item) {
+			return array_key_exists('tags', $item);
+		});
+
+		// Select tags from database.
+		$db_tags = DBselect(
+			'SELECT itemtagid, itemid, tag, value'.
+			' FROM item_tag'.
+			' WHERE '.dbConditionInt('itemid', array_keys($items))
+		);
+
+		array_walk($items, function (&$item) {
+			$item['db_tags'] = [];
+		});
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$items[$db_tag['itemid']]['db_tags'][] = $db_tag;
+		}
+
+		// Find which tags must be added/deleted.
+		$new_tags = [];
+		$del_tagids = [];
+		foreach ($items as $item) {
+			CArrayHelper::sort($item['tags'], ['tag', 'value']);
+
+			foreach ($item['db_tags'] as $del_tag_key => $tag_delete) {
+				foreach ($item['tags'] as $new_tag_key => $tag_add) {
+					if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
+						unset($item['db_tags'][$del_tag_key], $item['tags'][$new_tag_key]);
+						continue 2;
+					}
+				}
+			}
+
+			$del_tagids = array_merge($del_tagids, array_column($item['db_tags'], 'itemtagid'));
+
+			foreach ($item['tags'] as $tag_add) {
+				$tag_add['itemid'] = $item['itemid'];
+				$new_tags[] = $tag_add;
+			}
+		}
+
+		if ($del_tagids) {
+			DB::delete('item_tag', ['itemtagid' => $del_tagids]);
+		}
+		if ($new_tags) {
+			DB::insert('item_tag', $new_tags);
+		}
+	}
+
+	/**
+	 * Record item tags into database.
+	 *
+	 * @param array  $items
+	 * @param array  $items[]['tags']
+	 * @param string $items[]['tags'][]['tag']
+	 * @param string $items[]['tags'][]['value']
+	 * @param int    $items[]['itemid']
+	 */
+	protected function createItemTags(array $items): void {
+		$new_tags = [];
+		foreach ($items as $key => $item) {
+			if (array_key_exists('tags', $item)) {
+				foreach ($item['tags'] as $tag) {
+					$tag['itemid'] = $item['itemid'];
+					$new_tags[] = $tag;
+				}
+			}
+		}
+
+		if ($new_tags) {
+			DB::insert('item_tag', $new_tags);
+		}
 	}
 
 	/**

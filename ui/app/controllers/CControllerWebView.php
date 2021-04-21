@@ -29,6 +29,8 @@ class CControllerWebView extends CController {
 		$fields = [
 			'filter_groupids' => 'array_id',
 			'filter_hostids'  => 'array_id',
+			'filter_evaltype' => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_tags'     => 'array',
 			'sort'            => 'in hostname,name',
 			'sortorder'       => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'filter_rst'      => 'in 1',
@@ -61,16 +63,48 @@ class CControllerWebView extends CController {
 				PROFILE_TYPE_ID
 			);
 			CProfile::updateArray('web.httpmon.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
+
+			// tags
+			$evaltype = $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
+			CProfile::update('web.httpmon.filter.evaltype', $evaltype, PROFILE_TYPE_INT);
+
+			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+			foreach ($this->getInput('filter_tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+				$filter_tags['tags'][] = $tag['tag'];
+				$filter_tags['values'][] = $tag['value'];
+				$filter_tags['operators'][] = $tag['operator'];
+			}
+			CProfile::updateArray('web.httpmon.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.httpmon.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.httpmon.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 		}
 		else if ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.httpmon.filter.groupids');
 			CProfile::deleteIdx('web.httpmon.filter.hostids');
+			CProfile::deleteIdx('web.httpmon.filter.evaltype');
+			CProfile::deleteIdx('web.httpmon.filter.tags.tag');
+			CProfile::deleteIdx('web.httpmon.filter.tags.value');
+			CProfile::deleteIdx('web.httpmon.filter.tags.operator');
 		}
 
 		$data['filter'] = [
 			'groupids' => CProfile::getArray('web.httpmon.filter.groupids', []),
-			'hostids' => CProfile::getArray('web.httpmon.filter.hostids', [])
+			'hostids' => CProfile::getArray('web.httpmon.filter.hostids', []),
+			'evaltype' => CProfile::get('web.httpmon.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+			'tags' => []
 		];
+
+		// Tags filters.
+		foreach (CProfile::getArray('web.httpmon.filter.tags.tag', []) as $i => $tag) {
+			$data['filter']['tags'][] = [
+				'tag' => $tag,
+				'value' => CProfile::get('web.httpmon.filter.tags.value', null, $i),
+				'operator' => CProfile::get('web.httpmon.filter.tags.operator', null, $i)
+			];
+		}
 
 		// Select host groups.
 		$data['filter']['groupids'] = $data['filter']['groupids']
@@ -106,7 +140,9 @@ class CControllerWebView extends CController {
 				'sort' => $sort_field,
 				'sortorder' => $sort_order,
 				'groupids' => $filter_groupids,
-				'hostids' => $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null
+				'hostids' => $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null,
+				'evaltype' => $data['filter']['evaltype'],
+				'tags' => $data['filter']['tags']
 			]
 		])->get();
 
@@ -114,6 +150,14 @@ class CControllerWebView extends CController {
 			'profileIdx' => 'web.web.filter',
 			'active_tab' => CProfile::get('web.web.filter.active', 1)
 		];
+
+		if (!$data['filter']['tags']) {
+			$data['filter']['tags'] = [[
+				'tag' => '',
+				'operator' => TAG_OPERATOR_LIKE,
+				'value' => ''
+			]];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Web monitoring'));

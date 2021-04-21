@@ -32,57 +32,60 @@ class CButtonDropdown extends CButton {
 	public const ZBX_STYLE_BTN_VALUE = 'dropdown-value';
 
 	/**
+	 * Selected value.
+	 *
+	 * @var string
+	 */
+	protected $dropdown_value = null;
+
+	/**
 	 * Dropdown items array.
 	 *
 	 * @var array
 	 */
-	public $dropdown_items = [];
+	protected $dropdown_items = [];
 
 	/**
 	 * Create CButtonDropdown instance.
 	 *
-	 * @param string $name                Element name.
-	 * @param string $value               Element selected value.
-	 * @param array  $items               Dropdown items.
-	 * @param string $items[]['label']    Dropdown item label.
-	 * @param string $items[]['value']    Dropdown item value.
-	 * @param string $items[]['class']    Dropdown css class to be used for CButtonDropdown when item is selected.
+	 * @param string $name              Element name.
+	 * @param string $value             Element selected value.
+	 * @param array  $items             Dropdown items.
+	 * @param string $items[]['label']  Dropdown item label.
+	 * @param string $items[]['value']  Dropdown item value.
+	 * @param string $items[]['class']  Dropdown css class to be used for CButtonDropdown when item is selected.
+	 * @param string caption            Button caption.
 	 */
-	public function __construct(string $name, $value = null, array $items = []) {
-		parent::__construct($name, '');
 
-		$this->setId(uniqid('btn-dropdown-'));
-		$this->addClass(ZBX_STYLE_BTN_ALT);
-		$this->addClass(ZBX_STYLE_BTN_TOGGLE);
+	public function __construct(string $name, $value = null, array $items = [], string $caption = '') {
+		parent::__construct($name, $caption);
+
+		$this->setId($this->getId().'_button');
+
+		$this->dropdown_value = $value;
 		$this->dropdown_items = $items;
 
-		if ($value !== null) {
-			$this->setAttribute('value', $value);
-		}
+		$this->addClass(ZBX_STYLE_BTN_ALT);
+		$this->addClass(ZBX_STYLE_BTN_TOGGLE);
 	}
 
 	public function toString($destroy = true) {
-		$name = $this->getAttribute('name');
-		$node = (new CDiv())
-			->setId($this->getId())
-			->addClass(self::ZBX_STYLE_CLASS)
-			->addItem((new CButton(null))
-				->setAttribute('aria-label', $this->getAttribute('title'))
-				->setAttribute('disabled', $this->getAttribute('disabled'))
-				->addClass($this->getAttribute('class'))
-				->setId(zbx_formatDomId($name.'[btn]'))
-				->setMenuPopup([
-					'type' => 'dropdown',
-					'data' => [
-						'items' => $this->dropdown_items,
-						'toggle_class' => ZBX_STYLE_BTN_TOGGLE
-					]
-				])
-			)
-			->addItem((new CInput('hidden', $name, $this->getAttribute('value')))
-				->addClass(self::ZBX_STYLE_BTN_VALUE)
-		);
+		$this->setMenuPopup([
+			'type' => 'dropdown',
+			'data' => [
+				'items' => $this->dropdown_items,
+				'toggle_class' => ZBX_STYLE_BTN_TOGGLE
+			]
+		]);
 
-		return $node->toString(true);
+		return (new CDiv())
+			->addClass(self::ZBX_STYLE_CLASS)
+			->setId($this->getId().'_wrap')
+			->addItem(new CObject(parent::toString($destroy)))
+			->addItem(
+				(new CInput('hidden', $this->getAttribute('name'), $this->dropdown_value))
+					->addClass(self::ZBX_STYLE_BTN_VALUE)
+			)
+			->toString(true);
 	}
 }

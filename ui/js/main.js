@@ -669,11 +669,11 @@ function changeWidgetState(obj, widgetId, idx) {
 
 	if (css === 'btn-widget-expand') {
 		jQuery('.body', widgetObj).slideUp(50);
-		jQuery('.dashbrd-widget-foot', widgetObj).slideUp(50);
+		jQuery('.dashboard-widget-foot', widgetObj).slideUp(50);
 	}
 	else {
 		jQuery('.body', widgetObj).slideDown(50);
-		jQuery('.dashbrd-widget-foot', widgetObj).slideDown(50);
+		jQuery('.dashboard-widget-foot', widgetObj).slideDown(50);
 
 		state = 1;
 	}

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-10-16T09:33:51Z'
+  date: '2021-04-06T06:13:42Z'
   media_types:
     -
       name: Slack
@@ -18,6 +18,9 @@ zabbix_export:
         -
           name: channel
           value: '{ALERT.SENDTO}'
+        -
+          name: channel_id
+          value: '{EVENT.TAGS.__channel_id}'
         -
           name: discovery_host_dns
           value: '{DISCOVERY.DEVICE.DNS}'
@@ -72,6 +75,9 @@ zabbix_export:
         -
           name: host_name
           value: '{HOST.HOST}'
+        -
+          name: message_ts
+          value: '{EVENT.TAGS.__message_ts}'
         -
           name: slack_as_user
           value: 'true'
@@ -133,19 +139,21 @@ zabbix_export:
         function getPermalink(channelId, messageTimestamp) {
             var req = new HttpRequest();
         
+            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+                req.setProxy(params.HTTPProxy);
+            }
+        
             req.addHeader('Content-Type: application/x-www-form-urlencoded; charset=utf-8');
+            req.addHeader('Authorization: Bearer ' + params.bot_token);
         
-            var resp = JSON.parse(req.get(
-                '{0}?token={1}&channel={2}&message_ts={3}'.format(
+            var query = '{0}?channel={1}&message_ts={2}'.format(
                     Slack.getPermalink,
-                    params.bot_token,
-                    channelId,
-                    messageTimestamp
-                )
-            ));
+                    encodeURIComponent(channelId),
+                    encodeURIComponent(messageTimestamp)),
+                resp = JSON.parse(req.get(query));
         
-            if (req.status != 200 && !resp.ok) {
-                throw resp.error;
+            if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
+                throw 'message was created, but getting message link was failed with reason "' + resp.error + '"';
             }
         
             return resp.permalink;
@@ -168,21 +176,6 @@ zabbix_export:
             return problem_url;
         }
         
-        function getTagValue(event_tags, key) {
-            var pattern = new RegExp('(' + key + ':.+)');
-            var tag_value = event_tags
-                .split(',')
-                .filter(function (v) {
-                    return v.match(pattern);
-                })
-                .map(function (v) {
-                    return v.split(':')[1];
-                })[0]
-                || 0;
-        
-            return tag_value;
-        }
-        
         function handlerAlarm(params) {
             var fields = {
                 channel: params.channel,
@@ -201,7 +194,7 @@ zabbix_export:
         
                 var resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.status != 200 && !resp.ok) {
+                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
                 }
         
@@ -211,7 +204,7 @@ zabbix_export:
                 result.tags.__message_link = getPermalink(resp.channel, resp.ts);
             }
             else if (isEventUpdate(params)) {
-                fields.thread_ts = getTagValue(params.event_tags, 'message_ts');
+                fields.thread_ts = params.message_ts;
                 fields.attachments = [
                     createMessage(
                         SEVERITY_COLORS[params.event_nseverity] || 0,
@@ -223,15 +216,15 @@ zabbix_export:
                 ];
         
                 resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
-                if (req.status != 200 && !resp.ok) {
+                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
                 }
         
             }
             else if (isEventResolve(params)) {
-                fields.channel = getTagValue(params.event_tags, 'channel_id');
+                fields.channel = params.channel_id;
                 fields.text = '';
-                fields.ts = getTagValue(params.event_tags, 'message_ts');
+                fields.ts = params.message_ts;
                 fields.attachments = [
                     createMessage(
                         RESOLVE_COLOR,
@@ -242,7 +235,7 @@ zabbix_export:
                 ];
         
                 resp = JSON.parse(req.post(Slack.chatUpdate, JSON.stringify(fields)));
-                if (req.status != 200 && !resp.ok) {
+                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
                 }
             }
@@ -266,7 +259,7 @@ zabbix_export:
         
                 var resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.status != 200 && !resp.ok) {
+                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
                 }
         
@@ -287,7 +280,7 @@ zabbix_export:
         
                 resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.status != 200 && !resp.ok) {
+                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
                 }
         
@@ -304,7 +297,7 @@ zabbix_export:
         
                 resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.status != 200 && !resp.ok) {
+                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
                 }
             }
