@@ -121,9 +121,11 @@ class CConfigurationImport {
 	/**
 	 * Import configuration data.
 	 *
-	 * @param CImportDataAdapter $adapter   an object to provide access to the imported data
+	 * @param CImportDataAdapter $adapter an object to provide access to the imported data
 	 *
 	 * @return bool
+	 *
+	 * @throws Exception
 	 */
 	public function import(CImportDataAdapter $adapter) {
 		$this->adapter = $adapter;
@@ -133,7 +135,7 @@ class CConfigurationImport {
 
 		$this->processGroups();
 		$this->processTemplates();
-//		$this->processHosts();
+		$this->processHosts();
 
 //		// delete missing objects from processed hosts and templates
 //		$this->deleteMissingHttpTests();
@@ -241,14 +243,14 @@ class CConfigurationImport {
 				}
 			}
 
-			if (!$host['templates']) {
+			if ($host['templates']) {
 				foreach ($host['templates'] as $linked_template) {
-					$templates_refs += [$linked_template['host'] => []];
+					$templates_refs += [$linked_template['name'] => []];
 //					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 				}
 			}
 
-			if (!$host['proxy']) {
+			if ($host['proxy']) {
 				$proxy_refs[$host['proxy']['name']] = [];
 			}
 		}
@@ -621,18 +623,18 @@ class CConfigurationImport {
 	 *
 	 * @throws Exception
 	 */
-	protected function processHosts() {
+	protected function processHosts(): void {
 		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']
 				|| $this->options['process_hosts']) {
 			$hosts = $this->getFormattedHosts();
 
 			if ($hosts) {
-				$hostImporter = new CHostImporter($this->options, $this->referencer, $this->importedObjectContainer);
-				$hostImporter->import($hosts);
+				$host_importer = new CHostImporter($this->options, $this->referencer, $this->importedObjectContainer);
+				$host_importer->import($hosts);
 
-				// get list of imported host IDs and add them processed host ID list
-				$hostIds = $hostImporter->getProcessedHostIds();
-				$this->importedObjectContainer->addHostIds($hostIds);
+				// Get list of imported host IDs and add them processed host ID list.
+				$hostids = $host_importer->getProcessedHostIds();
+				$this->importedObjectContainer->addHostIds($hostids);
 			}
 		}
 	}
@@ -2413,8 +2415,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	public function getFormattedTemplates() {
-		if (!isset($this->formattedData['templates'])) {
+	public function getFormattedTemplates(): array {
+		if (!array_key_exists('templates', $this->formattedData)) {
 			$this->formattedData['templates'] = $this->adapter->getTemplates();
 		}
 
@@ -2426,8 +2428,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	public function getFormattedHosts() {
-		if (!isset($this->formattedData['hosts'])) {
+	public function getFormattedHosts(): array {
+		if (!array_key_exists('hosts', $this->formattedData)) {
 			$this->formattedData['hosts'] = $this->adapter->getHosts();
 		}
 

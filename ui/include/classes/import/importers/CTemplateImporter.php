@@ -87,40 +87,7 @@ class CTemplateImporter extends CImporter {
 				}
 			}
 
-			if ($this->options['templates']['createMissing'] && $templates_to_create) {
-				$created_templates = API::Template()->create($templates_to_create);
-
-				foreach ($templates_to_create as $index => $template) {
-					$templateid = $created_templates['templateids'][$index];
-
-					$this->referencer->setDbTemplate($templateid, $template);
-					$this->processedTemplateIds[$templateid] = $templateid;
-
-					if ($this->options['templateLinkage']['createMissing']
-							&& array_key_exists($template['host'], $template_linkage)) {
-						API::Template()->massAdd([
-							'templates' => ['templateid' => $templateid],
-							'templates_link' => $template_linkage[$template['host']]
-						]);
-					}
-
-					if ($this->options['valueMaps']['createMissing']
-							&& array_key_exists($template['host'], $valuemaps)) {
-						$valuemaps_to_create = [];
-						foreach ($valuemaps[$template['host']] as $valuemap) {
-							$valuemap['hostid'] = $templateid;
-							$valuemaps_to_create[] = $valuemap;
-						}
-
-						if ($valuemaps_to_create) {
-							API::ValueMap()->create($valuemaps_to_create);
-						}
-					}
-				}
-			}
-
 			if ($templates_to_update) {
-
 				// Get template linkages to unlink and clear.
 				if ($this->options['templateLinkage']['deleteMissing']) {
 					// Get already linked templates.
@@ -218,6 +185,7 @@ class CTemplateImporter extends CImporter {
 
 					if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
 						$valuemapids_to_delete = [];
+
 						if (array_key_exists($template['host'], $valuemaps)) {
 							$valuemap_uuids = array_column($valuemaps[$template['host']], 'uuid');
 							foreach ($db_valuemaps as $db_valuemap) {
@@ -232,6 +200,39 @@ class CTemplateImporter extends CImporter {
 
 						if ($valuemapids_to_delete) {
 							API::ValueMap()->delete($valuemapids_to_delete);
+						}
+					}
+				}
+			}
+
+			if ($this->options['templates']['createMissing'] && $templates_to_create) {
+				$created_templates = API::Template()->create($templates_to_create);
+
+				foreach ($templates_to_create as $index => $template) {
+					$templateid = $created_templates['templateids'][$index];
+
+					$this->referencer->setDbTemplate($templateid, $template);
+					$this->processedTemplateIds[$templateid] = $templateid;
+
+					if ($this->options['templateLinkage']['createMissing']
+						&& array_key_exists($template['host'], $template_linkage)) {
+						API::Template()->massAdd([
+							'templates' => ['templateid' => $templateid],
+							'templates_link' => $template_linkage[$template['host']]
+						]);
+					}
+
+					if ($this->options['valueMaps']['createMissing']
+						&& array_key_exists($template['host'], $valuemaps)) {
+						$valuemaps_to_create = [];
+
+						foreach ($valuemaps[$template['host']] as $valuemap) {
+							$valuemap['hostid'] = $templateid;
+							$valuemaps_to_create[] = $valuemap;
+						}
+
+						if ($valuemaps_to_create) {
+							API::ValueMap()->create($valuemaps_to_create);
 						}
 					}
 				}

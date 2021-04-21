@@ -58,7 +58,7 @@ class CImportReferencer {
 	protected $mapsRefs;
 	protected $templateDashboardsRefs;
 	protected $db_macros;
-	protected $proxiesRefs;
+	protected $db_proxies;
 	protected $hostPrototypesRefs;
 	protected $httptestsRefs;
 	protected $httpstepsRefs;
@@ -131,7 +131,7 @@ class CImportReferencer {
 	/**
 	 * Get host id by host.
 	 *
-	 * @param string $host
+	 * @param string $name
 	 *
 	 * @return string|bool
 	 */
@@ -339,16 +339,22 @@ class CImportReferencer {
 	/**
 	 * Get proxy id by name.
 	 *
-	 * @param string $name
+	 * @param string $host
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveProxy($name) {
-		if ($this->proxiesRefs === null) {
+	public function findProxyidByHost(string $host): ?string {
+		if ($this->db_proxies === null) {
 			$this->selectProxies();
 		}
 
-		return isset($this->proxiesRefs[$name]) ? $this->proxiesRefs[$name] : false;
+		foreach ($this->db_proxies as $proxyid => $proxy) {
+			if ($proxy['host'] === $host) {
+				return $proxyid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -480,11 +486,13 @@ class CImportReferencer {
 	/**
 	 * Add host name association with host id.
 	 *
-	 * @param string $host
 	 * @param string $id
+	 * @param array  $host
 	 */
-	public function addHostRef($host, $id) {
-		$this->db_hosts[$host] = $id;
+	public function setDbHost(string $id, array $host): void {
+		$this->db_hosts[$id] = [
+			'host' => $host['host']
+		];
 	}
 
 	/**
@@ -702,7 +710,7 @@ class CImportReferencer {
 	 * @param string $proxyId
 	 */
 	public function addProxyRef($name, $proxyId) {
-		$this->proxiesRefs[$name] = $proxyId;
+		$this->db_proxies[$name] = $proxyId;
 	}
 
 	/**
@@ -774,7 +782,7 @@ class CImportReferencer {
 	/**
 	 * Select group ids for previously added group names.
 	 */
-	protected function selectGroups() {
+	protected function selectGroups(): void {
 		if ($this->groups) {
 			$this->db_groups = API::HostGroup()->get([
 				'output' => ['name', 'uuid'],
@@ -793,7 +801,7 @@ class CImportReferencer {
 	/**
 	 * Select template ids for previously added template names.
 	 */
-	protected function selectTemplates() {
+	protected function selectTemplates(): void {
 		if ($this->templates) {
 			$this->db_templates = API::Template()->get([
 				'output' => ['host', 'uuid'],
@@ -813,12 +821,12 @@ class CImportReferencer {
 	/**
 	 * Select host ids for previously added host names.
 	 */
-	protected function selectHosts() {
+	protected function selectHosts(): void {
 		if ($this->hosts) {
 			// Fetch only normal hosts, discovered hosts must not be imported.
 			$this->db_hosts = API::Host()->get([
 				'output' => ['host'],
-				'search' => ['host' => $this->hosts],
+				'search' => ['host' => array_keys($this->hosts)],
 				'templated_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -1109,10 +1117,11 @@ class CImportReferencer {
 	/**
 	 * Select macro ids for previously added macro names.
 	 */
-	protected function selectMacros() {
+	protected function selectMacros(): void {
 		if ($this->macros) {
 			$this->db_macros = [];
 			$sql_where = [];
+
 			foreach ($this->macros as $host => $macros) {
 				$hostid = $this->findTemplateidOrHostidByHost($host);
 				if ($hostid) {
@@ -1124,6 +1133,7 @@ class CImportReferencer {
 			if ($sql_where) {
 				$db_macros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm'
 					.' WHERE '.implode(' OR ', $sql_where));
+
 				while ($db_macro = DBfetch($db_macros)) {
 					$this->db_macros[$db_macro['hostmacroid']] = [
 						'hostid' => $db_macro['hostid'],
@@ -1139,17 +1149,13 @@ class CImportReferencer {
 	/**
 	 * Select proxy ids for previously added proxy names.
 	 */
-	protected function selectProxies() {
-		if (!empty($this->proxies)) {
-			$this->proxiesRefs = [];
-			$dbProxy = API::Proxy()->get([
-				'filter' => ['host' => $this->proxies],
-				'output' => ['hostid', 'host'],
+	protected function selectProxies(): void {
+		if ($this->proxies) {
+			$this->db_proxies = API::Proxy()->get([
+				'output' => ['host'],
+				'search' => ['host' => array_keys($this->proxies)],
 				'preservekeys' => true
 			]);
-			foreach ($dbProxy as $proxy) {
-				$this->proxiesRefs[$proxy['host']] = $proxy['proxyid'];
-			}
 
 			$this->proxies = [];
 		}

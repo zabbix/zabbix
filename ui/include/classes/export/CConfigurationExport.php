@@ -45,22 +45,22 @@ class CConfigurationExport {
 	 */
 	protected $dataFields;
 
+	protected $options;
+
 	/**
 	 * Constructor.
 	 *
 	 * @param array $options IDs of elements that should be exported.
 	 */
 	public function __construct(array $options) {
-		$this->options = [
+		$this->options = array_merge([
 			'hosts' => [],
 			'templates' => [],
 			'groups' => [],
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => []
-		];
-
-		$this->options = array_merge($this->options, $options);
+		], $options);
 
 		$this->data = [
 			'groups' => [],
@@ -305,7 +305,7 @@ class CConfigurationExport {
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectGroups' => ['groupid', 'name'],
+			'selectGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],

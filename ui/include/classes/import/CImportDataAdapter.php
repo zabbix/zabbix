@@ -54,7 +54,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getGroups() {
+	public function getGroups(): array {
 		return array_key_exists('groups', $this->data) ? $this->data['groups'] : [];
 	}
 
@@ -63,7 +63,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getTemplates() {
+	public function getTemplates(): array {
 		$templates = [];
 
 		if (array_key_exists('templates', $this->data)) {
@@ -85,7 +85,7 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	public function getHosts() {
+	public function getHosts(): array {
 		$hosts = [];
 
 		if (array_key_exists('hosts', $this->data)) {
@@ -93,8 +93,8 @@ class CImportDataAdapter {
 				$host = CArrayHelper::renameKeys($host, ['proxyid' => 'proxy_hostid']);
 
 				if (array_key_exists('interfaces', $host)) {
-					foreach ($host['interfaces'] as $inum => $interface) {
-						$host['interfaces'][$inum] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
+					foreach ($host['interfaces'] as $index => $interface) {
+						$host['interfaces'][$index] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
 					}
 				}
 
