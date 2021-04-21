@@ -4508,9 +4508,11 @@ static int	DBpatch_5030150(void)
 
 static char	*update_template_name(char *old)
 {
-	char	*ptr, new[MAX_STRING_LEN];
+	char	*ptr, new[MAX_STRING_LEN], *ptr_snmp, buffer[7];
+	int	version;
 
 #define MIN_TEMPLATE_NAME_LEN	3
+#define STRING_SNMP_LABEL		"SNMP"
 
 	ptr = old;
 
@@ -4519,6 +4521,14 @@ static char	*update_template_name(char *old)
 			MIN_TEMPLATE_NAME_LEN <= strlen(new))
 	{
 		ptr = zbx_strdup(ptr, new);
+	}
+
+	for (version = 1; version <= 2; version++)
+	{
+		zbx_snprintf(buffer, sizeof(buffer), "%sv%d", STRING_SNMP_LABEL, version);
+		ptr_snmp = string_replace(ptr, buffer, STRING_SNMP_LABEL);
+		zbx_free(ptr);
+		ptr = ptr_snmp;
 	}
 
 	return ptr;
@@ -4668,15 +4678,21 @@ static int	DBpatch_5030153(void)
 
 				while (NULL != (row2 = DBfetch(result2)))
 				{
+					char	*template_name;
+
 					if (1 == expr_start)
 					{
 						zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset,
 								"/");
 						expr_start = 0;
 					}
+					template_name = zbx_strdup(NULL, row2[0]);
+					template_name = update_template_name(template_name);
 					zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset,
-							"%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
+							"%s{%s:%s.%s(%s)}",pexpr, template_name,
+							row2[1], row2[2], row2[3]);
 					pexpr = pexpr_f;
+					zbx_free(template_name);
 				}
 
 				DBfree_result(result2);
@@ -5081,6 +5097,8 @@ static int	DBpatch_5030160(void)
 
 				while (NULL != (row2 = DBfetch(result2)))
 				{
+					char	*template_name;
+
 					if (1 == expr_start)
 					{
 						zbx_snprintf_alloc(&total_expr, &total_expr_alloc, &total_expr_offset,
@@ -5088,9 +5106,14 @@ static int	DBpatch_5030160(void)
 						expr_start = 0;
 					}
 
+					template_name = zbx_strdup(NULL, row2[0]);
+					template_name = update_template_name(template_name);
+
 					zbx_snprintf_alloc(&total_expr, &total_expr_alloc, &total_expr_offset,
-							"%s{%s:%s.%s(%s)}",pexpr, row2[0], row2[1], row2[2], row2[3]);
+							"%s{%s:%s.%s(%s)}",pexpr, template_name,
+							row2[1], row2[2], row2[3]);
 					pexpr = pexpr_f;
+					zbx_free(template_name);
 				}
 
 				DBfree_result(result2);
