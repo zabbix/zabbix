@@ -8,18 +8,24 @@ The template is developed for monitoring DBMS Microsoft SQL Server via ODBC.
 
 This template was tested on:
 
-- Zabbix, version 5.0
 - Microsoft SQL, version 2017, 2019
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
 
-1. Create an MSSQL user for monitoring.  
+1. Create an MSSQL user for monitoring. For example, zbx_monitor.  
   **View Server State** and **View Any Definition** permissions should be granted to the user.  
+  Please, also add to the user read permission of tables sysjobschedules, sysjobhistory, sysjobs.  
+  For example, using T-SQL commands:  
+  `GRANT SELECT ON OBJECT::msdb.dbo.sysjobs TO zbx_monitor`  
+  `GRANT SELECT ON OBJECT::msdb.dbo.sysjobservers TO zbx_monitor`  
+  `GRANT SELECT ON OBJECT::msdb.dbo.sysjobactivity TO zbx_monitor`  
+  `GRANT EXECUTE ON OBJECT::msdb.dbo.agent_datetime TO zbx_monitor`  
   For more information please see the MSSQL documentation:  
     https://docs.microsoft.com/en-us/sql/relational-databases/security/authentication-access/create-a-database-user?view=sql-server-ver15  
     https://docs.microsoft.com/en-us/sql/t-sql/statements/grant-server-permissions-transact-sql?view=sql-server-ver15  
+    https://docs.microsoft.com/ru-ru/sql/ssms/agent/configure-a-user-to-create-and-manage-sql-server-agent-jobs?view=sql-server-ver15  
 2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).  
   Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.  
   See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.  
@@ -39,6 +45,12 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MSSQL.AVERAGE_WAIT_TIME.MAX} |<p>The maximum average wait time in ms for trigger expression.</p> |`500` |
+|{$MSSQL.BACKUP_DIFF.CRIT} |<p>The maximum days without a differential backup for high trigger expression.</p> |`6d` |
+|{$MSSQL.BACKUP_DIFF.WARN} |<p>The maximum days without a differential backup for warning trigger expression.</p> |`3d` |
+|{$MSSQL.BACKUP_FULL.CRIT} |<p>The maximum days without a full backup for high trigger expression.</p> |`10d` |
+|{$MSSQL.BACKUP_FULL.WARN} |<p>The maximum days without a full backup for warning trigger expression.</p> |`9d` |
+|{$MSSQL.BACKUP_LOG.CRIT} |<p>The maximum days without a log backup for high trigger expression.</p> |`8h` |
+|{$MSSQL.BACKUP_LOG.WARN} |<p>The maximum days without a log backup for warning trigger expression.</p> |`4h` |
 |{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT} |<p>The minimum % buffer cache hit ratio for high trigger expression.</p> |`30` |
 |{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN} |<p>The minimum % buffer cache hit ratio for warning trigger expression.</p> |`50` |
 |{$MSSQL.DBNAME.MATCHES} |<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p> |`.*` |
@@ -47,6 +59,8 @@ No specific Zabbix configuration is required.
 |{$MSSQL.DSN} |<p>System data source name.</p> |`<Put your DSN here>` |
 |{$MSSQL.FREE_LIST_STALLS.MAX} |<p>The maximum free list stalls per second for trigger expression.</p> |`2` |
 |{$MSSQL.INSTANCE} |<p>The instance name for the default instance is SQLServer. For named instance set macro value as MSSQL$instance name.</p> |`SQLServer` |
+|{$MSSQL.JOB.MATCHES} |<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p> |`.*` |
+|{$MSSQL.JOB.NOT_MATCHES} |<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
 |{$MSSQL.LAZY_WRITES.MAX} |<p>The maximum lazy writes per second for trigger expression.</p> |`20` |
 |{$MSSQL.LOCK_REQUESTS.MAX} |<p>The maximum lock requests per second for trigger expression.</p> |`1000` |
 |{$MSSQL.LOCK_TIMEOUTS.MAX} |<p>The maximum lock timeouts per second for trigger expression.</p> |`1` |
@@ -80,6 +94,7 @@ There are no template links in this template.
 |Non-local database discovery |<p>Discovery of the non-local (not local to the SQL Server instance) availability databases.</p> |ODBC |db.odbc.discovery[non-local_db,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Replication discovery |<p>Discovery of the database replicas.</p> |ODBC |db.odbc.discovery[replicas,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Mirroring discovery |<p>To see the row for a database other than master or tempdb, you must</p><p>either be the database owner or have at least ALTER ANY DATABASE or VIEW ANY</p><p>DATABASE server-level permission or CREATE DATABASE permission in the master</p><p>database. To see non-NULL values on a mirror database, you must be a member</p><p>of the sysadmin fixed server role.</p> |ODBC |db.odbc.discovery[mirrors,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Job discovery |<p>Scanning jobs in DBMS.</p> |ODBC |db.odbc.discovery[jobname,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- A: {#JOBNAME} MATCHES_REGEX `{$MSSQL.JOB.MATCHES}`</p><p>- B: {#JOBNAME} NOT_MATCHES_REGEX `{$MSSQL.JOB.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -164,6 +179,12 @@ There are no template links in this template.
 |MSSQL |MSSQL DB '{#DBNAME}': Log truncations |<p>The number of times the transaction log has been shrunk.</p> |DEPENDENT |mssql.db.log_truncations["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' && @.counter_name=='Log Truncations' && @.instance_name=='{#DBNAME}')].cntr_value.first()`</p> |
 |MSSQL |MSSQL DB '{#DBNAME}': Percent log used |<p>Percentage of space in the log that is in use.</p> |DEPENDENT |mssql.db.percent_log_used["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' && @.counter_name=='Percent Log Used' && @.instance_name=='{#DBNAME}')].cntr_value.first()`</p> |
 |MSSQL |MSSQL DB '{#DBNAME}': Transactions per second |<p>Number of transactions started for the database per second.</p> |DEPENDENT |mssql.db.transactions_sec.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' && @.counter_name=='Transactions/sec' && @.instance_name=='{#DBNAME}')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND |
+|MSSQL |MSSQL DB '{#DBNAME}': Last diff backup duration |<p>The last exec differential backup duration.</p> |DEPENDENT |mssql.backup.diff.duration["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}' && @.type=='I')].duration.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|MSSQL |MSSQL DB '{#DBNAME}': Last diff backup (time ago) |<p>The time amount since the last exec differential backup.</p> |DEPENDENT |mssql.backup.diff["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}' && @.type=='I')].timesincelastbackup.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|MSSQL |MSSQL DB '{#DBNAME}': Last full backup duration |<p>The last exec full backup duration.</p> |DEPENDENT |mssql.backup.full.duration["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}' && @.type=='D')].duration.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|MSSQL |MSSQL DB '{#DBNAME}': Last full backup (time ago) |<p>The time amount since the last exec full backup.</p> |DEPENDENT |mssql.backup.full["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}' && @.type=='D')].timesincelastbackup.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|MSSQL |MSSQL DB '{#DBNAME}': Last log backup duration |<p>The last exec duration of the log backup.</p> |DEPENDENT |mssql.backup.log.duration["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}' && @.type=='L')].duration.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|MSSQL |MSSQL DB '{#DBNAME}': Last log backup |<p>The time amount since the last exec the log backup.</p> |DEPENDENT |mssql.backup.log["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}' && @.type=='L')].timesincelastbackup.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |MSSQL |MSSQL AG '{#GROUP_NAME}': Primary replica recovery health |<p>Indicates the recovery health of the primary replica:</p><p>0 = In progress</p><p>1 = Online</p><p>2 = Unavailable</p> |DEPENDENT |mssql.primary_recovery_health["{#GROUP_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.group_name=='{#GROUP_NAME}')].primary_recovery_health.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MSSQL |MSSQL AG '{#GROUP_NAME}': Primary replica name |<p>Name of the server instance that is hosting the current primary replica.</p> |DEPENDENT |mssql.primary_replica["{#GROUP_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.group_name=='{#GROUP_NAME}')].primary_replica.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |MSSQL |MSSQL AG '{#GROUP_NAME}': Secondary replica recovery health |<p>Indicates the recovery health of a secondary replica replica:</p><p>0 = In progress</p><p>1 = Online</p><p>2 = Unavailable</p> |DEPENDENT |mssql.secondary_recovery_health["{#GROUP_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.group_name=='{#GROUP_NAME}')].secondary_recovery_health.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -185,6 +206,13 @@ There are no template links in this template.
 |MSSQL |MSSQL Mirroring '{#DBNAME}': State |<p>State of the mirror database and of the database mirroring session.</p><p>0 = Suspended</p><p>1 = Disconnected from the other partner</p><p>2 = Synchronizing</p><p>3 = Pending Failover</p><p>4 = Synchronized</p><p>5 = The partners are not synchronized. Failover is not possible now.</p><p>6 = The partners are synchronized. Failover is potentially possible. For information about the requirements for failover see, Database Mirroring Operating Modes.</p> |DEPENDENT |mssql.mirroring.state["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}')].mirroring_state.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MSSQL |MSSQL Mirroring '{#DBNAME}': Witness state |<p>State of the witness in the database mirroring session of the database:</p><p>0 = Unknown</p><p>1 = Connected</p><p>2 = Disconnected</p> |DEPENDENT |mssql.mirroring.witness_state["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}')].mirroring_witness_state.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MSSQL |MSSQL Mirroring '{#DBNAME}': Safety level |<p>Safety setting for updates on the mirror database:</p><p>0 = Unknown state</p><p>1 = Off [asynchronous]</p><p>2 = Full [synchronous]</p> |DEPENDENT |mssql.mirroring.safety_level["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.dbname=='{#DBNAME}')].mirroring_safety_level.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|MSSQL |MSSQL Job '{#JOBNAME}': Last run date-time |<p>The last date-time of the job run.</p> |DEPENDENT |mssql.job.lastrundatetime["{#JOBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.JobName=='{#JOBNAME}')].LastRunDateTime.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|MSSQL |MSSQL Job '{#JOBNAME}': Next run date-time |<p>The next date-time of the job run.</p> |DEPENDENT |mssql.job.nextrundatetime["{#JOBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.JobName=='{#JOBNAME}')].NextRunDateTime.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|MSSQL |MSSQL Job '{#JOBNAME}': Last run status message |<p>The informational message about the last run of the job.</p> |DEPENDENT |mssql.job.lastrunstatusmessage["{#JOBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.JobName=='{#JOBNAME}')].LastRunStatusMessage.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|MSSQL |MSSQL Job '{#JOBNAME}': Run status |<p>The job status possible values:</p><p>0 ⇒ Failed</p><p>1 ⇒ Succeeded</p><p>2 ⇒ Retry</p><p>3 ⇒ Canceled</p><p>4 ⇒ Running</p> |DEPENDENT |mssql.job.runstatus["{#JOBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.JobName=='{#JOBNAME}')].RunStatus.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|MSSQL |MSSQL Job '{#JOBNAME}': Run duration |<p>The last run job duration.</p> |DEPENDENT |mssql.job.run_duration["{#JOBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.JobName=='{#JOBNAME}')].RunDuration.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix_raw_items |MSSQL: Get last backup |<p>The item gets information about backup processes.</p> |ODBC |db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix_raw_items |MSSQL: Get job status |<p>The item get sql agent job status.</p> |ODBC |db.odbc.get[get_job_status,"{$MSSQL.DSN}"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix_raw_items |MSSQL: Get performance counters |<p>The item gets server global status information.</p> |ODBC |db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix_raw_items |MSSQL: Average latch wait time raw |<p>Average latch wait time (in milliseconds) for latch requests that had to wait.</p> |DEPENDENT |mssql.average_latch_wait_time_raw<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' && @.counter_name=='Average Latch Wait Time (ms)')].cntr_value.first()`</p> |
 |Zabbix_raw_items |MSSQL: Average latch wait time base |<p>For internal use only.</p> |DEPENDENT |mssql.average_latch_wait_time_base<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' && @.counter_name=='Average Latch Wait Time Base')].cntr_value.first()`</p> |
@@ -228,6 +256,12 @@ There are no template links in this template.
 |MSSQL DB '{#DBNAME}': Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m) |<p>Too many commits are waiting for the log flush.</p> |`{TEMPLATE_NAME:mssql.db.log_flush_waits_sec.rate["{#DBNAME}"].min(5m)}>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}` |WARNING | |
 |MSSQL DB '{#DBNAME}': Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m) |<p>The wait time to flush the log is too long.</p> |`{TEMPLATE_NAME:mssql.db.log_flush_wait_time["{#DBNAME}"].min(5m)}>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}` |WARNING | |
 |MSSQL DB '{#DBNAME}': Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m) |<p>There's not enough space left in the log.</p> |`{TEMPLATE_NAME:mssql.db.percent_log_used["{#DBNAME}"].min(5m)}>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}` |WARNING | |
+|MSSQL DB '{#DBNAME}': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"} |<p>The differential backup did not exec a long time.</p> |`{TEMPLATE_NAME:mssql.backup.diff["{#DBNAME}"].last()}>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}` |HIGH |<p>Manual close: YES</p> |
+|MSSQL DB '{#DBNAME}': Diff backup older than {$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"} |<p>The differential backup did not exec a long time.</p> |`{TEMPLATE_NAME:mssql.backup.diff["{#DBNAME}"].last()}>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- MSSQL DB '{#DBNAME}': Diff backup older than {$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"}</p> |
+|MSSQL DB '{#DBNAME}': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"} |<p>The full backup did not exec a long time.</p> |`{TEMPLATE_NAME:mssql.backup.full["{#DBNAME}"].last()}>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}` |HIGH |<p>Manual close: YES</p> |
+|MSSQL DB '{#DBNAME}': Full backup older than {$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"} |<p>The full backup did not exec a long time.</p> |`{TEMPLATE_NAME:mssql.backup.full["{#DBNAME}"].last()}>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- MSSQL DB '{#DBNAME}': Full backup older than {$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"}</p> |
+|MSSQL DB '{#DBNAME}': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"} |<p>The log backup did not exec a long time.</p> |`{TEMPLATE_NAME:mssql.backup.log["{#DBNAME}"].last()}>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}` |HIGH |<p>Manual close: YES</p> |
+|MSSQL DB '{#DBNAME}': Log backup older than {$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"} |<p>The log backup did not exec a long time.</p> |`{TEMPLATE_NAME:mssql.backup.log["{#DBNAME}"].last()}>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- MSSQL DB '{#DBNAME}': Log backup older than {$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"}</p> |
 |MSSQL AG '{#GROUP_NAME}': Primary replica recovery health in progress |<p>The primary replica is in the synchronization process.</p> |`{TEMPLATE_NAME:mssql.primary_recovery_health["{#GROUP_NAME}"].last()}=0` |WARNING | |
 |MSSQL AG '{#GROUP_NAME}': Secondary replica recovery health in progress |<p>The secondary replica is in the synchronization process.</p> |`{TEMPLATE_NAME:mssql.secondary_recovery_health["{#GROUP_NAME}"].last()}=0` |WARNING | |
 |MSSQL AG '{#GROUP_NAME}': All replicas unhealthy |<p>None of the availability replicas have a healthy.</p> |`{TEMPLATE_NAME:mssql.synchronization_health["{#GROUP_NAME}"].last()}=0` |DISASTER | |
@@ -248,6 +282,7 @@ There are no template links in this template.
 |MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE} |<p>The state of the mirror database and of the database mirroring session is "Pending Failover".</p> |`{TEMPLATE_NAME:mssql.mirroring.state["{#DBNAME}"].last()}=3` |WARNING | |
 |MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE} |<p>The state of the mirror database and of the database mirroring session is "Not synchronized". The partners are not synchronized. A failover is not possible now.</p> |`{TEMPLATE_NAME:mssql.mirroring.state["{#DBNAME}"].last()}=5` |HIGH | |
 |MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" Witness is disconnected |<p>The state of the witness in the database mirroring session of the database is "Disconnected".</p> |`{TEMPLATE_NAME:mssql.mirroring.witness_state["{#DBNAME}"].last()}=2` |WARNING | |
+|MSSQL Job '{#JOBNAME}': Failed to run |<p>The last run of the job is failed.</p> |`{TEMPLATE_NAME:mssql.job.runstatus["{#JOBNAME}"].last()}=0` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
