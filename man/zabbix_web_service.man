@@ -46,7 +46,7 @@ zabbix_web_service \- Zabbix web service
 .B zabbix_web_service \-V
 .SH DESCRIPTION
 .B zabbix_web_service
-is an application for Zabbix web scenarios. 
+is an application for providing web services to Zabbix components. 
 .SH OPTIONS
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
