@@ -211,6 +211,13 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 		goto out;
 	}
 
+	if (4 > response.offset || 0 != strncmp(response.data, "%PDF", 4))
+	{
+		*error = zbx_dsprintf(*error, "Unsupported format document returned by web service,"
+				" please check WebServiceURL server configuration parameter.");
+		goto out;
+	}
+
 	*report = response.data;
 	*report_size = response.offset;
 	response.data = NULL;
