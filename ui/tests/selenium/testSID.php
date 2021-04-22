@@ -663,7 +663,8 @@ class testSID extends CWebTest {
 						' performed due to unauthorized request.');
 			}
 			else {
-				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions '.
+						'to access this page.');
 				$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
 				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
@@ -1032,13 +1033,15 @@ class testSID extends CWebTest {
 	 * @dataProvider getElementRemoveData
 	 */
 	public function testSID_ElementRemove($data) {
-		$this->page->login()->open((!str_contains($data['link'], 'tokenid')) ? $data['link'] : $data['link'].self::$token_id)->waitUntilReady();
+		$this->page->login()->open((!str_contains($data['link'], 'tokenid')) ? $data['link'] : $data['link'].self::$token_id)
+				->waitUntilReady();
 		$this->query('xpath://input[@id="sid"]')->one()->delete();
 		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
 				' @type="submit"]')->waitUntilClickable()->one()->click();
 
 		if(array_key_exists('incorrect_request', $data)) {
-			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to '.
+					'access this page.');
 			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
