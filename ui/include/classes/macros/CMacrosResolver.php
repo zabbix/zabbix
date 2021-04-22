@@ -1215,7 +1215,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$parameters_str = substr($parameters_str, 0, $param->pos - $left);
 
 			// Add parameter.
-			if ($param instanceof CFunctionIdParserResult) {
+			if ($param instanceof CFunctionIdParserResult && $options['resolve_functionids']) {
 				array_unshift($expression, $macro_values[$param->match]);
 			}
 			elseif ($param instanceof CFunctionParserResult) {
