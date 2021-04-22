@@ -511,15 +511,7 @@ class CMacrosResolverGeneral {
 		$function_parameters = [];
 		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
 			foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-				switch ($param_raw->type) {
-					case CFunctionParser::PARAM_UNQUOTED:
-						$function_parameters[] = $param_raw->match;
-						break;
-
-					case CFunctionParser::PARAM_QUOTED:
-						$function_parameters[] = CFunctionParser::unquoteParam($param_raw->match);
-						break;
-				}
+				$function_parameters[] = $param_raw->getValue();
 			}
 		}
 
@@ -603,28 +595,21 @@ class CMacrosResolverGeneral {
 			$params_raw = $function_parser->getParamsRaw();
 			$function_chain = $params_raw['raw'];
 
-			foreach (array_reverse($params_raw['parameters']) as $param_raw) {
-				$param = $param_raw['raw'];
-				$forced = false;
-
-				switch ($param_raw['type']) {
-					case CFunctionParser::PARAM_QUOTED:
-						$param = CFunctionParser::unquoteParam($param);
-						$forced = true;
-						// break; is not missing here
-
-					case CFunctionParser::PARAM_UNQUOTED:
-						$matched_macros = $this->getMacroPositions($param, $types);
-
-						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-							$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
-						}
-
-						$param = quoteFunctionParam($param, $forced);
-						break;
+			foreach (array_reverse($params_raw['parameters']) as $param) {
+				if ($param instanceof CQueryParserResult) {
+					continue;
 				}
 
-				$function_chain = substr_replace($function_chain, $param, $param_raw['pos'], strlen($param_raw['raw']));
+				$value = $param->getValue(true);
+
+				$matched_macros = $this->getMacroPositions($value, $types);
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$value = substr_replace($value, $macros[$macro], $pos, strlen($macro));
+				}
+
+				$pos = $param->pos - $params_raw['pos'];
+
+				$function_chain = substr_replace($function_chain, $value, $pos, strlen($param->getValue(true)));
 			}
 
 			$function = substr_replace($function, $function_chain, $params_raw['pos'], strlen($params_raw['raw']));

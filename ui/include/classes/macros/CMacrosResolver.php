@@ -1869,6 +1869,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $functions[n]['hostid']
 	 * @param string $functions[n]['function']
 	 * @param string $functions[n]['parameter']
+	 * @param string $functions[n]['host']
+	 * @param string $functions[n]['key_']
 	 *
 	 * @return array
 	 */
@@ -1883,10 +1885,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($functions as $key => $function) {
-			$matched_macros = $this->extractFunctionMacros($function['function'].'('.$function['parameter'].')',
-				$types
-			);
+			$functions[$key]['function_string'] = $function['function'].'('.$function['parameter'].')';
+			if (($pos = strpos($functions[$key]['function_string'], TRIGGER_QUERY_PLACEHOLDER)) !== false) {
+				$functions[$key]['function_string'] = substr_replace($functions[$key]['function_string'],
+					'/'.$function['host'].'/'.$function['key_'], $pos, 1
+				);
+				$functions[$key]['function_query_pos'] = $pos;
+				$functions[$key]['function_query_length'] = strlen('/'.$function['host'].'/'.$function['key_']);
+			}
 
+			$matched_macros = $this->extractFunctionMacros($functions[$key]['function_string'], $types);
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = ['hostids' => [$function['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
@@ -1903,9 +1911,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value.
 		foreach ($macro_values as $key => $macros) {
 			$function = $functions[$key]['function'].'('.$functions[$key]['parameter'].')';
-			$function = $this->resolveFunctionMacros($function, $macros, $types);
+			$function = $this->resolveFunctionMacros($functions[$key]['function_string'], $macros, $types);
+			$function = substr_replace($function, TRIGGER_QUERY_PLACEHOLDER, $functions[$key]['function_query_pos'],
+				$functions[$key]['function_query_length']
+			);
 			$functions[$key]['parameter_expanded'] = substr($function, strlen($functions[$key]['function']) + 1, -1);
 		}
+
+		array_walk($functions, function (&$function) {
+			unset($function['function_string'], $function['function_query_pos'], $function['function_query_length']);
+		});
 
 		return $functions;
 	}
