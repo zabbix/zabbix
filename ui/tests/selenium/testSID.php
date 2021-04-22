@@ -1034,17 +1034,10 @@ class testSID extends CWebTest {
 	 * @dataProvider getElementRemoveData
 	 */
 	public function testSID_ElementRemove($data) {
-		if(!str_contains($data['link'], 'tokenid')) {
-			$this->page->login()->open($data['link'])->waitUntilReady();
-		}
-		else {
-			$this->page->login()->open($data['link'].self::$token_id)->waitUntilReady();
-		}
+		$this->page->login()->open((!str_contains($data['link'], 'tokenid')) ? $data['link'] : $data['link'].self::$token_id) ->waitUntilReady();
 		$this->query('xpath://input[@id="sid"]')->one()->delete();
-
-		$button = ($this->query('button:Update')->exists()) ? $this->query('button:Update')->one() : $this->query('xpath:'.
-				'//button[text()="Add" and @type="submit"]')->one();
-		$button->click();
+		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
+				' @type="submit"]')->waitUntilClickable()->one()->click();
 
 		if(array_key_exists('incorrect_request', $data)) {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
