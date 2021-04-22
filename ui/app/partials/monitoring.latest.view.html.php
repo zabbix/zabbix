@@ -56,7 +56,7 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
-		(new CColHeader())->addStyle('width: 5%'),
+		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 }
@@ -69,7 +69,7 @@ else {
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
-		(new CColHeader())->addStyle('width: 5%')
+		(new CColHeader())->addStyle('width: 6%')
 	]);
 }
 
