@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:45Z'
+  date: '2021-04-22T11:27:57Z'
   groups:
     -
       name: 'Templates/Operating systems'
@@ -357,38 +357,40 @@ zabbix_export:
       dashboards:
         -
           name: 'System performance'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '24'
-              height: '5'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU load'
+                        host: 'Mac OS X'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'CPU load'
-                    host: 'Mac OS X'
-            -
-              type: GRAPH_CLASSIC
-              'y': '5'
-              width: '24'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Memory usage'
-                    host: 'Mac OS X'
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Memory usage'
+                        host: 'Mac OS X'
   graphs:
     -
       name: 'CPU load'
