@@ -48,7 +48,7 @@ class CImportReferencer {
 	protected $db_groups;
 	protected $db_templates;
 	protected $db_hosts;
-	protected $itemsRefs;
+	protected $db_items;
 	protected $valueMapsRefs;
 	protected $triggersRefs;
 	protected $graphsRefs;
@@ -65,7 +65,7 @@ class CImportReferencer {
 	 * Initializes references for items.
 	 */
 	public function initItemsReferences() {
-		if ($this->itemsRefs === null) {
+		if ($this->db_items === null) {
 			$this->selectItems();
 		}
 	}
@@ -180,19 +180,46 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get item id by uuid.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findItemByUuid(string $uuid): ?string {
+		if ($this->db_items === null) {
+			$this->selectItems();
+		}
+
+		foreach ($this->db_items as $itemid => $item) {
+			if ($item['uuid'] === $uuid) {
+				return $itemid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get item id by host id and item key_.
 	 *
 	 * @param string $hostid
 	 * @param string $key
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveItem($hostid, $key) {
-		if ($this->itemsRefs === null) {
+	public function findItemByKey(string $hostid, string $key): ?string {
+		if ($this->db_items === null) {
 			$this->selectItems();
 		}
 
-		return isset($this->itemsRefs[$hostid][$key]) ? $this->itemsRefs[$hostid][$key] : false;
+		foreach ($this->db_items as $itemid => $item) {
+			if ($item['hostid'] === $hostid && $item['key_'] === $key) {
+				return $itemid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -528,7 +555,7 @@ class CImportReferencer {
 	 * @param string $itemId
 	 */
 	public function addItemRef($hostId, $key, $itemId) {
-		$this->itemsRefs[$hostId][$key] = $itemId;
+		$this->db_items[$hostId][$key] = $itemId;
 	}
 
 	/**
@@ -774,78 +801,98 @@ class CImportReferencer {
 	 * Select group ids for previously added group names.
 	 */
 	protected function selectGroups(): void {
-		if ($this->groups) {
-			$this->db_groups = API::HostGroup()->get([
-				'output' => ['name', 'uuid'],
-				'filter' => [
-					'uuid' => array_column($this->groups, 'uuid'),
-					'name' => array_keys($this->groups)
-				],
-				'searchByAny' => true,
-				'preservekeys' => true
-			]);
-
-			$this->groups = [];
+		if (!$this->groups) {
+			return;
 		}
+
+		$this->db_groups = API::HostGroup()->get([
+			'output' => ['name', 'uuid'],
+			'filter' => [
+				'uuid' => array_column($this->groups, 'uuid'),
+				'name' => array_keys($this->groups)
+			],
+			'searchByAny' => true,
+			'preservekeys' => true
+		]);
+
+		$this->groups = [];
 	}
 
 	/**
 	 * Select template ids for previously added template names.
 	 */
 	protected function selectTemplates(): void {
-		if ($this->templates) {
-			$this->db_templates = API::Template()->get([
-				'output' => ['host', 'uuid'],
-				'filter' => [
-					'uuid' => array_column($this->templates, 'uuid'),
-					'host' => array_keys($this->templates)
-				],
-				'searchByAny' => true,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$this->templates = [];
+		if (!$this->templates) {
+			return;
 		}
+
+		$this->db_templates = API::Template()->get([
+			'output' => ['host', 'uuid'],
+			'filter' => [
+				'uuid' => array_column($this->templates, 'uuid'),
+				'host' => array_keys($this->templates)
+			],
+			'searchByAny' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$this->templates = [];
 	}
 
 	/**
 	 * Select host ids for previously added host names.
 	 */
 	protected function selectHosts(): void {
-		if ($this->hosts) {
-			// Fetch only normal hosts, discovered hosts must not be imported.
-			$this->db_hosts = API::Host()->get([
-				'output' => ['host'],
-				'filter' => ['host' => array_keys($this->hosts)],
-				'templated_hosts' => true,
-				'preservekeys' => true
-			]);
-
-			$this->hosts = [];
+		if (!$this->hosts) {
+			return;
 		}
+
+		// Fetch only normal hosts, discovered hosts must not be imported.
+		$this->db_hosts = API::Host()->get([
+			'output' => ['host'],
+			'filter' => ['host' => array_keys($this->hosts)],
+			'templated_hosts' => true,
+			'preservekeys' => true
+		]);
+
+		$this->hosts = [];
 	}
 
 	/**
 	 * Select item ids for previously added item keys.
 	 */
-	protected function selectItems() {
-		if (!empty($this->items)) {
-			$this->itemsRefs = [];
+	protected function selectItems(): void {
+		if (!$this->items) {
+			return;
+		}
 
-			$sqlWhere = [];
-			foreach ($this->items as $host => $keys) {
-				$hostId = $this->findTemplateidOrHostidByHost($host);
-				if ($hostId) {
-					$sqlWhere[] = '(i.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('i.key_', $keys).')';
-				}
+		$this->db_items = [];
+		$sql_where = [];
+
+		foreach ($this->items as $host => $items) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid !== null) {
+				$sql_where[] = '(i.hostid='.zbx_dbstr($hostid)
+					.' AND ('
+						.dbConditionString('i.key_', array_keys($items))
+						.' OR '.dbConditionString('i.uuid', array_column($items, 'uuid'))
+					.'))';
 			}
+		}
 
-			if ($sqlWhere) {
-				$dbItems = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere));
-				while ($dbItem = DBfetch($dbItems)) {
-					$this->itemsRefs[$dbItem['hostid']][$dbItem['key_']] = $dbItem['itemid'];
-				}
+		if ($sql_where) {
+			$db_items = DBselect(
+				'SELECT i.itemid,i.hostid,i.key_,i.uuid FROM items i WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($db_item = DBfetch($db_items)) {
+				$this->db_items[$db_item['itemid']] = [
+					'uuid' => $db_item['uuid'],
+					'key_' => $db_item['key_'],
+					'hostid' => $db_item['hostid']
+				];
 			}
 		}
 	}
@@ -853,8 +900,8 @@ class CImportReferencer {
 	/**
 	 * Unset item refs to make referencer select them from db again.
 	 */
-	public function refreshItems() {
-		$this->itemsRefs = null;
+	public function refreshItems(): void {
+		$this->db_items = null;
 	}
 
 	/**
@@ -1072,47 +1119,51 @@ class CImportReferencer {
 	 * Select macro ids for previously added macro names.
 	 */
 	protected function selectMacros(): void {
-		if ($this->macros) {
-			$this->db_macros = [];
-			$sql_where = [];
-
-			foreach ($this->macros as $host => $macros) {
-				$hostid = $this->findTemplateidOrHostidByHost($host);
-				if ($hostid) {
-					$sql_where[] = '(hm.hostid='.zbx_dbstr($hostid).' AND '
-						.dbConditionString('hm.macro', array_keys($macros)).')';
-				}
-			}
-
-			if ($sql_where) {
-				$db_macros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm'
-					.' WHERE '.implode(' OR ', $sql_where));
-
-				while ($db_macro = DBfetch($db_macros)) {
-					$this->db_macros[$db_macro['hostmacroid']] = [
-						'hostid' => $db_macro['hostid'],
-						'macro' => $db_macro['macro']
-					];
-				}
-			}
-
-			$this->macros = [];
+		if (!$this->macros) {
+			return;
 		}
+
+		$this->db_macros = [];
+		$sql_where = [];
+
+		foreach ($this->macros as $host => $macros) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+			if ($hostid) {
+				$sql_where[] = '(hm.hostid='.zbx_dbstr($hostid).' AND '
+					.dbConditionString('hm.macro', array_keys($macros)).')';
+			}
+		}
+
+		if ($sql_where) {
+			$db_macros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm'
+				.' WHERE '.implode(' OR ', $sql_where));
+
+			while ($db_macro = DBfetch($db_macros)) {
+				$this->db_macros[$db_macro['hostmacroid']] = [
+					'hostid' => $db_macro['hostid'],
+					'macro' => $db_macro['macro']
+				];
+			}
+		}
+
+		$this->macros = [];
 	}
 
 	/**
 	 * Select proxy ids for previously added proxy names.
 	 */
 	protected function selectProxies(): void {
-		if ($this->proxies) {
-			$this->db_proxies = API::Proxy()->get([
-				'output' => ['host'],
-				'search' => ['host' => array_keys($this->proxies)],
-				'preservekeys' => true
-			]);
-
-			$this->proxies = [];
+		if (!$this->proxies) {
+			return;
 		}
+
+		$this->db_proxies = API::Proxy()->get([
+			'output' => ['host'],
+			'search' => ['host' => array_keys($this->proxies)],
+			'preservekeys' => true
+		]);
+
+		$this->proxies = [];
 	}
 
 	/**
@@ -1126,7 +1177,7 @@ class CImportReferencer {
 				$hostId = $this->findTemplateidOrHostidByHost($host);
 
 				foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
-					$discoveryRuleId = $this->resolveItem($hostId, $discoveryRuleKey);
+					$discoveryRuleId = $this->findItemByKey($hostId, $discoveryRuleKey);
 					if ($hostId) {
 						$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).' AND '.dbConditionString('h.host', $hostPrototypes).')';
 					}
@@ -1152,36 +1203,37 @@ class CImportReferencer {
 	 * Select httptestids for previously added web scenario names.
 	 */
 	protected function selectHttpTests(): void {
-		if ($this->httptests) {
-			$this->db_httptests = [];
+		if (!$this->httptests) {
+			return;
+		}
 
-			$sql_where = [];
+		$this->db_httptests = [];
 
-			foreach ($this->httptests as $host => $httptests) {
-				$hostid = $this->findTemplateidOrHostidByHost($host);
+		$sql_where = [];
 
-				if ($hostid !== false) {
-					$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid)
-						.' AND ('
-							.dbConditionString('ht.name', array_keys($httptests))
-							.' OR '.dbConditionString('ht.uuid', array_column($httptests, 'uuid'))
-						.'))';
-				}
+		foreach ($this->httptests as $host => $httptests) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid !== false) {
+				$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid)
+					.' AND ('
+						.dbConditionString('ht.name', array_keys($httptests))
+						.' OR '.dbConditionString('ht.uuid', array_column($httptests, 'uuid'))
+					.'))';
 			}
+		}
 
-			if ($sql_where) {
-				$db_httptests = DBselect(
-					'SELECT ht.hostid,ht.name,ht.httptestid,ht.uuid'.
-					' FROM httptest ht'.
-					' WHERE '.implode(' OR ', $sql_where)
-				);
-				while ($db_httptest = DBfetch($db_httptests)) {
-					$this->db_httptests[$db_httptest['httptestid']] = [
-						'uuid' => $db_httptest['uuid'],
-						'name' => $db_httptest['name'],
-						'hostid' => $db_httptest['hostid']
-					];
-				}
+		if ($sql_where) {
+			$db_httptests = DBselect(
+				'SELECT ht.hostid,ht.name,ht.httptestid,ht.uuid FROM httptest ht WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($db_httptest = DBfetch($db_httptests)) {
+				$this->db_httptests[$db_httptest['httptestid']] = [
+					'uuid' => $db_httptest['uuid'],
+					'name' => $db_httptest['name'],
+					'hostid' => $db_httptest['hostid']
+				];
 			}
 		}
 	}

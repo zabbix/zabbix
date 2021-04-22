@@ -136,7 +136,7 @@ class CConfigurationImport {
 
 //		// delete missing objects from processed hosts and templates
 		$this->deleteMissingHttpTests();
-//		$this->deleteMissingDiscoveryRules();
+		$this->deleteMissingDiscoveryRules();
 //		$this->deleteMissingTriggers();
 //		$this->deleteMissingGraphs();
 //		$this->deleteMissingItems();
@@ -680,7 +680,7 @@ class CConfigurationImport {
 						));
 					}
 
-					$master_itemid = $this->referencer->resolveItem($hostId, $item[$xml_itemkey]['key']);
+					$master_itemid = $this->referencer->findItemByKey($hostId, $item[$xml_itemkey]['key']);
 
 					if ($master_itemid !== false) {
 						$item['master_itemid'] = $master_itemid;
@@ -715,7 +715,7 @@ class CConfigurationImport {
 				}
 				unset($preprocessing_step);
 
-				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
+				$itemsId = $this->referencer->findItemByKey($hostId, $item['key_']);
 
 				if ($itemsId) {
 					$item['itemid'] = $itemsId;
@@ -746,7 +746,6 @@ class CConfigurationImport {
 		$this->referencer->refreshItems();
 	}
 
-
 	/**
 	 * Create CItem or CItemPrototype with dependency.
 	 *
@@ -761,7 +760,7 @@ class CConfigurationImport {
 		foreach ($entities_by_level as $level => $entities) {
 			foreach ($entities as &$entity) {
 				if (array_key_exists($xml_entitykey, $entity)) {
-					$entity['master_itemid'] = $this->referencer->resolveItem($entity['hostid'],
+					$entity['master_itemid'] = $this->referencer->findItemByKey($entity['hostid'],
 						$entity[$xml_entitykey]['key']
 					);
 
@@ -799,7 +798,7 @@ class CConfigurationImport {
 		foreach ($entities_by_level as $level => $entities) {
 			foreach ($entities as &$entity) {
 				if (array_key_exists($xml_entitykey, $entity)) {
-					$entity['master_itemid'] = $this->referencer->resolveItem($entity['hostid'],
+					$entity['master_itemid'] = $this->referencer->findItemByKey($entity['hostid'],
 						$entity[$xml_entitykey]['key']
 					);
 
@@ -879,7 +878,7 @@ class CConfigurationImport {
 				unset($item['graph_prototypes']);
 				unset($item['host_prototypes']);
 
-				$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
+				$itemId = $this->referencer->findItemByKey($hostId, $item['key_']);
 
 				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 					$headers = [];
@@ -906,7 +905,7 @@ class CConfigurationImport {
 						));
 					}
 
-					$item['master_itemid'] = $this->referencer->resolveItem($hostId,  $item['master_item']['key']);
+					$item['master_itemid'] = $this->referencer->findItemByKey($hostId,  $item['master_item']['key']);
 				}
 
 				unset($item['master_item']);
@@ -1013,7 +1012,7 @@ class CConfigurationImport {
 
 				$item['hostid'] = $hostId;
 				$item_key = $item['key_'];
-				$itemId = $this->referencer->resolveItem($hostId, $item_key);
+				$itemId = $this->referencer->findItemByKey($hostId, $item_key);
 
 				// prototypes
 				$item_prototypes = $item['item_prototypes'] ? $order_tree[$host][$item_key] : [];
@@ -1063,7 +1062,7 @@ class CConfigurationImport {
 							));
 						}
 
-						$master_itemprototypeid = $this->referencer->resolveItem($hostId,
+						$master_itemprototypeid = $this->referencer->findItemByKey($hostId,
 							$prototype[$xml_item_key]['key']
 						);
 
@@ -1094,9 +1093,9 @@ class CConfigurationImport {
 						$prototype['query_fields'] = $query_fields;
 					}
 
-					$prototypeId = $this->referencer->resolveItem($hostId, $prototype['key_']);
+					$prototypeId = $this->referencer->findItemByKey($hostId, $prototype['key_']);
 					$prototype['rule'] = ['hostid' => $hostId, 'key' => $item['key_']];
-					$prototype['ruleid'] = $this->referencer->resolveItem($hostId, $item['key_']);
+					$prototype['ruleid'] = $this->referencer->findItemByKey($hostId, $item['key_']);
 
 					foreach ($prototype['preprocessing'] as &$preprocessing_step) {
 						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
@@ -1278,7 +1277,7 @@ class CConfigurationImport {
 					if ($graph['ymin_item_1']) {
 						$hostId = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
 						$itemId = $hostId
-							? $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key'])
+							? $this->referencer->findItemByKey($hostId, $graph['ymin_item_1']['key'])
 							: false;
 
 						if (!$itemId) {
@@ -1298,7 +1297,7 @@ class CConfigurationImport {
 					if ($graph['ymax_item_1']) {
 						$hostId = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
 						$itemId = $hostId
-							? $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key'])
+							? $this->referencer->findItemByKey($hostId, $graph['ymax_item_1']['key'])
 							: false;
 
 						if (!$itemId) {
@@ -1318,7 +1317,7 @@ class CConfigurationImport {
 					foreach ($graph['gitems'] as &$gitem) {
 						$gitemHostId = $this->referencer->findTemplateidOrHostidByHost($gitem['item']['host']);
 						$gitem['itemid'] = $gitemHostId
-							? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
+							? $this->referencer->findItemByKey($gitemHostId, $gitem['item']['key'])
 							: false;
 
 						if (!$gitem['itemid']) {
@@ -1498,7 +1497,7 @@ class CConfigurationImport {
 		foreach ($allGraphs as $graph) {
 			if ($graph['ymin_item_1']) {
 				$hostId = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
-				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']) : false;
+				$itemId = $hostId ? $this->referencer->findItemByKey($hostId, $graph['ymin_item_1']['key']) : false;
 
 				if (!$itemId) {
 					throw new Exception(_s(
@@ -1514,7 +1513,7 @@ class CConfigurationImport {
 
 			if ($graph['ymax_item_1']) {
 				$hostId = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
-				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key']) : false;
+				$itemId = $hostId ? $this->referencer->findItemByKey($hostId, $graph['ymax_item_1']['key']) : false;
 
 				if (!$itemId) {
 					throw new Exception(_s(
@@ -1531,7 +1530,7 @@ class CConfigurationImport {
 			foreach ($graph['gitems'] as &$gitem) {
 				$gitemHostId = $this->referencer->findTemplateidOrHostidByHost($gitem['item']['host']);
 				$gitem['itemid'] = $gitemHostId
-					? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
+					? $this->referencer->findItemByKey($gitemHostId, $gitem['item']['key'])
 					: false;
 
 				if (!$gitem['itemid']) {
@@ -1827,7 +1826,7 @@ class CConfigurationImport {
 				$hostId = $this->referencer->findTemplateidOrHostidByHost($host);
 
 				foreach ($items as $item) {
-					$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
+					$itemId = $this->referencer->findItemByKey($hostId, $item['key_']);
 
 					if ($itemId) {
 						$itemIdsXML[$itemId] = $itemId;
@@ -1993,60 +1992,6 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes discovery rules from DB that are missing in XML.
-	 *
-	 * @return null
-	 */
-	protected function deleteMissingDiscoveryRules() {
-		if (!$this->options['discoveryRules']['deleteMissing']) {
-			return;
-		}
-
-		$processedHostIds = $this->importedObjectContainer->getHostids();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateids();
-
-		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
-
-		// no hosts or templates have been processed
-		if (!$processedHostIds) {
-			return;
-		}
-
-		$discoveryRuleIdsXML = [];
-
-		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
-
-		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostId = $this->referencer->findTemplateidOrHostidByHost($host);
-
-			foreach ($discoveryRules as $discoveryRule) {
-				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
-
-				if ($discoveryRuleId) {
-					$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
-				}
-			}
-		}
-
-		$dbDiscoveryRuleIds = API::DiscoveryRule()->get([
-			'output' => ['itemid'],
-			'hostids' => $processedHostIds,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'inherited' => false
-		]);
-
-		$discoveryRulesToDelete = array_diff_key($dbDiscoveryRuleIds, $discoveryRuleIdsXML);
-
-		if ($discoveryRulesToDelete) {
-			API::DiscoveryRule()->delete(array_keys($discoveryRulesToDelete));
-		}
-
-		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
-		$this->referencer->refreshItems();
-	}
-
-	/**
 	 * Deletes prototypes from DB that are missing in XML.
 	 *
 	 * @param array $all_discovery_rules
@@ -2062,7 +2007,7 @@ class CConfigurationImport {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
 			foreach ($discovery_rules as $discovery_rule) {
-				$discoveryid = $this->referencer->resolveItem($hostid, $discovery_rule['key_']);
+				$discoveryid = $this->referencer->findItemByKey($hostid, $discovery_rule['key_']);
 
 				if ($discoveryid) {
 					$xml_discoveryids[$discoveryid] = $discoveryid;
@@ -2100,7 +2045,7 @@ class CConfigurationImport {
 
 					// gather item prototype IDs to delete
 					foreach ($discovery_rule['item_prototypes'] as $item_prototype) {
-						$item_prototypeid = $this->referencer->resolveItem($hostid, $item_prototype['key_']);
+						$item_prototypeid = $this->referencer->findItemByKey($hostid, $item_prototype['key_']);
 
 						if ($item_prototypeid) {
 							$xml_item_prototypeids[$item_prototypeid] = $item_prototypeid;
@@ -2194,24 +2139,20 @@ class CConfigurationImport {
 
 		$httptestids = [];
 
-		$all_httptests = $this->getFormattedHttpTests();
+		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-		if ($all_httptests) {
-			foreach ($all_httptests as $host => $httptests) {
-				$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+			if ($hostid === null) {
+				continue;
+			}
 
-				if ($hostid === null) {
-					continue;
-				}
+			foreach ($httptests as $httptest) {
+				$httptestid = array_key_exists('uuid', $httptest)
+					? $this->referencer->findHttpTestidByUuid($httptest['uuid'])
+					: $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
 
-				foreach ($httptests as $httptest) {
-					$httptestid = array_key_exists('uuid', $httptest)
-						? $this->referencer->findHttpTestidByUuid($httptest['uuid'])
-						: $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
-
-					if ($httptestid !== null) {
-						$httptestids[$httptestid] = [];
-					}
+				if ($httptestid !== null) {
+					$httptestids[$httptestid] = [];
 				}
 			}
 		}
@@ -2231,6 +2172,60 @@ class CConfigurationImport {
 		}
 
 		$this->referencer->refreshHttpTests();
+	}
+
+	/**
+	 * Deletes discovery rules from DB that are missing in XML.
+	 */
+	protected function deleteMissingDiscoveryRules(): void {
+		if (!$this->options['discoveryRules']['deleteMissing']) {
+			return;
+		}
+
+		$processed_hostids = array_merge(
+			$this->importedObjectContainer->getHostids(),
+			$this->importedObjectContainer->getTemplateids()
+		);
+
+		if (!$processed_hostids) {
+			return;
+		}
+
+		$discovery_ruleids = [];
+
+		foreach ($this->getFormattedDiscoveryRules() as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+
+			if ($hostid === null) {
+				continue;
+			}
+
+			foreach ($discovery_rules as $discovery_rule) {
+				$discovery_ruleid = array_key_exists('uuid', $discovery_rule)
+					? $this->referencer->findItemByUuid($discovery_rule['uuid'])
+					: $this->referencer->findItemByKey($hostid, $discovery_rule['key_']);
+
+				if ($discovery_ruleid !== null) {
+					$discovery_ruleids[$discovery_ruleid] = [];
+				}
+			}
+		}
+
+		$db_discovery_ruleids = API::DiscoveryRule()->get([
+			'output' => ['itemid'],
+			'hostids' => $processed_hostids,
+			'inherited' => false,
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		$discovery_rules_to_delete = array_diff_key($db_discovery_ruleids, $discovery_ruleids);
+
+		if ($discovery_rules_to_delete) {
+			API::DiscoveryRule()->delete(array_keys($discovery_rules_to_delete));
+		}
+
+		$this->referencer->refreshItems();
 	}
 
 	/**
