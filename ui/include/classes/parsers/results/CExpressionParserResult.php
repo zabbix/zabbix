@@ -65,31 +65,43 @@ class CExpressionParserResult extends CParserResult {
 	}
 
 	/**
+	 * Auxiliary method for getTokensOfTypes().
+	 *
+	 * @param array  $tokens
+	 * @param array  $types
+	 *
+	 * @return array
+	 */
+	private static function _getTokensOfTypes(array $tokens, array $types) {
+		$result = [];
+
+		foreach ($tokens as $token) {
+			if ($token['type'] == CExpressionParserResult::TOKEN_TYPE_EXPRESSION) {
+				$result = array_merge($result, self::_getTokensOfTypes($token['data']['tokens'], $types));
+			}
+			elseif ($token['type'] == CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION) {
+				foreach ($token['data']['parameters'] as $parameter) {
+					$result = array_merge($result, self::_getTokensOfTypes($parameter['data']['tokens'], $types));
+				}
+			}
+			elseif (in_array($token['type'], $types)) {
+				$result[] = $token;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Returns all tokens of the given types.
 	 *
+	 * @param array  $tokens
 	 * @param array  $types
 	 *
 	 * @return array
 	 */
 	public function getTokensOfTypes(array $types): array {
-		$params_stack = $this->tokens;
-		$result = [];
-
-		while ($params_stack) {
-			$param = array_shift($params_stack);
-			if ($param instanceof CFunctionParserResult) {
-				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
-			}
-			if (($param instanceof CParserResult) && in_array($param->type, $types)) {
-				$result[] = $param;
-			}
-		}
-
-		usort($result, function ($a, $b) {
-			return $a->pos <=> $b->pos;
-		});
-
-		return $result;
+		return self::_getTokensOfTypes($this->tokens, $types);
 	}
 
 	/**

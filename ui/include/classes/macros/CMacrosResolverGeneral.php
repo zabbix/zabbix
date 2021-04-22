@@ -54,18 +54,18 @@ class CMacrosResolverGeneral {
 	 */
 	protected function resolveTriggerReferences($expression, $references) {
 		$values = [];
-		$expression_data = new CTriggerExpression(['collapsed_expression' => true]);
+		$expression_parser = new CExpressionParser(['collapsed_expression' => true, 'lldmacros' => true]);
 
-		if (($result = $expression_data->parse($expression)) !== false) {
-			foreach ($result->getTokens() as $token) {
-				switch ($token->type) {
-					case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
-					case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-						$values[] = $token->match;
+		if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
+			foreach ($expression_parser->getResult()->getTokens() as $token) {
+				switch ($token['type']) {
+					case CExpressionParserResult::TOKEN_TYPE_NUMBER:
+					case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
+						$values[] = $token['match'];
 						break;
 
-					case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-						$values[] = $token->data['string'];
+					case CExpressionParserResult::TOKEN_TYPE_STRING:
+						$values[] = CExpressionParser::unquoteString($token['match']);
 						break;
 				}
 			}
@@ -500,18 +500,27 @@ class CMacrosResolverGeneral {
 	/**
 	 * Extract macros from a trigger function.
 	 *
-	 * @param string $function	a trigger function, for example 'last({$LAST})'
+	 * @param string $function	a history function, for example 'last(/host/key, {$OFFSET})'
 	 * @param array  $types		the types of macros (see extractMacros() for more details)
 	 *
 	 * @return array			see extractMacros() for more details
 	 */
 	protected function extractFunctionMacros($function, array $types) {
-		$function_parser = new CFunctionParser();
-
+		$hist_function_parser = new CHistFunctionParser(['usermacros' => true, 'lldmacros' => true]);
 		$function_parameters = [];
-		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
-			foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-				$function_parameters[] = $param_raw->getValue();
+
+		if ($hist_function_parser->parse($function) == CParser::PARSE_SUCCESS) {
+			foreach ($hist_function_parser->getParameters() as $parameter) {
+				switch ($parameter['type']) {
+					case CHistFunctionParser::PARAM_TYPE_PERIOD:
+					case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
+						$function_parameters[] = $parameter['match'];
+						break;
+
+					case CHistFunctionParser::PARAM_TYPE_QUOTED:
+						$function_parameters[] = CHistFunctionParser::unquoteParam($parameter['match']);
+						break;
+				}
 			}
 		}
 
@@ -589,30 +598,30 @@ class CMacrosResolverGeneral {
 	 * @return string
 	 */
 	protected function resolveFunctionMacros($function, array $macros, array $types) {
-		$function_parser = new CFunctionParser();
+		$hist_function_parser = new CHistFunctionParser(['usermacros' => true, 'lldmacros' => true]);
 
-		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
-			$params_raw = $function_parser->getParamsRaw();
-			$function_chain = $params_raw['raw'];
+		if ($hist_function_parser->parse($function) == CParser::PARSE_SUCCESS) {
+			foreach (array_reverse($hist_function_parser->getParameters()) as $parameter) {
+				$param = $parameter['match'];
+				$forced = false;
 
-			foreach (array_reverse($params_raw['parameters']) as $param) {
-				if ($param instanceof CQueryParserResult) {
-					continue;
+				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED) {
+					$param = CHistFunctionParser::unquoteParam($param);
+					$forced = true;
 				}
 
-				$value = $param->getValue(true);
+				$matched_macros = $this->getMacroPositions($param, $types);
 
-				$matched_macros = $this->getMacroPositions($value, $types);
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					$value = substr_replace($value, $macros[$macro], $pos, strlen($macro));
+					$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
 				}
 
-				$pos = $param->pos - $params_raw['pos'];
+				if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
+					$param = quoteFunctionParam($param, $forced);
+				}
 
-				$function_chain = substr_replace($function_chain, $value, $pos, strlen($param->getValue(true)));
+				$function = substr_replace($function, $param, $parameter['pos'], $parameter['length']);
 			}
-
-			$function = substr_replace($function, $function_chain, $params_raw['pos'], strlen($params_raw['raw']));
 		}
 
 		return $function;
