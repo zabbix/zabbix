@@ -28,12 +28,20 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 	 */
 	protected $item_key_parser;
 
+	/**
+	 * Function parser.
+	 *
+	 * @var C10FunctionParser
+	 */
+	protected $function_parser;
+
 	public function __construct() {
 		$this->parser = new C10TriggerExpression([
 			'allow_func_only' => true,
 			'calculated' => true
 		]);
 		$this->item_key_parser = new CItemKey();
+		$this->function_parser = new C10FunctionParser();
 		$this->standalone_functions = getStandaloneFunctions();
 	}
 
@@ -74,7 +82,7 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 		$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION);
 
 		for ($i = count($functions) - 1; $i >= 0; $i--) {
-			$fn = $functions[$i]['data'] + ['host' => '', 'item' => ''];
+			$fn = $functions[$i]['data'] + ['host' => '', 'item' => '', 'function' => $functions[$i]['value']];
 			$key_param = $fn['functionParams'][0];
 			$host_delimiter_pos = strpos($key_param, ':');
 			$key_param_pos = strpos($key_param, '[');
