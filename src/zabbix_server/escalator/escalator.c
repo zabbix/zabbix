@@ -1934,23 +1934,24 @@ static const char	*check_escalation_result_string(int result)
 
 static	int	postpone_escalation(const DB_ESCALATION *escalation)
 {
-	int		count = 0;
+	int		ret;
+	char		*sql;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select count(eventid) from alerts where eventid=" ZBX_FS_UI64
-			" and actionid=" ZBX_FS_UI64 " and status in (0,3);", escalation->eventid,
-			escalation->actionid);
+	sql = zbx_dsprintf(NULL, "select eventid from alerts where eventid=" ZBX_FS_UI64 " and actionid=" ZBX_FS_UI64
+			" and status in (0,3);", escalation->eventid, escalation->actionid);
+
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
-		count = atoi(row[0]);
+		ret = ZBX_ESCALATION_SKIP;
+	else
+		ret = ZBX_ESCALATION_PROCESS;
 
 	DBfree_result(result);
 
-	if (0 == count)
-		return ZBX_ESCALATION_PROCESS;
-
-	return ZBX_ESCALATION_SKIP;
+	return ret;
 }
 
 /******************************************************************************
