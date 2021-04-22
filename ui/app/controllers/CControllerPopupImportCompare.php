@@ -143,7 +143,7 @@ class CControllerPopupImportCompare extends CController {
 			]
 		];
 
-		if (!$result) {
+		if ($result === false) {
 			CMessageHelper::setErrorTitle(_('Import failed'));
 			$data['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
 		}
