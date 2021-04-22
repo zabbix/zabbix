@@ -22,4 +22,5 @@ EXTRA_DIST = \
 	zabbix_get.man \
 	zabbix_sender.man \
 	zabbix_proxy.man \
-	zabbix_server.man
+	zabbix_server.man \
+	zabbix_web_service.man
