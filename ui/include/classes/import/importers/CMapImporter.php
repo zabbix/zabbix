@@ -164,7 +164,7 @@ class CMapImporter extends CImporter {
 
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						foreach ($selement['elements'] as &$element) {
-							$element['triggerid'] = $this->referencer->resolveTrigger($element['description'],
+							$element['triggerid'] = $this->referencer->findTriggeridByName($element['description'],
 								$element['expression'], $element['recovery_expression']
 							);
 
@@ -217,7 +217,7 @@ class CMapImporter extends CImporter {
 
 				foreach ($link['linktriggers'] as &$linkTrigger) {
 					$trigger = $linkTrigger['trigger'];
-					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+					$triggerId = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 						$trigger['recovery_expression']
 					);
 

@@ -50,7 +50,7 @@ class CImportReferencer {
 	protected $db_hosts;
 	protected $db_items;
 	protected $valueMapsRefs;
-	protected $triggersRefs;
+	protected $db_triggers;
 	protected $graphsRefs;
 	protected $iconMapsRefs;
 	protected $mapsRefs;
@@ -239,24 +239,49 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get trigger ID by trigger name and expression.
+	 * Get trigger ID by trigger uuid.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findTriggeridByUuid(string $uuid): ?string {
+		if ($this->db_triggers === null) {
+			$this->selectTriggers();
+		}
+
+		foreach ($this->db_triggers as $triggerid => $trigger) {
+			if ($trigger['uuid'] === $uuid) {
+				return $triggerid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get trigger ID by trigger name and expressions.
 	 *
 	 * @param string $name
 	 * @param string $expression
 	 * @param string $recovery_expression
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveTrigger($name, $expression, $recovery_expression) {
-		if ($this->triggersRefs === null) {
+	public function findTriggeridByName(string $name, string $expression, string $recovery_expression): ?string {
+		if ($this->db_triggers === null) {
 			$this->selectTriggers();
 		}
 
-		return array_key_exists($name, $this->triggersRefs)
-				&& array_key_exists($expression, $this->triggersRefs[$name])
-				&& array_key_exists($recovery_expression, $this->triggersRefs[$name][$expression])
-			? $this->triggersRefs[$name][$expression][$recovery_expression]
-			: false;
+		foreach ($this->db_triggers as $triggerid => $trigger) {
+			if ($trigger['description'] === $name
+					&& $trigger['expression'] === $expression
+					&& $trigger['recovery_expression'] === $recovery_expression) {
+				return $triggerid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -631,7 +656,7 @@ class CImportReferencer {
 	 * @param string $triggerid
 	 */
 	public function addTriggerRef($name, $expression, $recovery_expression, $triggerid) {
-		$this->triggersRefs[$name][$expression][$recovery_expression] = $triggerid;
+		$this->db_triggers[$name][$expression][$recovery_expression] = $triggerid;
 	}
 
 	/**
@@ -938,12 +963,23 @@ class CImportReferencer {
 	/**
 	 * Select trigger ids for previously added trigger names/expressions.
 	 */
-	protected function selectTriggers() {
-		if ($this->triggers) {
-			$this->triggersRefs = [];
+	protected function selectTriggers(): void {
+		if (!$this->triggers) {
+			return;
+		}
 
-			$dbTriggers = API::Trigger()->get([
-				'output' => ['triggerid', 'expression', 'description', 'recovery_expression'],
+		$this->db_triggers = [];
+		$uuids = [];
+
+		foreach ($this->triggers as $trigger) {
+			foreach ($trigger as $expression) {
+				$uuids += array_flip(array_column($expression, 'uuid'));
+			}
+		}
+
+		$db_triggers = array_merge(
+			API::Trigger()->get([
+				'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
 				'filter' => [
 					'description' => array_keys($this->triggers),
 					'flags' => [
@@ -951,65 +987,49 @@ class CImportReferencer {
 						ZBX_FLAG_DISCOVERY_PROTOTYPE,
 						ZBX_FLAG_DISCOVERY_CREATED
 					]
-				]
-			]);
-
-			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers,
-				['sources' => ['expression', 'recovery_expression']]
-			);
-
-			foreach ($dbTriggers as $dbTrigger) {
-				$description = $dbTrigger['description'];
-				$expression = $dbTrigger['expression'];
-				$recovery_expression = $dbTrigger['recovery_expression'];
-
-				if (array_key_exists($description, $this->triggers)
-						&& array_key_exists($expression, $this->triggers[$description])
-						&& array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
-					$this->triggersRefs[$description][$expression][$recovery_expression] = $dbTrigger['triggerid'];
-				}
-			}
-		}
-	}
-
-	/**
-	 * Select trigger ids for previously added trigger names/expressions.
-	 */
-	protected function selectTriggersByUuid() {
-		if ($this->triggersUuid) {
-			$this->triggersUuidRefs = [];
-
-			$dbTriggers = API::Trigger()->get([
-				'output' => ['triggerid', 'uuid'],
+				],
+				'preservekeys' => true
+			]),
+			API::Trigger()->get([
+				'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
 				'filter' => [
-					'uuid' => array_keys($this->triggersUuid),
+					'uuid' => array_keys($uuids),
 					'flags' => [
 						ZBX_FLAG_DISCOVERY_NORMAL,
 						ZBX_FLAG_DISCOVERY_PROTOTYPE,
 						ZBX_FLAG_DISCOVERY_CREATED
 					]
 				],
-				'selectHosts' => ['status']
-			]);
+				'preservekeys' => true
+			])
+		);
 
-			foreach ($dbTriggers as $dbTrigger) {
-				$uuid = $dbTrigger['uuid'];
-
-				$is_templated = true;
-				foreach($dbTrigger['hosts'] as $host) {
-					if ($host['status'] !== HOST_STATUS_TEMPLATE) {
-						$is_templated = false;
-					}
-				}
-
-				if (array_key_exists($uuid, $this->triggersUuid) && $is_templated) {
-					$this->triggersUuidRefs[$uuid] = $dbTrigger['triggerid'];
-				}
-			}
-
-			// TODO VM: How to check, if nonexisting trigger is from a tempalte? Probably it can only be done by parsing the trigger expressions.
-			// TODO VM: if such check is done, they (triggers) need to be added to $this->triggersUuidRefs with 'false' to avoid seracing them by name.
+		if (!$db_triggers) {
+			return;
 		}
+
+		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+
+		foreach ($db_triggers as $db_trigger) {
+			$uuid = $db_trigger['uuid'];
+			$description = $db_trigger['description'];
+			$expression = $db_trigger['expression'];
+			$recovery_expression = $db_trigger['recovery_expression'];
+
+			if (array_key_exists($uuid, $uuids)
+				|| (array_key_exists($description, $this->triggers)
+					&& array_key_exists($expression, $this->triggers[$description])
+					&& array_key_exists($recovery_expression, $this->triggers[$description][$expression]))) {
+				$this->db_triggers[$db_trigger['triggerid']] = $db_trigger;
+			}
+		}
+
+		$this->triggers = [];
+
+		// TODO VM: How to check, if nonexisting trigger is from a template? Probably it can only be done by parsing the trigger expressions.
+		// TODO VM: if such check is done, they (triggers) need to be added to $this->triggersUuidRefs with 'false' to avoid seraching them by name.
 	}
 
 	/**
@@ -1047,8 +1067,8 @@ class CImportReferencer {
 	/**
 	 * Unset trigger refs to make referencer select them from db again.
 	 */
-	public function refreshTriggers() {
-		$this->triggersRefs = null;
+	public function refreshTriggers(): void {
+		$this->db_triggers = null;
 	}
 
 	/**

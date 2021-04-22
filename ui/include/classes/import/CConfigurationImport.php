@@ -137,7 +137,7 @@ class CConfigurationImport {
 //		// delete missing objects from processed hosts and templates
 		$this->deleteMissingHttpTests();
 		$this->deleteMissingDiscoveryRules();
-//		$this->deleteMissingTriggers();
+		$this->deleteMissingTriggers();
 //		$this->deleteMissingGraphs();
 //		$this->deleteMissingItems();
 
@@ -1256,7 +1256,7 @@ class CConfigurationImport {
 
 				// trigger prototypes
 				foreach ($item['trigger_prototypes'] as $trigger) {
-					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+					$triggerId = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 						$trigger['recovery_expression']
 					);
 
@@ -1385,12 +1385,12 @@ class CConfigurationImport {
 			}
 
 			$deps = [];
-			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+			$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 				$trigger['recovery_expression']
 			);
 
 			foreach ($trigger['dependencies'] as $dependency) {
-				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression'],
+				$dep_triggerid = $this->referencer->findTriggeridByName($dependency['name'], $dependency['expression'],
 					$dependency['recovery_expression']
 				);
 
@@ -1585,7 +1585,7 @@ class CConfigurationImport {
 		$triggers = [];
 
 		foreach ($allTriggers as $trigger) {
-			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+			$triggerId = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 				$trigger['recovery_expression']
 			);
 
@@ -1645,12 +1645,12 @@ class CConfigurationImport {
 			}
 
 			$deps = [];
-			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+			$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 				$trigger['recovery_expression']
 			);
 
 			foreach ($trigger['dependencies'] as $dependency) {
-				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression'],
+				$dep_triggerid = $this->referencer->findTriggeridByName($dependency['name'], $dependency['expression'],
 					$dependency['recovery_expression']
 				);
 
@@ -1855,65 +1855,67 @@ class CConfigurationImport {
 
 	/**
 	 * Deletes triggers from DB that are missing in XML.
-	 *
-	 * @return null
 	 */
-	protected function deleteMissingTriggers() {
+	protected function deleteMissingTriggers(): void {
 		if (!$this->options['triggers']['deleteMissing']) {
 			return;
 		}
 
-		$processedHostIds = $this->importedObjectContainer->getHostids();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateids();
+		$processed_hostids = array_merge(
+			$this->importedObjectContainer->getHostids(),
+			$this->importedObjectContainer->getTemplateids()
+		);
 
-		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
-
-		// no hosts or templates have been processed
-		if (!$processedHostIds) {
+		if (!$processed_hostids) {
 			return;
 		}
 
-		$triggersXML = [];
+		$triggerids = [];
 
-		$allTriggers = $this->getFormattedTriggers();
+		foreach ($this->getFormattedTriggers() as $trigger) {
+			$triggerid = null;
 
-		if ($allTriggers) {
-			foreach ($allTriggers as $trigger) {
-				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+			if (array_key_exists('uuid', $trigger)) {
+				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
+			}
+
+			// In import file host trigger can have UUID assigned after conversion, such should be searched by name.
+			if ($triggerid === null) {
+				$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
 					$trigger['recovery_expression']
 				);
+			}
 
-				if ($triggerId) {
-					$triggersXML[$triggerId] = $triggerId;
-				}
+			if ($triggerid !== null) {
+				$triggerids[$triggerid] = [];
 			}
 		}
 
-		$dbTriggerIds = API::Trigger()->get([
-			'output' => ['triggerid'],
-			'hostids' => $processedHostIds,
+		$db_triggerids = API::Trigger()->get([
+			'output' => [],
 			'selectHosts' => ['hostid'],
-			'preservekeys' => true,
-			'nopermissions' => true,
+			'hostids' => $processed_hostids,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'inherited' => false,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
-		// check that potentially deletable trigger belongs to same hosts that are in XML
-		// if some triggers belong to more hosts than current XML contains, don't delete them
-		$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
-		$triggerIdsToDelete = [];
-		$processedHostIds = array_flip($processedHostIds);
+		// Check that potentially deletable trigger belongs to same hosts that are in the import file.
+		// If some triggers belong to more hosts than import file contains, don't delete them.
+		$triggerids_to_delete = [];
+		$processed_hostids = array_flip($processed_hostids);
 
-		foreach ($triggersToDelete as $triggerId => $trigger) {
-			$triggerHostIds = array_flip(zbx_objectValues($trigger['hosts'], 'hostid'));
-			if (!array_diff_key($triggerHostIds, $processedHostIds)) {
-				$triggerIdsToDelete[] = $triggerId;
+		foreach (array_diff_key($db_triggerids, $triggerids) as $triggerid => $trigger) {
+			$trigger_hostids = array_flip(array_column($trigger['hosts'], 'hostid'));
+
+			if (!array_diff_key($trigger_hostids, $processed_hostids)) {
+				$triggerids_to_delete[] = $triggerid;
 			}
 		}
 
-		if ($triggerIdsToDelete) {
-			API::Trigger()->delete($triggerIdsToDelete);
+		if ($triggerids_to_delete) {
+			API::Trigger()->delete($triggerids_to_delete);
 		}
 
 		// refresh triggers because template triggers can be inherited to host and used in maps
@@ -2025,7 +2027,7 @@ class CConfigurationImport {
 
 					// gather trigger prototype IDs to delete
 					foreach ($discovery_rule['trigger_prototypes'] as $trigger_prototype) {
-						$trigger_prototypeid = $this->referencer->resolveTrigger($trigger_prototype['description'],
+						$trigger_prototypeid = $this->referencer->findTriggeridByName($trigger_prototype['description'],
 							$trigger_prototype['expression'], $trigger_prototype['recovery_expression']
 						);
 
@@ -2165,10 +2167,10 @@ class CConfigurationImport {
 			'nopermissions' => true
 		]);
 
-		$httptest_to_delete = array_diff_key($db_httptestids, $httptestids);
+		$httptestids_to_delete = array_diff_key($db_httptestids, $httptestids);
 
-		if ($httptest_to_delete) {
-			API::HttpTest()->delete(array_keys($httptest_to_delete));
+		if ($httptestids_to_delete) {
+			API::HttpTest()->delete(array_keys($httptestids_to_delete));
 		}
 
 		$this->referencer->refreshHttpTests();
@@ -2219,10 +2221,10 @@ class CConfigurationImport {
 			'nopermissions' => true
 		]);
 
-		$discovery_rules_to_delete = array_diff_key($db_discovery_ruleids, $discovery_ruleids);
+		$discovery_ruleids_to_delete = array_diff_key($db_discovery_ruleids, $discovery_ruleids);
 
-		if ($discovery_rules_to_delete) {
-			API::DiscoveryRule()->delete(array_keys($discovery_rules_to_delete));
+		if ($discovery_ruleids_to_delete) {
+			API::DiscoveryRule()->delete(array_keys($discovery_ruleids_to_delete));
 		}
 
 		$this->referencer->refreshItems();
@@ -2324,8 +2326,8 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedTriggers() {
-		if (!isset($this->formattedData['triggers'])) {
+	protected function getFormattedTriggers(): array {
+		if (!array_key_exists('triggers', $this->formattedData)) {
 			$this->formattedData['triggers'] = $this->adapter->getTriggers();
 		}
 
