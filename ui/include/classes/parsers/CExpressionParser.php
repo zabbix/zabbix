@@ -67,7 +67,7 @@ class CExpressionParser extends CParser {
 	 *
 	 * @var null|CExpressionParserResult
 	 */
-	private $result = null;
+	private $result;
 
 	/**
 	 * Parser for the {HOST.HOST} macro.
@@ -140,8 +140,8 @@ class CExpressionParser extends CParser {
 			$this->result = new CExpressionParserResult();
 			$this->result->addTokens([
 				'type' => CExpressionParserResult::TOKEN_TYPE_EXPRESSION,
-				'value' => substr($source, $pos, $len),
 				'pos' => $pos,
+				'match' => substr($source, $pos, $len),
 				'length' => $len,
 				'data' => [
 					'tokens' => $tokens
@@ -190,8 +190,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_UNARY_MINUS;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -200,8 +200,8 @@ class CExpressionParser extends CParser {
 							$level++;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -230,8 +230,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_UNARY_MINUS;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -241,8 +241,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -276,8 +276,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_UNARY_MINUS;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -287,8 +287,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -324,8 +324,8 @@ class CExpressionParser extends CParser {
 							$level--;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 
@@ -361,8 +361,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_CLOSE_BRACE;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 
@@ -398,8 +398,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_UNARY_MINUS;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -409,8 +409,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -441,8 +441,8 @@ class CExpressionParser extends CParser {
 							$state = self::STATE_AFTER_OPEN_BRACE;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
-								'value' => $char,
 								'pos' => $p,
+								'match' => $char,
 								'length' => 1
 							];
 							break;
@@ -491,8 +491,8 @@ class CExpressionParser extends CParser {
 
 		$tokens[] = [
 			'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
-			'value' => 'not',
 			'pos' => $pos,
+			'match' => 'not',
 			'length' => 3
 		];
 		$pos += 2;
@@ -520,8 +520,8 @@ class CExpressionParser extends CParser {
 
 		$tokens[] = [
 			'type' => $token_type,
-			'value' => $parser->getMatch(),
 			'pos' => $pos,
+			'match' => $parser->getMatch(),
 			'length' => $parser->getLength()
 		];
 		$pos += $parser->getLength() - 1;
@@ -625,8 +625,8 @@ class CExpressionParser extends CParser {
 		$len = $hist_function_parser->getLength();
 		$tokens[] = [
 			'type' => CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION,
-			'value' => $hist_function_parser->getMatch(),
 			'pos' => $pos,
+			'match' => $hist_function_parser->getMatch(),
 			'length' => $len
 		];
 		$pos += $len - 1;
@@ -681,8 +681,8 @@ class CExpressionParser extends CParser {
 							$len = $_p - $p;
 							$_tokens[] = [
 								'type' => CExpressionParserResult::TOKEN_TYPE_EXPRESSION,
-								'value' => substr($source, $p, $len),
 								'pos' => $p,
+								'match' => substr($source, $p, $len),
 								'length' => $len,
 								'data' => [
 									'tokens' => $expression_tokens
@@ -725,8 +725,8 @@ class CExpressionParser extends CParser {
 		$len = $p - $pos;
 		$tokens[] = [
 			'type' => CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION,
-			'value' => substr($source, $pos, $len),
 			'pos' => $pos,
+			'match' => substr($source, $pos, $len),
 			'length' => $len,
 			'data' => [
 				'parameters' => $_tokens
@@ -761,8 +761,8 @@ class CExpressionParser extends CParser {
 		$len = $number_parser->getLength();
 		$tokens[] = [
 			'type' => CExpressionParserResult::TOKEN_TYPE_NUMBER,
-			'value' => $number_parser->getMatch(),
 			'pos' => $pos,
+			'match' => $number_parser->getMatch(),
 			'length' => $len,
 			'data' => ['suffix' => $number_parser->getSuffix()]
 		];
@@ -788,8 +788,8 @@ class CExpressionParser extends CParser {
 		$len = strlen($matches[0]);
 		$tokens[] = [
 			'type' => CExpressionParserResult::TOKEN_TYPE_STRING,
-			'value' => $matches[0],
 			'pos' => $pos,
+			'match' => $matches[0],
 			'length' => $len,
 			'data' => ['string' => self::unquoteString($matches[0])]
 		];
