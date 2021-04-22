@@ -52,7 +52,9 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 	 * @return string
 	 */
 	public function convert($item) {
-		if ($this->parser->parse($item['params']) === false) {
+		$expression = preg_replace("/[\\r\\n\\t]/", '', $item['params']);
+
+		if ($this->parser->parse($expression) === false) {
 			return $item;
 		}
 
@@ -61,14 +63,17 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 		$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
 		$parts = $this->getExpressionParts(0, $this->parser->result->length-1);
 		$this->wrap_subexpressions = ($parts['type'] === 'operator');
-		$this->convertExpressionParts($item['params'], [$parts], $extra_expressions);
+		$this->convertExpressionParts($expression, [$parts], $extra_expressions);
 		$extra_expressions = array_filter($extra_expressions);
 
 		if ($extra_expressions) {
 			$extra_expressions = array_keys(array_flip($extra_expressions));
-			$item['params'] = '('.$item['params'].')';
+			$item['params'] = '('.$expression.')';
 			$extra_expressions = array_reverse($extra_expressions);
 			$item['params'] .= ' or '.implode(' or ', $extra_expressions);
+		}
+		else {
+			$item['params'] = $expression;
 		}
 
 		return $item;
