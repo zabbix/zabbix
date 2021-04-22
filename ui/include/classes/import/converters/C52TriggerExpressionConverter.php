@@ -277,12 +277,10 @@ class C52TriggerExpressionConverter extends CConverter {
 				if (ctype_digit($parameters[0])) {
 					$parameters[0] = '#'.$parameters[0];
 				}
-				elseif ($parameters[0] === '') {
-					$parameters[0] = '#1';
-				}
 
 				$parameters[1] = self::convertTimeshift($parameters[1]);
 				if ($parameters[1] !== '') {
+					$parameters[0] = ($parameters[0] === '') ? '#1' : $parameters[0];
 					$parameters[0] .= ':'.$parameters[1];
 				}
 				unset($parameters[1], $unquotable_parameters[1]);

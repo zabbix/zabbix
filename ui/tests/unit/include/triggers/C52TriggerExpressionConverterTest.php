@@ -67,11 +67,11 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and {Trapper:trap[2].last()} > 0',
 
 				'date() > 0'.
-				' and last(/Trapper/trap[2],#1) > 0'
+				' and last(/Trapper/trap[2]) > 0'
 			],
 			[
 				'{Trapper:trap[1].dayofmonth()} > 0 and {Trapper2:trap[1].last()} > 0',
-				'(dayofmonth() > 0 and last(/Trapper2/trap[1],#1) > 0) or (last(/Trapper/trap[1])<>last(/Trapper/trap[1]))'
+				'(dayofmonth() > 0 and last(/Trapper2/trap[1]) > 0) or (last(/Trapper/trap[1])<>last(/Trapper/trap[1]))'
 			],
 			[
 				'{Trapper:trap[1].delta(30m)} > 0'.
@@ -158,7 +158,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 			],
 			[
 				'{Trapper:trap[1].time()} > 0 and {Trapper:trap[1].last()} <> 0',
-				'time() > 0 and last(/Trapper/trap[1],#1) <> 0'
+				'time() > 0 and last(/Trapper/trap[1]) <> 0'
 			],
 			[
 				'{Trapper:trap[1].trendavg(1h, now/h-1d)} > 0',
@@ -239,7 +239,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' and {Trapper:trap[3].last(#10,3600)} > 0'.
 				' and {Trapper:trap[3].last(#1,1d)} > 0',
 
-				'last(/Trapper/trap[3],#1) > 0'.
+				'last(/Trapper/trap[3]) > 0'.
 				' and last(/Trapper/trap[3],#5) > 0'.
 				' and last(/Trapper/trap[3],#10:now-3600s) > 0'.
 				' and last(/Trapper/trap[3],#1:now-1d) > 0'
@@ -312,7 +312,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				' or {Trapper:trap[2].last()} > 0',
 
 				'dayofweek() > 0'.
-				' or last(/Trapper/trap[2],#1) > 0'
+				' or last(/Trapper/trap[2]) > 0'
 			],
 			[
 				'{Trapper:trap[1].dayofweek()} > 0',
@@ -322,7 +322,7 @@ class C52TriggerExpressionConverterTest extends TestCase {
 				'{Trapper:trap[1].dayofweek()} > 0'.
 				' and {Host:trap[1].last()} > 0',
 
-				'(dayofweek() > 0 and last(/Host/trap[1],#1) > 0)'.
+				'(dayofweek() > 0 and last(/Host/trap[1]) > 0)'.
 				' or (last(/Trapper/trap[1])<>last(/Trapper/trap[1]))'
 			]
 		];
