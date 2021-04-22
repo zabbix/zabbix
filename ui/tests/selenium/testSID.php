@@ -37,11 +37,9 @@ class testSID extends CWebTest {
 
 	public function prepareTokenData() {
 		$response = CDataHelper::call('token.create', [
-			[
-				'name' => 'api_update',
-				'userid' => '1'
-				]
-			]);
+			'name' => 'api_update',
+			'userid' => '1'
+		]);
 		$this->assertArrayHasKey('tokenids', $response);
 		self::$token_id = $response['tokenids'][0];
 	}
@@ -1034,7 +1032,7 @@ class testSID extends CWebTest {
 	 * @dataProvider getElementRemoveData
 	 */
 	public function testSID_ElementRemove($data) {
-		$this->page->login()->open((!str_contains($data['link'], 'tokenid')) ? $data['link'] : $data['link'].self::$token_id) ->waitUntilReady();
+		$this->page->login()->open((!str_contains($data['link'], 'tokenid')) ? $data['link'] : $data['link'].self::$token_id)->waitUntilReady();
 		$this->query('xpath://input[@id="sid"]')->one()->delete();
 		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
 				' @type="submit"]')->waitUntilClickable()->one()->click();
