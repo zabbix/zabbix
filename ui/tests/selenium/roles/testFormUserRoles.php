@@ -1026,7 +1026,7 @@ class testFormUserRoles extends CWebTest {
 				$created_roleid = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr(trim($data['fields']['Name'])));
 				$this->assertFalse($created_roleid === null);
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.$created_roleid);
-			} //TO DO: Add hash check for update, after ZBX-19246 fix
+			} // TO DO: Add hash check for update, after ZBX-19246 fix
 			else {
 				$id = (array_key_exists('to_user', $data)) ? self::$delete_roleid : self::$roleid;
 				$this->page->login()->open('zabbix.php?action=userrole.edit&roleid='.$id);
