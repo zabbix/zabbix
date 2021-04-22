@@ -56,7 +56,6 @@ class CExpressionParser extends CParser {
 	 */
 	public $options = [
 		'lldmacros' => false,
-		'lowercase_errors' => false,
 		'collapsed_expression' => false,
 		'calculated' => false,
 		'host_macro' => []
@@ -86,7 +85,6 @@ class CExpressionParser extends CParser {
 	/**
 	 * @param array $options
 	 * @param bool  $options['lldmacros']
-	 * @param bool  $options['lowercase_errors']
 	 * @param bool  $options['collapsed_expression']
 	 * @param bool  $options['calculated']
 	 * @param bool  $options['host_macro']
@@ -156,7 +154,7 @@ class CExpressionParser extends CParser {
 	}
 
 	private static function parseExpression(string $source, int &$pos, array &$tokens, array $options,
-			?int &$parsed_pos = null) {
+			int &$parsed_pos = null) {
 		$binary_operator_parser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$logical_operator_parser = new CSetParser(['and', 'or']);
 
@@ -782,8 +780,7 @@ class CExpressionParser extends CParser {
 			'type' => CExpressionParserResult::TOKEN_TYPE_STRING,
 			'pos' => $pos,
 			'match' => $matches[0],
-			'length' => $len,
-			'data' => ['string' => self::unquoteString($matches[0])]
+			'length' => $len
 		];
 		$pos += $len - 1;
 

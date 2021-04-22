@@ -2305,10 +2305,7 @@ class CExpressionParserTest extends TestCase {
 							'type' => CExpressionParserResult::TOKEN_TYPE_STRING,
 							'pos' => 86,
 							'match' => '"\\"str\\""',
-							'length' => 9,
-							'data' => [
-								'string' => '"str"'
-							]
+							'length' => 9
 						],
 						[
 							'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
@@ -2412,10 +2409,7 @@ class CExpressionParserTest extends TestCase {
 													'type' => CExpressionParserResult::TOKEN_TYPE_STRING,
 													'pos' => 188,
 													'match' => '"abc"',
-													'length' => 5,
-													'data' => [
-														'string' => 'abc'
-													]
+													'length' => 5
 												]
 											]
 										]
