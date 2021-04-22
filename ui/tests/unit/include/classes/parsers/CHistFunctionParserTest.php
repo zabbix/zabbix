@@ -34,21 +34,12 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key)',
 					'function' => 'last',
-					'parameters' => '/host/key',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key)',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
 						]
 					]
 				],
@@ -60,21 +51,12 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key)',
 					'function' => 'last',
-					'parameters' => '/host/key',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key)',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 17,
-								'length' => 9
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 17,
+							'match' => '/host/key',
+							'length' => 9
 						]
 					]
 				],
@@ -86,21 +68,12 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(  /host/key  )',
 					'function' => 'last',
-					'parameters' => '  /host/key  ',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(  /host/key  )',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 7,
-								'length' => 9
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 7,
+							'match' => '/host/key',
+							'length' => 9
 						]
 					]
 				],
@@ -112,21 +85,12 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last( /host/key[ "param1", param2, "param3" ,"param4\""] )',
 					'function' => 'last',
-					'parameters' => ' /host/key[ "param1", param2, "param3" ,"param4\""] ',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '( /host/key[ "param1", param2, "param3" ,"param4\""] )',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key[ "param1", param2, "param3" ,"param4\""]',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key[ "param1", param2, "param3" ,"param4\""]',
-								'pos' => 6,
-								'length' => 50
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 6,
+							'match' => '/host/key[ "param1", param2, "param3" ,"param4\""]',
+							'length' => 50
 						]
 					]
 				],
@@ -138,31 +102,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, #25)',
 					'function' => 'last',
-					'parameters' => '/host/key, #25',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, #25)',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '#25',
-								'time_shift' => '',
-								'sec_num_contains_macros' => false,
-								'time_shift_contains_macros' => false,
-								'source' => null,
-								'match' => '#25',
-								'pos' => 16,
-								'length' => 3
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '#25',
+							'length' => 3
 						]
 					]
 				],
@@ -174,31 +125,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, 25)',
 					'function' => 'last',
-					'parameters' => '/host/key, 25',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, 25)',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '25',
-								'time_shift' => '',
-								'sec_num_contains_macros' => false,
-								'time_shift_contains_macros' => false,
-								'source' => null,
-								'match' => '25',
-								'pos' => 16,
-								'length' => 2
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '25',
+							'length' => 2
 						]
 					]
 				],
@@ -210,31 +148,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, 10h)',
 					'function' => 'last',
-					'parameters' => '/host/key, 10h',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, 10h)',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '10h',
-								'time_shift' => '',
-								'sec_num_contains_macros' => false,
-								'time_shift_contains_macros' => false,
-								'source' => null,
-								'match' => '10h',
-								'pos' => 16,
-								'length' => 3
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '10h',
+							'length' => 3
 						]
 					]
 				],
@@ -246,31 +171,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, 1h:now/d-1h)',
 					'function' => 'last',
-					'parameters' => '/host/key, 1h:now/d-1h',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, 1h:now/d-1h)',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '1h',
-								'time_shift' => 'now/d-1h',
-								'sec_num_contains_macros' => false,
-								'time_shift_contains_macros' => false,
-								'source' => null,
-								'match' => '1h:now/d-1h',
-								'pos' => 16,
-								'length' => 11
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '1h:now/d-1h',
+							'length' => 11
 						]
 					]
 				],
@@ -282,28 +194,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key,)',
 					'function' => 'last',
-					'parameters' => '/host/key,',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key,)',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '',
-								'pos' => 15,
-								'length' => 0
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 15,
+							'match' => '',
+							'length' => 0
 						]
 					]
 				],
@@ -315,31 +217,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, {$PERIOD}:{$OFFSET})',
 					'function' => 'last',
-					'parameters' => '/host/key, {$PERIOD}:{$OFFSET}',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, {$PERIOD}:{$OFFSET})',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '{$PERIOD}',
-								'time_shift' => '{$OFFSET}',
-								'sec_num_contains_macros' => true,
-								'time_shift_contains_macros' => true,
-								'source' => null,
-								'match' => '{$PERIOD}:{$OFFSET}',
-								'pos' => 16,
-								'length' => 19
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '{$PERIOD}:{$OFFSET}',
+							'length' => 19
 						]
 					]
 				],
@@ -351,31 +240,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, {$PERIOD}:now-{$ONE_HOUR} )',
 					'function' => 'last',
-					'parameters' => '/host/key, {$PERIOD}:now-{$ONE_HOUR} ',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, {$PERIOD}:now-{$ONE_HOUR} )',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '{$PERIOD}',
-								'time_shift' => 'now-{$ONE_HOUR}',
-								'sec_num_contains_macros' => true,
-								'time_shift_contains_macros' => true,
-								'source' => null,
-								'match' => '{$PERIOD}:now-{$ONE_HOUR}',
-								'pos' => 16,
-								'length' => 25
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '{$PERIOD}:now-{$ONE_HOUR}',
+							'length' => 25
 						]
 					]
 				],
@@ -387,31 +263,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, {$PERIOD} )',
 					'function' => 'last',
-					'parameters' => '/host/key, {$PERIOD} ',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, {$PERIOD} )',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '{$PERIOD}',
-								'time_shift' => '',
-								'sec_num_contains_macros' => true,
-								'time_shift_contains_macros' => false,
-								'source' => null,
-								'match' => '{$PERIOD}',
-								'pos' => 16,
-								'length' => 9
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '{$PERIOD}',
+							'length' => 9
 						]
 					]
 				],
@@ -423,31 +286,18 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, {{#PERIOD}.regsub("^([0-9]+)", \1)}:now/{#MONTH}-{#ONE_HOUR} )',
 					'function' => 'last',
-					'parameters' => '/host/key, {{#PERIOD}.regsub("^([0-9]+)", \1)}:now/{#MONTH}-{#ONE_HOUR} ',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, {{#PERIOD}.regsub("^([0-9]+)", \1)}:now/{#MONTH}-{#ONE_HOUR} )',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '{{#PERIOD}.regsub("^([0-9]+)", \1)}',
-								'time_shift' => 'now/{#MONTH}-{#ONE_HOUR}',
-								'sec_num_contains_macros' => true,
-								'time_shift_contains_macros' => true,
-								'source' => null,
-								'match' => '{{#PERIOD}.regsub("^([0-9]+)", \1)}:now/{#MONTH}-{#ONE_HOUR}',
-								'pos' => 16,
-								'length' => 60
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '{{#PERIOD}.regsub("^([0-9]+)", \1)}:now/{#MONTH}-{#ONE_HOUR}',
+							'length' => 60
 						]
 					]
 				],
@@ -459,115 +309,90 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'last(/host/key, #25, "abc" ,"\"def\"", 1, 1.125, -1e12, {$M} , {$M: context}, {#M}, {{#M}.regsub()},, ,)',
 					'function' => 'last',
-					'parameters' => '/host/key, #25, "abc" ,"\"def\"", 1, 1.125, -1e12, {$M} , {$M: context}, {#M}, {{#M}.regsub()},, ,',
-					'params_raw' => [
-						'type' => CHistFunctionParser::PARAM_ARRAY,
-						'raw' => '(/host/key, #25, "abc" ,"\"def\"", 1, 1.125, -1e12, {$M} , {$M: context}, {#M}, {{#M}.regsub()},, ,)',
-						'pos' => 4,
-						'parameters' => [
-							0 => new CQueryParserResult([
-								'host' => 'host',
-								'item' => 'key',
-								'type' => 11,
-								'source' => null,
-								'match' => '/host/key',
-								'pos' => 5,
-								'length' => 9
-							]),
-							1 => new CPeriodParserResult([
-								'sec_num' => '#25',
-								'time_shift' => '',
-								'sec_num_contains_macros' => false,
-								'time_shift_contains_macros' => false,
-								'source' => null,
-								'match' => '#25',
-								'pos' => 16,
-								'length' => 3
-							]),
-							2 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_QUOTED,
-								'source' => null,
-								'match' => '"abc"',
-								'pos' => 21,
-								'length' => 5
-							]),
-							3 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_QUOTED,
-								'source' => null,
-								'match' => '"\"def\""',
-								'pos' => 28,
-								'length' => 9
-							]),
-							4 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '1',
-								'pos' => 39,
-								'length' => 1
-							]),
-							5 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '1.125',
-								'pos' => 42,
-								'length' => 5
-							]),
-							6 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '-1e12',
-								'pos' => 49,
-								'length' => 5
-							]),
-							7 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '{$M}',
-								'pos' => 56,
-								'length' => 4
-							]),
-							8 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '{$M: context}',
-								'pos' => 63,
-								'length' => 13
-							]),
-							9 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '{#M}',
-								'pos' => 78,
-								'length' => 4
-							]),
-							10 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '{{#M}.regsub()}',
-								'pos' => 84,
-								'length' => 15
-							]),
-							11 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '',
-								'pos' => 100,
-								'length' => 0
-							]),
-							12 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '',
-								'pos' => 102,
-								'length' => 0
-							]),
-							13 => new CFunctionParameterResult([
-								'type' => CHistFunctionParser::PARAM_UNQUOTED,
-								'source' => null,
-								'match' => '',
-								'pos' => 103,
-								'length' => 0
-							])
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 5,
+							'match' => '/host/key',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 16,
+							'match' => '#25',
+							'length' => 3
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 21,
+							'match' => '"abc"',
+							'length' => 5
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 28,
+							'match' => '"\"def\""',
+							'length' => 9
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 39,
+							'match' => '1',
+							'length' => 1
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 42,
+							'match' => '1.125',
+							'length' => 5
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 49,
+							'match' => '-1e12',
+							'length' => 5
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 56,
+							'match' => '{$M}',
+							'length' => 4
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 63,
+							'match' => '{$M: context}',
+							'length' => 13
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 78,
+							'match' => '{#M}',
+							'length' => 4
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 84,
+							'match' => '{{#M}.regsub()}',
+							'length' => 15
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 100,
+							'match' => '',
+							'length' => 0
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 102,
+							'match' => '',
+							'length' => 0
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 103,
+							'match' => '',
+							'length' => 0
 						]
 					]
 				],
@@ -579,8 +404,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -590,8 +414,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -601,8 +424,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -612,8 +434,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -623,8 +444,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -634,8 +454,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -645,8 +464,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -656,8 +474,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -667,8 +484,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			],
@@ -678,8 +494,7 @@ class CHistFunctionParserTest extends TestCase {
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
 					'function' => '',
-					'parameters' => '',
-					'params_raw' => []
+					'parameters' => []
 				],
 				[]
 			]
@@ -698,18 +513,17 @@ class CHistFunctionParserTest extends TestCase {
 	public function testParse(string $source, int $pos, array $options, array $expected, array $unquoted_params): void {
 		$hist_function_parser = new CHistFunctionParser($options);
 
-		$this->assertEquals($expected, [
+		$this->assertSame($expected, [
 			'rc' => $hist_function_parser->parse($source, $pos),
 			'match' => $hist_function_parser->getMatch(),
 			'function' => $hist_function_parser->getFunction(),
-			'parameters' => $hist_function_parser->getParameters(),
-			'params_raw' => $hist_function_parser->getParamsRaw()
+			'parameters' => $hist_function_parser->getParameters()
 		]);
 		$this->assertSame(strlen($expected['match']), $hist_function_parser->getLength());
-		$this->assertSame(count($unquoted_params), $hist_function_parser->getParamsNum());
+		$this->assertSame(count($unquoted_params), count($hist_function_parser->getParameters()));
 
-		for ($n = 0, $count = $hist_function_parser->getParamsNum(); $n < $count; $n++) {
-			$this->assertSame($unquoted_params[$n], $hist_function_parser->getParam($n));
+		foreach ($unquoted_params as $num => $unquoted_param) {
+			$this->assertSame($unquoted_param, $hist_function_parser->getParam($num));
 		}
 	}
 }

@@ -67,7 +67,7 @@ class CExpressionParser extends CParser {
 	 *
 	 * @var null|CExpressionParserResult
 	 */
-	public $result = null;
+	private $result = null;
 
 	/**
 	 * Parser for the {HOST.HOST} macro.
@@ -845,16 +845,16 @@ class CExpressionParser extends CParser {
 	}
 
 	/**
-	 * Returns an friendly error message or empty string if expression was parsed successfully.
+	 * Returns an expression parser result.
 	 *
-	 * @return string
+	 * @return null|CExpressionParserResult
 	 */
 	public function getResult(): ?CExpressionParserResult {
 		return $this->result;
 	}
 
 	/**
-	 * Returns an friendly error message or empty string if expression was parsed successfully.
+	 * Returns a friendly error message or empty string if expression was parsed successfully.
 	 *
 	 * @return string
 	 */
