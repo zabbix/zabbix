@@ -33,7 +33,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'templates' => [
 						[
-							'host' => 'Template',
+							'template' => 'Template',
 							'items' => [
 								$calculated + ['params' => '100*last("vfs.fs.size[/,free]")/last("vfs.fs.size[/,total]")'],
 								$calculated + ['params' => 'avg("Zabbix Server:zabbix[wcache,values]",600)'],
@@ -54,7 +54,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				[
 					'templates' => [
 						[
-							'host' => 'Template',
+							'template' => 'Template',
 							'items' => [
 								$calculated + ['params' => '100*last(/'.'/vfs.fs.size[/,free])/last(/'.'/vfs.fs.size[/,total])'],
 								$calculated + ['params' => 'avg(/Zabbix Server/zabbix[wcache,values],600s)'],

@@ -105,12 +105,12 @@ class C52ImportConverter extends CConverter {
 	private static function convertTemplates(array $templates): array {
 		foreach ($templates as &$template) {
 			if (array_key_exists('items', $template)) {
-				$template['items'] = self::convertItems($template['items'], $template['host']);
+				$template['items'] = self::convertItems($template['items'], $template['template']);
 			}
 
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules'],
-					$template['host']
+					$template['template']
 				);
 			}
 
@@ -249,16 +249,22 @@ class C52ImportConverter extends CConverter {
 				);
 			}
 
+			$applications = array_key_exists('applications', $item_prototype) ? $item_prototype['applications'] : [];
+
 			if (array_key_exists('application_prototypes', $item_prototype)) {
+				$applications = array_merge($applications, $item_prototype['application_prototypes']);
+			}
+
+			if ($applications) {
 				$i = 0;
 				$item_prototype['tags'] = [];
 
-				foreach (self::convertApplicationsToTags($item_prototype['application_prototypes']) as $tag) {
+				foreach (self::convertApplicationsToTags($applications) as $tag) {
 					$item_prototype['tags']['tag'.($i ? $i : '')] = $tag;
 					$i++;
 				}
 
-				unset($item_prototype['application_prototypes']);
+				unset($item_prototype['applications'], $item_prototype['application_prototypes']);
 			}
 
 			if (array_key_exists('type', $item_prototype)) {
