@@ -2624,6 +2624,6 @@ class CExpressionParserTest extends TestCase {
 	public function testTokens(string $expression, array $tokens, array $options = []) {
 		$expression_parser = new CExpressionParser($options);
 		$this->assertSame(CParser::PARSE_SUCCESS, $expression_parser->parse($expression));
-		$this->assertSame($tokens, $expression_parser->result->getTokens());
+		$this->assertSame($tokens, $expression_parser->getResult()->getTokens());
 	}
 }
