@@ -1,12 +1,12 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-15T08:50:14Z'
+  date: '2021-04-22T09:43:39Z'
   media_types:
     -
       name: 'ManageEngine ServiceDesk'
       type: WEBHOOK
       parameters:
-        23:
+        22:
           name: event_nseverity
           value: '{EVENT.NSEVERITY}'
         0:
@@ -21,34 +21,34 @@ zabbix_export:
         3:
           name: event_value
           value: '{EVENT.VALUE}'
-        15:
+        14:
           name: 'field_ref:requester'
           value: '<PLACE API USER NAME>'
         11:
           name: 'field_string:description'
           value: '{ALERT.MESSAGE}'
-        14:
+        13:
           name: 'field_string:subject'
           value: '{ALERT.SUBJECT}'
-        16:
+        15:
           name: priority_average
           value: Normal
-        17:
+        16:
           name: priority_default
           value: Normal
-        18:
+        17:
           name: priority_disaster
           value: High
-        19:
+        18:
           name: priority_high
           value: High
-        20:
+        19:
           name: priority_information
           value: Low
-        21:
+        20:
           name: priority_not_classified
           value: Low
-        22:
+        21:
           name: priority_warning
           value: Medium
         8:
@@ -60,21 +60,21 @@ zabbix_export:
         10:
           name: sd_on_demand_refresh_token
           value: '<PLACE ON DEMAND REFRESH TOKEN>'
+        23:
+          name: sd_on_demand_url_auth
+          value: '<PLACE AUTHENTICATION URL FOR ON DEMAND>'
         7:
           name: sd_on_premise
           value: 'true'
         4:
           name: sd_on_premise_auth_token
           value: '<PLACE ON PREMISE TECHNICIAN_KEY>'
-        13:
+        12:
           name: sd_request_id
           value: '{EVENT.TAGS.__zbx_sd_request_id}'
         5:
           name: sd_url
           value: '<PLACE INSTANCE URL>'
-        12:
-          name: sd_url_auth
-          value: '<PLACE AUTHENTICATION URL FOR ON DEMAND>'
         6:
           name: trigger_description
           value: '{TRIGGER.DESCRIPTION}'
@@ -96,12 +96,13 @@ zabbix_export:
                     MEngine.params.url += 'api/v3/';
                 }
         
-                if (MEngine.params.on_premise.toLowerCase() !== 'true' && typeof MEngine.params.url_auth === 'string') {
-                    if (!MEngine.params.url_auth.endsWith('/')) {
-                        MEngine.params.url_auth += '/';
+                if (MEngine.params.on_premise.toLowerCase() !== 'true'
+                        && typeof MEngine.params.on_demand_url_auth === 'string') {
+                    if (!MEngine.params.on_demand_url_auth.endsWith('/')) {
+                        MEngine.params.on_demand_url_auth += '/';
                     }
         
-                    MEngine.params.url_auth += 'oauth/v2/token?';
+                    MEngine.params.on_demand_url_auth += 'oauth/v2/token?';
                 }
             },
         
@@ -119,7 +120,7 @@ zabbix_export:
         
             refreshAccessToken: function () {
                 [
-                    'url_auth',
+                    'on_demand_url_auth',
                     'on_demand_refresh_token',
                     'on_demand_client_id',
                     'on_demand_client_secret'
@@ -132,7 +133,7 @@ zabbix_export:
         
                 var response,
                     request = new HttpRequest(),
-                    url = MEngine.params.url_auth +
+                    url = MEngine.params.on_demand_url_auth +
                         'refresh_token=' + encodeURIComponent(MEngine.params.on_demand_refresh_token) +
                         '&grant_type=refresh_token&client_id=' + encodeURIComponent(MEngine.params.on_demand_client_id) +
                         '&client_secret=' + encodeURIComponent(MEngine.params.on_demand_client_secret) +
@@ -245,7 +246,7 @@ zabbix_export:
                     result;
         
                 if (isNote) {
-                    data.description = fields['field_string:description'];
+                    data.description = fields['field_string:description'].replace(/(?:\r\n|\r|\n)/g, '<br>');
                     result = {request_note: data};
                 }
                 else {
@@ -286,6 +287,7 @@ zabbix_export:
                                 }
                             }
                         });
+                    data.description = data.description.replace(/(?:\r\n|\r|\n)/g, '<br>');
                     result = {request: data};
                 }
         
@@ -349,9 +351,6 @@ zabbix_export:
                 params.event_nseverity = '6';
             }
         
-            fields['field_object:priority'] = params['priority_' + severities[params.event_nseverity].name]
-            || 'Normal';
-        
             if (params.event_update_status === '1' && (typeof params.sd_request_id === 'undefined'
                     || params.sd_request_id.trim() === ''
                     || params.sd_request_id === '{EVENT.TAGS.__zbx_sd_request_id}')) {
@@ -367,23 +366,28 @@ zabbix_export:
         
             // Create issue for non trigger-based events.
             if (params.event_source !== '0' && params.event_recovery_value !== '0') {
+                fields['field_object:priority'] = params['priority_' + severities[params.event_nseverity].name]
+                || 'Normal';
+        
                 MEngine.request('post', 'requests', MEngine.createPaylaod(fields));
             }
             // Create issue for trigger-based events.
             else if (params.event_value === '1' && params.event_update_status === '0') {
+                fields['field_object:priority'] = params['priority_' + severities[params.event_nseverity].name]
+                || 'Normal';
+        
                 var id = MEngine.request('post', 'requests', MEngine.createPaylaod(fields));
         
                 result.tags.__zbx_sd_request_id = id;
                 result.tags.__zbx_sd_request_link = MEngine.createLink(id, params.sd_url);
             }
             // Update created issue for trigger-based event.
-            else if (params.event_value === '0' && params.event_update_status === '0') {
-                MEngine.request('put', 'requests/' + params.sd_request_id, MEngine.createPaylaod(fields));
-            }
             else {
                 MEngine.request('post', 'requests/' + params.sd_request_id + '/notes',
                     MEngine.createPaylaod(fields, params.event_update_status === '1')
                 );
+                delete fields['field_string:description'];
+                MEngine.request('put', 'requests/' + params.sd_request_id, MEngine.createPaylaod(fields));
             }
         
             return JSON.stringify(result);

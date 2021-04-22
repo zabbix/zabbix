@@ -29,7 +29,9 @@ At first, create a user for API or use an existing one.
 - **redirect_uri**: specify the Callback URL that you registered during the app registration. You can use any ULR for Self client mode, *https://www.zoho.com* for example.
 
 Example:
-```curl -X POST https://accounts.zoho.com/oauth/v2/token?code=1000.f74e7b6fc16c95bbc1fa2f067962f84b.9768e796b6273774817032613ba6892a&grant_type=authorization_code&client_id=1000.15S25B602CISR5WO9RUZ8UT39O3RIH&client_secret=9ea302935eb150d9d6cbefd35b1eb8891332d815b8&redirect_uri=https://www.zoho.com```<br>
+```
+curl -X POST 'https://accounts.zoho.com/oauth/v2/token?code=1000.f74e7b6fc16c95bbc1fa2f067962f84b.9768e796b6273774817032613ba6892a&grant_type=authorization_code&client_id=1000.15S25B602CISR5WO9RUZ8UT39O3RIH&client_secret=9ea302935eb150d9d6cbefd35b1eb8891332d815b8&redirect_uri=https://www.zoho.com'
+```
 Use your domain-specific Zoho accounts URL when you make the request.<br>
 - For US: https://accounts.zoho.com
 - For AU: https://accounts.zoho.com.au
