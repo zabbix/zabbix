@@ -277,7 +277,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				if (ctype_digit($parameters[0])) {
 					$parameters[0] = '#'.$parameters[0];
 				}
-				elseif (substr($parameters[0], 0, 1) !== '#') {
+				elseif ($parameters[0] === '') {
 					$parameters[0] = '#1';
 				}
 
