@@ -105,12 +105,12 @@ class C52ImportConverter extends CConverter {
 	private static function convertTemplates(array $templates): array {
 		foreach ($templates as &$template) {
 			if (array_key_exists('items', $template)) {
-				$template['items'] = self::convertItems($template['items'], $template['template']);
+				$template['items'] = self::convertItems($template['items'], $template['host']);
 			}
 
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules'],
-					$template['template']
+					$template['host']
 				);
 			}
 
