@@ -1943,6 +1943,7 @@ static	int	postpone_escalation(const DB_ESCALATION *escalation)
 			" and status in (0,3);", escalation->eventid, escalation->actionid);
 
 	result = DBselectN(sql, 1);
+	zbx_free(sql);
 
 	if (NULL != (row = DBfetch(result)))
 		ret = ZBX_ESCALATION_SKIP;
