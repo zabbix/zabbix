@@ -58,7 +58,7 @@ class CImportReferencer {
 	protected $db_macros;
 	protected $db_proxies;
 	protected $hostPrototypesRefs;
-	protected $httptestsRefs;
+	protected $db_httptests;
 	protected $httpstepsRefs;
 
 	/**
@@ -362,6 +362,27 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get httptestid by web scenario uuid.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findHttpTestidByUuid(string $uuid): ?string {
+		if ($this->db_httptests === null) {
+			$this->selectHttpTests();
+		}
+
+		foreach ($this->db_httptests as $httptestid => $httptest) {
+			if ($httptest['uuid'] === $uuid) {
+				return $httptestid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get httptestid by hostid and web scenario name.
 	 *
 	 * @param string $hostid
@@ -369,14 +390,18 @@ class CImportReferencer {
 	 *
 	 * @return string|bool
 	 */
-	public function resolveHttpTest($hostid, $name) {
-		if ($this->httptestsRefs === null) {
+	public function findHttpTestidByName(string $hostid, string $name): ?string {
+		if ($this->db_httptests === null) {
 			$this->selectHttpTests();
 		}
 
-		return array_key_exists($hostid, $this->httptestsRefs) && array_key_exists($name, $this->httptestsRefs[$hostid])
-			? $this->httptestsRefs[$hostid][$name]
-			: false;
+		foreach ($this->db_httptests as $httptestid => $httptest) {
+			if ($httptest['hostid'] === $hostid && $httptest['name'] === $name) {
+				return $httptestid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -752,7 +777,7 @@ class CImportReferencer {
 		if ($this->groups) {
 			$this->db_groups = API::HostGroup()->get([
 				'output' => ['name', 'uuid'],
-				'search' => [
+				'filter' => [
 					'uuid' => array_column($this->groups, 'uuid'),
 					'name' => array_keys($this->groups)
 				],
@@ -771,7 +796,7 @@ class CImportReferencer {
 		if ($this->templates) {
 			$this->db_templates = API::Template()->get([
 				'output' => ['host', 'uuid'],
-				'search' => [
+				'filter' => [
 					'uuid' => array_column($this->templates, 'uuid'),
 					'host' => array_keys($this->templates)
 				],
@@ -792,7 +817,7 @@ class CImportReferencer {
 			// Fetch only normal hosts, discovered hosts must not be imported.
 			$this->db_hosts = API::Host()->get([
 				'output' => ['host'],
-				'search' => ['host' => array_keys($this->hosts)],
+				'filter' => ['host' => array_keys($this->hosts)],
 				'templated_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -1126,28 +1151,36 @@ class CImportReferencer {
 	/**
 	 * Select httptestids for previously added web scenario names.
 	 */
-	protected function selectHttpTests() {
+	protected function selectHttpTests(): void {
 		if ($this->httptests) {
-			$this->httptestsRefs = [];
+			$this->db_httptests = [];
 
 			$sql_where = [];
 
-			foreach ($this->httptests as $host => $names) {
+			foreach ($this->httptests as $host => $httptests) {
 				$hostid = $this->findTemplateidOrHostidByHost($host);
 
 				if ($hostid !== false) {
-					$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid).' AND '.dbConditionString('ht.name', $names).')';
+					$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid)
+						.' AND ('
+							.dbConditionString('ht.name', array_keys($httptests))
+							.' OR '.dbConditionString('ht.uuid', array_column($httptests, 'uuid'))
+						.'))';
 				}
 			}
 
 			if ($sql_where) {
 				$db_httptests = DBselect(
-					'SELECT ht.hostid,ht.name,ht.httptestid'.
+					'SELECT ht.hostid,ht.name,ht.httptestid,ht.uuid'.
 					' FROM httptest ht'.
 					' WHERE '.implode(' OR ', $sql_where)
 				);
 				while ($db_httptest = DBfetch($db_httptests)) {
-					$this->httptestsRefs[$db_httptest['hostid']][$db_httptest['name']] = $db_httptest['httptestid'];
+					$this->db_httptests[$db_httptest['httptestid']] = [
+						'uuid' => $db_httptest['uuid'],
+						'name' => $db_httptest['name'],
+						'hostid' => $db_httptest['hostid']
+					];
 				}
 			}
 		}
@@ -1156,8 +1189,8 @@ class CImportReferencer {
 	/**
 	 * Unset web scenario refs to make referencer select them from db again.
 	 */
-	public function refreshHttpTests() {
-		$this->httptestsRefs = null;
+	public function refreshHttpTests(): void {
+		$this->db_httptests = null;
 	}
 
 	/**
@@ -1174,7 +1207,7 @@ class CImportReferencer {
 
 				if ($hostid !== false) {
 					foreach ($httptests as $httptest_name => $httpstep_names) {
-						$httptestid = $this->resolveHttpTest($hostid, $httptest_name);
+						$httptestid = $this->findHttpTestidByName($hostid, $httptest_name);
 
 						if ($httptestid !== false) {
 							$sql_where[] = '(hs.httptestid='.zbx_dbstr($httptestid).

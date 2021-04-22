@@ -124,7 +124,7 @@ class CConfigurationImport {
 	 *
 	 * @throws Exception
 	 */
-	public function import(CImportDataAdapter $adapter) {
+	public function import(CImportDataAdapter $adapter): bool {
 		$this->adapter = $adapter;
 
 		// parse all import for references to resolve them all together with less sql count
@@ -135,7 +135,7 @@ class CConfigurationImport {
 		$this->processHosts();
 
 //		// delete missing objects from processed hosts and templates
-//		$this->deleteMissingHttpTests();
+		$this->deleteMissingHttpTests();
 //		$this->deleteMissingDiscoveryRules();
 //		$this->deleteMissingTriggers();
 //		$this->deleteMissingGraphs();
@@ -1442,7 +1442,7 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				$httptestid = $this->referencer->resolveHttpTest($hostid, $httptest['name']);
+				$httptestid = $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
 
 				if ($httptestid !== false) {
 					foreach ($httptest['steps'] as &$httpstep) {
@@ -1808,8 +1808,8 @@ class CConfigurationImport {
 			return;
 		}
 
-		$processedHostIds = $this->importedObjectContainer->getHostIds();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostids();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateids();
 
 		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
@@ -1864,8 +1864,8 @@ class CConfigurationImport {
 			return;
 		}
 
-		$processedHostIds = $this->importedObjectContainer->getHostIds();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostids();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateids();
 
 		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
@@ -1931,8 +1931,8 @@ class CConfigurationImport {
 			return;
 		}
 
-		$processedHostIds = $this->importedObjectContainer->getHostIds();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostids();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateids();
 
 		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
@@ -2002,8 +2002,8 @@ class CConfigurationImport {
 			return;
 		}
 
-		$processedHostIds = $this->importedObjectContainer->getHostIds();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
+		$processedHostIds = $this->importedObjectContainer->getHostids();
+		$processedTemplateIds = $this->importedObjectContainer->getTemplateids();
 
 		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
 
@@ -2178,22 +2178,21 @@ class CConfigurationImport {
 	/**
 	 * Deletes web scenarios from DB that are missing in XML.
 	 */
-	protected function deleteMissingHttpTests() {
+	protected function deleteMissingHttpTests(): void {
 		if (!$this->options['httptests']['deleteMissing']) {
 			return;
 		}
 
 		$processed_hostids = array_merge(
-			$this->importedObjectContainer->getHostIds(),
-			$this->importedObjectContainer->getTemplateIds()
+			$this->importedObjectContainer->getHostids(),
+			$this->importedObjectContainer->getTemplateids()
 		);
 
-		// no hosts or templates have been processed
 		if (!$processed_hostids) {
 			return;
 		}
 
-		$xml_httptestids = [];
+		$httptestids = [];
 
 		$all_httptests = $this->getFormattedHttpTests();
 
@@ -2201,11 +2200,17 @@ class CConfigurationImport {
 			foreach ($all_httptests as $host => $httptests) {
 				$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-				foreach ($httptests as $httptest) {
-					$httptestid = $this->referencer->resolveHttpTest($hostid, $httptest['name']);
+				if ($hostid === null) {
+					continue;
+				}
 
-					if ($httptestid) {
-						$xml_httptestids[$httptestid] = true;
+				foreach ($httptests as $httptest) {
+					$httptestid = array_key_exists('uuid', $httptest)
+						? $this->referencer->findHttpTestidByUuid($httptest['uuid'])
+						: $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
+
+					if ($httptestid !== null) {
+						$httptestids[$httptestid] = [];
 					}
 				}
 			}
@@ -2219,10 +2224,10 @@ class CConfigurationImport {
 			'nopermissions' => true
 		]);
 
-		$del_httptestids = array_diff_key($db_httptestids, $xml_httptestids);
+		$httptest_to_delete = array_diff_key($db_httptestids, $httptestids);
 
-		if ($del_httptestids) {
-			API::HttpTest()->delete(array_keys($del_httptestids));
+		if ($httptest_to_delete) {
+			API::HttpTest()->delete(array_keys($httptest_to_delete));
 		}
 
 		$this->referencer->refreshHttpTests();
@@ -2298,7 +2303,7 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedHttpTests() {
+	protected function getFormattedHttpTests(): array {
 		if (!array_key_exists('httptests', $this->formattedData)) {
 			$this->formattedData['httptests'] = $this->adapter->getHttpTests();
 		}

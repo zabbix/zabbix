@@ -88,7 +88,7 @@ class CTemplateDashboardImporter extends CImporter {
 			return;
 		}
 
-		$templateids = $this->importedObjectContainer->getTemplateIds();
+		$templateids = $this->importedObjectContainer->getTemplateids();
 		if (!$templateids) {
 			return;
 		}
