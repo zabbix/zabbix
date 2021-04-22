@@ -5119,12 +5119,16 @@ static void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **re
 	else if (0 == strcmp(function->name, "logeventid") || 0 == strcmp(function->name, "logsource"))
 	{
 		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, -1, -1,
 				ZBX_DBPATCH_ARG_STR, 0,
 				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, parameter, ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
 	else if (0 == strcmp(function->name, "logseverity"))
 	{
+		dbpatch_convert_params(&parameter, function->parameter, &params,
+				ZBX_DBPATCH_ARG_HIST, -1, -1,
+				ZBX_DBPATCH_ARG_NONE);
 		dbpatch_update_function(function, NULL, "", ZBX_DBPATCH_FUNCTION_UPDATE_PARAM);
 	}
 
