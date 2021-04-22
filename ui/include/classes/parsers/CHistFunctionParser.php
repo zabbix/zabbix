@@ -29,9 +29,10 @@ class CHistFunctionParser extends CParser {
 	protected const STATE_QUOTED = 3;
 	protected const STATE_END_OF_PARAMS = 4;
 
-	public const PARAM_ARRAY = 0;
-	public const PARAM_UNQUOTED = 1;
-	public const PARAM_QUOTED = 2;
+	public const PARAM_TYPE_QUERY = 0;
+	public const PARAM_TYPE_PERIOD = 1;
+	public const PARAM_TYPE_QUOTED = 2;
+	public const PARAM_TYPE_UNQUOTED = 3;
 
 	/**
 	 * An options array.
@@ -55,11 +56,18 @@ class CHistFunctionParser extends CParser {
 	private $number_parser;
 
 	/**
-	 * Object of parsed function.
+	 * Parsed function name.
 	 *
-	 * @var CFunctionParserResult
+	 * @var string
 	 */
-	public $result;
+	private $function = '';
+
+	/**
+	 * The list of the parsed function parameters.
+	 *
+	 * @var array
+	 */
+	private $parameters = [];
 
 	/**
 	 * @param array $options
@@ -92,9 +100,9 @@ class CHistFunctionParser extends CParser {
 	 * @param int     $pos
 	 */
 	public function parse($source, $pos = 0): int {
-		$this->result = new CFunctionParserResult();
 		$this->length = 0;
 		$this->match = '';
+		$this->function = '';
 
 		$p = $pos;
 
@@ -105,14 +113,8 @@ class CHistFunctionParser extends CParser {
 		$p += strlen($matches[0]);
 		$p2 = $p - 1;
 
-
-		$params_raw = [
-			'type' => self::PARAM_ARRAY,
-			'raw' => '',
-			'pos' => $p2 - $pos,
-			'parameters' => []
-		];
-		if (!$this->parseFunctionParameters($source, $p, $params_raw['parameters'])) {
+		$parameters = [];
+		if (!$this->parseFunctionParameters($source, $p, $parameters)) {
 			return self::PARSE_FAIL;
 		}
 
@@ -120,13 +122,8 @@ class CHistFunctionParser extends CParser {
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
-
-		$this->result->length = $this->length;
-		$this->result->match = substr($source, $pos, $this->length);
-		$this->result->function = $matches[1];
-		$this->result->parameters = substr($source, $p2 + 1, $p - $p2 - 2);
-		$this->result->params_raw = $params_raw;
-		$this->result->pos = $pos;
+		$this->function = $matches[1];
+		$this->parameters = $parameters;
 
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
@@ -163,7 +160,12 @@ class CHistFunctionParser extends CParser {
 						if ($num == 0) {
 							if ($this->query_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 								$p += $this->query_parser->getLength() - 1;
-								$_parameters[$num] = $this->query_parser->result;
+								$_parameters[$num] = [
+									'type' => self::PARAM_TYPE_QUERY,
+									'pos' => $this->query_parser->result->pos,
+									'match' => $this->query_parser->result->match,
+									'length' => $this->query_parser->result->length
+								];
 								$state = self::STATE_END;
 							}
 							else {
@@ -173,24 +175,33 @@ class CHistFunctionParser extends CParser {
 						elseif ($num == 1) {
 							switch ($source[$p]) {
 								case ',':
-									$_parameters[$num++] = new CFunctionParameterResult([
-										'type' => self::PARAM_UNQUOTED,
-										'pos' => $p
-									]);
+									$_parameters[$num++] = [
+										'type' => self::PARAM_TYPE_UNQUOTED,
+										'pos' => $p,
+										'match' => '',
+										'length' => 0
+									];
 									break;
 
 								case ')':
-									$_parameters[$num] = new CFunctionParameterResult([
-										'type' => self::PARAM_UNQUOTED,
-										'pos' => $p
-									]);
+									$_parameters[$num] = [
+										'type' => self::PARAM_TYPE_UNQUOTED,
+										'pos' => $p,
+										'match' => '',
+										'length' => 0
+									];
 									$state = self::STATE_END_OF_PARAMS;
 									break;
 
 								default:
 									if ($this->period_parser->parse($source, $p) != CParser::PARSE_FAIL) {
 										$p += $this->period_parser->getLength() - 1;
-										$_parameters[$num] = $this->period_parser->result;
+										$_parameters[$num] = [
+											'type' => self::PARAM_TYPE_PERIOD,
+											'pos' => $this->period_parser->result->pos,
+											'match' => $this->period_parser->result->match,
+											'length' => $this->period_parser->result->length
+										];
 										$state = self::STATE_END;
 									}
 									else {
@@ -201,39 +212,43 @@ class CHistFunctionParser extends CParser {
 						else {
 							switch ($source[$p]) {
 								case ',':
-									$_parameters[$num++] = new CFunctionParameterResult([
-										'type' => self::PARAM_UNQUOTED,
-										'pos' => $p
-									]);
+									$_parameters[$num++] = [
+										'type' => self::PARAM_TYPE_UNQUOTED,
+										'pos' => $p,
+										'match' => '',
+										'length' => 0
+									];
 									break;
 
 								case ')':
-									$_parameters[$num] = new CFunctionParameterResult([
-										'type' => self::PARAM_UNQUOTED,
-										'pos' => $p
-									]);
+									$_parameters[$num] = [
+										'type' => self::PARAM_TYPE_UNQUOTED,
+										'pos' => $p,
+										'match' => '',
+										'length' => 0
+									];
 									$state = self::STATE_END_OF_PARAMS;
 									break;
 
 								case '"':
-									$_parameters[$num] = new CFunctionParameterResult([
-										'type' => self::PARAM_QUOTED,
-										'match' => $source[$p],
+									$_parameters[$num] = [
+										'type' => self::PARAM_TYPE_QUOTED,
 										'pos' => $p,
+										'match' => $source[$p],
 										'length' => 1
-									]);
+									];
 									$state = self::STATE_QUOTED;
 									break;
 
 								default:
 									foreach ($parsers as $parser) {
 										if ($parser->parse($source, $p) != CParser::PARSE_FAIL) {
-											$_parameters[$num] = new CFunctionParameterResult([
-												'type' => self::PARAM_UNQUOTED,
-												'match' => $parser->getMatch(),
+											$_parameters[$num] = [
+												'type' => self::PARAM_TYPE_UNQUOTED,
 												'pos' => $p,
+												'match' => $parser->getMatch(),
 												'length' => $parser->getLength()
-											]);
+											];
 
 											$p += $parser->getLength() - 1;
 											$state = self::STATE_END;
@@ -270,8 +285,8 @@ class CHistFunctionParser extends CParser {
 
 				// a quoted parameter
 				case self::STATE_QUOTED:
-					$_parameters[$num]->match .= $source[$p];
-					$_parameters[$num]->length++;
+					$_parameters[$num]['match'] .= $source[$p];
+					$_parameters[$num]['length']++;
 
 					if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
 						$state = self::STATE_END;
@@ -302,40 +317,20 @@ class CHistFunctionParser extends CParser {
 	 * @return string
 	 */
 	public function getFunction(): string {
-		return $this->result->function;
+		return $this->function;
 	}
 
 	/**
 	 * Returns the parameters of the function.
 	 *
-	 * @return string
-	 */
-	public function getParameters(): string {
-		return $this->result->parameters;
-	}
-
-	/**
-	 * Returns the list of the parameters.
-	 *
 	 * @return array
 	 */
-	public function getParamsRaw(): array {
-		return $this->result->params_raw;
-	}
-
-	/**
-	 * Returns the number of the parameters.
-	 *
-	 * @return int
-	 */
-	public function getParamsNum(): int {
-		return array_key_exists('parameters', $this->result->params_raw)
-			? count($this->result->params_raw['parameters'])
-			: 0;
+	public function getParameters(): array {
+		return $this->parameters;
 	}
 
 	/*
-	 * Unquotes special symbols in the item parameter.
+	 * Unquotes special symbols in the parameter.
 	 *
 	 * @param string  $param
 	 *
@@ -362,17 +357,13 @@ class CHistFunctionParser extends CParser {
 	 *
 	 * @return string|null
 	 */
-	public function getParam(int $n): ?string {
-		if (!array_key_exists($n, $this->result->params_raw['parameters'])) {
+	public function getParam(int $num): ?string {
+		if (!array_key_exists($num, $this->parameters)) {
 			return null;
 		}
 
-		$param = $this->result->params_raw['parameters'][$n];
+		$param = $this->parameters[$num];
 
-		if ($param->type == self::PARAM_QUOTED) {
-			return self::unquoteParam($param->match);
-		}
-
-		return $param->match;
+		return ($param['type'] == self::PARAM_TYPE_QUOTED) ? self::unquoteParam($param['match']) : $param['match'];
 	}
 }
