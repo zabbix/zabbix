@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-21T18:58:38Z</date>
+   <date>2021-04-22T12:28:45Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -53,7 +53,7 @@ Template tooling version used: 0.38</description>
 , sj.enabled AS Enabled
 , sjs.last_run_outcome AS RunStatus
 , sjs.last_outcome_message AS LastRunStatusMessage
-, sjs.last_run_duration AS RunDuration
+, sjs.last_run_duration/10000*3600 + sjs.last_run_duration/100%100*60 + sjs.last_run_duration%100 AS RunDuration
 , CASE sjs.last_run_date
     WHEN 0 THEN NULL
     ELSE msdb.dbo.agent_datetime(sjs.last_run_date,sjs.last_run_time)
@@ -3236,6 +3236,16 @@ FROM sys.databases</params>
                      <master_item>
                         <key>db.odbc.get[get_job_status,"{$MSSQL.DSN}"]</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}</expression>
+                           <name>MSSQL Job '{#JOBNAME}': Job duration greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}</name>
+                           <opdata>Job duration: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>The job is taking too long.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>MSSQL Job '{#JOBNAME}': Run status</name>
@@ -4211,6 +4221,11 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <macro>{$MSSQL.BACKUP_DIFF.WARN}</macro>
                <value>3d</value>
                <description>The maximum days without a differential backup for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.BACKUP_DURATION.WARN}</macro>
+               <value>1h</value>
+               <description>The maximum job duration for warning trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.BACKUP_FULL.CRIT}</macro>

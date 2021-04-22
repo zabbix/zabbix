@@ -47,6 +47,7 @@ No specific Zabbix configuration is required.
 |{$MSSQL.AVERAGE_WAIT_TIME.MAX} |<p>The maximum average wait time in ms for trigger expression.</p> |`500` |
 |{$MSSQL.BACKUP_DIFF.CRIT} |<p>The maximum days without a differential backup for high trigger expression.</p> |`6d` |
 |{$MSSQL.BACKUP_DIFF.WARN} |<p>The maximum days without a differential backup for warning trigger expression.</p> |`3d` |
+|{$MSSQL.BACKUP_DURATION.WARN} |<p>The maximum job duration for warning trigger expression.</p> |`1h` |
 |{$MSSQL.BACKUP_FULL.CRIT} |<p>The maximum days without a full backup for high trigger expression.</p> |`10d` |
 |{$MSSQL.BACKUP_FULL.WARN} |<p>The maximum days without a full backup for warning trigger expression.</p> |`9d` |
 |{$MSSQL.BACKUP_LOG.CRIT} |<p>The maximum days without a log backup for high trigger expression.</p> |`8h` |
@@ -283,6 +284,7 @@ There are no template links in this template.
 |MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE} |<p>The state of the mirror database and of the database mirroring session is "Not synchronized". The partners are not synchronized. A failover is not possible now.</p> |`{TEMPLATE_NAME:mssql.mirroring.state["{#DBNAME}"].last()}=5` |HIGH | |
 |MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" Witness is disconnected |<p>The state of the witness in the database mirroring session of the database is "Disconnected".</p> |`{TEMPLATE_NAME:mssql.mirroring.witness_state["{#DBNAME}"].last()}=2` |WARNING | |
 |MSSQL Job '{#JOBNAME}': Failed to run |<p>The last run of the job is failed.</p> |`{TEMPLATE_NAME:mssql.job.runstatus["{#JOBNAME}"].last()}=0` |WARNING |<p>Manual close: YES</p> |
+|MSSQL Job '{#JOBNAME}': Job duration greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"} |<p>The job is taking too long.</p> |`{TEMPLATE_NAME:mssql.job.run_duration["{#JOBNAME}"].last()}>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
