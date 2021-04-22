@@ -3361,13 +3361,13 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 			if (ZBX_VALUEMAP_TYPE_LESS == valuemap->type &&
 					ZBX_INFINITY != (max = evaluate_string_to_double(valuemap->value)))
 			{
-				if (input_value < max)
+				if (input_value <= max)
 					goto map_value;
 			}
 			else if (ZBX_VALUEMAP_TYPE_GREATER == valuemap->type &&
 					ZBX_INFINITY != (min = evaluate_string_to_double(valuemap->value)))
 			{
-				if (input_value > min)
+				if (input_value >= min)
 					goto map_value;
 			}
 			else if (ZBX_VALUEMAP_TYPE_RANGE == valuemap->type)
