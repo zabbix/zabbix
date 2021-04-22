@@ -2474,8 +2474,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		{
 			if (0 == escalation->esc_step)
 				escalation_execute(escalation, action, event);
-
-			escalation_recover(escalation, action, event, r_event);
+			else
+				escalation_recover(escalation, action, event, r_event);
 		}
 		else if (escalation->nextcheck <= now)
 		{
