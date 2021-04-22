@@ -138,15 +138,7 @@ class CExpressionParser extends CParser {
 			$this->match = substr($source, $pos, $len);
 
 			$this->result = new CExpressionParserResult();
-			$this->result->addTokens([
-				'type' => CExpressionParserResult::TOKEN_TYPE_EXPRESSION,
-				'pos' => $pos,
-				'match' => substr($source, $pos, $len),
-				'length' => $len,
-				'data' => [
-					'tokens' => $tokens
-				]
-			]);
+			$this->result->addTokens($tokens);
 			$this->result->pos = $pos;
 
 			if (isset($source[$p])) {
