@@ -23,14 +23,15 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * @backup role
- * @backup module
+ * @backup role, module, users
  * @on-before prepareRoleData
  * @on-before prepareUserData
  */
 class testFormUserRoles extends CWebTest {
 
 	use TableTrait;
+
+	const ROLE_HASH = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid order by r.roleid;';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -56,6 +57,13 @@ class testFormUserRoles extends CWebTest {
 	protected static $super_roleid;
 
 	/**
+	 * Id of role that created for future role delete and type update.
+	 *
+	 * @var integer
+	 */
+	protected static $delete_roleid;
+
+	/**
 	 * Function used to create roles.
 	 */
 	public function prepareRoleData() {
@@ -70,26 +78,20 @@ class testFormUserRoles extends CWebTest {
 						'*.*'
 					]
 				]
+			],
+			[
+				'name' => 'super_role',
+				'type' => 3
+			],
+			[
+				'name' => 'role_for_delete',
+				'type' => 3
 			]
 		]);
 		$this->assertArrayHasKey('roleids', $response);
 		self::$roleid = $response['roleids'][0];
-
-		CDataHelper::call('role.create', [
-			[
-				'name' => 'role_for_delete',
-				'type' => 1
-			]
-		]);
-
-		$response_2 = CDataHelper::call('role.create', [
-			[
-				'name' => 'super_role',
-				'type' => 3
-			]
-		]);
-		$this->assertArrayHasKey('roleids', $response_2);
-		self::$super_roleid = $response_2['roleids'][0];
+		self::$super_roleid = $response['roleids'][1];
+		self::$delete_roleid = $response['roleids'][2];
 	}
 
 	public function prepareUserData() {
@@ -369,7 +371,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// A lot of saces in the name.
+			// A lot of spaces in the name.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -400,7 +402,75 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// All UI elements checked out except one.
+			// Trailing space in name.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'space' => true,
+					'fields' => [
+						'Name' => 'user_trailing ',
+						'User type' => 'User'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'space' => true,
+					'fields' => [
+						'Name' => 'admin_trailing ',
+						'User type' => 'Admin'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'space' => true,
+					'fields' => [
+						'Name' => 'super_admin_trailing ',
+						'User type' => 'Super admin'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Leading space in name.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'space' => true,
+					'fields' => [
+						'Name' => ' user_leading',
+						'User type' => 'User'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'space' => true,
+					'fields' => [
+						'Name' => ' admin_leading',
+						'User type' => 'Admin'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'space' => true,
+					'fields' => [
+						'Name' => ' super_admin_leading',
+						'User type' => 'Super admin'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// All UI elements unchecked.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -642,7 +712,7 @@ class testFormUserRoles extends CWebTest {
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		// New role check with screenshots.
-		$this->page->open('zabbix.php?action=userrole.edit');
+		$this->page->open('zabbix.php?action=userrole.edit')->waitUntilReady();
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
 			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
@@ -651,7 +721,7 @@ class testFormUserRoles extends CWebTest {
 		}
 
 		// Screens for super admin.
-		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=3');
+		$this->page->open('zabbix.php?action=userrole.edit&roleid=3');
 		$this->page->removeFocus();
 		$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]']);
 		foreach (['Clone' => true, 'Cancel' => true, 'Update' => false, 'Delete' => false] as $button => $clickable) {
@@ -660,12 +730,13 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	public function testFormUserRoles_SimpleUpdate() {
-		$hash_before = CDBHelper::getHash('SELECT * FROM role_rule where roleid=2');
+		$hash_before = CDBHelper::getHash(self::ROLE_HASH);
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('link', 'Admin role')->one()->click();
 		$this->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User role updated');
-		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role_rule where roleid=2'));
+		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid'.
+				' = r.roleid order by r.roleid;'));
 	}
 
 	public static function getUpdateData() {
@@ -674,7 +745,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'link' => 'role_for_update',
 					'fields' => [
 						'Name' => ''
 					],
@@ -686,7 +756,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'link' => 'role_for_update',
 					'fields' => [
 						'Name' => ' '
 					],
@@ -698,7 +767,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'link' => 'role_for_update',
 					'fields' => [
 						'Name' => 'User role '
 					],
@@ -710,7 +778,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'link' => 'role_for_update',
 					'fields' => [
 						'Monitoring' => [],
 						'Inventory' => [],
@@ -724,7 +791,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'link' => 'role_for_update',
 					'fields' => [
 						'Name' => 'user_changed_name',
 						'User type' => 'User'
@@ -736,7 +802,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'link' => 'user_changed_name',
 					'fields' => [
 						'User type' => 'Admin'
 					],
@@ -747,7 +812,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'link' => 'user_changed_name',
 					'fields' => [
 						'User type' => 'Super admin'
 					],
@@ -757,8 +821,8 @@ class testFormUserRoles extends CWebTest {
 			// Change type to user.
 			[
 				[
+					'to_user' => true,
 					'expected' => TEST_GOOD,
-					'link' => 'user_changed_name',
 					'fields' => [
 						'User type' => 'User'
 					],
@@ -769,7 +833,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'link' => 'user_changed_name',
 					'fields' => [],
 					'api_methods' => [],
 					'message_header' => 'User role updated'
@@ -779,7 +842,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'link' => 'user_changed_name',
 					'fields' => [
 						'API methods' => 'Allow list'
 					],
@@ -791,7 +853,6 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'link' => 'user_changed_name',
 					'fields' => [
 						'API methods' => 'Deny list'
 					],
@@ -801,8 +862,8 @@ class testFormUserRoles extends CWebTest {
 			// Access to actions removed.
 			[
 				[
+					'actions' => true,
 					'expected' => TEST_GOOD,
-					'link' => 'user_changed_name',
 					'fields' => [
 						'API methods' => 'Deny list',
 						'Create and edit dashboards and screens' => false,
@@ -824,8 +885,8 @@ class testFormUserRoles extends CWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormUserRoles_Update($data) {
-		$this->page->login()->open('zabbix.php?action=userrole.list');
-		$this->query('link', $data['link'])->one()->click();
+		$id = (array_key_exists('to_user', $data)) ? self::$delete_roleid : self::$roleid;
+		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid='.$id);
 		$this->checkRoleAction($data, 'update');
 	}
 
@@ -845,8 +906,7 @@ class testFormUserRoles extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM role WHERE name='.zbx_dbstr($role)));
 		}
 
-		$id = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr('Cloned_'.$role_name));
-		$this->page->open('zabbix.php?action=userrole.edit&roleid='.$id);
+		$this->query('link', 'Cloned_'.$role_name)->one()->click();
 		$cloned_values = $form->getFields()->asValues();
 		$this->assertEquals('Cloned_'.$role_name, $cloned_values['Name']);
 
@@ -860,7 +920,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		foreach (['Admin role', 'role_for_delete'] as $role) {
 			if ($role === 'Admin role') {
-				$hash_before = CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid');
+				$hash_before = CDBHelper::getHash(self::ROLE_HASH);
 			}
 			$this->query('link', $role)->one()->click();
 			$this->query('button:Delete')->one()->click();
@@ -869,7 +929,7 @@ class testFormUserRoles extends CWebTest {
 			if ($role === 'Admin role') {
 				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'The role "Admin role" is assigned to'.
 						' at least one user and cannot be deleted.');
-				$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid'));
+				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_HASH));
 			}
 			else {
 				$this->assertMessage(TEST_GOOD, 'User role deleted');
@@ -880,12 +940,12 @@ class testFormUserRoles extends CWebTest {
 
 	public function testFormUserRoles_Cancellation() {
 		foreach(['zabbix.php?action=userrole.edit', 'zabbix.php?action=userrole.edit&roleid=2'] as $link) {
-			$hash_before = CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid');
+			$hash_before = CDBHelper::getHash(self::ROLE_HASH);
 			$this->page->login()->open($link);
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 			$form->fill(['Name' => 'cancellation_name_user']);
 			$this->query('button:Cancel')->one()->click();
-			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid'));
+			$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_HASH));
 		}
 	}
 
@@ -906,11 +966,12 @@ class testFormUserRoles extends CWebTest {
 	 *  Checking layout after enabling modules.
 	 */
 	public function testFormUserRoles_Modules() {
-		foreach ([true, false] as $status) {
+		$this->page->login();
+		foreach ([true, false] as $enable_modules) {
 			$modules = ['4th Module', '5th Module'];
-			$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
+			$this->page->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-			if ($status === true) {
+			if ($enable_modules === true) {
 				$this->assertTrue($form->query('xpath://label[text()="No enabled modules found."]')->one()->isDisplayed());
 				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 				$this->query('button:Scan directory')->one()->click();
@@ -923,22 +984,12 @@ class testFormUserRoles extends CWebTest {
 				$this->page->waitUntilReady();
 			}
 			else {
-				$this->assertFalse($form->query('xpath://label[text()="No enabled modules found."]')->one($status)->isDisplayed());
+				$this->assertFalse($form->query('xpath://label[text()="No enabled modules found."]')->one($enable_modules)->isDisplayed());
 				foreach ($modules as $module) {
-					$form->getField($module)->isValid();
+					$form->getField($module)->isChecked();
 				}
 			}
 		}
-	}
-
-	/**
-	 * Fill multiselect field.
-	 *
-	 * @param array $methods	api methods from data provider
-	 */
-	private function fillMultiselect($methods) {
-		$api_field = $this->query('class:multiselect-control')->asMultiselect()->one();
-		$api_field->fill($methods);
 	}
 
 	/**
@@ -950,14 +1001,14 @@ class testFormUserRoles extends CWebTest {
 	private function checkRoleAction($data, $action) {
 		if ($action === 'create') {
 			if ($data['expected'] === TEST_BAD) {
-				$hash_before = CDBHelper::getHash('SELECT * FROM role');
+				$hash_before = CDBHelper::getHash(self::ROLE_HASH);
 			}
 		}
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 		$form->fill($data['fields']);
 
 		if (array_key_exists('api_methods', $data)) {
-			$this->fillMultiselect($data['api_methods']);
+			$this->query('class:multiselect-control')->asMultiselect()->one()->fill($data['api_methods']);
 		}
 		$form->submit();
 
@@ -965,45 +1016,41 @@ class testFormUserRoles extends CWebTest {
 			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
 
 			if ($action === 'create') {
-				$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role'));
+				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_HASH));
 			}
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, $data['message_header']);
 
 			if ($action === 'create') {
-				$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM role WHERE name='.zbx_dbstr($data['fields']['Name'])));
-				$created_roleid = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr($data['fields']['Name']));
+				$created_roleid = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr(trim($data['fields']['Name'])));
+				$this->assertFalse($created_roleid === null);
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.$created_roleid);
-			}
+			} //TO DO: Add hash check for update, after ZBX-19246 fix
 			else {
-				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$roleid);
+				$id = (array_key_exists('to_user', $data)) ? self::$delete_roleid : self::$roleid;
+				$this->page->login()->open('zabbix.php?action=userrole.edit&roleid='.$id);
 			}
 
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-			$form->checkValue($data['fields']);
+			if (!array_key_exists('space', $data)) {
+				$form->checkValue($data['fields']);
+			}
+			else {
+				$field = $data['fields'];
+				unset($field['Name']);
+				foreach([$field, trim($data['fields']['Name'])] as $value) {
+					$form->checkValue($value);
+				}
+			}
 			if (array_key_exists('api_methods', $data)) {
 				$this->assertApi($data['api_methods']);
 			}
 
-			if ($action === 'update') {
+			if ($action === 'update' && array_key_exists('actions', $data)) {
 				$this->assertActions($data['fields']);
 			}
 		}
-	}
-
-	/**
-	 * Get array list of API requests.
-	 *
-	 * @return array
-	 */
-	private function getApi(){
-		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->all()->count();
-		$result=[];
-		for ($i = 1;$i <= $counted; ++$i) {
-			$result[] = $this->query('xpath:(//ul[@class="multiselect-list"]/li)['.$i.']')->asMultiselect()->one()->getText();
-		}
-		return $result;
 	}
 
 	/**
@@ -1012,7 +1059,11 @@ class testFormUserRoles extends CWebTest {
 	 * @param array $api	given data provider
 	 */
 	private function assertApi($api) {
-		$api_list = $this->getApi();
+		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->all()->count();
+		$api_list=[];
+		for ($i = 1; $i <= $counted; ++$i) {
+			$api_list[] = $this->query('xpath:(//ul[@class="multiselect-list"]/li)['.$i.']')->asMultiselect()->one()->getText();
+		}
 		foreach ($api as $request) {
 			$this->assertTrue(in_array($request, $api_list));
 		}
@@ -1026,11 +1077,12 @@ class testFormUserRoles extends CWebTest {
 	private function assertActions($actions) {
 		$existing_actions = ['Create and edit dashboards and screens', 'Create and edit maps', 'Create and edit maintenance',
 				'Add problem comments', 'Change severity', 'Acknowledge problems', 'Close problems', 'Execute scripts'];
-		foreach($existing_actions as $action) {
+		foreach ($existing_actions as $action) {
 			if ((array_key_exists($action, $actions))) {
-				if($this->query('xpath://label[text()="'.$action.'"]/preceding-sibling::input[@checked]')->exists()) {
+				if ($this->query('xpath://label[text()="'.$action.'"]/preceding-sibling::input[@checked]')->exists()) {
 					$action_status = [$action => true];
-				} else {
+				}
+				else {
 					$action_status = [$action => false];
 				}
 				in_array($action_status, $actions);

@@ -56,7 +56,6 @@ class CFluidFormElement extends CFormElement {
 		if (($element = CElementQuery::getInputElement($label, './'.self::TABLE_FORM_FIELD))->isValid()) {
 			return $element;
 		}
-
 		else {
 			$element = $label->query('xpath:./../../'.self::TABLE_FORM_FIELD)->one(false);
 			return $element;
