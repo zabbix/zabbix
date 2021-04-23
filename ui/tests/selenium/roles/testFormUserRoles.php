@@ -31,7 +31,7 @@ class testFormUserRoles extends CWebTest {
 
 	use TableTrait;
 
-	const ROLE_HASH = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid order by r.roleid;';
+	const ROLE_HASH = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid order by r.roleid';
 
 	/**
 	 * Attach MessageBehavior to the test.
