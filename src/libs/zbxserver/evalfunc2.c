@@ -247,7 +247,7 @@ static int	get_function_parameter_hist_range(int from, const char *parameters, i
 	}
 	else
 	{
-		if (SUCCEED != is_uint31(parameter + 1, value))
+		if (SUCCEED != is_uint31(parameter + 1, value) || 0 >= *value)
 			goto out;
 		*type = ZBX_VALUE_NVALUES;
 	}
