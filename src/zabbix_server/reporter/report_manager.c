@@ -1594,26 +1594,13 @@ zbx_rm_widget_t;
  ******************************************************************************/
 static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *height)
 {
-	const zbx_rm_widget_t	widgets[] = {
-			{"clock", 1},
-			{"discovery", 6},
-			{"hostavail", 6},
-			{"map", 18},
-			{"navtree", 6},
-			{"plaintext", 6},
-			{"favmaps", 4},
-			{"favgraphs", 4},
-			{"favscreens", 4},
-			{"graph", 5},
-	};
-
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		y_max = 0, x_coeff = 1;
+	int		y_max = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dashboardid:" ZBX_FS_UI64, __func__, dashboardid);
 
-	result = DBselect("select w.type,w.width,w.y,w.height"
+	result = DBselect("select w.y,w.height"
 			" from widget w,dashboard_page p"
 			" where w.dashboard_pageid=p.dashboard_pageid"
 				" and p.dashboardid=" ZBX_FS_UI64
@@ -1621,41 +1608,20 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int	dashboard_width, bottom, min_width = 8, coeff;
-		size_t	i;
+		int	bottom;
 
-		bottom = atoi(row[2]) + atoi(row[3]);
+		bottom = atoi(row[0]) + atoi(row[1]);
 		if (bottom > y_max)
 			y_max = bottom;
-
-		dashboard_width = atoi(row[1]);
-
-		for (i = 0; i < ARRSIZE(widgets); i++)
-		{
-			if (0 == strcmp(row[0], widgets[i].name))
-			{
-				min_width = widgets[i].min_width;
-				break;
-			}
-		}
-
-		coeff = (dashboard_width < min_width ? (int)ceil((double)min_width / dashboard_width) : 1);
-
-		if (coeff > x_coeff)
-			x_coeff = coeff;
 	}
 	DBfree_result(result);
 
 	if (0 != y_max)
-	{
-		*width = x_coeff * ZBX_REPORT_DEFAULT_WIDTH;
 		*height = y_max * ZBX_REPORT_ROW_HEIGHT + ZBX_REPORT_BOTTOM_MARGIN;
-	}
 	else
-	{
-		*width = ZBX_REPORT_DEFAULT_WIDTH;
 		*height = ZBX_REPORT_DEFAULT_HEIGHT;
-	}
+
+	*width = ZBX_REPORT_DEFAULT_WIDTH;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() width:%d height:%d", __func__, *width, *height);
 }
