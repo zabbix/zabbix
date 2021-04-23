@@ -768,8 +768,8 @@ class testFormUserRoles extends CWebTest {
 			// Change type to user.
 			[
 				[
-					'to_user' => true,
 					'expected' => TEST_GOOD,
+					'to_user' => true,
 					'fields' => [
 						'User type' => 'User'
 					],
@@ -982,10 +982,12 @@ class testFormUserRoles extends CWebTest {
 			}
 
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+
 			if (array_key_exists('space', $data)) {
 				$data['fields']['Name'] = trim($data['fields']['Name']);
 			}
 			$form->checkValue($data['fields']);
+
 			if (array_key_exists('api_methods', $data)) {
 				$this->assertApi($data['api_methods']);
 			}
