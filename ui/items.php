@@ -1471,6 +1471,17 @@ else {
 	$data['items'] = API::Item()->get($options);
 	$data['parent_templates'] = [];
 
+	// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain tags already deleted).
+	if ($subfilter_tags) {
+		$item_tags = [];
+		foreach ($data['items'] as $item) {
+			foreach ($item['tags'] as $tag) {
+				$item_tags[json_encode([$tag['tag'], $tag['value']])] = true;
+			}
+		}
+		$subfilter_tags = array_intersect_key($subfilter_tags, $item_tags);
+	}
+
 	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
 	if ($data['items']) {
 		// resolve name macros
@@ -1658,12 +1669,10 @@ else {
 
 	// Replace hash keys by numeric index used in subfilter.
 	foreach ($data['filter_data']['subfilter_tags'] as $hash => $tag) {
-		if (array_key_exists('num', $tag)) {
-			$data['filter_data']['subfilter_tags'][$tag['num']] = [
-				'tag' => $tag['tag'],
-				'value' => $tag['value']
-			];
-		}
+		$data['filter_data']['subfilter_tags'][$tag['num']] = [
+			'tag' => $tag['tag'],
+			'value' => $tag['value']
+		];
 		unset($data['filter_data']['subfilter_tags'][$hash]);
 	}
 
