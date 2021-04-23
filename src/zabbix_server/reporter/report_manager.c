@@ -924,8 +924,6 @@ static void	rm_report_update_params(zbx_rm_report_t *report, zbx_vector_ptr_pair
 	zbx_vector_ptr_pair_t	old_params;
 	int			i, j;
 
-	/* TODO: add width, height parameters calculated from dashboard configuration */
-
 	zbx_vector_ptr_pair_create(&old_params);
 
 	zbx_vector_ptr_pair_append_array(&old_params, report->params.values, report->params.values_num);
@@ -1605,7 +1603,8 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
 			{"plaintext", 6},
 			{"favmaps", 4},
 			{"favgraphs", 4},
-			{"favscreens", 4}
+			{"favscreens", 4},
+			{"graph", 5},
 	};
 
 	DB_RESULT	result;
