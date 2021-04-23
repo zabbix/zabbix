@@ -46,6 +46,13 @@ class CRangeParser extends CParser {
 	private $lld_macro_function_parser;
 
 	/**
+	 * Number parser.
+	 *
+	 * @var CNumberParser
+	 */
+	private $number_parser;
+
+	/**
 	 * Range.
 	 *
 	 * @var array
@@ -59,19 +66,17 @@ class CRangeParser extends CParser {
 	 */
 	private $options = [
 		'usermacros' => false,
-		'lldmacros' => false
+		'lldmacros' => false,
+		'with_minus' => false,
+		'with_float' => false
 	];
 
 	/**
 	 * @param array $options   An array of options to initialize other parsers.
 	 */
 	public function __construct($options = []) {
-		if (array_key_exists('usermacros', $options)) {
-			$this->options['usermacros'] = $options['usermacros'];
-		}
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
+		$this->options = $options + $this->options;
+		$this->number_parser = new CNumberParser($this->options);
 
 		if ($this->options['usermacros']) {
 			$this->user_macro_parser = new CUserMacroParser();
@@ -91,6 +96,8 @@ class CRangeParser extends CParser {
 	 *   {$M}-{$M}
 	 *   {#M}-{#M}
 	 *   {$M}-{{#M}.regsub("^([0-9]+)", "{#M}: \1")}
+	 *   -200--10
+	 *   -2.5--1.35
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
@@ -196,21 +203,40 @@ class CRangeParser extends CParser {
 	 * @return bool|array     Returns false if non-numeric character found else returns array of position and match.
 	 */
 	private function parseDigits($source, &$pos) {
-		if (!preg_match('/^([0-9]+)/', substr($source, $pos), $matches)) {
+		if ($this->number_parser->parse($source, $pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
 
-		if ($matches[0] > ZBX_MAX_INT32) {
+		$value = $this->number_parser->getMatch();
+
+		if ($value > ZBX_MAX_INT32) {
+			return false;
+		}
+
+		if (!$this->options['with_minus'] && $value < 0) {
+			return false;
+		}
+
+		if ($value !== '' && $value[0] === '.') {
+			return false;
+		}
+
+		if (!$this->options['with_float'] && strpos($value, '.') !== false) {
+			// Do not count dot character and float part parsed by CNumberParser when float is not allowed.
+			$value = substr($value, 0, strpos($value, '.'));
+		}
+
+		if (filter_var($value, FILTER_VALIDATE_INT) === false && !$this->options['with_float']) {
 			return false;
 		}
 
 		// Second value must be greater than or equal to first one.
-		if ($this->range && ctype_digit($this->range[0]) && $this->range[0] > $matches[0]) {
+		if ($this->range && is_numeric($this->range[0]) && $this->range[0] > $value) {
 			return false;
 		}
 
-		$pos += strlen($matches[0]);
-		$this->range[] = $matches[0];
+		$pos += strlen($value);
+		$this->range[] = $value;
 
 		return true;
 	}
