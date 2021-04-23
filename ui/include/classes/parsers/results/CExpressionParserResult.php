@@ -105,6 +105,22 @@ class CExpressionParserResult extends CParserResult {
 	}
 
 	/**
+	 * Return list hosts found in parsed trigger expression.
+	 *
+	 * @return array
+	 */
+	public function getHosts(): array {
+		$hist_functions = $this->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
+		$hosts = [];
+
+		foreach ($hist_functions as $hist_function) {
+			$hosts[$hist_function['data']['parameters'][0]['data']['host']] = true;
+		}
+
+		return array_keys($hosts);
+	}
+
+	/**
 	 * Check whether the expression contains at least one token of the given type.
 	 *
 	 * @param int $type
@@ -203,20 +219,5 @@ class CExpressionParserResult extends CParserResult {
 		}
 
 		return array_keys(array_flip($items));
-	}
-	/**
-	 * Return list hosts found in parsed trigger expression.
-	 *
-	 * @return array
-	 */
-	public function getHosts():array {
-		$hosts = [];
-		foreach ($this->tokens as $token) {
-			if ($token instanceof CFunctionParserResult) {
-				$hosts = array_merge($hosts, $token->getHosts());
-			}
-		}
-
-		return array_keys(array_flip($hosts));
 	}
 }

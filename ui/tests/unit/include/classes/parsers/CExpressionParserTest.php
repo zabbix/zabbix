@@ -2317,7 +2317,40 @@ class CExpressionParserTest extends TestCase {
 							'type' => CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION,
 							'pos' => 98,
 							'match' => 'func(/host/key, #25:now/M, "eq", "str")',
-							'length' => 39
+							'length' => 39,
+							'data' => [
+								'function' => 'func',
+								'parameters' => [
+									[
+										'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+										'pos' => 103,
+										'match' => '/host/key',
+										'length' => 9,
+										'data' => [
+											'host' => 'host',
+											'item' => 'key'
+										]
+									],
+									[
+										'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+										'pos' => 114,
+										'match' => '#25:now/M',
+										'length' => 9
+									],
+									[
+										'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+										'pos' => 125,
+										'match' => '"eq"',
+										'length' => 4
+									],
+									[
+										'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+										'pos' => 131,
+										'match' => '"str"',
+										'length' => 5
+									]
+								]
+							]
 						],
 						[
 							'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
@@ -2358,7 +2391,22 @@ class CExpressionParserTest extends TestCase {
 													'type' => CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION,
 													'pos' => 156,
 													'match' => 'last(/host/key)',
-													'length' => 15
+													'length' => 15,
+													'data' => [
+														'function' => 'last',
+														'parameters' => [
+															[
+																'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+																'pos' => 161,
+																'match' => '/host/key',
+																'length' => 9,
+																'data' => [
+																	'host' => 'host',
+																	'item' => 'key'
+																]
+															]
+														]
+													]
 												]
 											]
 										]
@@ -2439,7 +2487,28 @@ class CExpressionParserTest extends TestCase {
 																			'type' => CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION,
 																			'pos' => 200,
 																			'match' => 'min(/host/key, 1d:now/d)',
-																			'length' => 24
+																			'length' => 24,
+																			'data' => [
+																				'function' => 'min',
+																				'parameters' => [
+																					[
+																						'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+																						'pos' => 204,
+																						'match' => '/host/key',
+																						'length' => 9,
+																						'data' => [
+																							'host' => 'host',
+																							'item' => 'key'
+																						]
+																					],
+																					[
+																						'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+																						'pos' => 215,
+																						'match' => '1d:now/d',
+																						'length' => 8
+																					]
+																				]
+																			]
 																		]
 																	]
 																]

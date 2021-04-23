@@ -617,7 +617,11 @@ class CExpressionParser extends CParser {
 			'type' => CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION,
 			'pos' => $pos,
 			'match' => $hist_function_parser->getMatch(),
-			'length' => $len
+			'length' => $len,
+			'data' => [
+				'function' => $hist_function_parser->getFunction(),
+				'parameters' => $hist_function_parser->getParameters()
+			]
 		];
 		$pos += $len - 1;
 
