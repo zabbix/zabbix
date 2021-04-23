@@ -903,7 +903,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartHistoryPollers",		&CONFIG_HISTORYPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartReportWriters",		&CONFIG_REPORTWRITER_FORKS,		TYPE_INT,
-			PARM_OPT,	0,			1000},
+			PARM_OPT,	0,			100},
 		{"WebServiceURL",		&CONFIG_WEBSERVICE_URL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{NULL}
