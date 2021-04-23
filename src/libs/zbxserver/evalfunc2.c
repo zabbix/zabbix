@@ -564,6 +564,12 @@ static int	evaluate_LOGSEVERITY(zbx_variant_t *value, DC_ITEM *item, const char 
 		goto out;
 	}
 
+	if (1 < num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
 	if (SUCCEED == get_last_n_value(item, parameters, ts, &vc_value, error))
 	{
 		zbx_variant_set_dbl(value, vc_value.value.log->severity);
