@@ -83,8 +83,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
 
-		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $name)->one(false)->isValid() === false) {
+		// Check if template name present on page, if not, check on next page.
+		for ($i = 0; $i < 2; $i++) {
+			if ($this->query('link', $name)->one(false)->isValid() === true) {
+				break;
+			}
 			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
 			$this->zbxTestWaitForPageToLoad();
 		}

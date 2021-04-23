@@ -37,7 +37,7 @@ class testFormTemplate extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Test Template',
+					'name' => 'Selenium Test Template',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -46,7 +46,7 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Test Template name',
-					'visible_name' => 'Test template with visible name',
+					'visible_name' => 'Selenium Test template with visible name',
 					'group' => 'Linux servers',
 					'new_group' => 'Selenium new group',
 					'description' => 'template description',
@@ -57,10 +57,10 @@ class testFormTemplate extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Test Template',
+					'name' => 'Selenium Test Template',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template "Test Template" already exists.'
+						'Template "Selenium Test Template" already exists.'
 					]
 
 				]
@@ -69,10 +69,10 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Existing visible name',
-					'visible_name' => 'Test template with visible name',
+					'visible_name' => 'Selenium Test template with visible name',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same visible name "Test template with visible name" already exists.'
+						'Template with the same visible name "Selenium Test template with visible name" already exists.'
 					]
 
 				]

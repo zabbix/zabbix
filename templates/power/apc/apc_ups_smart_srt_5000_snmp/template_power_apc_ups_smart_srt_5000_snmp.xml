@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-24T13:14:47Z</date>
+   <date>2021-04-14T16:30:10Z</date>
    <groups>
       <group>
          <name>Templates/Power</name>
@@ -48,7 +48,7 @@ The remaining battery capacity expressed as&#13;
  percentage of full capacity.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -75,6 +75,7 @@ The remaining battery capacity expressed as&#13;
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.5.0</snmp_oid>
                <key>battery.external_packs_count[upsAdvBatteryNumOfBattPacks]</key>
+               <delay>1h</delay>
                <history>7d</history>
                <status>ENABLED</status>
                <description>MIB: PowerNet-MIB&#13;
@@ -83,7 +84,7 @@ The number of external battery packs connected to the UPS. If&#13;
  ERROR_NO_SUCH_NAME.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -98,6 +99,7 @@ The number of external battery packs connected to the UPS. If&#13;
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.1.3.0</snmp_oid>
                <key>battery.last_replace_date[upsBasicBatteryLastReplaceDate]</key>
+               <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
@@ -110,7 +112,7 @@ The date when the UPS system's batteries were last replaced&#13;
  For Symmetra PX 250/500 this OID is read-only and is configurable in the local display only.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -131,7 +133,7 @@ The date when the UPS system's batteries were last replaced&#13;
 Indicates whether the UPS batteries need replacement.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <valuemap>
@@ -166,7 +168,7 @@ The UPS battery run time remaining before battery&#13;
  exhaustion.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -197,7 +199,7 @@ The status of the UPS batteries. A batteryLow(3) value&#13;
  installed has an internal error condition.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <valuemap>
@@ -238,7 +240,7 @@ The current internal UPS temperature in Celsius.&#13;
  Temperatures below zero read as 0.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -273,7 +275,7 @@ The current internal UPS temperature in Celsius.&#13;
 The actual battery bus voltage in Volts.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -286,89 +288,6 @@ The actual battery bus voltage in Volts.</description>
                      <params>6h</params>
                   </step>
                </preprocessing>
-            </item>
-            <item>
-               <name>ICMP ping</name>
-               <type>SIMPLE</type>
-               <key>icmpping</key>
-               <history>1w</history>
-               <status>ENABLED</status>
-               <applications>
-                  <application>
-                     <name>Status</name>
-                  </application>
-               </applications>
-               <valuemap>
-                  <name>Service state</name>
-               </valuemap>
-               <triggers>
-                  <trigger>
-                     <expression>{max(#3)}=0</expression>
-                     <name>Unavailable by ICMP ping</name>
-                     <priority>HIGH</priority>
-                     <description>Last three attempts returned timeout.  Please check device connectivity.</description>
-                  </trigger>
-               </triggers>
-            </item>
-            <item>
-               <name>ICMP loss</name>
-               <type>SIMPLE</type>
-               <key>icmppingloss</key>
-               <history>1w</history>
-               <status>ENABLED</status>
-               <value_type>FLOAT</value_type>
-               <units>%</units>
-               <applications>
-                  <application>
-                     <name>Status</name>
-                  </application>
-               </applications>
-               <triggers>
-                  <trigger>
-                     <expression>{min(5m)}&gt;{$ICMP.LOSS.WARN} and {min(5m)}&lt;100</expression>
-                     <name>High ICMP ping loss</name>
-                     <opdata>Loss: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                     <dependencies>
-                        <dependency>
-                           <name>Unavailable by ICMP ping</name>
-                           <expression>{Template Power APC Smart-UPS SRT 5000 SNMP:icmpping.max(#3)}=0</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
-            </item>
-            <item>
-               <name>ICMP response time</name>
-               <type>SIMPLE</type>
-               <key>icmppingsec</key>
-               <history>1w</history>
-               <status>ENABLED</status>
-               <value_type>FLOAT</value_type>
-               <units>s</units>
-               <applications>
-                  <application>
-                     <name>Status</name>
-                  </application>
-               </applications>
-               <triggers>
-                  <trigger>
-                     <expression>{avg(5m)}&gt;{$ICMP.RESPONSE_TIME.WARN}</expression>
-                     <name>High ICMP ping response time</name>
-                     <opdata>Value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                     <dependencies>
-                        <dependency>
-                           <name>High ICMP ping loss</name>
-                           <expression>{Template Power APC Smart-UPS SRT 5000 SNMP:icmppingloss.min(5m)}&gt;{$ICMP.LOSS.WARN} and {Template Power APC Smart-UPS SRT 5000 SNMP:icmppingloss.min(5m)}&lt;100</expression>
-                        </dependency>
-                        <dependency>
-                           <name>Unavailable by ICMP ping</name>
-                           <expression>{Template Power APC Smart-UPS SRT 5000 SNMP:icmpping.max(#3)}=0</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>Input fail cause</name>
@@ -404,7 +323,7 @@ a rate of change of input voltage greater than ten volts per cycle.&#13;
 the line voltage.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <valuemap>
@@ -430,7 +349,7 @@ the line voltage.</description>
 The current input frequency to the UPS system in Hz.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -465,7 +384,7 @@ The current input frequency to the UPS system in Hz.</description>
 The current utility line voltage in VAC.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -500,7 +419,7 @@ The current utility line voltage in VAC.</description>
 The current in amperes drawn by the load on the UPS.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -528,7 +447,7 @@ The current UPS load expressed as percentage&#13;
 of rated capacity.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -568,11 +487,11 @@ During self-test most UPSes report onBattery(3) but&#13;
  to the upsBasicStateOutputState OID.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <valuemap>
-                  <name>PowerNet-MIB::upsBasicBatteryStatus</name>
+                  <name>PowerNet-MIB::upsBasicOutputStatus</name>
                </valuemap>
                <preprocessing>
                   <step>
@@ -651,7 +570,7 @@ During self-test most UPSes report onBattery(3) but&#13;
 The output voltage of the UPS system in VAC.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Status</name>
                   </application>
                </applications>
                <preprocessing>
@@ -756,7 +675,7 @@ The physical location of this node (e.g., `telephone closet,&#13;
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>6h</params>
                   </step>
                </preprocessing>
             </item>
@@ -765,6 +684,7 @@ The physical location of this node (e.g., `telephone closet,&#13;
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.1.1.1.0</snmp_oid>
                <key>system.model[upsBasicIdentModel]</key>
+               <delay>15m</delay>
                <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
@@ -787,7 +707,7 @@ The UPS model name (e.g. 'APC Smart-UPS 600').</description>
                <name>System name</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.5.0</snmp_oid>
-               <key>system.name</key>
+               <key>system.name[sysName.0]</key>
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
@@ -806,7 +726,7 @@ the value is the zero-length string.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>6h</params>
                   </step>
                </preprocessing>
                <triggers>
@@ -844,7 +764,7 @@ to its `Fred Router'.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>6h</params>
                   </step>
                </preprocessing>
             </item>
@@ -853,6 +773,7 @@ to its `Fred Router'.</description>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.318.1.1.1.1.2.3.0</snmp_oid>
                <key>system.sn[upsAdvIdentSerialNumber]</key>
+               <delay>15m</delay>
                <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
@@ -928,6 +849,12 @@ portion of the system was last re-initialized.</description>
                <valuemap>
                   <name>zabbix.host.available</name>
                </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
                <triggers>
                   <trigger>
                      <expression>{max({$SNMP.TIMEOUT})}=0</expression>
@@ -935,12 +862,6 @@ portion of the system was last re-initialized.</description>
                      <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>SNMP is not available for polling. Please check device connectivity and SNMP settings.</description>
-                     <dependencies>
-                        <dependency>
-                           <name>Unavailable by ICMP ping</name>
-                           <expression>{Template Power APC Smart-UPS SRT 5000 SNMP:icmpping.max(#3)}=0</expression>
-                        </dependency>
-                     </dependencies>
                   </trigger>
                </triggers>
             </item>
@@ -959,6 +880,7 @@ portion of the system was last re-initialized.</description>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.2.6.0</snmp_oid>
                      <key>battery.external_packs_bad[upsAdvBatteryNumOfBadBattPacks.{#SNMPINDEX}]</key>
+                     <delay>15m</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <description>MIB: PowerNet-MIB&#13;
@@ -967,7 +889,7 @@ are defective. If the UPS does not use smart cells then the&#13;
 agent reports ERROR_NO_SUCH_NAME.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1003,6 +925,7 @@ agent reports ERROR_NO_SUCH_NAME.</description>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>battery.estimated_replace_date[upsHighPrecBatteryPackCartridgeReplaceDate.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
+                     <delay>1h</delay>
                      <history>7d</history>
                      <trends>0</trends>
                      <status>ENABLED</status>
@@ -1011,7 +934,7 @@ agent reports ERROR_NO_SUCH_NAME.</description>
 The battery cartridge estimated battery replace date.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1041,7 +964,7 @@ The battery cartridge health.&#13;
   bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1092,7 +1015,7 @@ bit 10 DisconnectedFrame&#13;
 bit 11 FirmwareMismatch</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1136,7 +1059,7 @@ bit 11 FirmwareMismatch</description>
 The battery pack temperature in Celsius.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1163,6 +1086,7 @@ The battery pack temperature in Celsius.</description>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>system.sn[upsHighPrecBatteryPackSerialNumber.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]</key>
+                     <delay>15m</delay>
                      <history>7d</history>
                      <trends>0</trends>
                      <status>ENABLED</status>
@@ -1207,7 +1131,7 @@ The sensor's current humidity reading - a relative humidity&#13;
  sensor that doesn't read humidity or lost communications.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1232,7 +1156,7 @@ uioCritical               (3),&#13;
 sensorStatusNotApplicable (4)</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1279,7 +1203,7 @@ The sensor's current temperature reading in Celsius.&#13;
  -1 indicates an invalid reading due to lost communications.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1340,7 +1264,7 @@ The sensor's current humidity reading - a relative humidity&#13;
  sensor that doesn't read humidity or lost communications.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1365,7 +1289,7 @@ uioCritical               (3),&#13;
 sensorStatusNotApplicable (4)</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1412,7 +1336,7 @@ The sensor's current temperature reading in Celsius.&#13;
  -1 indicates an invalid reading due to lost communications.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1472,7 +1396,7 @@ The input current in 0.1 amperes, or -0.1 if it's&#13;
  unsupported by this UPS.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1500,7 +1424,7 @@ The input voltage in VAC, or -1 if it's unsupported&#13;
  by this UPS.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1544,7 +1468,7 @@ The output current in 0.1 amperes drawn&#13;
  by this UPS.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1573,7 +1497,7 @@ The percentage of the UPS load capacity in VA at&#13;
  output phase, or -1 if it's unsupported by this UPS.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1597,7 +1521,7 @@ The output voltage in VAC, or -1 if it's unsupported&#13;
  by this UPS.</description>
                      <applications>
                         <application>
-                           <name>General</name>
+                           <name>Status</name>
                         </application>
                      </applications>
                      <preprocessing>
@@ -1629,14 +1553,6 @@ The output voltage in VAC, or -1 if it's unsupported&#13;
                <macro>{$BATTERY.TEMP.MAX.WARN}</macro>
                <value>55</value>
                <description>Maximum battery temperature for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$ICMP.LOSS.WARN}</macro>
-               <value>20</value>
-            </macro>
-            <macro>
-               <macro>{$ICMP.RESPONSE_TIME.WARN}</macro>
-               <value>0.15</value>
             </macro>
             <macro>
                <macro>{$SNMP.TIMEOUT}</macro>
@@ -2162,19 +2078,6 @@ The output voltage in VAC, or -1 if it's unsupported&#13;
             <mapping>
                <value>2</value>
                <newvalue>unknown</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>
