@@ -2815,6 +2815,10 @@ class CAction extends CApiService {
 	 * @param $actions
 	 */
 	protected function validateCreate($actions) {
+		if (!$actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$actionDbFields = [
 			'name'        => null,
 			'eventsource' => null
