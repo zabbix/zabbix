@@ -364,13 +364,18 @@ class C52TriggerExpressionConverter extends CConverter {
 				}
 				unset($parameters[1], $unquotable_parameters[1]);
 				break;
+
+			case 'logeventid':
+			case 'logsource':
+				array_unshift($parameters, '');
+				break;
 		}
 
 		// Keys in $parameters array to skip from quoting.
 		$unquotable_parameters = array_keys($unquotable_parameters);
 		$functions_with_period_parameter = ['delta', 'avg', 'max', 'min', 'sum', 'last', 'strlen', 'percentile',
 			'timeleft', 'forecast', 'band', 'count', 'fuzzytime', 'nodata', 'iregexp', 'regexp', 'str', 'trendavg',
-			'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum'
+			'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum', 'logeventid', 'logsource'
 		];
 		if (in_array($fn_name, $functions_with_period_parameter)) {
 			$unquotable_parameters[] = 0;
