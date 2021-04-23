@@ -1,1 +1,0 @@
-........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)

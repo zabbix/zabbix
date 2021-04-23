@@ -1,6 +1,7 @@
 Changes for 5.4.0rc1
 
 New features:
+.........T [ZBXNEXT-6571] added templates with multi-page dashboards (afayantsev)
 ........S. [ZBXNEXT-6497] added read/write locking to value cache (wiper)
 A.F.....S. [ZBXNEXT-2976] dropped support of applications; added support of tags for item related configuration entities (asestakovs, miks)
 .........T [ZBXNEXT-6504] added Templates "TiDB by HTTP", "TiDB TiKV by HTTP" and "TiDB PD by HTTP" (ychukina)
@@ -10,6 +11,9 @@ A.F.....S. [ZBXNEXT-6309] added support for multi-page dashboards (arimdjonoks, 
 .........T [ZBXNEXT-6571] added templates for APC UPSs Galaxy 3500, Smart-UPS, Smart-UPS SRT, Symmetra RM (mchudinov)
 
 Bug fixes:
+.........T [ZBX-18701] fixed syntax mistakes in Template DB MySQL, renamed LLD rule to Database discovery (mchudinov)
+........S. [ZBX-19159] added postponing of recovery operation when problem operation still executes, fixed memory leak while saving tags returned by webhook (dgoloscapov, wiper)
+....I..... [ZBX-19102] fixed conversion of EVENT.NAME to EVENT.RECOVERY.NAME in recovery opmessage (dgoloscapov)
 .........T [ZBX-19253] removed ICMP checks, moved items to another application, changed update interval, added "Discard with heartbeat" preprocessing in APC UPS templates (mchudinov)
 ..F....... [ZBX-19240] fixed JavaScript errors upon copying map or map navigation tree widgets (averza)
 .......PS. [ZBX-19088] fixed overload memory with unused vmware events (MVekslers)
