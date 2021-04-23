@@ -3,7 +3,7 @@
 This guide describes how to integrate Zabbix 5.4 installation with Express.ms messenger using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 
 ## Setting up Express
-1\. Create a bot user for API or use an existing one. *URL* cannot be empty, pas any URL here.<br>
+1\. Create a bot user for API or use an existing one. *URL* cannot be empty, pass any URL here.<br>
 
 2\. Open created bot and set *allowed_data* to *none*.<br>
 

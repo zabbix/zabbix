@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-22T03:03:03Z'
+  date: '2021-04-23T15:11:29Z'
   media_types:
     -
       name: Express.ms
@@ -41,10 +41,8 @@ zabbix_export:
         
                 Express.params = params;
         
-                if (typeof Express.params.url === 'string') {
-                    if (!Express.params.url.endsWith('/')) {
-                        Express.params.url += '/';
-                    }
+                if (typeof Express.params.url === 'string' && !Express.params.url.endsWith('/')) {
+                    Express.params.url += '/';
                 }
             },
         
@@ -99,13 +97,13 @@ zabbix_export:
                 return response.result;
             },
         
-            postMessage: function (isProblem) {
+            postMessage: function (is_problem) {
                 var data,
                     url,
                     result = {tags: {}},
                     response;
         
-                if (isProblem) {
+                if (is_problem) {
                     data = {
                         group_chat_id: Express.params.send_to,
                         notification: {
@@ -128,7 +126,7 @@ zabbix_export:
                         var tags = JSON.parse(Express.params.tags);
                     }
                     catch (error) {
-                        throw 'Cannot parse value of "express_tags". Value: ' + Express.params.tags + '.';
+                        throw 'Value of "express_tags" is not JSON. Value: ' + Express.params.tags + '.';
                     }
         
                     tags.forEach(function(tag) {
@@ -138,13 +136,13 @@ zabbix_export:
                     });
         
                     if (!data.source_sync_id) {
-                        throw 'Cannot get sync_id from tag "__zbx_ex_sync_id_' + Express.params.send_to + '".';
+                        throw 'Cannot update data. sync_id for the provided sender is unknown.';
                     }
                 }
         
                 response = Express.request(url, data);
         
-                if (isProblem && response.sync_id) {
+                if (is_problem && response.sync_id) {
                     result.tags['__zbx_ex_sync_id_' + Express.params.send_to] = response.sync_id;
         
                     return JSON.stringify(result);
@@ -152,7 +150,6 @@ zabbix_export:
                 else {
                     return 'OK';
                 }
-        
             }
         };
         
@@ -170,7 +167,8 @@ zabbix_export:
                         express[key.substring(8)] = params[key];
                     }
         
-                    if (required_params.indexOf(key) !== -1 && params[key].trim() === '' && params[key] === '{ALERT.SENDTO}') {
+                    if (required_params.indexOf(key) !== -1
+                            && (params[key].trim() === '' || params[key] === '{ALERT.SENDTO}')) {
                         throw 'Parameter "' + key + '" can\'t be empty.';
                     }
                 });
