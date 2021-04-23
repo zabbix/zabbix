@@ -463,8 +463,8 @@ out:
 static int	evaluate_LOGSOURCE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
-	char			*arg1 = NULL;
-	int			ret = FAIL;
+	char			*pattern = NULL;
+	int			ret = FAIL, nparams;
 	zbx_vector_ptr_t	regexps;
 	zbx_history_record_t	vc_value;
 
@@ -478,32 +478,38 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	if (2 < num_param(parameters))
+	if (2 < (nparams = num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_str(parameters, 2, &arg1))
+	if (2 == nparams)
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
-		goto out;
-	}
-
-	if ('@' == *arg1)
-	{
-		DCget_expressions_by_name(&regexps, arg1 + 1);
-
-		if (0 == regexps.values_num)
+		if (SUCCEED != get_function_parameter_str(parameters, 2, &pattern))
 		{
-			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", arg1 + 1);
+			*error = zbx_strdup(*error, "invalid third parameter");
 			goto out;
 		}
+
+		if ('@' == *pattern)
+		{
+			DCget_expressions_by_name(&regexps, pattern + 1);
+
+			if (0 == regexps.values_num)
+			{
+				*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist",
+						pattern + 1);
+				goto out;
+			}
+		}
 	}
+	else
+		pattern = zbx_strdup(NULL, "");
 
 	if (SUCCEED == get_last_n_value(item, parameters, ts, &vc_value, error))
 	{
-		switch (regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
+		switch (regexp_match_ex(&regexps, vc_value.value.log->source, pattern, ZBX_CASE_SENSITIVE))
 		{
 			case ZBX_REGEXP_MATCH:
 				zbx_variant_set_dbl(value, 1);
@@ -522,7 +528,7 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, DC_ITEM *item, const char *p
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
 out:
-	zbx_free(arg1);
+	zbx_free(pattern);
 
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
