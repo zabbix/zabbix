@@ -21,6 +21,7 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "dbupgrade_macros.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
@@ -4438,6 +4439,43 @@ static int	DBpatch_5030142(void)
 {
 	return DBdrop_table("applications");
 }
+
+static int	DBpatch_5030143(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select om.operationid,om.subject,om.message"
+			" from opmessage om,operations o,actions a"
+			" where om.operationid=o.operationid"
+				" and o.actionid=a.actionid"
+				" and a.eventsource=0 and o.operationtype=11");
+
+	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{EVENT.NAME}",
+			"{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030144(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
+
+	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
+			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -4587,5 +4625,7 @@ DBPATCH_ADD(5030139, 0, 1)
 DBPATCH_ADD(5030140, 0, 1)
 DBPATCH_ADD(5030141, 0, 1)
 DBPATCH_ADD(5030142, 0, 1)
+DBPATCH_ADD(5030143, 0, 1)
+DBPATCH_ADD(5030144, 0, 1)
 
 DBPATCH_END()
