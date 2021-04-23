@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-03-29T14:21:23Z'
+  date: '2021-04-22T11:26:37Z'
   groups:
     -
       name: Templates/Databases
@@ -1686,270 +1686,274 @@ zabbix_export:
       dashboards:
         -
           name: 'PostgreSQL databases'
-          widgets:
+          pages:
             -
-              type: GRAPH_PROTOTYPE
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+              widgets:
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Tuples'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Events'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Tuples'
+                        host: PostgreSQL
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Block hit/read'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '12'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Temp files'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '24'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+                  x: '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Events'
+                        host: PostgreSQL
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Locks'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '24'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
-                -
-                  type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Database size'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              'y': '36'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+                  'y': '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Block hit/read'
+                        host: PostgreSQL
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Queries'
-                    host: PostgreSQL
-            -
-              type: GRAPH_PROTOTYPE
-              x: '12'
-              'y': '36'
-              width: '12'
-              height: '12'
-              fields:
-                -
-                  type: INTEGER
-                  name: columns
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '3'
+                  x: '12'
+                  'y': '12'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Temp files'
+                        host: PostgreSQL
                 -
                   type: GRAPH_PROTOTYPE
-                  name: graphid
-                  value:
-                    name: 'DB {#DBNAME}: Slow queries'
-                    host: PostgreSQL
+                  'y': '24'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Locks'
+                        host: PostgreSQL
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '24'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Database size'
+                        host: PostgreSQL
+                -
+                  type: GRAPH_PROTOTYPE
+                  'y': '36'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Queries'
+                        host: PostgreSQL
+                -
+                  type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '36'
+                  width: '12'
+                  height: '12'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'DB {#DBNAME}: Slow queries'
+                        host: PostgreSQL
         -
           name: 'PostgreSQL stat'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '6'
-              fields:
+              widgets:
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL connections'
-                    host: PostgreSQL
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL connections'
+                        host: PostgreSQL
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL transactions'
-                    host: PostgreSQL
-            -
-              type: GRAPH_CLASSIC
-              'y': '6'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL transactions'
+                        host: PostgreSQL
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL ping'
-                    host: PostgreSQL
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '6'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  'y': '6'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL ping'
+                        host: PostgreSQL
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL uptime'
-                    host: PostgreSQL
-            -
-              type: GRAPH_CLASSIC
-              'y': '12'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '6'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL uptime'
+                        host: PostgreSQL
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL replication lag'
-                    host: PostgreSQL
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '12'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  'y': '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL replication lag'
+                        host: PostgreSQL
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL WAL'
-                    host: PostgreSQL
-            -
-              type: GRAPH_CLASSIC
-              'y': '18'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL WAL'
+                        host: PostgreSQL
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL bgwriter'
-                    host: PostgreSQL
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '18'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  'y': '18'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL bgwriter'
+                        host: PostgreSQL
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'PostgreSQL checkpoints'
-                    host: PostgreSQL
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '18'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'PostgreSQL checkpoints'
+                        host: PostgreSQL
       valuemaps:
         -
           name: 'PostgreSQL recovery role'
@@ -2111,14 +2115,13 @@ zabbix_export:
       ymin_type_1: FIXED
       graph_items:
         -
-          sortorder: '1'
           drawtype: GRADIENT_LINE
           color: A5D6A7
           item:
             host: PostgreSQL
             key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
         -
-          sortorder: '2'
+          sortorder: '1'
           color: 039BE5
           yaxisside: RIGHT
           item:

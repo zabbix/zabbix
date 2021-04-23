@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-24T11:15:15Z'
+  date: '2021-04-22T11:28:44Z'
   groups:
     -
       name: Templates/SAN
@@ -20,11 +20,6 @@ zabbix_export:
       groups:
         -
           name: Templates/SAN
-      applications:
-        -
-          name: CPU
-        -
-          name: Huawei
       items:
         -
           name: 'OceanStor 5300 V5: Status'
@@ -33,14 +28,15 @@ zabbix_export:
           key: 'huawei.5300.v5[status]'
           history: 7d
           description: 'System running status.'
-          applications:
-            -
-              name: Huawei
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Huawei
         -
           name: 'OceanStor 5300 V5: Capacity total'
           type: SNMP_AGENT
@@ -49,9 +45,6 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Total capacity of a device.'
-          applications:
-            -
-              name: Huawei
           preprocessing:
             -
               type: MULTIPLIER
@@ -61,6 +54,10 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
+          tags:
+            -
+              tag: Application
+              value: Huawei
         -
           name: 'OceanStor 5300 V5: Capacity used'
           type: SNMP_AGENT
@@ -69,14 +66,15 @@ zabbix_export:
           history: 7d
           units: B
           description: 'Used capacity of a device.'
-          applications:
-            -
-              name: Huawei
           preprocessing:
             -
               type: MULTIPLIER
               parameters:
                 - '1048576'
+          tags:
+            -
+              tag: Application
+              value: Huawei
         -
           name: 'OceanStor 5300 V5: Version'
           type: SNMP_AGENT
@@ -86,14 +84,15 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The device version.'
-          applications:
-            -
-              name: Huawei
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: Application
+              value: Huawei
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -119,9 +118,6 @@ zabbix_export:
               description: |
                 Health status of a BBU. For details, see definition of Enum Values (HEALTH_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'BBU {#ID}'
               valuemap:
                 name: 'Huawei storage: Health status'
               preprocessing:
@@ -129,6 +125,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'BBU {#ID}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -143,9 +143,6 @@ zabbix_export:
               description: |
                 Running status of a BBU. For details, see definition of Enum Values (RUNNING_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'BBU {#ID}'
               valuemap:
                 name: 'Huawei storage: Running status'
               preprocessing:
@@ -153,6 +150,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'BBU {#ID}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>2'
@@ -175,9 +176,10 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'CPU usage of a controller {#ID}.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Controller {#ID}'
+                  tag: Application
+                  value: 'Controller {#ID}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -194,9 +196,6 @@ zabbix_export:
               description: |
                 Controller health status. For details, see definition of Enum Values (HEALTH_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'Controller {#ID}'
               valuemap:
                 name: 'Huawei storage: Health status'
               preprocessing:
@@ -204,6 +203,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Controller {#ID}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -217,9 +220,10 @@ zabbix_export:
               history: 7d
               units: '%'
               description: 'Memory usage of a controller {#ID}.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Controller {#ID}'
+                  tag: Application
+                  value: 'Controller {#ID}'
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.MEM.MAX.TIME})}>{$HUAWEI.5300.MEM.MAX.WARN}'
@@ -232,9 +236,6 @@ zabbix_export:
               key: 'huawei.5300.v5[hwInfoControllerRole, "{#ID}"]'
               history: 7d
               description: 'Controller role..'
-              application_prototypes:
-                -
-                  name: 'Controller {#ID}'
               valuemap:
                 name: 'Huawei storage: Controller role'
               preprocessing:
@@ -242,6 +243,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Controller {#ID}'
               trigger_prototypes:
                 -
                   expression: '{diff()}=1'
@@ -257,9 +262,6 @@ zabbix_export:
               description: |
                 Controller running status. For details, see definition of Enum Values (RUNNING_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'Controller {#ID}'
               valuemap:
                 name: 'Huawei storage: Running status'
               preprocessing:
@@ -267,6 +269,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Controller {#ID}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>27'
@@ -299,14 +305,15 @@ zabbix_export:
               key: 'huawei.5300.v5[hwInfoDiskHealthMark, "{#ID}"]'
               history: 7d
               description: 'Health score of a disk. If the value is 255, indicating invalid.'
-              application_prototypes:
-                -
-                  name: 'Disk {#MODEL}'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#MODEL}'
             -
               name: 'Disk {#MODEL} on {#LOCATION}: Health status'
               type: SNMP_AGENT
@@ -316,9 +323,6 @@ zabbix_export:
               description: |
                 Disk health status. For details, see definition of Enum Values (HEALTH_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'Disk {#NAME}'
               valuemap:
                 name: 'Huawei storage: Health status'
               preprocessing:
@@ -326,6 +330,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -340,9 +348,6 @@ zabbix_export:
               description: |
                 Disk running status. For details, see definition of Enum Values (RUNNING_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'Disk {#MODEL}'
               valuemap:
                 name: 'Huawei storage: Running status'
               preprocessing:
@@ -350,6 +355,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk {#MODEL}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>27'
@@ -363,9 +372,10 @@ zabbix_export:
               history: 7d
               units: °C
               description: 'Disk temperature.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Disk {#MODEL}'
+                  tag: Application
+                  value: 'Disk {#MODEL}'
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.DISK.TEMP.MAX.TIME})}>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}'
@@ -389,9 +399,6 @@ zabbix_export:
               description: |
                 Enclosure health status. For details, see definition of Enum Values (HEALTH_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'Enclosure {#NAME}'
               valuemap:
                 name: 'Huawei storage: Health status'
               preprocessing:
@@ -399,6 +406,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Enclosure {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -413,9 +424,6 @@ zabbix_export:
               description: |
                 Enclosure running status. For details, see definition of Enum Values (RUNNING_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'Enclosure {#NAME}'
               valuemap:
                 name: 'Huawei storage: Running status'
               preprocessing:
@@ -423,6 +431,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Enclosure {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>27'
@@ -436,9 +448,10 @@ zabbix_export:
               history: 7d
               units: °C
               description: 'Enclosure temperature.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Enclosure {#NAME}'
+                  tag: Application
+                  value: 'Enclosure {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.TEMP.MAX.TIME})}>{$HUAWEI.5300.TEMP.MAX.WARN}'
@@ -462,9 +475,6 @@ zabbix_export:
               description: |
                 Health status of a fan. For details, see definition of Enum Values (HEALTH_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'FAN {#ID}'
               valuemap:
                 name: 'Huawei storage: Health status'
               preprocessing:
@@ -472,6 +482,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'FAN {#ID}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -486,9 +500,6 @@ zabbix_export:
               description: |
                 Operating status of a fan. For details, see definition of Enum Values (RUNNING_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'FAN {#ID}'
               valuemap:
                 name: 'Huawei storage: Running status'
               preprocessing:
@@ -496,6 +507,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'FAN {#ID}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>2'
@@ -517,14 +532,15 @@ zabbix_export:
               history: 7d
               units: '!ms'
               description: 'Average I/O latency of the node in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'LUN {#NAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})}>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}'
@@ -538,14 +554,15 @@ zabbix_export:
               history: 7d
               units: '!ms'
               description: 'Average read I/O response time in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'LUN {#NAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Average write I/O latency'
               type: SNMP_AGENT
@@ -554,14 +571,15 @@ zabbix_export:
               history: 7d
               units: '!ms'
               description: 'Average write I/O response time in milliseconds.'
-              application_prototypes:
-                -
-                  name: 'LUN {#NAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Read operations per second'
               type: SNMP_AGENT
@@ -570,9 +588,10 @@ zabbix_export:
               history: 7d
               units: '!iops'
               description: 'Read IOPS of the node.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'LUN {#NAME}'
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Read traffic per second'
               type: SNMP_AGENT
@@ -581,14 +600,15 @@ zabbix_export:
               history: 7d
               units: Bps
               description: 'Current read bandwidth for the LUN.'
-              application_prototypes:
-                -
-                  name: 'LUN {#NAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Total I/O per second'
               type: SNMP_AGENT
@@ -597,9 +617,10 @@ zabbix_export:
               history: 7d
               units: '!iops'
               description: 'Current IOPS of the LUN.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'LUN {#NAME}'
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Total traffic per second'
               type: SNMP_AGENT
@@ -608,14 +629,15 @@ zabbix_export:
               history: 7d
               units: Bps
               description: 'Current total bandwidth for the LUN.'
-              application_prototypes:
-                -
-                  name: 'LUN {#NAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Write operations per second'
               type: SNMP_AGENT
@@ -624,9 +646,10 @@ zabbix_export:
               history: 7d
               units: '!iops'
               description: 'Write IOPS of the node.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'LUN {#NAME}'
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Write traffic per second'
               type: SNMP_AGENT
@@ -635,14 +658,15 @@ zabbix_export:
               history: 7d
               units: Bps
               description: 'Current write bandwidth for the LUN.'
-              application_prototypes:
-                -
-                  name: 'LUN {#NAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Capacity'
               type: SNMP_AGENT
@@ -651,9 +675,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Capacity of the LUN.'
-              application_prototypes:
-                -
-                  name: 'LUN {#NAME}'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -663,6 +684,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
             -
               name: 'LUN {#NAME}: Status'
               type: SNMP_AGENT
@@ -670,9 +695,6 @@ zabbix_export:
               key: 'huawei.5300.v5[hwStorageLunStatus, "{#NAME}"]'
               history: 7d
               description: 'Status of the LUN.'
-              application_prototypes:
-                -
-                  name: 'LUN {#NAME}'
               valuemap:
                 name: 'Huawei storage: LUN status'
               preprocessing:
@@ -680,6 +702,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'LUN {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -763,9 +789,10 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: 'CPU usage of the node {#NODE}.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Node {#NODE}'
+                  tag: Application
+                  value: 'Node {#NODE}'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
@@ -782,9 +809,10 @@ zabbix_export:
               value_type: FLOAT
               units: '!ms'
               description: 'Average I/O latency of the node.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Node {#NODE}'
+                  tag: Application
+                  value: 'Node {#NODE}'
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})}>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}'
@@ -798,9 +826,10 @@ zabbix_export:
               history: 7d
               units: '!iops'
               description: 'Read IOPS of the node.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Node {#NODE}'
+                  tag: Application
+                  value: 'Node {#NODE}'
             -
               name: 'Node {#NODE}: Read traffic per second'
               type: SNMP_AGENT
@@ -809,14 +838,15 @@ zabbix_export:
               history: 7d
               units: Bps
               description: 'Read bandwidth for the node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
             -
               name: 'Node {#NODE}: Total I/O per second'
               type: SNMP_AGENT
@@ -825,9 +855,10 @@ zabbix_export:
               history: 7d
               units: '!iops'
               description: 'Total IOPS of the node.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Node {#NODE}'
+                  tag: Application
+                  value: 'Node {#NODE}'
             -
               name: 'Node {#NODE}: Total traffic per second'
               type: SNMP_AGENT
@@ -836,14 +867,15 @@ zabbix_export:
               history: 7d
               units: Bps
               description: 'Total bandwidth for the node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
             -
               name: 'Node {#NODE}: Write operations per second'
               type: SNMP_AGENT
@@ -852,9 +884,10 @@ zabbix_export:
               history: 7d
               units: '!iops'
               description: 'Write IOPS of the node.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Node {#NODE}'
+                  tag: Application
+                  value: 'Node {#NODE}'
             -
               name: 'Node {#NODE}: Write traffic per second'
               type: SNMP_AGENT
@@ -863,14 +896,15 @@ zabbix_export:
               history: 7d
               units: Bps
               description: 'Write bandwidth for the node.'
-              application_prototypes:
-                -
-                  name: 'Node {#NODE}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Node {#NODE}'
           graph_prototypes:
             -
               name: 'Node {#NODE}: CPU utilization'
@@ -939,14 +973,15 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Available capacity of a storage pool.'
-              application_prototypes:
-                -
-                  name: 'Pool {#MODEL}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
             -
               name: 'Pool {#NAME}: Capacity used percentage'
               type: CALCULATED
@@ -955,9 +990,10 @@ zabbix_export:
               units: '%'
               params: 'last("huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, \"{#NAME}\"]")/last("huawei.5300.v5[hwInfoStoragePoolTotalCapacity, \"{#NAME}\"]")*100'
               description: 'Used capacity of a storage pool in percents.'
-              application_prototypes:
+              tags:
                 -
-                  name: 'Pool {#MODEL}'
+                  tag: Application
+                  value: 'Pool {#MODEL}'
               trigger_prototypes:
                 -
                   expression: '{min({$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})}>{#THRESHOLD}'
@@ -972,9 +1008,6 @@ zabbix_export:
               description: |
                 Health status of a storage pool. For details, see definition of Enum Values (HEALTH_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'Pool {#NAME}'
               valuemap:
                 name: 'Huawei storage: Health status'
               preprocessing:
@@ -982,6 +1015,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#NAME}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>1'
@@ -996,9 +1033,6 @@ zabbix_export:
               description: |
                 Operating status of a storage pool. For details, see definition of Enum Values (RUNNING_STATUS_E).
                 https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference
-              application_prototypes:
-                -
-                  name: 'Pool {#MODEL}'
               valuemap:
                 name: 'Huawei storage: Running status'
               preprocessing:
@@ -1006,6 +1040,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
               trigger_prototypes:
                 -
                   expression: '{last()}<>27'
@@ -1019,14 +1057,15 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Used capacity of a storage pool.'
-              application_prototypes:
-                -
-                  name: 'Pool {#MODEL}'
               preprocessing:
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
             -
               name: 'Pool {#NAME}: Capacity total'
               type: SNMP_AGENT
@@ -1035,9 +1074,6 @@ zabbix_export:
               history: 7d
               units: B
               description: 'Total capacity of a storage pool.'
-              application_prototypes:
-                -
-                  name: 'Pool {#MODEL}'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -1047,6 +1083,10 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
+              tags:
+                -
+                  tag: Application
+                  value: 'Pool {#MODEL}'
           graph_prototypes:
             -
               name: 'Pool {#NAME}: Capacity'

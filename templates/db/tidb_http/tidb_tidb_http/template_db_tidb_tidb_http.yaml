@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-08T09:02:36Z'
+  date: '2021-04-22T12:58:24Z'
   groups:
     -
       name: Templates/Databases
@@ -21,11 +21,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Databases
-      applications:
-        -
-          name: 'TiDB node'
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'TiDB: CPU'
@@ -36,9 +31,6 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: 'Total user and system CPU usage ratio.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -54,6 +46,10 @@ zabbix_export:
                 - '100'
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: DDL waiting jobs'
           type: DEPENDENT
@@ -62,9 +58,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -72,6 +65,10 @@ zabbix_export:
                 - '$[?(@.name=="tidb_ddl_waiting_jobs")].value.sum()'
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{min(5m)}>{$TIDB.DDL.WAITING.MAX.WARN}'
@@ -85,9 +82,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of failures to reload the latest schema information in TiDB per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -100,6 +94,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{min(5m)}>{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}'
@@ -113,9 +111,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The statistics of the schemas that TiDB obtains from TiKV per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -127,6 +122,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Failed Query, rate'
           type: DEPENDENT
@@ -135,9 +134,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of error occurred when executing SQL statements per second (such as syntax errors and primary key conflicts).'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -150,6 +146,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Get instance metrics'
           type: HTTP_AGENT
@@ -158,9 +158,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get TiDB instance metrics.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -171,6 +168,10 @@ zabbix_export:
               parameters:
                 - ''
           url: '{$TIDB.URL}:{$TIDB.PORT}/metrics'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'TiDB: Get instance status'
           type: HTTP_AGENT
@@ -179,9 +180,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get TiDB instance status info.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -190,6 +188,10 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"status": "0"}'
           url: '{$TIDB.URL}:{$TIDB.PORT}/status'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'TiDB: Goroutine count'
           type: DEPENDENT
@@ -197,9 +199,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The number of Goroutines on TiDB instance.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -207,6 +206,10 @@ zabbix_export:
                 - '$[?(@.name=="go_goroutines")].value.first()'
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Heap memory usage'
           type: DEPENDENT
@@ -216,9 +219,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Number of heap bytes that are in use.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -226,6 +226,10 @@ zabbix_export:
                 - '$[?(@.name=="go_memstats_heap_inuse_bytes")].value.first()'
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{min(5m)}>{$TIDB.HEAP.USAGE.MAX.WARN}'
@@ -240,9 +244,6 @@ zabbix_export:
           value_type: FLOAT
           units: Ops
           description: 'The number of times that the metrics are refreshed on TiDB instance per minute.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -255,6 +256,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{max(5m)}<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}'
@@ -270,9 +275,6 @@ zabbix_export:
           value_type: FLOAT
           units: Ops
           description: 'The number of times that the operating system rewinds every second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -284,6 +286,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{min(5m)}>{$TIDB.TIME_JUMP_BACK.MAX.WARN}'
@@ -298,9 +304,6 @@ zabbix_export:
           value_type: FLOAT
           units: Ops
           description: 'The number of TSO commands that TiDB obtains from PD per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -312,6 +315,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: PD TSO requests, rate'
           type: DEPENDENT
@@ -321,9 +328,6 @@ zabbix_export:
           value_type: FLOAT
           units: Ops
           description: 'The number of TSO requests that TiDB obtains from PD per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -335,6 +339,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Open file descriptors, max'
           type: DEPENDENT
@@ -343,9 +351,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Maximum number of open file descriptors.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -353,6 +358,10 @@ zabbix_export:
                 - '$[?(@.name=="process_max_fds")].value.first()'
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Open file descriptors'
           type: DEPENDENT
@@ -361,9 +370,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of open file descriptors.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -371,6 +377,10 @@ zabbix_export:
                 - '$[?(@.name=="process_open_fds")].value.first()'
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: RSS memory usage'
           type: DEPENDENT
@@ -380,9 +390,6 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Resident memory size in bytes.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -390,6 +397,10 @@ zabbix_export:
                 - '$[?(@.name=="process_resident_memory_bytes")].value.first()'
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Total "error" server query, rate'
           type: DEPENDENT
@@ -399,9 +410,6 @@ zabbix_export:
           value_type: FLOAT
           units: Qps
           description: 'The number of queries on TiDB instance per second with failure of command execution results.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -413,6 +421,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Total "ok" server query, rate'
           type: DEPENDENT
@@ -422,9 +434,6 @@ zabbix_export:
           value_type: FLOAT
           units: Qps
           description: 'The number of queries on TiDB instance per second with success of command execution results.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -436,6 +445,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Total server query, rate'
           type: DEPENDENT
@@ -445,9 +458,6 @@ zabbix_export:
           value_type: FLOAT
           units: Qps
           description: 'The number of queries per second on TiDB instance.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -459,6 +469,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Schema lease "change" errors, rate'
           type: DEPENDENT
@@ -469,9 +483,6 @@ zabbix_export:
           description: |
             The number of schema lease errors per second. 
             "change" means that the schema has changed
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -484,6 +495,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Schema lease "outdate" errors , rate'
           type: DEPENDENT
@@ -494,9 +509,6 @@ zabbix_export:
           description: |
             The number of schema lease errors per second. 
             "outdate" errors means that the schema cannot be updated, which is a more serious error and triggers an alert.
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -509,6 +521,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{min(5m)}>{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}'
@@ -523,9 +539,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The total number of SQL statements executed per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -537,6 +550,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Status'
           type: DEPENDENT
@@ -546,9 +563,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Status of PD instance.'
-          applications:
-            -
-              name: 'TiDB node'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -564,6 +578,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: tidb.get_status
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{last()}=0'
@@ -576,9 +594,6 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: 'The connection number of current TiDB instance.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -586,6 +601,10 @@ zabbix_export:
                 - '$[?(@.name=="tidb_server_connections")].value.first()'
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Server critical error, rate'
           type: DEPENDENT
@@ -594,9 +613,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of critical errors occurred in TiDB per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -608,6 +624,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Server panic, rate'
           type: DEPENDENT
@@ -616,9 +636,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of panics occurred in TiDB per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -631,6 +648,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{last()}>0'
@@ -646,9 +667,6 @@ zabbix_export:
           value_type: FLOAT
           units: Ops
           description: 'The number of errors returned by TiKV.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -661,6 +679,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Lock resolves, rate'
           type: DEPENDENT
@@ -670,9 +692,6 @@ zabbix_export:
           value_type: FLOAT
           units: Ops
           description: 'The number of DDL tasks that are waiting.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -684,6 +703,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: TiClient region errors, rate'
           type: DEPENDENT
@@ -693,9 +716,6 @@ zabbix_export:
           value_type: FLOAT
           units: Ops
           description: 'The number of region related errors returned by TiKV per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -707,6 +727,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{min(5m)}>{$TIDB.REGION_ERROR.MAX.WARN}'
@@ -721,9 +745,6 @@ zabbix_export:
           value_type: FLOAT
           units: Ops
           description: 'The number of executed KV commands per second.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -735,6 +756,10 @@ zabbix_export:
                 - ''
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
         -
           name: 'TiDB: Uptime'
           type: DEPENDENT
@@ -744,9 +769,6 @@ zabbix_export:
           value_type: FLOAT
           units: uptime
           description: 'The runtime of each TiDB instance.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -760,6 +782,10 @@ zabbix_export:
                   return (Math.floor(Date.now()/1000)-Number(value));
           master_item:
             key: tidb.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{last()}<10m'
@@ -776,9 +802,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of the TiDB instance.'
-          applications:
-            -
-              name: 'TiDB node'
           preprocessing:
             -
               type: JSONPATH
@@ -790,6 +813,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: tidb.get_status
+          tags:
+            -
+              tag: Application
+              value: 'TiDB node'
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -814,9 +841,6 @@ zabbix_export:
               value_type: FLOAT
               units: Ops
               description: 'The number of executed KV commands per second.'
-              applications:
-                -
-                  name: 'TiDB node'
               preprocessing:
                 -
                   type: JSONPATH
@@ -828,6 +852,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: tidb.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB node'
           master_item:
             key: tidb.get_metrics
           preprocessing:
@@ -864,9 +892,6 @@ zabbix_export:
               value_type: FLOAT
               units: Qps
               description: 'The number of queries on TiDB instance per second with failure of command execution results.'
-              applications:
-                -
-                  name: 'TiDB node'
               preprocessing:
                 -
                   type: JSONPATH
@@ -878,6 +903,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: tidb.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB node'
             -
               name: 'TiDB: Server query "OK": {#TYPE}, rate'
               type: DEPENDENT
@@ -887,9 +916,6 @@ zabbix_export:
               value_type: FLOAT
               units: Qps
               description: 'The number of queries on TiDB instance per second with success of command execution results.'
-              applications:
-                -
-                  name: 'TiDB node'
               preprocessing:
                 -
                   type: JSONPATH
@@ -901,6 +927,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: tidb.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB node'
           master_item:
             key: tidb.get_metrics
           preprocessing:
@@ -943,9 +973,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of SQL statements executed per second.'
-              applications:
-                -
-                  name: 'TiDB node'
               preprocessing:
                 -
                   type: JSONPATH
@@ -957,6 +984,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: tidb.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB node'
           master_item:
             key: tidb.get_metrics
           preprocessing:
@@ -993,9 +1024,6 @@ zabbix_export:
               value_type: FLOAT
               units: Ops
               description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'
-              applications:
-                -
-                  name: 'TiDB node'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1007,6 +1035,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: tidb.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB node'
           master_item:
             key: tidb.get_metrics
           preprocessing:
@@ -1044,9 +1076,6 @@ zabbix_export:
               value_type: FLOAT
               units: Ops
               description: 'The number of results of GC-related operations per second.'
-              applications:
-                -
-                  name: 'TiDB node'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1058,6 +1087,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: tidb.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB node'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>{$TIDB.GC_ACTIONS.ERRORS.MAX.WARN}'
@@ -1118,9 +1151,6 @@ zabbix_export:
               value_type: FLOAT
               units: Ops
               description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'
-              applications:
-                -
-                  name: 'TiDB node'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1132,6 +1162,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: tidb.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB node'
           master_item:
             key: tidb.get_metrics
           preprocessing:
