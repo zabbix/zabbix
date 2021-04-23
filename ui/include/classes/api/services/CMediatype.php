@@ -1206,17 +1206,23 @@ class CMediatype extends CApiService {
 
 		// adding message templates
 		if ($options['selectMessageTemplates'] !== null && $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
+			$message_templates = [];
 			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'mediatype_messageid',
 				'media_type_message'
 			);
-			$message_templates = API::getApiService()->select('media_type_message', [
-				'output' => $options['selectMessageTemplates'],
-				'filter' => ['mediatype_messageid' => $relation_map->getRelatedIds()],
-				'preservekeys' => true
-			]);
-			$message_templates = $this->unsetExtraFields($message_templates, ['mediatype_messageid', 'mediatypeid'],
-				[]
-			);
+			$related_ids = $relation_map->getRelatedIds();
+
+			if ($related_ids) {
+				$message_templates = DB::select('media_type_message', [
+					'output' => $options['selectMessageTemplates'],
+					'mediatype_messageids' => $related_ids,
+					'preservekeys' => true
+				]);
+				$message_templates = $this->unsetExtraFields($message_templates, ['mediatype_messageid', 'mediatypeid'],
+					[]
+				);
+			}
+
 			$result = $relation_map->mapMany($result, $message_templates, 'message_templates');
 		}
 
