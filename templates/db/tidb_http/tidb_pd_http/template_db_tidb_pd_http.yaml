@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-08T09:02:39Z'
+  date: '2021-04-22T12:58:27Z'
   groups:
     -
       name: Templates/Databases
@@ -21,13 +21,6 @@ zabbix_export:
       groups:
         -
           name: Templates/Databases
-      applications:
-        -
-          name: 'PD instance'
-        -
-          name: 'TiDB cluster'
-        -
-          name: 'Zabbix raw items'
       items:
         -
           name: 'PD: Get instance metrics'
@@ -37,9 +30,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get TiDB PD instance metrics.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -50,6 +40,10 @@ zabbix_export:
               parameters:
                 - ''
           url: '{$PD.URL}:{$PD.PORT}/metrics'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'PD: Get instance status'
           type: HTTP_AGENT
@@ -58,9 +52,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get TiDB PD instance status info.'
-          applications:
-            -
-              name: 'Zabbix raw items'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -69,6 +60,10 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"status": "0"}'
           url: '{$PD.URL}:{$PD.PORT}/pd/api/v1/status'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
         -
           name: 'PD: GRPC Commands total, rate'
           type: DEPENDENT
@@ -77,9 +72,6 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The rate at which gRPC commands are completed.'
-          applications:
-            -
-              name: 'PD instance'
           preprocessing:
             -
               type: JSONPATH
@@ -92,6 +84,10 @@ zabbix_export:
                 - ''
           master_item:
             key: pd.get_metrics
+          tags:
+            -
+              tag: Application
+              value: 'PD instance'
         -
           name: 'PD: Status'
           type: DEPENDENT
@@ -101,9 +97,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Status of PD instance.'
-          applications:
-            -
-              name: 'PD instance'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -119,6 +112,10 @@ zabbix_export:
                 - 1h
           master_item:
             key: pd.get_status
+          tags:
+            -
+              tag: Application
+              value: 'PD instance'
           triggers:
             -
               expression: '{last()}=0'
@@ -133,9 +130,6 @@ zabbix_export:
           value_type: FLOAT
           units: uptime
           description: 'The runtime of each PD instance.'
-          applications:
-            -
-              name: 'PD instance'
           preprocessing:
             -
               type: JSONPATH
@@ -149,6 +143,10 @@ zabbix_export:
                   return (Math.floor(Date.now()/1000)-Number(value));
           master_item:
             key: pd.get_status
+          tags:
+            -
+              tag: Application
+              value: 'PD instance'
           triggers:
             -
               expression: '{last()}<10m'
@@ -165,9 +163,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'Version of the PD instance.'
-          applications:
-            -
-              name: 'PD instance'
           preprocessing:
             -
               type: JSONPATH
@@ -179,6 +174,10 @@ zabbix_export:
                 - 3h
           master_item:
             key: pd.get_status
+          tags:
+            -
+              tag: Application
+              value: 'PD instance'
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -201,9 +200,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The total count of cluster Regions.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -211,6 +207,10 @@ zabbix_export:
                     - '$[?(@.name == "pd_cluster_status" && @.labels.type == "leader_count")].value.first()'
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
             -
               name: 'TiDB cluster: Current peer count'
               type: DEPENDENT
@@ -218,9 +218,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The current count of all cluster peers.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -228,6 +225,10 @@ zabbix_export:
                     - '$[?(@.name == "pd_cluster_status" && @.labels.type == "region_count")].value.first()'
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
             -
               name: 'TiDB cluster: Storage capacity'
               type: DEPENDENT
@@ -237,9 +238,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The total storage capacity for this TiDB cluster.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -251,6 +249,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
             -
               name: 'TiDB cluster: Storage size'
               type: DEPENDENT
@@ -260,9 +262,6 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The storage size that is currently used by the TiDB cluster.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -270,6 +269,10 @@ zabbix_export:
                     - '$[?(@.name == "pd_cluster_status" && @.labels.type == "storage_size")].value.first()'
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
             -
               name: 'TiDB cluster: Disconnect stores'
               type: DEPENDENT
@@ -277,9 +280,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The count of disconnected stores.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -291,6 +291,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
               trigger_prototypes:
                 -
                   expression: '{last()}>0'
@@ -304,9 +308,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The count of down stores.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -318,6 +319,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
               trigger_prototypes:
                 -
                   expression: '{last()}>0'
@@ -331,9 +336,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The count of low space stores.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -345,6 +347,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
               trigger_prototypes:
                 -
                   expression: '{last()}>0'
@@ -357,9 +363,6 @@ zabbix_export:
               key: 'pd.cluster_status.store_offline[{#SINGLETON}]'
               delay: '0'
               history: 7d
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -371,6 +374,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
             -
               name: 'TiDB cluster: Tombstone stores'
               type: DEPENDENT
@@ -378,9 +385,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The count of tombstone stores.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -392,6 +396,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
             -
               name: 'TiDB cluster: Unhealth stores'
               type: DEPENDENT
@@ -399,9 +407,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The count of unhealthy stores.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -413,6 +418,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
             -
               name: 'TiDB cluster: Normal stores'
               type: DEPENDENT
@@ -420,9 +429,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: 'The count of healthy storage instances.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -434,6 +440,10 @@ zabbix_export:
                     - 1h
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
           trigger_prototypes:
             -
               expression: '{TiDB PD by HTTP:pd.cluster_status.storage_size[{#SINGLETON}].min(5m)}/{TiDB PD by HTTP:pd.cluster_status.storage_capacity[{#SINGLETON}].last()}*100>{$PD.STORAGE_USAGE.MAX.WARN}'
@@ -487,9 +497,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The rate per command type at which gRPC commands are completed.'
-              applications:
-                -
-                  name: 'PD instance'
               preprocessing:
                 -
                   type: JSONPATH
@@ -501,6 +508,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'PD instance'
           master_item:
             key: pd.get_metrics
           preprocessing:
@@ -544,9 +555,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats with the error status per second.'
-              application_prototypes:
-                -
-                  name: 'TiDB Store [{#STORE_ADDRESS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -560,6 +568,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB Store [{#STORE_ADDRESS}]'
             -
               name: 'PD: Region heartbeat: active, rate'
               type: DEPENDENT
@@ -568,9 +580,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats with the ok status per second.'
-              application_prototypes:
-                -
-                  name: 'TiDB Store [{#STORE_ADDRESS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -584,6 +593,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB Store [{#STORE_ADDRESS}]'
             -
               name: 'PD: Region schedule push: total, rate'
               type: DEPENDENT
@@ -591,9 +604,6 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              application_prototypes:
-                -
-                  name: 'TiDB Store [{#STORE_ADDRESS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -607,6 +617,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB Store [{#STORE_ADDRESS}]'
             -
               name: 'PD: Region heartbeat: total, rate'
               type: DEPENDENT
@@ -615,9 +629,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats reported to PD per instance per second.'
-              application_prototypes:
-                -
-                  name: 'TiDB Store [{#STORE_ADDRESS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -631,6 +642,10 @@ zabbix_export:
                     - ''
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB Store [{#STORE_ADDRESS}]'
           master_item:
             key: pd.get_metrics
           preprocessing:
@@ -674,9 +689,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The number of Regions in different label levels.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -684,6 +696,10 @@ zabbix_export:
                     - '$[?(@.name == "pd_regions_label_level" && @.labels.type == "{#TYPE}")].value.first()'
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
           master_item:
             key: pd.get_metrics
           preprocessing:
@@ -720,9 +736,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -730,6 +743,10 @@ zabbix_export:
                     - '$[?(@.name == "pd_regions_status" && @.labels.type == "{#TYPE}")].value.first()'
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
               trigger_prototypes:
                 -
                   expression: '{min(5m)}>0'
@@ -812,9 +829,6 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'The current running schedulers.'
-              applications:
-                -
-                  name: 'TiDB cluster'
               preprocessing:
                 -
                   type: JSONPATH
@@ -824,6 +838,10 @@ zabbix_export:
                   error_handler_params: '0'
               master_item:
                 key: pd.get_metrics
+              tags:
+                -
+                  tag: Application
+                  value: 'TiDB cluster'
           master_item:
             key: pd.get_metrics
           preprocessing:
