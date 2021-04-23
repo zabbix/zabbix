@@ -164,7 +164,11 @@ class CHistFunctionParser extends CParser {
 									'type' => self::PARAM_TYPE_QUERY,
 									'pos' => $this->query_parser->result->pos,
 									'match' => $this->query_parser->result->match,
-									'length' => $this->query_parser->result->length
+									'length' => $this->query_parser->result->length,
+									'data' => [
+										'host' => $this->query_parser->result->host,
+										'item' => $this->query_parser->result->item
+									]
 								];
 								$state = self::STATE_END;
 							}

@@ -39,7 +39,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						]
 					]
 				],
@@ -56,7 +60,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 17,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						]
 					]
 				],
@@ -73,7 +81,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 7,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						]
 					]
 				],
@@ -90,7 +102,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 6,
 							'match' => '/host/key[ "param1", param2, "param3" ,"param4\""]',
-							'length' => 50
+							'length' => 50,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key[ "param1", param2, "param3" ,"param4\""]'
+							]
 						]
 					]
 				],
@@ -107,7 +123,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
@@ -130,7 +150,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
@@ -153,7 +177,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
@@ -176,7 +204,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
@@ -199,7 +231,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
@@ -222,7 +258,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
@@ -245,7 +285,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
@@ -268,7 +312,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
@@ -291,7 +339,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
@@ -314,7 +366,11 @@ class CHistFunctionParserTest extends TestCase {
 							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
 							'pos' => 5,
 							'match' => '/host/key',
-							'length' => 9
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key'
+							]
 						],
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
