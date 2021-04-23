@@ -2050,17 +2050,16 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$expression_data = new CTriggerExpression([
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
-			'lowercase_errors' => true
+		$expression_parser = new CExpressionParser([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
 		]);
 
-		if (!$expression_data->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+		if ($expression_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_parser->getError());
 			return false;
 		}
 
-		if (!$expression_data->result->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_QUERY)) {
+		if (!$expression_parser->getResult()->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION])) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('trigger expression must contain at least one /host/key reference')
 			);
