@@ -1,4 +1,5 @@
-<?php /*
+<?php
+/*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
 **
@@ -102,7 +103,7 @@ class testFormUserRoles extends CWebTest {
 				'roleid' => self::$super_roleid,
 				'usrgrps' => [
 					[
-					'usrgrpid' => '7'
+						'usrgrpid' => '7'
 					]
 				]
 			]
@@ -526,9 +527,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User'
 					],
 					'api_methods' => [
-							'dashboard.create',
-							'dashboard.*',
-							'*.create'
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -541,9 +542,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Admin'
 					],
 					'api_methods' => [
-							'dashboard.create',
-							'dashboard.*',
-							'*.create'
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -556,9 +557,9 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin'
 					],
 					'api_methods' => [
-							'dashboard.create',
-							'dashboard.*',
-							'*.create'
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -573,9 +574,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-							'dashboard.create',
-							'dashboard.*',
-							'*.create'
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -589,9 +590,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-							'dashboard.create',
-							'dashboard.*',
-							'*.create'
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -605,9 +606,9 @@ class testFormUserRoles extends CWebTest {
 						'API methods' => 'Allow list'
 					],
 					'api_methods' => [
-							'dashboard.create',
-							'dashboard.*',
-							'*.create'
+						'dashboard.create',
+						'dashboard.*',
+						'*.create'
 					],
 					'message_header' => 'User role created'
 				]
@@ -1006,7 +1007,6 @@ class testFormUserRoles extends CWebTest {
 	private function assertApi($api) {
 		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->all()->count();
 		$api_list = [];
-
 		for ($i = 1; $i <= $counted; ++$i) {
 			$api_list[] = $this->query('xpath:(//ul[@class="multiselect-list"]/li)['.$i.']')->asMultiselect()->one()->getText();
 		}
