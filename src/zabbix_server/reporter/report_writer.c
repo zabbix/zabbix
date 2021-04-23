@@ -199,6 +199,7 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 		if (SUCCEED != zbx_json_open(response.data, &jp))
 		{
 			*error = response.data;
+			zbx_rtrim(*error, "\n\r");
 			response.data = NULL;
 		}
 		else
