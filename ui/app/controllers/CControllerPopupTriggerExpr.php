@@ -40,6 +40,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $allowedTypesInt = [];
 	private $functions = [];
 	private $operators = [];
+	private $period_optional = [];
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -61,6 +62,20 @@ class CControllerPopupTriggerExpr extends CController {
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
 				'A' => true
+			],
+			'shift' => [
+				'C' => _('Time shift'),
+				'T' => T_ZBX_INT,
+				'A' => false
+			]
+		];
+
+		$this->period_optional = [
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'M' => $this->metrics,
+				'A' => false
 			],
 			'shift' => [
 				'C' => _('Time shift'),
@@ -92,7 +107,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 		$this->param1Str = [
 			'pattern' => [
-				'C' => 'T',
+				'C' => 'V',
 				'T' => T_ZBX_STR,
 				'A' => false
 			]
@@ -150,17 +165,6 @@ class CControllerPopupTriggerExpr extends CController {
 		];
 
 		$this->param_find = [
-			'last' => [
-				'C' => _('Last of').' (T)',
-				'T' => T_ZBX_INT,
-				'M' => $this->metrics,
-				'A' => false
-			],
-			'shift' => [
-				'C' => _('Time shift'),
-				'T' => T_ZBX_INT,
-				'A' => false
-			],
 			'o' => [
 				'C' => 'O',
 				'T' => T_ZBX_STR,
@@ -315,8 +319,8 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'find' => [
-				'description' => _('find() - Check occurance of pattern V (which fulfill operator O) in period T (1 - match, 0 - no match)'),
-				'params' => $this->param_find,
+				'description' => _('find() - Check occurance of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)'),
+				'params' => $this->period_optional + $this->param_find,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']
 			],
@@ -377,19 +381,20 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>']
 			],
 			'logeventid' => [
-				'description' => _('logeventid() - Event ID of last log entry matching regular expression T (1 - match, 0 - no match)'),
-				'params' => $this->param1Str,
+				'description' => _('logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)'),
+				'params' => $this->period_optional + $this->param1Str,
 				'allowed_types' => $this->allowedTypesLog,
 				'operators' => ['=', '<>']
 			],
 			'logseverity' => [
-				'description' => _('logseverity() - Log severity of the last log entry'),
+				'description' => _('logseverity() - Log severity of the last log entry for period T'),
+				'params' => $this->period_optional,
 				'allowed_types' => $this->allowedTypesLog,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'logsource' => [
-				'description' => _('logsource() - Log source of the last log entry matching parameter T (1 - match, 0 - no match)'),
-				'params' => $this->param1Str,
+				'description' => _('logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)'),
+				'params' => $this->period_optional + $this->param1Str,
 				'allowed_types' => $this->allowedTypesLog,
 				'operators' => ['=', '<>']
 			],
