@@ -562,98 +562,249 @@ class testSID extends CWebTest {
 	public static function getElementRemoveData() {
 		return [
 			// Screen creation.
-			[['link' => 'screenconf.php?form=Create+screen']],
+			[
+				[
+					'db' => 'SELECT * FROM screens',
+					'link' => 'screenconf.php?form=Create+screen'
+				]
+			],
 
 			// Screen update.
-			[['link' => 'screenconf.php?form=update&screenid=200021']],
+			[
+				[
+					'db' => 'SELECT * FROM screens',
+					'link' => 'screenconf.php?form=update&screenid=200021'
+				]
+			],
 
 			// Map creation.
-			[['link' => 'sysmaps.php?form=Create+map']],
+			[
+				[
+					'db' => 'SELECT * FROM sysmaps',
+					'link' => 'sysmaps.php?form=Create+map'
+				]
+			],
 
 			// Map update.
-			[['link' => 'sysmaps.php?form=update&sysmapid=3']],
+			[
+				[
+					'db' => 'SELECT * FROM sysmaps',
+					'link' => 'sysmaps.php?form=update&sysmapid=3'
+				]
+			],
 
 			// Host groups creation.
-			[['link' => 'hostgroups.php?form=create']],
+			[
+				[
+					'db' => 'SELECT * FROM hosts_groups',
+					'link' => 'hostgroups.php?form=create'
+				]
+			],
 
 			// Host groups update.
-			[['link' => 'hostgroups.php?form=update&groupid=50012']],
+			[
+				[
+					'db' => 'SELECT * FROM hosts_groups',
+					'link' => 'hostgroups.php?form=update&groupid=50012'
+				]
+			],
 
 			// Template creation.
-			[['link' => 'templates.php?form=create']],
+			[
+				[
+					'db' => 'SELECT * FROM hosts',
+					'link' => 'templates.php?form=create'
+				]
+			],
 
 			// Template update.
-			[['link' => 'templates.php?form=update&templateid=10169']],
+			[
+				[
+					'db' => 'SELECT * FROM hosts',
+					'link' => 'templates.php?form=update&templateid=10169'
+				]
+			],
 
 			// Hosts creation.
-			[['link' => 'hosts.php?form=create']],
+			[
+				[
+					'db' => 'SELECT * FROM hosts',
+					'link' => 'hosts.php?form=create'
+				]
+			],
 
 			// Hosts update.
-			[['link' => 'hosts.php?form=update&hostid=10084']],
+			[
+				[
+					'db' => 'SELECT * FROM hosts',
+					'link' => 'hosts.php?form=update&hostid=10084'
+				]
+			],
 
 			// Application update.
-			[['link' => 'applications.php?form=update&applicationid=99010&hostid=50011']],
+			[
+				[
+					'db' => 'SELECT * FROM applications',
+					'link' => 'applications.php?form=update&applicationid=99010&hostid=50011'
+				]
+			],
 
 			// Application creation.
-			[['link' => 'applications.php?form=create&hostid=50011']],
+			[
+				[
+					'db' => 'SELECT * FROM applications',
+					'link' => 'applications.php?form=create&hostid=50011'
+				]
+			],
 
 			// Item update.
-			[['link' => 'items.php?form=update&hostid=50011&itemid=99086']],
+			[
+				[
+					'db' => 'SELECT * FROM items',
+					'link' => 'items.php?form=update&hostid=50011&itemid=99086'
+				]
+			],
 
 			// Item creation.
-			[['link' => 'items.php?form=create&hostid=50011']],
+			[
+				[
+					'db' => 'SELECT * FROM items',
+					'link' => 'items.php?form=create&hostid=50011'
+				]
+			],
 
 			// Trigger update.
-			[['link' => 'triggers.php?form=update&triggerid=100034']],
+			[
+				[
+					'db' => 'SELECT * FROM triggers',
+					'link' => 'triggers.php?form=update&triggerid=100034'
+				]
+			],
 
 			// Trigger creation.
-			[['link' => 'triggers.php?hostid=50011&form=create']],
+			[
+				[
+					'db' => 'SELECT * FROM triggers',
+					'link' => 'triggers.php?hostid=50011&form=create'
+				]
+			],
 
 			// Graph update.
-			[['link' => 'graphs.php?form=update&graphid=700026&filter_hostids%5B0%5D=99202']],
+			[
+				[
+					'db' => 'SELECT * FROM graphs',
+					'link' => 'graphs.php?form=update&graphid=700026&filter_hostids%5B0%5D=99202'
+				]
+			],
 
 			// Graph creation.
-			[['link' => 'graphs.php?hostid=50011&form=create']],
+			[
+				[
+					'db' => 'SELECT * FROM graphs',
+					'link' => 'graphs.php?hostid=50011&form=create'
+				]
+			],
 
 			// Discovery rule update.
-			[['link' => 'host_discovery.php?form=update&itemid=99107']],
+			[
+				[
+					'db' => 'SELECT * FROM drules',
+					'link' => 'host_discovery.php?form=update&itemid=99107'
+				]
+			],
 
 			// Discovery rule creation.
-			[['link' => 'host_discovery.php?form=create&hostid=99202']],
+			[
+				[
+					'db' => 'SELECT * FROM drules',
+					'link' => 'host_discovery.php?form=create&hostid=99202'
+				]
+			],
 
 			// Web update.
-			[['link' => 'httpconf.php?form=update&hostid=50001&httptestid=102']],
+			[
+				[
+					'db' => 'SELECT * FROM httptest',
+					'link' => 'httpconf.php?form=update&hostid=50001&httptestid=102'
+				]
+			],
 
 			// Web creation.
-			[['link' => 'httpconf.php?form=create&hostid=50001']],
+			[
+				[
+					'db' => 'SELECT * FROM httptest',
+					'link' => 'httpconf.php?form=create&hostid=50001'
+				]
+			],
 
 			// Maintenance creation.
-			[['link' => 'maintenance.php?form=create']],
+			[
+				[
+					'db' => 'SELECT * FROM maintenances',
+					'link' => 'maintenance.php?form=create'
+				]
+			],
 
 			// Maintenance update.
-			[['link' => 'maintenance.php?form=update&maintenanceid=3']],
+			[
+				[
+					'db' => 'SELECT * FROM maintenances',
+					'link' => 'maintenance.php?form=update&maintenanceid=3'
+				]
+			],
 
 			// Action creation.
-			[['link' => 'actionconf.php?eventsource=0&form=Create+action']],
+			[
+				[
+					'db' => 'SELECT * FROM actions',
+					'link' => 'actionconf.php?eventsource=0&form=Create+action'
+				]
+			],
 
 			// Action update.
-			[['link' => 'actionconf.php?form=update&actionid=3']],
+			[
+				[
+					'db' => 'SELECT * FROM actions',
+					'link' => 'actionconf.php?form=update&actionid=3'
+				]
+			],
 
 			// Event correlation creation.
-			[['link' => 'correlation.php?form=Create+correlation']],
+			[
+				[
+					'db' => 'SELECT * FROM correlation',
+					'link' => 'correlation.php?form=Create+correlation'
+				]
+			],
 
 			// Event correlation update.
-			[['link' => 'correlation.php?form=update&correlationid=99003']],
+			[
+				[
+					'db' => 'SELECT * FROM correlation',
+					'link' => 'correlation.php?form=update&correlationid=99003'
+				]
+			],
 
 			// Discovery creation.
-			[['link' => 'discoveryconf.php?form=Create+discovery+rule']],
+			[
+				[
+					'db' => 'SELECT * FROM host_discovery',
+					'link' => 'discoveryconf.php?form=Create+discovery+rule'
+				]
+			],
 
 			// Discovery update.
-			[['link' => 'discoveryconf.php?form=update&druleid=2']],
+			[
+				[
+					'db' => 'SELECT * FROM host_discovery',
+					'link' => 'discoveryconf.php?form=update&druleid=2'
+				]
+			],
 
 			// GUI update.
 			[
 				[
+					'db' => 'SELECT * FROM config',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=gui.edit'
 				]
@@ -662,6 +813,7 @@ class testSID extends CWebTest {
 			// Autoregistration update.
 			[
 				[
+					'db' => 'SELECT * FROM autoreg_host',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=autoreg.edit'
 				]
@@ -670,6 +822,7 @@ class testSID extends CWebTest {
 			// Image update.
 			[
 				[
+					'db' => 'SELECT * FROM images',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=image.edit&imageid=1'
 				]
@@ -678,6 +831,7 @@ class testSID extends CWebTest {
 			// Image creation.
 			[
 				[
+					'db' => 'SELECT * FROM images',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=image.edit&imagetype=1'
 				]
@@ -686,6 +840,7 @@ class testSID extends CWebTest {
 			// Icon map update.
 			[
 				[
+					'db' => 'SELECT * FROM icon_map',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
@@ -694,6 +849,7 @@ class testSID extends CWebTest {
 			// Icon map creation.
 			[
 				[
+					'db' => 'SELECT * FROM icon_map',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=iconmap.edit'
 				]
@@ -702,6 +858,7 @@ class testSID extends CWebTest {
 			// Regular expression update.
 			[
 				[
+					'db' => 'SELECT * FROM regexps',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=regex.edit&regexid=20'
 				]
@@ -710,6 +867,7 @@ class testSID extends CWebTest {
 			// Regular expression added.
 			[
 				[
+					'db' => 'SELECT * FROM regexps',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=regex.edit'
 				]
@@ -718,6 +876,7 @@ class testSID extends CWebTest {
 			// Macros update.
 			[
 				[
+					'db' => 'SELECT * FROM globalmacro',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=macros.edit'
 				]
@@ -726,6 +885,7 @@ class testSID extends CWebTest {
 			// Value map update.
 			[
 				[
+					'db' => 'SELECT * FROM valuemaps',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=valuemap.edit&valuemapid=83'
 				]
@@ -734,6 +894,7 @@ class testSID extends CWebTest {
 			// Value map creation.
 			[
 				[
+					'db' => 'SELECT * FROM valuemaps',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=valuemap.edit'
 				]
@@ -742,6 +903,7 @@ class testSID extends CWebTest {
 			// Working time update.
 			[
 				[
+					'db' => 'SELECT * FROM config',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=workingtime.edit'
 				]
@@ -750,6 +912,7 @@ class testSID extends CWebTest {
 			// Trigger severities update.
 			[
 				[
+					'db' => 'SELECT * FROM config',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=trigseverity.edit'
 				]
@@ -758,6 +921,7 @@ class testSID extends CWebTest {
 			// Trigger displaying update.
 			[
 				[
+					'db' => 'SELECT * FROM config',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=trigdisplay.edit'
 				]
@@ -766,6 +930,7 @@ class testSID extends CWebTest {
 			// Other update.
 			[
 				[
+					'db' => 'SELECT * FROM config',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=miscconfig.edit'
 				]
@@ -774,6 +939,7 @@ class testSID extends CWebTest {
 			// Proxy update.
 			[
 				[
+					'db' => 'SELECT * FROM hosts',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=proxy.edit&proxyid=20000'
 				]
@@ -782,6 +948,7 @@ class testSID extends CWebTest {
 			// Proxy creation.
 			[
 				[
+					'db' => 'SELECT * FROM hosts',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=proxy.edit'
 				]
@@ -790,6 +957,7 @@ class testSID extends CWebTest {
 			// Authentication update.
 			[
 				[
+					'db' => 'SELECT * FROM config',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=authentication.edit'
 				]
@@ -798,6 +966,7 @@ class testSID extends CWebTest {
 			// User group update.
 			[
 				[
+					'db' => 'SELECT * FROM users_groups',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7'
 				]
@@ -806,6 +975,7 @@ class testSID extends CWebTest {
 			// User group creation.
 			[
 				[
+					'db' => 'SELECT * FROM users_groups',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=usergroup.edit'
 				]
@@ -814,6 +984,7 @@ class testSID extends CWebTest {
 			// User update.
 			[
 				[
+					'db' => 'SELECT * FROM users',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=user.edit&userid=1'
 				]
@@ -822,6 +993,7 @@ class testSID extends CWebTest {
 			// User creation.
 			[
 				[
+					'db' => 'SELECT * FROM users',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=user.edit'
 				]
@@ -830,6 +1002,7 @@ class testSID extends CWebTest {
 			// Media update.
 			[
 				[
+					'db' => 'SELECT * FROM media',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1'
 				]
@@ -838,6 +1011,7 @@ class testSID extends CWebTest {
 			// Media creation.
 			[
 				[
+					'db' => 'SELECT * FROM media',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=mediatype.edit'
 				]
@@ -846,6 +1020,7 @@ class testSID extends CWebTest {
 			// Script update.
 			[
 				[
+					'db' => 'SELECT * FROM scripts',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=script.edit&scriptid=1'
 				]
@@ -854,6 +1029,7 @@ class testSID extends CWebTest {
 			// Script creation.
 			[
 				[
+					'db' => 'SELECT * FROM scripts',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=script.edit'
 				]
@@ -862,6 +1038,7 @@ class testSID extends CWebTest {
 			// User profile update.
 			[
 				[
+					'db' => 'SELECT * FROM profiles',
 					'incorrect_request' => true,
 					'link' => 'zabbix.php?action=userprofile.edit'
 				]
@@ -873,8 +1050,9 @@ class testSID extends CWebTest {
 	 * @dataProvider getElementRemoveData
 	 */
 	public function testSID_ElementRemove($data) {
+		$hash_before = CDBHelper::getHash($data['db']);
 		$this->page->login()->open($data['link'])->waitUntilReady();
-		$this->query('xpath://input[@id="sid"]')->one()->delete();
+		$this->query('xpath://input[@name="sid"]')->one()->delete();
 		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
 				' @type="submit"]')->waitUntilClickable()->one()->click();
 
@@ -888,5 +1066,7 @@ class testSID extends CWebTest {
 			$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
 					' performed due to unauthorized request.');
 		}
+
+		$this->assertEquals($hash_before, CDBHelper::getHash($data['db']));
 	}
 }
