@@ -942,6 +942,7 @@ class testFormUserRoles extends CWebTest {
 	 * @param string $action	create or update
 	 */
 	private function checkRoleAction($data, $action) {
+		// TO DO: remove if ($action === 'create'), after ZBX-19246 fix
 		if ($action === 'create') {
 			if ($data['expected'] === TEST_BAD) {
 				$hash_before = CDBHelper::getHash(self::ROLE_SQL);
@@ -958,6 +959,7 @@ class testFormUserRoles extends CWebTest {
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
 
+			// TO DO: remove if ($action === 'create'), after ZBX-19246 fix
 			if ($action === 'create') {
 				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
 			}
@@ -969,23 +971,17 @@ class testFormUserRoles extends CWebTest {
 				$created_roleid = CDBHelper::getValue('SELECT roleid FROM role WHERE name='.zbx_dbstr(trim($data['fields']['Name'])));
 				$this->assertFalse($created_roleid === null);
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.$created_roleid);
-			} // TO DO: Add hash check for update, after ZBX-19246 fix
+			}
 			else {
 				$id = (array_key_exists('to_user', $data)) ? self::$delete_roleid : self::$roleid;
 				$this->page->login()->open('zabbix.php?action=userrole.edit&roleid='.$id);
 			}
 
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-			if (!array_key_exists('space', $data)) {
-				$form->checkValue($data['fields']);
+			if (array_key_exists('space', $data)) {
+				$data['fields']['Name'] = trim($data['fields']['Name']);
 			}
-			else {
-				$field = $data['fields'];
-				unset($field['Name']);
-				foreach([$field, trim($data['fields']['Name'])] as $value) {
-					$form->checkValue($value);
-				}
-			}
+			$form->checkValue($data['fields']);
 			if (array_key_exists('api_methods', $data)) {
 				$this->assertApi($data['api_methods']);
 			}
