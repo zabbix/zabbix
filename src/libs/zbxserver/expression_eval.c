@@ -1050,7 +1050,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function2(value, item, func_name, params, ts, error);
+	ret = evaluate_function2(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 
