@@ -414,7 +414,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// All UI elements unchecked.
+			// All UI elements unchecked except one.
 			[
 				[
 					'expected' => TEST_GOOD,
