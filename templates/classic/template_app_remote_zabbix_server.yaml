@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-23T11:04:50Z'
+  date: '2021-04-22T11:28:20Z'
   groups:
     -
       name: Templates/Applications
@@ -1327,104 +1327,106 @@ zabbix_export:
       dashboards:
         -
           name: 'Zabbix server health'
-          widgets:
+          pages:
             -
-              type: GRAPH_CLASSIC
-              width: '12'
-              height: '6'
-              fields:
+              widgets:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix server performance'
+                        host: 'Remote Zabbix server'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix server performance'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              width: '12'
-              height: '6'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix data gathering process busy %'
+                        host: 'Remote Zabbix server'
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  'y': '6'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix internal process busy %'
+                        host: 'Remote Zabbix server'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix data gathering process busy %'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              'y': '6'
-              width: '12'
-              height: '5'
-              fields:
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '6'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix cache usage, % free'
+                        host: 'Remote Zabbix server'
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
+                  type: GRAPH_CLASSIC
+                  'y': '11'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Value cache effectiveness'
+                        host: 'Remote Zabbix server'
                 -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix internal process busy %'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '6'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix cache usage, % free'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              'y': '11'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Value cache effectiveness'
-                    host: 'Remote Zabbix server'
-            -
-              type: GRAPH_CLASSIC
-              x: '12'
-              'y': '11'
-              width: '12'
-              height: '5'
-              fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
-                  type: GRAPH
-                  name: graphid
-                  value:
-                    name: 'Zabbix internal queues'
-                    host: 'Remote Zabbix server'
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '11'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Zabbix internal queues'
+                        host: 'Remote Zabbix server'
       valuemaps:
         -
           name: 'Value cache operating mode'

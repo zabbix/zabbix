@@ -21,6 +21,7 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "dbupgrade_macros.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "../zbxalgo/vectorimpl.h"
@@ -4441,6 +4442,42 @@ static int	DBpatch_5030142(void)
 
 static int	DBpatch_5030143(void)
 {
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select om.operationid,om.subject,om.message"
+			" from opmessage om,operations o,actions a"
+			" where om.operationid=o.operationid"
+				" and o.actionid=a.actionid"
+				" and a.eventsource=0 and o.operationtype=11");
+
+	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{EVENT.NAME}",
+			"{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030144(void)
+{
+	DB_RESULT	result;
+	int		ret;
+	const char	*fields[] = {"subject", "message"};
+
+	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
+
+	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
+			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030145(void)
+{
 	const ZBX_TABLE	table =
 			{"report", "reportid", 0,
 				{
@@ -4467,26 +4504,26 @@ static int	DBpatch_5030143(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030144(void)
+static int	DBpatch_5030146(void)
 {
 	return DBcreate_index("report", "report_1", "name", 1);
 }
 
-static int	DBpatch_5030145(void)
+static int	DBpatch_5030147(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report", 1, &field);
 }
 
-static int	DBpatch_5030146(void)
+static int	DBpatch_5030148(void)
 {
 	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report", 2, &field);
 }
 
-static int	DBpatch_5030147(void)
+static int	DBpatch_5030149(void)
 {
 	const ZBX_TABLE	table =
 			{"report_param", "reportparamid", 0,
@@ -4503,19 +4540,19 @@ static int	DBpatch_5030147(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030148(void)
+static int	DBpatch_5030150(void)
 {
 	return DBcreate_index("report_param", "report_param_1", "reportid", 0);
 }
 
-static int	DBpatch_5030149(void)
+static int	DBpatch_5030151(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_param", 1, &field);
 }
 
-static int	DBpatch_5030150(void)
+static int	DBpatch_5030152(void)
 {
 	const ZBX_TABLE	table =
 			{"report_user", "reportuserid", 0,
@@ -4533,33 +4570,33 @@ static int	DBpatch_5030150(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030151(void)
+static int	DBpatch_5030153(void)
 {
 	return DBcreate_index("report_user", "report_user_1", "reportid", 0);
 }
 
-static int	DBpatch_5030152(void)
+static int	DBpatch_5030154(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_user", 1, &field);
 }
 
-static int	DBpatch_5030153(void)
+static int	DBpatch_5030155(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_user", 2, &field);
 }
 
-static int	DBpatch_5030154(void)
+static int	DBpatch_5030156(void)
 {
 	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("report_user", 3, &field);
 }
 
-static int	DBpatch_5030155(void)
+static int	DBpatch_5030157(void)
 {
 	const ZBX_TABLE	table =
 			{"report_usrgrp", "reportusrgrpid", 0,
@@ -4576,40 +4613,40 @@ static int	DBpatch_5030155(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030156(void)
+static int	DBpatch_5030158(void)
 {
 	return DBcreate_index("report_usrgrp", "report_usrgrp_1", "reportid", 0);
 }
 
-static int	DBpatch_5030157(void)
+static int	DBpatch_5030159(void)
 {
 	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 1, &field);
 }
 
-static int	DBpatch_5030158(void)
+static int	DBpatch_5030160(void)
 {
 	const ZBX_FIELD field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 2, &field);
 }
 
-static int	DBpatch_5030159(void)
+static int	DBpatch_5030161(void)
 {
 	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("report_usrgrp", 3, &field);
 }
 
-static int	DBpatch_5030160(void)
+static int	DBpatch_5030162(void)
 {
 	const ZBX_FIELD	field = {"url", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5030161(void)
+static int	DBpatch_5030163(void)
 {
 	const ZBX_FIELD	field = {"report_test_timeout", "60s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -4784,5 +4821,7 @@ DBPATCH_ADD(5030158, 0, 1)
 DBPATCH_ADD(5030159, 0, 1)
 DBPATCH_ADD(5030160, 0, 1)
 DBPATCH_ADD(5030161, 0, 1)
+DBPATCH_ADD(5030162, 0, 1)
+DBPATCH_ADD(5030163, 0, 1)
 
 DBPATCH_END()

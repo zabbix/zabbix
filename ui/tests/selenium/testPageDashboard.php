@@ -165,14 +165,14 @@ class testPageDashboard extends CLegacyWebTest {
 	public function testPageDashboard_RemoveFavouriteMaps() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$widget_content = CDashboardElement::find()->one()->getWidget('Favourite maps')->getContent();
-		$FavouriteScreens = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.
-				zbx_dbstr('web.favorite.sysmapid')));
+		$favourite_maps = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.
+				zbx_dbstr('web.favorite.sysmapids')));
 
-		foreach ($FavouriteScreens as $FavouriteScreen) {
+		foreach ($favourite_maps as $favourite_map) {
 			$widget_content->query('xpath://button[contains(@onclick, "(\'sysmapid\',\''.
-					$FavouriteScreen['value_id'].'\')")]')->waitUntilClickable()->one()->click();
+					$favourite_map['value_id'].'\')")]')->waitUntilClickable()->one()->click();
 			$map_name = CDBHelper::getValue('SELECT name FROM sysmaps WHERE sysmapid='.
-					zbx_dbstr($FavouriteScreen['value_id']));
+					zbx_dbstr($favourite_map['value_id']));
 			$widget_content->query('link', $map_name)->waitUntilNotPresent();
 		}
 
