@@ -1004,6 +1004,7 @@ class testFormUserRoles extends CWebTest {
 	private function assertApi($api) {
 		$counted = $this->query('xpath://ul[@class="multiselect-list"]/li')->all()->count();
 		$api_list=[];
+
 		for ($i = 1; $i <= $counted; ++$i) {
 			$api_list[] = $this->query('xpath:(//ul[@class="multiselect-list"]/li)['.$i.']')->asMultiselect()->one()->getText();
 		}
