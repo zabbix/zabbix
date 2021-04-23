@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-16 19:55+0300\n"
-"PO-Revision-Date: 2021-04-19 06:10+0300\n"
+"POT-Creation-Date: 2021-04-23 19:55+0300\n"
+"PO-Revision-Date: 2021-04-21 13:18+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1618805430.000000\n"
+"X-POOTLE-MTIME: 1619003928.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -203,7 +203,7 @@ msgstr[0] "תקלה אחת בסך הכול"
 msgstr[1] "%1$s תקלות בסך הכול"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
-#: include/actions.inc.php:2090 include/classes/screens/CScreenActions.php:129
+#: include/actions.inc.php:2090
 #: include/views/administration.auditacts.list.php:83
 #, c-format
 msgid "%1$s retry left"
@@ -524,7 +524,7 @@ msgstr "אירועים מוכרים שנפתרו"
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:125
 #: app/views/popup.valuemap.edit.php:54 app/views/reports.auditlog.list.php:70
 #: app/views/reports.auditlog.list.php:90 include/actions.inc.php:1756
-#: include/actions.inc.php:1839 include/classes/screens/CScreenActions.php:112
+#: include/actions.inc.php:1839
 #: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.action.edit.php:59
 #: include/views/configuration.action.edit.php:174
@@ -611,7 +611,6 @@ msgstr[1] "המשימות הופעלו"
 
 #: auditacts.php:27 include/classes/helpers/CMenuHelper.php:126
 #: include/classes/helpers/CRoleHelper.php:410
-#: include/classes/screens/CScreenActions.php:168
 #: include/classes/widgets/CWidgetConfig.php:45
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -1050,7 +1049,7 @@ msgstr "כמות הזיכרון הפיזי של האורח שהוחלף בשטח
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "כמות הזיכרון הפיזי שנצרך לטובת גיבוי עמודי הזיכרון הפיזי של המערכת האורחת, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח של המכונה הווירטואלית ב־VMware"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:116
@@ -1818,10 +1817,6 @@ msgstr "לא ניתן להוסיף מתווך"
 msgid "Cannot add regular expression"
 msgstr "לא ניתן להוסיף ביטוי רגולרי"
 
-#: screenconf.php:159
-msgid "Cannot add screen"
-msgstr "לא ניתן להוסיף מסך"
-
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
 msgid "Cannot add script"
@@ -1830,10 +1825,6 @@ msgstr "לא ניתן להוסיף סקריפט"
 #: services.php:154
 msgid "Cannot add service"
 msgstr "לא ניתן להוסיף שירות"
-
-#: slideconf.php:162
-msgid "Cannot add slide show"
-msgstr "לא ניתן להוסיף מצגת"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
@@ -2145,10 +2136,6 @@ msgid_plural "Cannot delete regular expressions"
 msgstr[0] "לא ניתן למחוק ביטוי רגולרי"
 msgstr[1] "לא ניתן למחוק ביטויים רגולריים"
 
-#: screenconf.php:241
-msgid "Cannot delete screen"
-msgstr "לא ניתן למחוק מסך"
-
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
@@ -2167,10 +2154,6 @@ msgstr "לא ניתן למחוק את המשימות הנבחרות"
 #: services.php:108
 msgid "Cannot delete service"
 msgstr "לא ניתן למחוק שירות"
-
-#: slideconf.php:197 slideconf.php:222
-msgid "Cannot delete slide show"
-msgstr "לא ניתן למחוק מצגת"
 
 #: templates.php:433 templates.php:447 templates.php:480
 msgid "Cannot delete template"
@@ -2949,10 +2932,6 @@ msgstr "לא ניתן לעדכן תפקיד משתמש לקריאה בלבד „
 msgid "Cannot update regular expression"
 msgstr "לא ניתן לעדכן את הביטוי הרגולרי"
 
-#: screenconf.php:113
-msgid "Cannot update screen"
-msgstr "לא ניתן לעדכן את המסך"
-
 #: app/controllers/CControllerScriptUpdate.php:61
 #: app/controllers/CControllerScriptUpdate.php:170
 msgid "Cannot update script"
@@ -2968,10 +2947,6 @@ msgstr "לא ניתן לעדכן את היקף הסקריפט. הסקריפט �
 #: services.php:147
 msgid "Cannot update service"
 msgstr "לא ניתן לעדכן את השירות"
-
-#: slideconf.php:147
-msgid "Cannot update slide show"
-msgstr "לא ניתן לעדכן את המצגת"
 
 #: include/classes/api/services/CHttpTest.php:494
 #: include/classes/api/services/CHttpTest.php:694
@@ -3080,8 +3055,8 @@ msgstr "מרכז"
 msgid "Certificate"
 msgstr "אישור"
 
-#: app/partials/monitoring.latest.view.html.php:58
-#: app/partials/monitoring.latest.view.html.php:71 include/items.inc.php:1843
+#: app/partials/monitoring.latest.view.html.php:57
+#: app/partials/monitoring.latest.view.html.php:70 include/items.inc.php:1843
 #: include/items.inc.php:1847
 msgctxt "noun"
 msgid "Change"
@@ -3388,7 +3363,7 @@ msgstr "הצבע %1$s שגוי: יש להשתמש בקוד צבע הקסדצימ
 msgid "Colour (OK)"
 msgstr "צבע (תקין)"
 
-#: include/classes/widgets/forms/CWidgetForm.php:71 screenconf.php:43
+#: include/classes/widgets/forms/CWidgetForm.php:71
 msgid "Columns"
 msgstr "עמודות"
 
@@ -3614,10 +3589,6 @@ msgstr "הגדרת מתווכים"
 msgid "Configuration of regular expressions"
 msgstr "הגדרת ביטויים רגולריים"
 
-#: screenconf.php:29
-msgid "Configuration of screens"
-msgstr "הגדרת מסכים"
-
 #: app/controllers/CControllerScriptEdit.php:204
 #: app/controllers/CControllerScriptList.php:197
 msgid "Configuration of scripts"
@@ -3626,10 +3597,6 @@ msgstr "הגדרת סקריפטים"
 #: services.php:27
 msgid "Configuration of services"
 msgstr "הגדרה של שירותים"
-
-#: slideconf.php:25
-msgid "Configuration of slide shows"
-msgstr "הגדרת מצגות"
 
 #: templates.php:28
 msgid "Configuration of templates"
@@ -4591,10 +4558,6 @@ msgstr "גישת בררת מחדל למודולים חדשים"
 msgid "Default authentication"
 msgstr "אימות כבררת מחדל"
 
-#: slideconf.php:37
-msgid "Default delay"
-msgstr "עיכוב בררת מחדל"
-
 #: app/views/administration.miscconfig.edit.php:52
 msgid "Default host inventory mode"
 msgstr "מצב מאגר כבררת מחדל למארחים"
@@ -5433,7 +5396,7 @@ msgstr "סטטיסטיקת כתיבה לכונן. מחזירה מספר שלם �
 msgid "Display OK triggers for"
 msgstr "הצגת הקפצות תקינות עבור"
 
-#: app/partials/monitoring.latest.view.html.php:238
+#: app/partials/monitoring.latest.view.html.php:237
 msgid "Display graph"
 msgstr "הצגת תרשים"
 
@@ -5441,7 +5404,7 @@ msgstr "הצגת תרשים"
 msgid "Display problems"
 msgstr "הצגת תקלות"
 
-#: app/partials/monitoring.latest.view.html.php:237
+#: app/partials/monitoring.latest.view.html.php:236
 msgid "Display stacked graph"
 msgstr "הצגת תרשים מוערם"
 
@@ -6852,7 +6815,7 @@ msgid "Gradient line"
 msgstr "קו מדורג"
 
 #: app/controllers/CControllerAuditLogList.php:190
-#: app/partials/monitoring.latest.view.html.php:155
+#: app/partials/monitoring.latest.view.html.php:154
 #: app/views/monitoring.charts.view.php:56
 #: include/classes/macros/CMacrosResolverGeneral.php:905
 #: include/classes/screens/CScreenProblem.php:1311
@@ -7283,8 +7246,8 @@ msgid "Highlight whole row"
 msgstr "הדגשת שורה שלמה"
 
 #: app/partials/configuration.filter.items.php:152
-#: app/partials/monitoring.latest.view.html.php:53
-#: app/partials/monitoring.latest.view.html.php:155
+#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:154
 #: app/partials/monitoring.problem.filter.php:31
 #: app/views/administration.housekeeping.edit.php:125
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
@@ -7348,7 +7311,7 @@ msgid "Horizontal align"
 msgstr "יישור אופקי"
 
 #: app/controllers/CControllerAuditLogList.php:187
-#: app/partials/monitoring.latest.view.html.php:41
+#: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
 #: app/views/administration.queue.details.php:47
 #: app/views/monitoring.charts.view.php:85
@@ -9167,12 +9130,11 @@ msgid "Infinity"
 msgstr "אינסוף"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
-#: app/partials/monitoring.latest.view.html.php:61
+#: app/partials/monitoring.latest.view.html.php:60
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1756 include/actions.inc.php:1839
-#: include/blocks.inc.php:684 include/classes/screens/CScreenActions.php:117
-#: include/classes/screens/CScreenProblem.php:869
+#: include/blocks.inc.php:684 include/classes/screens/CScreenProblem.php:869
 #: include/classes/screens/CScreenProblem.php:893
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.graph.list.php:140
@@ -9346,7 +9308,7 @@ msgstr "שיקום של תקלה פנימית"
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:51
 #: app/views/configuration.discovery.list.php:78
 #: app/views/popup.lldoperation.php:115
 #: app/views/popup.massupdate.item.php:226 include/forms.inc.php:565
@@ -9752,7 +9714,6 @@ msgstr "איטלקית (it_IT)"
 #: app/views/popup.massupdate.item.php:492 app/views/popup.triggerexpr.php:96
 #: app/views/popup.triggerwizard.php:92
 #: include/classes/screens/CScreenHistory.php:268
-#: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:47
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
 #: include/forms.inc.php:894 include/views/configuration.graph.edit.php:178
@@ -10269,8 +10230,8 @@ msgstr "7 הימים האחרונים"
 msgid "Last accessed at"
 msgstr "גישה אחרונה ב־"
 
-#: app/partials/monitoring.latest.view.html.php:56
-#: app/partials/monitoring.latest.view.html.php:69
+#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:68
 #: include/classes/screens/CScreenHttpTest.php:115
 msgid "Last check"
 msgstr "הבדיקה האחרונה"
@@ -10300,8 +10261,8 @@ msgstr "אחרון מבין"
 msgid "Last seen (age)"
 msgstr "נראה לאחרונה (גיל)"
 
-#: app/partials/monitoring.latest.view.html.php:57
-#: app/partials/monitoring.latest.view.html.php:70
+#: app/partials/monitoring.latest.view.html.php:56
+#: app/partials/monitoring.latest.view.html.php:69
 msgid "Last value"
 msgstr "ערך אחרון"
 
@@ -11169,7 +11130,6 @@ msgstr "נתיב בתפריט"
 #: app/views/popup.mediatype.message.php:80
 #: app/views/popup.mediatypetest.edit.php:75 include/actions.inc.php:1623
 #: include/actions.inc.php:1894 include/actions.inc.php:2001
-#: include/classes/screens/CScreenActions.php:115
 #: include/views/administration.auditacts.list.php:66
 #: include/views/administration.auditacts.list.php:97
 msgid "Message"
@@ -11514,7 +11474,7 @@ msgstr "NTLM"
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
 #: app/partials/monitoring.host.view.html.php:29
-#: app/partials/monitoring.latest.view.html.php:42
+#: app/partials/monitoring.latest.view.html.php:41
 #: app/partials/popup.operations.php:257
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
@@ -11640,8 +11600,8 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.edit.php:278
 #: include/views/monitoring.sysmap.list.php:48
 #: include/views/monitoring.sysmap.list.php:67 items.php:48 maintenance.php:40
-#: report2.php:506 screenconf.php:41 services.php:36 slideconf.php:36
-#: sysmaps.php:40 trigger_prototypes.php:38 triggers.php:45
+#: report2.php:506 services.php:36 sysmaps.php:40 trigger_prototypes.php:38
+#: triggers.php:45
 msgid "Name"
 msgstr "שם"
 
@@ -13423,11 +13383,11 @@ msgstr "אחוז"
 
 #: include/classes/items/CHelpItems.php:1055
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "אחוז הזיכרון הפיזי של המארח שנצרך, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח מכונה וירטואלית ב־VMware"
 
 #: include/classes/items/CHelpItems.php:979
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "אחוז הזמן שהמכונה הווירטואלית הייתה מכונה אך לא קיבלה משבצת זמן לרוץ על המעבד הפיזי, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח מכונה וירטואלית ב־VMware,‏ <instance> - מס׳ מעבד"
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:150
 msgid "Percentile line (left)"
@@ -14081,7 +14041,6 @@ msgid "Recent problems"
 msgstr "תקלות אחרונות"
 
 #: app/views/monitoring.widget.actionlog.view.php:36
-#: include/classes/screens/CScreenActions.php:114
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:37
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:38
 #: include/views/administration.auditacts.list.php:65
@@ -14680,7 +14639,7 @@ msgstr "תפקיד"
 msgid "Romanian (ro_RO)"
 msgstr "רומנית (ro_RO)"
 
-#: include/classes/widgets/forms/CWidgetForm.php:81 screenconf.php:46
+#: include/classes/widgets/forms/CWidgetForm.php:81
 msgid "Rows"
 msgstr "שורות"
 
@@ -15013,18 +14972,6 @@ msgstr "היקף"
 msgctxt "selected problems"
 msgid "Scope"
 msgstr "היקף"
-
-#: screenconf.php:158
-msgid "Screen added"
-msgstr "נוסף מסך"
-
-#: screenconf.php:241
-msgid "Screen deleted"
-msgstr "המסך נמחק"
-
-#: screenconf.php:112
-msgid "Screen updated"
-msgstr "המסך עודכן"
 
 #: app/controllers/CControllerAuditLogList.php:208
 #: app/views/administration.mediatype.edit.php:218
@@ -15761,18 +15708,6 @@ msgstr "גודל התגובה שהתקבל משרת ה־Zabbix‏ „%1$s” ח�
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr "התבצע דילוג על ההעתקה של התרשים „%1$s” למארח „%2$s”."
 
-#: slideconf.php:161
-msgid "Slide show added"
-msgstr "נוספה מצגת"
-
-#: slideconf.php:197 slideconf.php:222
-msgid "Slide show deleted"
-msgstr "נמחקה מצגת"
-
-#: slideconf.php:146
-msgid "Slide show updated"
-msgstr "המצגת עודכנה"
-
 #: include/locales.inc.php:74
 msgid "Slovak (sk_SK)"
 msgstr "סלובקית (sk_SK)"
@@ -15952,7 +15887,6 @@ msgstr "סטטיסטיקה וזמינות זיכרון מטמון הכתיבה �
 #: app/views/popup.massupdate.host.php:96
 #: app/views/popup.massupdate.item.php:325 include/actions.inc.php:1756
 #: include/actions.inc.php:1839 include/classes/html/CHostAvailability.php:76
-#: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:85
 #: include/classes/screens/CScreenHttpTest.php:116
 #: include/classes/screens/CScreenProblem.php:868
@@ -16313,8 +16247,8 @@ msgstr "ערך תגית"
 #: app/partials/configuration.filter.items.php:166
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.host.view.html.php:32
-#: app/partials/monitoring.latest.view.html.php:59
-#: app/partials/monitoring.latest.view.html.php:72
+#: app/partials/monitoring.latest.view.html.php:58
+#: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231 app/views/hint.box.php:78
 #: app/views/monitoring.latest.view.php:95
 #: app/views/monitoring.web.view.php:87
@@ -16787,8 +16721,7 @@ msgstr "עד"
 #: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1623
 #: include/actions.inc.php:1676 include/actions.inc.php:1756
 #: include/actions.inc.php:1839 include/actions.inc.php:1894
-#: include/blocks.inc.php:666 include/classes/screens/CScreenActions.php:111
-#: include/classes/screens/CScreenProblem.php:823
+#: include/blocks.inc.php:666 include/classes/screens/CScreenProblem.php:823
 #: include/classes/screens/CScreenProblem.php:1161
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -16863,8 +16796,6 @@ msgstr "תום הזמן"
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/screens/CScreenHistory.php:393
 #: include/classes/screens/CScreenHistory.php:446
-#: include/classes/screens/CScreenPlainText.php:42
-#: include/classes/screens/CScreenPlainText.php:58
 #: include/views/monitoring.history.php:288
 msgid "Timestamp"
 msgstr "חותמת זמן"
@@ -16989,7 +16920,7 @@ msgid "Trend storage period"
 msgstr "תקופת אחסון מגמות"
 
 #: app/partials/configuration.filter.items.php:156
-#: app/partials/monitoring.latest.view.html.php:54
+#: app/partials/monitoring.latest.view.html.php:53
 #: app/views/administration.housekeeping.edit.php:142
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:557 include/views/configuration.item.list.php:90
@@ -17257,7 +17188,7 @@ msgstr "יש לבחור בשני רכיבים במפה"
 #: app/controllers/CControllerPopupGeneric.php:247
 #: app/controllers/CControllerPopupGeneric.php:298
 #: app/partials/configuration.filter.items.php:145
-#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:54
 #: app/views/administration.image.list.php:38
 #: app/views/administration.mediatype.edit.php:56
 #: app/views/administration.mediatype.list.php:80
@@ -17273,7 +17204,6 @@ msgstr "יש לבחור בשני רכיבים במפה"
 #: app/views/popup.lldoperation.php:114 app/views/popup.massupdate.item.php:48
 #: app/views/popup.massupdate.item.php:225 app/views/popup.media.php:70
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:124
-#: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:50
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
@@ -17764,12 +17694,6 @@ msgstr "עדכון תקלה"
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "מצב מעודכן של המארח „%1$s”."
-
-#: include/classes/screens/CScreenActions.php:165
-#: include/classes/screens/CScreenPlainText.php:97
-#, c-format
-msgid "Updated: %1$s"
-msgstr "עודכן: %1$s"
 
 #: app/views/administration.image.edit.php:52
 msgid "Upload"
@@ -18394,7 +18318,6 @@ msgstr "אימות"
 #: include/blocks.inc.php:529 include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
-#: include/classes/screens/CScreenPlainText.php:58
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:167
 #: include/views/configuration.host.discovery.edit.php:305
