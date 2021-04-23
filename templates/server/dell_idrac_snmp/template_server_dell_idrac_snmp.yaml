@@ -75,7 +75,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
-            This attribute defines the firmware version of a remote access card.
+            This attribute defines the BIOS version of a server.
           applications:
             -
               name: Inventory
@@ -103,12 +103,12 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
-            This attribute defines the firmware version of a remote access card.
+            This attribute defines the system CMOS Battery Status.
           applications:
             -
               name: System
           valuemap:
-            name: 'Dell Open Manage System Status'
+            name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
