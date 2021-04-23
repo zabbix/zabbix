@@ -31,7 +31,7 @@ class testFormUserRoles extends CWebTest {
 
 	use TableTrait;
 
-	const ROLE_HASH = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid order by r.roleid';
+	const ROLE_SQL = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid order by r.roleid';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -674,13 +674,12 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	public function testFormUserRoles_SimpleUpdate() {
-		$hash_before = CDBHelper::getHash(self::ROLE_HASH);
+		$hash_before = CDBHelper::getHash(self::ROLE_SQL);
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('link', 'Admin role')->one()->click();
 		$this->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User role updated');
-		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid'.
-				' = r.roleid order by r.roleid;'));
+		$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
 	}
 
 	public static function getUpdateData() {
@@ -806,8 +805,8 @@ class testFormUserRoles extends CWebTest {
 			// Access to actions removed.
 			[
 				[
-					'actions' => true,
 					'expected' => TEST_GOOD,
+					'actions' => true,
 					'fields' => [
 						'API methods' => 'Deny list',
 						'Create and edit dashboards and screens' => false,
@@ -864,7 +863,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		foreach (['Admin role', 'role_for_delete'] as $role) {
 			if ($role === 'Admin role') {
-				$hash_before = CDBHelper::getHash(self::ROLE_HASH);
+				$hash_before = CDBHelper::getHash(self::ROLE_SQL);
 			}
 			$this->query('link', $role)->one()->click();
 			$this->query('button:Delete')->one()->click();
@@ -873,7 +872,7 @@ class testFormUserRoles extends CWebTest {
 			if ($role === 'Admin role') {
 				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'The role "Admin role" is assigned to'.
 						' at least one user and cannot be deleted.');
-				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_HASH));
+				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
 			}
 			else {
 				$this->assertMessage(TEST_GOOD, 'User role deleted');
@@ -884,12 +883,12 @@ class testFormUserRoles extends CWebTest {
 
 	public function testFormUserRoles_Cancellation() {
 		foreach(['zabbix.php?action=userrole.edit', 'zabbix.php?action=userrole.edit&roleid=2'] as $link) {
-			$hash_before = CDBHelper::getHash(self::ROLE_HASH);
+			$hash_before = CDBHelper::getHash(self::ROLE_SQL);
 			$this->page->login()->open($link);
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 			$form->fill(['Name' => 'cancellation_name_user']);
 			$this->query('button:Cancel')->one()->click();
-			$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_HASH));
+			$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
 		}
 	}
 
@@ -945,7 +944,7 @@ class testFormUserRoles extends CWebTest {
 	private function checkRoleAction($data, $action) {
 		if ($action === 'create') {
 			if ($data['expected'] === TEST_BAD) {
-				$hash_before = CDBHelper::getHash(self::ROLE_HASH);
+				$hash_before = CDBHelper::getHash(self::ROLE_SQL);
 			}
 		}
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
@@ -960,7 +959,7 @@ class testFormUserRoles extends CWebTest {
 			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
 
 			if ($action === 'create') {
-				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_HASH));
+				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
 			}
 		}
 		else {
