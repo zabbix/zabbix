@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-12-29T13:24:49Z'
+  date: '2021-04-23T11:35:08Z'
   groups:
     -
       name: Templates/Databases
@@ -13,7 +13,7 @@ zabbix_export:
         1. Create MySQL user for monitoring. For example:
         CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
         GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
-        For more information please read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html.
+        For more information please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html.
         2. Set in the {$MYSQL.DSN} macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI.
         Examples: MySQL1, tcp://localhost:3306, tcp://172.16.0.10, unix:/var/run/mysql.sock
         For more information about MySQL Unix socket file please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/problems-with-mysql-sock.html.
@@ -41,7 +41,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of connections that were aborted because the client died without closing the connection properly.'
+          description: 'Number of connections that were aborted because the client died without closing the connection properly.'
           applications:
             -
               name: MySQL
@@ -63,7 +63,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of failed attempts to connect to the MySQL server.'
+          description: 'Number of failed attempts to connect to the MySQL server.'
           applications:
             -
               name: MySQL
@@ -95,7 +95,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of transactions which used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.'
+          description: 'Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.'
           applications:
             -
               name: MySQL
@@ -146,7 +146,7 @@ zabbix_export:
           triggers:
             -
               expression: '{max(5m)}<{$MYSQL.BUFF_UTIL.MIN.WARN}'
-              name: 'MySQL: Buffer pool utilization is too low (less {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
+              name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
         -
@@ -157,7 +157,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes received from all clients.'
+          description: 'Number of bytes received from all clients.'
           applications:
             -
               name: MySQL
@@ -180,7 +180,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes sent to all clients.'
+          description: 'Number of bytes sent to all clients.'
           applications:
             -
               name: MySQL
@@ -290,7 +290,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of connection attempts (successful or not) to the MySQL server.'
+          description: 'Number of connection attempts (successful or not) to the MySQL server.'
           applications:
             -
               name: MySQL
@@ -334,7 +334,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of refused connections due to internal server errors, for example out of memory errors, or failed thread starts.'
+          description: 'Number of refused connections due to internal server errors, for example, out of memory errors, or failed thread starts.'
           applications:
             -
               name: MySQL
@@ -428,7 +428,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of connections the libwrap library refused.'
+          description: 'Number of connections the libwrap library has refused.'
           applications:
             -
               name: MySQL
@@ -450,7 +450,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of internal on-disk temporary tables created by the server while executing statements.'
+          description: 'Number of internal on-disk temporary tables created by the server while executing statements.'
           applications:
             -
               name: MySQL
@@ -506,7 +506,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of internal temporary tables created by the server while executing statements.'
+          description: 'Number of internal temporary tables created by the server while executing statements.'
           applications:
             -
               name: MySQL
@@ -581,7 +581,7 @@ zabbix_export:
           key: mysql.innodb_buffer_pool_reads
           delay: '0'
           history: 7d
-          description: 'The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.'
+          description: 'Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.'
           applications:
             -
               name: 'Zabbix raw items'
@@ -599,7 +599,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of logical reads per second that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.'
+          description: 'Number of logical reads per second that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.'
           applications:
             -
               name: MySQL
@@ -620,7 +620,7 @@ zabbix_export:
           key: mysql.innodb_buffer_pool_read_requests
           delay: '0'
           history: 7d
-          description: 'The number of logical read requests.'
+          description: 'Number of logical read requests.'
           applications:
             -
               name: 'Zabbix raw items'
@@ -638,7 +638,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of logical read requests per second.'
+          description: 'Number of logical read requests per second.'
           applications:
             -
               name: MySQL
@@ -660,7 +660,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at increasing innodb_buffer_pool_size.'
+          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing innodb_buffer_pool_size.'
           applications:
             -
               name: MySQL
@@ -682,7 +682,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           params: '(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}'
-          description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of innodb_log_file_size. Innodb_log_file_size is size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
+          description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           applications:
             -
               name: MySQL
@@ -796,7 +796,7 @@ zabbix_export:
           key: mysql.innodb_row_lock_waits
           delay: '0'
           history: 7d
-          description: 'The number of times operations on InnoDB tables had to wait for a row lock.'
+          description: 'Number of times operations on InnoDB tables had to wait for a row lock.'
           applications:
             -
               name: MySQL
@@ -813,7 +813,7 @@ zabbix_export:
           key: mysql.max_used_connections
           delay: '0'
           history: 7d
-          description: 'The maximum number of connections that have been in use simultaneously since the server started.'
+          description: 'The maximum number of connections that have been in use simultaneously since the server start.'
           applications:
             -
               name: MySQL
@@ -835,7 +835,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of tables that are open.'
+          description: 'Number of tables that are open.'
           applications:
             -
               name: MySQL
@@ -857,7 +857,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of cached table definitions.'
+          description: 'Number of cached table definitions.'
           applications:
             -
               name: MySQL
@@ -898,7 +898,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.'
+          description: 'Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.'
           applications:
             -
               name: MySQL
@@ -920,7 +920,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.'
+          description: 'Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.'
           applications:
             -
               name: MySQL
@@ -942,7 +942,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of queries that have taken more than long_query_time seconds.'
+          description: 'Number of queries that have taken more than long_query_time seconds.'
           applications:
             -
               name: MySQL
@@ -969,7 +969,7 @@ zabbix_export:
           key: mysql.threads_cached
           delay: '0'
           history: 7d
-          description: 'The number of threads in the thread cache.'
+          description: 'Number of threads in the thread cache.'
           applications:
             -
               name: MySQL
@@ -986,7 +986,7 @@ zabbix_export:
           key: mysql.threads_connected
           delay: '0'
           history: 7d
-          description: 'The number of currently open connections.'
+          description: 'Number of currently open connections.'
           applications:
             -
               name: MySQL
@@ -1004,7 +1004,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.'
+          description: 'Number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.'
           applications:
             -
               name: MySQL
@@ -1025,7 +1025,7 @@ zabbix_export:
           key: mysql.threads_running
           delay: '0'
           history: 7d
-          description: 'The number of threads that are not sleeping.'
+          description: 'Number of threads which are not sleeping.'
           applications:
             -
               name: MySQL
@@ -1043,7 +1043,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: uptime
-          description: 'The number of seconds that the server has been up.'
+          description: 'The amount of seconds that the server has been up.'
           applications:
             -
               name: MySQL
@@ -1093,7 +1093,7 @@ zabbix_export:
               manual_close: 'YES'
       discovery_rules:
         -
-          name: 'Databases discovery'
+          name: 'Database discovery'
           key: 'mysql.db.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
           delay: 1h
           filter:
@@ -1178,7 +1178,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of times MASTER_GTID_WAIT called.'
+              description: 'The number of times MASTER_GTID_WAIT called.'
               applications:
                 -
                   name: MySQL
@@ -1256,7 +1256,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The item gets status information on essential parameters of the slave threads.'
+              description: 'The item gets status information on the essential parameters of the slave threads.'
               applications:
                 -
                   name: 'Zabbix raw items'
@@ -1268,7 +1268,7 @@ zabbix_export:
               history: 7d
               units: s
               description: |
-                The number of seconds that the slave SQL thread is behind processing the master binary log.
+                Number of seconds that the slave SQL thread is behind processing the master binary log.
                 A high number (or an increasing one) can indicate that the slave is unable to handle events
                 from the master in a timely fashion.
               applications:
@@ -1306,7 +1306,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 Whether the I/O thread for reading the master's binary log is running. 
-                Normally, you want this to be Yes unless you have not yet started replication or have 
+                Normally, you want this to be Yes unless you have not yet started a replication or have 
                 explicitly stopped it with STOP SLAVE.
               applications:
                 -
@@ -1407,7 +1407,7 @@ zabbix_export:
         -
           macro: '{$MYSQL.ABORTED_CONN.MAX.WARN}'
           value: '3'
-          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
+          description: 'Number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$MYSQL.BUFF_UTIL.MIN.WARN}'
           value: '50'
