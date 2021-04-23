@@ -461,6 +461,7 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'actions' => true,
 					'fields' => [
 						'Name' => 'user_ui_no_actions',
 						'User type' => 'User',
@@ -479,6 +480,7 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'actions' => true,
 					'fields' => [
 						'Name' => 'admin_ui_no_actions',
 						'User type' => 'Admin',
@@ -498,6 +500,7 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'actions' => true,
 					'fields' => [
 						'Name' => 'super_admin_ui_no_Actions',
 						'User type' => 'Super admin',
@@ -612,6 +615,7 @@ class testFormUserRoles extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'actions' => true,
 					'fields' => [
 						'Name' => 'super_admin_role',
 						'User type' => 'Super admin',
@@ -986,7 +990,7 @@ class testFormUserRoles extends CWebTest {
 				$this->assertApi($data['api_methods']);
 			}
 
-			if ($action === 'update' && array_key_exists('actions', $data)) {
+			if (array_key_exists('actions', $data)) {
 				$this->assertActions($data['fields']);
 			}
 		}
