@@ -724,7 +724,6 @@ class CConfigurationExportBuilder {
 
 		foreach ($graphs as $graph) {
 			$data = [
-				'uuid' => $graph['uuid'],
 				'name' => $graph['name'],
 				'width' => $graph['width'],
 				'height' => $graph['height'],
@@ -743,6 +742,10 @@ class CConfigurationExportBuilder {
 				'ymax_item_1' => $graph['ymax_itemid'],
 				'graph_items' => $this->formatGraphItems($graph['gitems'])
 			];
+
+			if (array_key_exists('uuid', $graph)) {
+				$data['uuid'] = $graph['uuid'];
+			}
 
 			if ($graph['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['discover'] = $graph['discover'];
@@ -864,7 +867,6 @@ class CConfigurationExportBuilder {
 
 		foreach ($triggers as $trigger) {
 			$data = [
-				'uuid' => $trigger['uuid'],
 				'expression' => $trigger['expression'],
 				'recovery_mode' => $trigger['recovery_mode'],
 				'recovery_expression' => $trigger['recovery_expression'],
@@ -882,6 +884,10 @@ class CConfigurationExportBuilder {
 				'dependencies' => $this->formatDependencies($trigger['dependencies']),
 				'tags' => $this->formatTags($trigger['tags'])
 			];
+
+			if (array_key_exists('uuid', $trigger)) {
+				$data['uuid'] = $trigger['uuid'];
+			}
 
 			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['discover'] = $trigger['discover'];

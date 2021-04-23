@@ -1745,7 +1745,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 			]],
 			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
 				'trigger' =>				['type' => XML_ARRAY, 'rules' => [
-					'uuid' =>					['type' => XML_STRING | XML_REQUIRED],
+					'uuid' =>					['type' => XML_STRING],
 					'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 					'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
 					'recovery_expression' =>	['type' => XML_STRING, 'default' => ''],
@@ -1777,7 +1777,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 			]],
 			'graphs' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'rules' => [
 				'graph' =>					['type' => XML_ARRAY, 'rules' => [
-					'uuid' =>					['type' => XML_STRING | XML_REQUIRED],
+					'uuid' =>					['type' => XML_STRING],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'width' =>					['type' => XML_STRING, 'default' => '900'],
 					'height' =>					['type' => XML_STRING, 'default' => '200'],

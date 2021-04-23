@@ -920,7 +920,7 @@ class CConfigurationExport {
 
 		$graph_items = API::Item()->get([
 			'output' => ['key_'],
-			'selectHosts' => ['host'],
+			'selectHosts' => ['host', 'status'],
 			'itemids' => $graphItemIds,
 			'webitems' => true,
 			'filter' => [
@@ -961,6 +961,12 @@ class CConfigurationExport {
 			foreach ($graph['gitems'] as $ginum => $gItem) {
 				if (array_key_exists($gItem['itemid'], $graph_items)) {
 					$item = $graph_items[$gItem['itemid']];
+
+					if ($item['hosts'][0]['status'] != HOST_STATUS_TEMPLATE) {
+						unset($graph['uuid']);
+					}
+					unset($item['hosts'][0]['status']);
+
 					$graphs[$gnum]['gitems'][$ginum]['itemid'] = [
 						'host' => $item['hosts'][0]['host'],
 						'key' => $item['key_']
@@ -993,6 +999,7 @@ class CConfigurationExport {
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],
 			'selectTags' => ['tag', 'value'],
+			'selectHosts' => ['status'],
 			'hostids' => $hostIds,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'inherited' => false,
@@ -1012,6 +1019,11 @@ class CConfigurationExport {
 	protected function prepareTriggers(array $triggers) {
 		// Unset triggers containing discovered items.
 		foreach ($triggers as $idx => &$trigger) {
+			if ($trigger['hosts'][0]['status'] != HOST_STATUS_TEMPLATE) {
+				unset($trigger['uuid']);
+			}
+			unset($trigger['hosts']);
+
 			foreach ($trigger['items'] as $item) {
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($triggers[$idx]);

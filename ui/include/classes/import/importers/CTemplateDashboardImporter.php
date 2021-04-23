@@ -176,7 +176,7 @@ class CTemplateDashboardImporter extends CImporter {
 							$graph_name = $field['value']['name'];
 
 							$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
-							$field['value'] = $this->referencer->resolveGraph($hostid, $graph_name);
+							$field['value'] = $this->referencer->findGraphidByName($hostid, $graph_name);
 
 							if (!$field['value']) {
 								throw new Exception(_s('Cannot find graph "%1$s" used in dashboard "%2$s".',

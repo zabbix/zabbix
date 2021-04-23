@@ -51,7 +51,7 @@ class CImportReferencer {
 	protected $db_items;
 	protected $valueMapsRefs;
 	protected $db_triggers;
-	protected $graphsRefs;
+	protected $db_graphs;
 	protected $iconMapsRefs;
 	protected $mapsRefs;
 	protected $templateDashboardsRefs;
@@ -285,19 +285,46 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get graph ID by host ID and graph name.
+	 * Get graph ID by uuid.
 	 *
-	 * @param string $hostId
-	 * @param string $name
+	 * @param string $uuid
 	 *
-	 * @return string|bool
+	 * @return string|null
 	 */
-	public function resolveGraph($hostId, $name) {
-		if ($this->graphsRefs === null) {
+	public function findGraphidByUuid(string $uuid): ?string {
+		if ($this->db_graphs === null) {
 			$this->selectGraphs();
 		}
 
-		return isset($this->graphsRefs[$hostId][$name]) ? $this->graphsRefs[$hostId][$name] : false;
+		foreach ($this->db_graphs as $graphid => $graph) {
+			if ($graph['uuid'] === $uuid) {
+				return $graphid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get graph ID by host ID and graph name.
+	 *
+	 * @param string $hostid
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findGraphidByName(string $hostid, string $name): ?string {
+		if ($this->db_graphs === null) {
+			$this->selectGraphs();
+		}
+
+		foreach ($this->db_graphs as $graphid => $graph) {
+			if ($graph['name'] === $name && in_array($hostid, $graph['hosts'])) {
+				return $graphid;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -977,32 +1004,31 @@ class CImportReferencer {
 			}
 		}
 
-		$db_triggers = array_merge(
-			API::Trigger()->get([
-				'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
-				'filter' => [
-					'description' => array_keys($this->triggers),
-					'flags' => [
-						ZBX_FLAG_DISCOVERY_NORMAL,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						ZBX_FLAG_DISCOVERY_CREATED
-					]
-				],
-				'preservekeys' => true
-			]),
-			API::Trigger()->get([
-				'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
-				'filter' => [
-					'uuid' => array_keys($uuids),
-					'flags' => [
-						ZBX_FLAG_DISCOVERY_NORMAL,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						ZBX_FLAG_DISCOVERY_CREATED
-					]
-				],
-				'preservekeys' => true
-			])
-		);
+		$db_triggers = API::Trigger()->get([
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'filter' => [
+				'uuid' => array_keys($uuids),
+				'flags' => [
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_PROTOTYPE,
+					ZBX_FLAG_DISCOVERY_CREATED
+				]
+			],
+			'preservekeys' => true
+		]);
+
+		$db_triggers += API::Trigger()->get([
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'filter' => [
+				'description' => array_keys($this->triggers),
+				'flags' => [
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_PROTOTYPE,
+					ZBX_FLAG_DISCOVERY_CREATED
+				]
+			],
+			'preservekeys' => true
+		]);
 
 		if (!$db_triggers) {
 			return;
@@ -1035,33 +1061,46 @@ class CImportReferencer {
 	/**
 	 * Select graph IDs for previously added graph names.
 	 */
-	protected function selectGraphs() {
-		if ($this->graphs) {
-			$this->graphsRefs = [];
-
-			$graphNames = [];
-
-			foreach ($this->graphs as $graphs) {
-				foreach ($graphs as $graph) {
-					$graphNames[$graph] = $graph;
-				}
-			}
-
-			$dbGraphs = API::Graph()->get([
-				'output' => ['graphid', 'name'],
-				'selectHosts' => ['hostid'],
-				'filter' => [
-					'name' => $graphNames,
-					'flags' => null
-				]
-			]);
-
-			foreach ($dbGraphs as $dbGraph) {
-				foreach ($dbGraph['hosts'] as $host) {
-					$this->graphsRefs[$host['hostid']][$dbGraph['name']] = $dbGraph['graphid'];
-				}
-			}
+	protected function selectGraphs(): void {
+		if (!$this->graphs) {
+			return;
 		}
+
+		$this->db_graphs = [];
+		$graph_uuids = [];
+		$graph_names = [];
+
+		foreach ($this->graphs as $graph) {
+			$graph_uuids += array_flip(array_column($graph, 'uuid'));
+			$graph_names += array_flip(array_keys($graph));
+		}
+
+		$db_graphs =  API::Graph()->get([
+			'output' => ['uuid', 'name'],
+			'selectHosts' => ['hostid'],
+			'filter' => [
+				'uuid' => array_keys($graph_uuids),
+				'flags' => null
+			],
+			'preservekeys' => true
+		]);
+
+		$db_graphs += API::Graph()->get([
+			'output' => ['uuid', 'name'],
+			'selectHosts' => ['hostid'],
+			'filter' => [
+				'name' => array_keys($graph_names),
+				'flags' => null
+			],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_graphs as $graph) {
+			$graph['hosts'] = array_column($graph['hosts'], 'hostid');
+			$this->db_graphs[$graph['graphid']] = $graph;
+		}
+
+		$this->graphs = [];
 	}
 
 	/**
@@ -1074,8 +1113,8 @@ class CImportReferencer {
 	/**
 	 * Unset graph refs to make referencer select them from DB again.
 	 */
-	public function refreshGraphs() {
-		$this->graphsRefs = null;
+	public function refreshGraphs(): void {
+		$this->db_graphs = null;
 	}
 
 	/**

@@ -138,7 +138,7 @@ class CConfigurationImport {
 		$this->deleteMissingHttpTests();
 		$this->deleteMissingDiscoveryRules();
 		$this->deleteMissingTriggers();
-//		$this->deleteMissingGraphs();
+		$this->deleteMissingGraphs();
 //		$this->deleteMissingItems();
 
 //		// import objects
@@ -251,9 +251,10 @@ class CConfigurationImport {
 		foreach ($this->getFormattedItems() as $host => $items) {
 			foreach ($items as $item) {
 //				$itemsRefs[$host][$item['key_']] = $item['key_'];
-				$items_refs[$host][$item['key_']] = array_key_exists('uuid', $item)
-					? ['uuid' => $item['uuid']]
-					: [];
+				$items_refs[$host][$item['key_']] =
+					(array_key_exists('uuid', $item) && $item['uuid'] !== '')
+						? ['uuid' => $item['uuid']]
+						: [];
 
 				if ($item['valuemap']) {
 					$valuemaps_refs[$host] += [$item['valuemap']['name'] => []];
@@ -264,15 +265,17 @@ class CConfigurationImport {
 		foreach ($this->getFormattedDiscoveryRules() as $host => $discovery_rules) {
 			foreach ($discovery_rules as $discovery_rule) {
 //				$itemsRefs[$host][$discoveryRule['key_']] = $discoveryRule['key_'];
-				$items_refs[$host][$discovery_rule['key_']] = array_key_exists('uuid', $discovery_rule)
+				$items_refs[$host][$discovery_rule['key_']] =
+					(array_key_exists('uuid', $discovery_rule) && $discovery_rule['uuid'] !== '')
 						? ['uuid' => $discovery_rule['uuid']]
 						: [];
 
 				foreach ($discovery_rule['item_prototypes'] as $item_prototype) {
 //					$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
-					$items_refs[$host][$item_prototype['key_']] = array_key_exists('uuid', $item_prototype)
-						? ['uuid' => $item_prototype['uuid']]
-						: [];
+					$items_refs[$host][$item_prototype['key_']] =
+						(array_key_exists('uuid', $item_prototype) && $item_prototype['uuid'] !== '')
+							? ['uuid' => $item_prototype['uuid']]
+							: [];
 
 					if (!empty($item_prototype['valuemap'])) {
 //						$valueMapsRefs[$host][$item_prototype['valuemap']['name']] = $item_prototype['valuemap']['name'];
@@ -285,9 +288,10 @@ class CConfigurationImport {
 					$expression = $trigger['expression'];
 					$recovery_expression = $trigger['recovery_expression'];
 
-					$triggers_refs[$description][$expression][$recovery_expression] = array_key_exists('uuid', $trigger)
-						? ['uuid' => $trigger['uuid']]
-						: [];
+					$triggers_refs[$description][$expression][$recovery_expression] =
+						(array_key_exists('uuid', $trigger) && $trigger['uuid'] !== '')
+							? ['uuid' => $trigger['uuid']]
+							: [];
 
 					if (array_key_exists('dependencies', $trigger)) {
 						foreach ($trigger['dependencies'] as $dependency) {
@@ -321,15 +325,16 @@ class CConfigurationImport {
 //						$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
 						$items_refs[$gitem['item']['host']] += [$gitem['item']['key'] => []];
 //						$graphsRefs[$gitemItem['host']][$graph['name']] = $graph['name'];
-						$graphs_refs[$gitem['item']['host']][$graph['name']] = array_key_exists('uuid', $graph)
-							? ['uuid' => $graph['uuid']]
-							: [];
+						$graphs_refs[$gitem['item']['host']][$graph['name']] =
+							(array_key_exists('uuid', $graph) && $graph['uuid'] !== '')
+								? ['uuid' => $graph['uuid']]
+								: [];
 					}
 				}
 
 				foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
 					$host_prototypes_refs[$host][$discovery_rule['key_']][$host_prototype['host']] =
-						array_key_exists('uuid', $host_prototype)
+						(array_key_exists('uuid', $host_prototype) && $host_prototype['uuid'] !== '')
 							? ['uuid' => $host_prototype['uuid']]
 							: [];
 
@@ -385,16 +390,17 @@ class CConfigurationImport {
 					}
 
 					$items_refs[$gitem['item']['host']] += [$gitem['item']['key'] => []];
-					$graphs_refs[$gitem['item']['host']][$graph['name']] = array_key_exists('uuid', $graph)
-						? ['uuid' => $graph['uuid']]
-						: [];
+					$graphs_refs[$gitem['item']['host']][$graph['name']] =
+						(array_key_exists('uuid', $graph) && $graph['uuid'] !== '')
+							? ['uuid' => $graph['uuid']]
+							: [];
 				}
 			}
 		}
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggers_refs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] =
-				array_key_exists('uuid', $trigger)
+				(array_key_exists('uuid', $trigger) && $trigger['uuid'] !== '')
 					? ['uuid' => $trigger['uuid']]
 					: [];
 
@@ -488,9 +494,10 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
 			foreach ($httptests as $httptest) {
-				$httptests_refs[$host][$httptest['name']] = array_key_exists('uuid', $httptest)
-					? ['uuid' => $httptest['uuid']]
-					: [];
+				$httptests_refs[$host][$httptest['name']] =
+					(array_key_exists('uuid', $httptest) && $httptest['uuid'] !== '')
+						? ['uuid' => $httptest['uuid']]
+						: [];
 			}
 		}
 
@@ -1333,7 +1340,7 @@ class CConfigurationImport {
 					}
 					unset($gitem);
 
-					$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+					$graphId = $this->referencer->findGraphidByName($gitemHostId, $graph['name']);
 					if ($graphId) {
 						$graph['graphid'] = $graphId;
 						$graphsToUpdate[] = $graph;
@@ -1544,7 +1551,7 @@ class CConfigurationImport {
 			}
 			unset($gitem);
 
-			$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+			$graphId = $this->referencer->findGraphidByName($gitemHostId, $graph['name']);
 
 			if ($graphId) {
 				$graph['graphid'] = $graphId;
@@ -1875,7 +1882,7 @@ class CConfigurationImport {
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggerid = null;
 
-			if (array_key_exists('uuid', $trigger)) {
+			if (array_key_exists('uuid', $trigger) && $trigger['uuid'] !== '') {
 				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
 			}
 
@@ -1924,47 +1931,49 @@ class CConfigurationImport {
 
 	/**
 	 * Deletes graphs from DB that are missing in XML.
-	 *
-	 * @return null
 	 */
-	protected function deleteMissingGraphs() {
+	protected function deleteMissingGraphs(): void {
 		if (!$this->options['graphs']['deleteMissing']) {
 			return;
 		}
 
-		$processedHostIds = $this->importedObjectContainer->getHostids();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateids();
+		$processed_hostids = array_merge(
+			$this->importedObjectContainer->getHostids(),
+			$this->importedObjectContainer->getTemplateids()
+		);
 
-		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
-
-		// no hosts or templates have been processed
-		if (!$processedHostIds) {
+		if (!$processed_hostids) {
 			return;
 		}
 
-		$graphsIdsXML = [];
+		$graphids = [];
 
-		// gather host IDs for graphs that exist in XML
-		$allGraphs = $this->getFormattedGraphs();
+		foreach ($this->getFormattedGraphs() as $graph) {
+			$graphid = null;
 
-		if ($allGraphs) {
-			foreach ($allGraphs as $graph) {
-				if (isset($graph['gitems']) && $graph['gitems']) {
-					foreach ($graph['gitems'] as $gitem) {
-						$gitemHostId = $this->referencer->findTemplateidOrHostidByHost($gitem['item']['host']);
-						$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+			if (array_key_exists('uuid', $graph) && $graph['uuid'] !== '') {
+				$graphid = $this->referencer->findGraphidByUuid($graph['uuid']);
+			}
 
-						if ($graphId) {
-							$graphsIdsXML[$graphId] = $graphId;
-						}
+			if ($graphid !== null) {
+				$graphids[$graphid] = [];
+			}
+			elseif (array_key_exists('gitems', $graph)) {
+				// In import file host graph can have UUID assigned after conversion, such should be searched by name.
+				foreach ($graph['gitems'] as $gitem) {
+					$gitem_hostid = $this->referencer->findTemplateidOrHostidByHost($gitem['item']['host']);
+					$graphid = $this->referencer->findGraphidByName($gitem_hostid, $graph['name']);
+
+					if ($graphid !== null) {
+						$graphids[$graphid] = [];
 					}
 				}
 			}
 		}
 
-		$dbGraphIds = API::Graph()->get([
+		$db_graphids = API::Graph()->get([
 			'output' => ['graphid'],
-			'hostids' => $processedHostIds,
+			'hostids' => $processed_hostids,
 			'selectHosts' => ['hostid'],
 			'preservekeys' => true,
 			'nopermissions' => true,
@@ -1974,20 +1983,19 @@ class CConfigurationImport {
 
 		// check that potentially deletable graph belongs to same hosts that are in XML
 		// if some graphs belong to more hosts than current XML contains, don't delete them
-		$graphsToDelete = array_diff_key($dbGraphIds, $graphsIdsXML);
-		$graphIdsToDelete = [];
-		$processedHostIds = array_flip($processedHostIds);
+		$graphids_to_delete = [];
+		$processed_hostids = array_flip($processed_hostids);
 
-		foreach ($graphsToDelete as $graphId => $graph) {
-			$graphHostIds = array_flip(zbx_objectValues($graph['hosts'], 'hostid'));
+		foreach (array_diff_key($db_graphids, $graphids) as $graphid => $graph) {
+			$graph_hostids = array_flip(array_column($graph['hosts'], 'hostid'));
 
-			if (!array_diff_key($graphHostIds, $processedHostIds)) {
-				$graphIdsToDelete[] = $graphId;
+			if (!array_diff_key($graph_hostids, $processed_hostids)) {
+				$graphids_to_delete[] = $graphid;
 			}
 		}
 
-		if ($graphIdsToDelete) {
-			API::Graph()->delete($graphIdsToDelete);
+		if ($graphids_to_delete) {
+			API::Graph()->delete($graphids_to_delete);
 		}
 
 		$this->referencer->refreshGraphs();
@@ -2038,7 +2046,7 @@ class CConfigurationImport {
 
 					// gather graph prototype IDs to delete
 					foreach ($discovery_rule['graph_prototypes'] as $graph_prototype) {
-						$graph_prototypeid = $this->referencer->resolveGraph($hostid, $graph_prototype['name']);
+						$graph_prototypeid = $this->referencer->findGraphidByName($hostid, $graph_prototype['name']);
 
 						if ($graph_prototypeid) {
 							$xml_graph_prototypeids[$graph_prototypeid] = $graph_prototypeid;
@@ -2149,7 +2157,7 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				$httptestid = array_key_exists('uuid', $httptest)
+				$httptestid = (array_key_exists('uuid', $httptest) && $httptest['uuid'] !== '')
 					? $this->referencer->findHttpTestidByUuid($httptest['uuid'])
 					: $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
 
@@ -2203,7 +2211,7 @@ class CConfigurationImport {
 			}
 
 			foreach ($discovery_rules as $discovery_rule) {
-				$discovery_ruleid = array_key_exists('uuid', $discovery_rule)
+				$discovery_ruleid = (array_key_exists('uuid', $discovery_rule) && $discovery_rule['uuid'] !== '')
 					? $this->referencer->findItemByUuid($discovery_rule['uuid'])
 					: $this->referencer->findItemByKey($hostid, $discovery_rule['key_']);
 
